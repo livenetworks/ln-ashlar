@@ -147,13 +147,15 @@ Clear triggers work universally without external coordinators:
 | `data-ln-search-clear` | Button | Flag | — | Universal clear button (inside control wrapper or inside target empty state). Clears input and resets target state. |
 | `data-ln-search-clear-for` | Button | String | — | Remote clear button referencing target element ID. Clears linked input and resets target state. |
 | `data-ln-search-hide` | Target Children | Boolean | `false` | State attribute added to non-matching DOM elements (`"true"`). |
+| `data-ln-hash` | Target / Control | String (Optional) | — | Opt-in. Synchronizes search query to URL hash fragment (e.g. `#users-search:john`). Value is custom namespace; if empty defaults to `[targetId]-search`. |
 
 ### Programmatic JS API
 
 | Instance | Property / Method | Description |
 |---|---|---|
 | `element.lnSearchControl` (Control) | `targetId`, `input`, `debounceTime`, `destroy()` | Manages input, debounce timer, and clear button. |
-| `element.lnSearch` (State Host) | `term`, `_apply()`, `destroy()` | Owns true search state, dispatches events, and performs DOM filtering. |
+| `element.lnSearch` (State Host) | `term`, `nsKey`, `hashEnabled`, `_apply()`, `destroy()` | Owns true search state, URL hash sync, dispatches events, and performs DOM filtering. |
+
 
 ### Events API
 

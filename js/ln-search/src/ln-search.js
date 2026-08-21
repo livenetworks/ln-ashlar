@@ -1,4 +1,4 @@
-import { dispatchCancelable, registerComponent, queueBoot } from '../../ln-core';
+import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, resolveHashNamespace } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-search';
@@ -9,11 +9,26 @@ import { dispatchCancelable, registerComponent, queueBoot } from '../../ln-core'
 	const FIELDS_ATTR = 'data-ln-search-fields';
 	const EXCLUDE_ATTR = 'data-ln-search-exclude';
 	const HIDE_ATTR = 'data-ln-search-hide';
+	const HASH_ATTR = 'data-ln-hash';
 	const DEBOUNCE_MS = 500;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	// ─── Helpers ───────────────────────────────────────────────
+
+	// Resolves the hash namespace for search from target or its control
+	function _resolveSearchHashNamespace(target) {
+		const fromTarget = resolveHashNamespace(target, 'search');
+		if (fromTarget) return fromTarget;
+		if (target.id) {
+			const control = document.querySelector('[' + CONTROL_SELECTOR + '="' + target.id + '"]');
+			if (control) {
+				const fromControl = resolveHashNamespace(control, 'search');
+				if (fromControl) return fromControl;
+			}
+		}
+		return null;
+	}
 
 	// Matching form of the term — unchanged from the previous implementation.
 	// The attribute keeps the raw string, so writing it back into the input is
@@ -93,8 +108,12 @@ import { dispatchCancelable, registerComponent, queueBoot } from '../../ln-core'
 	function _stateComponent(dom) {
 		this.dom = dom;
 		this.term = dom.getAttribute(DOM_SELECTOR) || '';
+		this._destroyed = false;
 
 		const self = this;
+		this.nsKey = _resolveSearchHashNamespace(dom);
+		this.hashEnabled = !!this.nsKey;
+
 		this._observer = new MutationObserver(function (mutations) {
 			for (let i = 0; i < mutations.length; i++) {
 				const mut = mutations[i];
@@ -115,23 +134,54 @@ import { dispatchCancelable, registerComponent, queueBoot } from '../../ln-core'
 		});
 		this._observer.observe(dom, { childList: true, subtree: true, characterData: true });
 
+		// Hash change listener
+		this._onHashChange = function () {
+			if (self._destroyed || !self.hashEnabled) return;
+			const query = hashGet(self.nsKey);
+			const current = self.dom.getAttribute(DOM_SELECTOR) || '';
+			if (query !== null && query !== current) {
+				self.dom.setAttribute(DOM_SELECTOR, query);
+			} else if (query === null && current !== '') {
+				self.dom.setAttribute(DOM_SELECTOR, '');
+			}
+		};
+		if (this.hashEnabled) {
+			window.addEventListener('hashchange', this._onHashChange);
+		}
+
 		// Seed an authored / deep-linked term. Deferred through queueBoot so
 		// consumers on this same element have finished init and can prevent
 		// the default before the first dispatch.
-		if (_normalizeTerm(this.term)) {
-			queueBoot(function () {
+		queueBoot(function () {
+			if (self._destroyed) return;
+			if (self.hashEnabled) {
+				const hashVal = hashGet(self.nsKey);
+				if (hashVal !== null && hashVal !== self.term) {
+					self.term = hashVal;
+					self.dom.setAttribute(DOM_SELECTOR, hashVal);
+					_syncControls(self.dom, hashVal);
+					self._apply();
+					return;
+				}
+			}
+			if (_normalizeTerm(self.term)) {
 				_syncControls(self.dom, self.term);
 				self._apply();
-			});
-		}
+			}
+		});
 
 		return this;
 	}
+
 
 	_stateComponent.prototype._apply = function () {
 		const dom = this.dom;
 		const term = _normalizeTerm(this.term);
 		const tokens = _tokenize(term);
+
+		if (this.hashEnabled) {
+			hashSet(this.nsKey, this.term ? this.term : null);
+		}
 
 		// Consumers (ln-table, ln-list, ln-data-store) call preventDefault() to
 		// filter their own records. term keeps exactly its previous meaning;
@@ -176,9 +226,13 @@ import { dispatchCancelable, registerComponent, queueBoot } from '../../ln-core'
 
 	_stateComponent.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
+		this._destroyed = true;
 		if (this._observer) {
 			this._observer.disconnect();
 			this._observer = null;
+		}
+		if (this.hashEnabled && this._onHashChange) {
+			window.removeEventListener('hashchange', this._onHashChange);
 		}
 		delete this.dom[DOM_ATTRIBUTE];
 	};
@@ -318,9 +372,21 @@ import { dispatchCancelable, registerComponent, queueBoot } from '../../ln-core'
 
 	// ─── Attribute Sync (state is the single source of truth) ──
 
-	function _syncAttribute(el) {
+	function _syncAttribute(el, attrName) {
 		const instance = el[DOM_ATTRIBUTE];
-		if (!instance) return;
+		if (!instance || instance._destroyed) return;
+
+		if (attrName === HASH_ATTR) {
+			if (instance.hashEnabled && instance._onHashChange) {
+				window.removeEventListener('hashchange', instance._onHashChange);
+			}
+			instance.nsKey = _resolveSearchHashNamespace(el);
+			instance.hashEnabled = !!instance.nsKey;
+			if (instance.hashEnabled) {
+				window.addEventListener('hashchange', instance._onHashChange);
+			}
+			return;
+		}
 
 		const next = el.getAttribute(DOM_SELECTOR) || '';
 		// Breaks the input → attribute → input round trip.
@@ -334,8 +400,10 @@ import { dispatchCancelable, registerComponent, queueBoot } from '../../ln-core'
 	// ─── Init ──────────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _stateComponent, 'ln-search', {
+		extraAttributes: [HASH_ATTR],
 		onAttributeChange: _syncAttribute
 	});
 
 	registerComponent(CONTROL_SELECTOR, CONTROL_ATTRIBUTE, _controlComponent, 'ln-search-control');
 })();
+

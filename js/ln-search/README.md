@@ -65,13 +65,15 @@ For deep targeting (e.g. table rows or checkbox lists) add `data-ln-search-items
 | `data-ln-search-clear` | `<button>` | Identifies a clear button (in search control or target empty state). Clears input and resets target state. |
 | `data-ln-search-clear-for="targetId"` | `<button>` | Remote clear button targeting a specific element ID anywhere on the page. |
 | `data-ln-search-hide="true"` | Items in target | State attribute automatically set on non-matching elements (`display: none !important`). |
+| `data-ln-hash` | Target / Control | Opt-in. Synchronizes search query to URL hash fragment (e.g. `#users-search:john`). Value is custom namespace; if empty defaults to `[targetId]-search`. |
 
 ### JavaScript API
 
 | Instance | Property / Method | Description |
 | :--- | :--- | :--- |
 | `el.lnSearchControl` (Control) | `targetId`, `input`, `debounceTime`, `destroy()` | Control instance managing input and debounce. |
-| `el.lnSearch` (State Host) | `term`, `_apply()`, `destroy()` | State instance owning term and DOM filter logic. |
+| `el.lnSearch` (State Host) | `term`, `nsKey`, `hashEnabled`, `_apply()`, `destroy()` | State instance owning term, URL hash sync, and DOM filter logic. |
+
 
 ---
 

@@ -47,6 +47,12 @@
 				"src/ln-filter.js"
 			]
 		},
+		"data-ln-hash": {
+			"direction": null,
+			"sources": [
+				"src/ln-filter.js"
+			]
+		},
 		"data-ln-persist": {
 			"direction": "author",
 			"sources": [

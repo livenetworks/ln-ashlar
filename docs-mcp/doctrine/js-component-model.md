@@ -177,7 +177,33 @@ function _getFormatter(locale, options) {
 
 ---
 
-## 7. Naming Conventions
+## 7. URL Hash State Synchronization Doctrine (`data-ln-hash`)
+
+Ashlar components support opt-in URL hash synchronization (`data-ln-hash`) to enable shareable URLs, deep-linking, and browser back/forward history navigation without violating component isolation.
+
+### Core Architectural Principles:
+1. **Isolated Multi-Namespace Ownership:**
+   - URL fragment grammar: `#namespaceA:valueA&namespaceB:valueB`.
+   - Each component owns exactly ONE namespace, reads/writes only its own segment, and **strictly preserves foreign segments** during mutations (`hashSet(ns, value)`).
+   - Multi-Table & Multi-Control Coexistence: Multiple tables, search inputs, filter bars, tabs, and modals can sync to the URL simultaneously without collision:
+     `#users-search:john&users-filter:dept:design&users-sort:created-at.desc&orders-sort:total.asc&modal:edit-item`
+2. **Namespace Resolution Strategy:**
+   - When authored with an explicit string (`data-ln-hash="q"`), that exact namespace is used.
+   - When authored as a boolean flag (`data-ln-hash` or empty), the namespace defaults to `[targetId]-[defaultSuffix]` (e.g. `users-table-sort`, `users-table-search`, `users-table-filter`).
+3. **Codec & Value Separation (Zero Hyphen Collision):**
+   - **Sort Codec (`hashSortEncode` / `hashSortDecode`):** Uses dot separator with suffix parsing (`field.asc`, `field.desc`, e.g. `price.asc`, `created-at.desc`, `billing-address-zip.asc`). Suffix parsing prevents collisions with hyphens, underscores, or numbers in field names.
+   - **Filter Codec (`hashFilterEncode` / `hashFilterDecode`):** Uses key-value colon with comma lists (`key:val1,val2`, e.g. `category:design,dev`).
+   - **Deletion on Reset:** When a sort is cleared (`none`), search query is emptied (`""`), or filter is reset, the component deletes its namespace from the hash (`hashSet(ns, null)`), leaving foreign segments intact.
+4. **Boot Priority Matrix:**
+   - **1. URL Hash (`hashGet`):** Highest authority. Deep-linked or bookmarked URLs override local caches.
+   - **2. LocalStorage (`data-ln-persist`):** Intermediate authority. Restores past user session when no URL hash is present.
+   - **3. Authored HTML Markup:** Fallback default when neither hash nor storage exists.
+5. **Reactive Browser History Navigation:**
+   - Components attach `window.addEventListener('hashchange')` to synchronize DOM states when the user clicks the browser Back or Forward buttons.
+
+---
+
+## 8. Naming Conventions
 
 All naming must follow strict, predictable conventions:
 
@@ -185,6 +211,8 @@ All naming must follow strict, predictable conventions:
 |---|---|---|
 | State Host Attribute | `data-ln-{name}` | `data-ln-modal`, `data-ln-search` |
 | Control Pointer Attribute | `data-ln-{name}-for` | `data-ln-modal-for="id"`, `data-ln-search-for="id"` |
+| Hash Sync Attribute | `data-ln-hash` | `data-ln-hash`, `data-ln-hash="q"` |
+| Storage Persist Attribute | `data-ln-persist` | `data-ln-persist`, `data-ln-persist="key"` |
 | JS State Instance | `el.ln{Name}` | `el.lnModal`, `el.lnSearch` |
 | JS Control Instance | `el.ln{Name}Control` | `el.lnSearchControl`, `el.lnModalTrigger` |
 | Before Event (cancelable) | `ln-{name}:before-{action}` | `ln-modal:before-close` |
@@ -192,3 +220,4 @@ All naming must follow strict, predictable conventions:
 | Request Event (mutation) | `ln-{name}:request-{action}` | `ln-data-store:request-create` |
 | Dictionary Attribute | `data-ln-{name}-dict` | `data-ln-upload-dict` |
 | Template Identifier | `data-ln-template="{tmpl}"` | `data-ln-template="row"` |
+

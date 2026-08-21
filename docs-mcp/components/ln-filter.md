@@ -152,10 +152,22 @@ The canonical composition for table per-column filters. `ln-filter` dispatches e
 | `data-ln-filter-reset` | `<input type="checkbox">` | Flag | — | Marks the reset sentinel input ("All"). Checking it unchecks every value input in the group. |
 | `data-ln-filter-col` | Container root | `Number` | — | 0-based column index to filter rows in a plain HTML `<table>` by cell content. |
 | `data-ln-persist` | Container root | Flag \| `String` | — | Enables `localStorage` persistence of the active filter state, keyed by the container's `id` or by the attribute's string value. |
+| `data-ln-hash` | Container root | Flag \| `String` | — | Opt-in. Synchronizes active filters to URL hash fragment (e.g. `#users-filter:status:active,pending`). Value is custom namespace; if empty defaults to `[targetId]-filter`. |
 | `data-ln-filter-hide` | Target children / rows | `"true"` | — | Written by the component on elements that fail the active filters. |
 
 > [!NOTE]
 > `data-ln-filter-hide` is a component-written **state marker**, not a consumer configuration attribute — never author it in markup. It is listed here only to document the DOM the component produces.
+
+### Programmatic JS API (`element.lnFilter`)
+
+| Property / Method | Type | Description |
+|---|---|---|
+| `element.lnFilter.targetId` | `String` | Target element ID. |
+| `element.lnFilter.colIndex` | `Number \| null` | Column index for plain table row filtering, or `null`. |
+| `element.lnFilter.nsKey` | `String \| null` | The resolved hash namespace, or `null` if hash sync is not enabled. |
+| `element.lnFilter.hashEnabled` | `Boolean` | True if URL hash synchronization is active on this instance. |
+| `element.lnFilter.destroy()` | `Function` | Removes listeners, cleans up plain table filter entries, and tears down the instance. |
+
 
 ### Events API
 

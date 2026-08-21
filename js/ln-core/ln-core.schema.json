@@ -39,10 +39,22 @@
 				"helpers.js"
 			]
 		},
+		"data-ln-filter": {
+			"direction": "author",
+			"sources": [
+				"hash.js"
+			]
+		},
 		"data-ln-form": {
 			"direction": "author",
 			"sources": [
 				"helpers.js"
+			]
+		},
+		"data-ln-hash": {
+			"direction": "author",
+			"sources": [
+				"hash.js"
 			]
 		},
 		"data-ln-key": {
@@ -57,10 +69,28 @@
 				"persist.js"
 			]
 		},
+		"data-ln-search": {
+			"direction": "author",
+			"sources": [
+				"hash.js"
+			]
+		},
+		"data-ln-search-for": {
+			"direction": "author",
+			"sources": [
+				"hash.js"
+			]
+		},
 		"data-ln-show": {
 			"direction": "author",
 			"sources": [
 				"helpers.js"
+			]
+		},
+		"data-ln-sort": {
+			"direction": "author",
+			"sources": [
+				"hash.js"
 			]
 		},
 		"data-ln-template": {

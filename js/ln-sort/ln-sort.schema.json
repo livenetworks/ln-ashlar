@@ -15,6 +15,12 @@
 				"src/ln-sort.js"
 			]
 		},
+		"data-ln-hash": {
+			"direction": null,
+			"sources": [
+				"src/ln-sort.js"
+			]
+		},
 		"data-ln-persist": {
 			"direction": "author",
 			"sources": [
@@ -47,7 +53,7 @@
 			]
 		},
 		"data-ln-sort-state": {
-			"direction": "runtime",
+			"direction": "both",
 			"sources": [
 				"src/ln-sort.js"
 			]

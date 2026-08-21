@@ -1,6 +1,4 @@
-import { dispatch, dispatchCancelable, registerComponent, queueBoot } from '../../ln-core';
-import { createBatcher } from '../../ln-core';
-import { persistGet, persistSet } from '../../ln-core';
+import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatcher, persistGet, persistSet, hashGet, hashSet, resolveHashNamespace, hashFilterEncode, hashFilterDecode } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-filter';
@@ -10,6 +8,7 @@ import { persistGet, persistSet } from '../../ln-core';
 	const HIDE_ATTR = 'data-ln-filter-hide';
 	const RESET_ATTR = 'data-ln-filter-reset';
 	const COL_ATTR = 'data-ln-filter-col';
+	const HASH_ATTR = 'data-ln-hash';
 
 	// Shared column filter state per plain table (AND across columns, OR within column)
 	const _tableFilters = new WeakMap();
@@ -35,6 +34,21 @@ import { persistGet, persistSet } from '../../ln-core';
 		return { key: key, values: values, targetId: self.targetId };
 	}
 
+	function _applyInputValues(dom, key, values) {
+		const inputs = dom.querySelectorAll('[' + KEY_ATTR + ']');
+		const hasValues = Array.isArray(values) && values.length > 0;
+		for (let i = 0; i < inputs.length; i++) {
+			const input = inputs[i];
+			if (_isReset(input)) {
+				input.checked = !hasValues;
+			} else if (hasValues && input.getAttribute(KEY_ATTR) === key && values.indexOf(input.getAttribute(VALUE_ATTR)) !== -1) {
+				input.checked = true;
+			} else {
+				input.checked = false;
+			}
+		}
+	}
+
 	function _arraysDiffer(a, b) {
 		if (a.length !== b.length) return true;
 		for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return true;
@@ -53,6 +67,10 @@ import { persistGet, persistSet } from '../../ln-core';
 
 		// Event-diff cache — null means never dispatched yet
 		this._lastSnapshot = null;
+		this._destroyed = false;
+
+		this.nsKey = resolveHashNamespace(dom, 'filter');
+		this.hashEnabled = !!this.nsKey;
 
 		const self = this;
 
@@ -64,35 +82,60 @@ import { persistGet, persistSet } from '../../ln-core';
 
 		this._attachHandlers();
 
-		// ─── Restore persisted filter or boot pre-checked state ────
-		// Deferred via queueBoot so all sibling/consumer components have initialized listeners
-		let _persistRestored = false;
-		if (dom.hasAttribute('data-ln-persist')) {
-			const saved = persistGet('filter', dom);
-			if (saved && saved.key && Array.isArray(saved.values) && saved.values.length > 0) {
-				const inputs = dom.querySelectorAll('[' + KEY_ATTR + ']');
-				for (let i = 0; i < inputs.length; i++) {
-					const input = inputs[i];
-					if (_isReset(input)) {
-						input.checked = false;
-					} else if (input.getAttribute(KEY_ATTR) === saved.key &&
-					           saved.values.indexOf(input.getAttribute(VALUE_ATTR)) !== -1) {
-						input.checked = true;
-					} else {
-						input.checked = false;
-					}
-				}
-				queueBoot(function () { self._render(); });
-				_persistRestored = true;
+		// Hash change listener
+		this._onHashChange = function () {
+			if (self._destroyed || !self.hashEnabled) return;
+			const hashVal = hashGet(self.nsKey);
+			const decoded = hashFilterDecode(hashVal);
+			if (decoded && decoded.key && decoded.values.length > 0) {
+				_applyInputValues(self.dom, decoded.key, decoded.values);
+			} else {
+				_applyInputValues(self.dom, null, []);
+			}
+			self._render();
+		};
+		if (this.hashEnabled) {
+			window.addEventListener('hashchange', this._onHashChange);
+		}
+
+		// ─── Restore State on Boot ─────────────────────────────────
+		// Precedence: 1. URL Hash  2. LocalStorage Persist  3. Pre-checked HTML inputs
+		let restored = false;
+
+		if (this.hashEnabled) {
+			const hashVal = hashGet(this.nsKey);
+			const decoded = hashFilterDecode(hashVal);
+			if (decoded && decoded.key && decoded.values.length > 0) {
+				_applyInputValues(dom, decoded.key, decoded.values);
+				queueBoot(function () {
+					if (self._destroyed) return;
+					self._render();
+				});
+				restored = true;
 			}
 		}
 
-		if (!_persistRestored) {
+		if (!restored && dom.hasAttribute('data-ln-persist')) {
+			const saved = persistGet('filter', dom);
+			if (saved && saved.key && Array.isArray(saved.values) && saved.values.length > 0) {
+				_applyInputValues(dom, saved.key, saved.values);
+				queueBoot(function () {
+					if (self._destroyed) return;
+					self._render();
+				});
+				restored = true;
+			}
+		}
+
+		if (!restored) {
 			// DOM is already canonical — schedule boot render if anything is pre-checked
 			const inputs = dom.querySelectorAll('[' + KEY_ATTR + ']');
 			for (let i = 0; i < inputs.length; i++) {
 				if (inputs[i].checked && !_isReset(inputs[i])) {
-					queueBoot(function () { self._render(); });
+					queueBoot(function () {
+						if (self._destroyed) return;
+						self._render();
+					});
 					break;
 				}
 			}
@@ -100,6 +143,7 @@ import { persistGet, persistSet } from '../../ln-core';
 
 		return this;
 	}
+
 
 	// ─── Handlers (Delegated) ──────────────────────────────────
 
@@ -224,6 +268,12 @@ import { persistGet, persistSet } from '../../ln-core';
 			}
 		}
 
+		// Sync URL Hash if enabled
+		if (this.hashEnabled) {
+			const encoded = hashFilterEncode(active.key, active.values);
+			hashSet(this.nsKey, encoded);
+		}
+
 		// If a consumer (ln-table, ln-list, ln-data-store) claimed the event, skip default DOM filtering
 		if (defaultPrevented) return;
 
@@ -334,6 +384,7 @@ import { persistGet, persistSet } from '../../ln-core';
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
+		this._destroyed = true;
 
 		// Clean up plain table filter registry
 		if (this.colIndex !== null) {
@@ -354,10 +405,35 @@ import { persistGet, persistSet } from '../../ln-core';
 			delete this._onDomChange;
 		}
 
+		if (this.hashEnabled && this._onHashChange) {
+			window.removeEventListener('hashchange', this._onHashChange);
+		}
+
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
+	// ─── Attribute Sync ────────────────────────────────────────
+
+	function _syncAttribute(el, attrName) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance || instance._destroyed) return;
+
+		if (attrName === HASH_ATTR) {
+			if (instance.hashEnabled && instance._onHashChange) {
+				window.removeEventListener('hashchange', instance._onHashChange);
+			}
+			instance.nsKey = resolveHashNamespace(el, 'filter');
+			instance.hashEnabled = !!instance.nsKey;
+			if (instance.hashEnabled) {
+				window.addEventListener('hashchange', instance._onHashChange);
+			}
+		}
+	}
+
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-filter');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-filter', {
+		extraAttributes: [HASH_ATTR],
+		onAttributeChange: _syncAttribute
+	});
 })();

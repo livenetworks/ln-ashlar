@@ -9,6 +9,12 @@
 				"ln-search-dev.scss"
 			]
 		},
+		"data-ln-hash": {
+			"direction": null,
+			"sources": [
+				"src/ln-search.js"
+			]
+		},
 		"data-ln-search": {
 			"direction": "both",
 			"sources": [

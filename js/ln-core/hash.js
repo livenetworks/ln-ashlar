@@ -83,10 +83,67 @@ export function hashLinkClick(e) {
 	return true;
 }
 
+// ─── Hash Helpers for Controls (ln-sort, ln-search, ln-filter) ──
+
+export function resolveHashNamespace(el, defaultSuffix) {
+	if (!el || !el.hasAttribute('data-ln-hash')) return null;
+	const explicit = el.getAttribute('data-ln-hash');
+	if (explicit && explicit.trim() !== '') return explicit.trim();
+	const targetId = el.getAttribute('data-ln-sort')
+		|| el.getAttribute('data-ln-search-for')
+		|| el.getAttribute('data-ln-search')
+		|| el.getAttribute('data-ln-filter')
+		|| el.id;
+	if (targetId) {
+		return defaultSuffix ? (targetId + '-' + defaultSuffix) : targetId;
+	}
+	return defaultSuffix || null;
+}
+
+export function hashSortEncode(fieldOrColumn, direction) {
+	if (!direction || direction === 'none' || fieldOrColumn === null || fieldOrColumn === undefined) return null;
+	return String(fieldOrColumn) + '.' + direction;
+}
+
+export function hashSortDecode(val) {
+	if (!val || typeof val !== 'string') return null;
+	if (val.endsWith('.asc')) {
+		return { fieldOrColumn: val.slice(0, -4), direction: 'asc' };
+	}
+	if (val.endsWith('.desc')) {
+		return { fieldOrColumn: val.slice(0, -5), direction: 'desc' };
+	}
+	return null;
+}
+
+export function hashFilterEncode(key, values) {
+	if (!key || !Array.isArray(values) || values.length === 0) return null;
+	return key + ':' + values.map(encodeURIComponent).join(',');
+}
+
+export function hashFilterDecode(val) {
+	if (!val || typeof val !== 'string') return null;
+	const colon = val.indexOf(':');
+	if (colon === -1) return null;
+	const key = val.slice(0, colon);
+	const rawValues = val.slice(colon + 1);
+	const values = rawValues ? rawValues.split(',').map(function (v) {
+		try { return decodeURIComponent(v); }
+		catch (e) { return v; }
+	}).filter(Boolean) : [];
+	return { key: key, values: values };
+}
+
 if (typeof window !== 'undefined') {
 	window.lnCore = window.lnCore || {};
 	window.lnCore.hashParse = hashParse;
 	window.lnCore.hashGet = hashGet;
 	window.lnCore.hashSet = hashSet;
 	window.lnCore.hashLinkClick = hashLinkClick;
+	window.lnCore.resolveHashNamespace = resolveHashNamespace;
+	window.lnCore.hashSortEncode = hashSortEncode;
+	window.lnCore.hashSortDecode = hashSortDecode;
+	window.lnCore.hashFilterEncode = hashFilterEncode;
+	window.lnCore.hashFilterDecode = hashFilterDecode;
 }
+

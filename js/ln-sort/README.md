@@ -21,11 +21,15 @@ default-DOM-behaviour fallback. Unlike `ln-filter`, it never dual-dispatches to 
    `th.cellIndex` — SSR/DOM-only, resolved once at construction, never bridged to `field`.
    The dispatched payload always carries both keys, exactly one non-null:
    `{ field: string|null, column: number|null, direction, targetId }`.
-3. **Single sort, mutual exclusion via the target.** Every instance listens for
-   `ln-sort:change` on its OWN target (not on itself — events bubble up, listening on self would
-   never hear a sibling). When an incoming event's field/column doesn't match this instance's own,
-   it resets its own `data-ln-sort-state` to `"none"`. No registry, no sibling awareness.
-4. **Type is inferred once per sort, not per pair.** `ln-core.detectValueType` scans the current
+3. **Single sort, mutual exclusion & multi-control sync.** Every instance listens for
+   `ln-sort:change` on its OWN target. When an incoming event's field/column doesn't match this
+   instance's own, it resets its own `data-ln-sort-state` to `"none"`. When an incoming event matches
+   the same field/column, duplicate controls (e.g. table header button and mobile toolbar)
+   synchronize their `data-ln-sort-state` in real time.
+4. **Deferred initialization via `queueBoot`.** Restoring saved sort (`data-ln-persist`) or booting
+   pre-authored `data-ln-sort-state="asc"|"desc"` is deferred via `queueBoot` to ensure consumers
+   (`ln-table`, `ln-list`, `ln-data-store`) have finished initializing before the initial sort fires.
+5. **Type is inferred once per sort, not per pair.** `ln-core.detectValueType` scans the current
    value set; if every non-empty value is a finite number, comparison is numeric, else
    `localeCompare` via `ln-core.getLocale`. Per-pair type inference breaks comparator
    transitivity and produces wrong ordering — never do it.
@@ -83,10 +87,11 @@ cannot substitute for this — these icons are an SVG sprite via `<use href>`, n
 | :--- | :--- | :--- |
 | `data-ln-sort` | `<ul>` (root) | Component root. Value is the `id` of the target being sorted. |
 | `data-ln-sort-field` | Same as root | Opt-in. The record field name (data-driven). Omit for the `th.cellIndex` fallback (SSR/DOM only). |
-| `data-ln-sort-state` | Same as root | *State*. `"none" \| "asc" \| "desc"`. Drives which trigger button is visible via CSS. |
+| `data-ln-sort-state` | Same as root | *State*. `"none" \| "asc" \| "desc"`. Drives which trigger button is visible via CSS. Observed by `MutationObserver`. |
 | `data-ln-sort-items` | Same as root | Opt-in. Deep CSS selector for default-DOM-behaviour reordering (mirrors `data-ln-search-items`). |
 | `data-ln-sort-dir` | `<button>` (inside root) | `"asc" \| "desc" \| "none"`. Identifies which action this trigger performs. |
 | `data-ln-persist` | Same as root | Opt-in. Persists `{ field, column, direction }` to `localStorage`. Give each `[data-ln-sort]` its own value (or `id`) — persistence is per-instance, not per-table. |
+| `data-ln-hash` | Same as root | Opt-in. Synchronizes sort state to URL hash fragment (e.g. `#users-sort:price.asc`). Value is custom namespace; if empty defaults to `[targetId]-sort`. |
 
 ### JavaScript API (`el.lnSort`)
 
@@ -95,7 +100,10 @@ cannot substitute for this — these icons are an SVG sprite via `<use href>`, n
 | `targetId` | `string` | The `id` of the target element. |
 | `field` | `string \| null` | The authored field name, or `null`. |
 | `column` | `number \| null` | The resolved `th.cellIndex` fallback, or `null`. |
+| `nsKey` | `string \| null` | The resolved URL hash namespace, or `null`. |
+| `hashEnabled` | `boolean` | True if URL hash synchronization is active on this instance. |
 | `destroy()` | `() => void` | Removes listeners and tears down the instance. |
+
 
 ---
 
@@ -133,19 +141,18 @@ Source: `js/ln-sort/ln-sort.js`. One instance per `[data-ln-sort]`, stored at `e
 
 ### The three-step click (no cycle logic)
 
-`_onClick` reads `data-ln-sort-dir` off the clicked button and calls `_apply(direction)`, which:
-writes `data-ln-sort-state` on the root, dispatches `ln-sort:change` on the target, and — only if
-not prevented — runs `_defaultSort`. There is no `if (current === 'asc') then 'desc'` branch
-anywhere in this file; the SCSS cycle in `scss/config/mixins/_sort.scss` decides which button is
-even clickable next.
+`_onClick` reads `data-ln-sort-dir` off the clicked button and sets `data-ln-sort-state` on the root,
+which triggers `_syncAttribute` and `_apply(direction)`. `_apply()` updates `aria-sort` on parent `<th>`,
+dispatches `ln-sort:change` on the target, and — only if not prevented — runs `_defaultSort`. There is no
+`if (current === 'asc') then 'desc'` branch anywhere in this file; the SCSS cycle in
+`scss/config/mixins/_sort.scss` decides which button is even clickable next.
 
-### Mutual exclusion
+### Mutual exclusion & Multi-Control Sync
 
-Each instance adds its `ln-sort:change` listener to the resolved **target** element (captured once
-at construction as `this._target`), not to itself. A self-originated dispatch also re-enters this
-same listener (dispatch is synchronous and the listener is on the same target) — but the
-field/column comparison naturally evaluates "same" for a self-dispatch, so it's a safe no-op, not
-an explicit self-check.
+Each instance adds its `ln-sort:change` listener to the resolved **target** element. When an incoming
+event's field/column matches this instance's own, duplicate controls sync their `data-ln-sort-state`
+and `aria-sort`. When an incoming event belongs to a different column, the losing instance resets to `"none"`
+and drops its persist key.
 
 ### Default DOM behaviour
 
@@ -156,12 +163,11 @@ descendant if `field` is set, else `readValue(item)` directly. The `column` inde
 **never** consulted here — it exists solely to populate the event payload for SSR/DOM table
 consumers; see README "Field is optional" above.
 
-### Persistence
+### Persistence & Boot
 
 `data-ln-persist` on the root, restored in the constructor via `persistGet('sort', dom)` and
-applied via `_apply(saved.direction, true)` — the `skipPersist` flag prevents re-writing the value
-just read (same pattern as `ln-filter`'s restore). Cleared by setting `direction: 'none'`
-(`persistSet('sort', dom, null)`).
+applied via `_apply(saved.direction, true)` through `queueBoot`. Authoring `data-ln-sort-state="asc"|"desc"`
+is also applied safely at boot via `queueBoot`.
 
 ### Destroy
 

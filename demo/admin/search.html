@@ -587,6 +587,47 @@ document.getElementById('demo-list').setAttribute('data-ln-search', 'argentina')
 						</main>
 					</section>
 
+					<!-- URL Hash Synchronization -->
+					<section class="section-card">
+						<header><h3>URL Hash Synchronization (<code>data-ln-hash</code>)</h3></header>
+						<main>
+							<p>Adding <code>data-ln-hash</code> to the search input or target element synchronizes the search query into the URL hash fragment (e.g. <code>#demo-hash-search:react</code>). This enables deep-linking, shareable bookmarks, and browser Back/Forward navigation:</p>
+
+							<div class="search-wrap" style="margin-bottom: var(--size-md);">
+								<label class="search">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+									<input type="search" placeholder="Type to sync to URL hash..." data-ln-search-for="demo-hash-list" data-ln-search-debounce="0" data-ln-hash>
+									<button type="button" data-ln-search-clear aria-label="Clear search">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+									</button>
+								</label>
+							</div>
+
+							<ul id="demo-hash-list" data-ln-search="" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--size-xs);">
+								<li style="padding: var(--size-xs) var(--size-sm); background: var(--bg-sunken); border-radius: var(--radius-sm);">JavaScript (ES2026)</li>
+								<li style="padding: var(--size-xs) var(--size-sm); background: var(--bg-sunken); border-radius: var(--radius-sm);">TypeScript</li>
+								<li style="padding: var(--size-xs) var(--size-sm); background: var(--bg-sunken); border-radius: var(--radius-sm);">React &amp; Next.js</li>
+								<li style="padding: var(--size-xs) var(--size-sm); background: var(--bg-sunken); border-radius: var(--radius-sm);">Vue &amp; Nuxt</li>
+								<li style="padding: var(--size-xs) var(--size-sm); background: var(--bg-sunken); border-radius: var(--radius-sm);">Svelte &amp; SvelteKit</li>
+							</ul>
+
+<pre><code>&lt;label class="search"&gt;
+  &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-icon-search"&gt;&lt;/use&gt;&lt;/svg&gt;
+  &lt;input type="search" placeholder="Search..." data-ln-search-for="demo-hash-list" data-ln-search-debounce="0" data-ln-hash&gt;
+  &lt;button type="button" data-ln-search-clear aria-label="Clear search"&gt;
+    &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-icon-x"&gt;&lt;/use&gt;&lt;/svg&gt;
+  &lt;/button&gt;
+&lt;/label&gt;
+
+&lt;ul id="demo-hash-list" data-ln-search=""&gt;
+  &lt;li&gt;JavaScript (ES2026)&lt;/li&gt;
+  &lt;li&gt;TypeScript&lt;/li&gt;
+  ...
+&lt;/ul&gt;</code></pre>
+						</main>
+					</section>
+
+
 <script>
 	(function () {
 		// Custom handler — match counter

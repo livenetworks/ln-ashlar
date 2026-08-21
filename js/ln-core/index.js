@@ -2,6 +2,6 @@ export { cloneTemplate, cloneTemplateScoped, dispatch, dispatchCancelable, reque
 export { reactiveState, deepReactive, createBatcher } from './reactive.js';
 export { createWindowCache } from './window-cache.js';
 export { persistGet, persistSet, persistRemove, persistClear } from './persist.js';
-export { hashParse, hashGet, hashSet, hashLinkClick } from './hash.js';
+export { hashParse, hashGet, hashSet, hashLinkClick, resolveHashNamespace, hashSortEncode, hashSortDecode, hashFilterEncode, hashFilterDecode } from './hash.js';
 export { computePlacement, measureHidden } from './positioning.js';
 export { setCryptoKey, getCryptoKey, encryptData, decryptData } from './crypto.js';

@@ -72,7 +72,9 @@ Filters plain `<table>` rows by Column Index `2` (Department) and saves state to
 | `data-ln-filter-reset` | `<input type="checkbox">` | Marks the reset ("All") sentinel. |
 | `data-ln-filter-col` | Container root | Opt-in. 0-based column index to filter plain `<table>` rows by column cell text. |
 | `data-ln-persist` | Container root | Opt-in. Persists active checkbox selections in `localStorage`. |
+| `data-ln-hash` | Container root | Opt-in. Synchronizes active filters to URL hash fragment (e.g. `#users-filter:status:active,pending`). Value is custom namespace; if empty defaults to `[targetId]-filter`. |
 | `data-ln-filter-hide` | Children of target | *State*. Automatically toggled on non-matching elements (`display: none !important`). |
+
 
 ---
 

@@ -36,16 +36,16 @@
 ## 2. Codebase Integrity and Realistic Modeling
 - **No Hallucinated Attributes/Components**: Never invent attributes or components that do not exist (e.g., `data-ln-action` or `ln-action`). Only reference actual components found in the `js/` directory (e.g., `ln-toggle`, `ln-modal`, `ln-table`, `ln-form`, `ln-validate`, `ln-data-store`, `ln-data-coordinator`).
 
-## 3. Architecture Documentation Structure & Component Template
-- All component documentation in `architecture_docs_draft/components/` MUST strictly follow the unified structure defined in [`../COMPONENT_DOCUMENTATION_TEMPLATE.md`](../COMPONENT_DOCUMENTATION_TEMPLATE.md).
+## 3. Architecture Documentation Structure & Component Standards
+- All component documentation in `docs-mcp/components/` MUST strictly follow the unified English structure.
 - **Mandatory Section Headings**:
-  1. `## 1. Заднинско дејство и одговорност`
-  2. `## 2. Минимален HTML Маркап и Варијанти на Употреба`
-  3. `## 3. Декларативен API Договор (Атрибути и Настани)`
-  4. `## 4. CSS Стилизирање и Поведенски Концепт`
-  5. `## 5. Пристапност (ARIA) и Чести Грешки`
-  6. `## 6. Дијаграм на Текот и Животен Циклус` (Mermaid sequence diagram saved for the end of the doc)
-  7. `## 7. Поврзани Компоненти` (For listing related components & coordinators)
+  1. `## 1. Core Behavior & Responsibility`
+  2. `## 2. Minimal HTML Markup & Usage Variants`
+  3. `## 3. Declarative API Contract (Attributes & Events)`
+  4. `## 4. CSS Styling & Behavioral Concept`
+  5. `## 5. Accessibility (ARIA) & Common Pitfalls`
+  6. `## 6. Sequence & Lifecycle Flow` (Mermaid sequence diagram)
+  7. `## 7. Related Components & Coordinators`
 - **Relative Links Requirement**: Always use relative paths for file links in component documentation (e.g. `../../js/ln-tooltip/src/ln-tooltip.js`, `./ln-confirm.md`), NEVER absolute `file:///` URLs.
 - Lead documentation with user/developer usage examples; keep internal JS engine code dumps out of consumer docs.
 - **Conciseness & Compactness**: Keep documentation lean, focused, and direct. Consolidate related HTML markup variants into compact code blocks, use clean concise API tables, and keep Mermaid sequence diagrams focused on high-level lifecycle flows (3-4 key participants max). Avoid multi-paragraph over-explanations.
