@@ -1,6 +1,6 @@
 # ln-ui-coordinator
 
-A general-purpose **Layer 2 Coordinator** that mediates UI triggers, modals (`ln-modal`), AJAX (`ln-ajax`), record filling (`ln-fill`), and toast notifications (`ln-toast`).
+A general-purpose **Layer 2 Coordinator** that mediates UI triggers, modals (`ln-modal`), AJAX (`ln-ajax`), uploads (`ln-upload`), record filling (`ln-fill`), and toast notifications (`ln-toast`).
 
 ---
 
@@ -15,6 +15,8 @@ A general-purpose **Layer 2 Coordinator** that mediates UI triggers, modals (`ln
    - Dispatches error toasts on server error envelopes or network failures (with fallback support via `data-ln-ui-coordinator-dict`).
    - Climbs parent coordinator containers to inherit and merge dictionary translations hierarchically.
    - Keeps modals open on error so form validation messages remain visible.
+5. **Upload Feedback Mediation:** Catches `ln-upload:invalid` and `ln-upload:error`:
+   - Dispatches error toasts with translated messages (`upload-invalid-title`, `upload-invalid-type`, `upload-max-size`, `upload-max-files`, `upload-error-title`, `upload-failed`).
 
 ---
 
@@ -28,6 +30,12 @@ A general-purpose **Layer 2 Coordinator** that mediates UI triggers, modals (`ln
         <li data-ln-ui-coordinator-dict="network-error-title">Connection Error</li>
         <li data-ln-ui-coordinator-dict="server-error">The server encountered an error.</li>
         <li data-ln-ui-coordinator-dict="server-error-title">Server Error</li>
+        <li data-ln-ui-coordinator-dict="upload-invalid-title">Invalid File</li>
+        <li data-ln-ui-coordinator-dict="upload-invalid-type">This file type is not allowed.</li>
+        <li data-ln-ui-coordinator-dict="upload-max-size">File size exceeds maximum allowed limit.</li>
+        <li data-ln-ui-coordinator-dict="upload-max-files">Maximum number of uploaded files exceeded.</li>
+        <li data-ln-ui-coordinator-dict="upload-error-title">Upload Error</li>
+        <li data-ln-ui-coordinator-dict="upload-failed">Failed to upload file.</li>
     </ul>
 
     <!-- Triggers -->
@@ -52,10 +60,25 @@ A general-purpose **Layer 2 Coordinator** that mediates UI triggers, modals (`ln
 | Attribute | Element | Description |
 |:---|:---|:---|
 | `data-ln-ui-coordinator` | Container / Dialog | Activates UI orchestration on the element and its subtree, acting as dictionary host. |
-| `data-ln-ui-coordinator-dict` | `<li>` element | Translatable error messages (`network-error`, `network-error-title`, `server-error`, `server-error-title`). |
+| `data-ln-ui-coordinator-dict` | `<li>` element | Translatable fallback toast messages (see Dictionary Keys below). |
 | `data-ln-modal-for="id"` | Trigger `<button>` | Opens the target `ln-modal` by id. |
 | `data-ln-modal-mode="new\|edit"` | Trigger / `<dialog>` | Forces explicit modal creation or edit mode. |
 | `data-ln-fill-*` | Trigger `<a>` | Passes record values to form controls inside the opened modal. |
+
+### Dictionary Keys
+
+| Key | Used For | Fallback |
+|:---|:---|:---|
+| `network-error` | Network disconnection error message | `Network error` |
+| `network-error-title` | Network error toast title | `""` |
+| `server-error` | HTTP server error message | `Server error` |
+| `server-error-title` | HTTP server error toast title | `""` |
+| `upload-invalid-title` | Invalid file toast title | `Invalid File` |
+| `upload-invalid-type` | Invalid file extension / MIME message | `This file type is not allowed` |
+| `upload-max-size` | Exceeded max size message | `File is too large` |
+| `upload-max-files` | Exceeded max file count message | `Maximum file count exceeded` |
+| `upload-error-title` | Upload failure toast title | `Upload Error` |
+| `upload-failed` | Upload failure message | `Failed to upload file` |
 
 ---
 
@@ -72,3 +95,5 @@ A general-purpose **Layer 2 Coordinator** that mediates UI triggers, modals (`ln
 | `hashchange` | Listens | `window` | Synchronizes URL hash and active modals. |
 | `ln-ajax:success` | Listens | `document` | Enqueues success toast, closes modal, and resets forms. |
 | `ln-ajax:error` | Listens | `document` | Enqueues error toast while keeping modals open. |
+| `ln-upload:invalid` | Listens | `document` | Enqueues error toast on file validation failure. |
+| `ln-upload:error` | Listens | `document` | Enqueues error toast on upload failure. |

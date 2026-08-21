@@ -1,20 +1,20 @@
 // ── JS state: upload display toggles ──
-// Dictionary items hidden by JS
-.ln-upload [data-ln-upload-dict] {
+// Dictionary items hidden
+[data-ln-upload] [data-ln-upload-dict] {
 	display: none;
 }
 
-// Progress bar visibility controlled by JS uploading state
-.ln-upload__item--uploading .ln-upload__progress {
+// Progress visibility controlled by upload state on the upload component's own progress container
+[data-ln-upload-item][data-ln-upload-state="uploading"] [data-ln-upload-progress] {
 	display: block;
 }
 
-.ln-upload__item:not(.ln-upload__item--uploading) .ln-upload__progress {
+[data-ln-upload-item]:not([data-ln-upload-state="uploading"]) [data-ln-upload-progress] {
 	display: none;
 }
 
 // Deleting state — JS disables interaction
-.ln-upload__item--deleting {
+[data-ln-upload-item][data-ln-upload-state="deleting"] {
 	opacity: 0.7;
 	pointer-events: none;
 }

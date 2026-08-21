@@ -11,10 +11,6 @@
 @use 'btn' as *;
 
 // Upload component -- drag-and-drop zone, file list, progress bar.
-//
-// Usage:
-//   .ln-upload { @include upload; }
-//   .ln-upload__zone { @include upload-zone; }
 
 @mixin upload {
 	width: 100%;
@@ -99,7 +95,7 @@
 		flex-shrink: 0;
 	}
 
-	> .ln-upload__remove {
+	> [data-ln-upload-action="remove"] {
 		--btn-padding-y: var(--size-2xs);
 		--btn-padding-x: var(--size-2xs);
 		--margin-inline: var(--size-sm);
@@ -144,7 +140,7 @@
 	border-color: hsl(var(--color-error));
 	background-color: hsl(var(--color-error) / 0.1);
 
-	.ln-upload__progress-bar {
+	[data-ln-progress] {
 		background-color: hsl(var(--color-error));
 	}
 }
@@ -165,4 +161,10 @@
 		animation: ln-upload-spin 0.6s linear infinite;
 	}
 	flex-shrink: 0;
+}
+
+@keyframes ln-upload-spin {
+	to {
+		transform: rotate(360deg);
+	}
 }

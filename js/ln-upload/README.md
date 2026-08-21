@@ -1,255 +1,131 @@
 # ln-upload
 
-File upload component — drag-and-drop zone with XHR progress, client-side validation, and auto-rendered hidden inputs for form submit.
+File upload component — drag-and-drop zone with progress tracking, client-side validation, SSR hydration, and automatic hidden input sync for form submissions.
 
 ## Rationale & Mindset
 
-Historically, the component used custom attributes like `data-ln-upload-context` to pass extra parameters (such as the context category `lecture`, `email_logo`, etc.) to the upload endpoint. This created a **tight coupling** between the generic frontend library component and specific project-level backend parameter names.
-
-To make the component truly generic and declarative, it follows a **native-HTML form design mindset**:
-* **Inputs as Parameters**: Any parameter or metadata that needs to be sent alongside the uploaded file is defined using standard HTML form inputs (e.g. `<input type="hidden">`, `<select>`, `<textarea>`) nested directly inside the `.ln-upload` container.
-* **Dynamic Gathering**: When a file is dropped or selected, the component dynamically serializes all nested inputs and appends them to the `FormData` request.
-* **Separation of Concerns**: The frontend library does not need to know about specific keys (like `context` or `entity_id`). It simply forwards whatever form inputs you declare.
-
-### Benefits
-1. **Zero Configuration for Backend Keys**: No need to rewrite the JS component if the backend changes a parameter name from `context` to `type` or requires extra fields.
-2. **Dynamic Values**: If an input's value is modified by other scripts on the page prior to upload (e.g., dynamically setting an `entity_id` based on selection), the upload request will automatically receive the latest value at the moment of file dispatch.
-3. **Decoupled Delete Routes**: The component derives the `DELETE` endpoint dynamically by replacing `/upload` in the upload URL with the file ID, or you can specify a custom delete pattern using `data-ln-upload-delete="/my-api/{id}"`.
+The `ln-upload` component follows an **HTML-first declarative design mindset**:
+* **Inputs as Parameters**: Any metadata sent alongside uploaded files is defined via standard form fields (`<input type="hidden">`, `<select>`, etc.) inside the `[data-ln-upload]` container and dynamically serialized into `FormData`.
+* **Zero JS UI Strings**: Localized messages and unit labels live in `<ul hidden><li data-ln-upload-dict="..."></li></ul>` (read once via `buildDict`), with number formatting resolved via `Intl.NumberFormat` with `getLocale(dom)`.
+* **Pure Data Attributes (No BEM in JS)**: All JS behaviors bind strictly to declarative attributes (`[data-ln-upload-zone]`, `[data-ln-upload-list]`, `[data-ln-upload-item]`, `[data-ln-upload-progress]`, `[data-ln-progress]`, `[data-ln-upload-action="remove"]`).
+* **SSR Hydration**: Pre-rendered server files inside `[data-ln-upload-list]` carrying `data-ln-upload-id="123"` are automatically hydrated into internal state on mount.
 
 ## Attributes
 
-| Attribute | On | Description |
-|-----------|-----|-------------|
-| `data-ln-upload="/files/upload"` | container | Upload URL (default: `/files/upload`) |
-| `data-ln-upload-accept=".pdf,.doc,.docx"` | container | Allowed extensions (comma-separated) |
-| `data-ln-upload-delete="/files/{id}"` | container | Optional custom delete URL pattern containing `{id}` (default: derived dynamically by replacing `/upload` with the file ID) |
-| `data-ln-upload-context="documents"` | container | **[DEPRECATED]** Legacy context string sent as `context` fallback if no `<input name="context">` is nested. |
-| `data-ln-upload-dict="key"` | hidden element | I18n dictionary for messages (see below) |
+| Attribute | Element | Description |
+|-----------|---------|-------------|
+| `data-ln-upload="URL"` | Container | Upload POST endpoint URL |
+| `data-ln-upload-accept=".pdf,.doc"` | Container / Input | Allowed extensions or MIME patterns (e.g. `pdf,doc`, `.pdf,.docx`, `image/*`) |
+| `data-ln-upload-delete="URL/{id}"` | Container | Optional delete URL pattern containing `{id}` |
+| `data-ln-upload-max-size="10485760"` | Container | Maximum allowed file size in bytes |
+| `data-ln-upload-max-files="5"` | Container | Maximum total uploaded files limit |
+| `data-ln-upload-file-field="file"` | Container | Name of the file field in `FormData` (default: `file`) |
+| `data-ln-upload-ids-field="file_ids[]"` | Container | Name of the synced hidden inputs (default: `file_ids[]`) |
+| `data-ln-upload-dict="key"` | Hidden `<li>` | Dictionary entries for translations |
 
 ## Dictionary (i18n)
 
-All keys are optional. If a key is missing, the component falls back to the English value shown below. Dict entries are read once at init via `buildDict()` and then removed from the DOM.
+All keys are optional. Dict entries are read once at init via `buildDict()` and removed from the DOM:
 
-| Key | Used for | Fallback |
-|-----|----------|----------|
+| Key | Purpose | Fallback |
+|-----|---------|----------|
 | `remove` | Remove button aria-label and tooltip | `Remove` |
-| `error` | Size slot text when upload fails | `Error` |
-| `invalid-type` | Toast body — wrong extension | `This file type is not allowed` |
-| `upload-failed` | Toast body — upload error | `Upload failed` |
-| `delete-error` | Toast body — delete error | `Failed to delete file` |
-| `network-error` | XHR network error + toast title for delete | `Network error` |
-| `invalid-title` | Toast title — invalid file | `Invalid File` |
-| `error-title` | Toast title — upload error | `Upload Error` |
-| `delete-title` | Toast title — delete error | `Error` |
-| `connection-error` | Toast body — delete fetch network failure | `Could not connect to server` |
-
-Example (full override):
-
-```html
-<ul hidden>
-	<li data-ln-upload-dict="remove">Ukloni</li>
-	<li data-ln-upload-dict="error">Greška</li>
-	<li data-ln-upload-dict="invalid-type">Tip fajla nije dozvoljen</li>
-	<li data-ln-upload-dict="invalid-title">Neispravan fajl</li>
-	<!-- ... other keys as needed -->
-</ul>
-```
-
-## Customization — item template
-
-The component clones a `<template data-ln-template="ln-upload-item">` for every file row. Lookup order:
-
-1. **Scoped** — a `<template>` inside the `[data-ln-upload]` container (per-instance override)
-2. **Global** — a `<template>` anywhere at document root
-3. **Auto-injected default** — the component inserts a default template into `<body>` on first init if none is present, so zero-config usage keeps working
-
-### Required slots
-
-Your template MUST include these elements for the component to function:
-
-| Element | Attribute | Purpose |
-|---------|-----------|---------|
-| `<li>` root | `data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting"` | State classes toggled via `fill()` |
-| File name target | `data-ln-field="name"` | File name text |
-| Size/status target | `data-ln-field="sizeText"` | `"0%"` → `"45%"` → `"12.3 KB"` → `"Error"` |
-| File icon `<use>` | `data-ln-attr="href:iconHref"` | Auto-swapped to `#ln-icon-file` / `#ln-icon-custom-file-pdf` / `#ln-icon-custom-file-doc` / `#ln-icon-custom-file-epub` based on extension |
-| Remove button | `data-ln-upload-action="remove"` and `data-ln-attr="aria-label:removeLabel, title:removeLabel"` | Click target (attribute-based, not class-based) |
-| Progress bar | `class="ln-upload__progress-bar"` | Width is animated imperatively via inline style |
-
-### Example — override with a two-line article layout
-
-```html
-<div data-ln-upload="/files/upload">
-	<template data-ln-template="ln-upload-item">
-		<li class="ln-upload__item" data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting">
-			<svg class="ln-icon ln-icon--lg" aria-hidden="true"><use data-ln-attr="href:iconHref" href="#ln-icon-file"></use></svg>
-			<article>
-				<span class="ln-upload__name" data-ln-field="name"></span>
-				<span class="ln-upload__size" data-ln-field="sizeText"></span>
-			</article>
-			<button type="button" class="ln-upload__remove" data-ln-upload-action="remove" data-ln-attr="aria-label:removeLabel, title:removeLabel">
-				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
-			</button>
-			<div class="ln-upload__progress"><div class="ln-upload__progress-bar"></div></div>
-		</li>
-	</template>
-	<div class="ln-upload__zone"><p>Drop files</p></div>
-	<ul class="ln-upload__list"></ul>
-</div>
-```
-
-## API
-
-```javascript
-// Instance API (on container element)
-const uploader = document.getElementById('my-upload');
-
-uploader.lnUploadAPI.getFileIds();   // [1, 2, 3] — server IDs
-uploader.lnUploadAPI.getFiles();     // [{serverId, name, size}, ...]
-uploader.lnUploadAPI.clear();        // Deletes everything (from server too)
-uploader.lnUploadAPI.destroy();      // Cleanup — remove listeners and clear state
-
-// Global API — only for non-standard cases (Shadow DOM, iframe)
-// For AJAX/dynamic DOM or setAttribute: MutationObserver auto-initializes
-window.lnUpload.init(containerElement);  // Manual initialization
-window.lnUpload.initAll();               // Initialize all
-```
-
-## Events
-
-| Event | Bubbles | Detail |
-|-------|---------|--------|
-| `ln-upload:uploaded` | yes | `{ localId, serverId, name }` |
-| `ln-upload:error` | yes | `{ file, message }` |
-| `ln-upload:invalid` | yes | `{ file, message }` |
-| `ln-upload:removed` | yes | `{ localId, serverId }` |
-| `ln-upload:cleared` | yes | `{}` |
-
-## Server API
-
-### Upload (POST)
-
-Request: `multipart/form-data` with `file` and `context` fields.
-Headers: `X-CSRF-TOKEN`, `Accept: application/json`
-
-Expected response:
-```json
-{ "id": 123, "name": "document.pdf", "size": 45678 }
-```
-
-### Delete (DELETE `/files/{id}`)
-
-Headers: `X-CSRF-TOKEN`, `Accept: application/json`
-Expected status: `200`
+| `error` | Status text when upload fails | `Error` |
+| `unit-b`, `unit-kb`, `unit-mb`, `unit-gb` | Localized byte units | `B`, `KB`, `MB`, `GB` |
 
 ## HTML Structure
 
-### Recommended (New Declarative Approach)
-
-Place nested hidden inputs (or any form fields) representing your upload metadata inside the container:
-
 ```html
-<div class="ln-upload" data-ln-upload="/files/upload" data-ln-upload-accept=".pdf,.doc,.docx">
-    <!-- Extra parameters sent dynamically to the POST endpoint -->
-    <input type="hidden" name="context" value="documents">
-    <input type="hidden" name="entity_id" value="123">
+<div data-ln-upload="/files/upload" data-ln-upload-accept="pdf,doc,docx" data-ln-upload-delete="/files/{id}">
+    <input type="file" multiple hidden>
 
-    <div class="ln-upload__zone">
-        <p>Drag files here or click to browse</p>
+    <!-- Scoped Template -->
+    <template data-ln-template="ln-upload-item">
+        <li data-ln-upload-item>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-file"></use></svg>
+            <span data-ln-field="name"></span>
+            <span data-ln-field="sizeText"></span>
+            <button type="button" data-ln-upload-action="remove" data-ln-attr="aria-label:removeLabel, title:removeLabel">
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+            </button>
+            <div data-ln-upload-progress>
+                <div data-ln-progress="0"></div>
+            </div>
+        </li>
+    </template>
+
+    <div data-ln-upload-zone>
+        <p>Drop files here or click to browse</p>
     </div>
-    <ul class="ln-upload__list"></ul>
 
-    <!-- Dictionary (optional) — see "Dictionary (i18n)" section above -->
+    <ul data-ln-upload-list>
+        <!-- SSR Pre-rendered files are hydrated automatically on mount -->
+        <li data-ln-upload-item data-ln-upload-id="42" data-ln-upload-ext="pdf" data-ln-upload-size="1200000">
+            <span data-ln-field="name">contract.pdf</span>
+            <span data-ln-field="sizeText">1.2 MB</span>
+            <button type="button" data-ln-upload-action="remove"><svg class="ln-icon"><use href="#ln-icon-x"></use></svg></button>
+        </li>
+    </ul>
 </div>
 ```
 
-### Legacy (Attribute-Based Approach)
+## Programmatic API
 
-```html
-<div class="ln-upload" data-ln-upload="/files/upload" data-ln-upload-accept=".pdf,.doc,.docx" data-ln-upload-context="documents">
-    <div class="ln-upload__zone">
-        <p>Drag files here or click to browse</p>
-    </div>
-    <ul class="ln-upload__list"></ul>
-</div>
+```javascript
+const el = document.querySelector('[data-ln-upload]');
+
+el.lnUpload.getFileIds();   // ['42', '43']
+el.lnUpload.getFiles();     // [{ serverId: '42', name: 'contract.pdf', size: 1200000 }]
+el.lnUpload.upload(files);  // Upload FileList or Array of File objects
+el.lnUpload.remove(id);     // Remove by localId or serverId
+el.lnUpload.clear();        // Clear and delete all files
+el.lnUpload.destroy();      // Clean up listeners and abort in-flight uploads
 ```
 
-## File Icons
+## Custom Events
 
-The component automatically adds an SVG icon per file type using the icon loader:
-- `#ln-icon-custom-file-pdf` — PDF (custom CDN)
-- `#ln-icon-custom-file-doc` — DOC/DOCX (custom CDN)
-- `#ln-icon-custom-file-epub` — EPUB (custom CDN)
-- `#ln-icon-file` — all other types (Tabler CDN)
-
-Custom icons require `window.LN_ICON_CUSTOM_CDN` to be set. See `js/ln-icon/README.md`.
-
-## Hidden Inputs
-
-After each successful upload, the component automatically creates `<input type="hidden" name="file_ids[]" value="serverId">` for each file. On form submit, the server receives the IDs directly.
-
-## Integration & Source Files
-
-### Loading the Component
-
-The `ln-upload` component can be integrated into your project using one of the following methods:
-
-#### 1. In-Bundle (Standard Integration)
-Include the main unified `ln-ashlar` bundle to load all component observers together, which is standard for full application environments:
-```html
-<script src="dist/ln-ashlar.iife.js" defer></script>
-```
-
-#### 2. Standalone (Zero-Dependency IIFE)
-If you only need file upload capability without the rest of the bundle, load the standalone, self-registering IIFE version of the component directly:
-```html
-<script src="js/ln-upload/ln-upload.js" defer></script>
-```
-
-### Source Files
-
-For reference, active development, or customization, the component's codebase is structured into two main files:
-
-* **Active Development Source (ESM)**: The primary development file where all component features, drag-and-drop mechanics, validation, and XHR progress logic are implemented is [js/ln-upload/src/ln-upload.js](file:///c:/laragon/www/ln-ashlar/js/ln-upload/src/ln-upload.js).
-* **Compiled Standalone (IIFE)**: The built zero-dependency distribution version compiled for browser execution is [js/ln-upload/ln-upload.js](file:///c:/laragon/www/ln-ashlar/js/ln-upload/ln-upload.js).
+| Event | Type | Detail |
+|-------|------|--------|
+| `ln-upload:request-upload` | Command | `{ files: FileList \| File[] }` |
+| `ln-upload:request-remove` | Command | `{ localId?: string, serverId?: string\|number }` |
+| `ln-upload:request-clear` | Command | `{}` |
+| `ln-upload:before-upload` | Cancelable | `{ file: File }` |
+| `ln-upload:before-remove` | Cancelable | `{ localId: string, serverId: string\|number }` |
+| `ln-upload:before-clear` | Cancelable | `{}` |
+| `ln-upload:uploaded` | Notification | `{ localId, serverId, name, size, response }` |
+| `ln-upload:progress` | Notification | `{ localId, file, percent, loaded, total }` |
+| `ln-upload:removed` | Notification | `{ localId, serverId }` |
+| `ln-upload:invalid` | Notification | `{ file, reason }` |
+| `ln-upload:error` | Notification | `{ file, message, status, error }` |
+| `ln-upload:cleared` | Notification | `{}` |
+| `ln-upload:destroyed` | Notification | `{ target }` |
 
 ---
 
 ## 🔧 Internals
 
-Source: `js/ln-upload/ln-upload.js`. Each container has a closure-scoped `uploadedFiles` Map (`localId → { serverId, name, size }`) — not reactive; DOM is mutated directly as XHR events fire. `fileIdCounter` generates unique `localId` values (`'file-1'`, `'file-2'`, ...).
+Source: `js/ln-upload/src/ln-upload.js`. Registered via `registerComponent('data-ln-upload', 'lnUpload', _component, 'ln-upload')`.
 
-### Init
+### State & Storage
+Each container holds an internal `uploadedFiles` Map (`localId -> { serverId, name, size, xhr? }`). Unique local IDs (`file-1`, `file-2`, ...) identify in-DOM items across their lifecycle.
 
-`_initUpload(container)`, guarded by `container.lnUploadAPI` against double-init. `_ensureDefaultItemTemplate()` runs once per init and injects the default `<template>` into `<body>` if no `[data-ln-template="ln-upload-item"]` exists anywhere in the document (see template lookup order above). A hidden `<input type="file" multiple>` is created if none exists inside the container.
+### SSR Hydration Flow
+During `_hydrate()`, `ln-upload` scans `[data-ln-upload-list] [data-ln-upload-item]` and pre-rendered hidden inputs:
+1. Resolves `serverId` from `data-ln-upload-id` and assigns a local identifier (`data-ln-upload-local-id`).
+2. Reads `name` from `[data-ln-field="name"]` and `size` from `data-ln-upload-size` or `[data-ln-field="sizeText"]`.
+3. Registers existing files into `uploadedFiles` and ensures hidden `<input type="hidden" name="file_ids[]">` elements match without duplicates.
 
-### `addFile(file)` flow
+### Upload Flow
+1. Files dropped or picked pass through client validation (`accept`, `maxSize`, `maxFiles`). If invalid, `ln-upload:invalid` is emitted.
+2. `dispatchCancelable('ln-upload:before-upload', { file })` is checked.
+3. The scoped template `ln-upload-item` is cloned and mounted into `[data-ln-upload-list]`, stamped with `data-ln-upload-local-id` and `data-ln-upload-ext`.
+4. `FormData` is built by appending the file under `fileFieldName` and serializing any nested inputs (skipping `idsFieldName`).
+5. Real-time progress updates `[data-ln-progress]` attribute and emits `ln-upload:progress`.
+6. On success, `data-ln-upload-id` is assigned, size is formatted via `Intl.NumberFormat`, hidden inputs are synced via `_syncHiddenInputs()`, and `ln-upload:uploaded` is dispatched.
 
-1. Validate extension against `data-ln-upload-accept`. Invalid → dispatch `ln-upload:invalid`, enqueue error toast, return.
-2. `cloneTemplateScoped` resolves the template (scoped → global → auto-injected default).
-3. `fill(li, {...})` populates name, `sizeText: '0%'`, icon `href`, `removeLabel`, and the `uploading`/`error`/`deleting` state classes in one pass — the `ln-icon` observer independently picks up the `<use href>` swap and fetches the sprite.
-4. `data-file-id` set (structural, not a `fill` slot); remove button disabled until upload completes.
-5. `<li>` appended to `.ln-upload__list`, XHR POST opened with `FormData` (nested container inputs serialized in).
-6. Progress: `progressBar.style.width` set imperatively + `fill(li, { sizeText: percent + '%' })`.
-7. 2xx: `fill` to final state, remove button re-enabled, entry stored in `uploadedFiles`, hidden inputs rebuilt, `ln-upload:uploaded` dispatched.
-8. Non-2xx / XHR error: progress forced to 100%, `fill(li, { sizeText: dict.error, error: true })`, `ln-upload:error` dispatched, error toast enqueued.
+### Removal & Clear Flows
+- **`remove(id)`**: Cancels in-flight XHR if active. If `serverId` exists and a delete URL pattern is configured, sends a `DELETE` request. On success, removes the item from DOM, deletes from `uploadedFiles`, syncs hidden inputs, and emits `ln-upload:removed`.
+- **`clear()`**: Checks `ln-upload:before-clear` once. Aborts all active uploads, issues background DELETE requests for existing server files, clears `uploadedFiles`, empties the list container, syncs hidden inputs, and immediately emits `ln-upload:cleared`.
 
-### Remove / delete flow
-
-Remove-button clicks are delegated on `.ln-upload__list`, resolved via `closest('[data-ln-upload-action="remove"]')` (works through nested `svg`/`use`). `removeFile(localId)`: if the file has no `serverId` yet (still uploading), it's removed from DOM + Map directly. If a `serverId` exists, `fill(item, { deleting: true })` then `DELETE /files/{serverId}` — success removes from DOM + Map and dispatches `ln-upload:removed`; failure (non-200 or network catch) reverts `deleting: false` and enqueues an error toast.
-
-### Hidden inputs
-
-`updateHiddenInput()` fully rebuilds `<input type="hidden" name="file_ids[]">` from the current `uploadedFiles` Map after every upload and delete — form submit always reflects the current (not deleted) file set.
-
-### Auto-toast
-
-Errors dispatch `ln-toast:enqueue` on `window`. This is a soft integration — `ln-upload` does not import `ln-toast`; the toast only renders if that component is present.
-
-### `destroy()`
-
-Part of `container.lnUploadAPI`. Removes all listeners (zone, input, list), clears `uploadedFiles`, empties the `<ul>`, removes the init guard, deletes `lnUploadAPI`.
-
-### MutationObserver
-
-Global observer on `document.body` detects `[data-ln-upload]` elements added to the DOM and calls `_initUpload()` on them.
+### Teardown
+`destroy()` aborts all pending XHRs, removes event listeners (drag/drop, input change, removal clicks, command listeners), clears internal state and dictionary, and emits `ln-upload:destroyed`.

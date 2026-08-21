@@ -386,6 +386,41 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 	document.addEventListener('ln-ajax:success', _handleAjaxSuccess);
 	document.addEventListener('ln-ajax:error', _handleAjaxError);
 
+	// ─── Upload Feedback Mediation ──────────────────────────
+
+	function _handleUploadInvalid(e) {
+		const detail = e.detail || {};
+		const dict = _getCoordinatorDict(e.target);
+		const message = detail.message || (detail.reason === 'max-size' ? dict['upload-max-size'] || 'File is too large' : (detail.reason === 'max-files' ? dict['upload-max-files'] || 'Maximum file count exceeded' : dict['upload-invalid-type'] || 'This file type is not allowed'));
+		const title = dict['upload-invalid-title'] || 'Invalid File';
+
+		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+			detail: {
+				type: 'error',
+				title: title,
+				message: message
+			}
+		}));
+	}
+
+	function _handleUploadError(e) {
+		const detail = e.detail || {};
+		const dict = _getCoordinatorDict(e.target);
+		const message = detail.message || dict['upload-failed'] || 'Failed to upload file';
+		const title = dict['upload-error-title'] || 'Upload Error';
+
+		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+			detail: {
+				type: 'error',
+				title: title,
+				message: message
+			}
+		}));
+	}
+
+	document.addEventListener('ln-upload:invalid', _handleUploadInvalid);
+	document.addEventListener('ln-upload:error', _handleUploadError);
+
 	// ─── Hash Cleanup & Reset on Modal Close ───────────────
 
 	document.addEventListener('ln-modal:close', function (e) {

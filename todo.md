@@ -40,5 +40,5 @@
 - [x] ln-toggle
 - [x] ln-tooltip
 - [ ] ln-translations
-- [ ] ln-upload
+- [x] ln-upload
 - [x] ln-validate
