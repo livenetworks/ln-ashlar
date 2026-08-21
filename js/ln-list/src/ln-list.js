@@ -1,4 +1,4 @@
-import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, fillTemplate, registerComponent, createWindowCache, createBatcher, getLocale, detectValueType, compareValues } from '../../ln-core';
+import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent, readValue, createWindowCache, createBatcher, getLocale, detectValueType, compareValues } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-list';
@@ -85,6 +85,12 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		this._filteredData = [];
 		this.selectedIds = new Set();
 
+		// SSR filtering / sorting state
+		this._searchTerm = '';
+		this._filters = {};
+		this._sortField = null;
+		this._sortDir = null;
+
 		// Virtual scroll state
 		this._virtual = false;
 		this._itemHeight = 0;
@@ -97,6 +103,32 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		this.isUl = this.tbody.tagName === 'UL' || this.tbody.tagName === 'OL';
 
 		const self = this;
+
+		// --- Layer 1 Command Handlers ---
+		this._onRequestClearFilters = function () {
+			if (self.isDataDriven) {
+				self.currentFilters = {};
+				self.currentSearch = '';
+				dispatch(dom, 'ln-list:clear-filters', { list: self.name });
+				self._requestData();
+			} else {
+				self._searchTerm = '';
+				self._filters = {};
+				self._sortField = null;
+				self._sortDir = null;
+				self._applyFilterAndSort();
+				self._vStart = -1;
+				self._vEnd = -1;
+				self._render();
+				self._updateFooter();
+				dispatch(dom, 'ln-list:filter', {
+					term: '',
+					matched: self._filteredData.length,
+					total: self._data.length
+				});
+			}
+		};
+		dom.addEventListener('ln-list:request-clear-filters', this._onRequestClearFilters);
 
 		// --- Selection (both modes) ---
 		this._selectable = dom.hasAttribute('data-ln-list-selectable');
@@ -115,7 +147,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 
 			this._windowed = false;
 			this._cache = null;
-			if (this.isDataDriven && dom.hasAttribute('data-ln-list-window')) this._enterWindowedMode();
+			if (dom.hasAttribute('data-ln-list-window')) this._enterWindowedMode();
 
 			this._lastTotal = 0;
 			this._lastFiltered = 0;
@@ -183,16 +215,6 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			};
 			dom.addEventListener('ln-list:request-invalidate', this._onRequestInvalidate);
 
-			// Clear all
-			this._onClearAll = function (e) {
-				const btn = e.target.closest('[data-ln-list-clear-all]');
-				if (!btn) return;
-				self.currentFilters = {};
-				dispatch(dom, 'ln-list:clear-filters', { list: self.name });
-				self._requestData();
-			};
-			dom.addEventListener('click', this._onClearAll);
-
 			// --- Sort ---
 			// Mirrors ln-table's own data-driven ln-sort:change handler: windowed lists
 			// invalidate the sliding-window cache and re-fetch (via the existing
@@ -211,14 +233,16 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 					self._vStart = -1;
 					self._vEnd = -1;
 					self._render();
+					self._updateFooter();
+					dispatch(dom, 'ln-list:sorted', {
+						field: self.currentSort ? self.currentSort.field : null,
+						direction: e.detail.direction,
+						matched: self.visibleCount,
+						total: self.totalCount
+					});
 				}
 			};
 			dom.addEventListener('ln-sort:change', this._onSort);
-
-			// D4 — windowed lists cannot select rows they have never fetched
-			if (this._windowed && this._selectable && this._selectAllCheckbox) {
-				this._selectAllCheckbox.classList.add('hidden');
-			}
 
 			// --- Item Click & Actions ---
 			this._onItemClick = function (e) {
@@ -295,6 +319,72 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 				});
 				this._emptyObserver.observe(this.tbody, { childList: true });
 			}
+
+			this._onSearchChange = function (e) {
+				e.preventDefault();
+				const term = (e.detail && e.detail.term != null ? e.detail.term : '').trim();
+				self._searchTerm = term.toLowerCase();
+				self._applyFilterAndSort();
+				self._vStart = -1;
+				self._vEnd = -1;
+				self._render();
+				self._updateFooter();
+				dispatch(dom, 'ln-list:filter', {
+					term: self._searchTerm,
+					matched: self._filteredData.length,
+					total: self._data.length
+				});
+			};
+			dom.addEventListener('ln-search:change', this._onSearchChange);
+
+			this._onFilterChange = function (e) {
+				e.preventDefault();
+				if (!e.detail) return;
+				const key = e.detail.key;
+				const values = e.detail.values || [];
+				if (!key) return;
+
+				if (values.length === 0) {
+					delete self._filters[key];
+				} else {
+					const lower = [];
+					for (let i = 0; i < values.length; i++) {
+						lower.push(values[i].toLowerCase());
+					}
+					self._filters[key] = lower;
+				}
+				self._applyFilterAndSort();
+				self._vStart = -1;
+				self._vEnd = -1;
+				self._render();
+				self._updateFooter();
+				dispatch(dom, 'ln-list:filter', {
+					term: self._searchTerm,
+					matched: self._filteredData.length,
+					total: self._data.length
+				});
+			};
+			dom.addEventListener('ln-filter:change', this._onFilterChange);
+
+			this._onSort = function (e) {
+				if (e.detail && e.detail.field == null) return;
+				e.preventDefault();
+				const direction = e.detail && e.detail.direction === 'none' ? null : (e.detail && e.detail.direction);
+				self._sortField = direction === null ? null : (e.detail && e.detail.field);
+				self._sortDir = direction;
+				self._applyFilterAndSort();
+				self._vStart = -1;
+				self._vEnd = -1;
+				self._render();
+				self._updateFooter();
+				dispatch(dom, 'ln-list:sorted', {
+					field: self._sortField,
+					direction: e.detail && e.detail.direction,
+					matched: self._filteredData.length,
+					total: self._data.length
+				});
+			};
+			dom.addEventListener('ln-sort:change', this._onSort);
 		}
 
 		return this;
@@ -323,15 +413,33 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 					const f = fields[j];
 					const prop = f.getAttribute('data-ln-list-field');
 					if (prop) {
-						record[prop] = f.textContent.trim();
+						record[prop] = readValue(f);
 					}
+				}
+			}
+
+			// SSR and fallback field extraction via readValue
+			const fields = {};
+			const fieldNodes = el.querySelectorAll('[data-ln-list-field], [data-ln-field]');
+			for (let j = 0; j < fieldNodes.length; j++) {
+				const f = fieldNodes[j];
+				const prop = f.getAttribute('data-ln-list-field') || f.getAttribute('data-ln-field');
+				if (prop) fields[prop] = readValue(f);
+			}
+			for (let j = 0; j < el.attributes.length; j++) {
+				const attr = el.attributes[j];
+				if (attr.name.startsWith('data-') && !attr.name.startsWith('data-ln-')) {
+					const key = attr.name.slice(5);
+					if (key) fields[key] = attr.value;
 				}
 			}
 
 			this._data.push({
 				html: el.outerHTML,
 				id: id,
-				...record
+				searchText: text,
+				fields: fields,
+				...(record || {})
 			});
 		}
 
@@ -375,7 +483,56 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 				return compareValues(a[field], b[field], type, collator) * multiplier;
 			});
 		} else {
-			this._filteredData = this._data.slice();
+			const term = this._searchTerm;
+			const tokens = term ? term.split(/\s+/).filter(Boolean) : [];
+			const filters = this._filters || {};
+			const hasFilters = Object.keys(filters).length > 0;
+
+			if (tokens.length === 0 && !hasFilters) {
+				this._filteredData = this._data.slice();
+			} else {
+				this._filteredData = this._data.filter(function (row) {
+					if (tokens.length > 0) {
+						const match = tokens.every(function (token) {
+							return row.searchText && row.searchText.indexOf(token) !== -1;
+						});
+						if (!match) return false;
+					}
+					if (hasFilters) {
+						for (const key in filters) {
+							const activeVals = filters[key];
+							if (activeVals && activeVals.length > 0) {
+								const val = (row.fields && row.fields[key] !== undefined)
+									? row.fields[key]
+									: (row[key] !== undefined ? row[key] : null);
+								const sVal = val != null ? String(val).toLowerCase() : '';
+								if (activeVals.indexOf(sVal) === -1) return false;
+							}
+						}
+					}
+					return true;
+				});
+			}
+
+			// SSR Sort
+			if (this._sortField && this._sortDir) {
+				const field = this._sortField;
+				const multiplier = this._sortDir === 'desc' ? -1 : 1;
+				const collator = typeof Intl !== 'undefined'
+					? new Intl.Collator(getLocale(this.dom), { sensitivity: 'base' })
+					: null;
+
+				const values = this._filteredData.map(function (row) {
+					return (row.fields && row.fields[field] !== undefined) ? row.fields[field] : row[field];
+				});
+				const type = detectValueType(values);
+
+				this._filteredData.sort(function (a, b) {
+					const valA = (a.fields && a.fields[field] !== undefined) ? a.fields[field] : a[field];
+					const valB = (b.fields && b.fields[field] !== undefined) ? b.fields[field] : b[field];
+					return compareValues(valA, valB, type, collator) * multiplier;
+				});
+			}
 		}
 	};
 
@@ -404,8 +561,12 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			}
 		} else {
 			const count = this._filteredData.length;
+			const isFiltered = count === 0 && (this._searchTerm || Object.keys(this._filters || {}).length > 0);
 
-			if (count > VIRTUAL_THRESHOLD) {
+			if (isFiltered) {
+				this._disableVirtualScroll();
+				this._showEmptyState();
+			} else if (count > VIRTUAL_THRESHOLD) {
 				this._enableVirtualScroll();
 				this._renderVirtual();
 			} else {
@@ -422,8 +583,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 
 			for (let i = 0; i < data.length; i++) {
 				const el = this._buildItem(data[i]);
-				if (!el) break;
-				frag.appendChild(el);
+				if (el) frag.appendChild(el);
 			}
 
 			const scrollState = _saveScroll(this);
@@ -432,6 +592,16 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			_restoreScroll(scrollState);
 
 			if (this._selectable) this._updateSelectAll();
+		} else {
+			const html = [];
+			const data = this._filteredData;
+			for (let i = 0; i < data.length; i++) html.push(data[i].html);
+
+			const scrollState = _saveScroll(this);
+			this.tbody.innerHTML = html.join('');
+			_restoreScroll(scrollState);
+
+			if (this._selectable) this._restoreSelection();
 		}
 	};
 
@@ -585,6 +755,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			if (topSpacerHeight > 0) {
 				const topSpacer = document.createElement(this.isUl ? 'li' : 'div');
 				topSpacer.className = 'ln-list__spacer';
+				topSpacer.setAttribute('aria-hidden', 'true');
 				topSpacer.style.height = topSpacerHeight + 'px';
 				frag.appendChild(topSpacer);
 			}
@@ -597,6 +768,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			if (bottomSpacerHeight > 0) {
 				const bottomSpacer = document.createElement(this.isUl ? 'li' : 'div');
 				bottomSpacer.className = 'ln-list__spacer';
+				bottomSpacer.setAttribute('aria-hidden', 'true');
 				bottomSpacer.style.height = bottomSpacerHeight + 'px';
 				frag.appendChild(bottomSpacer);
 			}
@@ -610,13 +782,13 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		} else {
 			let html = '';
 			if (topSpacerHeight > 0) {
-				html += `<${this.isUl ? 'li' : 'div'} class="ln-list__spacer" style="height:${topSpacerHeight}px;padding:0;border:none"></${this.isUl ? 'li' : 'div'}>`;
+				html += `<${this.isUl ? 'li' : 'div'} class="ln-list__spacer" aria-hidden="true" style="height:${topSpacerHeight}px"></${this.isUl ? 'li' : 'div'}>`;
 			}
 			for (let i = start; i < end; i++) {
 				html += data[i].html;
 			}
 			if (bottomSpacerHeight > 0) {
-				html += `<${this.isUl ? 'li' : 'div'} class="ln-list__spacer" style="height:${bottomSpacerHeight}px;padding:0;border:none"></${this.isUl ? 'li' : 'div'}>`;
+				html += `<${this.isUl ? 'li' : 'div'} class="ln-list__spacer" aria-hidden="true" style="height:${bottomSpacerHeight}px"></${this.isUl ? 'li' : 'div'}>`;
 			}
 
 			const scrollState = _saveScroll(this);
@@ -686,6 +858,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		if (topSpacerHeight > 0) {
 			const topSpacer = document.createElement(this.isUl ? 'li' : 'div');
 			topSpacer.className = 'ln-list__spacer';
+			topSpacer.setAttribute('aria-hidden', 'true');
 			topSpacer.style.height = topSpacerHeight + 'px';
 			frag.appendChild(topSpacer);
 		}
@@ -700,6 +873,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		if (bottomSpacerHeight > 0) {
 			const bottomSpacer = document.createElement(this.isUl ? 'li' : 'div');
 			bottomSpacer.className = 'ln-list__spacer';
+			bottomSpacer.setAttribute('aria-hidden', 'true');
 			bottomSpacer.style.height = bottomSpacerHeight + 'px';
 			frag.appendChild(bottomSpacer);
 		}
@@ -740,7 +914,10 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		} else {
 			const fallback = this.dom.querySelector(`template[${EMPTY_TEMPLATE}]`);
 			if (fallback) {
-				el = document.importNode(fallback.content, true);
+				const matched = fallback.content.firstElementChild;
+				if (matched) {
+					el = document.importNode(matched, true);
+				}
 			}
 		}
 
@@ -755,7 +932,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		}
 
 		dispatch(this.dom, 'ln-list:empty', {
-			term: this.isDataDriven ? this.currentSearch : '',
+			term: this.isDataDriven ? this.currentSearch : this._searchTerm,
 			total: this.isDataDriven ? (this._lastTotal != null ? this._lastTotal : this._data.length) : this._data.length
 		});
 	};
@@ -784,6 +961,19 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 	};
 
 	// ─── Selection Helpers ─────────────────────────────────────
+
+	_component.prototype._restoreSelection = function () {
+		if (!this.tbody) return;
+		const items = this.tbody.querySelectorAll('[data-ln-item]');
+		for (let i = 0; i < items.length; i++) {
+			const id = items[i].getAttribute('data-ln-item-id');
+			const selected = id != null && this.selectedIds.has(String(id));
+			items[i].classList.toggle('ln-item-selected', selected);
+			const cb = items[i].querySelector('[data-ln-item-select]');
+			if (cb) cb.checked = selected;
+		}
+		this._updateSelectAll();
+	};
 
 	_component.prototype._enableSelection = function () {
 		if (this._selectableActive) return;
@@ -1006,6 +1196,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 
 		this._disableVirtualScroll();
+		this.dom.removeEventListener('ln-list:request-clear-filters', this._onRequestClearFilters);
 
 		if (this.isDataDriven) {
 			if (this._cache) this._cache.destroy();
@@ -1015,7 +1206,6 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			this.dom.removeEventListener('ln-list:request-revalidate', this._onRequestRevalidate);
 			this.dom.removeEventListener('ln-list:request-invalidate', this._onRequestInvalidate);
 			this.dom.removeEventListener('ln-sort:change', this._onSort);
-			this.dom.removeEventListener('click', this._onClearAll);
 
 			if (this.tbody) {
 				this.tbody.removeEventListener('click', this._onItemClick);
@@ -1026,6 +1216,9 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 				this._emptyObserver.disconnect();
 				this._emptyObserver = null;
 			}
+			if (this._onSearchChange) this.dom.removeEventListener('ln-search:change', this._onSearchChange);
+			if (this._onFilterChange) this.dom.removeEventListener('ln-filter:change', this._onFilterChange);
+			if (this._onSort) this.dom.removeEventListener('ln-sort:change', this._onSort);
 		}
 
 		if (this._onSelectionChange && this.tbody) {
@@ -1079,3 +1272,4 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		}
 	});
 })();
+

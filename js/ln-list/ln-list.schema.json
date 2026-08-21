@@ -15,6 +15,12 @@
 				"src/ln-list.js"
 			]
 		},
+		"data-ln-field": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
 		"data-ln-item": {
 			"direction": "author",
 			"sources": [
@@ -49,16 +55,6 @@
 			"direction": "author",
 			"sources": [
 				"ln-list.scss",
-				"src/ln-list.js"
-			]
-		},
-		"data-ln-list-clear": {
-			"direction": null,
-			"sources": []
-		},
-		"data-ln-list-clear-all": {
-			"direction": "author",
-			"sources": [
 				"src/ln-list.js"
 			]
 		},
@@ -133,14 +129,6 @@
 			"sources": [
 				"src/ln-list.js"
 			]
-		},
-		"data-ln-search": {
-			"direction": null,
-			"sources": []
-		},
-		"data-ln-search-for": {
-			"direction": null,
-			"sources": []
 		}
 	}
 }

@@ -10,6 +10,12 @@
 // Harmless in plain single-column list mode (1 / -1 spans the lone column).
 .ln-list__spacer {
 	grid-column: 1 / -1;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: none !important;
+	list-style: none !important;
+	background: transparent !important;
+	pointer-events: none;
 }
 
 // Windowed-virtualization placeholder item — static fill, no shimmer, parity

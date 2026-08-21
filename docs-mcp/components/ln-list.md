@@ -40,9 +40,7 @@ behavior differs by mode:
   columns) is **ignored entirely**: `preventDefault()` is never called, so `ln-sort`'s own default
   DOM-reorder fallback runs instead. Always author `data-ln-sort-field` when targeting a
   Data-Driven list.
-* **SSR mode** (no `data-ln-list-source`): `ln-list` registers **no** `ln-sort:change` listener at
-  all. Sorting an SSR list is handled entirely by `ln-sort`'s own default DOM-reorder fallback —
-  `ln-list` never sees or intercepts the event.
+* **SSR mode** (no `data-ln-list-source`): `ln-list` listens to `ln-sort:change`. When an event carrying a `field` (`field !== null`) is received, `ln-list` intercepts it (`preventDefault()`), re-sorts its in-memory parsed dataset, and updates the virtual scroll view (preventing DOM reorder destruction during virtual scrolling). When `field === null` (index-only sort), `ln-list` ignores the event, allowing `ln-sort`'s default DOM-reorder fallback to run.
 
 > [!CAUTION]
 > **`data-ln-list-field` is not `data-ln-sort-field`, and neither one is `data-ln-field`.** Three
@@ -51,19 +49,15 @@ behavior differs by mode:
 >   click intends to sort by — the control's own input, forwarded verbatim as `field` on the
 >   `ln-sort:change` payload.
 > - `data-ln-list-field` (on a sub-element inside each `[data-ln-item]` row) tells `ln-list`'s own
->   `_parseChildren()` which record property that sub-element's text represents — only read in
->   Data-Driven mode, only to reconstruct `row[prop]` from hydrated/pre-fetch markup before the
->   first `ln-list:set-data` arrives. It has nothing to do with which column is sortable.
+>   `_parseChildren()` which record property that sub-element's value represents — read in both
+>   Data-Driven and SSR modes via `readValue()` to extract structured record fields for in-memory
+>   sorting and filtering.
 > - `data-ln-field` (generic, from `ln-core`) is what `ln-sort`'s OWN default DOM-reorder fallback
->   reads per item when `ln-list` does not intercept the event (SSR mode, or an ignored
->   `field === null` event). Unrelated to `data-ln-list-field` even though both can be authored
->   inside the same `[data-ln-item]` row for different purposes.
+>   reads per item when `ln-list` does not intercept an index-only `field === null` event.
 >
-> Once `ln-list` intercepts (Data-Driven, `field` set), the sort key is `row[field]` on the
-> already-resolved in-memory record — populated either straight from the API payload (matching
-> field names 1:1) or, for pre-fetch hydrated rows, via `data-ln-list-field`. Author the same
-> field-name string in both `data-ln-sort-field` and (if hydrating) `data-ln-list-field` so they
-> agree in value — they are not the same attribute, they must simply match.
+> When `ln-list` intercepts (`field` set), the sort key is `row.fields[field]` or `row[field]` on the
+> in-memory record. Author matching field names in `data-ln-sort-field` and `data-ln-list-field` so
+> they agree in value.
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
@@ -147,8 +141,6 @@ In Data-Driven mode, the list requests data via coordinator events and populates
         (Selected: <span data-ln-list-selected></span>)
       </span>
     </div>
-    
-    <button type="button" data-ln-list-clear-all>Clear Filters</button>
   </div>
 
   <!-- List body target container (can be ul, ol, or div) -->
@@ -177,7 +169,7 @@ In Data-Driven mode, the list requests data via coordinator events and populates
     <div class="empty-state">
       <h3>No matches found</h3>
       <p>Try searching for something else or clearing filters.</p>
-      <button type="button" data-ln-list-clear class="btn">Clear Search</button>
+      <button type="button" data-ln-search-clear class="btn">Clear Search</button>
     </div>
   </template>
 
@@ -208,7 +200,7 @@ In Data-Driven mode, the list requests data via coordinator events and populates
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-list` | Root container | `String` | - | Identifies the list component and names the generated events. |
-| `data-ln-list-source` | Root container | `String` | - | Enables Data-Driven mode. Specifies a key or API endpoint to request data. |
+| `data-ln-list-source` | Root container | `String` | - | Enables Data-Driven mode. Specifies a key or Store ID to request data. |
 | `data-ln-list-selectable` | Root container | `Flag` | - | Enables selection logic and row select checkbox listeners. |
 | `data-ln-list-window` | Root container | `Number` | - | Opt-in server-side sliding-window virtualization. Sets the resident-item cap (`windowSize`) for the internal `ln-core.createWindowCache` instance. Observable — adding/removing it toggles windowed mode ON/OFF live, no re-init; changing the value while windowed reconfigures the live cache. |
 | `data-ln-list-window-page` | Root container | `Number` | `200` | Configures the chunk/page fetch size (`pageSize` / `limit`) for page-aligned server requests. Observable — applies to the live cache without re-init. |
@@ -219,12 +211,11 @@ In Data-Driven mode, the list requests data via coordinator events and populates
 | `data-ln-item-id` | `[data-ln-item]` | `String` | - | Unique ID of the row item (mapped from the data record). |
 | `data-ln-item-select` | `<input>` | `Flag` | - | Checkbox inside the row template for toggling row selection. |
 | `data-ln-list-select-all` | `<input>` | `Flag` | - | Global checkbox to select or deselect all items simultaneously. |
-| `data-ln-list-field` | Sub-element | `String` | - | Placed on elements within a row to map their text content to a property of the parsed record (crucial for local sorting/filtering of SSR/hydrated data). |
+| `data-ln-list-field` | Sub-element | `String` | - | Placed on elements within a row to map their value (via `readValue()`) to a property of the parsed record for local sorting/filtering. |
 | `data-ln-item-action` | `<button>` | `String` | - | Declares a named action on the item. Click bubbles up as `ln-list:item-action`. |
 | `data-ln-list-total` | `<span>` | `Flag` | - | Displays total number of records. |
 | `data-ln-list-filtered` | `<span>` | `Flag` | - | Displays filtered visible count. Parent element is hidden when no filters are active. |
 | `data-ln-list-selected` | `<span>` | `Flag` | - | Displays active selection count. Parent element is hidden when selection is 0. |
-| `data-ln-list-clear-all` | `<button>` | `Flag` | - | Button to clear all filters and trigger a new fetch. |
 | `data-ln-list-empty` | `<template>` | `Flag` | - | Template (`template[data-ln-list-empty]`) for the empty state in SSR mode. |
 | `data-ln-empty` | `<template>` | `Flag` | - | Generic fallback template (`template[data-ln-empty]`) for empty states in Data-Driven mode. |
 | `data-ln-empty-when` | Sub-element | `"initial"` \| `"search"` | - | Placed inside `template[data-ln-empty]` to show a specific block when list is empty initially (`initial`) vs when search returned no results (`search`). |
@@ -237,16 +228,22 @@ In Data-Driven mode, the list requests data via coordinator events and populates
 | `ln-list:set-loading` | Listens | No | Controls the visual loading state of the list. | `{ loading: Boolean }` |
 | `ln-list:page-failed` | Listens | No | Windowed mode (`data-ln-list-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry. | `{ offset: Number }` |
 | `ln-list:request-revalidate` | Listens | No | Windowed mode (`data-ln-list-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives. | *(no payload)* |
-| `ln-sort:change` | Listens | No | Column/field sort intent from [`ln-sort`](./ln-sort.md), **Data-Driven mode only** — SSR mode registers no listener at all (see "Sort Integration" in §1). An event with `field !== null` is intercepted: sets `currentSort`, re-sorts `_filteredData` locally and re-renders (non-windowed), or calls `_requestData()` for a fresh page (windowed, `data-ln-list-window`). An event with `field === null` is ignored (no `preventDefault()` called), leaving `ln-sort`'s own default DOM-reorder fallback to run. | `{ field: String\|null, column: Number\|null, direction: 'asc'\|'desc'\|'none', targetId: String }` |
+| `ln-list:request-invalidate` | Listens | No | Windowed mode (`data-ln-list-window`): invalidates the window cache and resets to page 0. | *(no payload)* |
+| `ln-list:request-clear-filters` | Listens | No | Resets all active filters and search term. In Data-Driven mode, dispatches `ln-list:clear-filters` and requests fresh data; in SSR mode, re-evaluates in-memory filters. | *(no payload)* |
+| `ln-search:change` | Listens | Yes | In SSR mode, filters in-memory records by search tokens and updates the virtual view. In Data-Driven mode, `ln-search` targets the Store directly. | `{ term: String, targetId: String }` |
+| `ln-filter:change` | Listens | Yes | In SSR mode, filters in-memory records by key/values and updates the virtual view. In Data-Driven mode, `ln-filter` targets the Store directly. | `{ key: String, values: Array, targetId: String }` |
+| `ln-sort:change` | Listens | Yes | In Data-Driven mode with `field !== null`, sets `currentSort`, re-sorts `_filteredData` locally (non-windowed) or calls `_requestData()` for fresh slice (windowed). In SSR mode, sorts in-memory records by field/value and updates the virtual view. | `{ field: String\|null, column: Number\|null, direction: 'asc'\|'desc'\|'none', targetId: String }` |
 | `ln-list:request-data` | Emits | No | Dispatched on initialization or parameter changes (sort, search, filter) to request data. Windowed mode (`data-ln-list-window`) additionally emits `offset`/`limit`/`queryGen`. | `{ list: String, sort: Object, filters: Object, search: String, offset?: Number, limit?: Number, queryGen?: Number }` |
 | `ln-list:ready` | Emits | No | Dispatched after hydration or initial SSR item parsing completes. | `{ total: Number }` |
 | `ln-list:rendered` | Emits | No | Dispatched after items are appended/redrawn in the DOM. | `{ list: String, total: Number, visible: Number }` |
+| `ln-list:filter` | Emits | No | Dispatched in SSR mode when search/filter narrows visible items. | `{ term: String, matched: Number, total: Number }` |
+| `ln-list:sorted` | Emits | No | Dispatched in SSR mode when items are sorted. | `{ field: String, direction: String, matched: Number, total: Number }` |
 | `ln-list:item-click` | Emits | No | Dispatched on item click (ignoring action button, checkbox, and link clicks). | `{ list: String, id: String, record: Object }` |
 | `ln-list:item-action` | Emits | No | Dispatched when clicking a button marked with `data-ln-item-action`. | `{ list: String, id: String, action: String, record: Object }` |
 | `ln-list:select` | Emits | No | Dispatched when item selection changes. | `{ list: String, selectedIds: Set, count: Number }` |
 | `ln-list:select-all` | Emits | No | Dispatched when the global "Select All" checkbox status changes. | `{ list: String, selected: Boolean }` |
 | `ln-list:empty` | Emits | No | Dispatched when the empty state template is drawn. | `{ term: String, total: Number }` |
-| `ln-list:clear-filters` | Emits | No | Dispatched on clear-all click to instruct coordinator to reset active filters. | `{ list: String }` |
+| `ln-list:clear-filters` | Emits | No | Dispatched to instruct coordinator/store to reset active filters. | `{ list: String }` |
 
 ---
 

@@ -955,13 +955,6 @@
 					"role": "marker",
 					"description": "Target element to render selected count."
 				},
-				"data-ln-list-clear-all": {
-					"type": "boolean",
-					"read_by": "ln-list",
-					"consumed_by": "js",
-					"role": "input",
-					"description": "Button trigger to clear all active list filters."
-				},
 				"data-ln-list-selectable": {
 					"type": "boolean",
 					"read_by": "ln-list",
@@ -996,13 +989,6 @@
 					"consumed_by": "js",
 					"role": "state",
 					"description": "Rendered record ID on item root element."
-				},
-				"data-ln-list-clear": {
-					"type": "boolean",
-					"read_by": "ln-list",
-					"consumed_by": "js",
-					"role": "input",
-					"description": "Button to clear search term."
 				},
 				"data-ln-list-field": {
 					"type": "string",
