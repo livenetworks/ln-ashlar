@@ -3485,8 +3485,11 @@ H(ee, Se, ke, "ln-router", {
     }
   }
   function n(v) {
+    if (v._lnSearchText !== void 0) return v._lnSearchText;
     const E = [];
-    return f(v, E), E.join(" ").replace(/\s+/g, " ").toLowerCase();
+    f(v, E);
+    const w = E.join(" ").replace(/\s+/g, " ").toLowerCase();
+    return v._lnSearchText = w, w;
   }
   function o(v, E) {
     if (!v.id) return;
@@ -3499,13 +3502,23 @@ H(ee, Se, ke, "ln-router", {
     }
   }
   function t(v) {
-    if (this.dom = v, this.term = v.getAttribute(d) || "", r(this.term)) {
-      const E = this;
-      Tt(function() {
-        o(E.dom, E.term), E._apply();
-      });
-    }
-    return this;
+    this.dom = v, this.term = v.getAttribute(d) || "";
+    const E = this;
+    return this._observer = new MutationObserver(function(w) {
+      for (let A = 0; A < w.length; A++) {
+        const L = w[A];
+        if (L.type === "childList" || L.type === "characterData") {
+          const q = L.target;
+          if (q && q._lnSearchText !== void 0 && delete q._lnSearchText, q && q.parentElement && q.parentElement._lnSearchText !== void 0 && delete q.parentElement._lnSearchText, L.addedNodes)
+            for (let x = 0; x < L.addedNodes.length; x++) {
+              const I = L.addedNodes[x];
+              I._lnSearchText !== void 0 && delete I._lnSearchText;
+            }
+        }
+      }
+    }), this._observer.observe(v, { childList: !0, subtree: !0, characterData: !0 }), r(this.term) && Tt(function() {
+      o(E.dom, E.term), E._apply();
+    }), this;
   }
   t.prototype._apply = function() {
     const v = this.dom, E = r(this.term), w = l(E);
@@ -3527,7 +3540,7 @@ H(ee, Se, ke, "ln-router", {
         }
     }
   }, t.prototype.destroy = function() {
-    this.dom[a] && delete this.dom[a];
+    this.dom[a] && (this._observer && (this._observer.disconnect(), this._observer = null), delete this.dom[a]);
   };
   function e(v) {
     this.dom = v, this.targetId = v.getAttribute(b), this.input = h(v);

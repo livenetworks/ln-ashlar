@@ -63,11 +63,16 @@ import { dispatchCancelable, registerComponent, queueBoot } from '../../ln-core'
 	// Item text minus every [data-ln-search-exclude] subtree. Parts join with a
 	// space so a token cannot match across an element boundary. Same collapse +
 	// lower-case the previous textContent path applied.
+	// Results are cached on el._lnSearchText to avoid repetitive DOM walks during keystrokes;
+	// cache is automatically invalidated when childList or characterData mutates.
 	// Never called for an exempt item — _apply short-circuits those before here.
 	function _searchText(el) {
+		if (el._lnSearchText !== undefined) return el._lnSearchText;
 		const parts = [];
 		_collectText(el, parts);
-		return parts.join(' ').replace(/\s+/g, ' ').toLowerCase();
+		const text = parts.join(' ').replace(/\s+/g, ' ').toLowerCase();
+		el._lnSearchText = text;
+		return text;
 	}
 
 	// Attribute is the truth: push it back into every control pointing here.
@@ -89,11 +94,31 @@ import { dispatchCancelable, registerComponent, queueBoot } from '../../ln-core'
 		this.dom = dom;
 		this.term = dom.getAttribute(DOM_SELECTOR) || '';
 
+		const self = this;
+		this._observer = new MutationObserver(function (mutations) {
+			for (let i = 0; i < mutations.length; i++) {
+				const mut = mutations[i];
+				if (mut.type === 'childList' || mut.type === 'characterData') {
+					const target = mut.target;
+					if (target && target._lnSearchText !== undefined) delete target._lnSearchText;
+					if (target && target.parentElement && target.parentElement._lnSearchText !== undefined) {
+						delete target.parentElement._lnSearchText;
+					}
+					if (mut.addedNodes) {
+						for (let j = 0; j < mut.addedNodes.length; j++) {
+							const node = mut.addedNodes[j];
+							if (node._lnSearchText !== undefined) delete node._lnSearchText;
+						}
+					}
+				}
+			}
+		});
+		this._observer.observe(dom, { childList: true, subtree: true, characterData: true });
+
 		// Seed an authored / deep-linked term. Deferred through queueBoot so
 		// consumers on this same element have finished init and can prevent
 		// the default before the first dispatch.
 		if (_normalizeTerm(this.term)) {
-			const self = this;
 			queueBoot(function () {
 				_syncControls(self.dom, self.term);
 				self._apply();
@@ -151,6 +176,10 @@ import { dispatchCancelable, registerComponent, queueBoot } from '../../ln-core'
 
 	_stateComponent.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
+		if (this._observer) {
+			this._observer.disconnect();
+			this._observer = null;
+		}
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

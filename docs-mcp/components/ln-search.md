@@ -23,7 +23,7 @@ The `ln-search` component is a decoupled search primitive implemented using the 
 *   **Dual Search Operations (Local vs Remote):**
     *   **Local DOM Filtering (Markup Search):** Configured with `data-ln-search-debounce="0"` on the control for instant per-keyup text matching. Matches stay visible, non-matching elements receive `data-ln-search-hide="true"`.
     *   **Remote API Search:** Uses default `500ms` debounce (or custom `data-ln-search-debounce="150"`) to throttle queries.
-*   **Tokenized AND Matching:** Matches whitespace-separated tokens order-independently using substring tests (`indexOf`).
+*   **Tokenized AND Matching & Text Caching:** Matches whitespace-separated tokens order-independently using substring tests (`indexOf`). Searchable text per item is cached dynamically (`_lnSearchText`) to guarantee $O(1)$ per-item lookups on keystrokes, and automatically invalidated via `MutationObserver` on DOM/text mutations.
 *   **Exempt & Subtree Exclusion (`data-ln-search-exclude`):**
     *   On an **item root**: The item is completely exempt from filtering (always visible, never hidden).
     *   On a **descendant**: That subtree is omitted from search text calculation.
