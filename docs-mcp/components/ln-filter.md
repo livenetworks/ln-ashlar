@@ -24,14 +24,14 @@ Key responsibilities include:
 - **Checkbox State Synchronization:** Handles mutual exclusion rules for reset ("All") sentinels and value inputs automatically.
 - **Client-side Filtering:** Automatically filters target elements (cards/lists) by matching child attributes (`data-[key]`) and toggling `data-ln-filter-hide="true"`.
 - **Plain Table Filtering:** Filters plain `<table>` rows by scanning column cell text using a 0-based column index (`data-ln-filter-col`).
-- **Auto-Population Mode:** Generates checkbox options dynamically from unique table column values when a `<template>` is present inside the filter container.
-- **State Persistence:** Saves and restores selected filter values in `localStorage` across page reloads when opted-in.
-- **Dual Dispatch Notification:** Emits changes via custom events (`ln-filter:changed` and `ln-filter:reset`) on both the filter container and the target element simultaneously.
+- **State Persistence:** Saves and restores selected filter values in `localStorage` across page reloads when opted-in (`data-ln-persist`).
+- **Two-Host Bridge Notification:** Emits cancelable `ln-filter:change` events with `{ bubbles: true }` on both the filter container (for UI coordinators) and the target element (for data presenters/stores).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
 > - **No direct API/Network calls:** It operates strictly on DOM elements or dispatches events; it does not perform AJAX/fetch requests.
-> - **No local DOM changes for `ln-table`:** When targeting an `ln-table` component (detected via the `data-ln-table` attribute), `ln-filter` functions purely as an event emitter. It bypasses local option generation and direct row-hiding to avoid interfering with `ln-table`'s rendering lifecycle, letting `ln-table` apply filters internally.
+> - **No DOM-scraping for options:** Filter options are authored in markup (or rendered by domain templates/`ln-options`), never dynamically derived by scraping table DOM cells.
+> - **No direct DOM changes when claimed:** When a consumer (like `ln-table` in SSR mode or `ln-data-store`) calls `e.preventDefault()`, `ln-filter` skips default DOM hiding.
 > - **No direct inline CSS hiding:** It does not apply `display: none` styles via JavaScript. Instead, it toggles the `data-ln-filter-hide="true"` attribute and relies on Vanilla CSS rules for visual hiding.
 
 ---
@@ -73,28 +73,33 @@ Binds the filter control to a list container. Target items declare matching `dat
 </ul>
 ```
 
-### Variant 1: Plain Table Filter with Auto-Population & Persistence
+### Variant 1: Plain Table Filter by Column Index (`data-ln-filter-col`)
 
-Auto-populates unique filter checkboxes from column index `2` (Department) and persists state in storage.
+Filters plain `<table>` rows by scanning column cell text at index `2` (Department).
 
 ```html
-<ul id="dept-filter" data-ln-filter="users-table" data-ln-filter-col="2" data-ln-persist>
-  <li>
-    <label>
-      <input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked>
-      All Departments
-    </label>
-  </li>
-  
-  <!-- Template cloned dynamically for unique values -->
-  <template>
+<nav data-ln-filter="users-table" data-ln-filter-col="2" data-ln-persist>
+  <ul>
     <li>
       <label>
-        <input type="checkbox"> {{ text }}
+        <input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked>
+        All Departments
       </label>
     </li>
-  </template>
-</ul>
+    <li>
+      <label>
+        <input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Engineering">
+        Engineering
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Design">
+        Design
+      </label>
+    </li>
+  </ul>
+</nav>
 
 <table id="users-table">
   <thead>
@@ -109,7 +114,7 @@ Auto-populates unique filter checkboxes from column index `2` (Department) and p
 
 ### Variant 2: Composition with Popover in `ln-table`
 
-The canonical composition for `ln-table` per-column filters. `ln-filter` dispatches events, and `ln-table` handles filtration.
+The canonical composition for table per-column filters. `ln-filter` dispatches events, and `ln-table` or `ln-data-store` handles filtration.
 
 ```html
 <!-- Table Header column with filter button -->
@@ -125,11 +130,6 @@ The canonical composition for `ln-table` per-column filters. `ln-filter` dispatc
 
 <!-- Popover container outside of the table -->
 <div data-ln-popover id="filter-dept-popover">
-  <input type="search" placeholder="Search..."
-         data-ln-search="filter-dept-list"
-         data-ln-search-items="label"
-         data-ln-search-debounce="0">
-
   <ul id="filter-dept-list" data-ln-filter="my-table">
     <li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
     <li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
@@ -146,7 +146,7 @@ The canonical composition for `ln-table` per-column filters. `ln-filter` dispatc
 
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
-| `data-ln-filter` | Container root (`<ul>` / `<table>` / filter wrapper) | `String` | — *(required)* | Target container `id` (list, plain table, or `ln-table`) whose elements are filtered. |
+| `data-ln-filter` | Container root (`<ul>` / `<nav>`) | `String` | — *(required)* | Target container `id` (list, plain table, or store) whose elements are filtered. |
 | `data-ln-filter-key` | `<input type="checkbox">` | `String` | — | Field name/key to match (corresponds to `data-[key]` on target children, or the filter key for table column filtering). |
 | `data-ln-filter-value` | `<input type="checkbox">` | `String` | `""` | Value to match. Checked inputs keep matching items visible (OR logic within the same key). |
 | `data-ln-filter-reset` | `<input type="checkbox">` | Flag | — | Marks the reset sentinel input ("All"). Checking it unchecks every value input in the group. |
@@ -159,12 +159,10 @@ The canonical composition for `ln-table` per-column filters. `ln-filter` dispatc
 
 ### Events API
 
-`ln-filter` dispatches events on both the filter container (`this.dom`) and the target element (`document.getElementById(targetId)`) simultaneously (Dual Dispatch).
-
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-filter:changed` | Emits | No | Fired on the filter root and the target element whenever the active filter selection changes. | `{ key: String, values: String[] }` |
-| `ln-filter:reset` | Emits | No | Fired on the filter root and the target element only when transitioning from an active filter state back to the reset sentinel ("All"). | `{}` |
+| `ln-filter:change` | Emits | Yes (`preventDefault`) | Fired on both the filter root and target whenever the filter selection changes. Consumers calling `preventDefault()` claim filtration and prevent default DOM item hiding. | `{ key: String, values: String[], targetId: String }` |
+| `ln-filter:reset` | Emits | No | Fired only when transitioning from an active filter state back to the reset sentinel ("All"). | `{ targetId: String }` |
 
 ---
 
@@ -231,27 +229,35 @@ The reset sentinel checkbox acts as an automatic coordinator:
 sequenceDiagram
     autonumber
     actor User as User
-    participant Filter as ln-filter Component
-    participant Target as Target Element (List/Table/ln-table)
+    participant Filter as ln-filter (Control)
+    participant Coord as ln-table-coordinator (UI)
+    participant Target as Target Element (List / Table / Store)
 
     User->>Filter: Clicks on a filter checkbox
     Note over Filter: Processes Sentinel ("All") logic and<br/>schedules asynchronous rendering (_queueRender)
-    
-    alt Standard Filtering (plain list/table)
-        Filter->>Target: Updates data-ln-filter-hide="true" on children/rows
-    else Integration with ln-table (data-ln-table detected)
-        Note over Filter: Bypasses direct DOM modification (Guard)
-    end
+    Filter->>Coord: dispatch 'ln-filter:change' (Two-Host Bridge for .ln-filter-active)
+    Coord->>Coord: Toggles .ln-filter-active on matching <th>
 
-    Filter->>Target: Emits ln-filter:changed event (Dual Dispatch)
-    Note over Target: ln-table listens to the event and filters/updates itself
+    Filter->>Target: dispatchCancelable 'ln-filter:change' { key, values, targetId }
+
+    alt Consumer calls e.preventDefault() (ln-table SSR / ln-data-store)
+        Target-->>Filter: defaultPrevented = true
+        Note over Target: Target handles filtration internally
+    else Standard DOM filtering
+        alt Plain table (data-ln-filter-col)
+            Filter->>Target: _filterTableRows() by column index
+        else Standard list/container
+            Filter->>Target: Updates data-ln-filter-hide="true" on non-matching children
+        end
+    end
 ```
 
 ---
 
 ## 7. Related Components
 
-- [ln-table.md](./ln-table.md) — Table component that consumes `ln-filter:changed` to filter table columns.
+- [ln-table.md](./ln-table.md) — Table component that consumes `ln-filter:change`.
+- [ln-table-coordinator.md](./ln-table-coordinator.md) — Coordinator managing header indicator states.
 - [ln-search.md](./ln-search.md) — Search input primitive that works orthogonally alongside `ln-filter`.
 - [ln-popover.md](./ln-popover.md) — Popover container used to host column filter dropdowns.
 - [ln-toggle.md](./ln-toggle.md) — Simple state toggler.

@@ -58,17 +58,14 @@
 #### Консумирани настани
 | Настан | Извор | Опис |
 | :--- | :--- | :--- |
-| `ln-search:change` | `document` | Промена во пребарувачот → диспачира `ln-table:set-search`. |
-| `ln-filter:changed` | `document` | Промена во колониски филтер → тогли `.ln-filter-active` и диспачира `ln-table:set-filter`. |
-| `click` | `document` | Кликови на копчиња за чистење филтри → диспачира `ln-table:request-clear-filters`. |
-| `keydown` (`'/'`) | `document` | Фокусирање на полето за пребарување. |
+| `ln-filter:change` | `dom` | Промена во филтер панелот → тогли `.ln-filter-active` на соодветното `<th>` во табелата. |
+| `click` | `dom` | Кликови на копчиња за чистење (`data-ln-table-clear` / `data-ln-table-clear-all`) → ги ресетира контролите и за SSR табела диспачира `ln-table:request-clear-filters`. |
+| `keydown` (`'/'`) | `document` | Брз пристап и фокусирање на најблиското поле за пребарување. |
 
 #### Диспачирани настани
 | Настан | Цел | Детали (`detail`) | Опис |
 | :--- | :--- | :--- | :--- |
-| `ln-table:set-search` | `[data-ln-table]` | `{ query, term, table }` | Бара постава на пребарувачки поим во табелата. |
-| `ln-table:set-filter` | `[data-ln-table]` | `{ key, values, table }` | Бара постава на филтер критериум по колона. |
-| `ln-table:request-clear-filters` | `[data-ln-table]` | `{ table }` | Бара целосно ресетирање на филтрите. |
+| `ln-table:request-clear-filters` | `[data-ln-table]` | `{ table }` | Се испраќа кон SSR табела при клик на копче за чистење филтри. |
 
 ---
 

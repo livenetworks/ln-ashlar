@@ -81,11 +81,13 @@
 #### Консумирани командни настани
 | Настан | Детали (`detail`) | Опис |
 | :--- | :--- | :--- |
-| `ln-table:set-search` | `{ query }` | Го поставува пребарувачкиот поим. |
-| `ln-table:set-filter` | `{ key, values }` | Поставува колониски филтер. |
-| `ln-table:set-data` | `{ data, total, filtered }` | Вбризгува податоци во табелата. |
+| `ln-search:change` | `{ term }` | Пребарувачки поим во SSR режим (повикува `preventDefault()`). |
+| `ln-filter:change` | `{ key, values, targetId }` | Колониски филтер во SSR режим (повикува `preventDefault()`). |
+| `ln-sort:change` | `{ column, direction }` | Сортирање по колона (повикува `preventDefault()`). |
+| `ln-table:set-search` | `{ query }` | Поставува пребарувачки поим (Data-Driven режим). |
+| `ln-table:set-data` | `{ data, total, filtered }` | Вбризгува податоци во табелата (Data-Driven режим). |
 | `ln-table:set-loading` | `{ loading: true\|false }` | Ја тогли loading состојбата `.ln-table--loading`. |
-| `ln-table:request-clear-filters` | `{}` | Го ресетира внатрешниот пребарувач и филтри. |
+| `ln-table:request-clear-filters` | `{}` | Го ресетира внатрешниот пребарувач и филтри во SSR режим. |
 
 #### Диспачирани известителни настани
 | Настан | Детали (`detail`) | Опис |

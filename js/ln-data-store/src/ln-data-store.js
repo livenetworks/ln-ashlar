@@ -283,7 +283,8 @@ import { createWindowIndex } from './window-index';
 				self.query.search = term;
 				_emitQueryChanged(self);
 			},
-			'ln-filter:changed': e => {
+			'ln-filter:change': e => {
+				e.preventDefault();
 				const key = e.detail && e.detail.key;
 				if (!key) return;
 				const values = (e.detail.values || []).slice();

@@ -26,7 +26,7 @@ The JavaScript source is located at [ln-table.js](../../js/ln-table/src/ln-table
 ### Orthogonality Doctrine (What the component does NOT do)
 * **No direct network/API calls:** It does not fetch data itself. When sorting, filtering, or searching changes in Data-Driven mode, it merely emits a `ln-table:request-data` event. The app coordinator (e.g., [`ln-data-coordinator`](./ln-data-coordinator.md)) handles the transport layer.
 * **No primary state storage:** The component represents a visual window onto the data. State modifications must be propagated back via the `ln-table:set-data` event.
-* **No filter UI generation:** It does not generate dropdown menus or filter checkboxes. Filter panels are independent DOM trees managed by [`ln-filter`](./ln-filter.md), which dispatches `ln-filter:changed`; [`ln-table-coordinator`](./ln-table-coordinator.md) receives it and translates it into `ln-table:set-filter`, which is what the table actually consumes.
+* **No filter UI generation:** It does not generate dropdown menus or filter checkboxes. Filter panels are independent DOM trees managed by [`ln-filter`](./ln-filter.md), which dispatches `ln-filter:change`. In SSR mode, `ln-table` consumes `ln-filter:change` directly with `preventDefault()`; in Data-Driven mode, `ln-data-store` owns the query filters and re-serves the table.
 * **No sort control UI:** It does not render or own sort trigger buttons. Column sort UI is composed via [`ln-sort`](./ln-sort.md) inside the `<th>`; `ln-table` only consumes the `ln-sort:change` event that control dispatches.
 
 ---
@@ -172,8 +172,8 @@ Use when the table queries a store and connects through a coordinator rather tha
 | `ln-table:set-loading` | Listens | No | Toggles the `.ln-table--loading` overlay class (Data-Driven mode). | `{ loading: Boolean }` |
 | `ln-table:page-failed` | Listens | No | Windowed mode (`data-ln-table-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry. | `{ offset: Number }` |
 | `ln-table:request-revalidate` | Listens | No | Windowed mode (`data-ln-table-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives. | *(no payload)* |
-| `ln-search:change` | Listens | No | Consumed directly on itself in SSR mode only, triggering local in-memory search matching. In Data-Driven mode `ln-table-coordinator` intercepts this event on the search input's target and dispatches `ln-table:set-search` instead. | `{ term: String }` |
-| `ln-table:set-filter` | Listens | No | Dispatched by `ln-table-coordinator` after it receives `ln-filter:changed` from a `[data-ln-filter]` popover; applies column filter values in both SSR and Data-Driven modes. | `{ key: String, values: Array, table: String }` |
+| `ln-search:change` | Listens | Yes (`preventDefault`) | Consumed directly on itself in SSR mode only, triggering local in-memory search matching. In Data-Driven mode `ln-table-coordinator` intercepts this event on the search input's target and dispatches `ln-table:set-search` instead. | `{ term: String }` |
+| `ln-filter:change` | Listens | Yes (`preventDefault`) | Consumed directly on itself in SSR mode only (`!this.isDataDriven`), applying column filters to the in-memory `_data` cache. | `{ key: String, values: Array, targetId: String }` |
 | `ln-sort:change` | Listens | No | Column sort intent from [`ln-sort`](./ln-sort.md). SSR mode re-orders in-memory rows locally and dispatches `ln-table:sorted`; Data-Driven mode sets `currentSort` and dispatches a fresh `ln-table:request-data`. `ln-table` always calls `preventDefault()`, superseding `ln-sort`'s own default DOM-reorder fallback. | `{ field: String\|null, column: Number\|null, direction: 'asc'\|'desc'\|'none', targetId: String }` |
 | `ln-table:ready` | Emits | No | Fired once after initial row hydration/parsing completes (SSR and Data-Driven modes). | `{ total: Number }` |
 | `ln-table:rendered` | Emits | No | Fired after `ln-table:set-data` finishes rendering (Data-Driven mode). | `{ table: String, total: Number, visible: Number }` |
@@ -362,7 +362,7 @@ stateDiagram-v2
 ## 7. Related Components
 
 * [`ln-search`](./ln-search.md) — drives table text matching via `ln-search:change` events.
-* [`ln-filter`](./ln-filter.md) — controls column filter logic and active dropdown menus; dispatches `ln-filter:changed`, which `ln-table-coordinator` translates into the `ln-table:set-filter` event this table consumes.
+* [`ln-filter`](./ln-filter.md) — controls column filter logic and active dropdown menus; dispatches `ln-filter:change`, consumed directly by SSR `ln-table` and `ln-data-store`.
 * [`ln-sort`](./ln-sort.md) — provides the column sort trigger buttons and dispatches `ln-sort:change`, which `ln-table` intercepts to reorder or re-request data.
 * [`ln-data-coordinator`](./ln-data-coordinator.md) — generic coordinator bridging store datasets and connectors to `ln-table` inputs.
 * [`ln-data-store`](./ln-data-store.md) — caches query collections and updates views.

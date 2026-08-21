@@ -51,11 +51,11 @@ ln-ashlar makes deliberate trade-offs, and its wins and costs are not the ones a
 
 **Ashlar way:** Autonomous IIFE components bind via `data-ln-*` attributes, auto-init via MutationObserver, communicate via CustomEvents addressed by element `id`. No parent-child coupling, no props, no imports between components. DOM position is irrelevant to wiring — teleport-safe by design.
 
-**Why:** A filter inside a popover teleported to `<body>` still dispatches `ln-filter:changed` on `getElementById(tableId)`. The components have no idea they were moved.
+**Why:** A filter inside a popover teleported to `<body>` still dispatches `ln-filter:change` on `getElementById(tableId)`. The components have no idea they were moved.
 
 **Concrete example:**
 - `js/ln-popover/src/ln-popover.js:91` — teleports the entire popover block to `<body>` on open.
-- `js/ln-filter/src/ln-filter.js:293` — `_dispatchOnBoth` dispatches on `getElementById(this.targetId)`. Works regardless of DOM position.
+- `js/ln-filter/src/ln-filter.js` — dispatches cancelable `ln-filter:change` on `getElementById(this.targetId)`. Works regardless of DOM position.
 
 ---
 
@@ -76,7 +76,7 @@ ln-ashlar makes deliberate trade-offs, and its wins and costs are not the ones a
 
 **Mainstream way:** A "filterable table" is a monolithic table component with built-in filter UI — dropdowns, chips, clear button, all owned by one component.
 
-**Ashlar way:** A "table filter" is `ln-popover` + `ln-search` + `ln-filter` composing together, with `ln-table` merely consuming one event (`ln-filter:changed`). Big components do not grow features; they expose events.
+**Ashlar way:** A "table filter" is `ln-popover` + `ln-search` + `ln-filter` composing together, with `ln-table` merely consuming one event (`ln-filter:change`). Big components do not grow features; they expose events.
 
 **Why:** Each component is independently testable and reusable. `ln-filter` works for card grids. `ln-popover` works for any overlay. Neither knows about the other.
 

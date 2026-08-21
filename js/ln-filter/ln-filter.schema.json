@@ -30,7 +30,7 @@
 			]
 		},
 		"data-ln-filter-key": {
-			"direction": "both",
+			"direction": "author",
 			"sources": [
 				"src/ln-filter.js"
 			]
@@ -42,7 +42,7 @@
 			]
 		},
 		"data-ln-filter-value": {
-			"direction": "both",
+			"direction": "author",
 			"sources": [
 				"src/ln-filter.js"
 			]
@@ -54,10 +54,8 @@
 			]
 		},
 		"data-ln-table": {
-			"direction": "author",
-			"sources": [
-				"src/ln-filter.js"
-			]
+			"direction": null,
+			"sources": []
 		}
 	}
 }

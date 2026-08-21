@@ -289,7 +289,7 @@
 					<main>
 						<ul>
 							<li><strong>Global search</strong> — <code>ln-search</code> dispatches <code>ln-search:change</code> on the <code>data-ln-table</code> wrapper. <code>ln-table</code> intercepts and filters rows in-memory — no custom script needed.</li>
-							<li><strong>Per-column filters</strong> — <code>ln-filter</code> dispatches <code>ln-filter:changed</code> on the table wrapper. <code>ln-table</code> maps filter keys to columns via <code>data-ln-table-filter-col</code> on <code>&lt;th&gt;</code>. Multiple columns combine with AND; within a column, values use OR. When active, <code>.ln-filter-active</code> is toggled on the filter <code>&lt;button&gt;</code> — the funnel icon turns accent color.</li>
+							<li><strong>Per-column filters</strong> — <code>ln-filter</code> dispatches <code>ln-filter:change</code> on the table wrapper. <code>ln-table</code> maps filter keys to columns via <code>data-ln-table-filter-col</code> on <code>&lt;th&gt;</code>. Multiple columns combine with AND; within a column, values use OR. When active, <code>.ln-filter-active</code> is toggled on the filter <code>&lt;button&gt;</code> — the funnel icon turns accent color.</li>
 							<li><strong>Popover pattern (canonical)</strong> — All columns use <code>ln-popover</code> with static authored checkboxes in <code>&lt;ul&gt;/&lt;li&gt;</code>. Each popover's <code>data-ln-filter</code> targets the table wrapper ID. Options come from the domain enum — including zero-record options like "Product".</li>
 							<li><strong>Sort</strong> — via <code>data-ln-sort</code> on a <code>&lt;ul&gt;</code> inside <code>&lt;th&gt;</code>. Click cycles ascending → descending → unsorted; the cycle order is CSS-driven, not JS.</li>
 						</ul>

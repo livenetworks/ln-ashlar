@@ -49,7 +49,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 
 		// Point-to-point only: the event either landed on the table itself, or it
 		// names the source that table is bound to. No "first table in the host"
-		// fallback — ln-filter fires the same ln-filter:changed on its own <ul>
+		// fallback — ln-filter fires ln-filter:change on its own <ul>
 		// root AND on the target, so a fallback makes the coordinator act twice
 		// for one user change and emit two identical fetches.
 		function _resolveTable(e) {
@@ -141,7 +141,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 			}
 		};
 
-		dom.addEventListener('ln-filter:changed', self._handlers.filter);
+		dom.addEventListener('ln-filter:change', self._handlers.filter);
 		dom.addEventListener('click', self._handlers.clear);
 	}
 
@@ -151,7 +151,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 
 		if (this._handlers) {
-			this.dom.removeEventListener('ln-filter:changed', this._handlers.filter);
+			this.dom.removeEventListener('ln-filter:change', this._handlers.filter);
 			this.dom.removeEventListener('click', this._handlers.clear);
 			this._handlers = null;
 		}

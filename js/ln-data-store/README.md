@@ -122,7 +122,7 @@ When `data-ln-data-store-window` is present, the store operates in windowed resi
 | Event | `e.detail` payload | Description |
 |---|---|---|
 | `ln-search:change` | `{ term }` | Updates the active `query.search` term and dispatches `ln-data-store:query-changed`. |
-| `ln-filter:changed` | `{ key, values }` | Updates the active `query.filters[key]` and dispatches `ln-data-store:query-changed`. |
+| `ln-filter:change` | `{ key, values, targetId }` | Updates the active `query.filters[key]` and dispatches `ln-data-store:query-changed`. |
 
 All mutations must be routed via DOM events. **Never invoke write methods directly.** The caller is responsible for supplying a `tempId` (e.g. `'_temp_' + crypto.randomUUID()`) when creating records:
 

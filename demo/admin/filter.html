@@ -235,7 +235,7 @@
 								<strong>Multi-Column AND Composition:</strong> Multiple filter instances can coordinate on the same native table target with different column indices (e.g. Department and Status). Checkboxes within a single column are evaluated with OR logic, while filters across different columns combine with AND logic.
 							</li>
 							<li>
-								<strong>Auto-Population &amp; Local Persistence:</strong> When a column filter is given a <code>&lt;template&gt;</code> slot, it dynamically extracts unique sorted cell values from the table to build its checklist on load. Adding <code>data-ln-persist</code> remembers active checkbox selections in the user's browser storage.
+								<strong>Authored Checklists &amp; Local Persistence:</strong> Filter options are authored directly in markup or rendered via domain templates (such as <code>ln-options</code>). Adding <code>data-ln-persist</code> automatically remembers active checkbox selections across page reloads.
 							</li>
 						</ol>
 
@@ -545,11 +545,11 @@ table {
 					</script>
 				</section>
 
-				<!-- Auto-Populate + Search -->
+				<!-- Column Filter + Searchable Options -->
 				<section class="section-card" data-demo-html>
-					<header><h3>Auto-Populate from Column + Search</h3></header>
+					<header><h3>Column Filter with Searchable Options</h3></header>
 					<main>
-						<p>Filter values auto-populated from column 2 text. Search input filters the checkbox list.</p>
+						<p>Column filter with authored options where a search input filters the checkbox list options dynamically.</p>
 
 						<div>
 							<label class="search">
@@ -561,9 +561,12 @@ table {
 							</label>
 							<nav id="filter-dept-list-3" data-ln-filter="demo-table-3" data-ln-filter-col="2" data-ln-search="" data-ln-search-items="label">
 								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label>
-								<template>
-									<label><input type="checkbox"> {{ text }}</label>
-								</template>
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Engineering"> Engineering</label>
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Design"> Design</label>
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Marketing"> Marketing</label>
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Finance"> Finance</label>
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="HR"> HR</label>
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="QA"> QA</label>
 							</nav>
 						</div>
 
@@ -588,7 +591,7 @@ table {
 						</div>
 					</main>
 					<script type="text/plain" data-demo-scss>
-// Auto-populated search filter:
+// Searchable column filter:
 #filter-dept-list-3 {
     @include filter-bar;
 }
@@ -606,13 +609,13 @@ table {
 						<table>
 							<thead><tr><th>Event</th><th>Bubbles</th><th>detail</th></tr></thead>
 							<tbody>
-								<tr><td><code>ln-filter:changed</code></td><td>yes</td><td><code>{ key, values: [] }</code></td></tr>
-								<tr><td><code>ln-filter:reset</code></td><td>yes</td><td><code>{}</code></td></tr>
+								<tr><td><code>ln-filter:change</code></td><td>yes</td><td><code>{ key, values: [], targetId }</code></td></tr>
+								<tr><td><code>ln-filter:reset</code></td><td>yes</td><td><code>{ targetId }</code></td></tr>
 							</tbody>
 						</table>
 						</div>
-						<pre><code>document.addEventListener('ln-filter:changed', function (e) {
-    console.log('Filter:', e.detail.key, '=', e.detail.values.join(', '));
+						<pre><code>document.addEventListener('ln-filter:change', function (e) {
+    console.log('Filter:', e.detail.key, '=', e.detail.values.join(', '), 'target:', e.detail.targetId);
 });
 
 document.addEventListener('ln-filter:reset', function (e) {
@@ -642,7 +645,7 @@ document.addEventListener('ln-filter:reset', function (e) {
 		const nav = document.getElementById('api-filter-nav');
 		if (!status || !nav) return;
 
-		document.addEventListener('ln-filter:changed', function (e) {
+		document.addEventListener('ln-filter:change', function (e) {
 			if (e.target !== nav) return;
 			const key = e.detail && e.detail.key ? e.detail.key : '';
 			const values = e.detail && Array.isArray(e.detail.values) ? e.detail.values : [];

@@ -138,41 +138,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		};
 		dom.addEventListener('ln-search:change', this._onSearchChange);
 
-		this._onSetFilter = function (e) {
-			if (!e.detail) return;
-			const key = e.detail.key;
-			const values = e.detail.values;
-
-			if (self.isDataDriven) {
-				if (!values || values.length === 0) {
-					delete self.currentFilters[key];
-				} else {
-					self.currentFilters[key] = values;
-				}
-				self._requestData();
-			} else {
-				if (!values || values.length === 0) {
-					delete self._columnFilters[key];
-				} else {
-					const lower = [];
-					for (let i = 0; i < values.length; i++) {
-						lower.push(values[i].toLowerCase());
-					}
-					self._columnFilters[key] = lower;
-				}
-				self._applyFilterAndSort();
-				self._vStart = -1;
-				self._vEnd = -1;
-				self._render();
-				dispatch(dom, 'ln-table:filter', {
-					term: self._searchTerm,
-					matched: self._filteredData.length,
-					total: self._data.length
-				});
-			}
-		};
-		dom.addEventListener('ln-table:set-filter', this._onSetFilter);
-
 		this._onRequestClearFilters = function () {
 			if (self.isDataDriven) {
 				self.currentFilters = {};
@@ -443,6 +408,35 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				});
 			};
 			dom.addEventListener('ln-sort:change', this._onSort);
+
+			this._onFilterChange = function (e) {
+				e.preventDefault();
+				if (!e.detail) return;
+				const key = e.detail.key;
+				const values = e.detail.values || [];
+				if (!key) return;
+
+				if (values.length === 0) {
+					delete self._columnFilters[key];
+				} else {
+					const lower = [];
+					for (let i = 0; i < values.length; i++) {
+						lower.push(values[i].toLowerCase());
+					}
+					self._columnFilters[key] = lower;
+				}
+				self._applyFilterAndSort();
+				self._vStart = -1;
+				self._vEnd = -1;
+				self._render();
+				self._updateFooter();
+				dispatch(dom, 'ln-table:filter', {
+					term: self._searchTerm,
+					matched: self._filteredData.length,
+					total: self._data.length
+				});
+			};
+			dom.addEventListener('ln-filter:change', this._onFilterChange);
 		}
 
 		return this;
@@ -1435,7 +1429,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		this._disableVirtualScroll();
 
 		this.dom.removeEventListener('ln-table:set-search', this._onSetSearch);
-		this.dom.removeEventListener('ln-table:set-filter', this._onSetFilter);
 		this.dom.removeEventListener('ln-table:request-clear-filters', this._onRequestClearFilters);
 
 		if (this.isDataDriven) {
@@ -1458,6 +1451,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			}
 			this.dom.removeEventListener('ln-sort:change', this._onSort);
 			this.dom.removeEventListener('ln-search:change', this._onSearchChange);
+			this.dom.removeEventListener('ln-filter:change', this._onFilterChange);
 		}
 
 		if (this._onSelectionChange && this.tbody) this.tbody.removeEventListener('change', this._onSelectionChange);

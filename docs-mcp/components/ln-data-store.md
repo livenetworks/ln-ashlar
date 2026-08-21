@@ -117,6 +117,10 @@ Exposed on the root element via `el.lnDataStore`:
 | `ln-data-store:request-update` | Listens | No | Optimistically updates a record or rekeys ID. | `{ id: ID, data: Object }` |
 | `ln-data-store:request-delete` | Listens | No | Optimistically deletes a record. | `{ id: ID }` |
 | `ln-data-store:request-bulk-delete` | Listens | No | Optimistically deletes multiple records. | `{ ids: Array }` |
+| `ln-search:change` | Listens | Yes (`preventDefault`) | Updates `query.search` and dispatches `ln-data-store:query-changed`. | `{ term: String }` |
+| `ln-filter:change` | Listens | Yes (`preventDefault`) | Updates `query.filters[key]` and dispatches `ln-data-store:query-changed`. | `{ key: String, values: Array, targetId: String }` |
+| `ln-sort:change` | Listens | Yes (`preventDefault`) | Updates `query.sort` and dispatches `ln-data-store:query-changed`. | `{ field: String, direction: String }` |
+| `ln-data-store:query-changed` | Emits | No | Emitted when store filters, search, or sort are modified. | `{ store: String, query: { filters: Object, search: String, sort: Object\|null } }` |
 | `ln-data-store:request-remote-sync` | Emits | No | Triggers network sync request. | `{ since: Number\|null }` |
 | `ln-data-store:initialized` | Emits | No | Emitted when store IndexedDB is configured. | `{ store: String, hasCache: Boolean, lastSyncedAt: Number\|null, count: Number }` |
 | `ln-data-store:ready` | Emits | No | Emitted when data is ready for viewing. | `{ store: String, count: Number, source: 'cache'\|'server' }` |

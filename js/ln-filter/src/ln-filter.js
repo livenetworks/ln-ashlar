@@ -1,4 +1,4 @@
-import { dispatch, fillTemplate, registerComponent } from '../../ln-core';
+import { dispatch, dispatchCancelable, registerComponent, queueBoot } from '../../ln-core';
 import { createBatcher } from '../../ln-core';
 import { persistGet, persistSet } from '../../ln-core';
 
@@ -11,7 +11,7 @@ import { persistGet, persistSet } from '../../ln-core';
 	const RESET_ATTR = 'data-ln-filter-reset';
 	const COL_ATTR = 'data-ln-filter-col';
 
-	// Shared column filter state per table (AND across columns, OR within column)
+	// Shared column filter state per plain table (AND across columns, OR within column)
 	const _tableFilters = new WeakMap();
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
@@ -21,16 +21,18 @@ import { persistGet, persistSet } from '../../ln-core';
 	}
 
 	function _deriveActive(self) {
-		let key = self._filterKey;
+		const inputs = self.dom.querySelectorAll('[' + KEY_ATTR + ']');
+		let key = null;
 		const values = [];
-		for (let i = 0; i < self.inputs.length; i++) {
-			const input = self.inputs[i];
+		for (let i = 0; i < inputs.length; i++) {
+			const input = inputs[i];
+			if (!key) key = input.getAttribute(KEY_ATTR);
 			if (input.checked && !_isReset(input)) {
 				const v = input.getAttribute(VALUE_ATTR);
 				if (v) values.push(v);
 			}
 		}
-		return { key: key, values: values };
+		return { key: key, values: values, targetId: self.targetId };
 	}
 
 	function _arraysDiffer(a, b) {
@@ -39,73 +41,15 @@ import { persistGet, persistSet } from '../../ln-core';
 		return false;
 	}
 
-	// ─── Auto-populate from table column ───────────────────────
-
-	function _populateFromColumn(instance) {
-		const dom = instance.dom;
-		const colIndex = instance.colIndex;
-		const tmpl = dom.querySelector('template');
-		if (!tmpl || colIndex === null) return;
-
-		const target = document.getElementById(instance.targetId);
-		if (!target) return;
-
-		const table = target.tagName === 'TABLE' ? target : target.querySelector('table');
-		if (!table || target.hasAttribute('data-ln-table')) return;
-
-		// Collect unique values from column
-		const seen = {};
-		const values = [];
-		const bodies = table.tBodies;
-		for (let b = 0; b < bodies.length; b++) {
-			const rows = bodies[b].rows;
-			for (let r = 0; r < rows.length; r++) {
-				const cell = rows[r].cells[colIndex];
-				const text = cell ? cell.textContent.trim() : '';
-				if (text && !seen[text]) {
-					seen[text] = true;
-					values.push(text);
-				}
-			}
-		}
-		values.sort(function (a, b) {
-			return a.localeCompare(b);
-		});
-
-		// Determine the filter key from existing inputs or dom attribute
-		const existingInput = dom.querySelector('[' + KEY_ATTR + ']');
-		const filterKey = existingInput
-			? existingInput.getAttribute(KEY_ATTR)
-			: (dom.getAttribute('data-ln-filter-key') || 'col' + colIndex);
-
-		// Clone template for each value
-		for (let i = 0; i < values.length; i++) {
-			const clone = tmpl.content.cloneNode(true);
-			const input = clone.querySelector('input');
-			if (!input) continue;
-			input.setAttribute(KEY_ATTR, filterKey);
-			input.setAttribute(VALUE_ATTR, values[i]);
-			fillTemplate(clone, { text: values[i] });
-			dom.appendChild(clone);
-		}
-	}
-
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
 		this.dom = dom;
 		this.targetId = dom.getAttribute(DOM_SELECTOR);
 
-		// Column index for table filtering (null = not a table column filter)
+		// Column index for plain table row filtering (null = standard child attribute filter)
 		const colAttr = dom.getAttribute(COL_ATTR);
 		this.colIndex = colAttr !== null ? parseInt(colAttr, 10) : null;
-
-		// Auto-populate from table column if template present
-		_populateFromColumn(this);
-
-		// Collect inputs AFTER auto-populate (new inputs may have been added)
-		this.inputs = Array.from(dom.querySelectorAll('[' + KEY_ATTR + ']'));
-		this._filterKey = this.inputs.length > 0 ? this.inputs[0].getAttribute(KEY_ATTR) : null;
 
 		// Event-diff cache — null means never dispatched yet
 		this._lastSnapshot = null;
@@ -113,23 +57,22 @@ import { persistGet, persistSet } from '../../ln-core';
 		const self = this;
 
 		const queueRender = createBatcher(
-			function () { self._render(); },
-			function () { self._afterRender(); }
+			function () { self._render(); }
 		);
 
-		// Stash for use in change handler
 		this._queueRender = queueRender;
 
 		this._attachHandlers();
 
-		// ─── Restore persisted filter ─────────────────────────────
+		// ─── Restore persisted filter or boot pre-checked state ────
+		// Deferred via queueBoot so all sibling/consumer components have initialized listeners
 		let _persistRestored = false;
 		if (dom.hasAttribute('data-ln-persist')) {
 			const saved = persistGet('filter', dom);
 			if (saved && saved.key && Array.isArray(saved.values) && saved.values.length > 0) {
-				// Write input.checked on matching inputs
-				for (let i = 0; i < this.inputs.length; i++) {
-					const input = this.inputs[i];
+				const inputs = dom.querySelectorAll('[' + KEY_ATTR + ']');
+				for (let i = 0; i < inputs.length; i++) {
+					const input = inputs[i];
 					if (_isReset(input)) {
 						input.checked = false;
 					} else if (input.getAttribute(KEY_ATTR) === saved.key &&
@@ -139,18 +82,17 @@ import { persistGet, persistSet } from '../../ln-core';
 						input.checked = false;
 					}
 				}
-				queueRender();
+				queueBoot(function () { self._render(); });
 				_persistRestored = true;
 			}
 		}
 
 		if (!_persistRestored) {
-			// DOM is already canonical — only schedule render if anything is pre-checked
-			// so visibility is applied and the initial ln-filter:changed fires (via
-			// null-snapshot diff in _afterRender).
-			for (let i = 0; i < this.inputs.length; i++) {
-				if (this.inputs[i].checked && !_isReset(this.inputs[i])) {
-					queueRender();
+			// DOM is already canonical — schedule boot render if anything is pre-checked
+			const inputs = dom.querySelectorAll('[' + KEY_ATTR + ']');
+			for (let i = 0; i < inputs.length; i++) {
+				if (inputs[i].checked && !_isReset(inputs[i])) {
+					queueBoot(function () { self._render(); });
 					break;
 				}
 			}
@@ -159,74 +101,72 @@ import { persistGet, persistSet } from '../../ln-core';
 		return this;
 	}
 
-	// ─── Handlers ──────────────────────────────────────────────
+	// ─── Handlers (Delegated) ──────────────────────────────────
 
 	_component.prototype._attachHandlers = function () {
 		const self = this;
 
-		this.inputs.forEach(function (input) {
-			if (input[DOM_ATTRIBUTE + 'Bound']) return;
-			input[DOM_ATTRIBUTE + 'Bound'] = true;
+		this._onDomChange = function (e) {
+			const input = e.target;
+			if (!input || !input.hasAttribute || !input.hasAttribute(KEY_ATTR)) return;
 
-			input._lnFilterChange = function () {
-				if (_isReset(input)) {
-					// Reset sentinel — regardless of direction, enforce checked + clear values
-					for (let i = 0; i < self.inputs.length; i++) {
-						if (!_isReset(self.inputs[i])) self.inputs[i].checked = false;
-					}
-					// Force sentinel back to checked (clicking an already-checked sentinel
-					// would natively uncheck it; force back to checked)
-					input.checked = true;
-					self._queueRender();
-					return;
+			const allInputs = Array.from(self.dom.querySelectorAll('[' + KEY_ATTR + ']'));
+
+			if (_isReset(input)) {
+				// Reset sentinel — enforce checked on reset, uncheck all values
+				for (let i = 0; i < allInputs.length; i++) {
+					if (!_isReset(allInputs[i])) allInputs[i].checked = false;
 				}
+				input.checked = true;
+				self._queueRender();
+				return;
+			}
 
-				if (input.checked) {
-					// Mutual exclusion: uncheck all reset sentinels
-					for (let i = 0; i < self.inputs.length; i++) {
-						if (_isReset(self.inputs[i])) self.inputs[i].checked = false;
-					}
-					// If all non-reset inputs are now checked → collapse to sentinel
-					// (only when a reset sentinel exists; lists without one skip this)
-					let hasReset = false;
-					for (let ri = 0; ri < self.inputs.length; ri++) {
-						if (_isReset(self.inputs[ri])) { hasReset = true; break; }
-					}
-					if (hasReset) {
-						let allChecked = true;
-						for (let ci = 0; ci < self.inputs.length; ci++) {
-							if (!_isReset(self.inputs[ci]) && !self.inputs[ci].checked) {
-								allChecked = false;
-								break;
-							}
-						}
-						if (allChecked) {
-							for (let mi = 0; mi < self.inputs.length; mi++) {
-								if (_isReset(self.inputs[mi])) self.inputs[mi].checked = true;
-								else self.inputs[mi].checked = false;
-							}
-						}
-					}
-				} else {
-					// If no non-reset values remain checked, fall back to reset
-					let anyChecked = false;
-					for (let i = 0; i < self.inputs.length; i++) {
-						if (!_isReset(self.inputs[i]) && self.inputs[i].checked) {
-							anyChecked = true;
+			if (input.checked) {
+				// Mutual exclusion: uncheck all reset sentinels
+				for (let i = 0; i < allInputs.length; i++) {
+					if (_isReset(allInputs[i])) allInputs[i].checked = false;
+				}
+				// If all non-reset inputs are now checked → collapse to sentinel
+				let hasReset = false;
+				for (let ri = 0; ri < allInputs.length; ri++) {
+					if (_isReset(allInputs[ri])) { hasReset = true; break; }
+				}
+				if (hasReset) {
+					let allChecked = true;
+					for (let ci = 0; ci < allInputs.length; ci++) {
+						if (!_isReset(allInputs[ci]) && !allInputs[ci].checked) {
+							allChecked = false;
 							break;
 						}
 					}
-					if (!anyChecked) {
-						for (let i = 0; i < self.inputs.length; i++) {
-							if (_isReset(self.inputs[i])) self.inputs[i].checked = true;
+					if (allChecked) {
+						for (let mi = 0; mi < allInputs.length; mi++) {
+							if (_isReset(allInputs[mi])) allInputs[mi].checked = true;
+							else allInputs[mi].checked = false;
 						}
 					}
 				}
+			} else {
+				// If no non-reset values remain checked, fall back to reset sentinel
+				let anyChecked = false;
+				for (let i = 0; i < allInputs.length; i++) {
+					if (!_isReset(allInputs[i]) && allInputs[i].checked) {
+						anyChecked = true;
+						break;
+					}
+				}
+				if (!anyChecked) {
+					for (let i = 0; i < allInputs.length; i++) {
+						if (_isReset(allInputs[i])) allInputs[i].checked = true;
+					}
+				}
+			}
 
-				self._queueRender();
-			};
-			input.addEventListener('change', input._lnFilterChange);
-		});
+			self._queueRender();
+		};
+
+		this.dom.addEventListener('change', this._onDomChange);
 	};
 
 	// ─── Render ────────────────────────────────────────────────
@@ -234,7 +174,58 @@ import { persistGet, persistSet } from '../../ln-core';
 	_component.prototype._render = function () {
 		const self = this;
 		const active = _deriveActive(this);
+		const prev = this._lastSnapshot;
+		const changed = !prev
+			|| prev.key !== active.key
+			|| _arraysDiffer(prev.values, active.values);
+
+		// Event-diff gating: only dispatch and render when filter state actually moved
+		if (!changed) return;
+
 		const isReset = active.key === null || active.values.length === 0;
+		const target = document.getElementById(self.targetId);
+		const detail = {
+			key: active.key,
+			values: active.values.slice(),
+			targetId: self.targetId
+		};
+
+		// Two-Host Bridge:
+		// 1. Dispatch on this.dom (Control Host) -> bubbles to ln-table-coordinator for UI headers
+		dispatch(self.dom, 'ln-filter:change', detail);
+
+		// 2. Dispatch cancelable on target (State/Data Host) -> bubbles to ln-data-store / ln-table
+		let defaultPrevented = false;
+		if (target && target !== self.dom) {
+			const evt = dispatchCancelable(target, 'ln-filter:change', detail);
+			if (evt.defaultPrevented) defaultPrevented = true;
+		}
+
+		// Fire ln-filter:reset only on transition into reset state
+		const wasActive = prev && prev.values.length > 0;
+		const nowReset = active.values.length === 0;
+		if (wasActive && nowReset) {
+			const resetDetail = { targetId: self.targetId };
+			dispatch(self.dom, 'ln-filter:reset', resetDetail);
+			if (target && target !== self.dom) {
+				dispatch(target, 'ln-filter:reset', resetDetail);
+			}
+		}
+
+		// Update diff cache snapshot
+		this._lastSnapshot = { key: active.key, values: active.values.slice() };
+
+		// Persist current filter state
+		if (this.dom.hasAttribute('data-ln-persist')) {
+			if (active.key && active.values.length > 0) {
+				persistSet('filter', this.dom, { key: active.key, values: active.values.slice() });
+			} else {
+				persistSet('filter', this.dom, null);
+			}
+		}
+
+		// If a consumer (ln-table, ln-list, ln-data-store) claimed the event, skip default DOM filtering
+		if (defaultPrevented) return;
 
 		// Build lowercase lookup for target filtering
 		const lowerValues = [];
@@ -242,13 +233,12 @@ import { persistGet, persistSet } from '../../ln-core';
 			lowerValues.push(active.values[i].toLowerCase());
 		}
 
-		// Apply filter
+		// Apply default DOM filtering
 		if (self.colIndex !== null) {
-			// Table column filtering — shared multi-column logic
+			// Plain table column filtering — shared multi-column logic
 			self._filterTableRows(active);
 		} else {
-			// Standard target-children filtering by data attribute
-			const target = document.getElementById(self.targetId);
+			// Standard target-children filtering by data-[key] attribute
 			if (!target) return;
 
 			const children = target.children;
@@ -263,6 +253,7 @@ import { persistGet, persistSet } from '../../ln-core';
 				const attr = el.getAttribute('data-' + active.key);
 				el.removeAttribute(HIDE_ATTR);
 
+				// Elements without data-{key} are exempt from filtering
 				if (attr === null) continue;
 
 				// OR logic: visible if attr matches ANY active value
@@ -273,49 +264,7 @@ import { persistGet, persistSet } from '../../ln-core';
 		}
 	};
 
-	_component.prototype._afterRender = function () {
-		const active = _deriveActive(this);
-		const prev = this._lastSnapshot;
-		const changed = !prev
-			|| prev.key !== active.key
-			|| _arraysDiffer(prev.values, active.values);
-
-		if (changed) {
-			// ln-filter:changed always fires when state moves
-			this._dispatchOnBoth('ln-filter:changed', {
-				key: active.key,
-				values: active.values.slice()
-			});
-
-			// ln-filter:reset fires only on transition into reset state
-			const wasActive = prev && prev.values.length > 0;
-			const nowReset = active.values.length === 0;
-			if (wasActive && nowReset) {
-				this._dispatchOnBoth('ln-filter:reset', {});
-			}
-
-			this._lastSnapshot = { key: active.key, values: active.values.slice() };
-		}
-
-		// Persist current filter state
-		if (this.dom.hasAttribute('data-ln-persist')) {
-			if (active.key && active.values.length > 0) {
-				persistSet('filter', this.dom, { key: active.key, values: active.values.slice() });
-			} else {
-				persistSet('filter', this.dom, null);
-			}
-		}
-	};
-
-	_component.prototype._dispatchOnBoth = function (eventName, detail) {
-		dispatch(this.dom, eventName, detail);
-		const target = document.getElementById(this.targetId);
-		if (target && target !== this.dom) {
-			dispatch(target, eventName, detail);
-		}
-	};
-
-	// ─── Table Row Filtering ───────────────────────────────────
+	// ─── Plain Table Row Filtering ─────────────────────────────
 
 	_component.prototype._filterTableRows = function (active) {
 		const target = document.getElementById(this.targetId);
@@ -324,13 +273,10 @@ import { persistGet, persistSet } from '../../ln-core';
 		const table = target.tagName === 'TABLE' ? target : target.querySelector('table');
 		if (!table) return;
 
-		// Guard: don't filter if this is an ln-table (it handles its own filtering)
-		if (target.hasAttribute('data-ln-table')) return;
-
-		const key = active.key || this._filterKey;
+		const key = active.key || (this.dom.getAttribute('data-ln-filter-key') || 'col' + this.colIndex);
 		const values = active.values;
 
-		// Get or create shared filter map for this table
+		// Get or create shared filter map for this plain table
 		if (!_tableFilters.has(table)) {
 			_tableFilters.set(table, {});
 		}
@@ -389,27 +335,25 @@ import { persistGet, persistSet } from '../../ln-core';
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 
-		// Clean up table filter registry
+		// Clean up plain table filter registry
 		if (this.colIndex !== null) {
 			const target = document.getElementById(this.targetId);
 			if (target) {
 				const table = target.tagName === 'TABLE' ? target : target.querySelector('table');
 				if (table && _tableFilters.has(table)) {
 					const filters = _tableFilters.get(table);
-					const key = this._filterKey;
+					const key = this.dom.getAttribute('data-ln-filter-key') || 'col' + this.colIndex;
 					if (key && filters[key]) delete filters[key];
 					if (Object.keys(filters).length === 0) _tableFilters.delete(table);
 				}
 			}
 		}
 
-		this.inputs.forEach(function (input) {
-			if (input._lnFilterChange) {
-				input.removeEventListener('change', input._lnFilterChange);
-				delete input._lnFilterChange;
-			}
-			delete input[DOM_ATTRIBUTE + 'Bound'];
-		});
+		if (this._onDomChange) {
+			this.dom.removeEventListener('change', this._onDomChange);
+			delete this._onDomChange;
+		}
+
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

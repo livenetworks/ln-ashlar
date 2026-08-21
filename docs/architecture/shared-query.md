@@ -41,7 +41,7 @@ flowchart TD
     CHART["ln-chart"]
 
     SEARCH -->|"ln-search:change"| STORE
-    FILTER -->|"ln-filter:changed"| STORE
+    FILTER -->|"ln-filter:change"| STORE
     SORT -->|"ln-sort:change"| STORE
     STORE -.->|"event bubbles"| COORD
     STORE -->|"query-changed"| COORD
@@ -65,7 +65,7 @@ sequenceDiagram
     participant T as ln-table
     participant L as ln-list
 
-    F->>S: ln-filter:changed {key, values}
+    F->>S: ln-filter:change {key, values, targetId}
     Note over S,C: event lands on the source and bubbles
     S->>S: merge into query
     S-->>C: ln-data-store:query-changed
@@ -128,7 +128,7 @@ pagination and passes the result to `getAll`.
   `getElementById` and dispatches a cancelable event *at* the target, carrying
   `targetId`. When the target is the source, the event lands there and bubbles
   to exactly one coordinator — routing comes from DOM containment.
-- **`ln-filter` needs no code.** It dispatches `ln-filter:changed` at the target
+- **`ln-filter` needs no code.** It dispatches `ln-filter:change` at the target
   source, where it lands directly and bubbles to the owning coordinator — the
   same containment routing `ln-search` relies on.
 - **`ln-sort` is new code.** It is a separate component, not an existing one rewritten. It draws its active state/indicator from the store's echo (`ln-data-store:query-changed`) rather than local state, meaning multiple sort controls targeting the same source will remain in sync.

@@ -779,14 +779,13 @@ See [js/ln-core/README.md](../../js/ln-core/README.md) for the reactive renderin
 ```
 User checks a checkbox
   → ln-filter handles mutual exclusion (all ↔ values)
-  → ln-filter dispatches ln-filter:changed on the [data-ln-filter] container
-  → ln-filter._dispatchOnBoth (js/ln-filter/src/ln-filter.js:293):
-      also dispatches on getElementById(tableId)
-  → ln-table._onColumnFilter receives the event
-  → updates _columnFilters, toggles .ln-filter-active on the button
-  → SSR: _applyFilterAndSort() + _render()
-  → data-driven: _requestData() → coordinator handles data fetch
-  → ln-table dispatches ln-table:filter
+  → ln-filter dispatches ln-filter:change on the [data-ln-filter] container
+  → Two-Host Bridge:
+      also dispatches cancelable on getElementById(targetId)
+  → ln-table in SSR mode / ln-data-store receives the event with preventDefault()
+  → SSR: _applyFilterAndSort() + _render() + _updateFooter()
+  → data-driven: ln-data-store query-changed → coordinator re-serves data
+  → ln-table-coordinator toggles .ln-filter-active on the button
 ```
 
 ### Teleport Safety
