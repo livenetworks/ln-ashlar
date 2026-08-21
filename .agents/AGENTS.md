@@ -34,6 +34,10 @@
 - **Paired Events**: Components emit `ln-{name}:before-{action}` (cancelable) before state changes, and `ln-{name}:{action}` (post-fact, bubbling) after state changes.
 - **Detail Guard Pattern**: Always check `e.detail && e.detail.prop` when listening to external events.
 
+### F. Local Encapsulation vs. Window-Level Coordinators (Multi-Instance Isolation)
+- **Local Multi-Instance Isolation**: Components that can be instantiated multiple times on a page (`form`, `ln-validate`, `ln-autosave`, `ln-accordion`, `ln-tabs`) are strictly self-contained. The validator (`ln-validate`) operates as an encapsulated child of its parent `<form>`. Multiple instances or forms on the same page operate completely independently.
+- **Window-Level Scope Boundary (`ln-ui-coordinator`)**: Window-level coordinators manage only shared, window-wide UI services (hash routing for modals `#modal-id`, toast dispatching, global AJAX success/error toast mediation, upload notifications). They MUST NEVER couple with, inspect, or manage the internal validation/submission state of local forms or components.
+
 ## 2. Codebase Integrity and Realistic Modeling
 - **No Hallucinated Attributes/Components**: Never invent attributes or components that do not exist (e.g., `data-ln-action` or `ln-action`). Only reference actual components found in the `js/` directory (e.g., `ln-toggle`, `ln-modal`, `ln-table`, `ln-form`, `ln-validate`, `ln-data-store`, `ln-data-coordinator`).
 

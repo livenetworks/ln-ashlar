@@ -53,10 +53,8 @@
 			]
 		},
 		"data-ln-validate-error": {
-			"direction": "author",
-			"sources": [
-				"src/ln-ui-coordinator.js"
-			]
+			"direction": null,
+			"sources": []
 		}
 	}
 }

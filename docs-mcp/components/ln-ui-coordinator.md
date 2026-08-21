@@ -33,6 +33,10 @@ Key responsibilities include:
 * **Upload Feedback Mediation:** Listening to `ln-upload:invalid` and `ln-upload:error`:
   - Dispatches error toast notifications for invalid files (type, size, count) and upload server/network failures using coordinator dictionary keys.
 
+> [!IMPORTANT]
+> **What the coordinator does NOT do (Orthogonality Doctrine):**
+> - **Does NOT inspect or manage form validation state:** Form validation is strictly encapsulated between `<form>` and child [`ln-validate`](./ln-validate.md) primitives. The coordinator does not query internal input validity states or manage submit gates.
+
 ---
 
 ## 2. Minimal HTML Markup & Usage Variants

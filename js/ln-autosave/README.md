@@ -89,13 +89,13 @@ form.lnAutosave.destroy();
       localStorage.removeItem(form.lnAutosave.key);
   });
   ```
-- **Nameless & File Inputs:** `ln-autosave` ignores disabled inputs, button elements, `type="file"`, and inputs missing a `name` attribute.
+- **Excluded Inputs:** `ln-autosave` automatically ignores disabled inputs, button elements, `type="file"`, `type="password"`, inputs missing a `name` attribute, and any element matching `[data-ln-autosave-exclude]`.
 
 ---
 
 ## 🔧 Internals
 
-Source: `js/ln-autosave/ln-autosave.js` (~130 lines). No `.scss` file — the component has no visual surface, no class it sets, no CSS-driving attribute.
+Source: `js/ln-autosave/ln-autosave.js` (~150 lines). No `.scss` file — the component has no visual surface, no class it sets, no CSS-driving attribute.
 
 ### State
 

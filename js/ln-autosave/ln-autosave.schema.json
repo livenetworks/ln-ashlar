@@ -22,7 +22,7 @@
 			]
 		},
 		"data-ln-autosave-exclude": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-autosave.js"
 			]

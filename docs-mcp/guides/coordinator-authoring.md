@@ -51,6 +51,7 @@ When writing a coordinator, follow these strict architectural guidelines:
 - **Child Component Orchestration:** The coordinator listens to CustomEvents emitted by child components inside its wrapper and dispatches command events or updates attributes on sibling child elements inside that same wrapper.
 - **No Imports:** A coordinator must never import or require the JavaScript files of the components it coordinates. Communication is 100% event-driven.
 - **Local DOM Scoping:** Never query the global document (e.g. `document.querySelectorAll` is forbidden). Always scope selectors to the coordinator's local DOM subtree (e.g. `this.dom.querySelectorAll`) so multiple instances of the coordinator can run concurrently on a single page without resource or ID collisions.
+- **Local Multi-Instance Isolation vs. Window Scope:** Components that can be multi-instantiated (`<form>`, `ln-validate`, `ln-accordion`, `ln-tabs`) are strictly self-contained. For example, `ln-validate` operates as an encapsulated child of its parent `<form>`. Window-level coordinators (`ln-ui-coordinator`) must never inspect or manage the internal validation/submission state of local multi-instance components.
 - **Teardown Cleanup:** The `destroy()` method must cleanly remove all event listeners added to global surfaces (such as `window` or `document`) and delete the instance DOM references.
 
 ---

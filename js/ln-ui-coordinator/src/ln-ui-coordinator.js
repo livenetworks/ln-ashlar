@@ -91,21 +91,6 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 		}
 	}
 
-	// ─── Native Submit Pending Intake & Hash Clear ───────────
-
-	document.addEventListener('submit', function (e) {
-		if (e.defaultPrevented) return;
-		const form = e.target;
-		const modal = form.closest('[data-ln-modal]');
-		if (modal && modal.id) {
-			try {
-				sessionStorage.setItem('ln-modal-pending:' + modal.id, 'true');
-			} catch (err) {}
-			// Clear hash before native submit/reload so browser reloads clean
-			hashSet(modal.id, null);
-		}
-	});
-
 	// ─── Trigger & Hash Navigation Delegation ──────────────
 
 	document.addEventListener('click', function (e) {
@@ -214,7 +199,7 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 		}
 	});
 
-	// ─── Hash Sync Listener & Pending Submit Resolution ────
+	// ─── Hash Sync Listener & Modal Route State ────────────
 
 	let _inSync = false;
 	function _syncHashModals() {
@@ -226,31 +211,6 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 				const modal = modals[i];
 				if (!modal.lnModal) continue;
 				const hashNs = modal.id;
-
-				const pendingKey = 'ln-modal-pending:' + hashNs;
-				let isPending = false;
-				try {
-					isPending = sessionStorage.getItem(pendingKey) === 'true';
-				} catch (err) {}
-
-				if (isPending) {
-					try {
-						sessionStorage.removeItem(pendingKey);
-					} catch (err) {}
-
-					const hasErrors = !!modal.querySelector('[data-ln-validate-error], [aria-invalid="true"]');
-
-					if (!hasErrors) {
-						hashSet(hashNs, null);
-						dispatch(modal, 'ln-modal:request-close', {});
-						_resetModalForm(modal);
-						continue;
-					} else {
-						modal.dataset.lnModalMode = 'edit';
-						dispatch(modal, 'ln-modal:request-open', {});
-						continue;
-					}
-				}
 
 				const param = hashGet(hashNs);
 				const present = param !== null;
@@ -333,9 +293,6 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 		const modal = e.target.closest('[data-ln-modal]');
 		if (modal && modal.lnModal) {
 			if (modal.id) {
-				try {
-					sessionStorage.removeItem('ln-modal-pending:' + modal.id);
-				} catch (err) {}
 				hashSet(modal.id, null);
 			}
 
@@ -428,9 +385,6 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 		if (!modal || !modal.lnModal) return;
 
 		if (modal.id) {
-			try {
-				sessionStorage.removeItem('ln-modal-pending:' + modal.id);
-			} catch (err) {}
 			if (hashGet(modal.id) !== null) {
 				hashSet(modal.id, null);
 			}

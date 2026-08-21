@@ -5,6 +5,7 @@ import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComp
 	const DOM_ATTRIBUTE = 'lnAutosave';
 	const CLEAR_SELECTOR = 'data-ln-autosave-clear';
 	const DEBOUNCE_SELECTOR = 'data-ln-autosave-debounce-input';
+	const EXCLUDE_SELECTOR = '[data-ln-autosave-exclude], input[type="password"]';
 	const STORAGE_PREFIX = 'ln-autosave:';
 	const DEFAULT_DEBOUNCE_MS = 1000;
 
@@ -26,7 +27,7 @@ import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComp
 
 		// Closure-scoped helpers (NOT on prototype — internal only)
 		function _save() {
-			const data = serializeForm(form, { exclude: '[data-ln-autosave-exclude]' });
+			const data = serializeForm(form, { exclude: EXCLUDE_SELECTOR });
 			try { localStorage.setItem(key, JSON.stringify(data)); }
 			catch (e) { return; }
 			dispatch(form, 'ln-autosave:saved', { target: form, data: data });
@@ -56,12 +57,12 @@ import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComp
 		// Listener handlers (held on `this` for symmetric removal in destroy)
 		this._onFocusout = function (e) {
 			const el = e.target;
-			if (_isFormField(el) && el.name && !el.hasAttribute('data-ln-autosave-exclude')) _save();
+			if (_isFormField(el) && el.name && !el.matches(EXCLUDE_SELECTOR)) _save();
 		};
 
 		this._onChange = function (e) {
 			const el = e.target;
-			if (_isFormField(el) && el.name && !el.hasAttribute('data-ln-autosave-exclude')) _save();
+			if (_isFormField(el) && el.name && !el.matches(EXCLUDE_SELECTOR)) _save();
 		};
 
 		this._onSubmit = function () { _clear(); };
@@ -84,7 +85,7 @@ import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComp
 		if (debounceMs > 0) {
 			this._onInput = function (e) {
 				const el = e.target;
-				if (!_isFormField(el) || !el.name || el.hasAttribute('data-ln-autosave-exclude')) return;
+				if (!_isFormField(el) || !el.name || el.matches(EXCLUDE_SELECTOR)) return;
 				if (inputTimer !== null) clearTimeout(inputTimer);
 				inputTimer = setTimeout(_save, debounceMs);
 			};
