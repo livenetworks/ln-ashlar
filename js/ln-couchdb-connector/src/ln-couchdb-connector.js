@@ -341,8 +341,8 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			}
 		};
 
-		// Bind events for CouchDB namespaces and also REST/API connector namespaces for 3-tier compatibility
-		const namespaces = ['ln-couchdb-connector', 'ln-api-connector', 'ln-rest-connector'];
+		// Bind events for CouchDB namespaces and also API connector namespaces for 3-tier compatibility
+		const namespaces = ['ln-couchdb-connector', 'ln-api-connector'];
 		namespaces.forEach(function (ns) {
 			self.dom.addEventListener(ns + ':request-sync', self._handlers.sync);
 			self.dom.addEventListener(ns + ':request-fetch', self._handlers.sync);
@@ -358,7 +358,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 
 		const self = this;
 		if (self._handlers) {
-			const namespaces = ['ln-couchdb-connector', 'ln-api-connector', 'ln-rest-connector'];
+			const namespaces = ['ln-couchdb-connector', 'ln-api-connector'];
 			namespaces.forEach(function (ns) {
 				self.dom.removeEventListener(ns + ':request-sync', self._handlers.sync);
 				self.dom.removeEventListener(ns + ':request-fetch', self._handlers.sync);

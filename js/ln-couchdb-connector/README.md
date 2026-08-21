@@ -81,7 +81,7 @@ connector.bulkDelete(["doc_17", "doc_23"])
 
 ### Commands (Dispatched TO the connector)
 
-You can trigger mutations and fetches asynchronously by dispatching standard events directly on the connector DOM element. All events are supported in `ln-couchdb-connector`, `ln-api-connector`, and `ln-rest-connector` namespaces for 100% backward compatibility.
+You can trigger mutations and fetches asynchronously by dispatching standard events directly on the connector DOM element. All events are supported in both `ln-couchdb-connector` and `ln-api-connector` namespaces.
 
 | Event | `detail` Payload | Description |
 |-------|------------------|-------------|

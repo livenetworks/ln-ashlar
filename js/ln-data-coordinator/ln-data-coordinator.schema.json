@@ -106,10 +106,8 @@
 			]
 		},
 		"data-ln-rest-connector": {
-			"direction": "author",
-			"sources": [
-				"src/ln-data-coordinator.js"
-			]
+			"direction": null,
+			"sources": []
 		},
 		"data-ln-stat": {
 			"direction": "author",

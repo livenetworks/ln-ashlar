@@ -289,7 +289,7 @@ export class QueueStorage {
 					if (reason === 'auth') {
 						entry.status = 'pending';
 						outbox.put(entry);
-						meta.put({ key: pauseKey(scope), value: true });
+						meta.put({ key: pauseKey(scope), value: 'auth' });
 						result = { status: 'auth', entry };
 						return;
 					}
@@ -386,7 +386,10 @@ export class QueueStorage {
 			return new Promise((resolve, reject) => {
 				const tx = db.transaction(META, 'readonly');
 				const request = tx.objectStore(META).get(pauseKey(scope));
-				request.onsuccess = () => resolve(!!(request.result && request.result.value));
+				request.onsuccess = () => {
+					const val = request.result ? request.result.value : false;
+					resolve(val || false);
+				};
 				request.onerror = () => reject(requestError(request, 'Queue pause-state read failed'));
 			});
 		});
@@ -397,7 +400,8 @@ export class QueueStorage {
 			if (!db) return;
 			return new Promise((resolve, reject) => {
 				const tx = db.transaction(META, 'readwrite');
-				tx.objectStore(META).put({ key: pauseKey(scope), value: !!paused });
+				const value = typeof paused === 'string' ? paused : (paused ? 'manual' : false);
+				tx.objectStore(META).put({ key: pauseKey(scope), value: value });
 				tx.oncomplete = () => resolve();
 				tx.onerror = () => reject(tx.error || new Error('Queue pause-state write failed'));
 				tx.onabort = () => reject(tx.error || new Error('Queue pause-state write aborted'));

@@ -70,7 +70,7 @@ tags: [network, database, couchdb, sync]
 
 ### Events API
 
-*Responds to events under `ln-couchdb-connector:...`, `ln-api-connector:...`, and `ln-rest-connector:...` namespaces for drop-in compatibility.*
+*Responds to events under `ln-couchdb-connector:...` and `ln-api-connector:...` namespaces for drop-in compatibility.*
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|

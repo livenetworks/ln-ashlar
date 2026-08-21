@@ -51,9 +51,12 @@ import { QueueStorage } from './queue-storage';
 				}
 				return _storage.getPaused(self.scope);
 			})
-			.then(paused => {
-				self._paused = !!paused;
-				if (self._paused) dispatch(self.dom, 'ln-api-queue:paused', { reason: 'auth', restored: true });
+			.then(pausedReason => {
+				self._paused = !!pausedReason;
+				if (self._paused) {
+					const reason = typeof pausedReason === 'string' ? pausedReason : 'auth';
+					dispatch(self.dom, 'ln-api-queue:paused', { reason: reason, restored: true });
+				}
 				return self._emitPendingCount();
 			})
 			.then(() => self._drain())
@@ -240,6 +243,16 @@ import { QueueStorage } from './queue-storage';
 		});
 	};
 
+	_component.prototype._onPause = function () {
+		const self = this;
+		return _storage.setPaused(self.scope, 'manual').then(() => {
+			self._paused = true;
+			dispatch(self.dom, 'ln-api-queue:paused', { reason: 'manual' });
+		}).catch(error => {
+			dispatch(self.dom, 'ln-api-queue:error', { operation: 'pause', error });
+		});
+	};
+
 	_component.prototype._onDrain = function () {
 		const self = this;
 		return _storage.resetFailed(self.scope).then(() => {
@@ -272,6 +285,7 @@ import { QueueStorage } from './queue-storage';
 			remap: e => self._onRemap(e),
 			resolveCreate: e => self._onResolveCreate(e),
 			resume: () => self._onResume(),
+			pause: () => self._onPause(),
 			drain: () => self._onDrain(),
 			clear: () => self._onClear()
 		};
@@ -282,6 +296,7 @@ import { QueueStorage } from './queue-storage';
 		self.dom.addEventListener('ln-api-queue:request-remap', self._handlers.remap);
 		self.dom.addEventListener('ln-api-queue:resolve-create', self._handlers.resolveCreate);
 		self.dom.addEventListener('ln-api-queue:request-resume', self._handlers.resume);
+		self.dom.addEventListener('ln-api-queue:request-pause', self._handlers.pause);
 		self.dom.addEventListener('ln-api-queue:request-drain', self._handlers.drain);
 		self.dom.addEventListener('ln-api-queue:request-clear', self._handlers.clear);
 	};
@@ -296,6 +311,7 @@ import { QueueStorage } from './queue-storage';
 		self.dom.removeEventListener('ln-api-queue:request-remap', self._handlers.remap);
 		self.dom.removeEventListener('ln-api-queue:resolve-create', self._handlers.resolveCreate);
 		self.dom.removeEventListener('ln-api-queue:request-resume', self._handlers.resume);
+		self.dom.removeEventListener('ln-api-queue:request-pause', self._handlers.pause);
 		self.dom.removeEventListener('ln-api-queue:request-drain', self._handlers.drain);
 		self.dom.removeEventListener('ln-api-queue:request-clear', self._handlers.clear);
 		window.removeEventListener('online', self._onlineHandler);

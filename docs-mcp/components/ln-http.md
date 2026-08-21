@@ -81,6 +81,7 @@ triggerEl.addEventListener('ln-http:error', function(e) {
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-http:request` | Listens | No | Dispatched by a consumer (must `bubble` to `document`) to run a deduplicated request; response/error fire back on the dispatching element. | `{ url, method?, body?, key?, signal? }` |
+| `ln-http:cancel` | Listens | No | Dispatched on `document` to cancel in-flight requests by key, URL, or all. | `{ key?: String, url?: String, all?: Boolean }` |
 | `ln-http:response` | Emits | No | Fired on the triggering element when a request completes (any HTTP status, e.g. 200/404/500). | `{ ok: Boolean, status: Number, response: Response }` |
 | `ln-http:error` | Emits | No | Fired on the triggering element on network failure (DNS/CORS/loss); never fires on manual or automatic abort. | `{ ok: false, status: 0, error: Error }` |
 

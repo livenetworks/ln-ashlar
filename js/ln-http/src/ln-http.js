@@ -39,17 +39,19 @@
 //   and _keyed (Path B, key-keyed). Aborts from either side are
 //   idempotent and cooperate cleanly.
 //
-// Public API (window.lnHttp):
-//   .cancel(url)         — abort any Path A in-flight whose URL matches.
-//   .cancelByKey(key)    — abort the Path B in-flight with this key.
-//   .cancelAll()         — abort every in-flight (both paths).
-//   .inflight            — getter; returns Array<{ url, method, key? }>
-//                          covering both paths, for debugging.
-//   .destroy()           — restore the original fetch, remove the
-//                          document listener, clear both queues.
-//                          Used in dev hot-reload and tests.
+// Public API & Event Control:
+//   ln-http:cancel       — event on document { key?, url?, all? } to abort in-flight requests.
+//   window.lnHttp.cancel(url)      — abort any Path A in-flight whose URL matches.
+//   window.lnHttp.cancelByKey(key) — abort the Path B in-flight with this key.
+//   window.lnHttp.cancelAll()      — abort every in-flight (both paths).
+//   window.lnHttp.inflight         — getter; returns Array<{ url, method, key? }>
+//                                    covering both paths, for debugging.
+//   window.lnHttp.destroy()        — restore original fetch, remove document
+//                                    listeners, clear all in-flight queues.
+//                                    Used in dev hot-reload and tests.
 
 import { dispatch } from '../../ln-core';
+import { extractUrl, extractMethod, buildHttpKey, isIdempotentMethod } from './http-core';
 
 (function () {
 	if (window.lnHttp) return;                    // double-load guard
@@ -58,37 +60,17 @@ import { dispatch } from '../../ln-core';
 	const _inflight  = new Map();                 // "METHOD URL" → AbortController (Path A)
 	const _keyed     = new Map();                 // consumer key   → AbortController (Path B)
 
-	// ─── helpers ───────────────────────────────────────────────────
-
-	// Accept string | URL | Request → return absolute URL string.
-	function _extractUrl(resource) {
-		if (typeof resource === 'string')   return resource;
-		if (resource instanceof URL)        return resource.href;
-		if (resource instanceof Request)    return resource.url;
-		return String(resource);              // last-resort coercion
-	}
-
-	// Extract method from options OR Request, default GET, uppercased.
-	function _extractMethod(resource, options) {
-		if (options && options.method) return String(options.method).toUpperCase();
-		if (resource instanceof Request) return resource.method.toUpperCase();
-		return 'GET';
-	}
-
-	function _key(url, method) { return method + ' ' + url; }
-	function _isIdempotent(method) { return method === 'GET' || method === 'HEAD'; }
-
 	// ─── Path A: window.fetch wrapper ─────────────────────────────
 
 	function _wrappedFetch(resource, options) {
 		options = options || {};
 
-		const url    = _extractUrl(resource);
-		const method = _extractMethod(resource, options);
-		const key    = _key(url, method);
+		const url    = extractUrl(resource);
+		const method = extractMethod(resource, options);
+		const key    = buildHttpKey(url, method);
 
 		// Idempotent dedup — abort previous in-flight on same key.
-		if (_isIdempotent(method) && _inflight.has(key)) {
+		if (isIdempotentMethod(method) && _inflight.has(key)) {
 			_inflight.get(key).abort();
 			_inflight.delete(key);
 		}
@@ -189,7 +171,19 @@ import { dispatch } from '../../ln-core';
 			});
 	}
 
+	function _onCancel(e) {
+		const detail = e.detail || {};
+		if (detail.all) {
+			window.lnHttp.cancelAll();
+		} else if (detail.key) {
+			window.lnHttp.cancelByKey(detail.key);
+		} else if (detail.url) {
+			window.lnHttp.cancel(detail.url);
+		}
+	}
+
 	document.addEventListener('ln-http:request', _onRequest);
+	document.addEventListener('ln-http:cancel', _onCancel);
 
 	// ─── Public API ───────────────────────────────────────────────
 
@@ -231,6 +225,7 @@ import { dispatch } from '../../ln-core';
 		destroy: function () {
 			window.lnHttp.cancelAll();
 			document.removeEventListener('ln-http:request', _onRequest);
+			document.removeEventListener('ln-http:cancel', _onCancel);
 			window.fetch = _origFetch;
 			delete window.lnHttp;
 		}

@@ -110,6 +110,9 @@ connector.delete(42)
 // 5. Bulk Delete records
 connector.bulkDelete([17, 23])
     .then(res => console.log('Bulk deleted:', res));
+
+// 6. Cancel in-flight query / fetch
+connector.cancel('query'); // or connector.cancel(targetEl)
 ```
 
 ---
@@ -118,11 +121,13 @@ connector.bulkDelete([17, 23])
 
 ### Commands (Dispatched TO the connector)
 
-You can trigger mutations and fetches asynchronously by dispatching standard events directly on the connector DOM element. All events are supported in both `ln-api-connector` and legacy `ln-rest-connector` namespaces.
+You can trigger mutations and fetches asynchronously by dispatching standard events directly on the connector DOM element.
 
 | Event | `detail` Payload | Description |
 |-------|------------------|-------------|
 | `ln-api-connector:request-sync` | `{ since, meta }` | Triggers a delta fetch request. |
+| `ln-api-connector:request-query` | `{ query, meta }` | Triggers a structured query/pagination request. |
+| `ln-api-connector:request-cancel` | `{ targetEl?, key?, meta? }` | Aborts active in-flight request for target element or key. |
 | `ln-api-connector:request-create` | `{ data, tempId, url, idempotencyKey?, meta }` | Triggers a creation request. |
 | `ln-api-connector:request-update` | `{ id, data, expected_version, url, idempotencyKey?, meta }` | Triggers a PUT update (supports 409 conflict checks). |
 | `ln-api-connector:request-delete` | `{ id, url, idempotencyKey?, meta }` | Triggers a deletion request. |

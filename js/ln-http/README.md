@@ -68,9 +68,13 @@ element.dispatchEvent(new CustomEvent('ln-http:request', {
 
 ---
 
-## ⚡ DOM Events (Path B response lifecycle)
+## ⚡ DOM Events (Path B response lifecycle & declarative control)
 
-Both events bubble from the element that dispatched the original `'ln-http:request'`.
+### `ln-http:cancel`
+Listened on `document`. Declaratively cancels in-flight requests without calling imperative window methods.
+- `detail`: `{ key?: string, url?: string, all?: boolean }`
+
+Both response events bubble from the element that dispatched the original `'ln-http:request'`.
 
 ### `ln-http:response`
 Fired when `fetch` resolves. The consumer must branch on `ok`/`status` and parse the raw body.

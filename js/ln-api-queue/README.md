@@ -38,7 +38,7 @@ When this child is absent, the coordinator's write handlers call the connector d
 |-----------|----------|-------------|
 | `id="name"` | Identity | Unique identifier of the queue (the scope name). Defaults to the coordinator's `id` if nested, else `'default'`. |
 | `data-ln-api-queue` | Selector | Marker attribute to declare the component. |
-| `data-ln-api-queue-online` | Status (read-only, reflected) | Set by the component itself — `"true"` when the scope is draining/idle normally, `"false"` while paused (e.g. auth pause). Useful for CSS hooks on a connectivity indicator; not meant to be written by consumers. |
+| `data-ln-api-queue-online` | Connectivity Override | Consumer override attribute (e.g. `"false"` to simulate offline state during testing/manual debugging). Checked via `_isOnline()`. |
 
 ---
 
@@ -49,7 +49,7 @@ The queue owns its **own** IndexedDB database, `ln_api_queue` — entirely separ
 | Object store | Key path | Indexes | Purpose |
 |---|---|---|---|
 | `outbox` | `entryId` | `by_scope_chain` (`[scope, chainKey]`), `by_scope_seq` (`[scope, seq]`) | One row per pending mutation. `seq` is a monotonically increasing per-scope counter used to preserve global FIFO ordering within a scope; `by_scope_chain` is used to find the head entry per chain. |
-| `_queue_meta` | `key` | — | Holds `seq:<scope>` counters and `paused:<scope>` auth-pause state. |
+| `_queue_meta` | `key` | — | Holds `seq:<scope>` counters and `paused:<scope>` state (`'auth'`, `'manual'`, or `false`). |
 
 Each `outbox` entry carries: `entryId`, `scope`, `chainKey`, `seq`, `op`, `targetId`, `payload`, `expectedVersion`, `meta`, `attempts`, `status` (`pending` / `inflight` / `failed`), `leaseOwner`, `leaseUntil`, and timestamps. The queue never inspects `payload` — it passes it through untouched to whatever the coordinator sends on `ln-api-queue:send`.
 
@@ -87,6 +87,7 @@ const queue = queueEl.lnApiQueue;
 | `ln-api-queue:request-remap` | `{ oldKey, newId }` | For pending entries whose chain is `oldKey`: any entry with `targetId === oldKey` gets `targetId = newId`; the chain itself is re-keyed from `oldKey` to `newId`; if `meta.action` contains `oldKey` as a substring, it is string-replaced with `newId` too (keeps a persisted per-record URL in sync after a create resolves). |
 | `ln-api-queue:resolve-create` | `{ entryId, oldKey, newId }` | Atomically deletes the acknowledged create and remaps every queued sibling from the temp key to the authoritative id in one transaction, then advances the chain. |
 | `ln-api-queue:request-resume` | `{}` | Clears the pause on this scope and resumes draining. |
+| `ln-api-queue:request-pause` | `{}` | Manually pauses draining for this scope. |
 | `ln-api-queue:request-drain` | `{}` | Manually triggers a drain attempt (e.g. to retry `failed` entries). |
 | `ln-api-queue:request-clear` | `{}` | Deletes all entries for this scope (e.g. on logout). |
 
@@ -98,7 +99,7 @@ const queue = queueEl.lnApiQueue;
 | `ln-api-queue:enqueued` | `{ entryId, chainKey, count }` | An entry was persisted. |
 | `ln-api-queue:pending-count` | `{ count, scope }` | Live outbox depth for the scope — the primary UI-facing signal (badge, banner). |
 | `ln-api-queue:auth-required` | `{ entryId, chainKey }` | The scope paused after a `401`/`419` nack. The consumer drives re-authentication, then dispatches `request-resume`. |
-| `ln-api-queue:paused` | `{ reason }` | Draining paused for this scope. |
+| `ln-api-queue:paused` | `{ reason: "auth" \| "manual", restored?: Boolean }` | Draining paused for this scope. `restored: true` when re-emitted upon component boot from persisted state. |
 | `ln-api-queue:resumed` | `{}` | Draining resumed for this scope. |
 | `ln-api-queue:failed` | `{ entryId, chainKey, attempts }` | Retries exhausted (see backoff below); the entry is retained (not deleted) for a manual `request-drain`. |
 | `ln-api-queue:drained` | `{ scope }` | The outbox for this scope is empty. |

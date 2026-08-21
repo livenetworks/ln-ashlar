@@ -199,7 +199,7 @@ import { MutationReceipts } from './mutation-receipts';
 
 	_component.prototype.findChildren = function () {
 		const storeEl = this.dom.querySelector('[data-ln-data-store]');
-		const connectorEl = this.dom.querySelector('[data-ln-api-connector], [data-ln-couchdb-connector], [data-ln-websocket-connector], [data-ln-rest-connector]');
+		const connectorEl = this.dom.querySelector('[data-ln-api-connector], [data-ln-couchdb-connector], [data-ln-websocket-connector]');
 		const queueEl = this.dom.querySelector('[data-ln-api-queue]');
 
 		return {

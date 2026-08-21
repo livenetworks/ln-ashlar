@@ -1,4 +1,5 @@
-import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from '../../ln-core';
+import { registerComponent, dispatch, getHeaders, parseHeaders } from '../../ln-core';
+import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './connector-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-api-connector';
@@ -42,23 +43,18 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		this.baseUrl = dom.getAttribute('data-ln-api-base-url') || '';
 		this.path = dom.getAttribute('data-ln-api-path') || '';
 		this.credentials = 'same-origin';
+		this.rawHeaders = dom.getAttribute('data-ln-api-headers');
+		this.headers = parseHeaders(this.rawHeaders);
 
 		this.paramKeys = {
-			offset: dom.getAttribute('data-ln-api-param-offset') || 'offset',
-			limit: dom.getAttribute('data-ln-api-param-limit') || 'limit',
-			search: dom.getAttribute('data-ln-api-param-search') || 'search',
-			sortField: dom.getAttribute('data-ln-api-param-sort-field') || 'sort_field',
-			sortDir: dom.getAttribute('data-ln-api-param-sort-dir') || 'sort_dir'
+			offset: dom.getAttribute('data-ln-api-param-offset') || undefined,
+			limit: dom.getAttribute('data-ln-api-param-limit') || undefined,
+			search: dom.getAttribute('data-ln-api-param-search') || undefined,
+			sortField: dom.getAttribute('data-ln-api-param-sort-field') || undefined,
+			sortDir: dom.getAttribute('data-ln-api-param-sort-dir') || undefined
 		};
 
-		const rawHeaders = dom.getAttribute('data-ln-api-headers') || '';
-		this.headers = parseHeaders(rawHeaders, 'ln-api-connector');
-
-		if (rawHeaders.toLowerCase().includes('authorization') || rawHeaders.toLowerCase().includes('bearer') || rawHeaders.toLowerCase().includes('basic')) {
-			console.warn('[ln-api-connector] Security Warning: Sensitive authorization credentials detected in data-ln-api-headers attribute. Storing secrets in HTML DOM attributes is highly discouraged and vulnerable to XSS credential extraction. Please use HttpOnly session cookies or a Backend Proxy Gateway instead.');
-		}
-
-		dispatch(dom, 'ln-api-connector:config-changed', {
+		dispatch(this.dom, 'ln-api-connector:config-changed', {
 			baseUrl: this.baseUrl,
 			path: this.path,
 			headers: this.headers,
@@ -69,16 +65,36 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 	// ─── Request Headers (forces X-LN-Response) ─────────────
 
 	_component.prototype._reqHeaders = function (idempotencyKey) {
-		const headers = Object.assign({}, getHeaders(this.headers), { 'X-LN-Response': 'data' });
-		if (idempotencyKey) headers['Idempotency-Key'] = idempotencyKey;
+		const headers = Object.assign({}, this.headers);
+		if (!headers['Accept'] && !headers['accept']) {
+			headers['Accept'] = 'application/json';
+		}
+		if (!headers['Content-Type'] && !headers['content-type']) {
+			headers['Content-Type'] = 'application/json';
+		}
+		if (idempotencyKey) {
+			headers['X-Idempotency-Key'] = idempotencyKey;
+		}
 		return headers;
+	};
+
+	// ─── Cancellation API ────────────────────────────────────
+
+	_component.prototype.cancel = function (key) {
+		if (!key) return false;
+		if (this._inflight.has(key)) {
+			this._inflight.get(key).abort();
+			this._inflight.delete(key);
+			return true;
+		}
+		return false;
 	};
 
 	// ─── JS API Methods (Promises) ──────────────────────────
 
 	_component.prototype.fetchDelta = function (since, targetEl) {
 		const self = this;
-		let url = buildUrl(self.baseUrl, self.path);
+		let url = joinUrl(self.baseUrl, self.path);
 
 		if (since !== undefined && since !== null && since !== '') {
 			url += (url.indexOf('?') !== -1 ? '&' : '?') + 'since=' + encodeURIComponent(since);
@@ -107,79 +123,33 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 
 	_component.prototype.query = function (queryParams, targetEl) {
 		const self = this;
-		queryParams = queryParams || {};
-		let url = buildUrl(self.baseUrl, self.path);
+		const qs = buildQueryParams(queryParams, self.paramKeys);
+		const url = buildQueryUrl(self.baseUrl, self.path, qs);
 
-		const keys = self.paramKeys || {
-			offset: 'offset',
-			limit: 'limit',
-			search: 'search',
-			sortField: 'sort_field',
-			sortDir: 'sort_dir'
-		};
+		const key = targetEl || 'query';
+		if (self._inflight.has(key)) {
+			self._inflight.get(key).abort();
+		}
+		const controller = new AbortController();
+		self._inflight.set(key, controller);
 
-		const searchParams = new URLSearchParams();
-		if (queryParams.search) {
-			searchParams.append(keys.search, queryParams.search);
-		}
-		if (queryParams.offset != null) {
-			searchParams.append(keys.offset, queryParams.offset);
-		}
-		if (queryParams.limit != null) {
-			searchParams.append(keys.limit, queryParams.limit);
-		}
-		if (queryParams.sort && queryParams.sort.field && queryParams.sort.direction) {
-			searchParams.append(keys.sortField, queryParams.sort.field);
-			searchParams.append(keys.sortDir, queryParams.sort.direction);
-		}
-		if (queryParams.filters && typeof queryParams.filters === 'object') {
-			Object.keys(queryParams.filters).forEach(key => {
-				const vals = queryParams.filters[key];
-				if (Array.isArray(vals) && vals.length > 0) {
-					searchParams.append(key, vals.join(','));
-				}
-			});
-		}
-
-		const qs = searchParams.toString();
-		if (qs) {
-			url += (url.indexOf('?') !== -1 ? '&' : '?') + qs;
-		}
-
-		let controller = null;
-		if (targetEl) {
-			if (self._inflight.has(targetEl)) {
-				self._inflight.get(targetEl).abort();
-			}
-			controller = new AbortController();
-			self._inflight.set(targetEl, controller);
-		}
-
-		const fetchOptions = {
+		return window.fetch(url, {
 			method: 'GET',
 			headers: self._reqHeaders(),
-			credentials: self.credentials
-		};
-		if (controller) {
-			fetchOptions.signal = controller.signal;
-		}
-
-		let promise = window.fetch(url, fetchOptions).then(_resolve);
-
-		if (targetEl && controller) {
-			promise = promise.finally(function () {
-				if (self._inflight.get(targetEl) === controller) {
-					self._inflight.delete(targetEl);
-				}
-			});
-		}
-
-		return promise;
+			credentials: self.credentials,
+			signal: controller.signal
+		})
+		.then(_resolve)
+		.finally(function () {
+			if (self._inflight.get(key) === controller) {
+				self._inflight.delete(key);
+			}
+		});
 	};
 
 	_component.prototype.create = function (payload, url, idempotencyKey) {
 		const self = this;
-		return window.fetch(buildUrl(self.baseUrl, url || self.path), {
+		return window.fetch(joinUrl(self.baseUrl, url || self.path), {
 			method: 'POST',
 			headers: self._reqHeaders(idempotencyKey),
 			credentials: self.credentials,
@@ -196,7 +166,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		// An explicit `url` is the COMPLETE resource URL — it already carries the
 		// id (e.g. the form's resolved action `/documents/42`). Do NOT re-append
 		// id, symmetric with create(). Only the path fallback needs id appended.
-		const target = url ? buildUrl(self.baseUrl, url) : buildUrl(self.baseUrl, self.path, id);
+		const target = url ? joinUrl(self.baseUrl, url) : joinUrl(self.baseUrl, self.path, id);
 		return window.fetch(target, {
 			method: 'PUT',
 			headers: self._reqHeaders(idempotencyKey),
@@ -208,7 +178,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 
 	_component.prototype.delete = function (id, url, idempotencyKey) {
 		const self = this;
-		return window.fetch(buildUrl(self.baseUrl, url || self.path, id), {
+		return window.fetch(joinUrl(self.baseUrl, url || self.path, id), {
 			method: 'DELETE',
 			headers: self._reqHeaders(idempotencyKey),
 			credentials: self.credentials
@@ -218,7 +188,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 
 	_component.prototype.bulkDelete = function (ids, url, idempotencyKey) {
 		const self = this;
-		return window.fetch(buildUrl(self.baseUrl, url || self.path) + '/bulk-delete', {
+		return window.fetch(joinUrl(self.baseUrl, url || self.path, 'bulk-delete'), {
 			method: 'DELETE',
 			headers: self._reqHeaders(idempotencyKey),
 			credentials: self.credentials,
@@ -277,15 +247,25 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 						});
 					});
 			},
+			cancel: function (e) {
+				const detail = e.detail || {};
+				const targetKey = (detail.meta && detail.meta.targetEl) ? detail.meta.targetEl : (detail.targetEl || detail.key);
+				if (targetKey) self.cancel(targetKey);
+			},
 			create: function (e) {
 				const detail = e.detail || {};
 				self.create(detail.data, detail.url, detail.idempotencyKey)
 					.then(function (body) {
-						const record  = (body && body.content !== undefined) ? body.content : body;
-						const message = (body && body.message) ? body.message : null;
-						dispatch(self.dom, 'ln-api-connector:created', { record: record, tempId: detail.tempId, message: message, meta: detail.meta || null });
+						const unwrapped = unwrapEnvelope(body);
+						dispatch(self.dom, 'ln-api-connector:created', {
+							record: unwrapped.record,
+							tempId: detail.tempId,
+							message: unwrapped.message,
+							meta: detail.meta || null
+						});
 					})
 					.catch(function (err) {
+						if (err && err.name === 'AbortError') return;
 						dispatch(self.dom, 'ln-api-connector:error', {
 							action: 'create',
 							error: err.message,
@@ -300,11 +280,16 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 				const detail = e.detail || {};
 				self.update(detail.id, detail.data, detail.expected_version, detail.url, detail.idempotencyKey)
 					.then(function (body) {
-						const record  = (body && body.content !== undefined) ? body.content : body;
-						const message = (body && body.message) ? body.message : null;
-						dispatch(self.dom, 'ln-api-connector:updated', { record: record, id: detail.id, message: message, meta: detail.meta || null });
+						const unwrapped = unwrapEnvelope(body);
+						dispatch(self.dom, 'ln-api-connector:updated', {
+							record: unwrapped.record,
+							id: detail.id,
+							message: unwrapped.message,
+							meta: detail.meta || null
+						});
 					})
 					.catch(function (err) {
+						if (err && err.name === 'AbortError') return;
 						dispatch(self.dom, 'ln-api-connector:error', {
 							action: 'update',
 							error: err.message,
@@ -321,9 +306,15 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 				self.delete(detail.id, detail.url, detail.idempotencyKey)
 					.then(function (body) {
 						const message = (body && body.message) ? body.message : null;
-						dispatch(self.dom, 'ln-api-connector:deleted', { response: body, id: detail.id, message: message, meta: detail.meta || null });
+						dispatch(self.dom, 'ln-api-connector:deleted', {
+							response: body,
+							id: detail.id,
+							message: message,
+							meta: detail.meta || null
+						});
 					})
 					.catch(function (err) {
+						if (err && err.name === 'AbortError') return;
 						dispatch(self.dom, 'ln-api-connector:error', {
 							action: 'delete',
 							error: err.message,
@@ -339,9 +330,15 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 				self.bulkDelete(detail.ids, detail.url, detail.idempotencyKey)
 					.then(function (body) {
 						const message = (body && body.message) ? body.message : null;
-						dispatch(self.dom, 'ln-api-connector:bulk-deleted', { response: body, ids: detail.ids, message: message, meta: detail.meta || null });
+						dispatch(self.dom, 'ln-api-connector:bulk-deleted', {
+							response: body,
+							ids: detail.ids,
+							message: message,
+							meta: detail.meta || null
+						});
 					})
 					.catch(function (err) {
+						if (err && err.name === 'AbortError') return;
 						dispatch(self.dom, 'ln-api-connector:error', {
 							action: 'bulk-delete',
 							error: err.message,
@@ -354,17 +351,14 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			}
 		};
 
-		// Support both general and REST namespaces for incoming requests
-		const namespaces = ['ln-api-connector', 'ln-rest-connector'];
-		namespaces.forEach(function (ns) {
-			self.dom.addEventListener(ns + ':request-sync', self._handlers.sync);
-			self.dom.addEventListener(ns + ':request-query', self._handlers.query);
-			self.dom.addEventListener(ns + ':request-fetch', self._handlers.query);
-			self.dom.addEventListener(ns + ':request-create', self._handlers.create);
-			self.dom.addEventListener(ns + ':request-update', self._handlers.update);
-			self.dom.addEventListener(ns + ':request-delete', self._handlers.delete);
-			self.dom.addEventListener(ns + ':request-bulk-delete', self._handlers.bulkDelete);
-		});
+		self.dom.addEventListener('ln-api-connector:request-sync', self._handlers.sync);
+		self.dom.addEventListener('ln-api-connector:request-query', self._handlers.query);
+		self.dom.addEventListener('ln-api-connector:request-fetch', self._handlers.query);
+		self.dom.addEventListener('ln-api-connector:request-cancel', self._handlers.cancel);
+		self.dom.addEventListener('ln-api-connector:request-create', self._handlers.create);
+		self.dom.addEventListener('ln-api-connector:request-update', self._handlers.update);
+		self.dom.addEventListener('ln-api-connector:request-delete', self._handlers.delete);
+		self.dom.addEventListener('ln-api-connector:request-bulk-delete', self._handlers.bulkDelete);
 	}
 
 	_component.prototype.destroy = function () {
@@ -379,16 +373,14 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		}
 
 		if (self._handlers) {
-			const namespaces = ['ln-api-connector', 'ln-rest-connector'];
-			namespaces.forEach(function (ns) {
-				self.dom.removeEventListener(ns + ':request-sync', self._handlers.sync);
-				self.dom.removeEventListener(ns + ':request-query', self._handlers.query);
-				self.dom.removeEventListener(ns + ':request-fetch', self._handlers.query);
-				self.dom.removeEventListener(ns + ':request-create', self._handlers.create);
-				self.dom.removeEventListener(ns + ':request-update', self._handlers.update);
-				self.dom.removeEventListener(ns + ':request-delete', self._handlers.delete);
-				self.dom.removeEventListener(ns + ':request-bulk-delete', self._handlers.bulkDelete);
-			});
+			self.dom.removeEventListener('ln-api-connector:request-sync', self._handlers.sync);
+			self.dom.removeEventListener('ln-api-connector:request-query', self._handlers.query);
+			self.dom.removeEventListener('ln-api-connector:request-fetch', self._handlers.query);
+			self.dom.removeEventListener('ln-api-connector:request-cancel', self._handlers.cancel);
+			self.dom.removeEventListener('ln-api-connector:request-create', self._handlers.create);
+			self.dom.removeEventListener('ln-api-connector:request-update', self._handlers.update);
+			self.dom.removeEventListener('ln-api-connector:request-delete', self._handlers.delete);
+			self.dom.removeEventListener('ln-api-connector:request-bulk-delete', self._handlers.bulkDelete);
 			self._handlers = null;
 		}
 
