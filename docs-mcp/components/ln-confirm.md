@@ -48,10 +48,10 @@ Recommended for complex button layouts (with icons, badges, or rich HTML). Isola
         data-ln-confirm-timeout="4">
     <span data-ln-confirm-idle>
         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
-        Избриши ставка (<span data-ln-table-selected>3</span>)
+        Delete Item (<span data-ln-table-selected>3</span>)
     </span>
     <span data-ln-confirm-active hidden>
-        Сигурен ли си?
+        Are you sure?
     </span>
 </button>
 ```
@@ -65,8 +65,8 @@ Ideal for simple text buttons where the prompt is passed cleanly via the attribu
 <form action="/account/delete" method="POST">
     <button type="submit" 
             class="btn btn-danger" 
-            data-ln-confirm="Дали сте сигурни дека сакате да го избришете профилот?">
-        Избриши профил
+            data-ln-confirm="Are you sure you want to delete your profile?">
+        Delete Profile
     </button>
 </form>
 ```
@@ -79,8 +79,8 @@ For compact layouts and table rows. Replaces the SVG icon path with `#ln-icon-ch
 ```html
 <button type="button" 
         class="btn btn-icon" 
-        aria-label="Избриши ставка" 
-        data-ln-confirm="Потврди бришење?">
+        aria-label="Delete Item" 
+        data-ln-confirm="Confirm deletion?">
     <svg class="ln-icon" aria-hidden="true">
         <use href="#ln-icon-trash"></use>
     </svg>

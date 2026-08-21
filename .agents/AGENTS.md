@@ -21,6 +21,7 @@
 
 ### D. HTML Template System & Zero JS Display Text
 - **HTML-First DOM Structure**: Component DOM structures belong in `<template data-ln-template="...">` in HTML, cloned via `cloneTemplate()` and populated via `fill()`. Never build DOM trees via `createElement` chains in JS.
+  - **Micro-Component Exception**: Behavioral button decorators (e.g. `ln-confirm`) are exempt from `<template>` cloning to avoid over-engineering. They use Two-Element Mode (`data-ln-confirm-idle`/`data-ln-confirm-active`) or declarative attribute strings (`data-ln-confirm="..."`). Hardcoded JS strings are strictly developer failsafes.
 - **Zero Display Text in JS**: Hardcoded UI text/labels in JS are strictly forbidden. Translatable text lives in `<ul hidden><li data-{component}-dict="key">...</li></ul>` (read via `buildDict`) or relies on browser `Intl` APIs (`Intl.DateTimeFormat`, `Intl.NumberFormat`).
 - **Semantic HTML5 & Accessibility First**:
   - Always use semantic HTML5 elements for data presentation instead of generic `<div>` or `<span>` containers:
@@ -57,7 +58,7 @@
   - **Remote Search (API Search):** When searching via backend APIs (e.g., using `ln-data-store`, `ln-table` remote mode, or custom fetches), always use a debounce of `500` milliseconds (the standard default in `ln-search`) to throttle requests and protect the server.
 
 ## 5. UI/UX Confirmation & Gating Guidelines
-- **Single-Element Actions (`ln-confirm`):** The `ln-confirm` component (in-place two-click confirmation) is strictly reserved for **single-element, low-impact actions** (e.g., deleting a single table row, archiving a single document). It must never be used for complex or high-risk actions.
+- **Single-Element Actions (`ln-confirm`):** The `ln-confirm` component (in-place two-click confirmation) is strictly reserved for **single-element, low-impact actions** (e.g., deleting a single table row, archiving a single document). It must never be used for complex or high-risk actions. Prefers Two-Element Mode (`data-ln-confirm-idle`/`data-ln-confirm-active`) for HTML-first clarity.
 - **Bulk Actions & High-Impact Operations (`ln-modal`):** For actions that affect multiple items simultaneously (e.g., bulk deleting selected tenants, batch status updates) or actions with major side effects, using in-place `ln-confirm` is strictly forbidden. Instead, a confirmation modal (`ln-modal`) MUST be shown. The modal must clearly list the affected resources, show the impact summary, and offer explicit, separate "Confirm" and "Cancel" buttons.
 
 ## 6. Global Restrictions
