@@ -106,6 +106,30 @@ test('connector-core: buildQueryParams handles custom parameter mappings', () =>
 	assert.equal(params.get('order'), 'desc');
 });
 
+test('connector-core: buildQueryParams ignores undefined/null in paramKeys and preserves defaults', () => {
+	const query = {
+		search: 'ashlar',
+		offset: 0,
+		limit: 200,
+		sort: { field: 'name', direction: 'asc' }
+	};
+	const qs = buildQueryParams(query, {
+		offset: undefined,
+		limit: undefined,
+		search: undefined,
+		sortField: undefined,
+		sortDir: undefined
+	});
+	const params = new URLSearchParams(qs);
+
+	assert.equal(params.get('search'), 'ashlar');
+	assert.equal(params.get('offset'), '0');
+	assert.equal(params.get('limit'), '200');
+	assert.equal(params.get('sort_field'), 'name');
+	assert.equal(params.get('sort_dir'), 'asc');
+	assert.equal(params.has('undefined'), false);
+});
+
 test('connector-core: buildQueryUrl constructs target URL cleanly', () => {
 	assert.equal(buildQueryUrl('/api', '/users', 'search=test'), '/api/users?search=test');
 	assert.equal(buildQueryUrl('/api', '/users?active=1', 'search=test'), '/api/users?active=1&search=test');

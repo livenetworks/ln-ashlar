@@ -35,7 +35,14 @@ export function joinUrl(...parts) {
  */
 export function buildQueryParams(queryParams, paramKeys) {
 	if (!queryParams || typeof queryParams !== 'object') return '';
-	const keys = Object.assign({}, DEFAULT_PARAM_KEYS, paramKeys || {});
+	const keys = Object.assign({}, DEFAULT_PARAM_KEYS);
+	if (paramKeys && typeof paramKeys === 'object') {
+		for (const k in paramKeys) {
+			if (paramKeys[k] !== undefined && paramKeys[k] !== null && paramKeys[k] !== '') {
+				keys[k] = paramKeys[k];
+			}
+		}
+	}
 	const searchParams = new URLSearchParams();
 
 	if (queryParams.search) {

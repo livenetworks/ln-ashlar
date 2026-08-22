@@ -46,13 +46,18 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 		this.rawHeaders = dom.getAttribute('data-ln-api-headers');
 		this.headers = parseHeaders(this.rawHeaders);
 
-		this.paramKeys = {
-			offset: dom.getAttribute('data-ln-api-param-offset') || undefined,
-			limit: dom.getAttribute('data-ln-api-param-limit') || undefined,
-			search: dom.getAttribute('data-ln-api-param-search') || undefined,
-			sortField: dom.getAttribute('data-ln-api-param-sort-field') || undefined,
-			sortDir: dom.getAttribute('data-ln-api-param-sort-dir') || undefined
-		};
+		const paramKeys = {};
+		const offset = dom.getAttribute('data-ln-api-param-offset');
+		if (offset) paramKeys.offset = offset;
+		const limit = dom.getAttribute('data-ln-api-param-limit');
+		if (limit) paramKeys.limit = limit;
+		const search = dom.getAttribute('data-ln-api-param-search');
+		if (search) paramKeys.search = search;
+		const sortField = dom.getAttribute('data-ln-api-param-sort-field');
+		if (sortField) paramKeys.sortField = sortField;
+		const sortDir = dom.getAttribute('data-ln-api-param-sort-dir');
+		if (sortDir) paramKeys.sortDir = sortDir;
+		this.paramKeys = paramKeys;
 
 		dispatch(this.dom, 'ln-api-connector:config-changed', {
 			baseUrl: this.baseUrl,
