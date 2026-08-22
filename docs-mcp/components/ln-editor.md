@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A visual rich text editor component that progressively enhances standard textareas.
-source: js/ln-editor/src/ln-editor.js
+source: components/ln-editor/src/ln-editor.js
 tags: [forms, editors, inputs, rich-text]
 ---
 
@@ -19,7 +19,7 @@ tags: [forms, editors, inputs, rich-text]
 - **Core Role:** Progressively enhances a standard `<textarea>` element, replacing it visually with a rich text editing workspace (`contenteditable` surface).
 - **Zero-Dependency WYSIWYG:** Relies entirely on native browser selection APIs and commands (`execCommand`), keeping bundle sizes small.
 - **Form Value Synchronization:** Automatically serializes rich text modifications back to the original `<textarea>` to preserve native form submission capabilities.
-- Located in [`js/ln-editor/src/ln-editor.js`](../../js/ln-editor/src/ln-editor.js).
+- Located in [`components/ln-editor/src/ln-editor.js`](../../components/ln-editor/src/ln-editor.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

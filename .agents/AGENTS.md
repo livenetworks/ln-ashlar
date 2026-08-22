@@ -39,7 +39,7 @@
 - **Window-Level Scope Boundary (`ln-ui-coordinator`)**: Window-level coordinators manage only shared, window-wide UI services (hash routing for modals `#modal-id`, toast dispatching, global AJAX success/error toast mediation, upload notifications). They MUST NEVER couple with, inspect, or manage the internal validation/submission state of local forms or components.
 
 ## 2. Codebase Integrity and Realistic Modeling
-- **No Hallucinated Attributes/Components**: Never invent attributes or components that do not exist (e.g., `data-ln-action` or `ln-action`). Only reference actual components found in the `js/` directory (e.g., `ln-toggle`, `ln-modal`, `ln-table`, `ln-form`, `ln-validate`, `ln-data-store`, `ln-data-coordinator`).
+- **No Hallucinated Attributes/Components**: Never invent attributes or components that do not exist (e.g., `data-ln-action` or `ln-action`). Only reference actual components found in the `components/` directory (e.g., `ln-toggle`, `ln-modal`, `ln-table`, `ln-form`, `ln-validate`, `ln-data-store`, `ln-data-coordinator`).
 
 ## 3. Architecture Documentation Structure & Component Standards
 - All component documentation in `docs-mcp/components/` MUST strictly follow the unified English structure.
@@ -51,7 +51,7 @@
   5. `## 5. Accessibility (ARIA) & Common Pitfalls`
   6. `## 6. Sequence & Lifecycle Flow` (Mermaid sequence diagram)
   7. `## 7. Related Components & Coordinators`
-- **Relative Links Requirement**: Always use relative paths for file links in component documentation (e.g. `../../js/ln-tooltip/src/ln-tooltip.js`, `./ln-confirm.md`), NEVER absolute `file:///` URLs.
+- **Relative Links Requirement**: Always use relative paths for file links in component documentation (e.g. `../../components/ln-tooltip/src/ln-tooltip.js`, `./ln-confirm.md`), NEVER absolute `file:///` URLs.
 - Lead documentation with user/developer usage examples; keep internal JS engine code dumps out of consumer docs.
 - **Conciseness & Compactness**: Keep documentation lean, focused, and direct. Consolidate related HTML markup variants into compact code blocks, use clean concise API tables, and keep Mermaid sequence diagrams focused on high-level lifecycle flows (3-4 key participants max). Avoid multi-paragraph over-explanations.
 

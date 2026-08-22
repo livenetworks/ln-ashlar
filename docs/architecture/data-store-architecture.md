@@ -187,7 +187,7 @@ connector directly; when it is absent, the coordinator's queue-absent path
 </ul>
 ```
 
-See [ln-api-queue README](../../js/ln-api-queue/README.md) for the full
+See [ln-api-queue README](../../components/ln-api-queue/README.md) for the full
 attribute, event, and schema reference.
 
 ---

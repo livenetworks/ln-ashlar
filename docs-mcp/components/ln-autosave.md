@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Saves draft form states in localStorage on field boundaries, restoring them on load and clearing them on submit or reset.
-source: js/ln-autosave/src/ln-autosave.js
+source: components/ln-autosave/src/ln-autosave.js
 tags: [forms, inputs, state, localstorage]
 ---
 
@@ -21,7 +21,7 @@ tags: [forms, inputs, state, localstorage]
 - **Opt-in Debounced Input:** Optionally performs debounced auto-saving on native `input` events while typing (configured via `data-ln-autosave-debounce-input`).
 - **Clean Invalidation:** Clears the stored draft when the form is submitted (`submit`), reset (`reset`), or when an element marked with `data-ln-autosave-clear` is clicked.
 - **Decoupled Event Restoration:** Restores form state on initialization and dispatches standard native `input` and `change` events on all restored fields. This automatically triggers sibling primitives (such as `ln-validate` and `ln-autoresize`) to re-evaluate their state without direct integration logic in `ln-autosave`.
-- Located in [`js/ln-autosave/src/ln-autosave.js`](../../js/ln-autosave/src/ln-autosave.js).
+- Located in [`components/ln-autosave/src/ln-autosave.js`](../../components/ln-autosave/src/ln-autosave.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

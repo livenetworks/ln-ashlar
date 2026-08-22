@@ -1,0 +1,58 @@
+// ==========================================================================
+// ln-toast — Functional Stacking & Mechanics
+// ==========================================================================
+
+[data-ln-toast] {
+	border: none;
+	background: transparent;
+	inset: auto;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	pointer-events: none;
+	display: flex;
+	flex-direction: column-reverse;
+	overflow: visible;
+
+	&:popover-open {
+		display: flex;
+	}
+}
+
+[data-ln-toast] > li {
+	list-style: none;
+	pointer-events: auto;
+
+	&.ln-enter {
+		opacity: 0;
+		transform: translateX(30px);
+	}
+
+	&.ln-out {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+}
+
+[data-ln-toast] .icon ul {
+	display: contents;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+
+	> li {
+		display: none;
+	}
+}
+
+[data-ln-toast] > li.success .icon li[data-ln-toast-when="success"],
+[data-ln-toast] > li.error .icon li[data-ln-toast-when="error"],
+[data-ln-toast] > li.warn .icon li[data-ln-toast-when="warn"],
+[data-ln-toast] > li.info .icon li[data-ln-toast-when="info"] {
+	display: block;
+}
+
+[data-ln-toast] .title:empty,
+[data-ln-toast] .body:empty {
+	display: none;
+}

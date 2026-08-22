@@ -1,6 +1,6 @@
 # Stat card / KPI card
 
-File: `scss/config/mixins/_stat-card.scss` + `scss/components/_stat-card.scss`.
+File: `theme/config/mixins/_stat-card.scss` + `theme/components/_stat-card.scss`.
 
 Dashboard KPI tile. Large numeric value, small uppercase label, and
 optional trend indicator.

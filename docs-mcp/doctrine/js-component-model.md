@@ -4,7 +4,7 @@ classification: doctrine
 status: draft
 domain: frontend
 summary: JavaScript component architecture of ln-ashlar - IIFE registration, the Attribute Bridge, MutationObserver auto-initialization, and event-driven data flow.
-source: docs/architecture/component-guide.md, js/ln-core/README.md, js/COMPONENTS.md
+source: docs/architecture/component-guide.md, components/ln-core/README.md, components/COMPONENTS.md
 tags: [doctrine, javascript, components, events, reactive]
 ---
 

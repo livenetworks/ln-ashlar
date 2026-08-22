@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createWindowIndex } from '../js/ln-data-store/src/window-index.js';
+import { createWindowIndex } from '../components/ln-data-store/src/window-index.js';
 
 test('createWindowIndex ensure() on empty index requests offset 0 once and deduplicates requests', async (t) => {
 	let requests = [];

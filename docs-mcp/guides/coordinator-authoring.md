@@ -4,7 +4,7 @@ classification: guide
 status: draft
 domain: frontend
 summary: Tutorial on authoring project-specific coordinators (Mediators) to orchestrate data-flow and UI feedback in ln-ashlar.
-source: js/COMPONENTS.md, docs/architecture/coordinator.md
+source: components/COMPONENTS.md, docs/architecture/coordinator.md
 tags: [coordinator, mediator, authoring, developer, guide]
 ---
 

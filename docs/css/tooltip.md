@@ -1,6 +1,6 @@
 # Tooltip
 
-File: `scss/config/mixins/_tooltip.scss` + `scss/components/_tooltip.scss`.
+File: `theme/config/mixins/_tooltip.scss` + `theme/components/_tooltip.scss`.
 
 CSS-only tooltip that uses a pseudo-element and the `data-ln-tooltip`
 attribute. Zero JS, zero positioning math.

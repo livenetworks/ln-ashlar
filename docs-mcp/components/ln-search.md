@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Two-host debounced search primitive that drives target state attributes and coordinates list filtering and remote queries.
-source: js/ln-search/src/ln-search.js
+source: components/ln-search/src/ln-search.js
 tags: [search, filter, debounce, dom-filtering, attribute-bridge]
 ---
 

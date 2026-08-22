@@ -4,7 +4,7 @@ classification: guide
 status: draft
 domain: frontend
 summary: Client-side routing and hash-state architecture in ln-ashlar - compound URL fragments, navigation lifecycles, and view teardowns.
-source: docs/architecture/hash-state.md, js/ln-router/README.md
+source: docs/architecture/hash-state.md, components/ln-router/README.md
 tags: [router, navigation, hash-state, spa, history]
 ---
 

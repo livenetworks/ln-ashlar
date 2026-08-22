@@ -1,6 +1,6 @@
 # Chip
 
-File: `scss/config/mixins/_chip.scss` + `scss/components/_chip.scss`.
+File: `theme/config/mixins/_chip.scss` + `theme/components/_chip.scss`.
 
 Inline passive label. For active filter tags, status labels, and
 metadata display.

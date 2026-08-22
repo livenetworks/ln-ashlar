@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A lightweight binary state toggler for collapsibles, drawers, and banners in the DOM.
-source: js/ln-toggle/src/ln-toggle.js
+source: components/ln-toggle/src/ln-toggle.js
 tags: [collapsible, state, accessibility, persistent]
 ---
 
@@ -18,7 +18,7 @@ tags: [collapsible, state, accessibility, persistent]
 
 The `ln-toggle` component serves as the smallest reactive state machine in `ln-ashlar`. Its sole responsibility is managing binary (`open` / `close`) states in the DOM and synchronizing accessibility indicators.
 
-The JavaScript source is located at [ln-toggle.js](../../js/ln-toggle/src/ln-toggle.js).
+The JavaScript source is located at [ln-toggle.js](../../components/ln-toggle/src/ln-toggle.js).
 
 Key responsibilities include:
 - **Binary State Management:** Toggling the value of the `data-ln-toggle` attribute on panel elements and synchronizing a visual `.open` CSS class.
@@ -131,14 +131,14 @@ All events bubble up from the target panel element.
 
 ## 5. CSS Styling & Behavioral Concept
 
-The visual expansion transition is powered by CSS Grid track sizing. The panel is styled using two key mixins defined in [scss/config/mixins/_collapsible.scss](../../scss/config/mixins/_collapsible.scss):
+The visual expansion transition is powered by CSS Grid track sizing. The panel is styled using two key mixins defined in [theme/config/mixins/_collapsible.scss](../../theme/config/mixins/_collapsible.scss):
 
 - `@mixin collapsible` — Applied to the panel container. It defaults to `grid-template-rows: 0fr` and transitions to `1fr` when `.open` is added.
 - `@mixin collapsible-content` — Applied to the direct child container. It enforces `overflow: hidden` and `min-height: 0` so the track can collapse to exactly `0px`.
 
 ### SCSS Style Binding:
 ```scss
-// In scss/components/_collapsible.scss
+// In theme/components/_collapsible.scss
 .collapsible {
     @include collapsible;
     

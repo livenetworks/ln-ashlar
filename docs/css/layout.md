@@ -1,6 +1,6 @@
 # Layout
 
-Grid and container query utilities. File: `scss/config/mixins/_layout.scss`.
+Grid and container query utilities. File: `theme/config/mixins/_layout.scss`.
 
 ## Grid
 
@@ -70,7 +70,7 @@ Block-axis only. For horizontal joined controls use `btn-group` or
 
 ## Container Queries
 
-Components don't know where they'll be placed. `@include container` on the parent, `@container` on the child — that's the only rule. Breakpoint values (`$cq-narrow`, `$cq-compact`, `$cq-medium`, `$cq-wide`) live in `scss/config/_breakpoints.scss` — see `breakpoints.md` for the full vocabulary.
+Components don't know where they'll be placed. `@include container` on the parent, `@container` on the child — that's the only rule. Breakpoint values (`$cq-narrow`, `$cq-compact`, `$cq-medium`, `$cq-wide`) live in `theme/config/_breakpoints.scss` — see `breakpoints.md` for the full vocabulary.
 
 ```scss
 // Parent declares context

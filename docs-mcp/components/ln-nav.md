@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Dynamically highlights active navigation links matching current URL location pathname with SPA history patch and ARIA aria-current attributes.
-source: js/ln-nav/src/ln-nav.js
+source: components/ln-nav/src/ln-nav.js
 tags: [navigation, routing, active-state, accessibility]
 ---
 
@@ -16,7 +16,7 @@ tags: [navigation, routing, active-state, accessibility]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-nav` component automatically evaluates and highlights active links within navigation menus based on the browser's current `window.location.pathname`. It is located in [`js/ln-nav/src/ln-nav.js`](../../js/ln-nav/src/ln-nav.js).
+The `ln-nav` component automatically evaluates and highlights active links within navigation menus based on the browser's current `window.location.pathname`. It is located in [`components/ln-nav/src/ln-nav.js`](../../components/ln-nav/src/ln-nav.js).
 
 *   **Active Route Highlight:** Queries all child `<a>` elements within host container `[data-ln-nav]`, compares link `href` targets against `window.location.pathname`, and applies the configured active CSS class and `aria-current="page"`.
 *   **SPA Navigation Detection (History Patching):** Listens to `popstate` events and monkey-patches `history.pushState` to re-evaluate active links during client-side SPA route transitions (e.g. via [`ln-router`](./ln-router.md)).

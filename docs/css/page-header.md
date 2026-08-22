@@ -1,6 +1,6 @@
 # Page header
 
-File: `scss/config/mixins/_page-header.scss` + `scss/components/_page-header.scss`.
+File: `theme/config/mixins/_page-header.scss` + `theme/components/_page-header.scss`.
 
 Standard page header pattern: breadcrumbs above, title + subtitle on
 the left, action buttons on the right. Stacks vertically on narrow

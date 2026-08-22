@@ -2,7 +2,7 @@
 
 How ln-ashlar components manage internal state and drive DOM updates. Covers the four primitives exported from `ln-core` (`fill`, `renderList`, `reactiveState`, `deepReactive`) and the `createBatcher` scheduler.
 
-For the high-level pattern summary, see [js/COMPONENTS.md — Reactive Rendering Pattern](../js/COMPONENTS.md).
+For the high-level pattern summary, see [components/COMPONENTS.md — Reactive Rendering Pattern](../components/COMPONENTS.md).
 
 ---
 

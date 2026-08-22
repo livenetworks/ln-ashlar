@@ -1,6 +1,6 @@
 # Theming
 
-File: `scss/config/_theme.scss`. Added in v1.1.
+File: `theme/config/_theme.scss`. Added in v1.1.
 
 ## Philosophy
 

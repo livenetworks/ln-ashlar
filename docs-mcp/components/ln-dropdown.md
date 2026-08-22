@@ -4,7 +4,7 @@ classification: coordinator
 status: stable
 domain: frontend
 summary: A DOM coordinator that manages positioning, top-layer promotion, accessibility, and dismissal of dropdown overlay menus.
-source: js/ln-dropdown/src/ln-dropdown.js
+source: components/ln-dropdown/src/ln-dropdown.js
 tags: [dropdown, overlay, positioning, coordinator]
 ---
 
@@ -18,7 +18,7 @@ tags: [dropdown, overlay, positioning, coordinator]
 
 The `ln-dropdown` component is a DOM coordinator that manages dropdown menus. It attaches to a wrapper DOM element declared with the `data-ln-dropdown` attribute. Its responsibility is to monitor the visibility state of its internal toggle menu ([`ln-toggle`](./ln-toggle.md)) and dynamically orchestrate its top-layer promotion, placement relative to the trigger button, accessibility semantics, and cleanup behavior (dismissing on click-outside, page scroll, or window resize).
 
-The JavaScript source is located at [ln-dropdown.js](../../js/ln-dropdown/src/ln-dropdown.js).
+The JavaScript source is located at [ln-dropdown.js](../../components/ln-dropdown/src/ln-dropdown.js).
 
 Key responsibilities include:
 - **Top-Layer Promotion:** Promoting the active menu into the browser's top layer via the native Popover API (`popover="manual"`, `showPopover()`) when opened to prevent clipping by parents with `overflow: hidden` or `z-index` stacking context rules.
@@ -169,11 +169,11 @@ The coordinator listens to the following bubbling events emitted by the inner `l
 
 ## 4. CSS Styling & Behavioral Concept
 
-The visual layer is separated from JavaScript logic. Custom styles are provided via reusable mixins in `scss/config/mixins/_dropdown.scss` and selector bindings in `scss/components/_dropdown.scss`.
+The visual layer is separated from JavaScript logic. Custom styles are provided via reusable mixins in `theme/config/mixins/_dropdown.scss` and selector bindings in `theme/components/_dropdown.scss`.
 
 ### SCSS Mixins Reference
 ```scss
-// In scss/config/mixins/_dropdown.scss
+// In theme/config/mixins/_dropdown.scss
 @mixin dropdown {
 	@include relative;
 }
@@ -265,7 +265,7 @@ The visual layer is separated from JavaScript logic. Custom styles are provided 
 
 ### SCSS Component Selector Bindings
 ```scss
-// In scss/components/_dropdown.scss
+// In theme/components/_dropdown.scss
 @use '../config/mixins' as *;
 
 [data-ln-dropdown] {
@@ -380,6 +380,6 @@ sequenceDiagram
 - [`ln-toggle`](./ln-toggle.md) — The binary state primitive that manages menu expansion.
 - [`ln-popover`](./ln-popover.md) — A visually richer overlay container for complex content.
 - [`ln-modal`](./ln-modal.md) — Blocking overlay dialogs with modal focus traps.
-- [Source JavaScript](../../js/ln-dropdown/src/ln-dropdown.js) — Core implementation of the dropdown coordinator.
-- [Source Component SCSS](../../scss/components/_dropdown.scss) — Core stylesheet for dropdown components.
-- [Source Mixin SCSS](../../scss/config/mixins/_dropdown.scss) — Reusable SCSS mixin for dropdown layout styling.
+- [Source JavaScript](../../components/ln-dropdown/src/ln-dropdown.js) — Core implementation of the dropdown coordinator.
+- [Source Component SCSS](../../theme/components/_dropdown.scss) — Core stylesheet for dropdown components.
+- [Source Mixin SCSS](../../theme/config/mixins/_dropdown.scss) — Reusable SCSS mixin for dropdown layout styling.

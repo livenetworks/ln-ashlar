@@ -4,7 +4,7 @@ classification: service
 status: stable
 domain: frontend
 summary: DOM-agnostic sliding-window data engine for server-side virtualization — sparse cache, LRU eviction, and stale-response guarding shared by ln-table and ln-list windowed modes.
-source: js/ln-core/window-cache.js
+source: components/ln-core/window-cache.js
 tags: [windowing, virtualization, sliding-window, service]
 ---
 
@@ -18,7 +18,7 @@ tags: [windowing, virtualization, sliding-window, service]
 
 `window-cache.js` exports `createWindowCache(config)`, a pure, DOM-agnostic data engine for server-side sliding-window virtualization. It owns a sparse cache keyed by logical index, logical/grand totals, request de-duplication, a stale-response guard (`queryGen`), LRU eviction to a bounded resident-row cap, and a debounced fetch trigger.
 
-The JavaScript source is located at [window-cache.js](../../js/ln-core/window-cache.js).
+The JavaScript source is located at [window-cache.js](../../components/ln-core/window-cache.js).
 
 Key responsibilities include:
 - **Sparse Windowing:** Holds at most `windowSize` records at any time, regardless of the logical dataset size, evicting the least-recently-touched rows first (LRU by touch-recency, not viewport distance).

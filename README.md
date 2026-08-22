@@ -153,10 +153,10 @@ npm install @livenetworks/ashlar
 Import source files into your main entries:
 ```js
 // main.scss - Import SCSS tokens, mixins, and defaults
-@use '@livenetworks/ashlar/scss/ln-ashlar.scss';
+@use '@livenetworks/ashlar/theme/ln-ashlar.scss';
 
 // main.js - Import and auto-initialize JS components
-import '@livenetworks/ashlar/js/index.js';
+import '@livenetworks/ashlar/components/index.js';
 ```
 
 ### 2. Install as a Git Submodule (Alternative)
@@ -166,10 +166,10 @@ git submodule add .../ln-ashlar.git resources/ln-ashlar
 
 Then reference the submodule paths:
 ```scss
-@use 'resources/ln-ashlar/scss/ln-ashlar.scss';
+@use 'resources/ln-ashlar/theme/ln-ashlar.scss';
 ```
 ```js
-import 'resources/ln-ashlar/js/index.js';
+import 'resources/ln-ashlar/components/index.js';
 ```
 
 ### 3. Build & Watch (For Library Demos Only)
@@ -202,7 +202,7 @@ Deep architectural blueprints detailing the engine driving `ln-ashlar`.
 
 For detailed manual instructions, properties, attributes, and events of individual components:
 
-* 📚 **[Complete Documentation Index](docs/README.md)** — The master roadmap containing direct links to each module's usage guide and architecture reference, both in `js/ln-*/README.md`.
+* 📚 **[Complete Documentation Index](docs/README.md)** — The master roadmap containing direct links to each module's usage guide and architecture reference, both in `components/ln-*/README.md`.
 
 ### CSS Layer Reference
 
@@ -223,56 +223,56 @@ For detailed manual instructions, properties, attributes, and events of individu
 
 | Component | Usage Guide (HTML Attributes / Events) | Technical Architecture (State / Render Loops) |
 |---|---|---|
-| **Core Utilities** | — | 🛠️ **[Core helpers reference](js/ln-core/README.md)** |
+| **Core Utilities** | — | 🛠️ **[Core helpers reference](components/ln-core/README.md)** |
 | **Component Pattern** | — | 🧠 **[JS Component Design Guide](docs/architecture/component-guide.md)** |
-| **SVG Icons** | 🏷️ **[Icon SVG Sprite Reference](js/ln-icon/README.md)** | 🌐 **[On-Demand CDN routing & injection](js/ln-icon/README.md)** |
-| **Toggle** | 🎚️ **[ln-toggle docs](js/ln-toggle/README.md)** | 📄 **[toggle architecture](js/ln-toggle/README.md)** |
-| **Accordion** | 📂 **[ln-accordion docs](js/ln-accordion/README.md)** | 📄 **[accordion architecture](js/ln-accordion/README.md)** |
-| **Modal** | 🪟 **[ln-modal docs](js/ln-modal/README.md)** | 📄 **[modal architecture](js/ln-modal/README.md)** |
-| **UI Coordinator** | 🎛️ **[ln-ui-coordinator docs](js/ln-ui-coordinator/README.md)** | 📄 **[ui-coordinator architecture](js/ln-ui-coordinator/README.md)** |
-| **Tabs** | 🔖 **[ln-tabs docs](js/ln-tabs/README.md)** | 📄 **[tabs architecture](js/ln-tabs/README.md)** |
-| **Toast** | 🔔 **[ln-toast docs](js/ln-toast/README.md)** | 📄 **[toast architecture](js/ln-toast/README.md)** |
-| **Dropdown** | 🔽 **[ln-dropdown docs](js/ln-dropdown/README.md)** | 📄 **[dropdown architecture](js/ln-dropdown/README.md)** |
-| **Popover** | 💬 **[ln-popover docs](js/ln-popover/README.md)** | 📄 **[popover architecture](js/ln-popover/README.md)** |
-| **Tooltip (JS)** | 💬 **[ln-tooltip docs](js/ln-tooltip/README.md)** | 📄 **[tooltip architecture](js/ln-tooltip/README.md)** |
-| **Navigation** | 🗺️ **[ln-nav docs](js/ln-nav/README.md)** | 📄 **[nav architecture](js/ln-nav/README.md)** |
-| **Router** | 🧭 **[ln-router docs](js/ln-router/README.md)** | 📄 **[router architecture](js/ln-router/README.md)** |
-| **Filter** | 🔍 **[ln-filter docs](js/ln-filter/README.md)** | 📄 **[filter architecture](js/ln-filter/README.md)** |
-| **Search** | 🔎 **[ln-search docs](js/ln-search/README.md)** | 📄 **[search architecture](js/ln-search/README.md)** |
-| **Table** | 📊 **[ln-table docs](js/ln-table/README.md)** | 📄 **[table architecture](js/ln-table/README.md)** |
-| **Table Coordinator** | 🎛️ **[ln-table-coordinator docs](js/ln-table-coordinator/README.md)** | 📄 **[table-coordinator architecture](js/ln-table-coordinator/README.md)** |
-| **Sort** | ⇅ **[ln-sort docs](js/ln-sort/README.md)** | 📄 **[sort architecture](js/ln-sort/README.md)** |
-| **Sortable** | 🔃 **[ln-sortable docs](js/ln-sortable/README.md)** | 📄 **[sortable architecture](js/ln-sortable/README.md)** |
-| **List** | 📋 **[ln-list docs](js/ln-list/README.md)** | 📄 **[list architecture](js/ln-list/README.md)** |
-| **Progress** | 📈 **[ln-progress docs](js/ln-progress/README.md)** | 📄 **[progress architecture](js/ln-progress/README.md)** |
-| **Circular Progress** | 📈 **[ln-circular-progress docs](js/ln-circular-progress/README.md)** | 📄 **[circular-progress architecture](js/ln-circular-progress/README.md)** |
-| **Stat** | 📈 **[ln-stat docs](js/ln-stat/README.md)** | 📄 **[stat architecture](js/ln-stat/README.md)** |
-| **Chart** | 📊 **[ln-chart docs](js/ln-chart/README.md)** | 📄 **[chart architecture](js/ln-chart/README.md)** |
-| **Link** | 🔗 **[ln-link docs](js/ln-link/README.md)** | 📄 **[link architecture](js/ln-link/README.md)** |
-| **Confirm** | ⚠️ **[ln-confirm docs](js/ln-confirm/README.md)** | 📄 **[confirm architecture](js/ln-confirm/README.md)** |
-| **Upload** | 📤 **[ln-upload docs](js/ln-upload/README.md)** | 📄 **[upload architecture](js/ln-upload/README.md)** |
-| **AJAX** | 🔄 **[ln-ajax docs](js/ln-ajax/README.md)** | 📄 **[ajax architecture](js/ln-ajax/README.md)** |
-| **Include** | 📥 **[ln-include docs](js/ln-include/README.md)** | 📄 **[include architecture](js/ln-include/README.md)** |
-| **HTTP** | — | 📄 **[http service architecture](js/ln-http/README.md)** |
-| **API Queue** | 🚦 **[ln-api-queue docs](js/ln-api-queue/README.md)** | 📄 **[api-queue architecture](js/ln-api-queue/README.md)** |
-| **Store** | 🗄️ **[ln-data-store docs](js/ln-data-store/README.md)** | 📄 **[store cache architecture](js/ln-data-store/README.md)** |
-| **Data Coordinator** | 🎛️ **[ln-data-coordinator docs](js/ln-data-coordinator/README.md)** | 📄 **[data-coordinator architecture](js/ln-data-coordinator/README.md)** |
-| **API Connector** | 🔌 **[ln-api-connector docs](js/ln-api-connector/README.md)** | — |
-| **CouchDB Connector** | 🔌 **[ln-couchdb-connector docs](js/ln-couchdb-connector/README.md)** | 📄 **[couchdb-connector architecture](js/ln-couchdb-connector/README.md)** |
-| **Form** | 📝 **[ln-form docs](js/ln-form/README.md)** | 📄 **[form lifecycle architecture](js/ln-form/README.md)** |
-| **Validate** | ⚠️ **[ln-validate docs](js/ln-validate/README.md)** | 📄 **[validate architecture](js/ln-validate/README.md)** |
-| **Fill** | 🧩 **[ln-fill docs](js/ln-fill/README.md)** | 📄 **[fill architecture](js/ln-fill/README.md)** |
-| **Options** | ⚙️ **[ln-options docs](js/ln-options/README.md)** | 📄 **[options architecture](js/ln-options/README.md)** |
-| **Slug** | 🏷️ **[ln-slug docs](js/ln-slug/README.md)** | 📄 **[slug architecture](js/ln-slug/README.md)** |
-| **Date** | 📅 **[ln-date docs](js/ln-date/README.md)** | 📄 **[date architecture](js/ln-date/README.md)** |
-| **Time** | 🕒 **[ln-time docs](js/ln-time/README.md)** | 📄 **[time architecture](js/ln-time/README.md)** |
-| **Number** | 🔢 **[ln-number docs](js/ln-number/README.md)** | 📄 **[number architecture](js/ln-number/README.md)** |
-| **Editor** | ✍️ **[ln-editor docs](js/ln-editor/README.md)** | 📄 **[editor architecture](js/ln-editor/README.md)** |
-| **Autosave** | 💾 **[ln-autosave docs](js/ln-autosave/README.md)** | 📄 **[autosave architecture](js/ln-autosave/README.md)** |
-| **Autoresize** | ↕️ **[ln-autoresize docs](js/ln-autoresize/README.md)** | 📄 **[autoresize architecture](js/ln-autoresize/README.md)** |
-| **Translations** | 🗣️ **[ln-translations docs](js/ln-translations/README.md)** | 📄 **[translations architecture](js/ln-translations/README.md)** |
-| **External Links** | 🌐 **[ln-external-links docs](js/ln-external-links/README.md)** | 📄 **[external-links architecture](js/ln-external-links/README.md)** |
-| **Debug** | 🐞 **[ln-debug docs](js/ln-debug/README.md)** | 📄 **[debug architecture](js/ln-debug/README.md)** |
+| **SVG Icons** | 🏷️ **[Icon SVG Sprite Reference](components/ln-icon/README.md)** | 🌐 **[On-Demand CDN routing & injection](components/ln-icon/README.md)** |
+| **Toggle** | 🎚️ **[ln-toggle docs](components/ln-toggle/README.md)** | 📄 **[toggle architecture](components/ln-toggle/README.md)** |
+| **Accordion** | 📂 **[ln-accordion docs](components/ln-accordion/README.md)** | 📄 **[accordion architecture](components/ln-accordion/README.md)** |
+| **Modal** | 🪟 **[ln-modal docs](components/ln-modal/README.md)** | 📄 **[modal architecture](components/ln-modal/README.md)** |
+| **UI Coordinator** | 🎛️ **[ln-ui-coordinator docs](components/ln-ui-coordinator/README.md)** | 📄 **[ui-coordinator architecture](components/ln-ui-coordinator/README.md)** |
+| **Tabs** | 🔖 **[ln-tabs docs](components/ln-tabs/README.md)** | 📄 **[tabs architecture](components/ln-tabs/README.md)** |
+| **Toast** | 🔔 **[ln-toast docs](components/ln-toast/README.md)** | 📄 **[toast architecture](components/ln-toast/README.md)** |
+| **Dropdown** | 🔽 **[ln-dropdown docs](components/ln-dropdown/README.md)** | 📄 **[dropdown architecture](components/ln-dropdown/README.md)** |
+| **Popover** | 💬 **[ln-popover docs](components/ln-popover/README.md)** | 📄 **[popover architecture](components/ln-popover/README.md)** |
+| **Tooltip (JS)** | 💬 **[ln-tooltip docs](components/ln-tooltip/README.md)** | 📄 **[tooltip architecture](components/ln-tooltip/README.md)** |
+| **Navigation** | 🗺️ **[ln-nav docs](components/ln-nav/README.md)** | 📄 **[nav architecture](components/ln-nav/README.md)** |
+| **Router** | 🧭 **[ln-router docs](components/ln-router/README.md)** | 📄 **[router architecture](components/ln-router/README.md)** |
+| **Filter** | 🔍 **[ln-filter docs](components/ln-filter/README.md)** | 📄 **[filter architecture](components/ln-filter/README.md)** |
+| **Search** | 🔎 **[ln-search docs](components/ln-search/README.md)** | 📄 **[search architecture](components/ln-search/README.md)** |
+| **Table** | 📊 **[ln-table docs](components/ln-table/README.md)** | 📄 **[table architecture](components/ln-table/README.md)** |
+| **Table Coordinator** | 🎛️ **[ln-table-coordinator docs](components/ln-table-coordinator/README.md)** | 📄 **[table-coordinator architecture](components/ln-table-coordinator/README.md)** |
+| **Sort** | ⇅ **[ln-sort docs](components/ln-sort/README.md)** | 📄 **[sort architecture](components/ln-sort/README.md)** |
+| **Sortable** | 🔃 **[ln-sortable docs](components/ln-sortable/README.md)** | 📄 **[sortable architecture](components/ln-sortable/README.md)** |
+| **List** | 📋 **[ln-list docs](components/ln-list/README.md)** | 📄 **[list architecture](components/ln-list/README.md)** |
+| **Progress** | 📈 **[ln-progress docs](components/ln-progress/README.md)** | 📄 **[progress architecture](components/ln-progress/README.md)** |
+| **Circular Progress** | 📈 **[ln-circular-progress docs](components/ln-circular-progress/README.md)** | 📄 **[circular-progress architecture](components/ln-circular-progress/README.md)** |
+| **Stat** | 📈 **[ln-stat docs](components/ln-stat/README.md)** | 📄 **[stat architecture](components/ln-stat/README.md)** |
+| **Chart** | 📊 **[ln-chart docs](components/ln-chart/README.md)** | 📄 **[chart architecture](components/ln-chart/README.md)** |
+| **Link** | 🔗 **[ln-link docs](components/ln-link/README.md)** | 📄 **[link architecture](components/ln-link/README.md)** |
+| **Confirm** | ⚠️ **[ln-confirm docs](components/ln-confirm/README.md)** | 📄 **[confirm architecture](components/ln-confirm/README.md)** |
+| **Upload** | 📤 **[ln-upload docs](components/ln-upload/README.md)** | 📄 **[upload architecture](components/ln-upload/README.md)** |
+| **AJAX** | 🔄 **[ln-ajax docs](components/ln-ajax/README.md)** | 📄 **[ajax architecture](components/ln-ajax/README.md)** |
+| **Include** | 📥 **[ln-include docs](components/ln-include/README.md)** | 📄 **[include architecture](components/ln-include/README.md)** |
+| **HTTP** | — | 📄 **[http service architecture](components/ln-http/README.md)** |
+| **API Queue** | 🚦 **[ln-api-queue docs](components/ln-api-queue/README.md)** | 📄 **[api-queue architecture](components/ln-api-queue/README.md)** |
+| **Store** | 🗄️ **[ln-data-store docs](components/ln-data-store/README.md)** | 📄 **[store cache architecture](components/ln-data-store/README.md)** |
+| **Data Coordinator** | 🎛️ **[ln-data-coordinator docs](components/ln-data-coordinator/README.md)** | 📄 **[data-coordinator architecture](components/ln-data-coordinator/README.md)** |
+| **API Connector** | 🔌 **[ln-api-connector docs](components/ln-api-connector/README.md)** | — |
+| **CouchDB Connector** | 🔌 **[ln-couchdb-connector docs](components/ln-couchdb-connector/README.md)** | 📄 **[couchdb-connector architecture](components/ln-couchdb-connector/README.md)** |
+| **Form** | 📝 **[ln-form docs](components/ln-form/README.md)** | 📄 **[form lifecycle architecture](components/ln-form/README.md)** |
+| **Validate** | ⚠️ **[ln-validate docs](components/ln-validate/README.md)** | 📄 **[validate architecture](components/ln-validate/README.md)** |
+| **Fill** | 🧩 **[ln-fill docs](components/ln-fill/README.md)** | 📄 **[fill architecture](components/ln-fill/README.md)** |
+| **Options** | ⚙️ **[ln-options docs](components/ln-options/README.md)** | 📄 **[options architecture](components/ln-options/README.md)** |
+| **Slug** | 🏷️ **[ln-slug docs](components/ln-slug/README.md)** | 📄 **[slug architecture](components/ln-slug/README.md)** |
+| **Date** | 📅 **[ln-date docs](components/ln-date/README.md)** | 📄 **[date architecture](components/ln-date/README.md)** |
+| **Time** | 🕒 **[ln-time docs](components/ln-time/README.md)** | 📄 **[time architecture](components/ln-time/README.md)** |
+| **Number** | 🔢 **[ln-number docs](components/ln-number/README.md)** | 📄 **[number architecture](components/ln-number/README.md)** |
+| **Editor** | ✍️ **[ln-editor docs](components/ln-editor/README.md)** | 📄 **[editor architecture](components/ln-editor/README.md)** |
+| **Autosave** | 💾 **[ln-autosave docs](components/ln-autosave/README.md)** | 📄 **[autosave architecture](components/ln-autosave/README.md)** |
+| **Autoresize** | ↕️ **[ln-autoresize docs](components/ln-autoresize/README.md)** | 📄 **[autoresize architecture](components/ln-autoresize/README.md)** |
+| **Translations** | 🗣️ **[ln-translations docs](components/ln-translations/README.md)** | 📄 **[translations architecture](components/ln-translations/README.md)** |
+| **External Links** | 🌐 **[ln-external-links docs](components/ln-external-links/README.md)** | 📄 **[external-links architecture](components/ln-external-links/README.md)** |
+| **Debug** | 🐞 **[ln-debug docs](components/ln-debug/README.md)** | 📄 **[debug architecture](components/ln-debug/README.md)** |
 
 ---
 

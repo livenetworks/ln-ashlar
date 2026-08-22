@@ -7,7 +7,7 @@ import {
 	hashFilterEncode,
 	hashFilterDecode,
 	resolveHashNamespace
-} from '../js/ln-core/hash.js';
+} from '../components/ln-core/hash.js';
 
 test('hashSortEncode encodes field and direction with dot separator', () => {
 	assert.equal(hashSortEncode('price', 'asc'), 'price.asc');

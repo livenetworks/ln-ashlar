@@ -4,7 +4,7 @@ classification: service
 status: stable
 domain: frontend
 summary: A namespaced URL fragment state serialization codec.
-source: js/ln-core/hash.js
+source: components/ln-core/hash.js
 tags: [hash, state, url, navigation]
 ---
 
@@ -16,7 +16,7 @@ tags: [hash, state, url, navigation]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-hash` codec (defined in [hash.js](../../js/ln-core/hash.js) and exported via `window.lnCore`) is a utility that manages namespaced interface states inside the browser's URL fragment (Hash).
+The `ln-hash` codec (defined in [hash.js](../../components/ln-core/hash.js) and exported via `window.lnCore`) is a utility that manages namespaced interface states inside the browser's URL fragment (Hash).
 
 *   **Namespaced Segment Isolation:** Manages states in the form of `#nsA:valA&nsB:valB`. Each component interacts strictly with its own namespace. When writing to the hash, it preserves all other segments, preventing components from wiping out each other's state (e.g., opening a modal does not reset the active tab).
 *   **Three-State Value Model:**

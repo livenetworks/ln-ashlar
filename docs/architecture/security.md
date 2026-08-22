@@ -37,7 +37,7 @@ This document outlines the security architecture, threat model mitigations, and 
 `ln-ashlar` provides a robust, built-in cryptographic utility module under its core barrel. This module leverages the native high-performance browser **Web Crypto API** to perform secure, asynchronous cryptographic operations without requiring bulky external libraries.
 
 ### Core Cryptographic Helpers
-These functions are defined in `js/ln-core/crypto.js` and re-exported under `window.lnCore`:
+These functions are defined in `components/ln-core/crypto.js` and re-exported under `window.lnCore`:
 
 * **`setCryptoKey(secretString)`**:
   Derives a cryptographically strong 256-bit key from a user-supplied passphrase or server-provided session token using a `SHA-256` digest, then imports it as an active `AES-GCM` key.

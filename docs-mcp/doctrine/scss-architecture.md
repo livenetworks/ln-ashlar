@@ -21,16 +21,16 @@ This document explains the styling architecture of `ln-ashlar`. It covers the tw
 To separate styling recipes from DOM applications, `ln-ashlar` divides SCSS files into two distinct layers:
 
 ```
-Mixin Layer (Recipe)        ->  scss/config/mixins/_table.scss   → @mixin table-base { ... }
-Component Layer (Binding)   ->  scss/components/_table.scss      → table { @include table-base; }
+Mixin Layer (Recipe)        ->  theme/config/mixins/_table.scss   → @mixin table-base { ... }
+Component Layer (Binding)   ->  theme/components/_table.scss      → table { @include table-base; }
 ```
 
-### A. The Mixin Layer (`scss/config/mixins/`)
+### A. The Mixin Layer (`theme/config/mixins/`)
 - Contains pure style recipes.
 - Does **not** output CSS classes or rules directly when compiled on its own.
 - Defines variables and structures but does not bind them to specific HTML tags or classes.
 
-### B. The Component Layer (`scss/components/`)
+### B. The Component Layer (`theme/components/`)
 - Applies mixins to default tags or standard utility classes.
 - Generates the final compiled CSS output.
 - Custom consumer components apply these mixins directly in their local selectors (e.g., `#audit-log-table { @include table-base; }`) rather than copy-pasting styling rules.
@@ -45,10 +45,10 @@ Derived mixins add only what differs from the base. Test: if the base changes a 
 
 ## 2. Co-located JS Styles vs. Global Styles
 
-Each functional JavaScript component folder (e.g., `js/ln-toggle/`, see [`ln-toggle`](../components/ln-toggle.md)) may contain a local `.scss` file. However, this is strictly constrained:
+Each functional JavaScript component folder (e.g., `components/ln-toggle/`, see [`ln-toggle`](../components/ln-toggle.md)) may contain a local `.scss` file. However, this is strictly constrained:
 
 - **Co-located SCSS (State only):** Used *only* to govern active functional state styling controlled by JS (e.g., `[data-ln-toggle-hide] { display: none !important; }` or timing transitions).
-- **Global Mixins/Components (Visual chrome):** All visual design details (padding, font sizes, borders, colors, shadow values) must live under the main SCSS directories (`scss/config/mixins/` or `scss/components/`).
+- **Global Mixins/Components (Visual chrome):** All visual design details (padding, font sizes, borders, colors, shadow values) must live under the main SCSS directories (`theme/config/mixins/` or `theme/components/`).
 
 ### Helper-Class Convention
 Unprefixed helper classes are thin mixin bindings (`.search { @include search; }`) — visual, static presentation. The `ln-` prefix is reserved for JS-state classes exclusively; never mix the two roles on the same class.
@@ -67,7 +67,7 @@ To avoid selector collisions and specificity bugs, follow these selector rules:
 
 ## 4. Design Tokens and Primitives
 
-Design values are declared as CSS custom properties in `scss/config/_tokens.scss`.
+Design values are declared as CSS custom properties in `theme/config/_tokens.scss`.
 
 ### A. Bare HSL Triplets
 To allow variable alpha opacity, colors (brand, secondary, and status values) are declared as raw HSL numeric values:
@@ -96,7 +96,7 @@ When styling custom, project-specific components (e.g. by unique IDs like `#user
 
 #### Correct SCSS Binding and Overriding:
 ```scss
-// In scss/components/_modal.scss
+// In theme/components/_modal.scss
 
 // Group shared base mixin inclusions together
 #user-edit-modal,

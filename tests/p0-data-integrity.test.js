@@ -6,12 +6,12 @@ import {
 	claimQueueHeads,
 	remapQueueEntries,
 	QueueStorage
-} from '../js/ln-api-queue/src/queue-storage.js';
+} from '../components/ln-api-queue/src/queue-storage.js';
 import {
 	normalizeDataQuery,
 	selectDataSource
-} from '../js/ln-data-coordinator/src/data-read-policy.js';
-import { MutationReceipts } from '../js/ln-data-coordinator/src/mutation-receipts.js';
+} from '../components/ln-data-coordinator/src/data-read-policy.js';
+import { MutationReceipts } from '../components/ln-data-coordinator/src/mutation-receipts.js';
 
 let databaseSequence = 0;
 

@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Dynamically populates HTML select controls with option elements from data stores while preserving state.
-source: js/ln-options/src/ln-options.js
+source: components/ln-options/src/ln-options.js
 tags: [forms, options, select, inputs]
 ---
 
@@ -20,7 +20,7 @@ tags: [forms, options, select, inputs]
 - **State Preservation:** Backs up the selected value (`select.value`) before rebuilding the options. If the previously selected value exists in the new dataset, it is automatically restored.
 - **Placeholder Retention:** Keeps initial header placeholder elements (e.g., `<option value="">Select...</option>`), replacing only option nodes that carry actual values.
 - **Event-Driven Isolation:** Emits `ln-options:request-data` to request dataset arrays and listens for `ln-options:set-data` to trigger option generation.
-- Located in [`js/ln-options/src/ln-options.js`](../../js/ln-options/src/ln-options.js).
+- Located in [`components/ln-options/src/ln-options.js`](../../components/ln-options/src/ln-options.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

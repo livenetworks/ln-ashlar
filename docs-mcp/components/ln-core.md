@@ -4,7 +4,7 @@ classification: service
 status: stable
 domain: frontend
 summary: Shared utility primitives, DOM binding engines, template cloning, and component initialization helpers for ln-ashlar.
-source: js/ln-core/index.js
+source: components/ln-core/index.js
 tags: [core, helpers, dom-binding, templates, service]
 ---
 
@@ -18,7 +18,7 @@ tags: [core, helpers, dom-binding, templates, service]
 
 `ln-core` serves as the base layer of the `ln-ashlar` architecture. It exports common DOM utilities, template rendering functions, event dispatchers, form serialization, component registration, dictionary builders, and reactive state management primitives.
 
-The JavaScript source is entry-pointed at [index.js](../../js/ln-core/index.js) and implemented across modular sub-files in [js/ln-core/](../../js/ln-core/).
+The JavaScript source is entry-pointed at [index.js](../../components/ln-core/index.js) and implemented across modular sub-files in [components/ln-core/](../../components/ln-core/).
 
 Key responsibilities include:
 - **Component Lifecycle Registration (`registerComponent`):** Registers component classes with MutationObserver-based lifecycle management (childList, attribute observation, auto-instantiation, and automatic `destroy()` teardown on DOM removal).

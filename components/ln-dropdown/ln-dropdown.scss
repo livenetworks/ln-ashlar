@@ -1,0 +1,18 @@
+// ==========================================================================
+// ln-dropdown — Functional State & Placement Rules
+// ==========================================================================
+
+[data-ln-dropdown] {
+	position: relative;
+}
+
+[data-ln-dropdown-menu] {
+	display: none;
+	position: fixed;
+	inset: auto;
+	margin: 0;
+
+	&.open {
+		display: block;
+	}
+}

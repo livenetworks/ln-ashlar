@@ -14,7 +14,7 @@ All agents consuming this corpus must understand that `ln-ashlar` supports **two
 
 | Layer | Location | Audience |
 |---|---|---|
-| Low-level (Internals) | `js/ln-*/README.md` alongside code | Core library developers |
+| Low-level (Internals) | `components/ln-*/README.md` alongside code | Core library developers |
 | **User Corpus (this folder)** | `docs-mcp/` | Library users, AI agents via MCP |
 | In-context skills | `.claude/skills/` (separate repo) | Claude Code sessions |
 
@@ -69,7 +69,7 @@ classification: simple       # see allowed classifications below
 status: draft                # draft | stable
 domain: frontend             # frontend | backend | process — corpus domain (absent = frontend)
 summary: One-sentence summary shown in list/search results.
-source: js/ln-toggle/src/ln-toggle.js   # main source files (supports arrays)
+source: components/ln-toggle/src/ln-toggle.js   # main source files (supports arrays)
 tags: [state, collapsible]
 ---
 ```

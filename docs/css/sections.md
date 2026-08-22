@@ -1,6 +1,6 @@
 # Sections
 
-Page section wrappers. File: `scss/components/_sections.scss`.
+Page section wrappers. File: `theme/components/_sections.scss`.
 
 ## `.section`
 

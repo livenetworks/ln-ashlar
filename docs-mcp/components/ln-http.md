@@ -4,7 +4,7 @@ classification: service
 status: stable
 domain: frontend
 summary: A transparent fetch wrapper and explicit-key network request deduplicator.
-source: js/ln-http/src/ln-http.js
+source: components/ln-http/src/ln-http.js
 tags: [http, fetch, request, network]
 ---
 
@@ -16,7 +16,7 @@ tags: [http, fetch, request, network]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-http` utility is a network middleware that wraps the browser's global `window.fetch` to prevent race conditions, avoid data conflicts, and handle request deduplication. It is defined in [ln-http.js](../../js/ln-http/src/ln-http.js).
+The `ln-http` utility is a network middleware that wraps the browser's global `window.fetch` to prevent race conditions, avoid data conflicts, and handle request deduplication. It is defined in [ln-http.js](../../components/ln-http/src/ln-http.js).
 
 It operates through two parallel paths:
 *   **Path A — Transparent Fetch Interception (GET/HEAD):** Intercepts all native calls to `fetch()`. If a new GET or HEAD request is sent to the exact same URL while a previous request is still in-flight, the previous request is automatically cancelled (`abort()`). Non-idempotent methods (POST, PUT, DELETE, etc.) are never auto-cancelled in this path to prevent mutating actions from being aborted.

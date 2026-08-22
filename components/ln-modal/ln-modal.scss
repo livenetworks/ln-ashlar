@@ -1,0 +1,51 @@
+// ==========================================================================
+// ln-modal — Functional & Accessibility Layout Rules
+// ==========================================================================
+// data-ln-modal drives visibility. JS calls native showModal()/close().
+// This attribute is the CSS surface: reset native <dialog> UA styles,
+// layout centering, backdrop positioning, and modal scroll-lock.
+// ZERO theme variables, colors, or typography.
+// ==========================================================================
+
+[data-ln-modal] {
+	background: transparent;
+	border: none;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	max-width: none;
+	max-height: none;
+	color: inherit;
+	overflow: visible;
+	display: none;
+
+	&[data-ln-modal="open"] {
+		display: flex;
+		position: fixed;
+		inset: 0;
+		z-index: 1000;
+		align-items: center;
+		justify-content: center;
+	}
+
+	&::backdrop {
+		position: fixed;
+		inset: 0;
+	}
+}
+
+// Prevent body scroll when modal is open
+body.ln-modal-open {
+	overflow: hidden;
+}
+
+// Mode-conditional title variants: shown only when ancestor modal matches the mode
+[data-ln-modal-when] {
+	display: none;
+}
+
+[data-ln-modal-mode="new"] [data-ln-modal-when="new"],
+[data-ln-modal-mode="edit"] [data-ln-modal-when="edit"] {
+	display: inline;
+}

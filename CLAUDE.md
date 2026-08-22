@@ -58,7 +58,7 @@ Before recommending an architecture, refactor, or claiming that a behavior/metho
 | **Primitives vs Vocabulary** | [docs/architecture/reference.md#token-surface-primitives-vocabulary](docs/architecture/reference.md#token-surface-primitives-vocabulary) |
 | **Breakpoints** | [docs/architecture/reference.md#breakpoint-tokens-use-the-mixin-not-the-literal](docs/architecture/reference.md#breakpoint-tokens-use-the-mixin-not-the-literal) |
 | **Icons (Tabler CDN)** | [docs/architecture/reference.md#icons](docs/architecture/reference.md#icons) |
-| **Reactive / core.md** | [js/ln-core/README.md](js/ln-core/README.md) & [docs/architecture/component-guide.md](docs/architecture/component-guide.md) |
+| **Reactive / core.md** | [components/ln-core/README.md](components/ln-core/README.md) & [docs/architecture/component-guide.md](docs/architecture/component-guide.md) |
 | **Global Standards** | `.claude/skills/` (html, css, js files) |
 
 ---
@@ -68,13 +68,13 @@ Before recommending an architecture, refactor, or claiming that a behavior/metho
 ```bash
 npm run build              # Build library into demo/dist/ + compile demo pages
 npm run dev                # Watch mode (library only)
-npm run sync:ln-schemas    # Regenerate js/ln-*/ln-*.schema.json from source code
+npm run sync:ln-schemas    # Regenerate components/ln-*/ln-*.schema.json from source code
 npm run sync:ln-schemas:check   # Report schema drift without writing (exit 1 on drift)
 ```
 
 `sync:ln-schemas` scans each component's `src/**.js` and co-located `*.scss` for
 `data-ln-*` attributes and writes the per-component schema. Compiled bundles at
-`js/ln-*/ln-*.js` are deliberately skipped, so build order does not affect the result.
+`components/ln-*/ln-*.js` are deliberately skipped, so build order does not affect the result.
 
 It is **non-destructive**: it owns only the keys it generates (`$comment`, `component`,
 `generator`, and each attribute's `direction` and `sources`) and preserves every other

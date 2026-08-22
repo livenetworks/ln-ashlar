@@ -4,7 +4,7 @@ classification: css
 status: draft
 domain: frontend
 summary: One sentence about the visual component / mixin.
-source: scss/components/_name.scss
+source: theme/components/_name.scss
 tags: []
 ---
 

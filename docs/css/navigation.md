@@ -1,6 +1,6 @@
 # Navigation
 
-Sidebar navigation component. File: `scss/config/mixins/_nav.scss`.
+Sidebar navigation component. File: `theme/config/mixins/_nav.scss`.
 
 ## HTML
 

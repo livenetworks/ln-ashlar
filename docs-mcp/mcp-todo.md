@@ -5,7 +5,7 @@
 
 ## Правила на работа (за секој документ)
 
-1. **Извори:** draft фајл (`architecture_docs_draft/`) + `js/ln-icon-x/README.md` + изворниот код. Draft-от е суровина, НЕ вистина — секој атрибут/настан/вредност се проверува наспроти кодот пред да влезе.
+1. **Извори:** draft фајл (`architecture_docs_draft/`) + `components/ln-icon-x/README.md` + изворниот код. Draft-от е суровина, НЕ вистина — секој атрибут/настан/вредност се проверува наспроти кодот пред да влезе.
 2. **Калап:** точниот темплејт од `docs-mcp/_templates/` — насловите се parsing contract, не се менуваат.
 3. **Frontmatter:** `name` == име на фајлот, `classification` според фолдерот, се раѓа со `status: draft`.
 4. **Валидација:** `validate_docs` на MCP серверот пред commit.
@@ -20,7 +20,7 @@
 - [x] **mindset** — извори: `docs/architecture/mindset.md`, `docs/architecture/philosophy.md`
 - [x] **html-markup-rules** — семантички HTML, ul/li правило, без гол `<div>`, кликабилни = `<button>`/`<a>` — извори: `docs/architecture/reference.md`, skills
 - [x] **scss-architecture** — двослојна архитектура (mixin layer / binding), override & theming, токени — извори: `docs/architecture/reference.md`, `docs/css/theming.md`, `docs/css/tokens.md`
-- [x] **js-component-model** — `data-ln-*` binding, настани како јазик, ортогоналност, без стилови во JS — извори: `docs/js/component-guide.md`, `docs/js/core.md`, `js/COMPONENTS.md`
+- [x] **js-component-model** — `data-ln-*` binding, настани како јазик, ортогоналност, без стилови во JS — извори: `docs/js/component-guide.md`, `docs/js/core.md`, `components/COMPONENTS.md`
 - [x] **data-flow** — `{{ }}` vs `data-ln-field` матрица на одлука — извор: `docs/architecture/data-flow.md`
 - [x] **data-layer** — store / coordinator / конектори, паралелен fan-out (v2) — извори: `docs/architecture/data-store-architecture.md`, `docs/architecture/coordinator.md`
 
@@ -29,8 +29,8 @@
 - [x] **getting-started** — инсталација, dist/, прв markup — ⚠ нема извор, се пишува одново — ✔ dist/-не-се-шипува-преку-npm наодот РЕШЕН на doc-слој (2026-07-17): §1 сега документира сите 4 патишта (A CDN преку jsDelivr@gh/demo/dist, B npm=извор+сопствен build, C precompiled self-host clone, D git submodule); npm-патот повеќе не праќа на непостоечки node_modules/dist. Отворено (packaging одлука кај корисникот, НЕ doc): дали воопшто да се шипува вистински `dist/` на npm
 - [x] **write-workflow** — форма → scope → coordinator → конектор → toast — извори: `architecture_docs_draft/write-workflow-guide.md`, `architecture_docs_draft/form-write-workflow.md` ⚠ двата draft-а се пред v2 rulings — задолжителна проверка наспроти кодот — ⚠ критични наоди (pre-v2 `_pending`/reverts/`field_diffs`) → `refactor-todo.md` §4.1
 - [x] **spa-routing** — hash state + router — извори: `docs/architecture/hash-state.md`, `docs/js/router.md`
-- [x] **component-authoring** — како се прави СВОЈА компонента: IIFE, attribute bridge (setAttribute = single source of truth), MutationObserver (childList + attributes), lifecycle events (`before-*` cancelable + post), template систем (`cloneTemplate`/`cloneTemplateScoped` + `fill`), dict pattern (i18n), co-located SCSS, API export патерни — извори: `js/COMPONENTS.md` (главна библија, интерна, англиски), `docs/js/component-guide.md`, `docs/architecture/reference.md#adding-a-new-js-component`
-- [x] **coordinator-authoring** — како се пишува проект-координатор (Mediator): четирите работи (UI trigger → request event, обработка на форми, notification → UI feedback, мост A→B), commands = request events / queries = директен API, изолациски правила — извори: `js/COMPONENTS.md` (§Coordinator — Full Example, §Mediator pattern), `docs/architecture/coordinator.md` ⚠ v2 проверка — ⚠ критичен наод (`ln-toggle:request-open` не постои) → `refactor-todo.md` §4.3
+- [x] **component-authoring** — како се прави СВОЈА компонента: IIFE, attribute bridge (setAttribute = single source of truth), MutationObserver (childList + attributes), lifecycle events (`before-*` cancelable + post), template систем (`cloneTemplate`/`cloneTemplateScoped` + `fill`), dict pattern (i18n), co-located SCSS, API export патерни — извори: `components/COMPONENTS.md` (главна библија, интерна, англиски), `docs/js/component-guide.md`, `docs/architecture/reference.md#adding-a-new-js-component`
+- [x] **coordinator-authoring** — како се пишува проект-координатор (Mediator): четирите работи (UI trigger → request event, обработка на форми, notification → UI feedback, мост A→B), commands = request events / queries = директен API, изолациски правила — извори: `components/COMPONENTS.md` (§Coordinator — Full Example, §Mediator pattern), `docs/architecture/coordinator.md` ⚠ v2 проверка — ⚠ критичен наод (`ln-toggle:request-open` не постои) → `refactor-todo.md` §4.3
 
 > Двата authoring водичи се раскажувачкиот слој над 3Б — секој линка кон
 > позадинските API документи (`ln-core`, `ln-http`, `positioning`...).
@@ -115,15 +115,15 @@
 `classification: service`. Овие немаат markup темплејти — §2 покажува JS употреба
 (import + повик), §3 е API табела. Сите линкаат назад кон `guides/component-authoring`.
 
-- [x] **ln-core** — прегледен документ на споделениот модул: `findElements`, `dispatch`/`dispatchCancelable`, `cloneTemplate`/`cloneTemplateScoped`, `fill`/`fillTemplate`, `buildDict`, `renderList`, `reactiveState`/`deepReactive`/`createBatcher` + мапа кон модулските документи подолу — извори: `js/ln-core/index.js`, `js/ln-core/helpers.js`, `js/COMPONENTS.md`
-- [x] **ln-helpers** — извор: `js/ln-core/helpers.js`
-- [x] **ln-reactive** — `reactiveState`/`deepReactive`/`createBatcher` — извори: `js/ln-core/reactive.js`, `docs/js/core.md`
-- [x] **positioning** — споделено viewport-aware позиционирање (dropdown/popover/tooltip) — извор: `js/ln-core/positioning.js`
-- [x] **ln-hash** — hash state примитив — извор: `js/ln-core/hash.js` (го користат ln-router, ln-tabs)
-- [x] **ln-persist** — localStorage persistence примитив — извор: `js/ln-core/persist.js` (го користат ln-tabs, ln-filter, ln-toggle, ln-sort)
-- [x] **ln-crypto** — извор: `js/ln-core/crypto.js`
-- [x] **ln-http** — event-driven JSON fetch со abort — извори: `js/ln-http/`, `docs/js/http.md`
-- [x] **ln-debug** — dev дијагностика (не е за production употреба) — извор: `js/ln-debug/`
+- [x] **ln-core** — прегледен документ на споделениот модул: `findElements`, `dispatch`/`dispatchCancelable`, `cloneTemplate`/`cloneTemplateScoped`, `fill`/`fillTemplate`, `buildDict`, `renderList`, `reactiveState`/`deepReactive`/`createBatcher` + мапа кон модулските документи подолу — извори: `components/ln-core/index.js`, `components/ln-core/helpers.js`, `components/COMPONENTS.md`
+- [x] **ln-helpers** — извор: `components/ln-core/helpers.js`
+- [x] **ln-reactive** — `reactiveState`/`deepReactive`/`createBatcher` — извори: `components/ln-core/reactive.js`, `docs/js/core.md`
+- [x] **positioning** — споделено viewport-aware позиционирање (dropdown/popover/tooltip) — извор: `components/ln-core/positioning.js`
+- [x] **ln-hash** — hash state примитив — извор: `components/ln-core/hash.js` (го користат ln-router, ln-tabs)
+- [x] **ln-persist** — localStorage persistence примитив — извор: `components/ln-core/persist.js` (го користат ln-tabs, ln-filter, ln-toggle, ln-sort)
+- [x] **ln-crypto** — извор: `components/ln-core/crypto.js`
+- [x] **ln-http** — event-driven JSON fetch со abort — извори: `components/ln-http/`, `docs/js/http.md`
+- [x] **ln-debug** — dev дијагностика (не е за production употреба) — извор: `components/ln-debug/`
 
 ---
 

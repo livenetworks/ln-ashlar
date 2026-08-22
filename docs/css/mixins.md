@@ -2,7 +2,7 @@
 
 Complete reference for all `@include` mixins, design tokens, and the icon system.
 
-**Source files:** `scss/config/_mixins.scss`, `scss/config/_tokens.scss`
+**Source files:** `theme/config/_mixins.scss`, `theme/config/_tokens.scss`
 
 > For full token values and theming, see [tokens.md](tokens.md).
 
@@ -489,7 +489,7 @@ Grid-based expand/collapse animation. **NEVER use `max-height` hack.**
 
 ### `@include accordion`
 
-Styled accordion list — contained card. Chevron rotation comes from the generic toggle layer (see `[data-ln-toggle-for][aria-expanded="true"]` rule in `scss/components/_toggle.scss`). Applied automatically to `[data-ln-accordion]`.
+Styled accordion list — contained card. Chevron rotation comes from the generic toggle layer (see `[data-ln-toggle-for][aria-expanded="true"]` rule in `theme/components/_toggle.scss`). Applied automatically to `[data-ln-accordion]`.
 
 ```html
 <ul data-ln-accordion>
@@ -518,7 +518,7 @@ Styled accordion list — contained card. Chevron rotation comes from the generi
 </ul>
 ```
 
-> **Chevron is icon-system-agnostic.** The toggle layer (`scss/components/_toggle.scss`) rotates any element with `class="ln-chevron"` inside a `[data-ln-toggle-for]` trigger — `<svg>`, `<i>`, `<span>`, `<img>`. Driven by `aria-expanded` (set by `ln-toggle.js`), so it works for accordion items AND standalone toggles. Use the ln-ashlar icon (`<svg class="ln-icon ln-chevron">`), a different icon library (`<i class="fas fa-chevron-down ln-chevron">`), or a text indicator (`<span class="ln-chevron">▾</span>`).
+> **Chevron is icon-system-agnostic.** The toggle layer (`theme/components/_toggle.scss`) rotates any element with `class="ln-chevron"` inside a `[data-ln-toggle-for]` trigger — `<svg>`, `<i>`, `<span>`, `<img>`. Driven by `aria-expanded` (set by `ln-toggle.js`), so it works for accordion items AND standalone toggles. Use the ln-ashlar icon (`<svg class="ln-icon ln-chevron">`), a different icon library (`<i class="fas fa-chevron-down ln-chevron">`), or a text indicator (`<span class="ln-chevron">▾</span>`).
 >
 > For custom accordion selectors: `#my-list { @include accordion; }`
 
@@ -627,11 +627,11 @@ Custom CDN icons: `#lnc-{id}` — e.g. `<use href="#ln-icon-custom-file-pdf">`.
 
 ### Adding a New Icon
 
-All ~4000 Tabler icons are available in `js/ln-icon/tabler/` (source library, not bundled).
+All ~4000 Tabler icons are available in `components/ln-icon/tabler/` (source library, not bundled).
 
 ```bash
 # Copy from source library to bundled set, then rebuild
-cp js/ln-icon/tabler/{name}.svg js/ln-icon/icons/{name}.svg
+cp components/ln-icon/tabler/{name}.svg components/ln-icon/icons/{name}.svg
 npm run build
 ```
 
@@ -880,11 +880,11 @@ Forms use CSS Grid + `<div class="form-element">` with explicit `for`/`id`. **Us
 
 | File | Contents |
 |------|----------|
-| `scss/config/_tokens.scss` | All CSS custom properties (`:root`) |
-| `scss/config/_mixins.scss` | `@forward` index for all mixin files |
-| `scss/config/mixins/` | Individual mixin files (spacing, display, typography, card, btn, form, …) |
-| `scss/base/_reset.scss` | `* { margin: 0; padding: 0; box-sizing: border-box }` |
-| `scss/base/_global.scss` | Global element styles — all buttons, links, images, `::selection` |
-| `scss/base/_typography.scss` | h1–h6, p, code, pre, blockquote, lists |
-| `scss/components/` | Apply mixins to default selectors (CSS output) |
-| `js/ln-icon/` | Zero-dependency dynamic on-demand SVG icon sprite loader |
+| `theme/config/_tokens.scss` | All CSS custom properties (`:root`) |
+| `theme/config/_mixins.scss` | `@forward` index for all mixin files |
+| `theme/config/mixins/` | Individual mixin files (spacing, display, typography, card, btn, form, …) |
+| `theme/base/_reset.scss` | `* { margin: 0; padding: 0; box-sizing: border-box }` |
+| `theme/base/_global.scss` | Global element styles — all buttons, links, images, `::selection` |
+| `theme/base/_typography.scss` | h1–h6, p, code, pre, blockquote, lists |
+| `theme/components/` | Apply mixins to default selectors (CSS output) |
+| `components/ln-icon/` | Zero-dependency dynamic on-demand SVG icon sprite loader |

@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A high-performance presenter component for rendering lists, cards, or grids with virtual scrolling, client-side sorting, filtering, searching, and selection.
-source: js/ln-list/src/ln-list.js
+source: components/ln-list/src/ln-list.js
 tags: [lists, cards, virtual-scrolling, sorting, selection]
 ---
 
@@ -23,7 +23,7 @@ tags: [lists, cards, virtual-scrolling, sorting, selection]
 
 For lists containing more than 200 items, `ln-list` automatically activates virtual scrolling, rendering only the items in the viewport plus a small buffer of extra items to keep rendering times low and conserve memory.
 
-The JavaScript source is located at [ln-list.js](../../js/ln-list/src/ln-list.js).
+The JavaScript source is located at [ln-list.js](../../components/ln-list/src/ln-list.js).
 
 ### Sort Integration (`ln-sort`)
 
@@ -258,7 +258,7 @@ To support virtual scrolling correctly, items must have a predictable height. If
 - `.ln-list--loading`: Temporary class applied to root container when data is fetching.
 
 ```scss
-/* Source details from js/ln-list/ln-list.scss */
+/* Source details from components/ln-list/ln-list.scss */
 .list-body {
     position: relative;
     overflow-y: auto;
@@ -358,4 +358,4 @@ sequenceDiagram
 - [`ln-data-coordinator`](./ln-data-coordinator.md) — Bridges data store fetching automatically.
 
 ---
-Component source file: [ln-list.js](../../js/ln-list/src/ln-list.js)
+Component source file: [ln-list.js](../../components/ln-list/src/ln-list.js)

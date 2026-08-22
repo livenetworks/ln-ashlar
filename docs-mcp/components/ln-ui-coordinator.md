@@ -4,7 +4,7 @@ classification: coordinator
 status: stable
 domain: frontend
 summary: A Layer 2 Coordinator that mediates user triggers, modals, AJAX operations, uploads, form submissions, URL hash navigation, data filling, and toast notifications.
-source: js/ln-ui-coordinator/src/ln-ui-coordinator.js
+source: components/ln-ui-coordinator/src/ln-ui-coordinator.js
 tags: [ui, coordinator, modal, ajax, upload, form, toast, hash-navigation]
 ---
 
@@ -18,7 +18,7 @@ tags: [ui, coordinator, modal, ajax, upload, form, toast, hash-navigation]
 
 The `ln-ui-coordinator` component is a **Layer 2 Coordinator (Mediator)** responsible for orchestrating the common UI lifecycle across user triggers, modals ([`ln-modal`](./ln-modal.md)), AJAX requests ([`ln-ajax`](./ln-ajax.md)), uploads ([`ln-upload`](./ln-upload.md)), record filling ([`ln-fill`](./ln-fill.md)), and toast notifications ([`ln-toast`](./ln-toast.md)).
 
-The JavaScript source is located at [ln-ui-coordinator.js](../../js/ln-ui-coordinator/src/ln-ui-coordinator.js).
+The JavaScript source is located at [ln-ui-coordinator.js](../../components/ln-ui-coordinator/src/ln-ui-coordinator.js).
 
 Key responsibilities include:
 * **Trigger & Hash Navigation:** Intercepting click events on triggers (`[data-ln-modal-for]`) and hash anchors (`<a href="#modalId:42">`), synchronizing URL hash state with modal visibility and active mode (`new` vs `edit`).

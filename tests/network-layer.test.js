@@ -7,7 +7,7 @@ import {
 	extractMethod,
 	buildHttpKey,
 	isIdempotentMethod
-} from '../js/ln-http/src/http-core.js';
+} from '../components/ln-http/src/http-core.js';
 
 import {
 	buildQueryParams,
@@ -15,11 +15,11 @@ import {
 	joinUrl,
 	unwrapEnvelope,
 	DEFAULT_PARAM_KEYS
-} from '../js/ln-api-connector/src/connector-core.js';
+} from '../components/ln-api-connector/src/connector-core.js';
 
 import {
 	QueueStorage
-} from '../js/ln-api-queue/src/queue-storage.js';
+} from '../components/ln-api-queue/src/queue-storage.js';
 
 let dbSequence = 0;
 

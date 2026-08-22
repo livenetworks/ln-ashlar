@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Automatically generates URL-friendly slugs from source fields in real time until manual override.
-source: js/ln-slug/src/ln-slug.js
+source: components/ln-slug/src/ln-slug.js
 tags: [forms, slugs, helper, formatting]
 ---
 
@@ -19,7 +19,7 @@ tags: [forms, slugs, helper, formatting]
 - **Core Role:** Generates URL-friendly paths (slugs) in real time from a source text field (such as a blog title or product name) inside the same form wrapper.
 - **Pristine State Tracking:** Synchronizes value mappings continuously until the user manually types inside the slug field. Modifying the slug directly toggles `_pristine = false`, disconnecting auto-syncing. If the user empties the slug input field, pristine status is restored (`_pristine = true`), re-enabling auto-population.
 - **Event Dispatching:** Fires a native `input` event on the target input upon every auto-generation update, ensuring that validator hooks (e.g. uniqueness checks) are triggered.
-- Located in [`js/ln-slug/src/ln-slug.js`](../../js/ln-slug/src/ln-slug.js).
+- Located in [`components/ln-slug/src/ln-slug.js`](../../components/ln-slug/src/ln-slug.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

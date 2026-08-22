@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Formats number inputs in real time based on active locales, syncing clean numeric data using hidden fields.
-source: js/ln-number/src/ln-number.js
+source: components/ln-number/src/ln-number.js
 tags: [forms, formatting, inputs, numbers]
 ---
 
@@ -21,7 +21,7 @@ tags: [forms, formatting, inputs, numbers]
 - **Two-Way Value Interception:** Overrides native DOM `value` property descriptors. Assigning values programmatically (e.g. `input.value = 1500.5`) to the visible or hidden input automatically synchronizes and updates the formatted presentation.
 - **Intelligent Cursor Tracking:** Measures digit offsets before formatting to preserve the cursor's logical position when the user types or deletes characters in the middle of a formatted string.
 - **Locale Synchronization:** Listens to global page language changes via a `MutationObserver` on the `document.documentElement` lang attribute, instantly formatting all fields if the page language shifts.
-- Located in [`js/ln-number/src/ln-number.js`](../../js/ln-number/src/ln-number.js).
+- Located in [`components/ln-number/src/ln-number.js`](../../components/ln-number/src/ln-number.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

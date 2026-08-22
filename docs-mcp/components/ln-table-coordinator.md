@@ -4,7 +4,7 @@ classification: coordinator
 status: stable
 domain: frontend
 summary: A wrapper coordinator component that encapsulates and coordinates child search, filter popovers, and table primitives on the page without requiring named scopes or explicit target IDs.
-source: js/ln-table-coordinator/src/ln-table-coordinator.js
+source: components/ln-table-coordinator/src/ln-table-coordinator.js
 tags: [table, coordinator, search, filter, keyboard-shortcuts]
 ---
 
@@ -18,7 +18,7 @@ tags: [table, coordinator, search, filter, keyboard-shortcuts]
 
 The `ln-table-coordinator` component is a Layer 2 mediator attached to a wrapper container (`<div data-ln-table-coordinator>`). It encapsulates and coordinates its child [`ln-search`](./ln-search.md), [`ln-filter`](./ln-filter.md), clear buttons, and target [`ln-table`](./ln-table.md) primitives without requiring named scopes or explicit target IDs.
 
-The JavaScript source is located at [ln-table-coordinator.js](../../js/ln-table-coordinator/src/ln-table-coordinator.js).
+The JavaScript source is located at [ln-table-coordinator.js](../../components/ln-table-coordinator/src/ln-table-coordinator.js).
 
 Key responsibilities include:
 - **Child Component Coordination:** Coordinating child search inputs, filter popovers, and table primitives enclosed within the wrapper container.

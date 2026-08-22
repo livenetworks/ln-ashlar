@@ -1,8 +1,8 @@
 # Motion
 
 Files:
-- `scss/config/mixins/_motion.scss` — `motion-safe` mixin
-- `scss/config/_tokens.scss` — duration and easing tokens
+- `theme/config/mixins/_motion.scss` — `motion-safe` mixin
+- `theme/config/_tokens.scss` — duration and easing tokens
 
 ## Philosophy
 
@@ -24,7 +24,7 @@ have opted out of motion see instant state changes.
 ## Using motion-safe
 
 ```scss
-@use 'ln-ashlar/scss/config/mixins' as *;
+@use 'ln-ashlar/theme/config/mixins' as *;
 
 .my-animated-panel {
 	opacity: 0;

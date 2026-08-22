@@ -1,6 +1,6 @@
 # Empty state
 
-File: `scss/config/mixins/_empty-state.scss` + `scss/components/_empty-state.scss`.
+File: `theme/config/mixins/_empty-state.scss` + `theme/components/_empty-state.scss`.
 
 Centered, icon-led placeholder for lists with no data.
 

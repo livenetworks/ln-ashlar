@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A touch-friendly drag-and-drop reordering primitive using Pointer Events.
-source: js/ln-sortable/src/ln-sortable.js
+source: components/ln-sortable/src/ln-sortable.js
 tags: [interactions, drag-and-drop, sorting, list]
 ---
 
@@ -18,7 +18,7 @@ tags: [interactions, drag-and-drop, sorting, list]
 
 - **Core Role:** Provides drag-and-drop reordering of direct child DOM elements within a parent container (`[data-ln-sortable]`).
 - **Touch-Friendly Interaction:** Operates exclusively using the modern browser Pointer Events API (`pointerdown`, `pointermove`, `pointerup`, `pointercancel`), supporting mouse, touch, and stylus input without reliance on heavy HTML5 drag-and-drop APIs.
-- Located in [`js/ln-sortable/src/ln-sortable.js`](../../js/ln-sortable/src/ln-sortable.js).
+- Located in [`components/ln-sortable/src/ln-sortable.js`](../../components/ln-sortable/src/ln-sortable.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

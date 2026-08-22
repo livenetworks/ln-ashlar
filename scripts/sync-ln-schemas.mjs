@@ -385,16 +385,16 @@ function main() {
 	const argv = process.argv.slice(2);
 	const checkOnly = argv.includes('--check');
 	const root = resolveRoot(argv);
-	const jsDir = path.join(root, 'js');
-	const scssDir = path.join(root, 'scss');
+	const compDir = path.join(root, 'components');
+	const themeDir = path.join(root, 'theme');
 
-	if (!fs.existsSync(jsDir)) {
-		console.error(`sync-ln-schemas: не постои js/ папка во root: ${root}`);
+	if (!fs.existsSync(compDir)) {
+		console.error(`sync-ln-schemas: не постои components/ папка во root: ${root}`);
 		process.exit(1);
 	}
 
-	const compDirs = fs.readdirSync(jsDir).filter((f) => {
-		const p = path.join(jsDir, f);
+	const compDirs = fs.readdirSync(compDir).filter((f) => {
+		const p = path.join(compDir, f);
 		return fs.statSync(p).isDirectory();
 	}).sort();
 
@@ -405,7 +405,7 @@ function main() {
 	const pendingWrites = [];
 
 	for (const comp of compDirs) {
-		const compPath = path.join(jsDir, comp);
+		const compPath = path.join(compDir, comp);
 		const srcPath = path.join(compPath, 'src');
 		const hasSrc = fs.existsSync(srcPath) && fs.statSync(srcPath).isDirectory();
 
@@ -494,11 +494,11 @@ function main() {
 		});
 	}
 
-	// Скенирај го коренскиот scss/ за несместливи атрибути
-	const rootScssFiles = fs.existsSync(scssDir) ? walk(scssDir, ['.scss']) : [];
-	const rootScssAttrs = new Map();
+	// Скенирај го коренскиот theme/ за несместливи атрибути
+	const rootThemeFiles = fs.existsSync(themeDir) ? walk(themeDir, ['.scss']) : [];
+	const rootThemeAttrs = new Map();
 
-	for (const file of rootScssFiles) {
+	for (const file of rootThemeFiles) {
 		const rel = path.relative(root, file).replace(/\\/g, '/');
 		const cleaned = stripComments(fs.readFileSync(file, 'utf8'));
 		for (const m of cleaned.matchAll(ATTR_RE)) {
@@ -507,13 +507,13 @@ function main() {
 				constructedTokens.add(attr);
 				continue;
 			}
-			if (!rootScssAttrs.has(attr)) rootScssAttrs.set(attr, new Set());
-			rootScssAttrs.get(attr).add(rel);
+			if (!rootThemeAttrs.has(attr)) rootThemeAttrs.set(attr, new Set());
+			rootThemeAttrs.get(attr).add(rel);
 		}
 	}
 
 	const unplaced = [];
-	for (const [attr, sources] of rootScssAttrs.entries()) {
+	for (const [attr, sources] of rootThemeAttrs.entries()) {
 		if (!allComponentAttrs.has(attr)) {
 			unplaced.push({ attr, sources: [...sources].sort() });
 		}
@@ -521,7 +521,7 @@ function main() {
 	unplaced.sort((a, b) => a.attr.localeCompare(b.attr));
 
 	// Вградена гаранција: union(компоненти) ∪ несместливи == целото скен-множество
-	const totalScanUniverse = new Set([...allComponentAttrs, ...rootScssAttrs.keys()]);
+	const totalScanUniverse = new Set([...allComponentAttrs, ...rootThemeAttrs.keys()]);
 	const combinedUnion = new Set([...allComponentAttrs, ...unplaced.map((u) => u.attr)]);
 
 	let guaranteeValid = totalScanUniverse.size === combinedUnion.size;

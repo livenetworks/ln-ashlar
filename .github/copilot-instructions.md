@@ -56,5 +56,5 @@ Before recommending an architecture, refactor, or claiming that a behavior/metho
 | **Primitives vs Vocabulary** | [docs/architecture/reference.md#token-surface-primitives-vocabulary](docs/architecture/reference.md#token-surface-primitives-vocabulary) |
 | **Breakpoints** | [docs/architecture/reference.md#breakpoint-tokens-use-the-mixin-not-the-literal](docs/architecture/reference.md#breakpoint-tokens-use-the-mixin-not-the-literal) |
 | **Icons (Tabler CDN)** | [docs/architecture/reference.md#icons](docs/architecture/reference.md#icons) |
-| **Reactive / core.md** | [js/ln-core/README.md](js/ln-core/README.md) & [docs/architecture/component-guide.md](docs/architecture/component-guide.md) |
+| **Reactive / core.md** | [components/ln-core/README.md](components/ln-core/README.md) & [docs/architecture/component-guide.md](docs/architecture/component-guide.md) |
 | **Global Standards** | `.claude/skills/` (html, css, js files) |

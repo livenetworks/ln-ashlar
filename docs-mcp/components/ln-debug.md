@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Development diagnostics component providing console log suppression control, DOM element inspection seams, and CSS visual linter integration.
-source: js/ln-debug/src/ln-debug.js
+source: components/ln-debug/src/ln-debug.js
 tags: [debug, diagnostics, linter, dev-tooling]
 ---
 
@@ -22,7 +22,7 @@ tags: [debug, diagnostics, linter, dev-tooling]
 2. **Developer Inspection Seam:** When applied to individual DOM elements, registers the component instance on `element.lnDebug` for inspection in browser developer tools.
 3. **Visual HTML Linter (Dev CSS):** In conjunction with `ln-ashlar-dev.css`, visually flags HTML structural errors, invalid attribute usages, missing required `id`s, and un-semantic markup directly in the browser UI.
 
-The JavaScript source is located at [ln-debug.js](../../js/ln-debug/src/ln-debug.js).
+The JavaScript source is located at [ln-debug.js](../../components/ln-debug/src/ln-debug.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
@@ -94,8 +94,8 @@ This component emits and listens to no custom ln-* events.
 Visual lint rules are isolated from production builds to avoid performance degradation or visual pollution.
 
 ### Diagnostic SCSS Architecture
-1. **Modular Rule Files:** Components maintain individual diagnostic rules in `*-dev.scss` files (e.g. [ln-date-dev.scss](../../js/ln-date/ln-date-dev.scss), [ln-number-dev.scss](../../js/ln-number/ln-number-dev.scss)).
-2. **Dev Bundle Aggregator:** All modular diagnostic files are imported into [ln-ashlar-dev.scss](../../scss/ln-ashlar-dev.scss) and compiled to `ln-ashlar-dev.css`.
+1. **Modular Rule Files:** Components maintain individual diagnostic rules in `*-dev.scss` files (e.g. [ln-date-dev.scss](../../components/ln-date/ln-date-dev.scss), [ln-number-dev.scss](../../components/ln-number/ln-number-dev.scss)).
+2. **Dev Bundle Aggregator:** All modular diagnostic files are imported into [ln-ashlar-dev.scss](../../theme/ln-ashlar-dev.scss) and compiled to `ln-ashlar-dev.css`.
 3. **Runtime Scoping:** All CSS diagnostic rules are scoped under `[data-ln-debug]`, ensuring rules remain inactive unless `data-ln-debug` is present on the page root.
 
 ### Visual Error Styles
@@ -149,15 +149,15 @@ sequenceDiagram
 
 ## 7. Related Components
 
-- **Source Code:** [`ln-debug.js` (Source)](../../js/ln-debug/src/ln-debug.js) | [`ln-debug.js` (Dist)](../../js/ln-debug/ln-debug.js) | [Aggregator SCSS](../../scss/ln-ashlar-dev.scss)
+- **Source Code:** [`ln-debug.js` (Source)](../../components/ln-debug/src/ln-debug.js) | [`ln-debug.js` (Dist)](../../components/ln-debug/ln-debug.js) | [Aggregator SCSS](../../theme/ln-ashlar-dev.scss)
 - **Modular Component Dev Styles:**
-  - [ln-toggle-dev.scss](../../js/ln-toggle/ln-toggle-dev.scss)
-  - [ln-table-dev.scss](../../js/ln-table/ln-table-dev.scss)
-  - [ln-modal-dev.scss](../../js/ln-modal/ln-modal-dev.scss)
-  - [ln-validate-dev.scss](../../js/ln-validate/ln-validate-dev.scss)
-  - [ln-date-dev.scss](../../js/ln-date/ln-date-dev.scss)
-  - [ln-number-dev.scss](../../js/ln-number/ln-number-dev.scss)
-  - [ln-tabs-dev.scss](../../js/ln-tabs/ln-tabs-dev.scss)
-  - [ln-search-dev.scss](../../js/ln-search/ln-search-dev.scss)
-  - [ln-filter-dev.scss](../../js/ln-filter/ln-filter-dev.scss)
-  - [ln-tooltip-dev.scss](../../js/ln-tooltip/ln-tooltip-dev.scss)
+  - [ln-toggle-dev.scss](../../components/ln-toggle/ln-toggle-dev.scss)
+  - [ln-table-dev.scss](../../components/ln-table/ln-table-dev.scss)
+  - [ln-modal-dev.scss](../../components/ln-modal/ln-modal-dev.scss)
+  - [ln-validate-dev.scss](../../components/ln-validate/ln-validate-dev.scss)
+  - [ln-date-dev.scss](../../components/ln-date/ln-date-dev.scss)
+  - [ln-number-dev.scss](../../components/ln-number/ln-number-dev.scss)
+  - [ln-tabs-dev.scss](../../components/ln-tabs/ln-tabs-dev.scss)
+  - [ln-search-dev.scss](../../components/ln-search/ln-search-dev.scss)
+  - [ln-filter-dev.scss](../../components/ln-filter/ln-filter-dev.scss)
+  - [ln-tooltip-dev.scss](../../components/ln-tooltip/ln-tooltip-dev.scss)

@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A network client connector adapting CouchDB revision protocols and changes feeds.
-source: js/ln-couchdb-connector/src/ln-couchdb-connector.js
+source: components/ln-couchdb-connector/src/ln-couchdb-connector.js
 tags: [network, database, couchdb, sync]
 ---
 
@@ -21,7 +21,7 @@ tags: [network, database, couchdb, sync]
 - Performs sequence-based delta synchronization over the CouchDB changes feed (`_changes?include_docs=true`).
 - Automatically resolves missing document revision parameters (`_rev`) by querying document states on PUT/DELETE mutations.
 - Translates relational schema `id` fields to NoSQL standard `_id` on request send, and reverse-maps them on response.
-- Located in [`js/ln-couchdb-connector/src/ln-couchdb-connector.js`](../../js/ln-couchdb-connector/src/ln-couchdb-connector.js).
+- Located in [`components/ln-couchdb-connector/src/ln-couchdb-connector.js`](../../components/ln-couchdb-connector/src/ln-couchdb-connector.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

@@ -1,0 +1,24 @@
+// ==========================================================================
+// ln-table — Functional Loading, Sort, and Virtualization State
+// ==========================================================================
+
+.ln-table--loading tbody {
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+[data-ln-table] th[data-ln-sort] [data-ln-sort-icon].hidden {
+	display: none;
+}
+
+[data-ln-table]:has([data-confirming]) {
+	overflow: visible;
+}
+
+.ln-table__spacer {
+	margin: 0 !important;
+	padding: 0 !important;
+	border: none !important;
+	background: transparent !important;
+	pointer-events: none;
+}

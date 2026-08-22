@@ -34,8 +34,8 @@ All files are in this conversation's outputs. Download them and place as follows
 
 | File | Destination | Action |
 |------|-------------|--------|
-| `ln-store.md` | `docs/js/ln-store.md` | NEW (create `docs/js/` dir) |
-| `ln-table.md` | `docs/js/ln-table.md` | NEW |
+| `ln-store.md` | `docs/components/ln-store.md` | NEW (create `docs/js/` dir) |
+| `ln-table.md` | `docs/components/ln-table.md` | NEW |
 
 ### NOT placing yet (deferred)
 

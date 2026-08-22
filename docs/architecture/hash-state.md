@@ -49,7 +49,7 @@ static Blade page without a server route to handle it.
 
 ### 2.2 Functions
 
-All four functions live in `js/ln-core/hash.js` and are exposed at
+All four functions live in `components/ln-core/hash.js` and are exposed at
 `window.lnCore.{hashParse, hashGet, hashSet, hashLinkClick}`.
 
 | Function | Signature | Purpose |

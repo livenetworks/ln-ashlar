@@ -1,0 +1,20 @@
+// ==========================================================================
+// ln-upload — Functional State & File Input Mechanics
+// ==========================================================================
+
+[data-ln-upload] [data-ln-upload-dict] {
+	display: none;
+}
+
+[data-ln-upload-item][data-ln-upload-state="uploading"] [data-ln-upload-progress] {
+	display: block;
+}
+
+[data-ln-upload-item]:not([data-ln-upload-state="uploading"]) [data-ln-upload-progress] {
+	display: none;
+}
+
+[data-ln-upload-item][data-ln-upload-state="deleting"] {
+	opacity: 0.7;
+	pointer-events: none;
+}

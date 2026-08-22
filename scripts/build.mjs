@@ -1,11 +1,20 @@
 import { build } from 'vite';
 import { resolve, join } from 'path';
 import fs from 'fs';
+import * as sass from 'sass-embedded';
 
 const __dirname = resolve();
-const jsDir = resolve(__dirname, 'js');
-const components = fs.readdirSync(jsDir).filter(file => {
-	const stat = fs.statSync(join(jsDir, file));
+const componentsDir = resolve(__dirname, 'components');
+const themeDir = resolve(__dirname, 'theme');
+const distDir = resolve(__dirname, 'dist');
+const demoDistDir = resolve(__dirname, 'demo/dist');
+
+// Ensure output directories exist
+if (!fs.existsSync(distDir)) fs.mkdirSync(distDir, { recursive: true });
+if (!fs.existsSync(demoDistDir)) fs.mkdirSync(demoDistDir, { recursive: true });
+
+const components = fs.readdirSync(componentsDir).filter(file => {
+	const stat = fs.statSync(join(componentsDir, file));
 	return stat.isDirectory() && file !== 'ln-core';
 });
 
@@ -16,31 +25,14 @@ const masterConfig = {
 	configFile: false,
 	build: {
 		outDir: 'demo/dist',
-		emptyOutDir: true,
+		emptyOutDir: false,
 		lib: {
-			entry: resolve(__dirname, 'js/index.js'),
+			entry: resolve(__dirname, 'components/index.js'),
 			name: 'LnAshlar',
 			formats: ['es', 'iife'],
 			fileName: (format) => format === 'es' ? 'ln-ashlar.js' : 'ln-ashlar.iife.js'
 		},
-		rollupOptions: {
-			output: {
-				assetFileNames: (assetInfo) => {
-					if (assetInfo.name && assetInfo.name.endsWith('.css')) {
-						return 'ln-ashlar.css';
-					}
-					return 'assets/[name][extname]';
-				}
-			}
-		},
 		watch: isWatch ? {} : null
-	},
-	css: {
-		preprocessorOptions: {
-			scss: {
-				api: 'modern-compiler'
-			}
-		}
 	}
 };
 
@@ -49,7 +41,7 @@ function getComponentConfig(entryName, srcPath) {
 	return {
 		configFile: false,
 		build: {
-			outDir: 'js',
+			outDir: 'components',
 			emptyOutDir: false,
 			lib: {
 				entry: { [entryName]: srcPath },
@@ -57,26 +49,63 @@ function getComponentConfig(entryName, srcPath) {
 				name: 'LnAshlarComponent',
 				fileName: (format, name) => `${name}.js`
 			},
-			rollupOptions: {
-				output: {
-					assetFileNames: 'assets/[name][extname]'
-				}
-			},
 			watch: isWatch ? {} : null
 		}
 	};
 }
 
+function compileSassFiles() {
+	console.log('Compiling Modular SCSS bundles (Core, Theme, Full, Dev)...');
+
+	const stylesheets = [
+		{ src: 'ln-ashlar-core.scss', out: 'ln-ashlar-core.css' },
+		{ src: 'ln-ashlar-theme.scss', out: 'ln-ashlar-theme.css' },
+		{ src: 'ln-ashlar.scss', out: 'ln-ashlar.css' },
+		{ src: 'ln-ashlar-dev.scss', out: 'ln-ashlar-dev.css' }
+	];
+
+	for (const { src, out } of stylesheets) {
+		const srcPath = join(themeDir, src);
+		if (!fs.existsSync(srcPath)) continue;
+
+		// Unminified / Expanded for demo/dist
+		const result = sass.compile(srcPath, {
+			style: 'expanded',
+			sourceMap: false
+		});
+
+		// Minified / Compressed for dist
+		const resultMin = sass.compile(srcPath, {
+			style: 'compressed',
+			sourceMap: false
+		});
+
+		fs.writeFileSync(join(demoDistDir, out), result.css);
+		fs.writeFileSync(join(distDir, out), resultMin.css);
+		console.log(`✓ Compiled ${out}`);
+	}
+}
+
 async function run() {
-	console.log('Building Master Bundle...');
+	console.log('Building Master JS Bundle...');
 	await build(masterConfig);
+
+	// Also copy built JS to dist/
+	if (fs.existsSync(join(demoDistDir, 'ln-ashlar.js'))) {
+		fs.copyFileSync(join(demoDistDir, 'ln-ashlar.js'), join(distDir, 'ln-ashlar.js'));
+	}
+	if (fs.existsSync(join(demoDistDir, 'ln-ashlar.iife.js'))) {
+		fs.copyFileSync(join(demoDistDir, 'ln-ashlar.iife.js'), join(distDir, 'ln-ashlar.iife.js'));
+	}
+
+	compileSassFiles();
 
 	console.log('Building Standalone Components (sequentially to prevent resource issues)...');
 	
 	// Collect all entries to build
 	const entriesToBuild = [];
 	for (const comp of components) {
-		const srcPath = join(jsDir, comp, 'src', `${comp}.js`);
+		const srcPath = join(componentsDir, comp, 'src', `${comp}.js`);
 		if (fs.existsSync(srcPath)) {
 			entriesToBuild.push({ entryName: `${comp}/${comp}`, srcPath });
 		}

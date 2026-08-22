@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Zero-dependency local-first database cache store backed by browser IndexedDB.
-source: js/ln-data-store/src/ln-data-store.js
+source: components/ln-data-store/src/ln-data-store.js
 tags: [data, store, database, indexeddb, offline-first]
 ---
 
@@ -20,7 +20,7 @@ tags: [data, store, database, indexeddb, offline-first]
 - **Optimistic Mutations:** Updates the local IndexedDB database immediately on mutation request events and triggers instant UI updates, bypassing network latency.
 - **At-Rest Encryption:** Secures cached data payload using AES-GCM encryption if a storage key is set, keeping only the primary `id` in plain text.
 - **Dynamic Schema Discovery:** Auto-registers database tables and indexes based on elements declared in the HTML markup.
-- Source path: [ln-data-store.js](../../js/ln-data-store/src/ln-data-store.js)
+- Source path: [ln-data-store.js](../../components/ln-data-store/src/ln-data-store.js)
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

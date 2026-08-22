@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Automatically detects outbound links to apply security attributes (target="_blank", rel="noopener noreferrer"), accessibility hints, and telemetry events.
-source: js/ln-external-links/src/ln-external-links.js
+source: components/ln-external-links/src/ln-external-links.js
 tags: [security, accessibility, telemetry, links]
 ---
 
@@ -16,7 +16,7 @@ tags: [security, accessibility, telemetry, links]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-external-links` component is an automated utility that scans and secures outbound links (`<a>` and `<area>` elements) across the page. It is located in [`js/ln-external-links/src/ln-external-links.js`](../../js/ln-external-links/src/ln-external-links.js).
+The `ln-external-links` component is an automated utility that scans and secures outbound links (`<a>` and `<area>` elements) across the page. It is located in [`components/ln-external-links/src/ln-external-links.js`](../../components/ln-external-links/src/ln-external-links.js).
 
 *   **Outbound Detection:** Automatically checks link hostnames against `window.location.hostname`. Any link targeting a different domain is identified as an external link.
 *   **Security Sanitization (Reverse Tabnabbing Prevention):** Appends `target="_blank"` and ensures `rel` contains `noopener noreferrer` to protect against security vulnerabilities.

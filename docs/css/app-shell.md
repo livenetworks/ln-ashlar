@@ -1,9 +1,9 @@
 # App Shell
 
 Mobile-ready application shell: fixed header, sidebar drawer, scrim
-overlay, footer. File: `scss/config/mixins/_app-shell.scss`. Sidebar
-extensions: `scss/config/mixins/_sidebar.scss`. Global bindings:
-`scss/components/_app-shell.scss`.
+overlay, footer. File: `theme/config/mixins/_app-shell.scss`. Sidebar
+extensions: `theme/config/mixins/_sidebar.scss`. Global bindings:
+`theme/components/_app-shell.scss`.
 
 The whole shell is a set of mixins that compose around a small set of
 intrinsic tokens:
@@ -67,7 +67,7 @@ Canonical HTML:
 ```
 
 No class is mandatory for the shell to work — the `.app-*` bindings
-in `scss/components/_app-shell.scss` are there for prototyping +
+in `theme/components/_app-shell.scss` are there for prototyping +
 drop-in use. Projects can use semantic selectors:
 
 ```scss
@@ -248,7 +248,7 @@ the brand triad, without any extra wrapper div.
 
 ## Global bindings
 
-File: `scss/components/_app-shell.scss`. Classes that ship pre-wired:
+File: `theme/components/_app-shell.scss`. Classes that ship pre-wired:
 
 | Class | Mixin |
 |---|---|

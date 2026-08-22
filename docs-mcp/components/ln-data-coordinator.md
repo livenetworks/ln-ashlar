@@ -4,7 +4,7 @@ classification: coordinator
 status: stable
 domain: frontend
 summary: Orchestrates local IndexedDB cache sync with remote database drivers and queues.
-source: js/ln-data-coordinator/src/ln-data-coordinator.js
+source: components/ln-data-coordinator/src/ln-data-coordinator.js
 tags: [data, synchronization, local-first]
 ---
 
@@ -20,7 +20,7 @@ tags: [data, synchronization, local-first]
 - Orchestrates and binds child database/transport components within its DOM sub-graph (e.g. [`ln-data-store`](./ln-data-store.md), [`ln-api-connector`](./ln-api-connector.md) / [`ln-couchdb-connector`](./ln-couchdb-connector.md), [`ln-api-queue`](./ln-api-queue.md)).
 - Intercepts native form submit actions globally on forms with a matching `data-ln-form-scope` to route writes.
 - Dispatches write operations in a **parallel fan-out** layout: triggers local database mutations and remote connector/queue uploads simultaneously.
-- Located in [`js/ln-data-coordinator/src/ln-data-coordinator.js`](../../js/ln-data-coordinator/src/ln-data-coordinator.js).
+- Located in [`components/ln-data-coordinator/src/ln-data-coordinator.js`](../../components/ln-data-coordinator/src/ln-data-coordinator.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

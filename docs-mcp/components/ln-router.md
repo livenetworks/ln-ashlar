@@ -4,7 +4,7 @@ classification: coordinator
 status: stable
 domain: frontend
 summary: SPA router engine managing declarative template routes, path specificity ranking, multi-region outlets, View Transitions, and teardown lifecycles.
-source: js/ln-router/src/ln-router.js
+source: components/ln-router/src/ln-router.js
 tags: [router, spa, routing, navigation, view-transitions]
 ---
 
@@ -16,7 +16,7 @@ tags: [router, spa, routing, navigation, view-transitions]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-router` component is the client-side SPA routing engine of `ln-ashlar`. It is located in [`js/ln-router/src/ln-router.js`](../../js/ln-router/src/ln-router.js).
+The `ln-router` component is the client-side SPA routing engine of `ln-ashlar`. It is located in [`components/ln-router/src/ln-router.js`](../../components/ln-router/src/ln-router.js).
 
 *   **Declarative HTML Template Routes:** Routes are declared directly in HTML using `<template data-ln-route="...">`.
 *   **Route Specificity Ranking:** Routes are ranked automatically based on pattern specificity:

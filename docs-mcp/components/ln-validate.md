@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A validation wrapper that adapts browser ValidityState and gates form submission.
-source: js/ln-validate/src/ln-validate.js
+source: components/ln-validate/src/ln-validate.js
 tags: [forms, validation, accessibility]
 ---
 
@@ -19,7 +19,7 @@ tags: [forms, validation, accessibility]
 - Wraps the native HTML5 `ValidityState` API of form elements to control visual error states in the DOM.
 - Implements a **touched gate** policy: errors are only shown after the user has interacted with the input (avoids errors on initial page load).
 - Registers a submit validation gate: if a form has at least one validated field, submit attempts are intercepted, all fields validated, and the first invalid field focused.
-- Located in [`js/ln-validate/src/ln-validate.js`](../../js/ln-validate/src/ln-validate.js).
+- Located in [`components/ln-validate/src/ln-validate.js`](../../components/ln-validate/src/ln-validate.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

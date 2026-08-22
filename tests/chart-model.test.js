@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { buildChartModel, parseChartViewBox } from '../js/ln-chart/src/chart-model.js';
+import { buildChartModel, parseChartViewBox } from '../components/ln-chart/src/chart-model.js';
 
 const viewBox = { x: 0, y: 0, width: 100, height: 100 };
 

@@ -275,14 +275,14 @@ A modal, drawer, or inline editor persists in the DOM and is reused across many 
 
 **Default: declarative trigger** — for click-triggered fills from table rows or
 inline buttons, `data-ln-fill-form` + `data-ln-fill-*` attributes on the trigger
-require no coordinator at all (see [`js/ln-fill/README.md`](../../js/ln-fill/README.md)).
+require no coordinator at all (see [`components/ln-fill/README.md`](../../components/ln-fill/README.md)).
 
 **Coordinator pattern** — use `ln-modal:before-open` + `lnFill` when the fill is
 programmatic and not click-triggered (e.g. a store conflict handler, an import
 workflow, or a deep-link pre-fill). Pattern: on `ln-modal:before-open`, call
 `window.lnCore.lnFill(modalEl, record)`. For the hash-param deep-link case specifically,
 the shipped generic `ln-ui-coordinator` handles this automatically (source:
-`js/ln-ui-coordinator/src/ln-ui-coordinator.js`); the manual
+`components/ln-ui-coordinator/src/ln-ui-coordinator.js`); the manual
 `before-open` + `lnFill` pattern remains valid for non-hash programmatic fills.
 Pass `record` to fill; pass `null` to reset. The helper fans out to all `[data-ln-form]`
 and `[data-ln-fillable]` descendants — coordinator never calls `lnForm.reset()` /
@@ -309,7 +309,7 @@ modalEl.addEventListener('ln-modal:before-open', () => {
 });
 ```
 
-See the mode-toggle markup and coordinator wiring in [`js/ln-modal/README.md §7`](../../js/ln-modal/README.md).
+See the mode-toggle markup and coordinator wiring in [`components/ln-modal/README.md §7`](../../components/ln-modal/README.md).
 
 ---
 

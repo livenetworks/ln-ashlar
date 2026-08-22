@@ -12,7 +12,7 @@ CSS Container Queries make this possible: the **parent** declares a container co
 
 ## Mixin to Add
 
-Add to `scss/config/_mixins.scss`:
+Add to `theme/config/_mixins.scss`:
 
 ```scss
 // Container context — declare on parent, child queries via @container

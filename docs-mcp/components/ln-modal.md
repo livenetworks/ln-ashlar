@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A native dialog modal component that manages overlay panels, native focus trapping, scroll locking, and cancel event synchronization.
-source: js/ln-modal/src/ln-modal.js
+source: components/ln-modal/src/ln-modal.js
 tags: [modal, dialog, overlay, simple-component]
 ---
 
@@ -18,7 +18,7 @@ tags: [modal, dialog, overlay, simple-component]
 
 The `ln-modal` component is a **Layer 1 Simple Component** that manages modal overlay windows (dialogs). It wraps the browser's native `<dialog>` element and manages its open/closed visibility state.
 
-The JavaScript source is located at [ln-modal.js](../../js/ln-modal/src/ln-modal.js).
+The JavaScript source is located at [ln-modal.js](../../components/ln-modal/src/ln-modal.js).
 
 Key responsibilities include:
 - **Visibility Management:** Synchronizing the `data-ln-modal` attribute (`"open"` / `"close"`) with native `<dialog>` methods `showModal()` and `close()`.
@@ -116,7 +116,7 @@ All events bubble (`bubbles: true`) and contain target details in `event.detail`
 
 ## 4. CSS Styling & Behavioral Concept
 
-Styles are defined in `js/ln-modal/ln-modal.scss` and `scss/config/mixins/_modal.scss`.
+Styles are defined in `components/ln-modal/ln-modal.scss` and `theme/config/mixins/_modal.scss`.
 
 ```scss
 [data-ln-modal] {

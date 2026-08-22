@@ -2,7 +2,7 @@
 
 > Cross-component philosophy for how data moves through ln-ashlar.
 > Component-specific attributes, events, payloads, and APIs live in each
-> component's `js/ln-{component}/README.md`. This document is
+> component's `components/ln-{component}/README.md`. This document is
 > the rules that span them.
 
 ---
@@ -291,9 +291,9 @@ is authored once per coordinator instance as a markup dictionary
 key is silent.
 
 For exact event names, payload shapes, and timing, see the
-[ln-data-store README](../../js/ln-data-store/README.md),
-[ln-data-coordinator README](../../js/ln-data-coordinator/README.md), and
-[ln-api-queue README](../../js/ln-api-queue/README.md).
+[ln-data-store README](../../components/ln-data-store/README.md),
+[ln-data-coordinator README](../../components/ln-data-coordinator/README.md), and
+[ln-api-queue README](../../components/ln-api-queue/README.md).
 
 ---
 
@@ -551,7 +551,7 @@ window.lnCore.lnFill(container, record)
 // record = null → fillables reset/clear themselves.
 ```
 
-Source: `js/ln-core/helpers.js` L159–172.
+Source: `components/ln-core/helpers.js` L159–172.
 
 #### Event
 
@@ -570,7 +570,7 @@ self-handle; nothing else needs to listen.
 `lnFill(formEl, record)` also dispatches `ln-fill` at `formEl` itself when it
 matches `[data-ln-form]` or `[data-ln-fillable]`. This means passing the form
 element directly (as `ln-fill` declarative trigger does) works correctly — the
-form's own `ln-fill` handler fires. Source: `js/ln-core/helpers.js` L164–165.
+form's own `ln-fill` handler fires. Source: `components/ln-core/helpers.js` L164–165.
 
 #### Guard rule (important for future fillable authors)
 
@@ -581,7 +581,7 @@ bubbled `ln-fill` from a descendant fillable double-triggers it. This is why
 
 #### Declarative trigger layer (`ln-fill` module)
 
-The `ln-fill` module (`js/ln-fill/`) adds a document-level click listener. On
+The `ln-fill` module (`components/ln-fill/`) adds a document-level click listener. On
 click of `[data-ln-fill-form="<id>"]`, it:
 
 1. Reads all `data-ln-fill-<key>` attributes from the trigger's `dataset`.
@@ -592,7 +592,7 @@ click of `[data-ln-fill-form="<id>"]`, it:
 4. Does NOT call `e.preventDefault()` — coexists with `data-ln-modal-for` on
    the same button.
 
-Source: `js/ln-fill/src/ln-fill.js`.
+Source: `components/ln-fill/src/ln-fill.js`.
 
 Declarative trigger is the **default** for click-triggered fills, including
 ln-table row templates — `fillTemplate()` now interpolates `{{ key }}` in

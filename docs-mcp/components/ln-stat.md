@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A metric display element that resolves record counts from data coordinators using custom events.
-source: js/ln-stat/src/ln-stat.js
+source: components/ln-stat/src/ln-stat.js
 tags: [metrics, display, data-store]
 ---
 
@@ -19,7 +19,7 @@ tags: [metrics, display, data-store]
 - **Core Role:** Displays statistical metrics (such as database record counts or filtered subgroups) in the user interface.
 - **Event-Driven Integration:** Emits `ln-stat:request-count` to trigger queries and listens for `ln-stat:set-count` to display the resolved value.
 - **Loading Management:** Supports loading states by removing the `.is-loading` class when the data value is rendered.
-- Located in [`js/ln-stat/src/ln-stat.js`](../../js/ln-stat/src/ln-stat.js).
+- Located in [`components/ln-stat/src/ln-stat.js`](../../components/ln-stat/src/ln-stat.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

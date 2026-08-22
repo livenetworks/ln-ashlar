@@ -4,7 +4,7 @@ classification: service
 status: stable
 domain: frontend
 summary: An on-demand SVG sprite loader and localStorage caching service.
-source: js/ln-icon/src/ln-icon.js
+source: components/ln-icon/src/ln-icon.js
 tags: [icons, svg, sprite, cache]
 ---
 
@@ -16,7 +16,7 @@ tags: [icons, svg, sprite, cache]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-icon` utility is an on-demand SVG sprite manager. It loads SVG vector definitions dynamically as they are requested in the DOM, caching them locally in `localStorage` to eliminate subsequent network latency. It is defined in [ln-icon.js](../../js/ln-icon/src/ln-icon.js).
+The `ln-icon` utility is an on-demand SVG sprite manager. It loads SVG vector definitions dynamically as they are requested in the DOM, caching them locally in `localStorage` to eliminate subsequent network latency. It is defined in [ln-icon.js](../../components/ln-icon/src/ln-icon.js).
 
 *   **Declarative Detection:** Monitors the DOM for `<use href="#ln-icon-...">` and `<use href="#ln-icon-custom-...">` targets.
 *   **On-Demand Fetching:** Fetches only the requested SVG assets from a CDN (or a custom company directory) dynamically.
@@ -95,7 +95,7 @@ These properties must be declared in the global scope (`window`) *before* the sc
 
 ## 4. CSS Styling & Behavioral Concept
 
-Styles are managed through the SCSS layout file `scss/config/_icons.scss`.
+Styles are managed through the SCSS layout file `theme/config/_icons.scss`.
 
 ### Core SCSS Layout
 

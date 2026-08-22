@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A zero-dependency form translation coordinator that clones translatable fields per language, synchronizing a locale-picker dropdown and active-language badges.
-source: js/ln-translations/src/ln-translations.js
+source: components/ln-translations/src/ln-translations.js
 tags: [i18n, forms, translation, localization, clone]
 ---
 
@@ -21,7 +21,7 @@ tags: [i18n, forms, translation, localization, clone]
 - **Menu & badge synchronization:** renders the available-language dropdown menu and the active-language badge list from two `<template>` elements (`ln-translations-menu-item`, `ln-translations-badge`), keeping both in sync on every add/remove.
 - **Server-rendered hydration:** on init, scans the container for existing `[data-ln-translatable-lang]` elements and treats any language found there (other than the default) as already active, rebuilding the menu and badges accordingly — no `addLanguage()` call required.
 
-The JavaScript source is located at [ln-translations.js](../../js/ln-translations/src/ln-translations.js).
+The JavaScript source is located at [ln-translations.js](../../components/ln-translations/src/ln-translations.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
@@ -163,11 +163,11 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 
 ## 4. CSS Styling & Behavioral Concept
 
-`ln-translations` ships co-located production SCSS: reusable mixins in [`scss/config/mixins/_translations.scss`](../../scss/config/mixins/_translations.scss) and selector bindings in [`scss/components/_translations.scss`](../../scss/components/_translations.scss).
+`ln-translations` ships co-located production SCSS: reusable mixins in [`theme/config/mixins/_translations.scss`](../../theme/config/mixins/_translations.scss) and selector bindings in [`theme/components/_translations.scss`](../../theme/components/_translations.scss).
 
 ### SCSS Mixins Reference
 ```scss
-// In scss/config/mixins/_translations.scss
+// In theme/config/mixins/_translations.scss
 @mixin translations-actions {
 	@include inline-flex;
 	@include items-center;
@@ -224,7 +224,7 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 
 ### SCSS Component Selector Bindings
 ```scss
-// In scss/components/_translations.scss
+// In theme/components/_translations.scss
 .ln-translations__actions { @include translations-actions; }
 [data-ln-translations-active] { @include translations-active-list; }
 [data-ln-translations-active] p { @include translations-badge; }

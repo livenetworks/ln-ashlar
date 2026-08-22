@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Formats Unix timestamps on native time elements into localized dates or auto-refreshing relative time strings.
-source: js/ln-time/src/ln-time.js
+source: components/ln-time/src/ln-time.js
 tags: [localization, formatting, time, date]
 ---
 
@@ -23,7 +23,7 @@ tags: [localization, formatting, time, date]
   - **Formatter Cache:** Caches instances of `Intl.DateTimeFormat` and `Intl.RelativeTimeFormat` under composite locale/options keys to prevent memory churn.
   - **Memory Safety:** Automatically tracks element detachment from the DOM (`document.body.contains`). Detached elements are garbage-collected from the active registry, and the global timer terminates when no relative elements remain.
 - **Dynamic Context:** Automatically generates standard description tooltip bounds (`dom.title`) matching the full localized date and time.
-- Located in [`js/ln-time/src/ln-time.js`](../../js/ln-time/src/ln-time.js).
+- Located in [`components/ln-time/src/ln-time.js`](../../components/ln-time/src/ln-time.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

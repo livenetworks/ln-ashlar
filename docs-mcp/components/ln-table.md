@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A high-performance table component supporting server-side rendering (SSR), data-driven templates, virtual scrolling, sorting, and row selection.
-source: js/ln-table/src/ln-table.js
+source: components/ln-table/src/ln-table.js
 tags: [tables, data-grid, virtual-scrolling, sorting, selection]
 ---
 
@@ -21,7 +21,7 @@ tags: [tables, data-grid, virtual-scrolling, sorting, selection]
 1. **SSR (Server-Side Rendered) Mode:** Hydrates pre-existing markup in `<tbody>` sent from the server. It parses the rows once on initialization and enables instant client-side sorting, column filtering, search, and virtual scrolling on the existing DOM.
 2. **Data-Driven Mode:** Functions as a dynamic template engine. When provided with a dataset, it clones a specified row template (`<template data-ln-template="...-row">`), performs safe XSS interpolation using double curly braces (`{{ field }}`), manages active row selections, and updates stats counters in the footer.
 
-The JavaScript source is located at [ln-table.js](../../js/ln-table/src/ln-table.js). Column sorting is delegated entirely to [`ln-sort`](./ln-sort.md) — `ln-table` never renders or owns a sort trigger button itself; it only listens for `ln-sort:change` on its own root and reacts (see §3 Events API).
+The JavaScript source is located at [ln-table.js](../../components/ln-table/src/ln-table.js). Column sorting is delegated entirely to [`ln-sort`](./ln-sort.md) — `ln-table` never renders or owns a sort trigger button itself; it only listens for `ln-sort:change` on its own root and reacts (see §3 Events API).
 
 ### Orthogonality Doctrine (What the component does NOT do)
 * **No direct network/API calls:** It does not fetch data itself. When sorting, filtering, or searching changes in Data-Driven mode, it merely emits a `ln-table:request-data` event. The app coordinator (e.g., [`ln-data-coordinator`](./ln-data-coordinator.md)) handles the transport layer.
@@ -193,8 +193,8 @@ Use when the table queries a store and connects through a coordinator rather tha
 ## 4. CSS Styling & Behavioral Concept
 
 Styles are divided according to **Separation of Concerns**:
-1. **Visual Styling Layer:** Handled by [_ln-table.scss](../../scss/config/mixins/_ln-table.scss).
-2. **Behavioral State Layer:** Defined in the component styles [ln-table.scss](../../js/ln-table/ln-table.scss).
+1. **Visual Styling Layer:** Handled by [_ln-table.scss](../../theme/config/mixins/_ln-table.scss).
+2. **Behavioral State Layer:** Defined in the component styles [ln-table.scss](../../components/ln-table/ln-table.scss).
 
 ### Core SCSS Mixins
 * `@mixin ln-table`: Styles border radii, header stickiness (`position: sticky`), shadows, and responsive scrolling wrapper.

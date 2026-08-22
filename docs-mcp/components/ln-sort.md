@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A view-agnostic sort control primitive that dispatches a cancelable sort intent on a target element, letting tables, lists, or custom integrations intercept it or fall back to a built-in DOM-reorder default.
-source: js/ln-sort/src/ln-sort.js
+source: components/ln-sort/src/ln-sort.js
 tags: [sort, table, list, ordering, dom-filtering]
 ---
 
@@ -16,7 +16,7 @@ tags: [sort, table, list, ordering, dom-filtering]
 
 ## 1. Core Behavior & Responsibility
 
-`ln-sort` announces a sort intent on a target element via a cancelable event, letting tables, lists, or custom integrations intercept it or fall back to a built-in DOM-reorder default. It is located at [`../../js/ln-sort/src/ln-sort.js`](../../js/ln-sort/src/ln-sort.js).
+`ln-sort` announces a sort intent on a target element via a cancelable event, letting tables, lists, or custom integrations intercept it or fall back to a built-in DOM-reorder default. It is located at [`../../components/ln-sort/src/ln-sort.js`](../../components/ln-sort/src/ln-sort.js).
 
 It follows the same contract shape as [`ln-search`](./ln-search.md): dispatch-only-to-target, cancelable, default-DOM-behaviour fallback. Unlike [`ln-filter`](./ln-filter.md), it never dual-dispatches to itself.
 
@@ -175,7 +175,7 @@ The circular order lives entirely in CSS via `[data-ln-sort-state]` — only one
 }
 ```
 
-Applied globally in [`../../scss/components/_sort.scss`](../../scss/components/_sort.scss):
+Applied globally in [`../../theme/components/_sort.scss`](../../theme/components/_sort.scss):
 
 ```scss
 [data-ln-sort] { @include sort; }
@@ -251,5 +251,5 @@ sequenceDiagram
 - [`ln-search.md`](./ln-search.md) — search primitive sharing the Two-Host and cancelable dispatch pattern.
 - [`ln-filter.md`](./ln-filter.md) — filter control primitive for multi-criteria filtering.
 - [`ln-persist.md`](./ln-persist.md) — opt-in per-instance persistence of the active sort via `data-ln-persist`.
-- Source Code: [`../../js/ln-sort/src/ln-sort.js`](../../js/ln-sort/src/ln-sort.js)
+- Source Code: [`../../components/ln-sort/src/ln-sort.js`](../../components/ln-sort/src/ln-sort.js)
 

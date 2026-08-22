@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A file upload component featuring drag-and-drop zones, progress tracking via ln-progress, file extension and size validation, SSR hydration, and automatic hidden input generation for form submits.
-source: js/ln-upload/src/ln-upload.js
+source: components/ln-upload/src/ln-upload.js
 tags: [upload, file-upload, drag-and-drop, progress, forms, hydration]
 ---
 
@@ -18,7 +18,7 @@ tags: [upload, file-upload, drag-and-drop, progress, forms, hydration]
 
 The `ln-upload` component is a file upload manager supporting drag-and-drop file selection, real-time XHR progress tracking, client-side validation, SSR hydration of pre-existing attachments, and dynamic hidden input synchronization for form submissions.
 
-The JavaScript source is located at [ln-upload.js](../../js/ln-upload/src/ln-upload.js).
+The JavaScript source is located at [ln-upload.js](../../components/ln-upload/src/ln-upload.js).
 
 Key responsibilities include:
 - **Drag-and-Drop Intake:** Listening for drag events (`dragover`, `dragleave`, `drop`) on `[data-ln-upload-zone]` and triggering selection on an authored native `<input type="file" multiple>` element.
@@ -174,7 +174,7 @@ All events bubble up (`bubbles: true`).
 
 ## 4. CSS Styling & Behavioral Concept
 
-SCSS styles live in `scss/components/_upload.scss` and `scss/config/mixins/_upload.scss`.
+SCSS styles live in `theme/components/_upload.scss` and `theme/config/mixins/_upload.scss`.
 
 ### Attribute Hooks & States
 

@@ -1,8 +1,8 @@
 # Alert
 
-Inline contextual feedback element — left-border + tinted background with icon, message, and optional dismiss. File: `scss/config/mixins/_alert.scss`.
+Inline contextual feedback element — left-border + tinted background with icon, message, and optional dismiss. File: `theme/config/mixins/_alert.scss`.
 
-Applied automatically to `.alert` via `scss/components/_alert.scss`.
+Applied automatically to `.alert` via `theme/components/_alert.scss`.
 
 ## HTML
 
@@ -115,7 +115,7 @@ Dismissal is driven by `ln-toggle`, not `ln-modal`:
 
 Once a user dismisses a `data-ln-persist` banner, it stays closed across
 reloads. Storage key format: `ln:toggle:{pagePath}:{id}`. See
-`js/ln-toggle/README.md` for the persistence contract.
+`components/ln-toggle/README.md` for the persistence contract.
 
 ### When to use
 

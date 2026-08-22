@@ -1,6 +1,6 @@
 # Tables
 
-File: `scss/config/mixins/_table.scss`. Applied: `scss/components/_table.scss`.
+File: `theme/config/mixins/_table.scss`. Applied: `theme/components/_table.scss`.
 
 ---
 
@@ -170,7 +170,7 @@ columns). See `breakpoints.md` for the `@media` vs `@container` split
 and `ln-ashlar-container-queries.md` for the full rationale.
 
 The table's specific threshold (above which it is tabular, below which
-it stacks) is defined in `scss/components/_table.scss`. Projects
+it stacks) is defined in `theme/components/_table.scss`. Projects
 override by applying `@include table-responsive` inside their own
 `@container` rule on a scoped selector — see the example above.
 

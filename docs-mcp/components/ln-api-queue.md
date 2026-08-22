@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A FIFO transactional outbox queue in IndexedDB for reliable offline-first writes.
-source: js/ln-api-queue/src/ln-api-queue.js
+source: components/ln-api-queue/src/ln-api-queue.js
 tags: [network, database, offline, queue]
 ---
 
@@ -21,7 +21,7 @@ tags: [network, database, offline, queue]
 - Implements dynamic **exponential backoff retry schedules** (`2s, 5s, 15s, 60s, 300s` intervals) for handling temporary network dropouts, up to 8 max attempts.
 - Performs runtime **ID Remapping**: replaces offline temporary record IDs (`_temp_uuid`) with official server-issued database IDs across all queued pending requests once creations succeed.
 - Retrying `failed` entries after retries are exhausted is manual — dispatch `ln-api-queue:request-drain` (e.g. from a "retry failed" UI action) to re-attempt them.
-- Located in [`js/ln-api-queue/src/ln-api-queue.js`](../../js/ln-api-queue/src/ln-api-queue.js).
+- Located in [`components/ln-api-queue/src/ln-api-queue.js`](../../components/ln-api-queue/src/ln-api-queue.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

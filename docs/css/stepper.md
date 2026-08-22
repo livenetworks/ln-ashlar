@@ -1,6 +1,6 @@
 # Stepper
 
-File: `scss/config/mixins/_stepper.scss` + `scss/components/_stepper.scss`.
+File: `theme/config/mixins/_stepper.scss` + `theme/components/_stepper.scss`.
 
 Linear progress indicator for multi-step workflows (approval flows,
 wizards, onboarding).

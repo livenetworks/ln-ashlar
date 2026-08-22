@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A declarative tab manager supporting N-way exclusive panel selection, URL hash deep-linking, localStorage persistence, and reactive ARIA attributes.
-source: js/ln-tabs/src/ln-tabs.js
+source: components/ln-tabs/src/ln-tabs.js
 tags: [tabs, navigation, accessibility, deep-linking, state]
 ---
 
@@ -16,17 +16,17 @@ tags: [tabs, navigation, accessibility, deep-linking, state]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-tabs` component (~180 lines JS) manages N-way exclusive selection of contextual panels within a wrapper container (`[data-ln-tabs]`). It is located in [`js/ln-tabs/src/ln-tabs.js`](../../js/ln-tabs/src/ln-tabs.js).
+The `ln-tabs` component (~180 lines JS) manages N-way exclusive selection of contextual panels within a wrapper container (`[data-ln-tabs]`). It is located in [`components/ln-tabs/src/ln-tabs.js`](../../components/ln-tabs/src/ln-tabs.js).
 
 *   **Single Source of Truth:** Active state resides strictly in `data-ln-tabs-active="key"` on the host container. Click events, URL hash updates (`hashchange`), `localStorage` restoration, and programmatic changes all converge into `setAttribute('data-ln-tabs-active', key)`. The component's `MutationObserver` callback executes UI rendering via `_applyActive(key)`.
 *   **Dual Operating Modes (Trigger-Based):**
-    1.  **Anchor Triggers (`<a href="#nsKey:key">`) → URL Hash Sync Mode:** Enables shareable, bookmarkable deep links with browser Back/Forward navigation. Uses `id` or `data-ln-tabs-key` on the wrapper as the namespace via [`js/ln-core/hash.js`](../../js/ln-core/hash.js).
-    2.  **Button Triggers (`<button>`) → localStorage Persist Mode:** Used for standard UI buttons. Does not mutate the URL. Opt-in persistence via `data-ln-persist` saves/restores state via [`js/ln-core/persist.js`](../../js/ln-core/persist.js).
+    1.  **Anchor Triggers (`<a href="#nsKey:key">`) → URL Hash Sync Mode:** Enables shareable, bookmarkable deep links with browser Back/Forward navigation. Uses `id` or `data-ln-tabs-key` on the wrapper as the namespace via [`components/ln-core/hash.js`](../../components/ln-core/hash.js).
+    2.  **Button Triggers (`<button>`) → localStorage Persist Mode:** Used for standard UI buttons. Does not mutate the URL. Opt-in persistence via `data-ln-persist` saves/restores state via [`components/ln-core/persist.js`](../../components/ln-core/persist.js).
 *   **Reactive ARIA & Focus Management:** Automatically updates `aria-selected` on triggers, toggles `.hidden` and `aria-hidden` on panels, and focuses the first focusable element inside newly activated panels (`data-ln-tabs-focus="true"` by default).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
-> - **Does NOT apply visual layout styles:** Tab bars, borders, and animations are strictly owned by CSS (`scss/components/_tabs.scss`).
+> - **Does NOT apply visual layout styles:** Tab bars, borders, and animations are strictly owned by CSS (`theme/components/_tabs.scss`).
 > - **Does NOT allow mixing anchor and button triggers in one group:** Trigger element type determines operating mode.
 
 ---

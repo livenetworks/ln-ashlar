@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A viewport notification service that renders non-blocking status toasts via global CustomEvent bus and HTML template hydration.
-source: js/ln-toast/src/ln-toast.js
+source: components/ln-toast/src/ln-toast.js
 tags: [toast, notification, messaging, viewports]
 ---
 
@@ -16,9 +16,9 @@ tags: [toast, notification, messaging, viewports]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-toast` component provides a global non-blocking toast notification service driven by a window-level CustomEvent bus (`window.addEventListener`). It is located in [`js/ln-toast/src/ln-toast.js`](../../js/ln-toast/src/ln-toast.js).
+The `ln-toast` component provides a global non-blocking toast notification service driven by a window-level CustomEvent bus (`window.addEventListener`). It is located in [`components/ln-toast/src/ln-toast.js`](../../components/ln-toast/src/ln-toast.js).
 
-*   **Declarative Templating:** Toast cards are rendered declaratively from an HTML template (`<template data-ln-template="ln-toast-item">`) using `cloneTemplateScoped` and `fill` from [`ln-core`](../../js/ln-core/src/ln-core.js).
+*   **Declarative Templating:** Toast cards are rendered declaratively from an HTML template (`<template data-ln-template="ln-toast-item">`) using `cloneTemplateScoped` and `fill` from [`ln-core`](../../components/ln-core/src/ln-core.js).
 *   **SSR / Hydration:** Supports auto-hydrating pre-rendered server-side `<li>` elements existing inside the toast container on initial load.
 *   **Queue Eviction (FIFO):** Automatically caps the maximum number of visible notifications (`data-ln-toast-max="5"`), evicting the oldest card when the queue threshold is exceeded.
 *   **Automatic Timeout & Manual Dismissal:** Manages auto-dismiss timers (`data-ln-toast-timeout="6000"`) and binds click handlers to `[data-ln-toast-close]` buttons.
@@ -148,7 +148,7 @@ Visual layer implementation using SCSS mixins:
 }
 ```
 
-*   **`@mixin toast-container`** ([`scss/config/mixins/_toast.scss`](../../scss/config/mixins/_toast.scss)): Positions container at viewport bottom-right with `pointer-events: none` to pass clicks through to page content. It resets Popover API default styling (`border: none`, `background: transparent`) and ensures `&:popover-open` maintains `display: flex`.
+*   **`@mixin toast-container`** ([`theme/config/mixins/_toast.scss`](../../theme/config/mixins/_toast.scss)): Positions container at viewport bottom-right with `pointer-events: none` to pass clicks through to page content. It resets Popover API default styling (`border: none`, `background: transparent`) and ensures `&:popover-open` maintains `display: flex`.
 *   **Top-Layer Promotion (Popover API):** When active toasts exist, the container is automatically promoted to the browser's **Top Layer** using `popover="manual"` and `showPopover()`. This guarantees toast notifications render **above native `<dialog>` modal backdrops** (`::backdrop`) and other top-layer surfaces. When all toasts dismiss, the container is demoted (`hidePopover()`).
 *   **Two-Phase Animation:** On mount, cards receive `.ln-enter` (removed next frame via `requestAnimationFrame`). On dismissal, cards receive `.ln-out` for 200ms before `removeChild()` is called.
 

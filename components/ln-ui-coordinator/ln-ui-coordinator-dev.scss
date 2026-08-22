@@ -1,0 +1,8 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// Dev diagnostics for ln-ui-coordinator
+	[data-ln-ui-coordinator] {
+		// Valid anywhere (dialog, section, main, body, container)
+	}
+}

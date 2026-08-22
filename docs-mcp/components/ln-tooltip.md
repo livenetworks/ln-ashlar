@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A progressive enhancement tooltip component that utilizes CSS for local elements and JavaScript with popover="manual" portals for clipping-free top-layer tooltips.
-source: js/ln-tooltip/src/ln-tooltip.js
+source: components/ln-tooltip/src/ln-tooltip.js
 tags: [tooltip, overlay, positioning, simple-component]
 ---
 
@@ -18,7 +18,7 @@ tags: [tooltip, overlay, positioning, simple-component]
 
 The `ln-tooltip` component is a progressive-enhancement floating tooltip engine that shows lightweight contextual descriptions on `hover` or `focus`.
 
-The JavaScript source is located at [ln-tooltip.js](../../js/ln-tooltip/src/ln-tooltip.js).
+The JavaScript source is located at [ln-tooltip.js](../../components/ln-tooltip/src/ln-tooltip.js).
 
 It operates on a dual-layer approach:
 1. **Layer 1: Zero-JS CSS Baseline:** Any element with `data-ln-tooltip="Text"` immediately displays a CSS-only tooltip via `::after` pseudo-elements. This runs instantly without JavaScript overhead.
@@ -105,11 +105,11 @@ When combining `data-ln-tooltip` with a native `title`, the engine automatically
 
 ## 4. CSS Styling & Behavioral Concept
 
-Visual styling is separated from JS logic. Local pseudo-elements are styled in `scss/config/mixins/_tooltip.scss` and `scss/components/_tooltip.scss`. The co-located `js/ln-tooltip/ln-tooltip.scss` supplies the enhancement-suppression rule for the CSS baseline.
+Visual styling is separated from JS logic. Local pseudo-elements are styled in `theme/config/mixins/_tooltip.scss` and `theme/components/_tooltip.scss`. The co-located `components/ln-tooltip/ln-tooltip.scss` supplies the enhancement-suppression rule for the CSS baseline.
 
 ### SCSS Component Selector Bindings
 ```scss
-// In scss/components/_tooltip.scss
+// In theme/components/_tooltip.scss
 [data-ln-tooltip] {
 	@include tooltip;
 }
@@ -125,7 +125,7 @@ Visual styling is separated from JS logic. Local pseudo-elements are styled in `
 
 ### Co-located Component SCSS
 ```scss
-// In js/ln-tooltip/ln-tooltip.scss
+// In components/ln-tooltip/ln-tooltip.scss
 [data-ln-tooltip][data-ln-tooltip-enhance]::after,
 [data-ln-tooltip][data-ln-tooltip-enhanced]::after,
 [data-ln-tooltip][title]::after {
@@ -135,7 +135,7 @@ Visual styling is separated from JS logic. Local pseudo-elements are styled in `
 
 ### SCSS Mixins Reference
 ```scss
-// In scss/config/mixins/_tooltip.scss
+// In theme/config/mixins/_tooltip.scss
 @mixin tooltip-bubble {
 	--padding-y: var(--size-xs);
 	--padding-x: var(--size-sm);

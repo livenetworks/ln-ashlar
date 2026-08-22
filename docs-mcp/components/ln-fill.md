@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A declarative form and display populator driven by click triggers or custom events.
-source: js/ln-fill/src/ln-fill.js
+source: components/ln-fill/src/ln-fill.js
 tags: [forms, data-binding, programmatic-fill]
 ---
 
@@ -18,7 +18,7 @@ tags: [forms, data-binding, programmatic-fill]
 
 The `ln-fill` component is a global DOM population behavior in `ln-ashlar`. It listens for triggers in the DOM (clicks or request events), extracts record datasets, and populates form fields.
 
-The JavaScript source is located at [ln-fill.js](../../js/ln-fill/src/ln-fill.js).
+The JavaScript source is located at [ln-fill.js](../../components/ln-fill/src/ln-fill.js).
 
 Key responsibilities include:
 - **Click-Triggered Fill:** Listening to delegated document clicks on elements with `data-ln-fill-form`, gathering `data-ln-fill-*` attributes, constructing a camelCased record, and dispatching it.
@@ -98,7 +98,7 @@ When `lnCore.lnFill` populates a `[data-ln-fillable]` container — or a compone
 | `data-ln-show` | Display node | `el.classList.toggle('hidden', !data[prop])` | Shows the node when the bound property is truthy. |
 | `data-ln-class` | Display node | `el.classList.toggle(cls, !!data[prop])` | Comma-separated `cls:prop` pairs, e.g. `active:isSelected`. |
 
-All four skip `null`/`undefined` values, preserving existing content. Source: `js/ln-core/helpers.js` (`fill`).
+All four skip `null`/`undefined` values, preserving existing content. Source: `components/ln-core/helpers.js` (`fill`).
 
 ### Programmatic JS API
 

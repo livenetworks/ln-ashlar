@@ -1,6 +1,6 @@
 # Prose
 
-File: `scss/config/mixins/_prose.scss` + `scss/components/_prose.scss`.
+File: `theme/config/mixins/_prose.scss` + `theme/components/_prose.scss`.
 
 Semantic rich-text styling for content that comes from rich editors
 (TipTap, CKEditor, Markdown renderers) or long-form article content.

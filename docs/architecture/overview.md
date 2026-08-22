@@ -29,8 +29,8 @@ This keeps your templates clean, readable, and highly maintainable.
 
 ### 2. The Two-Layer SCSS Design
 Every visual style in `ln-ashlar` is split into two layers:
-* **Mixins (Recipes):** Located in `scss/config/mixins/`. These contain raw visual declarations (padding, borders, layouts) but generate no CSS output on their own.
-* **Components (Applications):** Located in `scss/components/`. These apply the mixin recipes to default selectors (like `table`, `input`, or `.btn` class) for easy prototyping.
+* **Mixins (Recipes):** Located in `theme/config/mixins/`. These contain raw visual declarations (padding, borders, layouts) but generate no CSS output on their own.
+* **Components (Applications):** Located in `theme/components/`. These apply the mixin recipes to default selectors (like `table`, `input`, or `.btn` class) for easy prototyping.
 
 In production, you should rely on mixins applied to your project's semantic selectors, bypassing generic component classes.
 
@@ -185,14 +185,14 @@ resources/
 Import `ln-ashlar` configuration first, apply overrides, and import components:
 ```scss
 // 1. Import ln-ashlar SCSS tokens, mixins, and defaults
-@use 'ln-ashlar/scss/config/tokens' as *;
-@use 'ln-ashlar/scss/config/mixins' as *;
+@use 'ln-ashlar/theme/config/tokens' as *;
+@use 'ln-ashlar/theme/config/mixins' as *;
 
 // 2. Load your brand-specific variables (rebind vocabulary tokens)
 @use 'config/tokens';
 
 // 3. Load core components
-@use 'ln-ashlar/scss/ln-ashlar';
+@use 'ln-ashlar/theme/ln-ashlar';
 
 // 4. Style your application views using semantic selectors
 @use 'config/mixins';
@@ -211,10 +211,10 @@ Import `ln-ashlar` configuration first, apply overrides, and import components:
 Import the library bundle and configure your data layer:
 ```javascript
 // 1. Import and auto-initialize JS components
-import 'ln-ashlar/js/index.js';
+import 'ln-ashlar/components/index.js';
 
 // 2. Register a Domain Data Mapper
-import { registerDataMapper, setStorageKey } from 'ln-ashlar/js/ln-core';
+import { registerDataMapper, setStorageKey } from 'ln-ashlar/components/ln-core';
 
 registerDataMapper('tasks', {
   ingress(serverRaw) {

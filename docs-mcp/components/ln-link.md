@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A navigation helper component that turns entire DOM blocks into clickable areas while preserving HTML link semantics and accessibility.
-source: js/ln-link/src/ln-link.js
+source: components/ln-link/src/ln-link.js
 tags: [link, click, helper, navigation]
 ---
 
@@ -16,7 +16,7 @@ tags: [link, click, helper, navigation]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-link` component transforms whole block-level DOM elements (such as cards, panels, or table rows) into clickable link targets without corrupting native document semantics or screen reader navigability. It is defined in [ln-link.js](../../js/ln-link/src/ln-link.js).
+The `ln-link` component transforms whole block-level DOM elements (such as cards, panels, or table rows) into clickable link targets without corrupting native document semantics or screen reader navigability. It is defined in [ln-link.js](../../components/ln-link/src/ln-link.js).
 
 *   **Delegated Navigation:** Finds the first `<a>` descendant element within its boundary and routes container click interactions directly to that anchor's `href`.
 *   **Interaction Exclusions:** Prevents card-wide clicks if the user clicks directly on other nested interactive components (buttons, links, inputs, selects, or textareas), ensuring nested widgets operate without parent route interference.

@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A two-click interaction gate primitive for protecting destructive actions in-place.
-source: js/ln-confirm/src/ln-confirm.js
+source: components/ln-confirm/src/ln-confirm.js
 tags: [interactions, confirmation, validation]
 ---
 
@@ -21,7 +21,7 @@ tags: [interactions, confirmation, validation]
 - Automatically resets back to the idle state if the timeout (default: 3s) expires without a second click.
 - Steps out of the way of the default action on the second click, letting the native `click` or `submit` event proceed.
 - Stops propagation on both clicks, so neither the arming nor the accepting click reaches an ancestor click surface (clickable card, row handler).
-- Located in [`js/ln-confirm/src/ln-confirm.js`](../../js/ln-confirm/src/ln-confirm.js).
+- Located in [`components/ln-confirm/src/ln-confirm.js`](../../components/ln-confirm/src/ln-confirm.js).
 
 > [!NOTE]
 > **Micro-Component Doctrine & Template Exception:**
@@ -121,7 +121,7 @@ For compact layouts and table rows. Replaces the SVG icon path with `#ln-icon-ch
 
 The visual design for icon-only confirmation bubbles utilizes a CSS tooltip bubble positioned relative to the trigger.
 
-### SCSS Mixin Implementation (`scss/config/mixins/_confirm.scss`)
+### SCSS Mixin Implementation (`theme/config/mixins/_confirm.scss`)
 ```scss
 @use 'tooltip' as *;
 

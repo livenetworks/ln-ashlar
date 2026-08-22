@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A stateless RESTful API network connection driver.
-source: js/ln-api-connector/src/ln-api-connector.js
+source: components/ln-api-connector/src/ln-api-connector.js
 tags: [network, REST, sync, fetch]
 ---
 
@@ -21,7 +21,7 @@ tags: [network, REST, sync, fetch]
 - Appends required JSON configuration headers and dynamic `X-LN-Response: data` flags to queries.
 - Dispatches responses or request errors as bubbled CustomEvents back to the DOM tree.
 - Decouples remote storage paths from UI layers.
-- Located in [`js/ln-api-connector/src/ln-api-connector.js`](../../js/ln-api-connector/src/ln-api-connector.js).
+- Located in [`components/ln-api-connector/src/ln-api-connector.js`](../../components/ln-api-connector/src/ln-api-connector.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

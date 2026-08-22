@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: An HTML-over-the-wire network orchestration component that converts navigation links and form submissions into AJAX calls.
-source: js/ln-ajax/src/ln-ajax.js
+source: components/ln-ajax/src/ln-ajax.js
 tags: [ajax, navigation, form, network]
 ---
 
@@ -16,7 +16,7 @@ tags: [ajax, navigation, form, network]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-ajax` component implements **HTML-over-the-wire** interactions. It intercepts standard link navigations and form submissions inside an observed container and converts them into AJAX requests, updating designated DOM regions dynamically. It is defined in [ln-ajax.js](../../js/ln-ajax/src/ln-ajax.js).
+The `ln-ajax` component implements **HTML-over-the-wire** interactions. It intercepts standard link navigations and form submissions inside an observed container and converts them into AJAX requests, updating designated DOM regions dynamically. It is defined in [ln-ajax.js](../../components/ln-ajax/src/ln-ajax.js).
 
 *   **Navigation Hijacking:** Intercepts click events on all child `<a>` links and submit events on all child `<form>` elements (unless exempted with `data-ln-ajax="false"`).
 *   **Write Pipeline Precedence:** Form structures that carry the `data-ln-form-scope` write routing attribute are ignored by `ln-ajax` (the coordinator's write workflow handles them). `ln-ajax` prints a single `console.warn` notifying the developer of the override.

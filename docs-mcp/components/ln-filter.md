@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A zero-dependency, event-driven generic list and table filter primitive that manages item visibility states through checkbox controls.
-source: js/ln-filter/src/ln-filter.js
+source: components/ln-filter/src/ln-filter.js
 tags: [filter, list, table, accessibility, persistent]
 ---
 
@@ -18,7 +18,7 @@ tags: [filter, list, table, accessibility, persistent]
 
 The `ln-filter` component is a zero-dependency, event-driven primitive that manages item visibility states in lists or tables using declarative checkbox controls. It enables multi-criteria filtering (OR logic for options within the same category, and AND logic across different categories/columns).
 
-The JavaScript source is located at [ln-filter.js](../../js/ln-filter/src/ln-filter.js).
+The JavaScript source is located at [ln-filter.js](../../components/ln-filter/src/ln-filter.js).
 
 Key responsibilities include:
 - **Checkbox State Synchronization:** Handles mutual exclusion rules for reset ("All") sentinels and value inputs automatically.

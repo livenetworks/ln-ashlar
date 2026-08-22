@@ -4,7 +4,7 @@ classification: component
 status: draft
 domain: data-display
 summary: Zero-dependency SVG line/area renderer bound to ln-data-coordinator datasets.
-source: js/ln-chart/README.md, js/ln-chart/src/ln-chart.js
+source: components/ln-chart/README.md, components/ln-chart/src/ln-chart.js
 tags: [component, chart, svg, data, coordinator]
 ---
 
@@ -59,11 +59,11 @@ store/connector.
 
 - Authored SVG and templates are preserved; JS updates geometry attributes and
   bound text only.
-- `.chart` owns visual chrome through `scss/config/mixins/_chart.scss`.
+- `.chart` owns visual chrome through `theme/config/mixins/_chart.scss`.
 - Instance customization rebinds `--chart-*` custom properties.
 - Store/API knowledge remains exclusively in `ln-data-coordinator`.
 - Scaling is category-based on x and linear numeric on y; the zero baseline is
   included by default to avoid misleading magnitude.
 
-See [`js/ln-chart/README.md`](../../js/ln-chart/README.md) for the full markup,
+See [`components/ln-chart/README.md`](../../components/ln-chart/README.md) for the full markup,
 CSS-variable list, and data-coordinator example.
