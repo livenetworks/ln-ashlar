@@ -739,6 +739,50 @@
 				}
 			}
 		},
+		"ln-key": {
+			"element": {
+				"recommended_tag": "button, a, input, textarea, select, ul, li, any declaration host",
+				"tag_enforced": false,
+				"note": "Keyboard shortcut declaration host; the action target may be the host or a separately selected semantic element."
+			},
+			"attributes": {
+				"data-ln-key": {
+					"type": "string",
+					"read_by": "ln-key",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Comma- or whitespace-separated keyboard combinations normalized from Ctrl, Alt, Shift, Meta, and a key."
+				},
+				"data-ln-key-target": {
+					"type": "string",
+					"read_by": "ln-key",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Optional document-level CSS selector for the click or focus target; defaults to the declaration host."
+				},
+				"data-ln-key-modifier": {
+					"type": "string",
+					"read_by": "ln-key",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Modifier context inherited by descendant external-map items, for example 'Ctrl' or 'Ctrl+Shift'."
+				},
+				"data-ln-key-for": {
+					"type": "string",
+					"read_by": "ln-key",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Document-level CSS selector from an external-map item to its action target; trimmed item text supplies one key."
+				},
+				"data-ln-key-allow-input": {
+					"type": "boolean",
+					"read_by": "ln-key",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Allows the shortcut when the keyboard event originates inside an editing control; external-map items may inherit it from their modifier container."
+				}
+			}
+		},
 		"ln-link": {
 			"element": {
 				"recommended_tag": "tr, li, article, div",

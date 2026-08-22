@@ -151,6 +151,7 @@ For detailed manual instructions, properties, attributes, and events of individu
 | **Dropdown** | 🔽 **[ln-dropdown docs](js/ln-dropdown/README.md)** | 📄 **[dropdown architecture](js/ln-dropdown/README.md)** |
 | **Popover** | 💬 **[ln-popover docs](js/ln-popover/README.md)** | 📄 **[popover architecture](js/ln-popover/README.md)** |
 | **Tooltip (JS)** | 💬 **[ln-tooltip docs](js/ln-tooltip/README.md)** | 📄 **[tooltip architecture](js/ln-tooltip/README.md)** |
+| **Keyboard Shortcuts** | ⌨️ **[ln-key docs](js/ln-key/README.md)** | 📄 **[key architecture](js/ln-key/README.md)** |
 | **Navigation** | 🗺️ **[ln-nav docs](js/ln-nav/README.md)** | 📄 **[nav architecture](js/ln-nav/README.md)** |
 | **Filter** | 🔍 **[ln-filter docs](js/ln-filter/README.md)** | 📄 **[filter architecture](js/ln-filter/README.md)** |
 | **Search** | 🔎 **[ln-search docs](js/ln-search/README.md)** | 📄 **[search architecture](js/ln-search/README.md)** |

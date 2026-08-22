@@ -63,6 +63,12 @@
 | `ln-dropdown` | Menu-grade coordinator: click-outside, top-layer, auto-positioning. Any `<ul>` of links/actions | Rich panels → `ln-popover` |
 | `ln-sortable` | Drag-to-reorder lists, builder canvases | Paginated data; tree structures (unsupported) |
 
+## Interaction Primitives
+
+| Component | Use for | Don't use for |
+|---|---|---|
+| `ln-key` | Application keyboard shortcuts or grouped retrofit maps that activate/focus existing semantic targets | Replacing native button/link keyboard behavior; arbitrary command execution |
+
 ## Data Flow & AJAX
 
 | Component | Use for | Don't use for |

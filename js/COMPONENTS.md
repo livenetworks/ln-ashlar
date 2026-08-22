@@ -1002,6 +1002,7 @@ The component calls `_ensureDefaultItemTemplate()` at the top of `_initUpload()`
 | ln-sortable | Instance | `data-ln-table-sortable` | Drag & drop reorder |
 | ln-dropdown | Instance | `data-ln-dropdown` | Positioned dropdown menu (wraps ln-toggle) |
 | ln-popover | Instance | `data-ln-popover` | Rich popover with viewport-aware positioning and ESC-stack management |
+| ln-key | Instance | `data-ln-key` | Keyboard shortcut primitive that triggers native click or focus behavior |
 | ln-link | Instance | `data-ln-link` | Clickable rows/containers |
 | ln-confirm | Instance | `data-ln-confirm` | Two-click confirmation for destructive actions |
 | ln-autosave | Instance | `data-ln-autosave` | Auto-save form to localStorage on blur/change |
