@@ -493,8 +493,8 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			const total = this._lastTotal;
 			const filtered = this.visibleCount;
 
-			// Protect initial SSR seed rows while background API fetch is in-flight
-			if (this._hasInitialSeed && !this.isLoaded && this._data.length > 0) {
+			// Keep rendering existing rows while background API fetch is in-flight
+			if (this.dom.classList.contains('ln-table--loading') && this._filteredData.length > 0) {
 				this._renderAll();
 				return;
 			}
@@ -812,6 +812,9 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	// ─── Empty state ───────────────────────────────────────────
 
 	_component.prototype._showEmptyState = function () {
+		if (this.dom.classList.contains('ln-table--loading') && this.tbody && this.tbody.rows.length > 0) {
+			return;
+		}
 		const colSpan = this.ths.length || 1;
 		let emptyEl = null;
 
