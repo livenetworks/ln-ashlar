@@ -1,4 +1,4 @@
-import { registerComponent, getLocale, getLocaleFallback } from '../../ln-core';
+import { registerComponent, getLocale, getLocaleFallback, ensureLocaleObserver } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-time';
@@ -158,6 +158,15 @@ import { registerComponent, getLocale, getLocaleFallback } from '../../ln-core';
 	// ─── Component ────────────────────────────────────────────
 	function _constructor(dom) {
 		this.dom = dom;
+		const self = this;
+
+		// ── Subscribe to global locale changes ──────────────
+		this._onLocaleChange = function () {
+			_render(self);
+		};
+		ensureLocaleObserver();
+		document.addEventListener('ln-core:locale-change', this._onLocaleChange);
+
 		_render(this);
 
 		if (dom.getAttribute(DOM_SELECTOR) === 'relative') {
@@ -173,6 +182,9 @@ import { registerComponent, getLocale, getLocaleFallback } from '../../ln-core';
 	};
 
 	_constructor.prototype.destroy = function () {
+		if (this._onLocaleChange) {
+			document.removeEventListener('ln-core:locale-change', this._onLocaleChange);
+		}
 		_relativeElements.delete(this);
 		if (_relativeElements.size === 0) _stopInterval();
 		delete this.dom[DOM_ATTRIBUTE];
@@ -200,24 +212,10 @@ import { registerComponent, getLocale, getLocaleFallback } from '../../ln-core';
 		}
 	}
 
-	// ─── Locale Observer ──────────────────────────────────────
-	function _localeObserver() {
-		new MutationObserver(function () {
-			const els = document.querySelectorAll('[' + DOM_SELECTOR + ']');
-			for (let i = 0; i < els.length; i++) {
-				const inst = els[i][DOM_ATTRIBUTE];
-				if (inst) {
-					_render(inst);
-				}
-			}
-		}).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'], subtree: true });
-	}
-
 	// ─── Registration ─────────────────────────────────────────
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _constructor, 'ln-time', {
 		extraAttributes: ['datetime', 'data-ln-time-locale', 'lang'],
 		onAttributeChange: _onAttributeChange,
 		onInit: _onInit
 	});
-	_localeObserver();
 })();

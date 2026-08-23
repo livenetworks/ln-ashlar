@@ -46,11 +46,7 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 
 	// Control host is the input itself, or a wrapper around it.
 	function _resolveInput(host) {
-		const tag = host.tagName;
-		if (tag === 'INPUT' || tag === 'TEXTAREA') return host;
-		return host.querySelector('[name="search"]')
-			|| host.querySelector('input[type="search"]')
-			|| host.querySelector('input[type="text"]');
+		return host.matches('input, textarea') ? host : host.querySelector('input, textarea');
 	}
 
 	// Forwarded to consumers in the event detail; never matched here.
@@ -96,8 +92,6 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		if (!target.id) return;
 		const controls = document.querySelectorAll('[' + CONTROL_SELECTOR + '="' + target.id + '"]');
 		for (const control of controls) {
-			const inst = control[CONTROL_ATTRIBUTE];
-			if (inst) clearTimeout(inst._debounceTimer);
 			const input = _resolveInput(control);
 			if (input && input.value !== term) input.value = term;
 		}
@@ -113,26 +107,6 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		const self = this;
 		this.nsKey = _resolveSearchHashNamespace(dom);
 		this.hashEnabled = !!this.nsKey;
-
-		this._observer = new MutationObserver(function (mutations) {
-			for (let i = 0; i < mutations.length; i++) {
-				const mut = mutations[i];
-				if (mut.type === 'childList' || mut.type === 'characterData') {
-					const target = mut.target;
-					if (target && target._lnSearchText !== undefined) delete target._lnSearchText;
-					if (target && target.parentElement && target.parentElement._lnSearchText !== undefined) {
-						delete target.parentElement._lnSearchText;
-					}
-					if (mut.addedNodes) {
-						for (let j = 0; j < mut.addedNodes.length; j++) {
-							const node = mut.addedNodes[j];
-							if (node._lnSearchText !== undefined) delete node._lnSearchText;
-						}
-					}
-				}
-			}
-		});
-		this._observer.observe(dom, { childList: true, subtree: true, characterData: true });
 
 		// Hash change listener
 		this._onHashChange = function () {
@@ -227,10 +201,6 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 	_stateComponent.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this._destroyed = true;
-		if (this._observer) {
-			this._observer.disconnect();
-			this._observer = null;
-		}
 		if (this.hashEnabled && this._onHashChange) {
 			window.removeEventListener('hashchange', this._onHashChange);
 		}
@@ -244,12 +214,7 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		this.targetId = dom.getAttribute(CONTROL_SELECTOR);
 		this.input = _resolveInput(dom);
 
-		const debounceVal = dom.getAttribute('data-ln-search-debounce');
-		this.debounceTime = debounceVal !== null ? parseInt(debounceVal, 10) : DEBOUNCE_MS;
-		if (isNaN(this.debounceTime)) this.debounceTime = DEBOUNCE_MS;
-
 		this._debounceTimer = null;
-
 		this._attachHandler();
 
 		// The browser can fill the input with no event fired — form restore on reload /
@@ -274,6 +239,7 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 	_controlComponent.prototype._write = function (value) {
 		const target = document.getElementById(this.targetId);
 		if (!target) return;
+		if (target.getAttribute(DOM_SELECTOR) === value) return;
 		target.setAttribute(DOM_SELECTOR, value);
 	};
 
@@ -283,9 +249,16 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 
 		this._onInput = function () {
 			clearTimeout(self._debounceTimer);
-			self._debounceTimer = setTimeout(function () {
+			const raw = self.dom.getAttribute('data-ln-search-debounce') || self.input.getAttribute('data-ln-search-debounce');
+			const ms = raw !== null ? +(raw) : DEBOUNCE_MS;
+
+			if (self.input.value === '' || ms === 0) {
 				self._write(self.input.value);
-			}, self.debounceTime);
+			} else {
+				self._debounceTimer = setTimeout(function () {
+					self._write(self.input.value);
+				}, ms);
+			}
 		};
 
 		this.input.addEventListener('input', this._onInput);
@@ -324,6 +297,18 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 			return { target: target, input: input };
 		}
 
+		// 1b. Clear button is inside a view bound to a search target (data-ln-table-source / data-ln-list-source)
+		const view = btn.closest('[data-ln-table-source], [data-ln-list-source]');
+		if (view) {
+			const sourceId = view.getAttribute('data-ln-table-source') || view.getAttribute('data-ln-list-source');
+			const sourceTarget = sourceId ? document.getElementById(sourceId) : null;
+			if (sourceTarget && sourceTarget.hasAttribute(DOM_SELECTOR)) {
+				const control = document.querySelector('[' + CONTROL_SELECTOR + '="' + sourceId + '"]');
+				const input = control ? _resolveInput(control) : null;
+				return { target: sourceTarget, input: input };
+			}
+		}
+
 		// 2. Clear button is inside a search control wrapper (when data-ln-search-for is on wrapper)
 		const controlWrap = btn.closest('[' + CONTROL_SELECTOR + ']');
 		if (controlWrap) {
@@ -358,9 +343,6 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		e.preventDefault();
 
 		if (res.input) {
-			const control = res.input.closest('[' + CONTROL_SELECTOR + ']') || res.input;
-			const inst = control[CONTROL_ATTRIBUTE];
-			if (inst) clearTimeout(inst._debounceTimer);
 			res.input.value = '';
 			res.input.focus();
 		}
@@ -377,14 +359,10 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		if (!instance || instance._destroyed) return;
 
 		if (attrName === HASH_ATTR) {
-			if (instance.hashEnabled && instance._onHashChange) {
-				window.removeEventListener('hashchange', instance._onHashChange);
-			}
+			if (instance._onHashChange) window.removeEventListener('hashchange', instance._onHashChange);
 			instance.nsKey = _resolveSearchHashNamespace(el);
 			instance.hashEnabled = !!instance.nsKey;
-			if (instance.hashEnabled) {
-				window.addEventListener('hashchange', instance._onHashChange);
-			}
+			if (instance.hashEnabled) window.addEventListener('hashchange', instance._onHashChange);
 			return;
 		}
 
@@ -401,7 +379,14 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _stateComponent, 'ln-search', {
 		extraAttributes: [HASH_ATTR],
-		onAttributeChange: _syncAttribute
+		onAttributeChange: _syncAttribute,
+		onSubtreeChange: function (el, mut) {
+			const target = mut.target;
+			if (target && target._lnSearchText !== undefined) delete target._lnSearchText;
+			if (target && target.parentElement && target.parentElement._lnSearchText !== undefined) {
+				delete target.parentElement._lnSearchText;
+			}
+		}
 	});
 
 	registerComponent(CONTROL_SELECTOR, CONTROL_ATTRIBUTE, _controlComponent, 'ln-search-control');

@@ -42,6 +42,26 @@ import { registerComponent, dispatch } from '../../ln-core';
 		return this;
 	}
 
+	function _findSearchInput(dom, sourceId) {
+		const sel = sourceId ? '[data-ln-search-for="' + sourceId + '"]' : '[data-ln-search-for]';
+		const host = dom.querySelector(sel) || document.querySelector(sel);
+		if (!host) return null;
+		return (host.tagName === 'INPUT' || host.tagName === 'TEXTAREA')
+			? host
+			: host.querySelector('input, textarea');
+	}
+
+	function _findFilterElements(dom, sourceId) {
+		if (sourceId) {
+			const scoped = dom.querySelectorAll('[data-ln-filter="' + sourceId + '"]');
+			if (scoped.length > 0) return scoped;
+			const global = document.querySelectorAll('[data-ln-filter="' + sourceId + '"]');
+			if (global.length > 0) return global;
+		}
+		const fallbackScoped = dom.querySelectorAll('[data-ln-filter]');
+		return fallbackScoped.length > 0 ? fallbackScoped : document.querySelectorAll('[data-ln-filter]');
+	}
+
 	// ─── Event Binding (host-scoped — own subtree only) ────
 
 	function _bindEvents(self) {
@@ -107,26 +127,22 @@ import { registerComponent, dispatch } from '../../ln-core';
 				const sourceId = table.getAttribute('data-ln-table-source') || table.id;
 				const sourceEl = sourceId ? document.getElementById(sourceId) : null;
 				if (sourceEl && sourceEl.hasAttribute('data-ln-search')) {
+					// State component syncs input controls and emits ln-search:change
 					sourceEl.setAttribute('data-ln-search', '');
-				}
-
-				const searchEl = (sourceId && dom.querySelector('[data-ln-search-for="' + sourceId + '"]'))
-					|| dom.querySelector('[data-ln-search-for]');
-				if (searchEl) {
-					const input = (searchEl.tagName === 'INPUT' || searchEl.tagName === 'TEXTAREA')
-						? searchEl
-						: searchEl.querySelector('input');
+				} else {
+					const input = _findSearchInput(dom, sourceId);
 					if (input && input.value !== '') {
 						input.value = '';
 						input.dispatchEvent(new Event('input', { bubbles: true }));
 					}
 				}
 
-				const filters = (sourceId && dom.querySelectorAll('[data-ln-filter="' + sourceId + '"]'))
-					|| dom.querySelectorAll('[data-ln-filter]');
-				for (let i = 0; i < filters.length; i++) {
-					const resetInput = filters[i].querySelector('[data-ln-filter-reset]');
-					if (resetInput) {
+				const filterEls = _findFilterElements(dom, sourceId);
+				for (let i = 0; i < filterEls.length; i++) {
+					const resetInput = filterEls[i].querySelector('[data-ln-filter-reset]');
+					if (!resetInput) continue;
+					const hasActiveValues = filterEls[i].querySelectorAll('input:not([data-ln-filter-reset]):checked').length > 0;
+					if (!resetInput.checked || hasActiveValues) {
 						resetInput.checked = true;
 						resetInput.dispatchEvent(new Event('change', { bubbles: true }));
 					}

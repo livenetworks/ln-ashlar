@@ -90,8 +90,8 @@ import { registerComponent, dispatch, dispatchCancelable, buildDict, cloneTempla
 		this.deleteUrlPattern = dom.getAttribute(DELETE_ATTR) || '';
 		this.fileFieldName = dom.getAttribute(FILE_FIELD_ATTR) || DEFAULT_FILE_FIELD;
 		this.idsFieldName = dom.getAttribute(IDS_FIELD_ATTR) || DEFAULT_IDS_FIELD;
-		this.maxSize = parseInt(dom.getAttribute(MAX_SIZE_ATTR), 10) || 0;
-		this.maxFiles = parseInt(dom.getAttribute(MAX_FILES_ATTR), 10) || 0;
+		this.maxSize = +dom.getAttribute(MAX_SIZE_ATTR) || 0;
+		this.maxFiles = +dom.getAttribute(MAX_FILES_ATTR) || 0;
 
 		const acceptStr = dom.getAttribute(ACCEPT_ATTR) || (this.input ? this.input.getAttribute('accept') : '');
 		this.allowedExts = _parseAccept(acceptStr);

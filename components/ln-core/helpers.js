@@ -506,6 +506,35 @@ export function getLocale(el) {
 	return raw;
 }
 
+// ─── Shared Locale-Change Broadcaster ─────────────────────
+//
+// One <html lang> observer for the whole page. Installs lazily on first call
+// (first locale-sensitive instance constructed) and at most once — the
+// _localeObserverBound guard survives multiple inlined-core bundles, exactly
+// like _fillBound. On a lang change it fires a single bubbling
+// 'ln-core:locale-change' CustomEvent on document; instances subscribe and
+// re-format only themselves.
+export function ensureLocaleObserver() {
+	if (typeof window === 'undefined') return;
+	window.lnCore = window.lnCore || {};
+	if (window.lnCore._localeObserverBound) return;
+	window.lnCore._localeObserverBound = true;
+
+	guardBody(function () {
+		const observer = new MutationObserver(function () {
+			document.dispatchEvent(new CustomEvent('ln-core:locale-change', {
+				bubbles: true,
+				detail: {}
+			}));
+		});
+		observer.observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ['lang'],
+			subtree: true
+		});
+	}, 'ln-core');
+}
+
 // ─── Raw Value Read ───────────────────────────────────────
 
 /**
@@ -641,6 +670,7 @@ export function queueBoot(fn) {
 export function registerComponent(selector, attribute, ComponentFn, componentTag, options = {}) {
 	const extraAttributes = options.extraAttributes || [];
 	const onAttributeChange = options.onAttributeChange || null;
+	const onSubtreeChange = options.onSubtreeChange || null;
 	const onInit = options.onInit || null;
 
 	function constructor(domRoot) {
@@ -654,6 +684,14 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 			for (let i = 0; i < mutations.length; i++) {
 				const mutation = mutations[i];
 				if (mutation.type === 'childList') {
+					if (onSubtreeChange && mutation.target) {
+						const isComplex = selector.indexOf('[') !== -1 || selector.indexOf('.') !== -1 || selector.indexOf('#') !== -1;
+						const query = isComplex ? selector : '[' + selector + ']';
+						const host = mutation.target.nodeType === 1
+							? (mutation.target.matches(query) ? mutation.target : mutation.target.closest(query))
+							: (mutation.target.parentElement ? mutation.target.parentElement.closest(query) : null);
+						if (host) onSubtreeChange(host, mutation);
+					}
 					for (let j = 0; j < mutation.addedNodes.length; j++) {
 						const node = mutation.addedNodes[j];
 						if (node.nodeType === 1) {
@@ -843,6 +881,7 @@ if (typeof window !== 'undefined') {
 	window.lnCore.fill = fill;
 	window.lnCore.lnFill = lnFill;
 	window.lnCore.renderList = renderList;
+	window.lnCore.ensureLocaleObserver = ensureLocaleObserver;
 }
 
 

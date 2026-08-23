@@ -15,6 +15,12 @@
 				"src/ln-search.js"
 			]
 		},
+		"data-ln-list-source": {
+			"direction": "author",
+			"sources": [
+				"src/ln-search.js"
+			]
+		},
 		"data-ln-search": {
 			"direction": "both",
 			"sources": [
@@ -66,6 +72,12 @@
 			]
 		},
 		"data-ln-search-items": {
+			"direction": "author",
+			"sources": [
+				"src/ln-search.js"
+			]
+		},
+		"data-ln-table-source": {
 			"direction": "author",
 			"sources": [
 				"src/ln-search.js"

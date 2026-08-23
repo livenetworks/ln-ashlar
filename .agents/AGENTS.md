@@ -14,8 +14,10 @@
 - **Queries (Reading State)**: Coordinators MAY read component state properties directly (`el.lnProfile.currentId`).
 - **Component Isolation**: Components NEVER import or reference sibling components. Communication is 100% event-driven via CustomEvents (`{ bubbles: true }`) or attribute bridging by coordinators.
 
-### C. Attribute Bridge Pattern (Single Source of Truth)
-- Prototype methods that change state MUST ONLY call `setAttribute` (e.g. `this.dom.setAttribute('data-ln-toggle', 'open')`).
+### C. Attribute Bridge Pattern & Observable Single Source of Truth
+- **All `data-ln-*` Attributes Are Observable**: Every state attribute is observed via `MutationObserver` registered at the core/component level. The attribute in the DOM is the **Single Source of Truth** at all times.
+- **Instant DOM Attribute Writes**: Prototype methods and input controls MUST write state directly to target DOM attributes via `setAttribute` (e.g. `this.dom.setAttribute('data-ln-toggle', 'open')`, `target.setAttribute('data-ln-search', input.value)`).
+- **Attribute Observer Debouncing**: Debounce timers (e.g., for search throttling) MUST reside in the component's attribute observer (`_syncAttribute`), NOT in the input control event handlers. This ensures input events update the DOM attribute immediately, while `_syncAttribute` handles debouncing the heavy work (events / fetches). Programmatic resets (`setAttribute('data-ln-search', '')`) or `0ms` debounces execute instantly without delay.
 - `MutationObserver` detects attribute changes and triggers internal state synchronization (`_syncAttribute()`).
 - **Forbidden ("Checkbox Hack")**: Using `<input type="checkbox">` for toggle state is strictly forbidden (breaks `MutationObserver`, teleportation, ARIA semantics, and encapsulation).
 

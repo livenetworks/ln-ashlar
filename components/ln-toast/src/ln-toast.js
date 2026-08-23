@@ -33,9 +33,8 @@ import { guardBody, cloneTemplateScoped, fill, registerComponent, dispatch } fro
 
 	function _Component(dom) {
 		this.dom = dom;
-		dom[DOM_ATTRIBUTE] = this;
-		this.timeoutDefault = parseInt(dom.getAttribute("data-ln-toast-timeout") || "6000", 10);
-		this.max = parseInt(dom.getAttribute("data-ln-toast-max") || "5", 10);
+		this.timeoutDefault = +(dom.getAttribute("data-ln-toast-timeout") ?? 6000);
+		this.max = +(dom.getAttribute("data-ln-toast-max") ?? 5);
 
 		const items = Array.from(dom.querySelectorAll("[data-ln-toast-item]"));
 		while (items.length > this.max) dom.removeChild(items.shift());
@@ -175,9 +174,7 @@ import { guardBody, cloneTemplateScoped, fill, registerComponent, dispatch } fro
 		const closeBtn = li.querySelector('[data-ln-toast-close]');
 		if (closeBtn) closeBtn.addEventListener('click', function () { _dismiss(li); });
 
-		const raw = li.getAttribute('data-ln-toast-timeout');
-		const parsed = raw !== null ? parseInt(raw, 10) : NaN;
-		const timeout = Number.isFinite(parsed) ? parsed : cmp.timeoutDefault;
+		const timeout = +(li.getAttribute('data-ln-toast-timeout') ?? cmp.timeoutDefault);
 		if (timeout > 0) li._timer = setTimeout(function () { _dismiss(li); }, timeout);
 	}
 

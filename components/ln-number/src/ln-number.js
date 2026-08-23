@@ -1,4 +1,4 @@
-import { dispatch, getLocale, registerComponent, interceptValueProperty } from '../../ln-core';
+import { dispatch, getLocale, registerComponent, interceptValueProperty, ensureLocaleObserver } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-number';
@@ -46,6 +46,18 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		if (dom[DOM_ATTRIBUTE]) return dom[DOM_ATTRIBUTE];
 		dom[DOM_ATTRIBUTE] = this;
 		this.dom = dom;
+		const self = this;
+
+		// ── Subscribe to global locale changes ──────────────
+		this._onLocaleChange = function () {
+			if (self.isTextElement) {
+				self._formatTextContent();
+			} else if (!isNaN(self.value)) {
+				self._displayFormatted(self.value);
+			}
+		};
+		ensureLocaleObserver();
+		document.addEventListener('ln-core:locale-change', this._onLocaleChange);
 
 		if (dom.tagName !== 'INPUT') {
 			this.isTextElement = true;
@@ -67,7 +79,6 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		this._hidden = hidden;
 
 		// ── Intercept programmatic value sets on hidden input ──
-		const self = this;
 		Object.defineProperty(hidden, 'value', {
 			get: function () {
 				return _inputValueDesc.get.call(hidden);
@@ -387,6 +398,9 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
+		if (this._onLocaleChange) {
+			document.removeEventListener('ln-core:locale-change', this._onLocaleChange);
+		}
 		if (!this.isTextElement) {
 			this.dom.removeEventListener('input', this._onInput);
 			this.dom.removeEventListener('paste', this._onPaste);
@@ -400,24 +414,6 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		dispatch(this.dom, 'ln-number:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
-
-	// ─── Locale Observer ──────────────────────────────────────
-
-	function _localeObserver() {
-		new MutationObserver(function () {
-			const els = document.querySelectorAll('[' + DOM_SELECTOR + ']');
-			for (let i = 0; i < els.length; i++) {
-				const inst = els[i][DOM_ATTRIBUTE];
-				if (inst) {
-					if (inst.isTextElement) {
-						inst._formatTextContent();
-					} else if (!isNaN(inst.value)) {
-						inst._displayFormatted(inst.value);
-					}
-				}
-			}
-		}).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'], subtree: true });
-	}
 
 	// ─── Init ──────────────────────────────────────────────────
 
@@ -439,5 +435,4 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 			}
 		}
 	});
-	_localeObserver();
 })();

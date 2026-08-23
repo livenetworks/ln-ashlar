@@ -1,4 +1,4 @@
-import { dispatch, getLocale, registerComponent, interceptValueProperty, getLocaleFallback, registerLocaleFallback, buildDict } from '../../ln-core';
+import { dispatch, getLocale, registerComponent, interceptValueProperty, getLocaleFallback, registerLocaleFallback, buildDict, ensureLocaleObserver } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-date';
@@ -211,6 +211,19 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, getLoca
 		dom[DOM_ATTRIBUTE] = this;
 
 		this.dom = dom;
+		const self = this;
+
+		// ── Subscribe to global locale changes ──────────────
+		this._onLocaleChange = function () {
+			if (self.isTextElement) {
+				self._formatTextContent();
+			} else if (self.value) {
+				const date = _parseISO(self.value);
+				if (date) self._displayFormatted(date);
+			}
+		};
+		ensureLocaleObserver();
+		document.addEventListener('ln-core:locale-change', this._onLocaleChange);
 
 		if (dom.tagName !== 'INPUT') {
 			this.isTextElement = true;
@@ -219,7 +232,6 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, getLoca
 		}
 
 		this.isTextElement = false;
-		const self = this;
 
 		// ── Read initial state ──────────────────────────────
 		const initialValue = dom.value;
@@ -561,28 +573,12 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, getLoca
 		this.dom.name = this._hidden.name;
 		this.dom.type = 'date';
 		if (isoVal) this.dom.value = isoVal;
+		if (this._onLocaleChange) {
+			document.removeEventListener('ln-core:locale-change', this._onLocaleChange);
+		}
 		dispatch(this.dom, 'ln-date:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
-
-	// ─── Locale Observer ──────────────────────────────────────
-
-	function _localeObserver() {
-		new MutationObserver(function () {
-			const els = document.querySelectorAll('[' + DOM_SELECTOR + ']');
-			for (let i = 0; i < els.length; i++) {
-				const inst = els[i][DOM_ATTRIBUTE];
-				if (inst) {
-					if (inst.isTextElement) {
-						inst._formatTextContent();
-					} else if (inst.value) {
-						const date = _parseISO(inst.value);
-						if (date) inst._displayFormatted(date);
-					}
-				}
-			}
-		}).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'], subtree: true });
-	}
 
 	// ─── Init ─────────────────────────────────────────────────
 
@@ -599,5 +595,4 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, getLoca
 			}
 		}
 	});
-	_localeObserver();
 })();

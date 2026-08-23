@@ -17,18 +17,13 @@ import { dispatch, registerComponent } from '../../ln-core';
 		this.trackCircle = null;
 		this.progressCircle = null;
 		this.labelEl = null;
-		this._attrObserver = null;
 		_buildSvg.call(this);
 		_render.call(this);
-		_listenValues.call(this);
 		return this;
 	}
 
 	_constructor.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
-		if (this._attrObserver) {
-			this._attrObserver.disconnect();
-		}
 		if (this.svg) {
 			this.svg.remove();
 		}
@@ -89,26 +84,6 @@ import { dispatch, registerComponent } from '../../ln-core';
 		this.dom.appendChild(this.labelEl);
 	}
 
-	function _listenValues() {
-		const self = this;
-		const observer = new MutationObserver(function (mutations) {
-			for (const mutation of mutations) {
-				if (mutation.attributeName === 'data-ln-circular-progress' ||
-					mutation.attributeName === 'data-ln-circular-progress-max' ||
-					mutation.attributeName === 'data-ln-circular-progress-label') {
-					_render.call(self);
-				}
-			}
-		});
-
-		observer.observe(this.dom, {
-			attributes: true,
-			attributeFilter: ['data-ln-circular-progress', 'data-ln-circular-progress-max', 'data-ln-circular-progress-label']
-		});
-
-		this._attrObserver = observer;
-	}
-
 	function _render() {
 		const value = parseFloat(this.dom.getAttribute('data-ln-circular-progress')) || 0;
 		const max = parseFloat(this.dom.getAttribute('data-ln-circular-progress-max')) || 100;
@@ -142,5 +117,11 @@ import { dispatch, registerComponent } from '../../ln-core';
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _constructor, 'ln-circular-progress');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _constructor, 'ln-circular-progress', {
+		extraAttributes: ['data-ln-circular-progress-max', 'data-ln-circular-progress-label'],
+		onAttributeChange: function (el) {
+			const inst = el[DOM_ATTRIBUTE];
+			if (inst) _render.call(inst);
+		}
+	});
 })();

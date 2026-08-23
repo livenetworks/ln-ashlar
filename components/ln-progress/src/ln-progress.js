@@ -8,42 +8,19 @@ import { dispatch, registerComponent } from '../../ln-core';
 
 	function _constructor(dom) {
 		this.dom = dom;
-		this._attrObserver = null;
 		this._parentObserver = null;
 		_render.call(this);
-		_listenValues.call(this);
 		_listenParent.call(this);
 		return this;
 	}
 
 	_constructor.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
-		if (this._attrObserver) {
-			this._attrObserver.disconnect();
-		}
 		if (this._parentObserver) {
 			this._parentObserver.disconnect();
 		}
 		delete this.dom[DOM_ATTRIBUTE];
 	};
-
-	function _listenValues() {
-		const self = this;
-		const observer = new MutationObserver(function (mutations) {
-			for (const mutation of mutations) {
-				if (mutation.attributeName === 'data-ln-progress' || mutation.attributeName === 'data-ln-progress-max') {
-					_render.call(self);
-				}
-			}
-		});
-
-		observer.observe(this.dom, {
-			attributes: true,
-			attributeFilter: ['data-ln-progress', 'data-ln-progress-max']
-		});
-
-		this._attrObserver = observer;
-	}
 
 	function _listenParent() {
 		const self = this;
@@ -93,6 +70,13 @@ import { dispatch, registerComponent } from '../../ln-core';
 		DOM_SELECTOR,
 		DOM_ATTRIBUTE,
 		_constructor,
-		'ln-progress'
+		'ln-progress',
+		{
+			extraAttributes: ['data-ln-progress-max'],
+			onAttributeChange: function (el) {
+				const inst = el[DOM_ATTRIBUTE];
+				if (inst) _render.call(inst);
+			}
+		}
 	);
 })();
