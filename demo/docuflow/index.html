@@ -96,14 +96,14 @@
 	<template data-ln-route="/packages" data-ln-route-title="Packages — DocuFlow">
 		<section id="packages-view">
 			<section data-ln-table-coordinator>
-			<section data-ln-table="packages" data-ln-table-source="packages" data-ln-search="" id="packages-table">
+			<section data-ln-table="packages" data-ln-table-source="packages" id="packages-table">
 				<header class="ln-table__toolbar">
 					<div>
 						<h2>Packages</h2>
 					</div>
 					<label class="search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-						<input type="search" placeholder="Search…" data-ln-search-for="packages-table">
+						<input type="search" placeholder="Search…" data-ln-search-for="packages">
 						<button type="button" data-ln-search-clear aria-label="Clear search">
 							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 						</button>
@@ -214,14 +214,14 @@
 	<template data-ln-route="/tenants" data-ln-route-title="Tenants — DocuFlow">
 		<section id="tenants-view">
 			<section data-ln-table-coordinator>
-			<section data-ln-table="tenants" data-ln-table-source="tenants" data-ln-search="" id="tenants-table">
+			<section data-ln-table="tenants" data-ln-table-source="tenants" id="tenants-table">
 				<header class="ln-table__toolbar">
 					<div>
 						<h2>Tenants</h2>
 					</div>
 					<label class="search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-						<input type="search" placeholder="Search…" data-ln-search-for="tenants-table">
+						<input type="search" placeholder="Search…" data-ln-search-for="tenants">
 						<button type="button" data-ln-search-clear aria-label="Clear search">
 							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 						</button>
@@ -332,6 +332,7 @@
 		     data-ln-data-store-stale="-1"
 		     data-ln-data-store-indexes="active"
 		     data-ln-data-store-search-fields="name"
+		     data-ln-search=""
 		     id="packages"></div>
 		<div data-ln-api-connector
 		     data-ln-api-base-url="/demo/docuflow/api"
@@ -344,6 +345,7 @@
 		     data-ln-data-store-stale="-1"
 		     data-ln-data-store-indexes="package_id,auth_method,active"
 		     data-ln-data-store-search-fields="name,slug,custom_domain"
+		     data-ln-search=""
 		     id="tenants"></div>
 		<div data-ln-api-connector
 		     data-ln-api-base-url="/demo/docuflow/api"

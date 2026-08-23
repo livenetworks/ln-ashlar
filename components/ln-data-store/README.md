@@ -29,8 +29,9 @@ It possesses no visual interface and is **completely blind to the network** (no 
 | `data-ln-data-store-stale="N"` | Seconds before cache is considered stale. Set to `never` or `-1` to disable staleness. | `300` |
 | `data-ln-data-store-indexes="…"` | Comma-separated list of IndexedDB index fields. | `""` |
 | `data-ln-data-store-search-fields="…"` | Comma-separated list of text-search fields for local query search matching. | `""` |
-| `data-ln-data-store-window="N"` | Enables windowed residency mode. Size of the LRU position window cache. | *Disabled* |
+| `data-ln-data-store-window="N"` | Enables windowed residency mode. Caps how many records stay resident — both the LRU position index and the records held in IndexedDB. | *Disabled* |
 | `data-ln-data-store-window-page="N"` | Page size of slices requested from the server. | `200` |
+| `data-ln-data-store-no-local-query` | Leave queries to the server: the store stops answering reads from its own records. Read live, so it can be flipped per situation. | *Absent* |
 
 ---
 
@@ -111,7 +112,13 @@ store.setPresenters({
 
 ### 4. Windowed Residency (Virtualization)
 
-When `data-ln-data-store-window` is present, the store operates in windowed residency mode. In this mode, the server is the sole authority on record order (sorting, filtering, and text search are delegated to the server). The store maintains a memory index of logical positions to record IDs (`Map<position, id>`) with a maximum capacity. When a view requests a range of records, the store resolves the IDs from its index and fetches them from IndexedDB. If any page of IDs is missing, it dispatches `ln-data-store:request-page`.
+When `data-ln-data-store-window` is present, the store operates in windowed residency mode. The server is the authority on record order: the store keeps a memory index of logical positions to record IDs (`Map<position, id>`) capped at the window size. A view's range request is resolved through that index and materialised from IndexedDB; a missing page dispatches `ln-data-store:request-page`. Records the index evicts are deleted from IndexedDB too, so the window bounds what is stored, not only what is positioned. Only IDs the index itself placed can be evicted, so a locally created record the server has not positioned is never dropped.
+
+A query change resets the index — positions are query-relative and become meaningless. Until the server's first page for the new query lands, the store answers from the records it already holds and marks the answer **provisional**: rows only, no totals. Counts and scroll geometry hold at whatever the last authoritative answer established, and the server's answer supersedes the provisional one at the next generation. The local pass stops as soon as the requested slice is full, so its cost tracks the viewport rather than the store.
+
+`data-ln-data-store-no-local-query` turns that off: the store reports the window as unresolved and the view waits for the server. Already-positioned rows are still served from cache — those are the server's own answer, only materialised locally.
+
+Windowed residency and coordinator autosync are mutually exclusive in practice: a full sync inserts records the index never positioned, which the window cannot bound.
 
 ---
 

@@ -15,6 +15,12 @@
 				"src/ln-data-store.js"
 			]
 		},
+		"data-ln-data-store-no-local-query": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-store.js"
+			]
+		},
 		"data-ln-data-store-search-fields": {
 			"direction": "author",
 			"sources": [

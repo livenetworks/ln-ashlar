@@ -120,9 +120,31 @@ export function createWindowCache(config) {
 
 		// Splice a fetched page. Stale (superseded-query) responses are dropped.
 		// Out-of-order pages splice at their own offset, so order is irrelevant.
+		// Returns whether the page counted as an answer — the render client keys
+		// its loading affordance off that.
 		ingest: function (detail) {
 			detail = detail || {};
-			if (detail.queryGen != null && detail.queryGen !== queryGen) return;
+			if (detail.queryGen != null && detail.queryGen !== queryGen) return false;
+
+			const offset = detail.offset || 0;
+			const rows = detail.data || [];
+			let resolved = 0;
+			for (let i = 0; i < rows.length; i++) {
+				if (rows[i] != null) resolved++;
+			}
+
+			// A page that resolved nothing is not an answer in two cases. A windowed
+			// store whose position index was just reset answers the next request with
+			// pure nulls and a carried-over filtered count; and a provisional page
+			// states rows only, so an empty one states nothing at all. Letting either
+			// through consumes the swap below and blanks the view — the exact flash
+			// stale-while-revalidate exists to prevent. An authoritative filtered === 0
+			// is a different statement: the source declaring an empty result set, which
+			// must render the empty state.
+			if (resolved === 0 && (detail.provisional || detail.filtered > 0)) {
+				inflight.delete(offset);
+				return false;
+			}
 
 			// First response of a new generation: drop the stale rows now, at the
 			// swap moment, not at invalidate()/revalidate() time — stale-while-revalidate.
@@ -132,13 +154,17 @@ export function createWindowCache(config) {
 				pendingSwap = false;
 			}
 
-			grandTotal = detail.total != null ? detail.total : grandTotal;
-			logicalTotal = detail.filtered != null
-				? detail.filtered
-				: (detail.data ? detail.data.length : logicalTotal);
+			// A provisional page carries rows, not totals. Knowing how many records
+			// match requires looking at every one of them, which is exactly the work
+			// the local answer skips to stay fast — so the counts and the spacer
+			// geometry hold at whatever the last authoritative answer established.
+			if (!detail.provisional) {
+				grandTotal = detail.total != null ? detail.total : grandTotal;
+				logicalTotal = detail.filtered != null
+					? detail.filtered
+					: (detail.data ? detail.data.length : logicalTotal);
+			}
 
-			const offset = detail.offset || 0;
-			const rows = detail.data || [];
 			for (let i = 0; i < rows.length; i++) {
 				// A windowed source sends null for a position it has not resolved
 				// yet. That is absence, not a record — keeping it out of the map is
@@ -150,6 +176,7 @@ export function createWindowCache(config) {
 			inflight.delete(offset);
 			evict();
 			onChange();
+			return true;
 		},
 
 		// First load: fetch page 0 at the current generation (no bump).

@@ -16,13 +16,13 @@
 			]
 		},
 		"data-ln-field": {
-			"direction": "author",
+			"direction": "both",
 			"sources": [
 				"src/ln-list.js"
 			]
 		},
 		"data-ln-item": {
-			"direction": "author",
+			"direction": "both",
 			"sources": [
 				"src/ln-list.js"
 			]

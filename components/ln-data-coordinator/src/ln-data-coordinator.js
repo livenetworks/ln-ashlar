@@ -833,7 +833,10 @@ import { MutationReceipts } from './mutation-receipts';
 					total: r.total,
 					filtered: r.filtered,
 					offset: request.offset !== undefined ? request.offset : r.offset,
-					queryGen: request.queryGen !== undefined ? request.queryGen : r.queryGen
+					queryGen: request.queryGen !== undefined ? request.queryGen : r.queryGen,
+					// The store answered from its own records while the server query
+					// is still out; the view renders it but keeps the refresh showing.
+					provisional: r.provisional === true
 				};
 				dispatch(el, 'ln-' + kind + ':set-data', detail);
 				self._boundDelivered.set(el, true);
@@ -890,7 +893,9 @@ import { MutationReceipts } from './mutation-receipts';
 		const self = this;
 
 		return ready.then(function () {
-			const source = selectDataSource(store, children.connector, false);
+			const hasFilters = filters && Object.keys(filters).length > 0;
+			const requiresRemote = !!(children.connector && store && (((store.windowed || store._windowIndex) && hasFilters) || store.noLocalQuery));
+			const source = requiresRemote ? 'remote' : selectDataSource(store, children.connector, false);
 			if (source === 'remote') {
 				dispatch(children.connectorEl, 'ln-api-connector:request-query', {
 					query: { filters: filters },
@@ -931,9 +936,10 @@ import { MutationReceipts } from './mutation-receipts';
 				kind = 'stat';
 			}
 
-			if (!this._ownsStore(storeName)) continue;
+			if (!self._ownsStore(storeName)) continue;
 
-			const store = this.findChildren().store;
+			const children = self.findChildren();
+			const store = children.store;
 
 			if (kind === 'table' || kind === 'list') {
 				const windowAttr = kind === 'table' ? 'data-ln-table-window' : 'data-ln-list-window';
@@ -947,8 +953,22 @@ import { MutationReceipts } from './mutation-receipts';
 			}
 			if (kind === 'table' || kind === 'list' || kind === 'chart') {
 				const cached = self._boundQueries.get(el) || { sort: null, filters: {}, search: '' };
+				const effective = composeQuery(cached, store.query);
+
+				// Same read policy the view-initiated path applies. Without this the
+				// store-change refresh would query the cache even when the store has
+				// been told to leave queries to the server.
+				if (selectDataSource(store, children.connector) === 'remote') {
+					dispatch(el, 'ln-' + kind + ':set-loading', { loading: true });
+					dispatch(children.connectorEl, 'ln-api-connector:request-query', {
+						query: effective,
+						meta: { targetEl: el, kind: kind, offset: effective.offset, limit: effective.limit }
+					});
+					continue;
+				}
+
 				(function (capturedEl, capturedKind) {
-					store.getAll(composeQuery(cached, store.query)).then(function (r) {
+					store.getAll(effective).then(function (r) {
 						const detail = {
 							data: r.data,
 							total: (syncMeta && syncMeta.total !== undefined) ? syncMeta.total : r.total,

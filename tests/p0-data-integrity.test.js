@@ -54,7 +54,7 @@ async function usingQueueStorage(options, operation) {
 }
 
 test('loaded cache is selected for normal reads', () => {
-	const store = { isLoaded: true };
+	const store = { isLoaded: true, canServe: true };
 	assert.equal(selectDataSource(store, {}), 'store');
 });
 
@@ -71,6 +71,14 @@ test('store initialization failure routes remote when possible', () => {
 	const store = { isLoaded: false, initializationError: new Error('IndexedDB failed') };
 	assert.equal(selectDataSource(store, {}, false), 'remote');
 	assert.equal(selectDataSource(store, null, false), 'none');
+});
+
+test('declinesRead when store has noLocalQuery and not windowed', () => {
+	const unwindowedNoLocal = { canServe: true, noLocalQuery: true, windowed: false };
+	assert.equal(selectDataSource(unwindowedNoLocal, {}), 'remote');
+
+	const windowedNoLocal = { canServe: true, noLocalQuery: true, windowed: true };
+	assert.equal(selectDataSource(windowedNoLocal, {}), 'store');
 });
 
 test('query normalization is detail-null safe', () => {

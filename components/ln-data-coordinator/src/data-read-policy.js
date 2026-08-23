@@ -12,7 +12,12 @@ export function normalizeDataQuery(detail) {
 
 export function selectDataSource(store, connector) {
 	const storeUnavailable = !store || !!store.initializationError;
-	if (connector && (storeUnavailable || !store.isLoaded)) return 'remote';
+	// A store told to leave queries to the server can still serve a windowed read:
+	// those rows are the server's own answer, held by position. Without a window a
+	// local query is the only thing it could do, which is exactly what it was told
+	// not to do — so the read goes remote.
+	const declinesRead = !!(store && store.noLocalQuery && !store.windowed);
+	if (connector && (storeUnavailable || !store.canServe || declinesRead)) return 'remote';
 	if (store && !store.initializationError) return 'store';
 	return 'none';
 }

@@ -138,6 +138,14 @@ import { dispatch, registerComponent } from '../../ln-core';
 			}
 		}
 
+		// Initial value check — if the field already contains a value
+		// upon instantiation, trigger validation immediately to sync DOM state.
+		const hasInitialValue = (dom.value && dom.value.trim() !== '') || dom.checked;
+		if (hasInitialValue) {
+			this._touched = true;
+			this.validate();
+		}
+
 		return this;
 	}
 

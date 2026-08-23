@@ -104,23 +104,25 @@ Opted-in by adding the `data-ln-list-source` attribute pointing to a `data-ln-da
 
 ### Listened Events
 
+* `ln-list:set-search` `{ query }`: Layer 1 command to set list search term.
 * `ln-list:set-data` `{ data, total, filtered }`: Hydrates/renders the items in Data-Driven mode.
 * `ln-list:set-loading` `{ loading: true|false }`: Toggles the loading dimming overlay class (`.ln-list--loading`).
 * `ln-list:page-failed` `{ offset }`: Windowed mode — the coordinator reports the page fetch at `offset` failed.
 * `ln-list:request-revalidate`: Windowed mode — asks the cache to revalidate the currently visible page after a local mutation.
 * `ln-list:request-invalidate`: Windowed mode — invalidates window cache and resets to page 0.
 * `ln-list:request-clear-filters`: Layer 1 command to clear search and active filters.
-* `ln-search:change` `{ term }`: SSR mode — filters in-memory records and updates virtual scroll / DOM.
+* `ln-search:change` `{ term }`: Top-level search change. In Data-Driven mode, triggers query refetch via `_requestData()`. In SSR mode, filters in-memory records and updates DOM.
 * `ln-filter:change` `{ key, values }`: SSR mode — filters in-memory records by field / data attributes.
-* `ln-sort:change` `{ field, direction }`: In Data-Driven mode, triggers cache re-fetch (windowed) or local sort (non-windowed). In SSR mode, sorts in-memory records and updates virtual scroll.
+* `ln-sort:change` `{ field, direction }`: In Data-Driven mode, sets `currentSort` and triggers query refetch via `_requestData()`. In SSR mode, sorts in-memory records and updates virtual scroll.
 
 ### Emitted Events
 
 * `ln-list:request-data` `{ list, sort, filters, search }`: Requests data query from the Coordinator. When windowed, includes `{ offset, limit, queryGen }`.
+* `ln-list:search` `{ list, query }`: Fired in Data-Driven mode when search term updates.
 * `ln-list:ready` `{ total }`: Fired when initial markup parsing completes.
 * `ln-list:rendered` `{ list, total, visible }`: Fired after items have been drawn to DOM.
 * `ln-list:filter` `{ term, matched, total }`: Fired in SSR mode when search/filter narrows visible items.
-* `ln-list:sorted` `{ field, direction, matched, total }`: Fired when items are sorted.
+* `ln-list:sorted` `{ field, direction, matched, total }`: Fired in SSR mode when items are sorted.
 * `ln-list:item-click` `{ list, id, record }`: Fired when clicking item body (excluding buttons, anchors, inputs).
 * `ln-list:item-action` `{ list, id, action, record }`: Fired when clicking `[data-ln-item-action]`.
 * `ln-list:select` `{ list, selectedIds, count }`: Fired when selection updates.

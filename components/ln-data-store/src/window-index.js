@@ -19,10 +19,23 @@ export function createWindowIndex(config = {}) {
 		map.set(i, id);
 	}
 
+	// Returns the ids that left residency, so the store can drop them from
+	// IndexedDB and windowSize bounds the records held, not just the positions.
+	// Only ids this index itself placed can ever be returned — a locally created
+	// record the server has not positioned is never in the map, so eviction can
+	// not reach it.
 	function evict() {
+		if (map.size <= windowSize) return [];
+		const dropped = [];
 		while (map.size > windowSize) {
-			map.delete(map.keys().next().value);
+			const key = map.keys().next().value;
+			dropped.push(map.get(key));
+			map.delete(key);
 		}
+		// One id can occupy more than one position; it has only left residency
+		// once no remaining position refers to it.
+		const remaining = new Set(map.values());
+		return dropped.filter(id => !remaining.has(id));
 	}
 
 	function fire(offset, query) {
@@ -39,6 +52,9 @@ export function createWindowIndex(config = {}) {
 		get queryGen() { return queryGen; },
 		set queryGen(val) { queryGen = val; },
 		get size() { return map.size; },
+		// Whether a server ordering exists for the current query at all — false
+		// from reset() until the first ingest(). Distinct from a missing page.
+		get hasLoaded() { return hasLoaded; },
 
 		getId: i => {
 			if (!map.has(i)) return undefined;
@@ -63,7 +79,7 @@ export function createWindowIndex(config = {}) {
 		},
 
 		ingest: (offset, ids, total, filtered, qGen) => {
-			if (qGen != null && qGen !== queryGen) return;
+			if (qGen != null && qGen !== queryGen) return [];
 			hasLoaded = true;
 			if (total != null) grandTotal = total;
 			if (filtered != null) logicalTotal = filtered;
@@ -72,7 +88,7 @@ export function createWindowIndex(config = {}) {
 				touch(offset + i, ids[i]);
 			}
 			inflight.delete(offset);
-			evict();
+			return evict();
 		},
 
 		reset: function () {

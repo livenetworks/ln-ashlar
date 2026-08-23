@@ -4,6 +4,7 @@ import { createWindowIndex } from './window-index';
 (function () {
 	const DOM_SELECTOR = 'data-ln-data-store';
 	const DOM_ATTRIBUTE = 'lnDataStore';
+	const NO_LOCAL_QUERY_ATTR = 'data-ln-data-store-no-local-query';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -217,6 +218,11 @@ import { createWindowIndex } from './window-index';
 		this._handlers = null;
 
 		this.isLoaded = false;
+		// Two different questions that shared one flag until they were split.
+		// isLoaded: a full sync has landed, so the cache is authoritative and sync
+		// staleness may be judged against it. canServe: records are held that can
+		// answer a read. A page fetch grants the second without granting the first.
+		this.canServe = false;
 		this.isInitialized = false;
 		this.initializationError = null;
 		this.hasCache = false;
@@ -243,6 +249,10 @@ import { createWindowIndex } from './window-index';
 		} else {
 			this._windowIndex = null;
 		}
+		this.windowed = this._windowIndex !== null;
+		// Opt out of answering reads from the cache: queries wait for the server.
+		// Read live so it can be flipped per situation — see onAttributeChange.
+		this.noLocalQuery = dom.hasAttribute(NO_LOCAL_QUERY_ATTR);
 		this.totalCount = 0;
 		this.presenters = null;
 		this._mutationChain = Promise.resolve();
@@ -332,16 +342,22 @@ import { createWindowIndex } from './window-index';
 		return self._mutationChain;
 	}
 
-	function _persistMutationMeta(self) {
+	function _persistMutationMeta(self, deltaCount = 0) {
 		return _countRecords(self._name).then(count => {
-			self.totalCount = count;
+			if (self._windowIndex || self.windowed) {
+				const current = self.totalCount != null ? self.totalCount : count;
+				self.totalCount = Math.max(0, current + deltaCount);
+			} else {
+				self.totalCount = count;
+			}
 			self.hasCache = true;
 			self.isLoaded = true;
+			self.canServe = true;
 			return _setMeta(self._name, {
 				schema_version: SCHEMA_VERSION,
 				last_synced_at: self.lastSyncedAt,
 				has_cache: true,
-				record_count: count
+				record_count: self.totalCount
 			});
 		});
 	}
@@ -351,7 +367,7 @@ import { createWindowIndex } from './window-index';
 	function _handleCreateRequest(self, { tempId, data = {}, requestId } = {}) {
 		const record = { ...data, id: tempId };
 
-		return _putRecord(self._name, record).then(() => _persistMutationMeta(self)).then(() => {
+		return _putRecord(self._name, record).then(() => _persistMutationMeta(self, 1)).then(() => {
 			dispatch(self.dom, 'ln-data-store:created', { store: self._name, record, tempId, requestId });
 		});
 	}
@@ -368,7 +384,7 @@ import { createWindowIndex } from './window-index';
 				? _rekeyRecord(self._name, id, updated)
 				: _putRecord(self._name, updated);
 
-			return write.then(() => _persistMutationMeta(self)).then(() => {
+			return write.then(() => _persistMutationMeta(self, 0)).then(() => {
 				dispatch(self.dom, 'ln-data-store:updated', { store: self._name, record: updated, previous: existing, requestId });
 			});
 		});
@@ -381,7 +397,7 @@ import { createWindowIndex } from './window-index';
 				return;
 			}
 
-			return _deleteRecord(self._name, id).then(() => _persistMutationMeta(self)).then(() => {
+			return _deleteRecord(self._name, id).then(() => _persistMutationMeta(self, -1)).then(() => {
 				dispatch(self.dom, 'ln-data-store:deleted', { store: self._name, id, requestId });
 			});
 		});
@@ -396,7 +412,7 @@ import { createWindowIndex } from './window-index';
 		return Promise.all(ids.map(id => _getRecord(self._name, id))).then(records => {
 			const savedIds = records.filter(Boolean).map(r => r.id);
 
-			return _deleteBulk(self._name, savedIds).then(() => _persistMutationMeta(self)).then(() => {
+			return _deleteBulk(self._name, savedIds).then(() => _persistMutationMeta(self, -savedIds.length)).then(() => {
 				dispatch(self.dom, 'ln-data-store:deleted', { store: self._name, ids: savedIds, requestId });
 			});
 		});
@@ -427,6 +443,7 @@ import { createWindowIndex } from './window-index';
 
 				if (self.hasCache) {
 					self.isLoaded = true;
+					self.canServe = true;
 					dispatch(self.dom, 'ln-data-store:ready', { store: self._name, count: self.totalCount, source: 'cache' });
 				}
 
@@ -448,6 +465,7 @@ import { createWindowIndex } from './window-index';
 		}).catch(error => {
 			self.isInitialized = true;
 			self.isLoaded = false;
+			self.canServe = false;
 			self.hasCache = false;
 			self.isSyncing = false;
 			self.initializationError = error;
@@ -539,25 +557,43 @@ import { createWindowIndex } from './window-index';
 		});
 	}
 
-	function _filter(records, filters) {
-		if (!filters) return records;
-		const keys = Object.keys(filters).filter(k => Array.isArray(filters[k]) && filters[k].length > 0);
-		if (!keys.length) return records;
+	function _filterKeys(filters) {
+		if (!filters) return [];
+		return Object.keys(filters).filter(k => Array.isArray(filters[k]) && filters[k].length > 0);
+	}
 
-		return records.filter(record =>
-			keys.every(field => filters[field].map(String).includes(String(record[field])))
+	function _matchesFilters(record, keys, filters) {
+		return keys.every(field => filters[field].map(String).includes(String(record[field])));
+	}
+
+	function _filter(records, filters) {
+		const keys = _filterKeys(filters);
+		if (!keys.length) return records;
+		return records.filter(record => _matchesFilters(record, keys, filters));
+	}
+
+	// Whitespace splits tokens; every token must appear in at least one field —
+	// AND across tokens, OR across fields. Same rule ln-search applies to DOM text
+	// and the one the term is built for, so a local answer and a server answer
+	// describe the same set. Plain substring only, never a RegExp built from input.
+	function _tokenize(query) {
+		return String(query || '').toLowerCase().split(/\s+/).filter(Boolean);
+	}
+
+	function _matchesTokens(record, tokens, searchFields) {
+		return tokens.every(token =>
+			searchFields.some(field => {
+				const val = record[field];
+				return val != null && String(val).toLowerCase().includes(token);
+			})
 		);
 	}
 
 	function _search(records, query, searchFields) {
 		if (!query || !searchFields || !searchFields.length) return records;
-		const lower = query.toLowerCase();
-		return records.filter(record =>
-			searchFields.some(field => {
-				const val = record[field];
-				return val != null && String(val).toLowerCase().includes(lower);
-			})
-		);
+		const tokens = _tokenize(query);
+		if (!tokens.length) return records;
+		return records.filter(record => _matchesTokens(record, tokens, searchFields));
 	}
 
 	function _aggregate(records, field, fn) {
@@ -591,6 +627,113 @@ import { createWindowIndex } from './window-index';
 
 	// ─── Public CRUD & Sync APIs ───────────────────────────
 
+	// ─── Query vs Paging ───────────────────────────────────
+	//
+	// Two separate concerns, deliberately kept apart. _queryLocal answers "which
+	// records match, in what order" over the records this store actually holds.
+	// _positionalPage answers "which record sits at logical row N" using the
+	// server's ordering held in _windowIndex. A windowed store needs both; it must
+	// not let the second stand in for the first.
+
+	// Walks in primary-key order collecting matches and stops the moment the
+	// requested slice is full, so the cost tracks the viewport instead of the store
+	// (31ms vs 117ms for a 200-row slice out of 10k records).
+	//
+	// Legal only when the cursor's order already IS the output order, otherwise a
+	// match past the cut could belong ahead of one inside it — so an active sort
+	// disqualifies it. An encrypted store disqualifies it too: decryption is async
+	// and an await inside the cursor callback lets the transaction close.
+	//
+	// When a full pass is unavoidable the getAll path is measurably cheaper than a
+	// cursor (117ms vs 232ms over 10k), so that case is not routed here.
+	function _canScanEarly(options) {
+		return !options.sort && !getCryptoKey();
+	}
+
+	function _scanLocal(self, options, need) {
+		const keys = _filterKeys(options.filters);
+		const tokens = options.search ? _tokenize(options.search) : [];
+		const searchFields = self._searchFields;
+		const useSearch = tokens.length > 0 && searchFields && searchFields.length > 0;
+
+		return _tx(self._name, 'readonly').then(store => {
+			if (!store) return [];
+			return new Promise((resolve, reject) => {
+				const found = [];
+				const request = store.openCursor();
+				request.onsuccess = () => {
+					const cursor = request.result;
+					if (!cursor || found.length >= need) {
+						resolve(found);
+						return;
+					}
+					const record = cursor.value;
+					const passes = (!keys.length || _matchesFilters(record, keys, options.filters))
+						&& (!useSearch || _matchesTokens(record, tokens, searchFields));
+					if (passes) found.push(record);
+					cursor.continue();
+				};
+				request.onerror = () => reject(request.error);
+			});
+		});
+	}
+
+	function _queryLocal(self, records, options) {
+		const total = records.length;
+
+		if (options.filters) records = _filter(records, options.filters);
+		if (options.search) records = _search(records, options.search, self._searchFields);
+
+		const filtered = records.length;
+
+		if (options.sort) records = _sort(records, options.sort);
+
+		if (options.offset || options.limit) {
+			const offset = options.offset || 0;
+			const limit = options.limit || records.length;
+			records = records.slice(offset, offset + limit);
+		}
+
+		return { records: records, total: total, filtered: filtered };
+	}
+
+	function _positionalPage(self, offset, limit) {
+		const ids = [];
+		for (let i = offset; i < offset + limit; i++) {
+			const id = self._windowIndex.getId(i);
+			ids.push(id);
+		}
+
+		const uniqueResolvedIds = Array.from(new Set(ids.filter(id => id !== undefined)));
+
+		return _getMultipleRecords(self._name, uniqueResolvedIds).then(records => {
+			const recordMap = new Map();
+			for (let i = 0; i < records.length; i++) {
+				const rec = records[i];
+				if (rec) {
+					recordMap.set(String(rec.id), rec);
+				}
+			}
+			const data = [];
+			for (let i = 0; i < ids.length; i++) {
+				const id = ids[i];
+				if (id === undefined) {
+					data.push(null);
+				} else {
+					const rec = recordMap.get(String(id));
+					data.push(rec || null);
+				}
+			}
+			return {
+				data: _decorate(self, data),
+				total: self._windowIndex.grandTotal,
+				filtered: self._windowIndex.logicalTotal,
+				offset: offset,
+				queryGen: self._windowIndex.queryGen
+			};
+		});
+	}
+
 	_component.prototype.getAll = function (options = {}) {
 		const self = this;
 		if (self._windowIndex) {
@@ -598,62 +741,49 @@ import { createWindowIndex } from './window-index';
 			const limit = options.limit || 200;
 			self._windowIndex.ensure(offset, offset + limit, options);
 
-			const ids = [];
-			for (let i = offset; i < offset + limit; i++) {
-				const id = self._windowIndex.getId(i);
-				ids.push(id);
+			// The index holds no ordering for this query — it was reset the moment
+			// the query changed. Until the server's first page lands the positions
+			// are ours to assign, so the query is answered from the records already
+			// held and flagged provisional; the server's answer supersedes it at the
+			// next generation. Once the index HAS loaded its ordering is authoritative
+			// and a page still missing stays a placeholder — splicing local records
+			// into server positions would put the wrong record on the row.
+			// Told to leave queries to the server: report the window as unresolved and
+			// let the view hold the previous generation until the server answers. The
+			// positional page below stays available either way — those rows are the
+			// server's own answer, only materialised from cache.
+			if (!self._windowIndex.hasLoaded && !self.noLocalQuery) {
+				const need = offset + limit;
+				// Rows only, never totals — see window-cache.ingest. Nothing to show
+				// (empty store, or nothing matched locally) is not an answer either:
+				// the positional page reports the window as unresolved and the view
+				// keeps the previous generation until the server settles it.
+				const provisional = records => records.length
+					? {
+						data: _decorate(self, records),
+						offset: offset,
+						queryGen: self._windowIndex.queryGen,
+						provisional: true
+					}
+					: _positionalPage(self, offset, limit);
+
+				if (_canScanEarly(options)) {
+					return _scanLocal(self, options, need).then(matches =>
+						provisional(matches.slice(offset, need)));
+				}
+				return _getAllRecords(self._name).then(records =>
+					provisional(_queryLocal(self, records, options).records));
 			}
 
-			const uniqueResolvedIds = Array.from(new Set(ids.filter(id => id !== undefined)));
-
-			return _getMultipleRecords(self._name, uniqueResolvedIds).then(records => {
-				const recordMap = new Map();
-				for (let i = 0; i < records.length; i++) {
-					const rec = records[i];
-					if (rec) {
-						recordMap.set(String(rec.id), rec);
-					}
-				}
-				const data = [];
-				for (let i = 0; i < ids.length; i++) {
-					const id = ids[i];
-					if (id === undefined) {
-						data.push(null);
-					} else {
-						const rec = recordMap.get(String(id));
-						data.push(rec || null);
-					}
-				}
-				return {
-					data: _decorate(self, data),
-					total: self._windowIndex.grandTotal,
-					filtered: self._windowIndex.logicalTotal,
-					offset: offset,
-					queryGen: self._windowIndex.queryGen
-				};
-			});
+			return _positionalPage(self, offset, limit);
 		}
 
 		return _getAllRecords(self._name).then(records => {
-			const total = records.length;
-
-			if (options.filters) records = _filter(records, options.filters);
-			if (options.search) records = _search(records, options.search, self._searchFields);
-
-			const filtered = records.length;
-
-			if (options.sort) records = _sort(records, options.sort);
-
-			if (options.offset || options.limit) {
-				const offset = options.offset || 0;
-				const limit = options.limit || records.length;
-				records = records.slice(offset, offset + limit);
-			}
-
+			const r = _queryLocal(self, records, options);
 			return {
-				data: _decorate(self, records),
-				total,
-				filtered
+				data: _decorate(self, r.records),
+				total: r.total,
+				filtered: r.filtered
 			};
 		});
 	};
@@ -663,9 +793,12 @@ import { createWindowIndex } from './window-index';
 	};
 
 	_component.prototype.count = function (filters) {
-		return filters
-			? _getAllRecords(this._name).then(records => _filter(records, filters).length)
-			: _countRecords(this._name);
+		const hasFilters = filters && Object.keys(filters).length > 0;
+		if (!hasFilters) {
+			if (this.totalCount != null) return Promise.resolve(this.totalCount);
+			return _countRecords(this._name);
+		}
+		return _getAllRecords(this._name).then(records => _filter(records, filters).length);
 	};
 
 	_component.prototype.aggregate = function (field, fn) {
@@ -695,7 +828,9 @@ import { createWindowIndex } from './window-index';
 			if (self._windowIndex && (meta.offset != null || meta.total != null)) {
 				const offset = meta.offset != null ? meta.offset : 0;
 				const ids = upsertedRecords.map(r => r.id);
-				self._windowIndex.ingest(offset, ids, meta.total, meta.filtered, meta.queryGen);
+				// Residency is the index: what the window pushed out stops being held.
+				const evicted = self._windowIndex.ingest(offset, ids, meta.total, meta.filtered, meta.queryGen);
+				if (evicted && evicted.length) return _deleteBulk(self._name, evicted);
 			}
 		}).then(() => _countRecords(self._name)).then(count => {
 			self.totalCount = meta.total !== undefined ? meta.total : count;
@@ -709,6 +844,7 @@ import { createWindowIndex } from './window-index';
 		}).then(() => {
 			const isInitialLoad = !self.isLoaded;
 			self.isLoaded = true;
+			self.canServe = true;
 			self.isSyncing = false;
 			self.lastSyncedAt = syncedAt;
 
@@ -741,8 +877,10 @@ import { createWindowIndex } from './window-index';
 
 		return chain.then(() => _countRecords(self._name)).then(count => {
 			self.totalCount = meta.total !== undefined ? meta.total : count;
-			// record_count/has_cache stay untouched — a page fetch is not an
+			// record_count/has_cache/isLoaded stay untouched — a page fetch is not an
 			// authoritative cache; it would corrupt _isStale/storeInitialized sync gating.
+			// It does leave records behind, so the store can serve reads from here on.
+			if (upsertedRecords.length > 0) self.canServe = true;
 			return _decorate(self, upsertedRecords);
 		}).catch(err => {
 			console.error('[ln-data-store] applyQuery failed:', err);
@@ -777,6 +915,7 @@ import { createWindowIndex } from './window-index';
 		if (this._windowIndex) {
 			this._windowIndex.clear();
 			this._windowIndex = null;
+			this.windowed = false;
 		}
 		if (this._handlers) {
 			for (const [event, fn] of Object.entries(this._handlers)) {
@@ -812,6 +951,7 @@ import { createWindowIndex } from './window-index';
 		}).then(() => {
 			Object.values(_stores).forEach(inst => {
 				inst.isLoaded = false;
+				inst.canServe = false;
 				inst.isInitialized = false;
 				inst.initializationError = null;
 				inst.hasCache = false;
@@ -838,7 +978,19 @@ import { createWindowIndex } from './window-index';
 
 	// ─── Registration ──────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-data-store');
+	// The opt-out is policy for the next read, so a flip needs no invalidation —
+	// nothing already delivered becomes wrong, the following query just resolves
+	// under the new rule.
+	function _syncAttribute(el, attrName) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance || attrName !== NO_LOCAL_QUERY_ATTR) return;
+		instance.noLocalQuery = el.hasAttribute(NO_LOCAL_QUERY_ATTR);
+	}
+
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-data-store', {
+		extraAttributes: [NO_LOCAL_QUERY_ATTR],
+		onAttributeChange: _syncAttribute
+	});
 
 	window[DOM_ATTRIBUTE].clearAll = _clearAll;
 	window[DOM_ATTRIBUTE].init = window[DOM_ATTRIBUTE];

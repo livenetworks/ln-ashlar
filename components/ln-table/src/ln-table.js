@@ -180,8 +180,11 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				}
 
 				if (self._windowed) {
-					dom.classList.remove('ln-table--loading');
-					self._cache.ingest(detail);
+					// Only an accepted, authoritative page ends the refresh. A declined
+					// one means the source has not resolved the new query yet; a
+					// provisional one is the store's own answer, rendered while the
+					// server query is still out.
+					if (self._cache.ingest(detail) && !detail.provisional) dom.classList.remove('ln-table--loading');
 					return;
 				}
 
