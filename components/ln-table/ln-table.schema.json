@@ -95,7 +95,7 @@
 			]
 		},
 		"data-ln-table-row": {
-			"direction": "author",
+			"direction": "both",
 			"sources": [
 				"src/ln-table.js"
 			]
@@ -113,7 +113,7 @@
 			]
 		},
 		"data-ln-table-row-select": {
-			"direction": "author",
+			"direction": "both",
 			"sources": [
 				"src/ln-table.js"
 			]

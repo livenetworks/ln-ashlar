@@ -902,13 +902,47 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	};
 
 	_component.prototype._buildRow = function (record) {
-		const clone = cloneTemplateScoped(this.dom, this.name + '-row', 'ln-table');
-		if (!clone) return null;
+		let clone = cloneTemplateScoped(this.dom, this.name + '-row', 'ln-table');
+		if (!clone) {
+			const genericTpl = this.dom.querySelector('template[data-ln-table-row]');
+			if (genericTpl) {
+				clone = document.importNode(genericTpl.content, true);
+			}
+		}
 
-		const tr = clone.querySelector('[data-ln-table-row]') || clone.firstElementChild;
-		if (!tr) return null;
+		let tr = clone ? (clone.querySelector('[data-ln-table-row]') || clone.firstElementChild) : null;
 
-		this._fillRow(tr, record);
+		if (!tr) {
+			if (record && record.html) {
+				const temp = document.createElement('tbody');
+				temp.innerHTML = record.html;
+				tr = temp.firstElementChild;
+			} else {
+				tr = document.createElement('tr');
+				tr.setAttribute('data-ln-table-row', '');
+				const ths = this.ths;
+
+				for (let j = 0; j < ths.length; j++) {
+					const isSelectCol = ths[j].hasAttribute('data-ln-table-col-select');
+					const td = document.createElement('td');
+
+					if (isSelectCol) {
+						const cb = document.createElement('input');
+						cb.type = 'checkbox';
+						cb.setAttribute('data-ln-table-row-select', '');
+						td.appendChild(cb);
+					} else {
+						const colName = ths[j].getAttribute('data-ln-table-col');
+						if (colName && record[colName] != null) {
+							td.textContent = String(record[colName]);
+						}
+					}
+					tr.appendChild(td);
+				}
+			}
+		} else {
+			this._fillRow(tr, record);
+		}
 
 		tr._lnRecord = record;
 		if (record.id != null) {
