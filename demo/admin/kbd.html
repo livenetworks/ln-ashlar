@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Kbd — ln-ashlar</title>
+	<title>ln-key — Keyboard Shortcuts Demo — ln-ashlar</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -71,7 +71,7 @@
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
 				</button>
-				<h1>Kbd</h1>
+				<h1>ln-key (Keyboard Shortcuts)</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
@@ -206,126 +206,370 @@
 		<!-- Content -->
 		<section>
 			<div class="app-content-wrapper">
-<h1>Kbd</h1>
-				<p>Keycap styling for inline keyboard shortcut documentation. Applied globally to all <code>&lt;kbd&gt;</code> elements via <code>scss/base/_typography.scss</code>. No attribute needed.</p>
+<h1>ln-key (Keyboard Shortcuts)</h1>
+<p>Declaratively binds keyboard shortcuts to native click or focus behavior on target DOM elements. Supports modifier combinations (<code>Ctrl</code>, <code>Alt</code>, <code>Shift</code>, <code>Meta</code>), target redirection, input protection, and declarative shortcut mapping via <code>data-ln-key-for</code>.</p>
 
-				<!-- Basic shortcuts -->
-				<section class="section-card" data-demo-html>
-					<header><h3>Basic Shortcuts</h3></header>
-					<main>
-						<p>Press <kbd>Ctrl</kbd> + <kbd>K</kbd> to open the command palette.</p>
-						<p>Save the document with <kbd>Ctrl</kbd>+<kbd>S</kbd>.</p>
-						<p>Undo the last action with <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</p>
-					</main>
-					<script type="text/plain" data-demo-scss>
-					// Applied globally in ln-ashlar
-					kbd {
-						@include kbd;
-					}
-					</script>
-				</section>
+<!-- Live Event Logger & Status -->
+<section class="section-card">
+	<header>
+		<h3>Live Shortcut Event Monitor</h3>
+	</header>
+	<main>
+		<p>Press any shortcut key on this page (e.g. <kbd>Ctrl</kbd>+<kbd>K</kbd>, <kbd>Ctrl</kbd>+<kbd>S</kbd>, <kbd>Alt</kbd>+<kbd>N</kbd>, <kbd>Escape</kbd>) to test the live listeners and view dispatched custom events.</p>
+		
+		<div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+			<div style="flex: 1; padding: 0.75rem 1rem; background: var(--ln-color-bg-subtle, #f8fafc); border: 1px solid var(--ln-color-border, #e2e8f0); border-radius: var(--ln-radius-md, 6px); font-family: var(--ln-font-mono, monospace); font-size: 0.875rem;">
+				<strong>Last Triggered:</strong> <span id="key-log-status" style="color: var(--ln-color-primary, #0284c7);">Waiting for keyboard interaction...</span>
+			</div>
+			<button type="button" class="btn btn-secondary btn-sm" id="btn-clear-log">Clear Log</button>
+		</div>
 
-				<!-- Modifier keys -->
-				<section class="section-card" data-demo-html>
-					<header><h3>Modifier Keys</h3></header>
-					<main>
-						<p>Mac: <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd></p>
-						<p>Windows/Linux: <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd></p>
-						<p>Open terminal: <kbd>Ctrl</kbd> + <kbd>`</kbd></p>
-						<p>Force quit: <kbd>Cmd</kbd> + <kbd>Option</kbd> + <kbd>Esc</kbd></p>
-					</main>
-					<script type="text/plain" data-demo-scss>
-					kbd {
-						@include kbd;
-					}
-					</script>
-				</section>
+		<div class="table-container" style="max-height: 200px; overflow-y: auto;">
+			<table style="width: 100%; font-size: 0.875rem;">
+				<thead>
+					<tr>
+						<th>Time</th>
+						<th>Key Combo</th>
+						<th>Action</th>
+						<th>Target Element</th>
+						<th>Source Element</th>
+					</tr>
+				</thead>
+				<tbody id="key-log-tbody">
+					<tr>
+						<td colspan="5" style="text-align: center; color: var(--ln-color-text-muted, #64748b);">No shortcut events recorded yet. Try pressing <kbd>Ctrl</kbd>+<kbd>S</kbd> or <kbd>Ctrl</kbd>+<kbd>K</kbd>.</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</main>
+</section>
 
-				<!-- Single keys -->
-				<section class="section-card" data-demo-html>
-					<header><h3>Single Keys</h3></header>
-					<main>
-						<p>Navigate: <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd></p>
-						<p>Confirm: <kbd>Enter</kbd></p>
-						<p>Cancel: <kbd>Esc</kbd></p>
-						<p>Arrow keys: <kbd>&uarr;</kbd> <kbd>&darr;</kbd> <kbd>&larr;</kbd> <kbd>&rarr;</kbd></p>
-						<p>Function keys: <kbd>F1</kbd> <kbd>F5</kbd> <kbd>F12</kbd></p>
-					</main>
-					<script type="text/plain" data-demo-scss>
-					kbd {
-						@include kbd;
-					}
-					</script>
-				</section>
+<!-- Basic Direct Hotkeys -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>1. Direct Action Hotkeys (<code>data-ln-key</code>)</h3>
+	</header>
+	<main>
+		<p>Attaching <code>data-ln-key</code> directly to buttons or links triggers their native <code>click()</code> when the specified key combination is pressed.</p>
+		
+		<div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-top: 1rem;">
+			<button type="button" class="btn btn-primary" id="btn-save-draft" data-ln-key="Ctrl+S, Meta+S">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-device-floppy"></use></svg>
+				Save Draft (<kbd>Ctrl</kbd>+<kbd>S</kbd>)
+			</button>
 
-				<!-- In a shortcut table -->
-				<section class="section-card" data-demo-html>
-					<header><h3>Shortcuts Reference Table</h3></header>
-					<main>
-						<div class="table-container">
-						<table>
-							<thead>
-								<tr>
-									<th>Action</th>
-									<th>Shortcut</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td data-label="Action">Command palette</td>
-									<td data-label="Shortcut"><kbd>Ctrl</kbd>+<kbd>K</kbd></td>
-								</tr>
-								<tr>
-									<td data-label="Action">Save</td>
-									<td data-label="Shortcut"><kbd>Ctrl</kbd>+<kbd>S</kbd></td>
-								</tr>
-								<tr>
-									<td data-label="Action">Undo</td>
-									<td data-label="Shortcut"><kbd>Ctrl</kbd>+<kbd>Z</kbd></td>
-								</tr>
-								<tr>
-									<td>Redo</td>
-									<td><kbd>Ctrl</kbd>+<kbd>Y</kbd></td>
-								</tr>
-								<tr>
-									<td>Find</td>
-									<td><kbd>Ctrl</kbd>+<kbd>F</kbd></td>
-								</tr>
-								<tr>
-									<td>Bold</td>
-									<td><kbd>Ctrl</kbd>+<kbd>B</kbd></td>
-								</tr>
-								<tr>
-									<td>Italic</td>
-									<td><kbd>Ctrl</kbd>+<kbd>I</kbd></td>
-								</tr>
-							</tbody>
-						</table>
-						</div>
-					</main>
-					<script type="text/plain" data-demo-scss>
-					kbd {
-						@include kbd;
-					}
-					</script>
-				</section>
+			<button type="button" class="btn btn-success" id="btn-publish-post" data-ln-key="Alt+P">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-send"></use></svg>
+				Publish (<kbd>Alt</kbd>+<kbd>P</kbd>)
+			</button>
 
-				<!-- In prose context -->
-				<section class="section-card" data-demo-html>
-					<header><h3>Kbd inside Prose</h3></header>
-					<main>
-						<article class="prose">
-							<h2>Keyboard shortcuts</h2>
-							<p>You can use keyboard shortcuts throughout the application. Press <kbd>Ctrl</kbd>+<kbd>K</kbd> to open the command palette, or <kbd>?</kbd> to see a full list of available shortcuts.</p>
-							<p>When editing a document, <kbd>Ctrl</kbd>+<kbd>S</kbd> saves your draft, and <kbd>Ctrl</kbd>+<kbd>Z</kbd> undoes the last change.</p>
-						</article>
-					</main>
-					<script type="text/plain" data-demo-scss>
-					kbd {
-						@include kbd;
-					}
-					</script>
-				</section>
+			<button type="button" class="btn btn-secondary" id="btn-new-item" data-ln-key="Alt+N">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
+				New Item (<kbd>Alt</kbd>+<kbd>N</kbd>)
+			</button>
+
+			<button type="button" class="btn btn-outline" id="btn-cancel-action" data-ln-key="Escape">
+				Cancel (<kbd>Esc</kbd>)
+			</button>
+		</div>
+	</main>
+	<script type="text/plain" data-demo-scss>
+	/* Direct shortcut declaration */
+	button[data-ln-key] {
+		/* Accessible native button activation */
+	}
+	</script>
+</section>
+
+<!-- Target Focus Redirection -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>2. Target Focus & Input Redirection (<code>data-ln-key-target</code>)</h3>
+	</header>
+	<main>
+		<p>Use <code>data-ln-key-target="#id"</code> to route a shortcut to another DOM element (e.g. focusing a search bar or filter dropdown).</p>
+		
+		<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 1rem;">
+			<div>
+				<label for="demo-search-input" style="font-weight: 600; display: block; margin-bottom: 0.375rem;">
+					Global Search Input:
+				</label>
+				<div style="display: flex; gap: 0.5rem;">
+					<input type="search" id="demo-search-input" class="form-control" placeholder="Search items or commands...">
+					<button type="button" class="btn btn-secondary" data-ln-key="Ctrl+K, Meta+K" data-ln-key-target="#demo-search-input">
+						<kbd>Ctrl</kbd>+<kbd>K</kbd>
+					</button>
+				</div>
+				<small style="color: var(--ln-color-text-muted, #64748b); display: block; margin-top: 0.25rem;">
+					Pressing <kbd>Ctrl</kbd>+<kbd>K</kbd> automatically focuses this input box.
+				</small>
+			</div>
+
+			<div>
+				<label for="demo-filter-select" style="font-weight: 600; display: block; margin-bottom: 0.375rem;">
+					Status Filter Dropdown:
+				</label>
+				<div style="display: flex; gap: 0.5rem;">
+					<select id="demo-filter-select" class="form-select" data-ln-key="Alt+F">
+						<option value="all">All Statuses</option>
+						<option value="active">Active Only</option>
+						<option value="archived">Archived</option>
+					</select>
+					<button type="button" class="btn btn-outline" data-ln-key-target="#demo-filter-select" data-ln-key="Alt+F">
+						Focus (<kbd>Alt</kbd>+<kbd>F</kbd>)
+					</button>
+				</div>
+			</div>
+		</div>
+	</main>
+</section>
+
+<!-- Declarative Shortcut Map & ln-key-for -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>3. Declarative Shortcut Map (<code>data-ln-key-map</code> &amp; <code>data-ln-key-for</code>)</h3>
+	</header>
+	<main>
+		<p>Combine a container's <code>data-ln-key-map="Ctrl+Shift"</code> modifier context with individual <code>&lt;kbd data-ln-key-for="#target"&gt;Key&lt;/kbd&gt;</code> elements to generate composed shortcuts automatically without duplicate attribute boilerplate.</p>
+
+		<div data-ln-key-map="Ctrl+Shift" style="padding: 1.25rem; background: var(--ln-color-bg-subtle, #f8fafc); border: 1px solid var(--ln-color-border, #e2e8f0); border-radius: var(--ln-radius-md, 6px); margin-top: 1rem;">
+			<h4 style="margin-top: 0; margin-bottom: 0.75rem; font-size: 0.95rem;">Bulk Export Menu (Parent Modifier: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>)</h4>
+			
+			<div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+				<button type="button" class="btn btn-secondary" id="btn-export-csv">
+					Export CSV (<kbd data-ln-key-for="#btn-export-csv">C</kbd>)
+				</button>
+
+				<button type="button" class="btn btn-secondary" id="btn-export-pdf">
+					Export PDF (<kbd data-ln-key-for="#btn-export-pdf">P</kbd>)
+				</button>
+
+				<button type="button" class="btn btn-secondary" id="btn-export-json">
+					Export JSON (<kbd data-ln-key-for="#btn-export-json">J</kbd>)
+				</button>
+			</div>
+			<small style="color: var(--ln-color-text-muted, #64748b); display: block; margin-top: 0.75rem;">
+				Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd>, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>, or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>J</kbd> to trigger these actions.
+			</small>
+		</div>
+	</main>
+</section>
+
+<!-- Editable Protection & allow-input -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>4. Input Protection &amp; Input Override (<code>data-ln-key-allow-input</code>)</h3>
+	</header>
+	<main>
+		<p>By default, <code>ln-key</code> ignores single-character hotkeys when the user is typing inside text inputs, textareas, or contenteditables. Use <code>data-ln-key-allow-input</code> to explicitly permit submission shortcuts (like <kbd>Ctrl</kbd>+<kbd>Enter</kbd>).</p>
+
+		<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; margin-top: 1rem;">
+			<div style="padding: 1rem; border: 1px solid var(--ln-color-border, #e2e8f0); border-radius: var(--ln-radius-md, 6px);">
+				<h4 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 0.95rem;">Standard Input (Protected)</h4>
+				<p style="font-size: 0.85rem; color: var(--ln-color-text-muted, #64748b); margin-bottom: 0.75rem;">
+					Pressing hotkeys like <kbd>Alt</kbd>+<kbd>N</kbd> or <kbd>Esc</kbd> while typing in this box will NOT fire background actions.
+				</p>
+				<input type="text" class="form-control" placeholder="Type here to test hotkey isolation...">
+			</div>
+
+			<div style="padding: 1rem; border: 1px solid var(--ln-color-border, #e2e8f0); border-radius: var(--ln-radius-md, 6px);">
+				<h4 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 0.95rem;">Form Comment Textarea (Override)</h4>
+				<p style="font-size: 0.85rem; color: var(--ln-color-text-muted, #64748b); margin-bottom: 0.75rem;">
+					Pressing <kbd>Ctrl</kbd>+<kbd>Enter</kbd> inside this comment box submits the form directly.
+				</p>
+				<textarea id="demo-comment-box" class="form-control" rows="2" placeholder="Enter feedback comment..."></textarea>
+				<div style="margin-top: 0.5rem; text-align: right;">
+					<button type="button" class="btn btn-primary btn-sm" id="btn-submit-comment" data-ln-key="Ctrl+Enter, Meta+Enter" data-ln-key-allow-input data-ln-key-target="#btn-submit-comment">
+						Submit Comment (<kbd>Ctrl</kbd>+<kbd>Enter</kbd>)
+					</button>
+				</div>
+			</div>
+		</div>
+	</main>
+</section>
+
+<!-- Keycap Styling & Reference -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>5. Keycap Typography &amp; UI Styling Reference</h3>
+	</header>
+	<main>
+		<p>All <code>&lt;kbd&gt;</code> elements are automatically styled via <code>theme/base/_typography.scss</code> to give a clean, elevated keycap appearance across light and dark themes.</p>
+
+		<div class="table-container" style="margin-top: 1rem;">
+			<table style="width: 100%;">
+				<thead>
+					<tr>
+						<th>Action Description</th>
+						<th>Shortcut Combination</th>
+						<th>Scope / Context</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Save Draft</td>
+						<td><kbd>Ctrl</kbd>+<kbd>S</kbd> / <kbd>Cmd</kbd>+<kbd>S</kbd></td>
+						<td>Global Form</td>
+					</tr>
+					<tr>
+						<td>Publish Content</td>
+						<td><kbd>Alt</kbd>+<kbd>P</kbd></td>
+						<td>Editor Toolbar</td>
+					</tr>
+					<tr>
+						<td>Focus Search</td>
+						<td><kbd>Ctrl</kbd>+<kbd>K</kbd></td>
+						<td>Header Navigation</td>
+					</tr>
+					<tr>
+						<td>Export Package</td>
+						<td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></td>
+						<td>Bulk Operations Menu</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</main>
+</section>
+
+<!-- Interactive Script for Event Logging and Toast Notifications -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+	const logStatus = document.getElementById('key-log-status');
+	const logTbody = document.getElementById('key-log-tbody');
+	const btnClear = document.getElementById('btn-clear-log');
+	let isFirstLog = true;
+
+	function showToast(title, message, type) {
+		document.dispatchEvent(new CustomEvent('ln-toast:show', {
+			detail: { title: title, message: message, type: type || 'info' },
+			bubbles: true
+		}));
+	}
+
+	function formatElement(el) {
+		if (!el) return '<em>none</em>';
+		const tag = el.tagName.toLowerCase();
+		const id = el.id ? '#' + el.id : '';
+		const text = el.textContent.trim().slice(0, 20);
+		return `<code>&lt;${tag}${id}&gt;</code> (${text})`;
+	}
+
+	// Listen to ln-key:trigger events globally
+	document.addEventListener('ln-key:trigger', function (e) {
+		const detail = e.detail || {};
+		const key = detail.key || 'Unknown';
+		const action = detail.action || 'trigger';
+		const target = detail.target;
+		const source = detail.source;
+		const timestamp = new Date().toLocaleTimeString();
+
+		// Update status bar
+		if (logStatus) {
+			logStatus.innerHTML = `<strong>${key}</strong> &rarr; <code>${action}()</code> on ${formatElement(target)}`;
+		}
+
+		// Append row to table
+		if (logTbody) {
+			if (isFirstLog) {
+				logTbody.innerHTML = '';
+				isFirstLog = false;
+			}
+
+			const tr = document.createElement('tr');
+			tr.innerHTML = `
+				<td><time style="color: var(--ln-color-text-muted, #64748b);">${timestamp}</time></td>
+				<td><kbd>${key}</kbd></td>
+				<td><span class="status-badge" data-status="active">${action}()</span></td>
+				<td>${formatElement(target)}</td>
+				<td>${formatElement(source)}</td>
+			`;
+			logTbody.insertBefore(tr, logTbody.firstChild);
+		}
+
+		// Show toast
+		const targetName = target ? (target.id ? '#' + target.id : target.tagName.toLowerCase()) : 'target';
+		showToast('Shortcut Triggered: ' + key, `Executed ${action}() on ${targetName}`, 'success');
+	});
+
+	// Direct button click handlers for feedback when clicked manually
+	const saveBtn = document.getElementById('btn-save-draft');
+	if (saveBtn) {
+		saveBtn.addEventListener('click', function () {
+			showToast('Draft Saved', 'Your document draft was saved.', 'info');
+		});
+	}
+
+	const publishBtn = document.getElementById('btn-publish-post');
+	if (publishBtn) {
+		publishBtn.addEventListener('click', function () {
+			showToast('Post Published', 'Your post was successfully published.', 'success');
+		});
+	}
+
+	const newItemBtn = document.getElementById('btn-new-item');
+	if (newItemBtn) {
+		newItemBtn.addEventListener('click', function () {
+			showToast('New Item', 'New item dialog opened.', 'info');
+		});
+	}
+
+	const cancelBtn = document.getElementById('btn-cancel-action');
+	if (cancelBtn) {
+		cancelBtn.addEventListener('click', function () {
+			showToast('Cancelled', 'Action cancelled.', 'warn');
+		});
+	}
+
+	const exportCsvBtn = document.getElementById('btn-export-csv');
+	if (exportCsvBtn) {
+		exportCsvBtn.addEventListener('click', function () {
+			showToast('Export CSV', 'Exporting data as CSV...', 'info');
+		});
+	}
+
+	const exportPdfBtn = document.getElementById('btn-export-pdf');
+	if (exportPdfBtn) {
+		exportPdfBtn.addEventListener('click', function () {
+			showToast('Export PDF', 'Generating PDF export...', 'info');
+		});
+	}
+
+	const exportJsonBtn = document.getElementById('btn-export-json');
+	if (exportJsonBtn) {
+		exportJsonBtn.addEventListener('click', function () {
+			showToast('Export JSON', 'Downloading JSON payload...', 'info');
+		});
+	}
+
+	const submitCommentBtn = document.getElementById('btn-submit-comment');
+	if (submitCommentBtn) {
+		submitCommentBtn.addEventListener('click', function () {
+			const commentBox = document.getElementById('demo-comment-box');
+			const val = commentBox ? commentBox.value.trim() : '';
+			if (!val) {
+				showToast('Validation Warning', 'Please type a comment before submitting.', 'warn');
+			} else {
+				showToast('Comment Submitted', 'Comment: "' + val + '"', 'success');
+				if (commentBox) commentBox.value = '';
+			}
+		});
+	}
+
+	if (btnClear) {
+		btnClear.addEventListener('click', function () {
+			if (logTbody) {
+				logTbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--ln-color-text-muted, #64748b);">Log cleared. Press a hotkey to record events.</td></tr>';
+				isFirstLog = true;
+			}
+			if (logStatus) {
+				logStatus.textContent = 'Waiting for keyboard interaction...';
+			}
+		});
+	}
+});
+</script>
 			</div>
 		</section>
 
