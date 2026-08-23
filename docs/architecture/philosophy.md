@@ -1,6 +1,6 @@
 # Philosophy and Architectural Principles Behind `ln-ashlar`
 
-This document elaborates on the philosophical and technical background behind the development of `ln-ashlar`. It explains why we chose a **DOM-First Application Architecture** (supporting both Server-Rendered HTML and Client-Side Single-Page Applications), analyzing historical computing cycles, performance, the security risks of mainstream frameworks, and the long-term sustainability of web applications.
+This document elaborates on the philosophical and technical background behind the development of `ln-ashlar`. It explains why we chose a **DOM-First Application Architecture** (supporting both Server-Rendered HTML and Client-Side Single-Page Applications), analyzing performance, execution models, the security risks of mainstream frameworks, and the long-term sustainability of web applications.
 
 ---
 
@@ -27,29 +27,11 @@ This document elaborates on the philosophical and technical background behind th
 
 ---
 
-## 2. Historical Computing Cycles & The SPA Misconception
-
-The computer industry periodically shifts processing responsibility between the central server and the end client:
-
-```
-┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
-│ 1. Centralized  │       │ 2. Distributed  │       │ 3. Centralized  │
-│   (Mainframe)   ├──────►│   (Fat Client)  ├──────►│   (Early Web)   │
-│ Server-Terminal │       │  Local Desktop  │       │ Server-side HTML│
-└─────────────────┘       └─────────────────┘       └───────┬─────────┘
-                                                            │
-┌─────────────────┐       ┌─────────────────┐               │
-│ 5. DOM-First    │       │   4. Client JS  │               │
-│   Dual-Core     │◄──────┤    (Heavy SPA)  │◄──────────────┘
-│  (ln-ashlar)    │       │  React/Vue/Ang  │
-└─────────────────┘       └─────────────────┘
-```
+## 2. React SPA vs. Ashlar SPA Execution Models
 
 > [!IMPORTANT]
 > **Misconception:** *"DOM-First means returning to 1990s server-rendered web pages and rejecting SPAs."*  
 > **Reality:** `ln-ashlar` is a **Dual-Core Architecture**. It natively supports both **Server-Rendered HTML (Laravel, Go, Django)** and **Client-Side Single-Page Applications (`ln-router`)**. The debate is not *SSR vs. SPA*, but **React SPA vs. Ashlar SPA**.
-
-### React SPA vs. Ashlar SPA Execution Models
 
 * **React SPA Execution Model:**  
   `JS State → React Component Tree → Virtual DOM Reconciliation → Real DOM Patch`  
