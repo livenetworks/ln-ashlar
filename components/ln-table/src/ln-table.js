@@ -38,23 +38,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		return null;
 	}
 
-	function _saveScroll(self) {
-		const sc = self._scrollContainer || _findScrollContainer(self.dom);
-		return {
-			container: sc,
-			top: sc ? sc.scrollTop : window.scrollY
-		};
-	}
-
-	function _restoreScroll(state) {
-		if (state.container) {
-			state.container.scrollTop = state.top;
-		} else {
-			window.scrollTo(window.scrollX, state.top);
-		}
-	}
-
-
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
@@ -178,6 +161,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 			this._lastTotal = 0;
 			this._lastFiltered = 0;
+			this._hasInitialSeed = false;
 
 			// Windowed (sliding-window) server-side virtualization — opt-in
 			this._windowed = false;
@@ -187,18 +171,28 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			// --- Event listeners ---
 			this._onSetData = function (e) {
 				const detail = e.detail || {};
+				const newData = detail.data || [];
+				const newTotal = detail.total != null ? detail.total : newData.length;
+
+				// Protect initial SSR seed rows: do not overwrite pre-rendered HTML rows with empty un-synced store payloads before initial API response arrives
+				if (self._hasInitialSeed && !self.isLoaded && newData.length === 0 && newTotal === 0) {
+					return;
+				}
+
 				if (self._windowed) {
 					dom.classList.remove('ln-table--loading');
 					self._cache.ingest(detail);
 					return;
 				}
-				self._data = detail.data || [];
-				self._lastTotal = detail.total != null ? detail.total : self._data.length;
+
+				self._data = newData;
+				self._lastTotal = newTotal;
 				self._lastFiltered = detail.filtered != null ? detail.filtered : self._data.length;
 
 				self.totalCount = self._lastTotal;
 				self.visibleCount = self._lastFiltered;
 				self.isLoaded = true;
+				self._hasInitialSeed = false;
 
 				dom.classList.remove('ln-table--loading');
 
@@ -302,60 +296,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			};
 			if (this.tbody) this.tbody.addEventListener('click', this._onRowAction);
 
-			// --- Keyboard navigation (tbody rows) ---
-			this._focusedRowIndex = -1;
-			this._onKeydown = function (e) {
-				if (!dom.contains(document.activeElement) && document.activeElement !== document.body) return;
-				if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
 
-				const rows = self.tbody ? Array.from(self.tbody.querySelectorAll('[data-ln-table-row]')) : [];
-				if (!rows.length) return;
-
-				switch (e.key) {
-					case 'ArrowDown':
-						e.preventDefault();
-						self._focusedRowIndex = Math.min(self._focusedRowIndex + 1, rows.length - 1);
-						self._focusRow(rows);
-						break;
-					case 'ArrowUp':
-						e.preventDefault();
-						self._focusedRowIndex = Math.max(self._focusedRowIndex - 1, 0);
-						self._focusRow(rows);
-						break;
-					case 'Home':
-						e.preventDefault();
-						self._focusedRowIndex = 0;
-						self._focusRow(rows);
-						break;
-					case 'End':
-						e.preventDefault();
-						self._focusedRowIndex = rows.length - 1;
-						self._focusRow(rows);
-						break;
-					case 'Enter':
-						if (self._focusedRowIndex >= 0 && self._focusedRowIndex < rows.length) {
-							e.preventDefault();
-							const tr = rows[self._focusedRowIndex];
-							dispatch(dom, 'ln-table:row-click', {
-								table: self.name,
-								id: tr.getAttribute('data-ln-table-row-id'),
-								record: tr._lnRecord || {}
-							});
-						}
-						break;
-					case ' ':
-						if (self._selectable && self._focusedRowIndex >= 0 && self._focusedRowIndex < rows.length) {
-							e.preventDefault();
-							const cb = rows[self._focusedRowIndex].querySelector('[data-ln-table-row-select]');
-							if (cb) {
-								cb.checked = !cb.checked;
-								cb.dispatchEvent(new Event('change', { bubbles: true }));
-							}
-						}
-						break;
-				}
-			};
-			document.addEventListener('keydown', this._onKeydown);
 
 			// Local hydration of initial SSR rows
 			if (this.tbody && this.tbody.rows.length > 0) {
@@ -499,6 +440,9 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		}
 
 		this._filteredData = this._data.slice();
+		if (this._data.length > 0) {
+			this._hasInitialSeed = true;
+		}
 
 		if (this.isDataDriven) {
 			this._lastTotal = this._data.length;
@@ -518,105 +462,8 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	// ─── Filter + Sort ─────────────────────────────────────────
 
 	_component.prototype._applyFilterAndSort = function () {
-		if (this.isDataDriven) {
-			const term = (this.currentSearch || '').trim().toLowerCase();
-			const tokens = term ? term.split(/\s+/).filter(Boolean) : [];
-			const filters = this.currentFilters || {};
-			const hasFilters = Object.keys(filters).length > 0;
-
-			// 1. Filter
-			this._filteredData = this._data.filter(function (row) {
-				if (tokens.length > 0) {
-					const match = tokens.every(function (token) {
-						for (const key in row) {
-							if (row.hasOwnProperty(key) && typeof row[key] === 'string' && key !== 'html' && key !== 'searchText') {
-								if (row[key].toLowerCase().indexOf(token) !== -1) {
-									return true;
-								}
-							}
-						}
-						return false;
-					});
-					if (!match) return false;
-				}
-
-				if (hasFilters) {
-					for (const field in filters) {
-						const activeVals = filters[field];
-						if (activeVals && activeVals.length > 0) {
-							const val = row[field];
-							const sVal = val != null ? String(val) : '';
-							if (activeVals.indexOf(sVal) === -1) return false;
-						}
-					}
-				}
-				return true;
-			});
-
-			this.visibleCount = this._filteredData.length;
-
-			// 2. Sort
-			if (!this.currentSort || !this.currentSort.field || !this.currentSort.direction) return;
-
-			const field = this.currentSort.field;
-			const direction = this.currentSort.direction;
-			const multiplier = direction === 'desc' ? -1 : 1;
-
-			const values = this._filteredData.map(function (row) { return row[field]; });
-			const type = detectValueType(values);
-
-			this._filteredData.sort(function (a, b) {
-				return compareValues(a[field], b[field], type, _collator) * multiplier;
-			});
-
-		} else {
-			const term = this._searchTerm;
-			const tokens = term ? term.split(/\s+/).filter(Boolean) : [];
-			const colFilters = this._columnFilters;
-			const hasColFilters = Object.keys(colFilters).length > 0;
-			const ths = this.ths;
-
-			const colIndexByKey = {};
-			if (hasColFilters) {
-				for (let i = 0; i < ths.length; i++) {
-					const filterKey = ths[i].getAttribute('data-ln-table-filter-col');
-					if (filterKey) colIndexByKey[filterKey] = i;
-				}
-			}
-
-			if (tokens.length === 0 && !hasColFilters) {
-				this._filteredData = this._data.slice();
-			} else {
-				this._filteredData = this._data.filter(function (row) {
-					if (tokens.length > 0) {
-						const match = tokens.every(function (token) {
-							return row.searchText.indexOf(token) !== -1;
-						});
-						if (!match) return false;
-					}
-					if (hasColFilters) {
-						for (const key in colFilters) {
-							const idx = colIndexByKey[key];
-							if (idx !== undefined) {
-								if (colFilters[key].indexOf(row.rawTexts[idx]) === -1) return false;
-							}
-						}
-					}
-					return true;
-				});
-			}
-
-			if (this._sortCol < 0 || !this._sortDir) return;
-
-			const colIndex = this._sortCol;
-			const multiplier = this._sortDir === 'desc' ? -1 : 1;
-			const values = this._filteredData.map(function (row) { return row.values[colIndex]; });
-			const type = detectValueType(values);
-
-			this._filteredData.sort(function (a, b) {
-				return compareValues(a.values[colIndex], b.values[colIndex], type, _collator) * multiplier;
-			});
-		}
+		this._filteredData = this._data ? this._data.slice() : [];
+		this.visibleCount = (this.isDataDriven && this._lastFiltered != null) ? this._lastFiltered : this._filteredData.length;
 	};
 
 	// ─── Column width locking ──────────────────────────────────
@@ -645,6 +492,12 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			if (this._windowed) { this._renderWindowed(); return; }
 			const total = this._lastTotal;
 			const filtered = this.visibleCount;
+
+			// Protect initial SSR seed rows while background API fetch is in-flight
+			if (this._hasInitialSeed && !this.isLoaded && this._data.length > 0) {
+				this._renderAll();
+				return;
+			}
 
 			if (total === 0) {
 				this._disableVirtualScroll();
@@ -692,10 +545,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				frag.appendChild(tr);
 			}
 
-			const scrollState = _saveScroll(this);
-			this.tbody.textContent = '';
-			this.tbody.appendChild(frag);
-			_restoreScroll(scrollState);
+			this.tbody.replaceChildren(frag);
 
 			if (this._selectable) this._updateSelectAll();
 		} else {
@@ -703,9 +553,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			const data = this._filteredData;
 			for (let i = 0; i < data.length; i++) html.push(data[i].html);
 
-			const scrollState = _saveScroll(this);
 			this.tbody.innerHTML = html.join('');
-			_restoreScroll(scrollState);
 
 			if (this._selectable) this._restoreSelection();
 		}
@@ -721,34 +569,20 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		const self = this;
 
 		if (!this._rowHeight) {
-			if (this._windowed) {
+			if (this.tbody && this.tbody.rows.length > 0) {
+				this._rowHeight = this.tbody.rows[0].offsetHeight || 40;
+			} else {
 				let tempRow = null;
-				const sample = this._cache.peek();
-				if (sample) {
-					tempRow = this._buildRow(sample);
-				} else {
-					tempRow = this._buildPlaceholderRow();
+				if (this._windowed) {
+					const sample = this._cache ? this._cache.peek() : null;
+					tempRow = sample ? this._buildRow(sample) : this._buildPlaceholderRow();
+				} else if (this.isDataDriven && this._data.length > 0) {
+					tempRow = this._buildRow(this._data[0]);
 				}
-				if (tempRow) {
-					this.tbody.textContent = '';
+				if (tempRow && this.tbody) {
 					this.tbody.appendChild(tempRow);
 					this._rowHeight = tempRow.offsetHeight || 40;
-					this.tbody.textContent = '';
-				}
-			} else if (this.isDataDriven) {
-				if (this._data.length > 0) {
-					const tempRow = this._buildRow(this._data[0]);
-					if (tempRow) {
-						this.tbody.textContent = '';
-						this.tbody.appendChild(tempRow);
-						this._rowHeight = tempRow.offsetHeight || 40;
-						this.tbody.textContent = '';
-					}
-				}
-			} else {
-				const rows = this.tbody ? this.tbody.rows : [];
-				if (rows.length > 0) {
-					this._rowHeight = rows[0].offsetHeight || 40;
+					tempRow.remove();
 				}
 			}
 		}
@@ -858,10 +692,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				frag.appendChild(bottomSpacer);
 			}
 
-			const scrollState = _saveScroll(this);
-			this.tbody.textContent = '';
-			this.tbody.appendChild(frag);
-			_restoreScroll(scrollState);
+			this.tbody.replaceChildren(frag);
 
 			if (this._selectable) this._updateSelectAll();
 		} else {
@@ -877,9 +708,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 					colSpan + '" style="height:' + bottomH + 'px;padding:0;border:none"></td></tr>';
 			}
 
-			const scrollState = _saveScroll(this);
 			this.tbody.innerHTML = html;
-			_restoreScroll(scrollState);
 
 			if (this._selectable) this._restoreSelection();
 		}
@@ -971,10 +800,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			frag.appendChild(bottomSpacer);
 		}
 
-		const scrollState = _saveScroll(this);
-		this.tbody.textContent = '';
-		this.tbody.appendChild(frag);
-		_restoreScroll(scrollState);
+		this.tbody.replaceChildren(frag);
 
 		// Select-all is disabled in windowed mode (D4) — no _updateSelectAll() call.
 		this._vStart = startRow;
@@ -987,7 +813,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 	_component.prototype._showEmptyState = function () {
 		const colSpan = this.ths.length || 1;
-		this.tbody.textContent = '';
+		let emptyEl = null;
 
 		let clone = null;
 
@@ -1016,7 +842,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 			if (clone) {
 				if (clone.tagName === 'TR') {
-					this.tbody.appendChild(clone);
+					emptyEl = clone;
 				} else {
 					const td = document.createElement('td');
 					td.setAttribute('colspan', String(colSpan));
@@ -1024,7 +850,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 					const tr = document.createElement('tr');
 					tr.className = 'ln-table__empty';
 					tr.appendChild(td);
-					this.tbody.appendChild(tr);
+					emptyEl = tr;
 				}
 			}
 		} else {
@@ -1036,7 +862,13 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			const tr = document.createElement('tr');
 			tr.className = 'ln-table__empty';
 			tr.appendChild(td);
-			this.tbody.appendChild(tr);
+			emptyEl = tr;
+		}
+
+		if (emptyEl) {
+			this.tbody.replaceChildren(emptyEl);
+		} else {
+			this.tbody.replaceChildren();
 		}
 
 		dispatch(this.dom, 'ln-table:empty', {
@@ -1405,22 +1237,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		}
 	};
 
-	// ─── Keyboard Focus Helpers ────────────────────────────────
 
-	_component.prototype._focusRow = function (rows) {
-		for (let i = 0; i < rows.length; i++) {
-			rows[i].classList.remove('ln-row-focused');
-			rows[i].removeAttribute('tabindex');
-		}
-
-		if (this._focusedRowIndex >= 0 && this._focusedRowIndex < rows.length) {
-			const row = rows[this._focusedRowIndex];
-			row.classList.add('ln-row-focused');
-			row.setAttribute('tabindex', '0');
-			row.focus();
-			row.scrollIntoView({ block: 'nearest' });
-		}
-	};
 
 	// ─── Destroy ───────────────────────────────────────────────
 
@@ -1438,7 +1255,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			this.dom.removeEventListener('ln-table:request-revalidate', this._onRequestRevalidate);
 			this.dom.removeEventListener('ln-table:request-invalidate', this._onRequestInvalidate);
 			this.dom.removeEventListener('ln-sort:change', this._onSort);
-			document.removeEventListener('keydown', this._onKeydown);
 			if (this.tbody) {
 				this.tbody.removeEventListener('click', this._onRowClick);
 				this.tbody.removeEventListener('click', this._onRowAction);

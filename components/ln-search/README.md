@@ -13,7 +13,7 @@ It splits search into a **Control** (`data-ln-search-for="targetId"`) that manag
 ```html
 <label class="search">
 	<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-	<input type="search" placeholder="Search …" data-ln-search-for="<targetId>" data-ln-search-debounce="0">
+	<input type="search" placeholder="Search …" data-ln-search-for="<targetId>">
 	<button type="button" data-ln-search-clear aria-label="Clear search">
 		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 	</button>
@@ -39,7 +39,7 @@ For deep targeting (e.g. table rows or checkbox lists) add `data-ln-search-items
 ## 🧭 Philosophy & Architecture
 
 1. **Two-Host Separation (Attribute Bridge):**
-   - **Control (`data-ln-search-for="targetId"`):** Debounces keystrokes and writes the raw value to `target.setAttribute('data-ln-search', rawValue)`.
+   - **Control (`data-ln-search-for="targetId"`):** Forwards user input and writes the raw value to `target.setAttribute('data-ln-search', rawValue)`.
    - **State Host (`data-ln-search="term"`):** Uses `MutationObserver` (`_syncAttribute`) to detect attribute changes, syncs all matching controls, and dispatches `ln-search:change`.
 2. **Tokenized AND Matching:** By default, splits search queries on whitespace and tests tokens with substring checks (`indexOf`). An item matches only if every token is present in its text.
 3. **Exemptions & Subtree Exclusion (`data-ln-search-exclude`):**
@@ -61,7 +61,6 @@ For deep targeting (e.g. table rows or checkbox lists) add `data-ln-search-items
 | `data-ln-search-items="selector"` | Target element | Deep CSS selector (e.g. `tbody tr`) to query items instead of direct children. |
 | `data-ln-search-fields="a,b"` | Target element | Comma-separated list of field keys forwarded in event detail. |
 | `data-ln-search-exclude` | Item root or descendant | Excludes item from filtering (on root) or excludes subtree text (on descendant). |
-| `data-ln-search-debounce="ms"` | Control | Debounce delay in milliseconds (`0` for instant local DOM filtering, default `500`). |
 | `data-ln-search-clear` | `<button>` | Identifies a clear button (in search control or target empty state). Clears input and resets target state. |
 | `data-ln-search-clear-for="targetId"` | `<button>` | Remote clear button targeting a specific element ID anywhere on the page. |
 | `data-ln-search-hide="true"` | Items in target | State attribute automatically set on non-matching elements (`display: none !important`). |
@@ -71,7 +70,7 @@ For deep targeting (e.g. table rows or checkbox lists) add `data-ln-search-items
 
 | Instance | Property / Method | Description |
 | :--- | :--- | :--- |
-| `el.lnSearchControl` (Control) | `targetId`, `input`, `debounceTime`, `destroy()` | Control instance managing input and debounce. |
+| `el.lnSearchControl` (Control) | `targetId`, `input`, `destroy()` | Control instance managing input. |
 | `el.lnSearch` (State Host) | `term`, `nsKey`, `hashEnabled`, `_apply()`, `destroy()` | State instance owning term, URL hash sync, and DOM filter logic. |
 
 
@@ -128,7 +127,6 @@ if ($search !== '') {
 ## ⚠️ Common Pitfalls
 
 - **Using `data-ln-search="tableId"` on inputs:** `data-ln-search` is the target state attribute. Inputs must use `data-ln-search-for="tableId"`.
-- **Omitting `data-ln-search-debounce="0"` for Local DOM Search:** For instant local DOM filtering, always set `data-ln-search-debounce="0"` to avoid the default 500ms debounce.
 - **Programmatic Value Mutations:** Assigning `input.value = "text"` programmatically does not trigger native `input` events. Either dispatch a native `input` event on the control or set the attribute directly on the target:
   ```js
   document.getElementById('my-table').setAttribute('data-ln-search', 'query');

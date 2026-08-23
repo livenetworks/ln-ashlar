@@ -1,5 +1,7 @@
 # ln-ashlar Project Rules
 
+> 📜 **Standalone Document:** Full human- and AI-readable engineering doctrines are maintained in [DOCTRINE.md](../DOCTRINE.md).
+
 ## 1. Ashlar Architecture & Component Authoring Doctrines
 
 ### A. Three-Layer Architecture

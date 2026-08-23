@@ -169,7 +169,7 @@ Use when the table queries a store and connects through a coordinator rather tha
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-table:set-data` | Listens | No | Populates the table with a raw dataset (Data-Driven mode). Windowed mode (`data-ln-table-window`) additionally reads `offset`/`queryGen` off the payload, routing it into the internal window cache. | `{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }` |
-| `ln-table:set-loading` | Listens | No | Toggles the `.ln-table--loading` overlay class (Data-Driven mode). | `{ loading: Boolean }` |
+| `ln-table:set-loading` | Listens | No | Toggles the `.ln-table--loading` class (Data-Driven mode). | `{ loading: Boolean }` |
 | `ln-table:page-failed` | Listens | No | Windowed mode (`data-ln-table-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry. | `{ offset: Number }` |
 | `ln-table:request-revalidate` | Listens | No | Windowed mode (`data-ln-table-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives. | *(no payload)* |
 | `ln-search:change` | Listens | Yes (`preventDefault`) | Consumed directly on itself in SSR mode only, triggering local in-memory search matching. In Data-Driven mode `ln-table-coordinator` intercepts this event on the search input's target and dispatches `ln-table:set-search` instead. | `{ term: String }` |

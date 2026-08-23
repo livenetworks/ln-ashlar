@@ -10,7 +10,6 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 	const EXCLUDE_ATTR = 'data-ln-search-exclude';
 	const HIDE_ATTR = 'data-ln-search-hide';
 	const HASH_ATTR = 'data-ln-hash';
-	const DEBOUNCE_MS = 500;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -214,7 +213,6 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		this.targetId = dom.getAttribute(CONTROL_SELECTOR);
 		this.input = _resolveInput(dom);
 
-		this._debounceTimer = null;
 		this._attachHandler();
 
 		// The browser can fill the input with no event fired — form restore on reload /
@@ -248,17 +246,7 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		const self = this;
 
 		this._onInput = function () {
-			clearTimeout(self._debounceTimer);
-			const raw = self.dom.getAttribute('data-ln-search-debounce') || self.input.getAttribute('data-ln-search-debounce');
-			const ms = raw !== null ? +(raw) : DEBOUNCE_MS;
-
-			if (self.input.value === '' || ms === 0) {
-				self._write(self.input.value);
-			} else {
-				self._debounceTimer = setTimeout(function () {
-					self._write(self.input.value);
-				}, ms);
-			}
+			self._write(self.input.value);
 		};
 
 		this.input.addEventListener('input', this._onInput);
@@ -266,7 +254,6 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 
 	_controlComponent.prototype.destroy = function () {
 		if (!this.dom[CONTROL_ATTRIBUTE]) return;
-		clearTimeout(this._debounceTimer);
 		if (this.input && this._onInput) {
 			this.input.removeEventListener('input', this._onInput);
 		}

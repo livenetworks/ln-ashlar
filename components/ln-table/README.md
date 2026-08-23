@@ -229,7 +229,7 @@ Source: `components/ln-table/ln-table.js`. Sort is a separate, co-loaded compone
 - The constructor branches once, at construction: `this.isDataDriven = dom.hasAttribute('data-ln-table-source')`.
 - **SSR**: reads `<tbody>` rows once at bootstrap, caches them as static HTML strings in `_data`, and re-sorts/filters that in-memory cache on `ln-search:change`, `ln-sort:change`, and `ln-filter:change`.
 - **Data-driven**: `isLoaded = false` until the first `ln-table:set-data`. If `<tbody>` already has rows (hybrid), they're parsed synchronously first — instant local sort/filter/search response before the authoritative dataset arrives. When the background sync lands, `_vStart`/`_vEnd` reset to `-1` and virtual scroll re-initializes against the full dataset.
-- **Loading dimming**: `ln-table:set-loading {loading:true}` adds `.ln-table--loading` to the wrapper; `ln-table:set-data` clears it automatically.
+- **Loading state**: `ln-table:set-loading {loading:true}` adds `.ln-table--loading` to the wrapper; `ln-table:set-data` clears it automatically.
 
 ### DOM mutations
 

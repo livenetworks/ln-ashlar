@@ -40,12 +40,6 @@
 				"src/ln-search.js"
 			]
 		},
-		"data-ln-search-debounce": {
-			"direction": "author",
-			"sources": [
-				"src/ln-search.js"
-			]
-		},
 		"data-ln-search-exclude": {
 			"direction": "author",
 			"sources": [

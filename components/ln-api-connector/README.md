@@ -80,6 +80,7 @@ All attributes are dynamically observed. Any runtime changes to these attributes
 | `data-ln-api-base-url` | Connection | The base URL of the API gateway (e.g. `https://api.example.com/v1` or `/api`). Fallback: `data-ln-api-connector-base-url`, `data-ln-rest-base-url`. |
 | `data-ln-api-path` | Connection | Resource path endpoint (e.g. `/documents`). Fallback: `data-ln-api-connector-path`, `data-ln-rest-path`. |
 | `data-ln-api-headers` | Credentials | JSON-formatted string of request headers (e.g. `{"Authorization": "Bearer tok_123"}`). Fallback: `data-ln-api-connector-headers`, `data-ln-rest-headers`. |
+| `data-ln-api-connector-query-debounce="ms"` | Connection | Debounce delay in milliseconds for `request-query` events. Default `300`. Set to `0` to disable. Mutations (create/update/delete) are never debounced. |
 
 ---
 
@@ -114,6 +115,20 @@ connector.bulkDelete([17, 23])
 // 6. Cancel in-flight query / fetch
 connector.cancel('query'); // or connector.cancel(targetEl)
 ```
+
+---
+
+## Query Debounce
+
+Remote query requests (`ln-api-connector:request-query`) are debounced per key using a **leading-edge-then-coalesce** strategy:
+
+- The **first** query for an idle key fires immediately (no waiting).
+- Rapid follow-up queries for the same key within the debounce window are coalesced: only the latest one fires when the window closes.
+- An isolated query (e.g. initial page load, a single filter change) is always instant.
+
+The delay defaults to **300 ms** and is overridable via `data-ln-api-connector-query-debounce="<ms>"` on the connector element. Set to `0` to disable debouncing entirely.
+
+Mutations (`create`, `update`, `delete`, `bulk-delete`) are never debounced — they fire immediately every time.
 
 ---
 

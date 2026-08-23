@@ -1,57 +1,47 @@
 # 🚀 ln-ashlar
 
-> **Unified, zero-dependency frontend framework for both Server-Rendered (SSR) & Client-Side SPA applications.** Delivering a high-performance harmony between server-rendered HTML or REST/JSON APIs, semantic SCSS mixins, client-side routing, and attribute-driven, zero-initialization vanilla JS components. Built with **zero runtime dependencies** for maximum speed, longevity, and security.
+> **AI-Native, DOM-First Web Application Architecture for Long-Lived Systems.**  
+> Unlike mainstream JS frameworks that treat the DOM as a passive output projection of an in-memory JavaScript state tree, `ln-ashlar` leverages the native W3C DOM as an **authoritative runtime state surface**. Built with **zero runtime npm dependencies** for maximum speed, longevity, AI-agent efficiency, and security.
 
 🌐 **Live Interactive Demo:** [ashlar.live.net.mk](https://ashlar.live.net.mk)
 
 ---
 
-## 🏛️ The Dual-Core DOM-First Paradigm (SSR + Client-Side SPA)
+## 🏛️ The Paradigm: DOM as the Runtime State Surface
 
-`ln-ashlar` is built on a **DOM-First** architecture. The browser works directly with native DOM standards; there is no in-memory component tree to build. 
+`ln-ashlar` rejects the mainstream premise that applications must build a secondary UI tree in JavaScript memory (Virtual DOM, Signals, or fine-grained reactivity trees). Instead, it establishes **DOM-First Architecture**:
 
-Whether your architecture relies on **Server-Rendered HTML** (Laravel, Go, Django, Rails) or **Client-Side SPAs consuming REST/JSON APIs**, `ln-ashlar` provides first-class support for both paradigms:
-
-### 1. 🌐 Backend-First Progressive HTML Enhancement (SSR)
-* **Progressive HTML Enhancement:** Your backend delivers complete, semantic, indexable HTML.
-* **Instant First Paint:** Fast to render, SEO-friendly, and accessible in milliseconds.
-* **Zero Boilerplate:** HTML elements auto-activate via attributes (`data-ln-modal`, `data-ln-filter`, `data-ln-data-store`) backed by a native `MutationObserver`.
-
-### 2. ⚡ Client-Side Single-Page Applications (SPA / JSON Mode)
-* **Built-in SPA Router (`ln-router`):** Full client-side routing with dynamic parameters (`/users/:id`), catch-all paths (`*`), atomic region swapping (`replaceChildren`), and cancelable navigation intercepts (`ln-router:before-navigate`).
-* **Compound Hash-State Codec (`hash.js`):** Deep linking and overlay state tracking (`#tab:settings&modal:42`) that preserves browser Back/Forward navigation without page reloads.
-* **JSON API Data Layer (`ln-http`, `ln-api-connector`, `ln-data-store`):** Native async JSON client with abort control, queueing, and 3-Tier local storage (Memory + IndexedDB/localStorage).
-* **Client-Side Reactive Rendering (`lnCore.renderList`, `deepReactive` & `createBatcher`):** Declaratively render and bind JSON API payloads into `<template>` nodes with keyed node reuse (`data-ln-key`), deep Proxy mutation traps, and microtask render batching (`queueMicrotask`) without Virtual DOM overhead.
-* **Modular Authoring (`spa-starter/`):** Out-of-the-box SPA scaffold supporting co-located view modules (`App.defineView()`) and session-long modules (`App.defineModule()`).
-
-> [!NOTE]
-> **Runtime Icon CDN Dependency:** While `ln-ashlar` has zero runtime npm package dependencies, the `ln-icon` component fetches SVG icons dynamically from jsDelivr (Tabler Icons) or a custom CDN URL. Once fetched, they are stored in `localStorage` so subsequent page views load instantly and work offline. If the client is offline and `localStorage` is empty, icon requests will fail silently and not display.
-
-> [!TIP]
-> 📖 **Read the complete engineering manifesto!**  
-> For a detailed historical analysis of processing cycles, performance (Skeleton Screens vs. IndexedDB cache), framework EOL risks, and security CVE risks with npm, read our complete [Architectural Philosophy](docs/architecture/philosophy.md).
+1. 🔍 **Zero Hidden State in JS Memory:** Application state is never trapped inside private JavaScript closures, reactivity signals, or hidden memory trees. The true state lives openly and visibly on the DOM element's attributes (`data-ln-*`).
+2. 🎛️ **DevTools Inspector as the Control Plane:** Modifying any attribute directly in browser DevTools immediately activates the component's behavior in real-time. Native `MutationObserver` instantly synchronizes the internal engine, updates the DOM, and dispatches lifecycle events.
+3. 🤖 **AI-Native & Contract-Driven:** AI agents (via MCP, `.agents/`, and `docs-mcp/`) generate declarative, schema-validated HTML contracts rather than complex JavaScript program trees.
 
 ---
 
-### Architectural Comparison & Trade-offs
+## 📊 Architectural Positioning & Trade-offs
 
 | Dimension | Component-Tree Frameworks (React / Vue / Angular) | DOM-First Architecture (`ln-ashlar`) |
 | :--- | :--- | :--- |
-| **UI & Rendering Model** | In-memory component tree & reconciliation (Virtual DOM / Ivy / Signals) with hydration. | Direct W3C DOM enhancement via `MutationObserver` and custom `data-ln-*` attributes. Zero hydration cost. |
-| **Runtime Dependencies** | Framework runtime dependencies + npm package ecosystem. | **Zero runtime dependencies** (0 npm packages at runtime, pure native Web APIs). |
-| **Server & Client Harmony** | Primarily JSON/client-state oriented; SSR requires dedicated hydration / server-rendering pipelines. | **Dual Mode**: Direct progressive enhancement over server-rendered HTML (Laravel, Go, Django) or client SPA (`ln-router`). |
-| **Data & State Flow** | Fine-grained reactivity, unidirectional props/state, centralized stores. | Local-first store (IndexedDB/Memory) with FIFO sync queue, event-driven inter-component messaging. |
-| **Best Suited For** | High-frequency continuous client state (collaborative editors, real-time dashboards, complex canvas). | Admin panels, CRUD systems, enterprise portals, long-lived apps with strong backend integration. |
-| **Key Architectural Cost** | Dependency maintenance, hydration overhead, framework-specific abstractions. | Manual bookkeeping for derived state (no auto-signals), runtime-only event tracing, no JSX compile-time markup types. |
-| **Long-Term Longevity** | Managed via framework LTS releases and automated migration tools (`ng update`, codemods). | Built directly on permanent W3C browser standards (`<dialog>`, Popover API, `CustomEvent`). |
+| **Primary State Surface** | In-memory JS component tree & reactive state. | **Direct W3C DOM** (`data-ln-*` attribute surface). |
+| **Primary Code Artifact** | JavaScript program (JSX, hooks, signals, state closures). | **Declarative Semantic HTML Contract**. |
+| **AI Agent Suitability** | Must generate full program logic, state handlers & reactivity trees. | Resolves intent directly to **declarative markup contracts** (⭐⭐⭐⭐⭐). |
+| **Runtime Dependencies** | Framework core + extensive npm package ecosystem. | **Zero runtime npm dependencies** (pure native Web APIs). |
+| **Observability & Inspection** | Requires specialized DevTools extensions to inspect hidden memory state. | **100% Inspectable**: DevTools HTML Inspector is the native Control Plane. |
+| **Long-Term Longevity** | Managed via framework LTS cycles and automated refactoring (`ng update`). | Built directly on **permanent W3C browser standards** (`<dialog>`, Popover API, CustomEvent). |
+| **Server & Client Harmony** | Primarily JSON/SPA focused; SSR requires complex hydration pipelines. | **Dual-Core**: Native SSR progressive enhancement (Laravel, Go, Django) & SPA (`ln-router`). |
+| **Optimal Use Cases** | High-frequency continuous client state (collaborative editors, games, canvas). | Enterprise CRUD, Admin Panels, ERPs, long-lived apps with strong backend integration. |
 
----
+### 🎯 Application Suitability & Workload Breakdown
 
-### The Three Core Assertions of DOM-First Architecture
+| Application Workload | **Ashlar Suitability** | Why Ashlar Wins |
+| :--- | :---: | :--- |
+| **AI-Generated Applications & Workflows** | ⭐⭐⭐⭐⭐ | Machine-readable HTML contracts (`docs-mcp/`), zero build requirements. |
+| **Admin Panels, CRUD & Form Systems** | ⭐⭐⭐⭐⭐ | DOM-first state, native browser validation, instant IndexedDB caching. |
+| **Classic Web & Landing Pages** | ⭐⭐⭐⭐⭐ | Instant FCP, native SEO, zero bundle bloat. |
+| **Documentation & Content Systems** | ⭐⭐⭐⭐⭐ | HTML-centric structure, clean semantic mixins, zero JS overhead. |
+| **Enterprise Portals & Internal Tools** | ⭐⭐⭐⭐⭐ | 15+ year browser stability, zero supply-chain security liability. |
+| **Real-Time Dashboards & High-Freq Canvas** | ⭐⭐⭐ | Optimal with `ln-data-store` local caches; VDOM better for Figma-like canvas apps. |
 
-1. 🔍 **Zero Hidden State in JS Memory:** State is never trapped inside private JavaScript closures, component instances, or hidden memory trees. The true state lives openly and visibly on the DOM element's attributes (`data-ln-*`).
-2. 🧪 **100% Declarative, Testable & Reproducible:** Any given UI state (searching a term, opening a modal, toggling an accordion, deep-linking) can be authored, inspected, automated, restored, or server-rendered purely via HTML attributes without orchestration scripts.
-3. 🎛️ **DevTools Inspector as the Control Plane:** Editing any attribute in the browser's DevTools Inspector immediately activates the component's functionality in real-time. The underlying `MutationObserver` instantly synchronizes the internal engine, updates the DOM, syncs matching controls (`[data-ln-*-for]`), and dispatches lifecycle events.
+*For the complete 17-category breakdown and CTO decision matrix, see our [Architecture Philosophy](docs/architecture/philosophy.md#4-comprehensive-architectural-comparison-matrix-ashlar-vs-mainstream).*
 
 ---
 
@@ -97,53 +87,32 @@ Combine autonomous components directly in semantic HTML — **zero initializatio
 > **What happens automatically under the hood:**
 > - `data-ln-modal-for="user-modal"` binds the trigger button to toggle the native `<dialog>` without writing JS listeners (`ln-modal`).
 > - `data-ln-tooltip` mounts an accessible top-layer tooltip on hover and focus (`ln-tooltip`).
-> - `<use href="#ln-*">` fetches SVG icons on-demand from CDN and caches them in `localStorage` (`ln-icons`).
+> - `<use href="#ln-*">` fetches SVG icons on-demand from CDN and caches them in `localStorage` (`ln-icon`).
 > - `data-ln-validate` intercepts the form submit gate, validates native browser `ValidityState`, and toggles `.hidden` on corresponding error messages without external validation libraries (`ln-validate`).
 > - `data-ln-modal-close` safely dismisses the modal and restores focus (`ln-modal`).
 
 ---
 
-## 🧭 Four Core Philosophy Principles
+## 🛡️ The Three Core Pillars
 
-Four strict principles drive every technical decision in this library:
+### 1. 🏛️ Dual-Core Architecture (SSR + Client-Side SPA)
+- **Backend-First Progressive HTML Enhancement (SSR):** Your backend (Laravel, Go, Django, Rails) delivers indexable, semantic HTML. Elements auto-activate via attributes (`data-ln-modal`, `data-ln-filter`, `data-ln-table`).
+- **Client-Side Single-Page Applications (SPA / JSON Mode):** Built-in client router (`ln-router`), compound hash-state codec (`hash.js`), 3-tier local storage (`ln-data-store`), and microtask-batched Proxy reactivity (`deepReactive`, `renderList`) when client JSON APIs are required.
 
-1. **HTML describes WHAT, not HOW** — Use semantic elements only. No presentational or utility classes in markup (avoid `grid-4`, `text-secondary`, `flex`). Visual changes happen in SCSS, never in HTML.
-2. **Style via `@include` on semantic selectors** — Projects write `#user-table { @include table-base; }`, not `<table class="table table-striped">`. The selector describes the element; the mixin describes how it looks.
-3. **Every color is a CSS variable** — Always use `hsl(var(--color-primary))`, never hardcoded hex codes like `#2737a1`. This makes the entire design system fully customizable at any scope via simple variable overrides.
-4. **JS is attribute-driven, zero init** — Interactivity is declared via attributes (`data-ln-modal`, `data-ln-filter`, `data-ln-toggle`). A single `MutationObserver` registers, binds, and cleans up instances automatically.
+### 2. 🤖 AI-Native & MCP Surface
+- **Machine-Readable Component Corpus (`docs-mcp/`):** Schema-validated documentation served directly to AI agent workflows via Model Context Protocol (MCP).
+- **MCP Component Router:** Decision matrix resolving user intent into declarative components before generating markup.
+- **In-Repo Agent Protocols (`.agents/`, `CLAUDE.md`, `DOCTRINE.md`):** Strict architectural rules, component templates, and lifecycle constraints loaded automatically into AI coding sessions.
 
----
-
-## 🤖 AI-Native & MCP Surface
-
-`ln-ashlar` is designed from the ground up to be inspectable, routable, and generatable by AI agents:
-
-* **Machine-Readable Component Corpus (`docs-mcp/`):** Unified, schema-validated documentation served directly to AI agent workflows via Model Context Protocol (MCP).
-* **MCP Component Router:** Decision matrix and routing layer that resolves user intent to specific declarative components before generating markup.
-* **In-Repo Agent Protocols (`.agents/`, `.cursorrules`, `CLAUDE.md`):** Strict architectural rules, component templates, and lifecycle constraints loaded automatically into AI pairing sessions.
-* **Agent Skills Submodule (`.claude/`):** Bundled domain skills and workflows (`livenetworks/claude-skills`).
-
-Because `ln-ashlar` relies on semantic HTML, explicit `data-ln-*` attribute contracts, and native W3C events, AI coding agents can resolve user intent directly to a declarative component and emit markup that is verifiable against the attribute contract, with no compilation step between the source and the DOM.
-
----
-
-## 🌐 Browser Support
-
-`ln-ashlar` targets evergreen browsers with native support for the **Popover API**, since `ln-modal`, `ln-dropdown`, `ln-tooltip`, `ln-toast`, `ln-popover`, and `ln-router` rely on it (via `dialog.showModal()` and `popover`) for top-layer rendering. This is the floor — every other CSS/JS feature the library uses (`:has()`, `color-mix()`, `@container`) is supported earlier in all three engines.
-
-| Browser | Minimum Version |
-|---|---|
-| Chrome / Edge | 114+ |
-| Safari | 17.4+ |
-| Firefox | 125+ |
-
-Below this floor, CSS features degrade visually (a rule simply doesn't apply), but the Popover/`<dialog>` JS APIs break functionality outright — the affected components silently fail to open rather than falling back.
+### 3. 🔒 Longevity & Zero Supply-Chain Risk
+- **Zero Runtime npm Dependencies:** Eliminates supply-chain vulnerabilities, breaking transitive updates, and framework EOL cycles.
+- **W3C Web Standards First:** Relies on native browser primitives (`<dialog>`, Popover API, `:has()`, `@container`, `CustomEvent`, Web Crypto API).
 
 ---
 
 ## ⚡ Quick Start
 
-`ln-ashlar` is a source-only package. Import SCSS and JS directly and let your project's bundler compile them.
+`ln-ashlar` is a source-only package. Import SCSS and JS directly into your project bundler.
 
 ### 1. Install via npm
 ```bash
@@ -182,19 +151,32 @@ npm run dev     # Watch mode (automatic compilation on SCSS or JS changes)
 
 ---
 
+## 🌐 Browser Support
+
+`ln-ashlar` targets evergreen browsers with native support for the **Popover API**, since `ln-modal`, `ln-dropdown`, `ln-tooltip`, `ln-toast`, `ln-popover`, and `ln-router` rely on it (via `dialog.showModal()` and `popover`) for top-layer rendering.
+
+| Browser | Minimum Version |
+|---|---|
+| Chrome / Edge | 114+ |
+| Safari | 17.4+ |
+| Firefox | 125+ |
+
+---
+
 ## 📐 Core Architecture Specifications
 
 Deep architectural blueprints detailing the engine driving `ln-ashlar`.
 
 | Specification | Contents |
 |:---|:---|
-| 📖 **[Architecture Philosophy](docs/architecture/philosophy.md)** | The DOM-First engineering manifesto detailing computing cycles, framework EOL risks, and performance. |
-| 🔄 **[Data Flow Architecture](docs/architecture/data-flow.md)** | Rules governing how data moves. Splits responsibilities into **four isolated concerns**: Data (`ln-data-store` + `ln-data-coordinator`), Render (`ln-table`), Submit (`ln-form`), and Validate (`ln-validate`). Details the **parallel fan-out write pipeline** (optimistic cache write + offline queue) with a comprehensive Mermaid flow diagram. |
-| 🧭 **[3-Tier Local-First Storage Specs](docs/architecture/data-store-architecture.md)** | Technical reference for decoupling storage caches (`ln-data-store`), network gateways (`ln-*-connector`), and data transformations (`ln-mapper`) under a single parent **Data Coordinator** (`ln-data-coordinator`). |
+| 📜 **[Ashlar Engineering Doctrines](DOCTRINE.md)** | Mandatory 3-Layer architecture, component authoring doctrines, CQS event conventions, and state observability rules. |
+| 📖 **[Architecture Philosophy](docs/architecture/philosophy.md)** | The DOM-First engineering manifesto detailing computing cycles, framework EOL risks, performance, security, **and full 17-category comparison tables**. |
+| 🔄 **[Data Flow Architecture](docs/architecture/data-flow.md)** | Rules governing how data moves. Splits responsibilities into **four isolated concerns**: Data (`ln-data-store` + `ln-data-coordinator`), Render (`ln-table`), Submit (`ln-form`), and Validate (`ln-validate`). Details the **parallel fan-out write pipeline** with Mermaid sequence diagrams. |
+| 🧭 **[3-Tier Local-First Storage Specs](docs/architecture/data-store-architecture.md)** | Technical reference for decoupling storage caches (`ln-data-store`), network gateways (`ln-*-connector`), and data transformations (`ln-mapper`). |
 | ⚡ **[Reactive Architecture Reference](docs/reactive.md)** | Blueprint on how components manage internal state using Proxy traps (`reactiveState` and `deepReactive`), batched microtask rendering, DOM bindings (`fill`, `renderList`), and attribute-to-state bridges. |
 | 📐 **[Design System Specifications](docs/architecture/reference.md)** | Complete styling specs covering CSS Custom Properties, layout grids, buttons, responsive breakpoints, typography hierarchies, dark mode theming, and icons. |
 | 🛡️ **[Security & Threat Mitigation](docs/architecture/security.md)** | Deep architectural security analysis covering Web Crypto API encryption-at-rest, strict CSP compliance (no dynamic eval), sensitive DOM attribute protections, and the same-origin AJAX fragment trust boundary. |
-| 🧠 **[Architect Overview Guide](docs/architecture/overview.md)** | The master developer guide introducing the DOM-First doctrine, component inventories, override architectures, and new project integration pipelines. |
+| 🧠 **[Architect Overview Guide](docs/architecture/overview.md)** | Master developer guide introducing the DOM-First doctrine, component inventories, override architectures, and new project integration pipelines. |
 
 ---
 
@@ -202,7 +184,7 @@ Deep architectural blueprints detailing the engine driving `ln-ashlar`.
 
 For detailed manual instructions, properties, attributes, and events of individual components:
 
-* 📚 **[Complete Documentation Index](docs/README.md)** — The master roadmap containing direct links to each module's usage guide and architecture reference, both in `components/ln-*/README.md`.
+* 📚 **[Complete Documentation Index](docs/README.md)** — Master roadmap containing direct links to each module's usage guide and architecture reference.
 
 ### CSS Layer Reference
 

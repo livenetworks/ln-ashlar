@@ -11,6 +11,9 @@ When I share plans, specs, or ask architectural questions — DON'T immediately 
 
 This applies to architecture discussions, spec reviews, and planning. For trivial implementation tasks ("create this file", "fix this bug"), execute directly.
 
+> 📜 **Engineering Doctrines & Standards:**  
+> Refer to [DOCTRINE.md](DOCTRINE.md) for official component authoring doctrines, CQS guidelines, state observability, and 3-Layer architecture.
+
 ---
 
 ## Pre-Code Standards Verification (CRITICAL CHECKLIST)

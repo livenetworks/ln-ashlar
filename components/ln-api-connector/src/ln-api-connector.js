@@ -28,6 +28,7 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 		dom[DOM_ALIAS] = this; // Set alias for compatibility
 
 		this._inflight = new Map();
+		this._queryTimers = new Map(); // per-key: { timer, pendingDetail, pendingParams, pendingTarget }
 		this.refreshConfig();
 		this._handlers = null;
 		_bindEvents(this);
@@ -58,6 +59,9 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 		const sortDir = dom.getAttribute('data-ln-api-param-sort-dir');
 		if (sortDir) paramKeys.sortDir = sortDir;
 		this.paramKeys = paramKeys;
+
+		const qd = dom.getAttribute('data-ln-api-connector-query-debounce');
+		this.queryDebounce = qd !== null ? +qd : 300;
 
 		dispatch(this.dom, 'ln-api-connector:config-changed', {
 			baseUrl: this.baseUrl,
@@ -229,28 +233,49 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 				const detail = e.detail || {};
 				const queryParams = detail.query || detail;
 				const targetEl = (detail.meta && detail.meta.targetEl) ? detail.meta.targetEl : null;
-				self.query(queryParams, targetEl)
-					.then(function (res) {
-						const payload = res || {};
-						dispatch(self.dom, 'ln-api-connector:fetched', {
-							data: payload.data || (Array.isArray(payload) ? payload : []),
-							total: payload.total,
-							filtered: payload.filtered,
-							offset: queryParams.offset,
-							queryGen: queryParams.queryGen,
-							meta: detail.meta || null
+				const key = targetEl || 'query';
+				const delay = self.queryDebounce;
+
+				function _doQuery(d, qp, tel) {
+					self.query(qp, tel)
+						.then(function (res) {
+							const payload = res || {};
+							dispatch(self.dom, 'ln-api-connector:fetched', {
+								data: payload.data || (Array.isArray(payload) ? payload : []),
+								total: payload.total,
+								filtered: payload.filtered,
+								offset: qp.offset,
+								queryGen: qp.queryGen,
+								meta: d.meta || null
+							});
+						})
+						.catch(function (err) {
+							if (err && err.name === 'AbortError') return;
+							dispatch(self.dom, 'ln-api-connector:error', {
+								action: 'query',
+								error: err.message,
+								status: err.status || 0,
+								data: err.data || null,
+								meta: d.meta || null
+							});
 						});
-					})
-					.catch(function (err) {
-						if (err && err.name === 'AbortError') return;
-						dispatch(self.dom, 'ln-api-connector:error', {
-							action: 'query',
-							error: err.message,
-							status: err.status || 0,
-							data: err.data || null,
-							meta: detail.meta || null
-						});
-					});
+				}
+
+				if (delay === 0) {
+					_doQuery(detail, queryParams, targetEl);
+					return;
+				}
+
+				if (self._queryTimers.has(key)) {
+					clearTimeout(self._queryTimers.get(key));
+				}
+
+				const timer = setTimeout(function () {
+					self._queryTimers.delete(key);
+					_doQuery(detail, queryParams, targetEl);
+				}, delay);
+
+				self._queryTimers.set(key, timer);
 			},
 			cancel: function (e) {
 				const detail = e.detail || {};
@@ -377,7 +402,14 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 			self._inflight.clear();
 		}
 
-		if (self._handlers) {
+		if (this._queryTimers) {
+			this._queryTimers.forEach(function (timer) {
+				if (timer) clearTimeout(timer);
+			});
+			this._queryTimers.clear();
+		}
+
+		if (this._handlers) {
 			self.dom.removeEventListener('ln-api-connector:request-sync', self._handlers.sync);
 			self.dom.removeEventListener('ln-api-connector:request-query', self._handlers.query);
 			self.dom.removeEventListener('ln-api-connector:request-fetch', self._handlers.query);
@@ -414,7 +446,8 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 			'data-ln-api-param-limit',
 			'data-ln-api-param-search',
 			'data-ln-api-param-sort-field',
-			'data-ln-api-param-sort-dir'
+			'data-ln-api-param-sort-dir',
+			'data-ln-api-connector-query-debounce'
 		],
 		onAttributeChange: _syncAttribute
 	});

@@ -15,6 +15,12 @@
 				"src/ln-api-connector.js"
 			]
 		},
+		"data-ln-api-connector-query-debounce": {
+			"direction": "author",
+			"sources": [
+				"src/ln-api-connector.js"
+			]
+		},
 		"data-ln-api-headers": {
 			"direction": "author",
 			"sources": [
