@@ -6058,7 +6058,7 @@ H(Xt, Re, He, "ln-router", {
       r._pristine && r._mirror();
     }, this._onSlug = function() {
       r._mirroring || (r._pristine = r.dom.value === "");
-    }, i.addEventListener("input", this._onSource), y.addEventListener("input", this._onSlug), this;
+    }, i.addEventListener("input", this._onSource), y.addEventListener("input", this._onSlug), this._pristine && i.value && i.value.trim() !== "" && this._mirror(), this;
   }
   w.prototype._mirror = function() {
     this._mirroring = !0, this.dom.value = b(this.source.value), this.dom.dispatchEvent(new Event("input", { bubbles: !0 })), this._mirroring = !1;

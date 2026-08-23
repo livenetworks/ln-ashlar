@@ -53,6 +53,11 @@ import { registerComponent } from '../../ln-core';
 		source.addEventListener('input', this._onSource);
 		dom.addEventListener('input', this._onSlug);
 
+		// Initial check — if source field already has text and slug is pristine, mirror immediately
+		if (this._pristine && source.value && source.value.trim() !== '') {
+			this._mirror();
+		}
+
 		return this;
 	}
 
