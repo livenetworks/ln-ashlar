@@ -17,7 +17,7 @@ tags: [forms, slugs, helper, formatting]
 ## 1. Core Behavior & Responsibility
 
 - **Core Role:** Generates URL-friendly paths (slugs) in real time from a source text field (such as a blog title or product name) inside the same form wrapper.
-- **Pristine State Tracking:** Synchronizes value mappings continuously until the user manually types inside the slug field. Modifying the slug directly toggles `_pristine = false`, disconnecting auto-syncing. If the user empties the slug input field, pristine status is restored (`_pristine = true`), re-enabling auto-population.
+- **Pristine State Tracking:** Synchronizes value mappings continuously until the user manually types inside the slug field. Modifying the slug directly toggles `_pristine = false`, disconnecting auto-syncing. If the user empties the slug input field, pristine status is restored (`_pristine = true`), re-enabling auto-population. If the source field contains text upon component instantiation and the slug field is empty, it immediately generates the initial slug.
 - **Event Dispatching:** Fires a native `input` event on the target input upon every auto-generation update, ensuring that validator hooks (e.g. uniqueness checks) are triggered.
 - Located in [`components/ln-slug/src/ln-slug.js`](../../components/ln-slug/src/ln-slug.js).
 

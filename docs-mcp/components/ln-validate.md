@@ -17,7 +17,7 @@ tags: [forms, validation, accessibility]
 ## 1. Core Behavior & Responsibility
 
 - Wraps the native HTML5 `ValidityState` API of form elements to control visual error states in the DOM.
-- Implements a **touched gate** policy: errors are only shown after the user has interacted with the input (avoids errors on initial page load).
+- Implements a **touched gate** policy: pristine empty fields hide errors on initial page load, but pre-filled inputs containing a value upon instantiation automatically execute validation immediately to synchronize DOM state.
 - Registers a submit validation gate: if a form has at least one validated field, submit attempts are intercepted, all fields validated, and the first invalid field focused.
 - Located in [`components/ln-validate/src/ln-validate.js`](../../components/ln-validate/src/ln-validate.js).
 

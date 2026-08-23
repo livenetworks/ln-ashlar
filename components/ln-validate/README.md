@@ -134,9 +134,11 @@ input.lnValidate.destroy();
 
 Source: `components/ln-validate/ln-validate.js` (~160 lines). Imports only `dispatch`/`registerComponent` from `ln-core` — no sibling-component imports.
 
-### State
+### State & Constructor Initialization
 
 Three fields per instance (`dom.lnValidate`): `dom`, `_touched` (bool), `_customErrors` (Set). No cached error-`<li>` array, no cached `.form-element` ancestor reference, no debounce — every `validate()` call re-queries `parent.querySelectorAll` and recomputes from `dom.checkValidity()`. Cheap because the query is scoped to one field's wrapper and validity checks are microsecond-fast.
+
+**Initial Value Instantiation Check:** Upon component construction, if an input field already contains a non-empty value (`dom.value` is non-empty or `dom.checked`), `ln-validate` immediately marks `_touched = true` and invokes `this.validate()` to synchronize its visual state and error elements in the DOM without requiring initial user interaction. Pristine empty fields remain `_touched = false`.
 
 ### Listener discriminator
 

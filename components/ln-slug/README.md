@@ -29,7 +29,8 @@ The component tracks a `_pristine` flag per instance. Mirroring only runs while 
 
 | Situation | Result |
 |-----------|--------|
-| Slug field is empty at init | pristine = `true` (mirroring active) |
+| Slug field is empty at init & source has text | pristine = `true` (mirrors source text immediately on init) |
+| Slug field is empty at init & source is empty | pristine = `true` (mirroring active on future typing) |
 | Slug field is non-empty at init (server-rendered) | pristine = `false` (never overwrite) |
 | User types non-empty value into slug field | pristine = `false` (mirroring stops) |
 | User clears slug field | pristine = `true` (mirroring resumes) |
