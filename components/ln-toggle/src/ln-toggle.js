@@ -1,21 +1,54 @@
-import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
-import { persistGet, persistSet } from '../../ln-core';
+import { dispatch, dispatchCancelable, persistGet, persistSet, registerComponent } from '../../ln-core';
+import { getNextToggleState, isTargetDisabled, normalizeToggleState, shouldIgnoreClick } from './toggle-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-toggle';
 	const DOM_ATTRIBUTE = 'lnToggle';
+	const TRIGGER_ATTRIBUTE = 'data-ln-toggle-for';
+	const ACTION_ATTRIBUTE = 'data-ln-toggle-action';
+	const PERSIST_ATTRIBUTE = 'data-ln-persist';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	const instances = new Set();
+	let clickListener = null;
 
+	function _ensureClickListener() {
+		if (clickListener) return;
+		clickListener = function (e) {
+			if (shouldIgnoreClick(e)) return;
 
+			const trigger = e.target.closest('[' + TRIGGER_ATTRIBUTE + ']');
+			if (!trigger || isTargetDisabled(trigger)) return;
+
+			const targetId = trigger.getAttribute(TRIGGER_ATTRIBUTE);
+			if (!targetId) return;
+
+			const target = document.getElementById(targetId);
+			if (!target || !target[DOM_ATTRIBUTE]) return;
+
+			e.preventDefault();
+			const action = trigger.getAttribute(ACTION_ATTRIBUTE) || 'toggle';
+			const current = target.getAttribute(DOM_SELECTOR);
+			const nextState = getNextToggleState(current, action);
+			target.setAttribute(DOM_SELECTOR, nextState);
+		};
+		document.addEventListener('click', clickListener);
+	}
+
+	function _maybeRemoveClickListener() {
+		if (instances.size > 0 || !clickListener) return;
+		document.removeEventListener('click', clickListener);
+		clickListener = null;
+	}
 
 	function _syncTriggerAria(panelEl, isOpen) {
+		if (!panelEl || !panelEl.id) return;
 		const triggers = document.querySelectorAll(
-			'[data-ln-toggle-for="' + panelEl.id + '"]'
+			'[' + TRIGGER_ATTRIBUTE + '="' + panelEl.id + '"]'
 		);
-		for (const trigger of triggers) {
-			trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+		for (let i = 0; i < triggers.length; i++) {
+			triggers[i].setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 		}
 	}
 
@@ -39,11 +72,11 @@ import { persistGet, persistSet } from '../../ln-core';
 		this.dom.addEventListener('ln-toggle:request-close', this._onRequestClose);
 		this.dom.addEventListener('ln-toggle:request-toggle', this._onRequestToggle);
 
-		// ─── Restore persisted state ──────────────────────────────
-		if (dom.hasAttribute('data-ln-persist')) {
+		// Restore persisted state
+		if (dom.hasAttribute(PERSIST_ATTRIBUTE)) {
 			const saved = persistGet('toggle', dom);
 			if (saved !== null) {
-				dom.setAttribute(DOM_SELECTOR, saved);
+				dom.setAttribute(DOM_SELECTOR, normalizeToggleState(saved));
 			}
 		}
 
@@ -54,6 +87,9 @@ import { persistGet, persistSet } from '../../ln-core';
 		}
 
 		_syncTriggerAria(dom, this.isOpen);
+
+		instances.add(this);
+		_ensureClickListener();
 
 		return this;
 	}
@@ -68,7 +104,7 @@ import { persistGet, persistSet } from '../../ln-core';
 
 	_component.prototype.toggle = function () {
 		const current = this.dom.getAttribute(DOM_SELECTOR);
-		this.dom.setAttribute(DOM_SELECTOR, current === 'open' ? 'close' : 'open');
+		this.dom.setAttribute(DOM_SELECTOR, getNextToggleState(current, 'toggle'));
 	};
 
 	_component.prototype.destroy = function () {
@@ -76,8 +112,12 @@ import { persistGet, persistSet } from '../../ln-core';
 		this.dom.removeEventListener('ln-toggle:request-open', this._onRequestOpen);
 		this.dom.removeEventListener('ln-toggle:request-close', this._onRequestClose);
 		this.dom.removeEventListener('ln-toggle:request-toggle', this._onRequestToggle);
-		dispatch(this.dom, 'ln-toggle:destroyed', { target: this.dom });
+
+		instances.delete(this);
 		delete this.dom[DOM_ATTRIBUTE];
+		_maybeRemoveClickListener();
+
+		dispatch(this.dom, 'ln-toggle:destroyed', { target: this.dom });
 	};
 
 	// ─── Attribute Sync ────────────────────────────────────────
@@ -101,7 +141,7 @@ import { persistGet, persistSet } from '../../ln-core';
 			el.classList.add('open');
 			_syncTriggerAria(el, true);
 			dispatch(el, 'ln-toggle:open', { target: el });
-			if (el.hasAttribute('data-ln-persist')) {
+			if (el.hasAttribute(PERSIST_ATTRIBUTE)) {
 				persistSet('toggle', el, 'open');
 			}
 		} else {
@@ -114,35 +154,11 @@ import { persistGet, persistSet } from '../../ln-core';
 			el.classList.remove('open');
 			_syncTriggerAria(el, false);
 			dispatch(el, 'ln-toggle:close', { target: el });
-			if (el.hasAttribute('data-ln-persist')) {
+			if (el.hasAttribute(PERSIST_ATTRIBUTE)) {
 				persistSet('toggle', el, 'close');
 			}
 		}
 	}
-
-	// ─── Event Delegation ──────────────────────────────────────
-
-	document.addEventListener('click', function (e) {
-		if (e.ctrlKey || e.metaKey || e.button === 1) return;
-
-		const trigger = e.target.closest('[data-ln-toggle-for]');
-		if (trigger) {
-			const targetId = trigger.getAttribute('data-ln-toggle-for');
-			const target = document.getElementById(targetId);
-			if (target && target[DOM_ATTRIBUTE]) {
-				e.preventDefault();
-				const action = trigger.getAttribute('data-ln-toggle-action') || 'toggle';
-				if (action === 'open') {
-					target.setAttribute(DOM_SELECTOR, 'open');
-				} else if (action === 'close') {
-					target.setAttribute(DOM_SELECTOR, 'close');
-				} else if (action === 'toggle') {
-					const current = target.getAttribute(DOM_SELECTOR);
-					target.setAttribute(DOM_SELECTOR, current === 'open' ? 'close' : 'open');
-				}
-			}
-		}
-	});
 
 	// ─── Init ──────────────────────────────────────────────────
 

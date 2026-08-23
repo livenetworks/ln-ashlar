@@ -66,7 +66,7 @@
 					"role": "input",
 					"description": "Opt-in marker for elements allowed to receive auto-fill data."
 				},
-				"data-ln-key": {
+				"data-ln-render-key": {
 					"type": "string",
 					"read_by": "ln-core",
 					"consumed_by": "js",

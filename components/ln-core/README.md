@@ -153,7 +153,7 @@ fillTemplate(frag, { text: 'Engineering' });
 
 ### renderList(container, items, templateName, keyFn, fillFn, componentTag)
 
-Keyed list rendering with DOM reuse. Existing children matched by `data-ln-key` attribute.
+Keyed list rendering with DOM reuse. Existing children matched by `data-ln-render-key` attribute.
 
 ```js
 renderList(
@@ -168,7 +168,7 @@ renderList(
 
 - `keyFn(item)` returns a unique string key for each item
 - `fillFn(el, item, index)` updates the DOM element with item data
-- Reuses existing elements with matching `data-ln-key` (avoids re-clone)
+- Reuses existing elements with matching `data-ln-render-key` (avoids re-clone)
 - Replaces all container children atomically (`textContent = '' + appendChild(frag)`)
 - Calls `fillTemplate(clone, item)` automatically for newly-cloned elements — `{{ key }}` placeholders in the template resolve from the item data without extra wiring.
 

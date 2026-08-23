@@ -236,11 +236,11 @@ export function fillTemplate(clone, data) {
 // ─── Keyed List Rendering ──────────────────────────────────
 
 export function renderList(container, items, templateName, keyFn, fillFn, componentTag) {
-	// Index existing children by data-ln-key
+	// Index existing children by data-ln-render-key
 	const existingByKey = {};
 	for (let i = 0; i < container.children.length; i++) {
 		const child = container.children[i];
-		const key = child.getAttribute('data-ln-key');
+		const key = child.getAttribute('data-ln-render-key');
 		if (key) existingByKey[key] = child;
 	}
 
@@ -260,7 +260,7 @@ export function renderList(container, items, templateName, keyFn, fillFn, compon
 			fillTemplate(clone, item);
 			el = clone.firstElementChild;
 			if (!el) continue;
-			el.setAttribute('data-ln-key', key);
+			el.setAttribute('data-ln-render-key', key);
 			fillFn(el, item, i);
 		}
 		frag.appendChild(el);

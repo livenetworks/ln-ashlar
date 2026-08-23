@@ -110,7 +110,7 @@ populateForm(form, { name: "Jane", age: 31, isAdmin: false });
 | `fillTemplate` | `(clone: DocumentFragment\|HTMLElement, data: Object)` | `DocumentFragment\|HTMLElement` | Replaces `{{ prop }}` placeholders inside text nodes and element attribute values. |
 | `fill` | `(root: HTMLElement\|DocumentFragment, data: Object)` | `HTMLElement\|DocumentFragment` | Executes declarative attribute binding (`data-ln-field`, `data-ln-attr`, `data-ln-show`, `data-ln-class`) inside `root`. |
 | `lnFill` | `(container: HTMLElement, record: Object\|null)` | `HTMLElement` | Dispatches `ln-fill` custom event across `[data-ln-form]` and `[data-ln-fillable]` descendants. `null` triggers form/display clear. |
-| `renderList` | `(container: HTMLElement, items: Array, templateName: String, keyFn: Function, fillFn: Function, componentTag?: String)` | `void` | Performs keyed list reconciliation on `container` matching `data-ln-key`. |
+| `renderList` | `(container: HTMLElement, items: Array, templateName: String, keyFn: Function, fillFn: Function, componentTag?: String)` | `void` | Performs keyed list reconciliation on `container` matching `data-ln-render-key`. |
 | `dispatch` | `(element: HTMLElement, eventName: String, detail?: Object)` | `void` | Dispatches a bubbling `CustomEvent`. |
 | `dispatchCancelable` | `(element: HTMLElement, eventName: String, detail?: Object)` | `CustomEvent` | Dispatches a cancelable bubbling `CustomEvent`. Returns event object to check `defaultPrevented`. |
 | `requestData` | `(component: Object, eventName: String, keyName: String)` | `void` | Re-filters, sorts, and re-renders list/table components, then dispatches data request event with current sort, filter, and search state. |

@@ -173,10 +173,10 @@ renderList(
 
 ### How it works
 
-1. Index all current children by their `data-ln-key` attribute
+1. Index all current children by their `data-ln-render-key` attribute
 2. For each item in `items`:
    - If a node with matching key exists → call `fillFn(existingEl, item, i)` — node reused
-   - If not → clone template, set `data-ln-key`, call `fillFn(newEl, item, i)`
+   - If not → clone template, set `data-ln-render-key`, call `fillFn(newEl, item, i)`
 3. Atomic replace: `container.textContent = ''` then `container.appendChild(fragment)` — one reflow
 4. Orphaned nodes (keys no longer in `items`) are discarded
 
@@ -364,7 +364,7 @@ The attribute is the external interface. The Proxy is the internal reaction engi
 | `data-ln-attr="attr:prop, ..."` | template / live DOM | `fill` | `el.setAttribute(attr, data[prop])` |
 | `data-ln-show="prop"` | template / live DOM | `fill` | `classList.toggle('hidden', !data[prop])` |
 | `data-ln-class="cls:prop, ..."` | template / live DOM | `fill` | `classList.toggle(cls, !!data[prop])` |
-| `data-ln-key="id"` | rendered list item | `renderList` | keyed DOM node reuse |
+| `data-ln-render-key="id"` | rendered list item | `renderList` | keyed DOM node reuse |
 
 Existing component attributes (`data-ln-modal`, `data-ln-tabs`, etc.) are not part of this layer.
 
