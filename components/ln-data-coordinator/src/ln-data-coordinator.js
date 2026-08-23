@@ -647,9 +647,9 @@ import { MutationReceipts } from './mutation-receipts';
 
 				if (!children.storeEl) return;
 
-				const isAuth      = status === 401 || status === 419;
+				const isAuth = status === 401 || status === 419;
 				const isTransient = status === 0 || status >= 500;
-				const isConflict  = status === 409 || status === 412;
+				const isConflict = status === 409 || status === 412;
 
 				// ── Auth: pause queue, keep local write ──
 				if (isAuth) {
@@ -717,10 +717,10 @@ import { MutationReceipts } from './mutation-receipts';
 
 			// ─── View Binder Handlers ─────────────────────────────
 			reqTableData: function (e) { self._serveData(e, 'table'); },
-			reqListData:  function (e) { self._serveData(e, 'list'); },
+			reqListData: function (e) { self._serveData(e, 'list'); },
 			reqChartData: function (e) { self._serveData(e, 'chart'); },
-			reqOptions:   function (e) { self._serveOptions(e); },
-			reqStat:      function (e) { self._serveStat(e); },
+			reqOptions: function (e) { self._serveOptions(e); },
+			reqStat: function (e) { self._serveStat(e); },
 			refreshQuery: function () { self._refreshAll(null, true); },
 			refresh: function (e) {
 				self._mutationReceipts.resolve(e.detail);
@@ -767,18 +767,18 @@ import { MutationReceipts } from './mutation-receipts';
 
 		// View binder — request handlers (document-level to reach tables/lists outside this subtree)
 		document.addEventListener('ln-table:request-data', self._handlers.reqTableData);
-		document.addEventListener('ln-list:request-data',  self._handlers.reqListData);
+		document.addEventListener('ln-list:request-data', self._handlers.reqListData);
 		document.addEventListener('ln-chart:request-data', self._handlers.reqChartData);
 		document.addEventListener('ln-options:request-data', self._handlers.reqOptions);
-		document.addEventListener('ln-stat:request-count',  self._handlers.reqStat);
+		document.addEventListener('ln-stat:request-count', self._handlers.reqStat);
 
 		// Store-change refresh — attach to self.dom so bubbling store events are caught
-		self.dom.addEventListener('ln-data-store:ready',   self._handlers.refresh);
+		self.dom.addEventListener('ln-data-store:ready', self._handlers.refresh);
 		self.dom.addEventListener('ln-data-store:created', self._handlers.refresh);
 		self.dom.addEventListener('ln-data-store:updated', self._handlers.refresh);
 		self.dom.addEventListener('ln-data-store:deleted', self._handlers.refresh);
 		self.dom.addEventListener('ln-data-store:mutation-error', self._handlers.mutationError);
-		self.dom.addEventListener('ln-data-store:synced',  self._handlers.refreshSynced);
+		self.dom.addEventListener('ln-data-store:synced', self._handlers.refreshSynced);
 		self.dom.addEventListener('ln-data-store:query-changed', self._handlers.refreshQuery);
 	}
 
@@ -1022,18 +1022,18 @@ import { MutationReceipts } from './mutation-receipts';
 
 			// View binder — document-level listeners
 			document.removeEventListener('ln-table:request-data', self._handlers.reqTableData);
-			document.removeEventListener('ln-list:request-data',  self._handlers.reqListData);
+			document.removeEventListener('ln-list:request-data', self._handlers.reqListData);
 			document.removeEventListener('ln-chart:request-data', self._handlers.reqChartData);
 			document.removeEventListener('ln-options:request-data', self._handlers.reqOptions);
-			document.removeEventListener('ln-stat:request-count',  self._handlers.reqStat);
+			document.removeEventListener('ln-stat:request-count', self._handlers.reqStat);
 
 			// Store-change listeners
-			self.dom.removeEventListener('ln-data-store:ready',   self._handlers.refresh);
+			self.dom.removeEventListener('ln-data-store:ready', self._handlers.refresh);
 			self.dom.removeEventListener('ln-data-store:created', self._handlers.refresh);
 			self.dom.removeEventListener('ln-data-store:updated', self._handlers.refresh);
 			self.dom.removeEventListener('ln-data-store:deleted', self._handlers.refresh);
 			self.dom.removeEventListener('ln-data-store:mutation-error', self._handlers.mutationError);
-			self.dom.removeEventListener('ln-data-store:synced',  self._handlers.refreshSynced);
+			self.dom.removeEventListener('ln-data-store:synced', self._handlers.refreshSynced);
 			self.dom.removeEventListener('ln-data-store:query-changed', self._handlers.refreshQuery);
 
 			self._handlers = null;

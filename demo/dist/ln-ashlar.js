@@ -4161,10 +4161,6 @@ H(Yt, Le, De, "ln-router", {
           return;
         }
         const c = this._lastTotal, u = this.visibleCount;
-        if (this.dom.classList.contains("ln-table--loading") && this._filteredData.length > 0) {
-          this._renderAll();
-          return;
-        }
         if (c === 0) {
           this._disableVirtualScroll(), this._showEmptyState();
           return;
@@ -4304,8 +4300,6 @@ H(Yt, Le, De, "ln-router", {
     }
     this.tbody.replaceChildren(E), this._vStart = t, this._vEnd = n, this._cache.ensure(t, n);
   }, m.prototype._showEmptyState = function() {
-    if (this.dom.classList.contains("ln-table--loading") && this.tbody && this.tbody.rows.length > 0)
-      return;
     const c = this.ths.length || 1;
     let u = null, h = null;
     if (this.isDataDriven) {
