@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A viewport notification service that renders non-blocking status toasts via global CustomEvent bus and HTML template hydration.
-source: js/ln-toast/src/ln-toast.js
+source: components/ln-toast/src/ln-toast.js
 tags: [toast, notification, messaging, viewports]
 ---
 
@@ -16,9 +16,9 @@ tags: [toast, notification, messaging, viewports]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-toast` component provides a global non-blocking toast notification service driven by a window-level CustomEvent bus (`window.addEventListener`). It is located in [`js/ln-toast/src/ln-toast.js`](../../js/ln-toast/src/ln-toast.js).
+The `ln-toast` component provides a global non-blocking toast notification service driven by a window-level CustomEvent bus (`window.addEventListener`). It is located in [`components/ln-toast/src/ln-toast.js`](../../components/ln-toast/src/ln-toast.js).
 
-*   **Declarative Templating:** Toast cards are rendered declaratively from an HTML template (`<template data-ln-template="ln-toast-item">`) using `cloneTemplateScoped` and `fill` from [`ln-core`](../../js/ln-core/src/ln-core.js).
+*   **Declarative Templating:** Toast cards are rendered declaratively from an HTML template (`<template data-ln-template="ln-toast-item">`) using `cloneTemplateScoped` and `fill` from [`ln-core`](../../components/ln-core/src/ln-core.js).
 *   **SSR / Hydration:** Supports auto-hydrating pre-rendered server-side `<li>` elements existing inside the toast container on initial load.
 *   **Queue Eviction (FIFO):** Automatically caps the maximum number of visible notifications (`data-ln-toast-max="5"`), evicting the oldest card when the queue threshold is exceeded.
 *   **Automatic Timeout & Manual Dismissal:** Manages auto-dismiss timers (`data-ln-toast-timeout="6000"`) and binds click handlers to `[data-ln-toast-close]` buttons.
@@ -49,17 +49,17 @@ Placed at the end of the main layout body:
     <li data-ln-toast-item data-ln-attr="class:type">
         <div class="icon">
             <ul>
-                <li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg></li>
-                <li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-x"></use></svg></li>
-                <li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg></li>
-                <li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg></li>
+                <li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg></li>
+                <li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-x"></use></svg></li>
+                <li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg></li>
+                <li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg></li>
             </ul>
         </div>
         <section class="content">
             <header>
                 <strong class="title" data-ln-field="title"></strong>
                 <button type="button" data-ln-toast-close aria-label="Close">
-                    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+                    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
                 </button>
             </header>
             <main class="body" data-ln-field="message"></main>
@@ -102,7 +102,7 @@ window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
 
 ### Attributes Table
 
-| Attribute | Target Element | Type | Default | Description |
+| Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-toast` | Container (`ul`) | Identifier | — | Marks element as a toast container host. |
 | `data-ln-toast-timeout` | Container / Event | `Number (ms)` | `6000` | Display duration before auto-dismissal. `0` disables timeout. |
@@ -110,12 +110,24 @@ window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
 | `data-ln-toast-item` | Card (`li`) | Identifier | — | Identifies individual toast cards for hydration/removal. |
 | `data-ln-toast-close` | Button | Identifier | — | Identifies manual close triggers inside card headers. |
 
+### Programmatic JS API
+
+The initialized container instance is exposed on the host element via `dom.lnToast`.
+
+| Property / Method | Type | Description |
+|---|---|---|
+| `dom.lnToast` | `Object` | The toast container service instance attached to the DOM element. |
+| `dom.lnToast.enqueue(opts)` | `Function` | Programmatically constructs and appends a toast item to this container. |
+| `dom.lnToast.clear()` | `Function` | Dismisses all active toast notifications inside this container. |
+| `dom.lnToast.destroy()` | `Function` | Dismisses active cards, demotes top-layer, dispatches `ln-toast:destroyed`, and destroys instance. |
+
 ### Events API
 
-| Event | Target | Payload `detail` | Description |
-|---|---|---|---|
-| `ln-toast:enqueue` | `window` | `{ type, title, message, data, timeout, container }` | Dispatches a request to construct and append a new toast notification. |
-| `ln-toast:clear` | `window` | `{ container }` | Clears all active toast notifications (optionally filtered by container). |
+| Event | Direction | Cancelable | Description | `detail` Object |
+|---|:---:|:---:|---|---|
+| `ln-toast:enqueue` | Listens | No | Dispatches a request to construct and append a new toast notification. | `{ type, title, message, data, timeout, container }` |
+| `ln-toast:clear` | Listens | No | Clears all active toast notifications (optionally filtered by container). | `{ container }` |
+| `ln-toast:destroyed` | Emits | No | Dispatched when `destroy()` is called on the container instance. | `{ target: HTMLElement }` |
 
 ---
 
@@ -136,7 +148,7 @@ Visual layer implementation using SCSS mixins:
 }
 ```
 
-*   **`@mixin toast-container`** ([`scss/config/mixins/_toast.scss`](../../scss/config/mixins/_toast.scss)): Positions container at viewport bottom-right with `pointer-events: none` to pass clicks through to page content. It resets Popover API default styling (`border: none`, `background: transparent`) and ensures `&:popover-open` maintains `display: flex`.
+*   **`@mixin toast-container`** ([`theme/config/mixins/_toast.scss`](../../theme/config/mixins/_toast.scss)): Positions container at viewport bottom-right with `pointer-events: none` to pass clicks through to page content. It resets Popover API default styling (`border: none`, `background: transparent`) and ensures `&:popover-open` maintains `display: flex`.
 *   **Top-Layer Promotion (Popover API):** When active toasts exist, the container is automatically promoted to the browser's **Top Layer** using `popover="manual"` and `showPopover()`. This guarantees toast notifications render **above native `<dialog>` modal backdrops** (`::backdrop`) and other top-layer surfaces. When all toasts dismiss, the container is demoted (`hidePopover()`).
 *   **Two-Phase Animation:** On mount, cards receive `.ln-enter` (removed next frame via `requestAnimationFrame`). On dismissal, cards receive `.ln-out` for 200ms before `removeChild()` is called.
 

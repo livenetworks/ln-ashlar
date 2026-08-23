@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Zero-dependency local-first database cache store backed by browser IndexedDB.
-source: js/ln-data-store/src/ln-data-store.js
+source: components/ln-data-store/src/ln-data-store.js
 tags: [data, store, database, indexeddb, offline-first]
 ---
 
@@ -20,7 +20,7 @@ tags: [data, store, database, indexeddb, offline-first]
 - **Optimistic Mutations:** Updates the local IndexedDB database immediately on mutation request events and triggers instant UI updates, bypassing network latency.
 - **At-Rest Encryption:** Secures cached data payload using AES-GCM encryption if a storage key is set, keeping only the primary `id` in plain text.
 - **Dynamic Schema Discovery:** Auto-registers database tables and indexes based on elements declared in the HTML markup.
-- Source path: [ln-data-store.js](../../js/ln-data-store/src/ln-data-store.js)
+- Source path: [ln-data-store.js](../../components/ln-data-store/src/ln-data-store.js)
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
@@ -35,10 +35,11 @@ tags: [data, store, database, indexeddb, offline-first]
 ### Base HTML Markup
 
 ```html
-<div data-ln-data-store="documents"
+<div data-ln-data-store
      data-ln-data-store-indexes="status,department,updated_at"
      data-ln-data-store-search-fields="title,owner"
-     data-ln-data-store-stale="300">
+     data-ln-data-store-stale="300"
+     id="documents">
 </div>
 ```
 
@@ -48,7 +49,7 @@ Use for configuration settings or static data tables.
 
 #### HTML Markup
 ```html
-<div data-ln-data-store="settings" data-ln-data-store-stale="never"></div>
+<div data-ln-data-store data-ln-data-store-stale="never" id="settings"></div>
 ```
 
 ### Variant 2: Full 3-Tier Synchronization Configuration
@@ -57,11 +58,12 @@ Use when synchronizing with a REST backend API.
 
 #### HTML Markup
 ```html
-<ul data-ln-data-coordinator="tasks" hidden>
+<ul data-ln-data-coordinator hidden>
     <!-- Tier 1: Local Cache -->
-    <li data-ln-data-store="tasks" 
+    <li data-ln-data-store 
         data-ln-data-store-indexes="due_date,priority"
-        data-ln-data-store-search-fields="title,description">
+        data-ln-data-store-search-fields="title,description"
+        id="tasks">
     </li>
     <!-- Tier 2: Backend Connector -->
     <li data-ln-api-connector 
@@ -79,7 +81,7 @@ Use when synchronizing with a REST backend API.
 
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
-| `data-ln-data-store` | Root | `String` | *Required* | Declares the store name. |
+| `data-ln-data-store` | Root | Flag / Valueless | *Required* | Activates the store. The store name is defined by the element's `id`. |
 | `data-ln-data-store-stale` | Root | `Integer` \| `"never"` \| `-1` | `300` | Seconds before data is considered stale. |
 | `data-ln-data-store-indexes` | Root | `String` | `""` | Comma-separated IndexedDB index fields. |
 | `data-ln-data-store-search-fields` | Root | `String` | `""` | Comma-separated list of text fields for search. |
@@ -115,6 +117,10 @@ Exposed on the root element via `el.lnDataStore`:
 | `ln-data-store:request-update` | Listens | No | Optimistically updates a record or rekeys ID. | `{ id: ID, data: Object }` |
 | `ln-data-store:request-delete` | Listens | No | Optimistically deletes a record. | `{ id: ID }` |
 | `ln-data-store:request-bulk-delete` | Listens | No | Optimistically deletes multiple records. | `{ ids: Array }` |
+| `ln-search:change` | Listens | Yes (`preventDefault`) | Updates `query.search` and dispatches `ln-data-store:query-changed`. | `{ term: String }` |
+| `ln-filter:change` | Listens | Yes (`preventDefault`) | Updates `query.filters[key]` and dispatches `ln-data-store:query-changed`. | `{ key: String, values: Array, targetId: String }` |
+| `ln-sort:change` | Listens | Yes (`preventDefault`) | Updates `query.sort` and dispatches `ln-data-store:query-changed`. | `{ field: String, direction: String }` |
+| `ln-data-store:query-changed` | Emits | No | Emitted when store filters, search, or sort are modified. | `{ store: String, query: { filters: Object, search: String, sort: Object\|null } }` |
 | `ln-data-store:request-remote-sync` | Emits | No | Triggers network sync request. | `{ since: Number\|null }` |
 | `ln-data-store:initialized` | Emits | No | Emitted when store IndexedDB is configured. | `{ store: String, hasCache: Boolean, lastSyncedAt: Number\|null, count: Number }` |
 | `ln-data-store:ready` | Emits | No | Emitted when data is ready for viewing. | `{ store: String, count: Number, source: 'cache'\|'server' }` |

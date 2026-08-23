@@ -4,7 +4,7 @@ classification: service
 status: stable
 domain: frontend
 summary: Direct DOM manipulation, declarative attribute binding, template interpolation, form serialization, link interception, and component registration helpers.
-source: js/ln-core/helpers.js
+source: components/ln-core/helpers.js
 tags: [helpers, dom, forms, templates, serialization, registration, service]
 ---
 
@@ -18,7 +18,7 @@ tags: [helpers, dom, forms, templates, serialization, registration, service]
 
 `ln-helpers` implements the core DOM utility functions, component registration pipeline, form processing tools, and template engines used across all `ln-ashlar` components and project coordinators.
 
-The JavaScript source is located at [helpers.js](../../js/ln-core/helpers.js).
+The JavaScript source is located at [helpers.js](../../components/ln-core/helpers.js).
 
 Key responsibilities include:
 - **Component Lifecycle Registration (`registerComponent`):** Registers component classes with MutationObserver-based lifecycle management (childList, attribute observation, auto-instantiation, and automatic `destroy()` teardown on DOM removal).

@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Automates form data population and handles RESTful method spoofing.
-source: js/ln-form/src/ln-form.js
+source: components/ln-form/src/ln-form.js
 tags: [forms, populate, REST]
 ---
 
@@ -18,7 +18,7 @@ tags: [forms, populate, REST]
 
 - Automates the population of input values from data records (Form Population).
 - Handles RESTful action URI interpolation and method spoofing for update operations.
-- Located in [`js/ln-form/src/ln-form.js`](../../js/ln-form/src/ln-form.js).
+- Located in [`components/ln-form/src/ln-form.js`](../../components/ln-form/src/ln-form.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
@@ -104,7 +104,7 @@ Configured for both creation and modification. Uses dynamic action path template
 
 ## 4. CSS Styling & Behavioral Concept
 
-- **Headless Component:** `ln-form` has no visual classes of its own. Visual styling is defined in `scss/components/_form.scss` for general HTML form elements.
+- **Headless Component:** `ln-form` has no visual classes of its own. Visual styling is defined in `theme/components/_form.scss` for general HTML form elements.
 - **Population Algorithm:**
   When `.fill(data)` runs, it scans fields with `name` or `data-ln-fill-as`:
   - *Text / Hidden / Textarea:* Value set to matching key value.

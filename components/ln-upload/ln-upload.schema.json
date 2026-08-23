@@ -1,0 +1,131 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-upload",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-field": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-progress": {
+			"direction": "both",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload": {
+			"direction": "author",
+			"sources": [
+				"ln-upload.scss",
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-accept": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-action": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-delete": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-dict": {
+			"direction": null,
+			"sources": [
+				"ln-upload.scss",
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-ext": {
+			"direction": "runtime",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-file-field": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-id": {
+			"direction": "both",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-ids-field": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-item": {
+			"direction": "both",
+			"sources": [
+				"ln-upload.scss",
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-list": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-local-id": {
+			"direction": "both",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-max-files": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-max-size": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-progress": {
+			"direction": null,
+			"sources": [
+				"ln-upload.scss"
+			]
+		},
+		"data-ln-upload-size": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-state": {
+			"direction": "runtime",
+			"sources": [
+				"ln-upload.scss",
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-zone": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		}
+	}
+}

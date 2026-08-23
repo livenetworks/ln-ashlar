@@ -1,0 +1,13 @@
+// ==========================================================================
+// ln-confirm — Functional Two-Element Mode Toggle
+// ==========================================================================
+
+[data-ln-confirm] {
+	&:not([data-confirming="true"]) [data-ln-confirm-active] {
+		display: none;
+	}
+
+	&[data-confirming="true"] [data-ln-confirm-idle] {
+		display: none;
+	}
+}

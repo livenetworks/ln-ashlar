@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A visual rich text editor component that progressively enhances standard textareas.
-source: js/ln-editor/src/ln-editor.js
+source: components/ln-editor/src/ln-editor.js
 tags: [forms, editors, inputs, rich-text]
 ---
 
@@ -19,7 +19,7 @@ tags: [forms, editors, inputs, rich-text]
 - **Core Role:** Progressively enhances a standard `<textarea>` element, replacing it visually with a rich text editing workspace (`contenteditable` surface).
 - **Zero-Dependency WYSIWYG:** Relies entirely on native browser selection APIs and commands (`execCommand`), keeping bundle sizes small.
 - **Form Value Synchronization:** Automatically serializes rich text modifications back to the original `<textarea>` to preserve native form submission capabilities.
-- Located in [`js/ln-editor/src/ln-editor.js`](../../js/ln-editor/src/ln-editor.js).
+- Located in [`components/ln-editor/src/ln-editor.js`](../../components/ln-editor/src/ln-editor.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
@@ -33,19 +33,19 @@ tags: [forms, editors, inputs, rich-text]
 
 ### Base HTML Markup
 
-Standard rich text editor template containing a basic action toolbar:
+Standard rich text editor template containing an authored action toolbar and hidden target `<textarea>`:
 
 ```html
 <div data-ln-editor="post_editor" class="ln-editor">
-    <!-- Action Toolbar -->
-    <nav class="ln-editor__toolbar">
+    <!-- Action Toolbar (Authored HTML) -->
+    <div role="toolbar" aria-label="Text formatting">
         <ul>
             <li><button type="button" data-ln-editor-action="bold" aria-label="Bold">B</button></li>
             <li><button type="button" data-ln-editor-action="italic" aria-label="Italic">I</button></li>
             <li><button type="button" data-ln-editor-action="underline" aria-label="Underline">U</button></li>
             <li><button type="button" data-ln-editor-action="link" aria-label="Link">Link</button></li>
         </ul>
-    </nav>
+    </div>
 
     <!-- Native Textarea -->
     <label for="post-body">Content:</label>
@@ -55,69 +55,18 @@ Standard rich text editor template containing a basic action toolbar:
 
 ---
 
-### Variant 1: Popover Label Configuration
+### Link Popover Template Markup
 
-Overrides default link dialog labels directly via data attributes on the wrapper element:
-
-```html
-<div data-ln-editor="comment_editor"
-     data-ln-editor-link-placeholder="Enter web address..."
-     data-ln-editor-link-confirm="Apply"
-     data-ln-editor-link-cancel="Cancel"
-     class="ln-editor">
-    <nav class="ln-editor__toolbar">
-        <button type="button" data-ln-editor-action="bold">B</button>
-        <button type="button" data-ln-editor-action="link">Link</button>
-    </nav>
-    <textarea name="comment" placeholder="Write comment..."></textarea>
-</div>
-```
-
----
-
-### Variant 2: Localized Interface Dictionary
-
-Extracts popover labels from a hidden BCP 47 mapping structure inside the container (using `buildDict`):
+When the `link` action is included in the toolbar, author the `<template data-ln-template="ln-editor-link-popover">` on the page. The editor clones this template when inserting or editing links:
 
 ```html
-<div data-ln-editor="translated_editor" class="ln-editor">
-    <nav class="ln-editor__toolbar">
-        <button type="button" data-ln-editor-action="bold">B</button>
-        <button type="button" data-ln-editor-action="link">Link</button>
-    </nav>
-    <textarea name="content"></textarea>
-
-    <!-- Inline Localized Dictionary -->
-    <ul hidden>
-        <li data-ln-editor-dict="link-placeholder">Insert URL...</li>
-        <li data-ln-editor-dict="link-confirm">Confirm</li>
-        <li data-ln-editor-dict="link-cancel">Cancel</li>
-    </ul>
-</div>
-```
-
----
-
-### Variant 3: Custom Popover Templates
-
-Developers can redefine the HTML structure of the inline link editor popup by supplying a custom `<template>` element:
-
-```html
-<div data-ln-editor="custom_editor" class="ln-editor">
-    <nav class="ln-editor__toolbar">
-        <button type="button" data-ln-editor-action="link">Link</button>
-    </nav>
-    <textarea name="content"></textarea>
-
-    <!-- Custom Popover Blueprint -->
-    <template data-ln-template="ln-editor-link-popover">
-        <div class="ln-editor__link-popover custom-popover-theme">
-            <input type="url" data-ln-attr="placeholder:placeholderText" class="custom-input" />
-            <button type="button" data-ln-editor-action="confirm-link" data-ln-attr="aria-label:confirmLabel">✓</button>
-            <button type="button" data-ln-editor-action="cancel-link" data-ln-attr="aria-label:cancelLabel">✗</button>
-        </div>
-    </template>
-</div>
+<template data-ln-template="ln-editor-link-popover">
+    <div class="ln-editor__link-popover">
+        <input type="url" placeholder="https://…" />
+        <button type="button" data-ln-editor-action="confirm-link" aria-label="Confirm" title="Confirm">✓</button>
+        <button type="button" data-ln-editor-action="cancel-link" aria-label="Cancel" title="Cancel">✗</button>
+    </div>
+</template>
 ```
 
 ---
@@ -128,12 +77,9 @@ Developers can redefine the HTML structure of the inline link editor popup by su
 
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
-| `data-ln-editor` | Wrapper | `String` | — | Initializes the rich text editor. The value specifies the instance identifier. |
-| `data-ln-editor-action` | Button | `String` | — | Defines the command executed when the button is clicked. |
-| `data-ln-editor-link-placeholder` | Wrapper | `String` | — | Custom placeholder for the link popup input field. |
-| `data-ln-editor-link-confirm` | Wrapper | `String` | — | Custom button label for applying links. |
-| `data-ln-editor-link-cancel` | Wrapper | `String` | — | Custom button label for canceling link creation. |
-| `data-ln-editor-source` | Textarea | Flag (auto) | — | Injected by JS onto the target `<textarea>` to mark it for absolute hiding. |
+| `data-ln-editor` | Wrapper | `String` | — | Initializes the rich text editor instance. |
+| `data-ln-editor-action` | Button | `String` | — | Defines the formatting command executed when the button is clicked. |
+| `data-ln-editor-source` | Textarea | Flag (runtime) | — | Injected by JS onto the target `<textarea>` to mark it for CSS hiding. Removed on `destroy()`. |
 
 ### Supported Actions
 
@@ -220,7 +166,7 @@ sequenceDiagram
     participant Form as Parent Form
 
     Textarea->>Editor: Component Mount
-    Editor->>Editor: Parse buildDict and setup custom templates
+    Editor->>Editor: Read initial textarea content & wire toolbar
     Editor->>Editor: Build contenteditable workspace & sync text content
     Editor->>Textarea: Hide original element (display: none)
     Editor->>Form: Listen for reset events

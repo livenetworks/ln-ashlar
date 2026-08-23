@@ -1,6 +1,6 @@
 # Chip
 
-File: `scss/config/mixins/_chip.scss` + `scss/components/_chip.scss`.
+File: `theme/config/mixins/_chip.scss` + `theme/components/_chip.scss`.
 
 Inline passive label. For active filter tags, status labels, and
 metadata display.
@@ -22,7 +22,7 @@ metadata display.
 <span class="ln-chip">
 	Quality Manual
 	<button type="button" aria-label="Remove">
-		<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 	</button>
 </span>
 

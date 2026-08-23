@@ -1,6 +1,6 @@
 # Stat card / KPI card
 
-File: `scss/config/mixins/_stat-card.scss` + `scss/components/_stat-card.scss`.
+File: `theme/config/mixins/_stat-card.scss` + `theme/components/_stat-card.scss`.
 
 Dashboard KPI tile. Large numeric value, small uppercase label, and
 optional trend indicator.
@@ -12,7 +12,7 @@ optional trend indicator.
 	<p data-ln-stat-label>Total documents</p>
 	<p data-ln-stat-value>1,247</p>
 	<p data-ln-stat-trend="up">
-		<svg class="ln-icon" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg>
 		12% from last month
 	</p>
 </article>

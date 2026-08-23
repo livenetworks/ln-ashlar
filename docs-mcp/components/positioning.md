@@ -4,7 +4,7 @@ classification: service
 status: stable
 domain: frontend
 summary: Viewport-aware mathematical and measurement positioning utilities for floating UI components.
-source: js/ln-core/positioning.js
+source: components/ln-core/positioning.js
 tags: [positioning, floating-ui, service]
 ---
 
@@ -18,7 +18,7 @@ tags: [positioning, floating-ui, service]
 
 The `positioning.js` module is a core utility script that provides mathematical and DOM helpers to precisely align floating UI elements (such as `ln-popover`, `ln-tooltip`, and `ln-dropdown`) relative to their anchor controls.
 
-The JavaScript source is located at [positioning.js](../../js/ln-core/positioning.js).
+The JavaScript source is located at [positioning.js](../../components/ln-core/positioning.js).
 
 Key responsibilities include:
 - **Placement Calculation (`computePlacement`):** A pure utility that maps anchor coordinates and floating dimensions onto viewport pixels. It checks whether the floating panel fits inside the viewport and falls back to secondary and tertiary directions if boundary collisions occur.

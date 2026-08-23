@@ -1,0 +1,25 @@
+// ==========================================================================
+// ln-list — Functional Loading and Virtualization State
+// ==========================================================================
+
+.ln-list--loading [data-ln-list-body] {
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+.ln-list__spacer {
+	grid-column: 1 / -1;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: none !important;
+	list-style: none !important;
+	background: transparent !important;
+	pointer-events: none;
+}
+
+.ln-list__placeholder {
+	margin: 0 !important;
+	padding: 0 !important;
+	border: none !important;
+	list-style: none !important;
+}

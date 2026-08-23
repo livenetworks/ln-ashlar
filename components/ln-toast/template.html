@@ -1,0 +1,18 @@
+<!-- Developer example — copy into your page markup inside <template data-ln-template="ln-toast-item">. Not a runtime artifact. -->
+<li data-ln-toast-item data-ln-attr="class:type">
+	<div class="icon">
+		<ul>
+			<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg></li>
+			<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-x"></use></svg></li>
+			<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg></li>
+			<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg></li>
+		</ul>
+	</div>
+	<section class="content">
+		<header>
+			<strong class="title" data-ln-field="title"></strong>
+			<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+		</header>
+		<main class="body" data-ln-field="message"></main>
+	</section>
+</li>

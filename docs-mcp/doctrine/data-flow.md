@@ -23,7 +23,7 @@ This document explains how data flows unidirectionally through `ln-ashlar` acros
 | # | Concern | Component(s) | Primary Responsibility |
 |---|---|---|---|
 | **1** | **Data** | `ln-data-store` | Manages local IndexedDB caches, local query execution, offline synchronization, and state updates. |
-| **2** | **Render** | [`ln-table`](../components/ln-table.md), [`ln-list`](../components/ln-list.md) | Visual rendering of datasets, virtual scrolling, and translating visual actions (sort, page) into query intent. |
+| **2** | **Render** | [`ln-table`](../components/ln-table.md), [`ln-list`](../components/ln-list.md), [`ln-chart`](../components/ln-chart.md) | Visual rendering of datasets and translating visual actions or declarative mappings into query intent. |
 | **3** | **Submit** | [`ln-form`](../components/ln-form.md), [`ln-confirm`](../components/ln-confirm.md), [`ln-http`](../components/ln-http.md) | Form serialization, submit gating, UX confirmation, and transport payloads. |
 | **4** | **Validate** | [`ln-validate`](../components/ln-validate.md) | Field-level validation constraints, custom rules, and UI error displays. |
 
@@ -36,8 +36,8 @@ Data moves strictly in predictable, asynchronous loops:
 ### A. The Read Loop
 1. The **Data Store** (`ln-data-store`) loads records from its local IndexedDB cache or syncs them from the server.
 2. The store dispatches an `ln-data-store:ready` or `ln-data-store:loaded` event.
-3. The **Coordinator** (`ln-data-coordinator`) queries the store (e.g. `store.getAll()`) and dispatches `ln-table:set-data` or `ln-list:set-data` to the bound view components.
-4. Bound **Renderers** (`ln-table` or `ln-list`) listen to these `set-data` events and redraw themselves dynamically.
+3. The **Coordinator** (`ln-data-coordinator`) queries the store (e.g. `store.getAll()`) and dispatches `ln-table:set-data`, `ln-list:set-data`, or `ln-chart:set-data` to the bound view components.
+4. Bound **Renderers** (`ln-table`, `ln-list`, or `ln-chart`) listen to these `set-data` events and redraw themselves dynamically.
 
 ### B. The Write Loop
 1. The user submits a form.

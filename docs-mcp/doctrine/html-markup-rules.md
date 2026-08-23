@@ -34,7 +34,7 @@ This guide details the mandatory HTML conventions and structure doctrines within
         <header>
             <h3>Edit User</h3>
             <button type="button" aria-label="Close" data-ln-modal-close>
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
             </button>
         </header>
         <main>
@@ -96,7 +96,7 @@ Every element that performs an action upon interaction must use the correct inte
 
 ```html
 <button aria-label="Close">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 </button>
 ```
 
@@ -139,6 +139,20 @@ const removeLabel = dict['remove'] || 'Remove';
 ```
 
 For numbers, dates, times, and currencies, always leverage native browser `Intl` APIs (`Intl.DateTimeFormat`, `Intl.NumberFormat`) instead of dictionary entries.
+
+### Micro-Component Pattern & Template Exemption
+Micro-components and behavioral gatekeepers (such as `ln-confirm`) that decorate a single interactive element are **exempt** from the `<template>` cloning requirement to avoid over-engineering.
+
+For full HTML-first declarative purity and localization, micro-components use:
+1. **Two-Element Markup Mode (Recommended):** Child elements define both states natively in HTML without touching text in JS:
+   ```html
+   <button type="button" data-ln-confirm>
+       <span data-ln-confirm-idle>Delete</span>
+       <span data-ln-confirm-active hidden>Are you sure?</span>
+   </button>
+   ```
+2. **Shorthand Attribute Mode:** Localized text passed directly in the attribute (`data-ln-confirm="Are you sure?"`).
+3. **Developer Failsafes:** Un-localized strings in JS (e.g. `'Confirm?'`) are strictly treated as last-resort failsafes for empty authoring, not runtime UI layers.
 
 ---
 

@@ -2,7 +2,7 @@
 
 > Cross-component philosophy for how data moves through ln-ashlar.
 > Component-specific attributes, events, payloads, and APIs live in each
-> component's `js/ln-{component}/README.md`. This document is
+> component's `components/ln-{component}/README.md`. This document is
 > the rules that span them.
 
 ---
@@ -23,8 +23,9 @@ never reach in.
 
 Two flows cross the concerns:
 
-- **Read.** A renderer binds to a store by name (`data-ln-table-store`,
-  `data-ln-list-store`, `data-ln-options`, `data-ln-stat`) and dispatches its
+- **Read.** A renderer binds to a store by its `id` (`data-ln-table-source`,
+  `data-ln-list-source`, `data-ln-chart-source`, `data-ln-options`,
+  `data-ln-stat`) and dispatches its
   own `request-data` intent. The coordinator that owns the matching store
   resolves it against the store's query engine and delivers
   `ln-{kind}:set-data`. The renderer draws.
@@ -55,7 +56,8 @@ What this rules out:
 ### 2.1 Data — `ln-data-store` + `ln-data-coordinator`
 
 **Owns.** `ln-data-store`: an IndexedDB-backed local cache per resource,
-declared with `data-ln-data-store="<name>"`. Query engine — `getAll(options)`,
+declared with the marker attribute `data-ln-data-store` and identified by its
+`id`. Query engine — `getAll(options)`,
 `getById`, `count`, `aggregate` — with sort / filter / search / limit applied
 **client-side over the cache**. Optimistic writes on
 `ln-data-store:request-create` / `-update` / `-delete` / `-bulk-delete` — the
@@ -77,7 +79,7 @@ separate confirm/revert method). Delivers live data to bound view components
 beyond the native `action`/`method` contract. The UI controls that produce
 sort/filter/search input (intent).
 
-**Intent vs execution.** UI components like `ln-table-sort`, `ln-filter`,
+**Intent vs execution.** UI components like `ln-sort`, `ln-filter`,
 and `ln-search` produce **intent** — which column to sort by, which filter
 to apply, what to search for — via `ln-table:request-data` /
 `ln-list:request-data`. The coordinator resolves the request against its
@@ -97,19 +99,17 @@ intent) into an `ln-table:request-data` / `ln-list:request-data` payload.
 and receives a fresh array on every `ln-{kind}:set-data`. The query engine.
 Network calls.
 
-> **Windowed exception.** In windowed mode (`data-ln-table-window` /
-> `data-ln-list-window`), the renderer does own a bounded cache — an
-> `ln-core.createWindowCache` instance holding at most the configured
-> `windowSize` resident rows. `ln-{kind}:set-data` still delivers one
-> fetched page at a time rather than the full array; the cache splices
-> each page in and evicts by LRU. This is the sole exception to "renderer
-> is stateless about records" — the cache exists because the full dataset
-> is too large to hold client-side, not because the renderer resumed
-> owning data by default.
+> **Windowed residency.** In windowed residency mode (`data-ln-data-store-window`),
+> the store (`ln-data-store`) owns the bounded position index (`window-index`).
+> The renderer remains stateless about records: it holds only a single resident
+> page slice (`_sliceData` at `_sliceOffset`) and draws placeholders (empty items/rows)
+> for indices outside that slice. When scrolling outside this slice, the renderer
+> dispatches `request-data` with `offset`/`limit` to fetch the missing slice from
+> the coordinator.
 
 A renderer binds to a coordinator-owned store by attribute —
-`data-ln-table-store="<storeName>"` on `[data-ln-table]`, or
-`data-ln-list-store="<storeName>"` on `[data-ln-list]`. On mount, and on
+`data-ln-table-source="<storeName>"` on `[data-ln-table]`, or
+`data-ln-list-source="<storeName>"` on `[data-ln-list]`. On mount, and on
 every sort/filter/search change, the renderer dispatches
 `ln-table:request-data` / `ln-list:request-data` at itself; the coordinator
 whose child store matches `<storeName>` (guarded by an ownership check, so
@@ -291,9 +291,9 @@ is authored once per coordinator instance as a markup dictionary
 key is silent.
 
 For exact event names, payload shapes, and timing, see the
-[ln-data-store README](../../js/ln-data-store/README.md),
-[ln-data-coordinator README](../../js/ln-data-coordinator/README.md), and
-[ln-api-queue README](../../js/ln-api-queue/README.md).
+[ln-data-store README](../../components/ln-data-store/README.md),
+[ln-data-coordinator README](../../components/ln-data-coordinator/README.md), and
+[ln-api-queue README](../../components/ln-api-queue/README.md).
 
 ---
 
@@ -321,8 +321,8 @@ the boundary.
 
 ```html
 <!-- ACCEPTED -->
-<section data-ln-table="documents" data-ln-table-store="documents">
-	<!-- data-ln-table-col-sort / data-ln-filter / data-ln-search on the
+<section data-ln-table="documents" data-ln-table-source="documents">
+	<!-- data-ln-sort / data-ln-filter / data-ln-search on the
 	     toolbar controls produce the intent; ln-table dispatches
 	     ln-table:request-data with { sort, filters, search } and the
 	     owning ln-data-coordinator resolves it via store.getAll(options). -->
@@ -369,7 +369,7 @@ function _dispatchChange(storeName, records) {
 `-updated` / `-deleted` on its own element only, and knows nothing about
 renderers. Re-serving bound views is `ln-data-coordinator`'s job: on those
 same store-level notifications it queries
-`[data-ln-table-store],[data-ln-list-store],[data-ln-options],[data-ln-stat]`
+`[data-ln-table-source],[data-ln-list-source],[data-ln-chart-source],[data-ln-options],[data-ln-stat]`
 once, filters to the elements whose store name matches its own child
 (`_ownsStore()`), and re-runs each one's last query. This still avoids the
 O(n)-per-record cost the rejected pattern above has — the scan runs once
@@ -399,7 +399,7 @@ Two problems stack:
    translating sync into a draw call. The data layer is reaching into
    the render layer through the consumer.
 
-The renderer binds by attribute (`data-ln-table-store`, `data-ln-list-store`)
+The renderer binds by attribute (`data-ln-table-source`, `data-ln-list-source`)
 and dispatches its own `request-data` on mount; the owning coordinator
 answers with `ln-{kind}:set-data` on subscription, on every mutation, and
 on every sync. **Reactive to a stream, not a puller of state.**
@@ -551,7 +551,7 @@ window.lnCore.lnFill(container, record)
 // record = null → fillables reset/clear themselves.
 ```
 
-Source: `js/ln-core/helpers.js` L159–172.
+Source: `components/ln-core/helpers.js` L159–172.
 
 #### Event
 
@@ -570,7 +570,7 @@ self-handle; nothing else needs to listen.
 `lnFill(formEl, record)` also dispatches `ln-fill` at `formEl` itself when it
 matches `[data-ln-form]` or `[data-ln-fillable]`. This means passing the form
 element directly (as `ln-fill` declarative trigger does) works correctly — the
-form's own `ln-fill` handler fires. Source: `js/ln-core/helpers.js` L164–165.
+form's own `ln-fill` handler fires. Source: `components/ln-core/helpers.js` L164–165.
 
 #### Guard rule (important for future fillable authors)
 
@@ -581,7 +581,7 @@ bubbled `ln-fill` from a descendant fillable double-triggers it. This is why
 
 #### Declarative trigger layer (`ln-fill` module)
 
-The `ln-fill` module (`js/ln-fill/`) adds a document-level click listener. On
+The `ln-fill` module (`components/ln-fill/`) adds a document-level click listener. On
 click of `[data-ln-fill-form="<id>"]`, it:
 
 1. Reads all `data-ln-fill-<key>` attributes from the trigger's `dataset`.
@@ -592,7 +592,7 @@ click of `[data-ln-fill-form="<id>"]`, it:
 4. Does NOT call `e.preventDefault()` — coexists with `data-ln-modal-for` on
    the same button.
 
-Source: `js/ln-fill/src/ln-fill.js`.
+Source: `components/ln-fill/src/ln-fill.js`.
 
 Declarative trigger is the **default** for click-triggered fills, including
 ln-table row templates — `fillTemplate()` now interpolates `{{ key }}` in
@@ -631,7 +631,7 @@ the canonical convention for new code.
                         data-ln-fill-title="{{ title }}"
                         aria-label="Edit"
                     >
-                        <svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg>
+                        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg>
                     </button>
                 </li>
             </ul>
@@ -648,7 +648,7 @@ the canonical convention for new code.
                 <span data-ln-modal-when="edit">Edit — <span data-ln-field="title"></span></span>
             </h3>
             <button type="button" data-ln-modal-close aria-label="Close">
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
             </button>
         </header>
         <main>
@@ -752,10 +752,10 @@ _scan(document.body);  // init
 | Term | Definition |
 |------|------------|
 | **Coordinator** | A component or script that listens for events on one element and writes attributes (or dispatches events) on another, never calling instance methods directly. Two flavours — page-level (consumer-written shim that bridges data-flow components) and library-shipped (encapsulates a reusable cross-component rule, e.g. `ln-accordion`, or the data layer's own `ln-data-coordinator`). For details, see the [Coordinator Doctrine](coordinator.md). |
-| **Store** | An `ln-data-store` instance (`data-ln-data-store="<name>"`) bound to a single resource. One element, one cache. It is a pure cache — it holds no write queue of its own; the optional offline outbox lives in `ln-api-queue`. |
-| **Renderer** | Any element with `data-ln-table-store`, `data-ln-list-store`, `data-ln-options`, or `data-ln-stat`. Receives `ln-{kind}:set-data` / `:set-loading` (or `:set-count` for stats) from the coordinator that owns the matching store. |
+| **Store** | An `ln-data-store` instance (marker attribute `data-ln-data-store`, identified by its `id`) bound to a single resource. One element, one cache. It is a pure cache — it holds no write queue of its own; the optional offline outbox lives in `ln-api-queue`. |
+| **Renderer** | Any element with `data-ln-table-source`, `data-ln-list-source`, `data-ln-chart-source`, `data-ln-options`, or `data-ln-stat`. Receives `ln-{kind}:set-data` / `:set-loading` (or `:set-count` for stats) from the coordinator that owns the matching store. |
 | **Scoped form** | `data-ln-form-scope="<name>"` on a `<form>` matches it to the `data-ln-data-coordinator` of the same name (or, when empty, to the nearest containing coordinator). The coordinator claims its native submit at the `document` bubble phase, after `ln-validate`'s own gate has already run. |
-| **Intent** | A UI component's output describing what the user wants — sort by column X descending, filter by status, search for "foo". Produced by `ln-table-sort`, `ln-filter`, `ln-search`; delivered via `request-data`, consumed by the coordinator through the owning store's `getAll()` options. |
+| **Intent** | A UI component's output describing what the user wants — sort by column X descending, filter by status, search for "foo". Produced by `ln-sort`, `ln-filter`, `ln-search`; delivered via `request-data`, consumed by the coordinator through the owning store's `getAll()` options. |
 | **Optimistic write** | Writing to the local cache before the server confirms. There is no `_pending` flag — a create's only marker is its `_temp_<uuid>` id, held until the server response arrives. |
 | **Reconcile** | Replacing a `_temp_<uuid>` with the server's authoritative id via an **ordinary** `ln-data-store:request-update` (the store detects the id mismatch and rekeys). There is no separate `confirmMutation` — reconciliation reuses the same update event a normal edit would dispatch. |
 | **Error bucket** | The three-way classification of a non-2xx connector response: **auth** (401/419 — pauses the queue scope, optimistic write stays), **transient** (status `0` / 5xx — optimistic write stays, retried with backoff on the queued path), **deterministic** (409 on update, or any other 4xx/3xx — create is deleted, 409 update takes the server's `remote` record, everything else is left for the next sync). Drives both the store action and the queue's ack/nack identically on the queued and non-queued paths. |

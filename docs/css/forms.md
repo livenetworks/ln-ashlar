@@ -1,6 +1,6 @@
 # Forms & Buttons
 
-File: `scss/components/_form.scss`.
+File: `theme/components/_form.scss`.
 
 ## Inputs
 
@@ -16,7 +16,7 @@ wrapper owns border, padding, and focus ring.
 
 ```html
 <label>
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
     <input type="search" placeholder="Search…">
 </label>
 ```
@@ -29,15 +29,15 @@ hover, tighter padding, 1rem icons — use `class="search"`:
 
 ```html
 <label class="search">
-	<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-	<input type="search" placeholder="Search…" data-ln-search="my-list">
+	<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+	<input type="search" placeholder="Search…" data-ln-search-for="my-list" data-ln-search-debounce="0">
 	<button type="button" data-ln-search-clear aria-label="Clear search">
-		<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 	</button>
 </label>
 ```
 
-`class="search"` is a library component (`scss/components/_form.scss`:
+`class="search"` is a library component (`theme/components/_form.scss`:
 `.search { @include search; }`) — a delta-only variant of `@include
 form-input-icon-group`: capped width, recessed fill, white clear-button hover,
 1rem icons. The base icon-group chrome still comes from the global auto-bind, so
@@ -55,7 +55,7 @@ inline composition, not prose — they are tuned for density.
 The trade-off: icon groups look compact and sit closer to the
 surrounding label/value rhythm; standalone inputs stay comfortable for
 long-form typing. Concrete values live in the mixin at
-`scss/config/mixins/_form.scss`.
+`theme/config/mixins/_form.scss`.
 
 ## Focus Indicators
 

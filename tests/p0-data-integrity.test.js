@@ -6,12 +6,12 @@ import {
 	claimQueueHeads,
 	remapQueueEntries,
 	QueueStorage
-} from '../js/ln-api-queue/src/queue-storage.js';
+} from '../components/ln-api-queue/src/queue-storage.js';
 import {
 	normalizeDataQuery,
 	selectDataSource
-} from '../js/ln-data-coordinator/src/data-read-policy.js';
-import { MutationReceipts } from '../js/ln-data-coordinator/src/mutation-receipts.js';
+} from '../components/ln-data-coordinator/src/data-read-policy.js';
+import { MutationReceipts } from '../components/ln-data-coordinator/src/mutation-receipts.js';
 
 let databaseSequence = 0;
 
@@ -54,24 +54,31 @@ async function usingQueueStorage(options, operation) {
 }
 
 test('loaded cache is selected for normal reads', () => {
-	const store = { isLoaded: true };
-	assert.equal(selectDataSource(store, {}, false), 'store');
+	const store = { isLoaded: true, canServe: true };
+	assert.equal(selectDataSource(store, {}), 'store');
 });
 
 test('empty local-only store remains a valid read source', () => {
 	const store = { isLoaded: false, isInitialized: true };
-	assert.equal(selectDataSource(store, null, false), 'store');
+	assert.equal(selectDataSource(store, null), 'store');
 });
 
-test('unloaded and windowed connector reads route remote', () => {
-	assert.equal(selectDataSource({ isLoaded: false }, {}, false), 'remote');
-	assert.equal(selectDataSource({ isLoaded: true }, {}, true), 'remote');
+test('unloaded connector reads route remote', () => {
+	assert.equal(selectDataSource({ isLoaded: false }, {}), 'remote');
 });
 
 test('store initialization failure routes remote when possible', () => {
 	const store = { isLoaded: false, initializationError: new Error('IndexedDB failed') };
 	assert.equal(selectDataSource(store, {}, false), 'remote');
 	assert.equal(selectDataSource(store, null, false), 'none');
+});
+
+test('declinesRead when store has noLocalQuery and not windowed', () => {
+	const unwindowedNoLocal = { canServe: true, noLocalQuery: true, windowed: false };
+	assert.equal(selectDataSource(unwindowedNoLocal, {}), 'remote');
+
+	const windowedNoLocal = { canServe: true, noLocalQuery: true, windowed: true };
+	assert.equal(selectDataSource(windowedNoLocal, {}), 'store');
 });
 
 test('query normalization is detail-null safe', () => {

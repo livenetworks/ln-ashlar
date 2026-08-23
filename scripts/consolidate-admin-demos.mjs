@@ -8,20 +8,20 @@ const ADMIN_DIR = join(__dirname, '..', 'demo', 'admin');
 const SIDEBAR_CANONICAL = `		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
 				<span class="app-name">ashlar-gui</span>
 			</div>
 
-			<label class="sidebar-search" data-ln-search="demo-nav" data-ln-search-items="li">
-				<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
+			<label class="sidebar-search" data-ln-search="demo-nav" data-ln-search-items="li" data-ln-search-debounce="0">
+				<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 				<input type="search" placeholder="Filter menu…">
 			</label>
 
 			<div class="sidebar-content">
 				<nav class="nav" id="demo-nav" data-ln-nav="active">
 					<ul>
-						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
 					<h6 class="nav-section">CSS Components</h6>
@@ -90,14 +90,14 @@ const HEADER_TEMPLATE = (title) => `		<!-- Header -->
 		<header>
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
 				</button>
 				<h1>${title}</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
 					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-moon"></use></svg>
 					</button>
 					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
 						Test Toast

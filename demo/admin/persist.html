@@ -37,8 +37,6 @@
 	</script>
 	<link rel="stylesheet" href="dist/admin.css">
 	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
-	<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
 	<script src="../dist/ln-ashlar.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
 </head>
@@ -49,16 +47,16 @@
 		<li data-ln-toast-item data-ln-attr="class:type">
 			<div class="icon">
 				<ul>
-					<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg></li>
-					<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-x"></use></svg></li>
-					<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg></li>
-					<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg></li>
+					<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg></li>
+					<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-x"></use></svg></li>
+					<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg></li>
+					<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg></li>
 				</ul>
 			</div>
 			<section class="content">
 				<header>
 					<strong class="title" data-ln-field="title"></strong>
-					<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+					<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</header>
 				<main class="body" data-ln-field="message"></main>
 			</section>
@@ -71,14 +69,14 @@
 		<header class="app-header">
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
 				</button>
 				<h1>Persist</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
 					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-palette"></use></svg>
 					</button>
 					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
 						<ul>
@@ -91,7 +89,7 @@
 						</ul>
 					</div>
 					<button type="button" id="demo-density-trigger" data-ln-popover-for="demo-density-picker" aria-label="Choose density">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-adjustments-horizontal"></use></svg>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-adjustments-horizontal"></use></svg>
 					</button>
 					<div class="demo-density-picker" data-ln-popover id="demo-density-picker">
 						<ul>
@@ -112,20 +110,20 @@
 		<!-- Sidebar -->
 		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
 			<header>
-				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
 				<span class="app-name">ashlar-gui</span>
 				<label class="search sidebar-search">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-					<input type="search" placeholder="Filter menu…" data-ln-search="demo-nav" data-ln-search-items="li">
-					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+					<input type="search" placeholder="Filter menu…" data-ln-search-for="demo-nav" data-ln-search-debounce="0">
+					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</label>
 			</header>
 
 			<main>
-				<nav class="nav" id="demo-nav" data-ln-nav="active">
+				<nav class="nav" id="demo-nav" data-ln-nav="active" data-ln-search="" data-ln-search-items="li">
 					<ul>
-						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
 					<h6 class="nav-section">CSS Components</h6>
@@ -164,6 +162,7 @@
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
 						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
+						<li><a href="include.html"><span class="nav-label">Include</span></a></li>
 						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
@@ -222,7 +221,7 @@
 								<strong>Persisted toggle A</strong>
 								<small><code>id="persist-toggle-a" data-ln-persist</code></small>
 								<button type="button" data-ln-toggle-for="persist-toggle-a" aria-label="Toggle A">
-									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg>
 								</button>
 							</header>
 							<section id="persist-toggle-a" data-ln-toggle="close" data-ln-persist class="collapsible">
@@ -238,7 +237,7 @@
 								<strong>Persisted toggle B</strong>
 								<small><code>id="persist-toggle-b" data-ln-persist</code></small>
 								<button type="button" data-ln-toggle-for="persist-toggle-b" aria-label="Toggle B">
-									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg>
 								</button>
 							</header>
 							<section id="persist-toggle-b" data-ln-toggle="close" data-ln-persist class="collapsible">
@@ -254,7 +253,7 @@
 								<strong>Control — no persistence</strong>
 								<small><code>id="no-persist-toggle"</code> — no <code>data-ln-persist</code></small>
 								<button type="button" data-ln-toggle-for="no-persist-toggle" aria-label="Toggle control">
-									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg>
 								</button>
 							</header>
 							<section id="no-persist-toggle" data-ln-toggle="close" class="collapsible">
@@ -276,7 +275,7 @@
 							<li>
 								<header data-ln-toggle-for="acc-panel-1">
 									Panel 1 — General settings
-									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg>
 								</header>
 								<section id="acc-panel-1" data-ln-toggle="close" data-ln-persist class="collapsible">
 									<article class="collapsible-body">
@@ -288,7 +287,7 @@
 							<li>
 								<header data-ln-toggle-for="acc-panel-2">
 									Panel 2 — Security
-									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg>
 								</header>
 								<section id="acc-panel-2" data-ln-toggle="close" data-ln-persist class="collapsible">
 									<article class="collapsible-body">
@@ -300,7 +299,7 @@
 							<li>
 								<header data-ln-toggle-for="acc-panel-3">
 									Panel 3 — Notifications
-									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg>
 								</header>
 								<section id="acc-panel-3" data-ln-toggle="close" data-ln-persist class="collapsible">
 									<article class="collapsible-body">
@@ -375,51 +374,51 @@
 					<header><h3>4 — Table sort persistence</h3></header>
 					<main>
 						<p>Click a column header to sort, then refresh. The sort column and direction are restored.</p>
-						<p><code>data-ln-persist</code> goes on the <code>[data-ln-table]</code> wrapper — one attribute covers both <code>ln-table</code> and <code>ln-table-sort</code>.</p>
+						<p><code>data-ln-persist</code> goes on each <code>[data-ln-sort]</code> element individually — persistence is per sort instance, not per table. Give each one a distinct key. Sorting is single-column, so at most one <code>ln:sort:</code> key exists at a time — sorting a different column clears the previous column's stored key.</p>
 
-						<div id="persist-table" data-ln-table data-ln-persist>
+						<div id="persist-table" data-ln-table>
 							<table>
 								<thead>
 									<tr>
-										<th data-ln-table-sort="string">
+										<th>
 											Name
-											<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
-												<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-												<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-												<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-											</button>
+											<ul data-ln-sort="persist-table" data-ln-persist="name-sort">
+												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+											</ul>
 										</th>
-										<th data-ln-table-sort="string">
+										<th>
 											Department
-											<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
-												<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-												<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-												<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-											</button>
+											<ul data-ln-sort="persist-table" data-ln-persist="department-sort">
+												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+											</ul>
 										</th>
-										<th data-ln-table-sort="string">
+										<th>
 											Role
-											<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
-												<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-												<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-												<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-											</button>
+											<ul data-ln-sort="persist-table" data-ln-persist="role-sort">
+												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+											</ul>
 										</th>
-										<th data-ln-table-sort="number" class="numeric">
+										<th class="numeric">
 											Salary
-											<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
-												<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-												<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-												<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-											</button>
+											<ul data-ln-sort="persist-table" data-ln-persist="salary-sort">
+												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+											</ul>
 										</th>
-										<th data-ln-table-sort="date">
+										<th>
 											Start date
-											<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
-												<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-												<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-												<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-											</button>
+											<ul data-ln-sort="persist-table" data-ln-persist="start-date-sort">
+												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+											</ul>
 										</th>
 									</tr>
 								</thead>
@@ -476,7 +475,7 @@
 								</tbody>
 							</table>
 						</div>
-						<p><small>Storage key: <code>ln:table-sort:{path}:persist-table</code> — value: <code>{ col: N, dir: "asc"|"desc" }</code></small></p>
+						<p><small>Storage key: <code>ln:sort:{path}:name-sort</code> — value: <code>{ field, column, direction, targetId }</code></small></p>
 					</main>
 				</section>
 
@@ -531,7 +530,7 @@
 								<tbody>
 									<tr><td>ln-toggle</td><td><code>ln:toggle:{path}:{id}</code></td><td><code>"open"</code> or <code>"close"</code></td></tr>
 									<tr><td>ln-tabs</td><td><code>ln:tabs:{path}:{key}</code></td><td><code>"security"</code></td></tr>
-									<tr><td>ln-table-sort</td><td><code>ln:table-sort:{path}:{id}</code></td><td><code>{"col":3,"dir":"desc"}</code></td></tr>
+									<tr><td>ln-sort</td><td><code>ln:sort:{path}:{id}</code></td><td><code>{"field":null,"column":3,"direction":"desc","targetId":"persist-table"}</code></td></tr>
 									<tr><td>ln-filter</td><td><code>ln:filter:{path}:{id}</code></td><td><code>{"key":"status","values":["active"]}</code></td></tr>
 								</tbody>
 							</table>
@@ -592,7 +591,7 @@
 		<form>
 			<header>
 				<h3>Basic Modal</h3>
-				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 			</header>
 			<main>
 				<p>This is a basic modal with a title and content.</p>
@@ -608,13 +607,13 @@
 		<form id="demo-form-el" data-ln-form>
 			<header>
 				<span class="icon">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-user"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-user"></use></svg>
 				</span>
 				<hgroup>
 					<h3>Edit User</h3>
 					<p>Update the user's details below.</p>
 				</hgroup>
-				<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 			</header>
 			<main>
 				<div class="form-element">
@@ -636,7 +635,7 @@
 			</main>
 			<footer>
 				<button type="button" class="delete-action">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
 					Delete
 				</button>
 				<button type="button" data-ln-modal-close>Cancel</button>

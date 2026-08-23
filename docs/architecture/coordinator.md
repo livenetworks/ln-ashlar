@@ -8,7 +8,7 @@ Instead of building massive, monophonic components that try to own state, layout
 
 ## 🧭 Core Philosophy
 
-The Coordinator Doctrine is guided by three non-negotiable rules:
+The Coordinator Doctrine is guided by five non-negotiable rules:
 
 ### 1. The DOM is the Contract
 A coordinator does not maintain private JavaScript state (e.g. `this.isOpen = true` or `this.activeStep = 3`). The state is written directly into the DOM as standard HTML attributes (e.g. `data-ln-toggle="open"` or `class="active"`). The HTML attribute is the sole source of truth.
@@ -20,6 +20,40 @@ A coordinator interacts with its child elements through decoupled channels:
 
 ### 3. Absolute Testability & Inspectability
 Because all state transitions are reflected as attribute mutations in the DOM, you can test and debug the entire layout by manually changing attributes in your browser's Developer Tools or running automated testing scripts. Setting `data-ln-toggle="open"` in DevTools behaves exactly the same as clicking the physical trigger button.
+
+### 4. Children Only — the Subtree Is the Boundary
+A coordinator coordinates **its own descendants and nothing else**. Its listeners bind to its host element, never to `document`. It resolves targets with `this.dom.querySelector()`, never `document.querySelector()`. Outside its own subtree a coordinator does not exist and does not look.
+
+There is no page-wide fallback. A coordinator that cannot resolve a target inside its host does nothing — it never guesses by grabbing the first matching element on the page. A fallback such as `document.querySelector('[data-ln-table]')` silently turns every unrelated component on the page into an accidental input: a search box filtering a sidebar menu ends up driving a data table it has no relationship with.
+
+This boundary is what makes coordinators composable. Ten coordinators of the same type on one page each see only their own children, and there is no shared state to leak between them.
+
+### 5. ID Binding Is Point-to-Point
+When one component is bound to another by id — `data-ln-search="<targetId>"`, `data-ln-modal-for="<modalId>"`, `data-ln-filter="<tableId>"` — it communicates with **that target and only that target**. It is not a broadcast.
+
+Such components dispatch their event **on the target element**, not on themselves. Delivery therefore depends on where the *target* lives, not where the trigger lives. A search input in a sidebar may legitimately drive a table inside a coordinator: the event originates on the table, which is the coordinator's own child, so rule 4 is satisfied without the input being a descendant of anything.
+
+The corollary binds the listening side. An event merely bubbling past is not permission to act on it. A coordinator acts only when the event's target is one of its own children.
+
+### Sanctioned Exceptions
+
+Rule 4 admits exceptions, but only where the behaviour genuinely is not coordination. A page-level keyboard shortcut, or a fan-out helper that must reach any matching element wherever it lives, has no host whose subtree could contain its work — scoping it would not make it correct, it would make it useless.
+
+Two such exceptions ship today: `ln-ui-coordinator`, which listens at `document` because its triggers are anywhere on the page and its targets are addressed by id, and `ln-table-coordinator`'s `/` focus shortcut, which is a page affordance rather than coordination between a host and its children.
+
+What makes them sanctioned rather than sloppy is that they are named. An exception must be deliberate, documented where it lives, and justified by the impossibility of scoping — not by convenience. A `document` listener that *could* have been bound to a host is a defect, whatever it is called.
+
+### The Target Decides
+
+Rules 4 and 5 together mean an id-bound event has exactly one addressee, and what happens next depends entirely on what that addressee is capable of. `ln-search` illustrates the full range: it dispatches a **cancelable** `ln-search:change` on its target, then applies its own default DOM show/hide only if nothing cancelled it.
+
+| Target | What happens |
+|---|---|
+| Inert DOM — a `<nav>` menu | Nothing cancels. `ln-search` hides non-matching children via `data-ln-search-hide`. |
+| A component with an opinion — an SSR `ln-table` | The table intercepts the event **on itself**, calls `preventDefault()`, and runs its own in-memory filter so its active sort and footer counts stay coherent. |
+| A data-driven `ln-table` | Its parent coordinator intercepts, calls `preventDefault()`, and translates the term into a data request. |
+
+One protocol, three outcomes, no special-casing anywhere. The cancelable gate is precisely what allows a dumb target and a smart target to be driven by the same component — and it is why a component must never cancel an event on behalf of a target it does not own.
 
 ---
 
@@ -64,26 +98,26 @@ sequenceDiagram
   3. It measures the trigger and places the menu right-aligned beneath it.
   4. It listens for viewport resizes and outside clicks to safely write `data-ln-toggle="close"` back to the menu when needed.
 
-#### 3. `ln-modal-coordinator` (Bridging Triggers, Hash Navigation, Fill, and Submit)
-* **Children:** none — a global document listener (mirrors `ln-fill`).
-* **The Rule:** a modal must open, get its form filled, and auto-close on
-  successful submit — without `ln-modal`, `ln-fill`, or `ln-form` knowing
-  about each other.
+#### 3. `ln-ui-coordinator` (Bridging Triggers, Hash Navigation, Fill, AJAX, and Submit)
+* **Children:** acts on targets across the page with dictionary scoped to `[data-ln-ui-coordinator]`; see [Sanctioned Exceptions](#sanctioned-exceptions) above for why global trigger delegation is a deliberate exception to Rule 4.
+* **The Rule:** a modal must open, get its form filled, auto-close on
+  successful AJAX submit, and toast response messages — without `ln-modal`,
+  `ln-fill`, `ln-ajax`, or `ln-toast` knowing about each other.
 * **Flow:**
   1. A trigger (`[data-ln-modal-for]` button or `<a href="#modalId:42">` hash
      anchor) is clicked; the coordinator intercepts it, updates the URL hash
      via `hashSet` (preserving foreign segments), and determines mode
      (`new` vs `edit`) from the presence of a hash param.
   2. It extracts `data-ln-modal-*` / `data-ln-fill-*` payload attributes from
-     the trigger, dispatches `ln-fill:request` to populate the form, and
+     the trigger, calls `lnFill` to populate the form, and
      dispatches `ln-modal:request-open` to the target `ln-modal`.
-  3. On `ln-form:success` / `ln-ajax:success` bubbling from the form, it
-     cleans the hash, dispatches `ln-modal:request-close`, and dispatches
-     `ln-form:request-reset`.
-  4. On `ln-form:error` / `ln-ajax:error`, it does nothing — the modal stays
-     open so inline validation errors remain visible.
+  3. On `ln-ajax:success` bubbling from the form, it
+     dispatches `ln-toast:enqueue` if a response message is present, cleans the hash,
+     dispatches `ln-modal:request-close`, and resets modal forms.
+  4. On `ln-ajax:error`, it dispatches error toast notifications and keeps the
+     modal open so inline validation errors remain visible.
 
-See also: [Hash-state doctrine](hash-state.md) — the cross-cutting rules for namespace ownership, foreign-segment preservation, and anchor interception that make hash-param coordinators like `ln-modal-coordinator` safe to compose.
+See also: [Hash-state doctrine](hash-state.md) — the cross-cutting rules for namespace ownership, foreign-segment preservation, and anchor interception that make hash-param coordinators like `ln-ui-coordinator` safe to compose.
 
 ---
 
@@ -241,14 +275,14 @@ A modal, drawer, or inline editor persists in the DOM and is reused across many 
 
 **Default: declarative trigger** — for click-triggered fills from table rows or
 inline buttons, `data-ln-fill-form` + `data-ln-fill-*` attributes on the trigger
-require no coordinator at all (see [`js/ln-fill/README.md`](../../js/ln-fill/README.md)).
+require no coordinator at all (see [`components/ln-fill/README.md`](../../components/ln-fill/README.md)).
 
 **Coordinator pattern** — use `ln-modal:before-open` + `lnFill` when the fill is
 programmatic and not click-triggered (e.g. a store conflict handler, an import
 workflow, or a deep-link pre-fill). Pattern: on `ln-modal:before-open`, call
 `window.lnCore.lnFill(modalEl, record)`. For the hash-param deep-link case specifically,
-the shipped generic `ln-modal-coordinator` handles this automatically (source:
-`js/ln-modal-coordinator/src/ln-modal-coordinator.js`); the manual
+the shipped generic `ln-ui-coordinator` handles this automatically (source:
+`components/ln-ui-coordinator/src/ln-ui-coordinator.js`); the manual
 `before-open` + `lnFill` pattern remains valid for non-hash programmatic fills.
 Pass `record` to fill; pass `null` to reset. The helper fans out to all `[data-ln-form]`
 and `[data-ln-fillable]` descendants — coordinator never calls `lnForm.reset()` /
@@ -275,7 +309,7 @@ modalEl.addEventListener('ln-modal:before-open', () => {
 });
 ```
 
-See the mode-toggle markup and coordinator wiring in [`js/ln-modal/README.md §7`](../../js/ln-modal/README.md).
+See the mode-toggle markup and coordinator wiring in [`components/ln-modal/README.md §7`](../../components/ln-modal/README.md).
 
 ---
 
@@ -284,6 +318,9 @@ See the mode-toggle markup and coordinator wiring in [`js/ln-modal/README.md §7
 When writing your own custom coordinators, adhere to this checklist to ensure stability and compatibility:
 
 * **[ ] Never import children:** A presentation coordinator must remain oblivious to the internal implementation of its children. Listen to bubbled events, and write attributes.
+* **[ ] Bind to your host, not to `document`:** Attach listeners to `this.dom`, so events reach you only by bubbling up through your own subtree. A `document`-level listener sees every component on the page and makes the coordinator a page-wide singleton by accident.
 * **[ ] Scan your subtree only:** Never query the global `document.querySelectorAll()` inside a coordinator. Use `this.dom.querySelectorAll()` to ensure that multiple instances of your coordinator on the same page never conflict.
+* **[ ] Never fall back to the page:** If a target cannot be resolved inside your host, do nothing. Guessing with `document.querySelector('[data-ln-x]')` picks the first match on the page and silently binds you to a component you have no relationship with.
+* **[ ] Check the event target before acting:** An event that bubbles through your host is not necessarily addressed to you. Confirm `e.target` is one of your children before intercepting or cancelling it.
 * **[ ] Clean up thoroughly:** In the `destroy()` method, remove all event listeners added to parent wrappers or global surfaces (like `window` or `document`), and drop all internal references to prevent memory leaks.
 * **[ ] Support dynamic markup:** Expect elements to be added or removed dynamically. If you cache elements, ensure you handle dynamic insertions (typically via the component's MutationObserver hook) or re-evaluate selectors on user actions.

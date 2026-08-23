@@ -1,6 +1,6 @@
 # Avatar
 
-Profile button or link with image, initials fallback, and optional name/role text. Files: `scss/config/mixins/_avatar.scss`, `scss/components/_avatar.scss`.
+Profile button or link with image, initials fallback, and optional name/role text. Files: `theme/config/mixins/_avatar.scss`, `theme/components/_avatar.scss`.
 
 ## HTML
 

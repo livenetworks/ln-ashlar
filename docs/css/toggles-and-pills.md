@@ -1,6 +1,6 @@
 # Pills & Switches
 
-File: `scss/config/mixins/_form.scss` + `scss/components/_form.scss`
+File: `theme/config/mixins/_form.scss` + `theme/components/_form.scss`
 
 `ln-ashlar` offers four distinct visual treatments for native checkboxes (`<input type="checkbox">`) and radio buttons (`<input type="radio">`):
 1. **Filled Pills**: Gray-background, horizontal joined button segmented control.

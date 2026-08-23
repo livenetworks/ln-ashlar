@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A FIFO transactional outbox queue in IndexedDB for reliable offline-first writes.
-source: js/ln-api-queue/src/ln-api-queue.js
+source: components/ln-api-queue/src/ln-api-queue.js
 tags: [network, database, offline, queue]
 ---
 
@@ -21,7 +21,7 @@ tags: [network, database, offline, queue]
 - Implements dynamic **exponential backoff retry schedules** (`2s, 5s, 15s, 60s, 300s` intervals) for handling temporary network dropouts, up to 8 max attempts.
 - Performs runtime **ID Remapping**: replaces offline temporary record IDs (`_temp_uuid`) with official server-issued database IDs across all queued pending requests once creations succeed.
 - Retrying `failed` entries after retries are exhausted is manual — dispatch `ln-api-queue:request-drain` (e.g. from a "retry failed" UI action) to re-attempt them.
-- Located in [`js/ln-api-queue/src/ln-api-queue.js`](../../js/ln-api-queue/src/ln-api-queue.js).
+- Located in [`components/ln-api-queue/src/ln-api-queue.js`](../../components/ln-api-queue/src/ln-api-queue.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
@@ -74,6 +74,7 @@ tags: [network, database, offline, queue]
 | `ln-api-queue:nack` | Listens | No | Rejects transmission; triggers retry, drop, or pause. | `{ entryId: ID, reason: "retry" \| "drop" \| "auth" }` |
 | `ln-api-queue:request-remap` | Listens | No | Triggers temporary ID remapping. | `{ oldKey: String, newId: ID }` |
 | `ln-api-queue:request-resume` | Listens | No | Triggers queue drainage resumption. | `{}` |
+| `ln-api-queue:request-pause` | Listens | No | Manually pauses queue drainage for this scope. | `{}` |
 | `ln-api-queue:request-drain` | Listens | No | Manually triggers a drain attempt — the canonical way to retry `failed` entries (e.g. a UI "retry failed" action). | `{}` |
 | `ln-api-queue:request-clear` | Listens | No | Empties the queue local store. | `{}` |
 | `ln-api-queue:send` | Emits | No | Dispatched to coordinator to execute request. | `{ entryId: ID, chainKey: String, op: String, payload: Object }` |
@@ -82,7 +83,7 @@ tags: [network, database, offline, queue]
 | `ln-api-queue:drained` | Emits | No | Dispatched when the outbox becomes empty. | `{ scope: String }` |
 | `ln-api-queue:failed` | Emits | No | Dispatched when 8 retry attempts are exhausted. | `{ entryId: ID, chainKey: String, attempts: Number }` |
 | `ln-api-queue:auth-required` | Emits | No | Dispatched when auth pause occurs. | `{ entryId: ID, chainKey: String }` |
-| `ln-api-queue:paused` | Emits | No | Dispatched when draining pauses for a scope (e.g. after an `auth` nack). | `{ reason: String }` |
+| `ln-api-queue:paused` | Emits | No | Dispatched when draining pauses for a scope (e.g. after an `auth` nack or manual request-pause). | `{ reason: "auth" \| "manual", restored?: Boolean }` |
 | `ln-api-queue:resumed` | Emits | No | Dispatched when draining resumes for a scope. | `{}` |
 | `ln-api-queue:destroyed` | Emits | No | Dispatched when the instance is torn down. | `{ scope: String }` |
 

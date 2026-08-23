@@ -1,0 +1,8 @@
+// ==========================================================================
+// ln-tabs — Functional Panel State
+// ==========================================================================
+
+[data-ln-tabs] [data-ln-panel].hidden,
+[data-ln-tabs] [data-ln-panel][aria-hidden="true"] {
+	display: none;
+}

@@ -4,7 +4,7 @@ classification: simple
 status: draft
 domain: frontend
 summary: One sentence describing the component's role.
-source: js/ln-name/src/ln-name.js
+source: components/ln-name/src/ln-name.js
 tags: []
 ---
 

@@ -1,0 +1,63 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-filter",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-filter-dev.scss"
+			]
+		},
+		"data-ln-filter": {
+			"direction": "author",
+			"sources": [
+				"ln-filter-dev.scss",
+				"src/ln-filter.js"
+			]
+		},
+		"data-ln-filter-col": {
+			"direction": "author",
+			"sources": [
+				"src/ln-filter.js"
+			]
+		},
+		"data-ln-filter-hide": {
+			"direction": "runtime",
+			"sources": [
+				"ln-filter.scss",
+				"src/ln-filter.js"
+			]
+		},
+		"data-ln-filter-key": {
+			"direction": "author",
+			"sources": [
+				"src/ln-filter.js"
+			]
+		},
+		"data-ln-filter-reset": {
+			"direction": "author",
+			"sources": [
+				"src/ln-filter.js"
+			]
+		},
+		"data-ln-filter-value": {
+			"direction": "author",
+			"sources": [
+				"src/ln-filter.js"
+			]
+		},
+		"data-ln-hash": {
+			"direction": null,
+			"sources": [
+				"src/ln-filter.js"
+			]
+		},
+		"data-ln-persist": {
+			"direction": "author",
+			"sources": [
+				"src/ln-filter.js"
+			]
+		}
+	}
+}

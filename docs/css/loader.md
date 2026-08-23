@@ -1,6 +1,6 @@
 # Loader
 
-CSS-only spinner. Mixin only — no default class selector. Files: `scss/config/mixins/_loader.scss`, `scss/components/_loader.scss` (keyframes only).
+CSS-only spinner. Mixin only — no default class selector. Files: `theme/config/mixins/_loader.scss`, `theme/components/_loader.scss` (keyframes only).
 
 ## Usage
 

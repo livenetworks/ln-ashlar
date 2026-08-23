@@ -4,7 +4,7 @@
 // `--color-primary` values in scss/config/_theme.scss; update them
 // in lockstep.
 
-@use '../../../../scss/config/mixins' as *;
+@use '../../../../theme/config/mixins' as *;
 
 .demo-theme-picker {
 	ul {

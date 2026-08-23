@@ -13,7 +13,7 @@ Modern frameworks often force developers to download megabytes of client-side Ja
 1. **Server-Rendered structure, client-rendered behavior:** The server (Laravel, Go, Rails, etc.) generates the complete, semantic HTML. The browser paints it immediately. A lightweight, native `MutationObserver` registers and binds vanilla JS components dynamically.
 2. **HTML describes WHAT, not HOW:** HTML markup should only consist of semantic tags and structural elements. Visual details belong exclusively in SCSS.
 3. **Pure SCSS Styling via `@include`:** We strictly forbid Tailwind-style utility classes in markup (avoid classes like `flex`, `grid-cols-4`, `text-red-500`). Markup is styled by applying SCSS mixins to semantic selectors (e.g., `#user-table { @include table-base; }`).
-4. **Zero Dependencies:** To ensure decades of stability and complete immunity to npm supply chain attacks, `ln-ashlar` contains zero transitive dependencies at runtime.
+4. **Zero Dependencies:** To ensure decades of stability and no transitive npm runtime tree, `ln-ashlar` contains zero runtime dependencies. This does not extend to `npm` packages served over a CDN — jsDelivr distributes `@tabler/icons` (see the [Dynamic SVG Icon Trust Boundary](security.md#7-dynamic-svg-icon-trust-boundary-ln-icons)), so a compromised release of that package would still propagate through the CDN into the page.
 
 ---
 
@@ -29,8 +29,8 @@ This keeps your templates clean, readable, and highly maintainable.
 
 ### 2. The Two-Layer SCSS Design
 Every visual style in `ln-ashlar` is split into two layers:
-* **Mixins (Recipes):** Located in `scss/config/mixins/`. These contain raw visual declarations (padding, borders, layouts) but generate no CSS output on their own.
-* **Components (Applications):** Located in `scss/components/`. These apply the mixin recipes to default selectors (like `table`, `input`, or `.btn` class) for easy prototyping.
+* **Mixins (Recipes):** Located in `theme/config/mixins/`. These contain raw visual declarations (padding, borders, layouts) but generate no CSS output on their own.
+* **Components (Applications):** Located in `theme/components/`. These apply the mixin recipes to default selectors (like `table`, `input`, or `.btn` class) for easy prototyping.
 
 In production, you should rely on mixins applied to your project's semantic selectors, bypassing generic component classes.
 
@@ -102,6 +102,7 @@ Here is the inventory of our zero-dependency vanilla JS components:
 | **ln-filter** | `data-ln-filter` | Binds UI filters (like checkbox list dropdowns) to data streams. |
 | **ln-search** | `data-ln-search` | Captures input keystrokes, debounces them, and dispatches search queries. |
 | **ln-table** | `data-ln-table` | Base table features (sticky headers, simple client-side cell sorting). Supports data-driven virtual-scroll mode: clones rows from a template dynamically. |
+| **ln-sort** | `data-ln-sort` | Generic sort trigger (click cycles asc/desc/null, dispatches intent to a `ln-data-store`; not to be confused with `ln-sortable`'s drag & drop reorder). |
 | **ln-sortable** | `data-ln-sortable` | Drag-and-drop ordering for lists and table rows. |
 | **ln-progress** | `data-ln-progress` | Responsive progress bar indicator. |
 | **ln-circular-progress**| `data-ln-circular-progress`| SVG circular progress spinner. |
@@ -184,14 +185,14 @@ resources/
 Import `ln-ashlar` configuration first, apply overrides, and import components:
 ```scss
 // 1. Import ln-ashlar SCSS tokens, mixins, and defaults
-@use 'ln-ashlar/scss/config/tokens' as *;
-@use 'ln-ashlar/scss/config/mixins' as *;
+@use 'ln-ashlar/theme/config/tokens' as *;
+@use 'ln-ashlar/theme/config/mixins' as *;
 
 // 2. Load your brand-specific variables (rebind vocabulary tokens)
 @use 'config/tokens';
 
 // 3. Load core components
-@use 'ln-ashlar/scss/ln-ashlar';
+@use 'ln-ashlar/theme/ln-ashlar';
 
 // 4. Style your application views using semantic selectors
 @use 'config/mixins';
@@ -210,10 +211,10 @@ Import `ln-ashlar` configuration first, apply overrides, and import components:
 Import the library bundle and configure your data layer:
 ```javascript
 // 1. Import and auto-initialize JS components
-import 'ln-ashlar/js/index.js';
+import 'ln-ashlar/components/index.js';
 
 // 2. Register a Domain Data Mapper
-import { registerDataMapper, setStorageKey } from 'ln-ashlar/js/ln-core';
+import { registerDataMapper, setStorageKey } from 'ln-ashlar/components/ln-core';
 
 registerDataMapper('tasks', {
   ingress(serverRaw) {

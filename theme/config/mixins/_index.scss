@@ -1,0 +1,62 @@
+// Mixins index — @forward all in correct order
+// Primitives first, composites after (they depend on primitives)
+
+// Primitives
+@forward 'spacing';
+@forward 'breakpoints';
+@forward 'display';
+@forward 'sizing';
+@forward 'typography';
+@forward 'colors';
+@forward 'borders';
+@forward 'shadows';
+@forward 'transitions';
+@forward 'motion';
+@forward 'position';
+@forward 'interaction';
+@forward 'focus';
+
+// Composites (depend on primitives)
+@forward 'layout';
+@forward 'collapsible';
+@forward 'accordion';
+@forward 'card';
+@forward 'chip';
+@forward 'nav';
+@forward 'btn';
+@forward 'form';
+@forward 'filter';
+@forward 'modal';
+@forward 'breadcrumbs';
+@forward 'loader';
+@forward 'tabs';
+@forward 'table';
+@forward 'sort';
+@forward 'avatar';
+@forward 'footer';
+@forward 'sidebar';
+@forward 'app-shell';
+@forward 'status-badge';
+@forward 'alert';
+@forward 'empty-state';
+@forward 'page-header';
+@forward 'stepper';
+@forward 'timeline';
+@forward 'stat-card';
+@forward 'prose';
+@forward 'editor';
+@forward 'kbd';
+@forward 'tooltip';
+@forward 'popover';
+@forward 'progress';
+@forward 'link';
+@forward 'confirm';
+@forward 'circular-progress';
+@forward 'dropdown';
+@forward 'toast';
+@forward 'upload';
+@forward 'translations';
+@forward 'ln-table';
+@forward 'chart';
+@forward 'ajax';
+@forward 'diagnostics';

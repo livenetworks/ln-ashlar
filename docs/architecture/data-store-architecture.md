@@ -12,7 +12,7 @@ Below is the visual structure representing how elements are nested in the DOM, i
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│  DOM: <div data-ln-data-coordinator="documents">                       │
+│  DOM: <ul id="documents-module" data-ln-data-coordinator>              │
 │                                                                        │
 │  [COORDINATOR (Parent Brain)]                                          │
 │  - Traverses and monitors its DOM children                             │
@@ -20,7 +20,7 @@ Below is the visual structure representing how elements are nested in the DOM, i
 │  - Executes JS Ingress/Egress data restructuring                       │
 │                                                                        │
 │     ┌────────────────────────────────────────────────────────────┐     │
-│     │  DOM: <div data-ln-data-store>                             │     │
+│     │  DOM: <li id="documents" data-ln-data-store>               │     │
 │     │                                                            │     │
 │     │  [STORAGE CACHE DATABASE (Child 1)]                        │     │
 │     │  - Standard IndexedDB storage, schemas, & indexes          │     │
@@ -30,7 +30,7 @@ Below is the visual structure representing how elements are nested in the DOM, i
 │     └────────────────────────────────────────────────────────────┘     │
 │                                                                        │
 │     ┌────────────────────────────────────────────────────────────┐     │
-│     │  DOM: <div data-ln-rest-connector>                         │     │
+│     │  DOM: <li data-ln-rest-connector>                          │     │
 │     │                                                            │     │
 │     │  [TRANSPORT GATEWAY (Child 2)]                             │     │
 │     │  - Manages secure connection pathways, endpoints, & sync   │     │
@@ -38,7 +38,7 @@ Below is the visual structure representing how elements are nested in the DOM, i
 │     └────────────────────────────────────────────────────────────┘     │
 │                                                                        │
 │     ┌────────────────────────────────────────────────────────────┐     │
-│     │  DOM: <div data-ln-api-queue>  (OPTIONAL Child 3)          │     │
+│     │  DOM: <li data-ln-api-queue>  (OPTIONAL Child 3)           │     │
 │     │                                                            │     │
 │     │  [OFFLINE OUTBOX (Child 3, optional)]                      │     │
 │     │  - Own IndexedDB database (ln_api_queue), separate from    │     │
@@ -111,53 +111,53 @@ All transport-specific connection properties (base URLs, endpoints, and path con
 ### Scenario A: REST API Resource Coordinator
 ```html
 <!-- Parent Coordinator: encapsulates documents domain, no gateway or path attributes -->
-<div data-ln-data-coordinator="documents" data-ln-data-mapper="demo-docs">
-     
+<ul id="documents-module" data-ln-data-coordinator data-ln-data-mapper="demo-docs" hidden>
+
     <!-- Child 1: Storage Layer (IndexedDB Database Cache - pure and blind) -->
-    <div data-ln-data-store 
-         data-ln-data-store-indexes="department,status,updated_at">
-    </div>
+    <li id="documents" data-ln-data-store
+        data-ln-data-store-indexes="department,status,updated_at">
+    </li>
 
     <!-- Child 2: Transport Gateway (REST Connector - owns path and base URL) -->
-    <div data-ln-rest-connector 
-         data-ln-rest-base-url="https://api.livenetworks.com/v1"
-         data-ln-rest-path="/documents">
-    </div>
-</div>
+    <li data-ln-rest-connector
+        data-ln-rest-base-url="https://api.livenetworks.com/v1"
+        data-ln-rest-path="/documents">
+    </li>
+</ul>
 ```
 
 ### Scenario B: WebSocket Real-Time Coordinator
 ```html
-<div data-ln-data-coordinator="chat-messages">
+<ul id="chat-messages-module" data-ln-data-coordinator hidden>
 
     <!-- Child 1: Storage Cache -->
-    <div data-ln-data-store 
-         data-ln-data-store-indexes="timestamp">
-    </div>
+    <li id="chat-messages" data-ln-data-store
+        data-ln-data-store-indexes="timestamp">
+    </li>
 
     <!-- Child 2: Transport Gateway (WebSocket Connector - owns ws URL and channel) -->
-    <div data-ln-websocket-connector 
-         data-ln-websocket-url="wss://api.livenetworks.com/realtime"
-         data-ln-websocket-channel="rooms:lobby">
-    </div>
-</div>
+    <li data-ln-websocket-connector
+        data-ln-websocket-url="wss://api.livenetworks.com/realtime"
+        data-ln-websocket-channel="rooms:lobby">
+    </li>
+</ul>
 ```
 
 ### Scenario C: CouchDB Sync Gateway Coordinator
 ```html
-<div data-ln-data-coordinator="tasks">
+<ul id="tasks-module" data-ln-data-coordinator hidden>
 
     <!-- Child 1: Storage Cache -->
-    <div data-ln-data-store 
-         data-ln-data-store-indexes="due_date,priority">
-    </div>
+    <li id="tasks" data-ln-data-store
+        data-ln-data-store-indexes="due_date,priority">
+    </li>
 
     <!-- Child 2: Transport Gateway (CouchDB Sync Connector - owns db details and local sync endpoint) -->
-    <div data-ln-couchdb-connector 
-         data-ln-couchdb-url="https://couch.livenetworks.com"
-         data-ln-couchdb-db="tasks">
-    </div>
-</div>
+    <li data-ln-couchdb-connector
+        data-ln-couchdb-url="https://couch.livenetworks.com"
+        data-ln-couchdb-db="tasks">
+    </li>
+</ul>
 ```
 
 ### Scenario D: REST Coordinator with an offline outbox (optional Child 3)
@@ -169,25 +169,25 @@ connector directly; when it is absent, the coordinator's queue-absent path
 (direct connector call) behaves exactly as in Scenarios A-C.
 
 ```html
-<div data-ln-data-coordinator="documents" data-ln-data-mapper="documents">
+<ul id="documents-module" data-ln-data-coordinator data-ln-data-mapper="documents" hidden>
 
     <!-- Child 1: Storage Cache -->
-    <div data-ln-data-store
-         data-ln-data-store-indexes="department,status,updated_at">
-    </div>
+    <li id="documents" data-ln-data-store
+        data-ln-data-store-indexes="department,status,updated_at">
+    </li>
 
     <!-- Child 2: Transport Gateway -->
-    <div data-ln-api-connector
-         data-ln-api-base-url="/api"
-         data-ln-api-path="/documents">
-    </div>
+    <li data-ln-api-connector
+        data-ln-api-base-url="/api"
+        data-ln-api-path="/documents">
+    </li>
 
     <!-- Child 3 (optional): Offline outbox — own IndexedDB, FIFO per chain -->
-    <div data-ln-api-queue></div>
-</div>
+    <li id="documents-queue" data-ln-api-queue></li>
+</ul>
 ```
 
-See [ln-api-queue README](../../js/ln-api-queue/README.md) for the full
+See [ln-api-queue README](../../components/ln-api-queue/README.md) for the full
 attribute, event, and schema reference.
 
 ---
@@ -230,13 +230,13 @@ registerDataMapper('documents', {
 
 This mapper is then bound cleanly and safely in HTML via a reference attribute:
 ```html
-<div data-ln-data-coordinator="documents" data-ln-data-mapper="documents">
+<ul id="documents-module" data-ln-data-coordinator data-ln-data-mapper="documents" hidden>
     <!-- Child 1: Database Store Cache -->
-    <div data-ln-data-store data-ln-data-store-indexes="department,status"></div>
+    <li id="documents" data-ln-data-store data-ln-data-store-indexes="department,status"></li>
 
     <!-- Child 2: Transport Connector Gateway -->
-    <div data-ln-rest-connector data-ln-rest-base-url="/api" data-ln-rest-path="/documents"></div>
-</div>
+    <li data-ln-rest-connector data-ln-rest-base-url="/api" data-ln-rest-path="/documents"></li>
+</ul>
 ```
 
 ---

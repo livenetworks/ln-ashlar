@@ -4,7 +4,7 @@ classification: doctrine
 status: draft
 domain: frontend
 summary: JavaScript component architecture of ln-ashlar - IIFE registration, the Attribute Bridge, MutationObserver auto-initialization, and event-driven data flow.
-source: docs/architecture/component-guide.md, js/ln-core/README.md, js/COMPONENTS.md
+source: docs/architecture/component-guide.md, components/ln-core/README.md, components/COMPONENTS.md
 tags: [doctrine, javascript, components, events, reactive]
 ---
 
@@ -42,9 +42,13 @@ This document describes the JavaScript component architecture of `ln-ashlar`. It
 
 ### Coordinator Mindset: Wrapper-Level Scoping & Child Component Orchestration
 - **Wrapper Encapsulation:** A Coordinator component resides on a parent container element (e.g. `<div data-ln-table-coordinator>`, `<ul data-ln-accordion>`, `<section data-ln-data-coordinator>`) and orchestrates child components within its DOM subtree.
-- **Role-Based Definition (Naming Convention):** A coordinator is defined by its architectural role (wrapper-level mediator orchestrating child components), not by a mandatory `-coordinator` suffix. While complex system mediators use explicit `-coordinator` suffixes (e.g., `data-ln-table-coordinator`, `data-ln-data-coordinator`, `data-ln-modal-coordinator`), structural UI coordinators use natural component names (e.g., `data-ln-accordion` coordinating child `ln-toggle` items, `data-ln-tabs`).
+- **Role-Based Definition (Naming Convention):** A coordinator is defined by its architectural role (wrapper-level mediator orchestrating child components), not by a mandatory `-coordinator` suffix. While complex system mediators use explicit `-coordinator` suffixes (e.g., `data-ln-table-coordinator`, `data-ln-data-coordinator`, `data-ln-ui-coordinator`), structural UI coordinators use natural component names (e.g., `data-ln-accordion` coordinating child `ln-toggle` items, `data-ln-tabs`).
 - **Unscoped Coexistence:** Coordinators operate at the wrapper level without requiring explicit scope names or target ID linkages. This allows multiple coordinator blocks (e.g., multiple table/filter sections or multiple accordions) to run concurrently on the same page without ID collisions or cross-component interference.
 - **Child Orchestration:** The coordinator listens to events from child components (`ln-search`, `ln-filter`, `ln-toggle`, `ln-form`) inside its wrapper and bridges commands directly to sibling child primitives (`ln-table`, `ln-data-store`).
+
+### Local Encapsulation vs. Window-Level Scope Boundaries (Multi-Instance Isolation)
+- **Local Multi-Instance Isolation:** Components that can be instantiated multiple times on a page (`<form>`, `ln-validate`, `ln-autosave`, `ln-accordion`, `ln-tabs`) are strictly self-contained. For example, `ln-validate` operates as an encapsulated child of its parent `<form>`. A page can have $N$ independent forms or modal instances, each operating with complete autonomy over its own lifecycle, DOM state, and submit gates.
+- **Window-Level Scope Boundary:** A window-level coordinator (like `ln-ui-coordinator`) is strictly reserved for shared, window-wide UI services (hash routing for modals `#modal-id`, toast dispatching, global AJAX success/error toast mediation, upload notifications). It **must never** couple with, inspect, or manage the internal validation/submission state of local forms or multi-instance components. Anything that can be multi-instantiated belongs to its own local wrapper/form lifecycle.
 
 ### Overlay Exception
 Overlay components (modal, dropdown, popover, tooltip) get exactly three document-level touchpoints, paired to the open/close lifecycle: dismissal listeners (Escape/outside-click), focus management, and one `.ln-*` body state class. Listeners attach on open, detach on close — they remain sensors that funnel into the component's own attribute state machine, never actuators on foreign DOM. Prefer native top-layer primitives (`<dialog>.showModal()`, Popover API) over hand-rolled stacking.
@@ -65,12 +69,39 @@ A component with no own DOM — no instances, no observer — is a document-leve
 
 ---
 
-## 3. The Attribute Bridge Pattern
+## 3. The Attribute Bridge Pattern & Two-Host Architecture
 
-To maintain the HTML DOM as the single source of truth, `ln-ashlar` enforces the **Attribute Bridge Pattern**:
+To maintain the HTML DOM as the single source of truth, `ln-ashlar` enforces the **Attribute Bridge Pattern** across all components:
 
-- **Mutations Write Attributes:** Public prototype methods that change state must **only** call `setAttribute` on the root DOM element (e.g., `this.dom.setAttribute('data-ln-toggle', 'open')`).
-- **Observer Synchronizes State:** A `MutationObserver` watches attribute changes and triggers an internal synchronization method (`_syncAttribute()`), which performs the actual DOM modifications and dispatches events.
+### The Two-Host Pattern (Control vs. State Host)
+Components with separate triggers/inputs and targets use a decoupled two-host architecture:
+1. **Control / Trigger (`data-ln-{name}-for="targetId"`)**:
+   - Resides on the user control (e.g. `<input data-ln-search-for="my-table">`, `<button data-ln-modal-for="user-modal">`, `<button data-ln-toggle-for="details">`).
+   - Owns user interactions (keystrokes, debounce, clear buttons, clicks).
+   - **Does NOT mutate target state directly in JS**: It strictly writes to the target DOM attribute (e.g. `target.setAttribute('data-ln-search', value)` or `target.setAttribute('data-ln-modal', 'open')`).
+2. **State Host (`data-ln-{name}="state"`)**:
+   - Resides on the target container/element (e.g. `<table id="my-table" data-ln-search="">`, `<div id="user-modal" data-ln-modal="closed">`).
+   - Owns the true state property (`this.term`, `this.isOpen`).
+   - Monitored by a `MutationObserver` (`onAttributeChange: _syncAttribute`).
+
+### Attribute-Driven Commands vs. Event-Driven Notifications
+- **Commands & Requests (Mutations):** Come strictly through **Attributes** via `setAttribute` (or request events from coordinators). Modifying the HTML attribute is how anything in the system asks a component to change. The component's `MutationObserver` catches this change, validates it against the current instance state (idempotency guard `if (next === instance.state) return`), updates internal state, and syncs controls.
+- **Events (Lifecycle & Intent Announcements):**
+  - **Before / Intent Events (`ln-{name}:before-{action}` / cancelable hooks like `ln-search:change`):** Announces *"I am preparing to act / search / close — does an external consumer want to take over or cancel?"*. Calling `event.preventDefault()` allows coordinators or parent components (like `ln-table` or `ln-data-store`) to handle the action.
+  - **After / Notification Events (`ln-{name}:{action}`):** Announces *"Action completed / state has transitioned"*. Bubbles up for coordinators, analytics, or UI feedback.
+
+### Two-Way Attribute-to-Control Synchronization
+When an attribute is modified directly on the State Host (e.g. via deep-linking, coordinator, or DevTools), the State Host automatically updates all matching controls via reverse ID query:
+```js
+function _syncControls(target, value) {
+    if (!target.id) return;
+    const controls = document.querySelectorAll('[' + CONTROL_SELECTOR + '="' + target.id + '"]');
+    for (const control of controls) {
+        const input = _resolveInput(control);
+        if (input && input.value !== value) input.value = value;
+    }
+}
+```
 
 #### Correct State Transition (Attribute Bridge):
 ```js
@@ -100,6 +131,14 @@ Dynamic HTML injected into the page (via AJAX, router transitions, or raw `inner
 - The observer filters on target attributes via `attributeFilter` to ensure performance is not degraded by unrelated class or style mutations.
 - Double-initialization is prevented by checking the presence of the instance property (e.g., `if (el.lnName) return`).
 - **Instant Inspector Activation:** Because the observer tracks target attribute additions globally across the document tree, a developer can dynamically add a component selector (e.g. `data-ln-toggle="close"`) to any element directly inside the browser's developer tools inspector, and the framework will instantly bootstrap the component instance without requiring a page refresh.
+
+### The Three Core Assertions of DOM-First Architecture
+1. **Zero Hidden State in JS Memory (No Inaccessible Closures):**
+   State is never trapped inside private JavaScript closures, component instances, or hidden memory trees. The true state lives openly and visibly on the DOM element's attributes (`data-ln-*`).
+2. **100% Declarative, Testable & Reproducible:**
+   Any given UI state (e.g. searching a term, opening a modal, toggling an accordion, deep-linking) can be authored, inspected, automated, restored, or server-rendered purely via HTML attributes without orchestration scripts.
+3. **DevTools Inspector as the Control Plane:**
+   Editing any attribute in the browser's DevTools Inspector immediately activates the component's functionality in real-time. The underlying `MutationObserver` instantly synchronizes the internal engine, updates the DOM, syncs matching controls (`[data-ln-*-for]`), and dispatches lifecycle events.
 
 ### Hydration Polarity (SSR)
 Server-rendered content is authored as full markup; JS hydration adds behavior only. `<template>` + fill is reserved for runtime data — not for content that already exists in the server-rendered page. Content is visible without JS; transient enter-states (`.ln-enter`) are the exception, not the default.
@@ -142,16 +181,47 @@ function _getFormatter(locale, options) {
 
 ---
 
-## 7. Naming Conventions
+## 7. URL Hash State Synchronization Doctrine (`data-ln-hash`)
+
+Ashlar components support opt-in URL hash synchronization (`data-ln-hash`) to enable shareable URLs, deep-linking, and browser back/forward history navigation without violating component isolation.
+
+### Core Architectural Principles:
+1. **Isolated Multi-Namespace Ownership:**
+   - URL fragment grammar: `#namespaceA:valueA&namespaceB:valueB`.
+   - Each component owns exactly ONE namespace, reads/writes only its own segment, and **strictly preserves foreign segments** during mutations (`hashSet(ns, value)`).
+   - Multi-Table & Multi-Control Coexistence: Multiple tables, search inputs, filter bars, tabs, and modals can sync to the URL simultaneously without collision:
+     `#users-search:john&users-filter:dept:design&users-sort:created-at.desc&orders-sort:total.asc&modal:edit-item`
+2. **Namespace Resolution Strategy:**
+   - When authored with an explicit string (`data-ln-hash="q"`), that exact namespace is used.
+   - When authored as a boolean flag (`data-ln-hash` or empty), the namespace defaults to `[targetId]-[defaultSuffix]` (e.g. `users-table-sort`, `users-table-search`, `users-table-filter`).
+3. **Codec & Value Separation (Zero Hyphen Collision):**
+   - **Sort Codec (`hashSortEncode` / `hashSortDecode`):** Uses dot separator with suffix parsing (`field.asc`, `field.desc`, e.g. `price.asc`, `created-at.desc`, `billing-address-zip.asc`). Suffix parsing prevents collisions with hyphens, underscores, or numbers in field names.
+   - **Filter Codec (`hashFilterEncode` / `hashFilterDecode`):** Uses key-value colon with comma lists (`key:val1,val2`, e.g. `category:design,dev`).
+   - **Deletion on Reset:** When a sort is cleared (`none`), search query is emptied (`""`), or filter is reset, the component deletes its namespace from the hash (`hashSet(ns, null)`), leaving foreign segments intact.
+4. **Boot Priority Matrix:**
+   - **1. URL Hash (`hashGet`):** Highest authority. Deep-linked or bookmarked URLs override local caches.
+   - **2. LocalStorage (`data-ln-persist`):** Intermediate authority. Restores past user session when no URL hash is present.
+   - **3. Authored HTML Markup:** Fallback default when neither hash nor storage exists.
+5. **Reactive Browser History Navigation:**
+   - Components attach `window.addEventListener('hashchange')` to synchronize DOM states when the user clicks the browser Back or Forward buttons.
+
+---
+
+## 8. Naming Conventions
 
 All naming must follow strict, predictable conventions:
 
 | Target | Pattern | Example |
 |---|---|---|
-| Functional Attribute | `data-ln-{name}` | `data-ln-modal` |
-| JS Instance | `el.ln{Name}` | `el.lnModal` |
+| State Host Attribute | `data-ln-{name}` | `data-ln-modal`, `data-ln-search` |
+| Control Pointer Attribute | `data-ln-{name}-for` | `data-ln-modal-for="id"`, `data-ln-search-for="id"` |
+| Hash Sync Attribute | `data-ln-hash` | `data-ln-hash`, `data-ln-hash="q"` |
+| Storage Persist Attribute | `data-ln-persist` | `data-ln-persist`, `data-ln-persist="key"` |
+| JS State Instance | `el.ln{Name}` | `el.lnModal`, `el.lnSearch` |
+| JS Control Instance | `el.ln{Name}Control` | `el.lnSearchControl`, `el.lnModalTrigger` |
 | Before Event (cancelable) | `ln-{name}:before-{action}` | `ln-modal:before-close` |
 | After Event (notification) | `ln-{name}:{action}` | `ln-modal:close` |
 | Request Event (mutation) | `ln-{name}:request-{action}` | `ln-data-store:request-create` |
 | Dictionary Attribute | `data-ln-{name}-dict` | `data-ln-upload-dict` |
 | Template Identifier | `data-ln-template="{tmpl}"` | `data-ln-template="row"` |
+

@@ -4,7 +4,7 @@ classification: coordinator
 status: stable
 domain: frontend
 summary: A wrapper coordinator component that encapsulates and coordinates child search, filter popovers, and table primitives on the page without requiring named scopes or explicit target IDs.
-source: js/ln-table-coordinator/src/ln-table-coordinator.js
+source: components/ln-table-coordinator/src/ln-table-coordinator.js
 tags: [table, coordinator, search, filter, keyboard-shortcuts]
 ---
 
@@ -18,15 +18,14 @@ tags: [table, coordinator, search, filter, keyboard-shortcuts]
 
 The `ln-table-coordinator` component is a Layer 2 mediator attached to a wrapper container (`<div data-ln-table-coordinator>`). It encapsulates and coordinates its child [`ln-search`](./ln-search.md), [`ln-filter`](./ln-filter.md), clear buttons, and target [`ln-table`](./ln-table.md) primitives without requiring named scopes or explicit target IDs.
 
-The JavaScript source is located at [ln-table-coordinator.js](../../js/ln-table-coordinator/src/ln-table-coordinator.js).
+The JavaScript source is located at [ln-table-coordinator.js](../../components/ln-table-coordinator/src/ln-table-coordinator.js).
 
 Key responsibilities include:
 - **Child Component Coordination:** Coordinating child search inputs, filter popovers, and table primitives enclosed within the wrapper container.
 - **Multiple Coordinators Per Page:** Allowing multiple `data-ln-table-coordinator` wrappers to coexist independently on the exact same page without ID collisions or cross-table interference.
-- **Search Wire Mediation:** Catching `ln-search:change` events within the wrapper, value-mirroring search inputs, and dispatching `ln-table:set-search` to the child table.
-- **Filter Wire Mediation:** Catching `ln-filter:changed` events within the wrapper, toggling `.ln-filter-active` visual indicator classes on header filter buttons (`<th>`), and dispatching `ln-table:set-filter` to the child table.
-- **Clear Actions Handler:** Intercepting clicks on `[data-ln-table-clear]` and `[data-ln-table-clear-all]` inside the wrapper, resetting search inputs and filter checkboxes to `checked`, removing `.ln-filter-active` indicator classes, and dispatching `ln-table:request-clear-filters` to the child table.
-- **Keyboard Shortcut:** Capturing keydown `'/'` to focus the search input inside the active wrapper container.
+- **Filter Indicator Mediation:** Catching `ln-filter:change` events within the wrapper and toggling `.ln-filter-active` visual indicator classes on header filter buttons (`<th>`).
+- **Clear Actions Handler:** Intercepting clicks on `[data-ln-table-clear]` and `[data-ln-table-clear-all]` inside the wrapper, symmetrically resetting linked search inputs and `data-ln-search` state host attributes, checking filter reset checkboxes, removing `.ln-filter-active` indicator classes, and dispatching `ln-table:request-clear-filters` to an SSR table.
+- **Keyboard Shortcut:** Capturing keydown `'/'` to focus the search input inside the active wrapper container (safely ignored when focus is inside an `<input>`, `<textarea>`, or `contenteditable` surface like `ln-editor`).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
@@ -39,7 +38,7 @@ Key responsibilities include:
 
 ### Base HTML Markup (Wrapper Coordinator Pattern)
 
-Below is the canonical production pattern where `data-ln-table-coordinator` wraps the search bar, table primitive, and filter popovers as a single cohesive unit:
+Below is the canonical production pattern where `data-ln-table-coordinator` wraps the search bar, table primitive, and filter popovers as a single cohesive unit. The wrapper may equally be an outer element enclosing the card and its popovers rather than the card itself — the contract requires only that the table, its filter popovers, and its clear buttons are descendants of the coordinator host, not any specific shape of container.
 
 ```html
 <!-- Table Coordinator Wrapper -->
@@ -48,14 +47,14 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
     <!-- Header Toolbar with Search & Reset -->
     <header class="page-header">
         <label class="search">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-            <input type="search" placeholder="Search employees... (Press '/')" data-ln-search="employee-table" data-ln-search-debounce="0">
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+            <input type="search" placeholder="Search employees... (Press '/')" data-ln-search-for="employee-table" data-ln-search-debounce="0">
             <button type="button" data-ln-search-clear aria-label="Clear search">
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
             </button>
         </label>
         <button type="button" class="btn" data-ln-table-clear>
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-filter-off"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter-off"></use></svg>
             <span>Reset Filters</span>
         </button>
     </header>
@@ -65,7 +64,7 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
         <!-- Empty State Template -->
         <template data-ln-table-empty>
             <article class="ln-table__empty-state">
-                <svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-filter"></use></svg>
+                <svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
                 <h3>No employees found</h3>
                 <p>Try adjusting your search terms or filters.</p>
                 <button type="button" class="btn" data-ln-table-clear>Clear all</button>
@@ -76,29 +75,29 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
         <table>
             <thead>
                 <tr>
-                    <th data-ln-table-sort="string">
-                        Name
-                        <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort by name">
-                            <svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-                            <svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-                            <svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-                        </button>
+                    <th>
+                        <span>Name</span>
+                        <ul data-ln-sort="employee-table" data-ln-sort-state="none">
+                            <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+                            <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+                            <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+                        </ul>
                     </th>
-                    <th data-ln-table-sort="string" data-ln-table-filter-col="dept">
-                        Department
+                    <th data-ln-table-filter-col="dept">
+                        <span>Department</span>
                         <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-dept-popover" aria-label="Filter department">
-                            <svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+                            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
                         </button>
-                        <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort by department">
-                            <svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-                            <svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-                            <svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-                        </button>
+                        <ul data-ln-sort="employee-table" data-ln-sort-state="none">
+                            <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+                            <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+                            <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+                        </ul>
                     </th>
-                    <th data-ln-table-sort="string" data-ln-table-filter-col="status">
-                        Status
+                    <th data-ln-table-filter-col="status">
+                        <span>Status</span>
                         <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-status-popover" aria-label="Filter status">
-                            <svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+                            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
                         </button>
                     </th>
                 </tr>
@@ -147,7 +146,7 @@ Multiple `data-ln-table-coordinator` wrappers can safely exist on the same page.
     <header class="page-header">
         <h2>Active Employees</h2>
         <label class="search">
-            <input type="search" placeholder="Search active..." data-ln-search="active-employees-table">
+            <input type="search" placeholder="Search active..." data-ln-search-for="active-employees-table" data-ln-search-debounce="0">
         </label>
     </header>
     <div data-ln-table id="active-employees-table">
@@ -158,13 +157,32 @@ Multiple `data-ln-table-coordinator` wrappers can safely exist on the same page.
 <!-- Table 2 Coordinator: Archived Records -->
 <section class="section-card" data-ln-table-coordinator>
     <header class="page-header">
-        <h2>Archived Records</h2>
-        <label class="search">
-            <input type="search" placeholder="Search archive..." data-ln-search="archived-records-table">
-        </label>
+        <button type="button" class="btn btn-outline" data-ln-table-clear>Reset Filters</button>
     </header>
-    <div data-ln-table id="archived-records-table">
-        <!-- Table 2 content -->
+
+    <!-- Table Component -->
+    <table id="my-table" data-ln-table="items" data-ln-search="">
+        <thead>
+            <tr>
+                <th data-ln-table-filter-col="category">
+                    Category
+                    <button class="table-filter" type="button" data-ln-table-col-filter data-ln-popover-for="filter-cat" aria-label="Filter category">
+                        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
+                    </button>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-category="engineering"><td>Engineering</td></tr>
+        </tbody>
+    </table>
+
+    <!-- Filter Popover -->
+    <div data-ln-popover id="filter-cat">
+        <ul data-ln-filter="my-table">
+            <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-reset checked> All</label></li>
+            <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="engineering"> Engineering</label></li>
+        </ul>
     </div>
 </section>
 ```
@@ -178,8 +196,8 @@ Multiple `data-ln-table-coordinator` wrappers can safely exist on the same page.
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-table-coordinator` | Wrapper | Flag | Required | Declares the wrapper container that coordinates child search, filter, and table elements. |
-| `data-ln-search` | Input / Host | Table ID | Required | Targets the table (by its `id`) whose rows the search filters; the coordinator mediates the resulting event. A bare `data-ln-search` with no target ID emits nothing. |
-| `data-ln-filter` | `<ul>` / Form | Flag / Table ID | — | Filter popover/form coordinated by the parent wrapper (or targeted to explicit table ID). |
+| `data-ln-search-for` | Input / Host | Table / Target ID | Required | Targets the element (by its `id`) whose items the search filters. |
+| `data-ln-filter` | `<ul>` / Form | Table / Target ID | Required | Filter popover/form coordinated by the parent wrapper. |
 | `data-ln-table-clear` | Button | Flag | — | Button trigger that resets search and filters for the child table inside the wrapper. |
 | `data-ln-table-clear-all` | Button | Flag | — | Button trigger that resets search and filters globally across all tables. |
 | `data-ln-table-filter-col` | `<th>` | Key String | Required | Identifies the table header column matching a filter key string. |
@@ -192,13 +210,10 @@ Multiple `data-ln-table-coordinator` wrappers can safely exist on the same page.
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-search:change` | Listens | No | Caught on `data-ln-search` inside the wrapper container. | `{ term: String }` |
-| `ln-filter:changed` | Listens | No | Caught on `data-ln-filter` inside the wrapper container. | `{ key: String, values: Array }` |
-| `click` | Listens | No | Caught on `[data-ln-table-clear]` inside wrapper. | Native MouseEvent |
+| `ln-filter:change` | Listens | No | Caught on `data-ln-filter` inside the wrapper container to update header indicators. | `{ key: String, values: Array, targetId: String }` |
+| `click` | Listens | No | Caught on `[data-ln-table-clear]` / `[data-ln-table-clear-all]` inside wrapper. | Native MouseEvent |
 | `keydown` | Listens | No | Caught on `document` to focus search inside active wrapper on `'/'`. | Native KeyboardEvent |
-| `ln-table:set-search` | Emits | No | Dispatched to child `[data-ln-table]` element. | `{ query: String, term: String, table: String }` |
-| `ln-table:set-filter` | Emits | No | Dispatched to child `[data-ln-table]` element. | `{ key: String, values: Array, table: String }` |
-| `ln-table:request-clear-filters` | Emits | No | Dispatched to child `[data-ln-table]` element. | `{ table: String }` |
+| `ln-table:request-clear-filters` | Emits | No | Dispatched to child SSR `[data-ln-table]` element on clear button click. | `{ table: String }` |
 
 ---
 
@@ -212,14 +227,15 @@ The `ln-table-coordinator` component is completely unstyled and contains no layo
 
 ### ARIA & Keyboard
 
-- **Search Shortcut:** Pressing `/` anywhere on the page automatically moves focus to `[data-ln-search]` inputs inside the active wrapper container.
+- **Search Shortcut:** Pressing `/` anywhere on the page automatically moves focus to `[data-ln-search-for]` inputs inside the active wrapper container. It is automatically ignored when the active element is an input, textarea, or `isContentEditable` element (e.g. `ln-editor`).
 - **Icon Labels:** Filter and sort buttons in `<th>` carry explicit `aria-label` attributes.
 
 ### Common Pitfalls & Anti-patterns
 
 > [!CAUTION]
-> 1. **Omitting Wrapper Container:** Always place `data-ln-table-coordinator` on the parent container wrapping your `data-ln-search`, `data-ln-table`, and `data-ln-filter` popovers so child components are coordinated automatically without ID conflicts.
+> 1. **Omitting Wrapper Container:** Always place `data-ln-table-coordinator` on the parent container wrapping your `data-ln-table` and `data-ln-filter` popovers so header indicators and clear actions are coordinated automatically without ID conflicts.
 > 2. **Missing `ul/li` Wrap:** Filter options inside popovers MUST be wrapped in `<ul>/<li>` containers according to project DOM rules (`<ul data-ln-filter><li><label><input type="checkbox"...></label></li></ul>`).
+> 3. **Clear Button Composition:** For detached or data-driven layouts, reset buttons can compose both table and search clear triggers: `<button type="button" data-ln-table-clear data-ln-search-clear-for="storeId">Reset All</button>`.
 
 ---
 
@@ -229,20 +245,14 @@ The `ln-table-coordinator` component is completely unstyled and contains no layo
 sequenceDiagram
     autonumber
     actor User
-    participant Search as Child Search [data-ln-search]
     participant FilterPopover as Child Filter Popover [data-ln-filter]
     participant Coord as ln-table-coordinator [data-ln-table-coordinator]
-    participant Table as Child Table [data-ln-table]
-
-    User->>Search: Type query (or press '/')
-    Search->>Coord: Emit ln-search:change
-    Coord->>Table: Dispatch ln-table:set-search { query, table }
-    Table->>Table: Re-filter dataset & re-render view
+    participant Table as Child Table / Store
 
     User->>FilterPopover: Select Checkbox
-    FilterPopover->>Coord: Emit ln-filter:changed { key, values }
-    Coord->>Table: Toggle .ln-filter-active on th [data-ln-table-col-filter]
-    Coord->>Table: Dispatch ln-table:set-filter { key, values, table }
+    FilterPopover->>Coord: Emit ln-filter:change { key, values, targetId }
+    Coord->>Coord: Toggle .ln-filter-active on matching <th> [data-ln-table-col-filter]
+    FilterPopover->>Table: dispatchCancelable ln-filter:change { key, values, targetId }
     Table->>Table: Re-filter dataset & re-render view
 ```
 

@@ -4,121 +4,178 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Methods: GET');
 
-$jsonFile = __DIR__ . '/documents.json';
+$jsonFile   = __DIR__ . '/documents.json';
+$sqliteFile = __DIR__ . '/documents.sqlite';
+
 if (!file_exists($jsonFile)) {
 	echo json_encode(['data' => [], 'error' => 'Data file not found.']);
 	exit;
 }
 
-$rawJson = file_get_contents($jsonFile);
-$data = json_decode($rawJson, true);
-$records = isset($data['data']) ? $data['data'] : [];
-$grandTotal = count($records);
+$pdo = new PDO('sqlite:' . $sqliteFile);
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+// Check if SQLite cache needs initial creation or synchronization
+$needsSync = !file_exists($sqliteFile)
+	|| filesize($sqliteFile) === 0
+	|| (filemtime($jsonFile) > filemtime($sqliteFile));
+
+if (!$needsSync) {
+	// Verify table exists
+	$tableCheck = $pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name='documents'")->fetchColumn();
+	if (!$tableCheck) {
+		$needsSync = true;
+	}
+}
+
+if ($needsSync) {
+	$pdo->exec("CREATE TABLE IF NOT EXISTS documents (
+		id INTEGER PRIMARY KEY,
+		title TEXT,
+		department TEXT,
+		status TEXT,
+		priority TEXT,
+		owner TEXT,
+		file_size INTEGER,
+		tags TEXT,
+		created_at INTEGER,
+		updated_at INTEGER
+	)");
+	$pdo->exec("CREATE INDEX IF NOT EXISTS idx_doc_dept ON documents(department);");
+	$pdo->exec("CREATE INDEX IF NOT EXISTS idx_doc_status ON documents(status);");
+	$pdo->exec("CREATE INDEX IF NOT EXISTS idx_doc_priority ON documents(priority);");
+	$pdo->exec("CREATE INDEX IF NOT EXISTS idx_doc_updated ON documents(updated_at);");
+
+	$rawJson = file_get_contents($jsonFile);
+	$data = json_decode($rawJson, true);
+	$records = isset($data['data']) ? $data['data'] : [];
+
+	$pdo->beginTransaction();
+	$pdo->exec("DELETE FROM documents");
+	$stmt = $pdo->prepare("INSERT INTO documents (id, title, department, status, priority, owner, file_size, tags, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+	foreach ($records as $r) {
+		$stmt->execute([
+			$r['id'] ?? null,
+			$r['title'] ?? '',
+			$r['department'] ?? '',
+			$r['status'] ?? '',
+			$r['priority'] ?? '',
+			$r['owner'] ?? '',
+			$r['file_size'] ?? 0,
+			json_encode($r['tags'] ?? []),
+			$r['created_at'] ?? 0,
+			$r['updated_at'] ?? 0
+		]);
+	}
+	$pdo->commit();
+	touch($sqliteFile, filemtime($jsonFile));
+}
+
+// 1. Total records count in database
+$grandTotal = (int)$pdo->query("SELECT COUNT(*) FROM documents")->fetchColumn();
+
+// 2. Build WHERE clauses for Search & Filters
+$where = [];
+$params = [];
 
 // Support query parameter 'search' or 'q'
 $search = isset($_GET['search']) ? trim($_GET['search']) : (isset($_GET['q']) ? trim($_GET['q']) : '');
-
 if ($search !== '') {
-	$searchLower = mb_strtolower($search, 'UTF-8');
-	$filtered = [];
-	foreach ($records as $record) {
-		$match = false;
-		
-		// Search title
-		if (isset($record['title']) && mb_strpos(mb_strtolower($record['title'], 'UTF-8'), $searchLower) !== false) {
-			$match = true;
+	// Token-based wildcard matching: split by whitespace, convert '*' to '%', AND-combined tokens
+	$tokens = preg_split('/\s+/', $search, -1, PREG_SPLIT_NO_EMPTY);
+	$searchFields = ['title', 'department', 'owner', 'tags', 'status', 'priority'];
+
+	foreach ($tokens as $token) {
+		$tokenPattern = '%' . str_replace('*', '%', $token) . '%';
+		$tokenPattern = preg_replace('/%+/', '%', $tokenPattern);
+
+		$fieldClauses = [];
+		foreach ($searchFields as $field) {
+			$fieldClauses[] = "$field LIKE ?";
+			$params[] = $tokenPattern;
 		}
-		// Search department
-		elseif (isset($record['department']) && mb_strpos(mb_strtolower($record['department'], 'UTF-8'), $searchLower) !== false) {
-			$match = true;
-		}
-		// Search owner
-		elseif (isset($record['owner']) && mb_strpos(mb_strtolower($record['owner'], 'UTF-8'), $searchLower) !== false) {
-			$match = true;
-		}
-		// Search tags
-		elseif (isset($record['tags']) && is_array($record['tags'])) {
-			foreach ($record['tags'] as $tag) {
-				if (mb_strpos(mb_strtolower($tag, 'UTF-8'), $searchLower) !== false) {
-					$match = true;
-					break;
-				}
-			}
-		}
-		
-		if ($match) {
-			$filtered[] = $record;
-		}
+		$where[] = '(' . implode(' OR ', $fieldClauses) . ')';
 	}
-	$records = $filtered;
 }
 
 // Support filters by department and status (comma-separated lists)
-$departmentFilter = isset($_GET['department']) && $_GET['department'] !== '' ? explode(',', $_GET['department']) : [];
-$statusFilter = isset($_GET['status']) && $_GET['status'] !== '' ? explode(',', $_GET['status']) : [];
-
-if (!empty($departmentFilter)) {
-	$filtered = [];
-	foreach ($records as $record) {
-		if (isset($record['department']) && in_array($record['department'], $departmentFilter)) {
-			$filtered[] = $record;
-		}
+if (!empty($_GET['department'])) {
+	$depts = array_values(array_filter(array_map('trim', explode(',', $_GET['department']))));
+	if (!empty($depts)) {
+		$in = implode(',', array_fill(0, count($depts), '?'));
+		$where[] = "department IN ($in)";
+		$params = array_merge($params, $depts);
 	}
-	$records = $filtered;
 }
 
-if (!empty($statusFilter)) {
-	$filtered = [];
-	foreach ($records as $record) {
-		if (isset($record['status']) && in_array($record['status'], $statusFilter)) {
-			$filtered[] = $record;
-		}
+if (!empty($_GET['status'])) {
+	$statuses = array_values(array_filter(array_map('trim', explode(',', $_GET['status']))));
+	if (!empty($statuses)) {
+		$in = implode(',', array_fill(0, count($statuses), '?'));
+		$where[] = "status IN ($in)";
+		$params = array_merge($params, $statuses);
 	}
-	$records = $filtered;
 }
 
-// Check sorting parameters
+if (!empty($_GET['priority'])) {
+	$priorities = array_values(array_filter(array_map('trim', explode(',', $_GET['priority']))));
+	if (!empty($priorities)) {
+		$in = implode(',', array_fill(0, count($priorities), '?'));
+		$where[] = "priority IN ($in)";
+		$params = array_merge($params, $priorities);
+	}
+}
+
+$whereSql = !empty($where) ? ' WHERE ' . implode(' AND ', $where) : '';
+
+// 3. Count filtered records
+if (!empty($where)) {
+	$countStmt = $pdo->prepare("SELECT COUNT(*) FROM documents" . $whereSql);
+	$countStmt->execute($params);
+	$filteredCount = (int)$countStmt->fetchColumn();
+} else {
+	$filteredCount = $grandTotal;
+}
+
+// 4. Sorting
 $sortField = isset($_GET['sort_field']) ? $_GET['sort_field'] : '';
-$sortDir = isset($_GET['sort_dir']) ? strtolower($_GET['sort_dir']) : 'asc';
+$allowedSort = ['id', 'title', 'department', 'status', 'priority', 'owner', 'file_size', 'created_at', 'updated_at'];
+$orderSql = '';
 
-if ($sortField !== '') {
-	usort($records, function ($a, $b) use ($sortField, $sortDir) {
-		$valA = isset($a[$sortField]) ? $a[$sortField] : '';
-		$valB = isset($b[$sortField]) ? $b[$sortField] : '';
-		
-		if (is_numeric($valA) && is_numeric($valB)) {
-			$diff = $valA - $valB;
-		} else {
-			$diff = strcmp((string)$valA, (string)$valB);
-		}
-		
-		return $sortDir === 'desc' ? -$diff : $diff;
-	});
+if ($sortField !== '' && in_array($sortField, $allowedSort, true)) {
+	$sortDir = (isset($_GET['sort_dir']) && strtolower($_GET['sort_dir']) === 'desc') ? 'DESC' : 'ASC';
+	$orderSql = " ORDER BY $sortField $sortDir";
 }
 
-// Pagination
-$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 0;
-$offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+// 5. Pagination
+$limit = isset($_GET['limit']) ? max(0, (int)$_GET['limit']) : 0;
+$offset = isset($_GET['offset']) ? max(0, (int)$_GET['offset']) : 0;
+$limitSql = $limit > 0 ? " LIMIT $limit OFFSET $offset" : '';
 
-$totalCount = count($records);
+// 6. Fetch paginated data
+$query = "SELECT * FROM documents" . $whereSql . $orderSql . $limitSql;
+$stmt = $pdo->prepare($query);
+$stmt->execute($params);
+$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-if ($limit > 0) {
-	$records = array_slice($records, $offset, $limit);
-}
-
-foreach ($records as &$rec) {
-	if (!isset($rec['file_size_display']) && isset($rec['file_size'])) {
-		$b = $rec['file_size'];
-		$rec['file_size_display'] = $b >= 1048576 ? round($b / 1048576, 1) . ' MB' : round($b / 1024, 1) . ' KB';
+// 7. Format display fields (only for the requested page slice)
+foreach ($rows as &$rec) {
+	$rec['id'] = (int)$rec['id'];
+	$rec['file_size'] = (int)$rec['file_size'];
+	$rec['created_at'] = (int)$rec['created_at'];
+	$rec['updated_at'] = (int)$rec['updated_at'];
+	if (is_string($rec['tags'])) {
+		$rec['tags'] = json_decode($rec['tags'], true) ?: [];
 	}
-	if (!isset($rec['updated_display']) && isset($rec['updated_at'])) {
-		$rec['updated_display'] = date('Y-m-d', $rec['updated_at']);
-	}
+	$b = $rec['file_size'];
+	$rec['file_size_display'] = $b >= 1048576 ? round($b / 1048576, 1) . ' MB' : round($b / 1024, 1) . ' KB';
+	$rec['updated_display'] = date('Y-m-d', $rec['updated_at']);
 }
 unset($rec);
 
 echo json_encode([
-	'data' => $records,
-	'total' => $grandTotal,
-	'filtered' => $totalCount
+	'data'     => $rows,
+	'total'    => $grandTotal,
+	'filtered' => $filteredCount
 ]);

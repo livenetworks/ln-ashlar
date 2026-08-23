@@ -1,0 +1,109 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-core",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-attr": {
+			"direction": "author",
+			"sources": [
+				"helpers.js"
+			]
+		},
+		"data-ln-class": {
+			"direction": "author",
+			"sources": [
+				"helpers.js"
+			]
+		},
+		"data-ln-debug": {
+			"direction": "author",
+			"sources": [
+				"helpers.js"
+			]
+		},
+		"data-ln-field": {
+			"direction": "author",
+			"sources": [
+				"helpers.js"
+			]
+		},
+		"data-ln-fill-as": {
+			"direction": "author",
+			"sources": [
+				"helpers.js"
+			]
+		},
+		"data-ln-fillable": {
+			"direction": "author",
+			"sources": [
+				"helpers.js"
+			]
+		},
+		"data-ln-filter": {
+			"direction": "author",
+			"sources": [
+				"hash.js"
+			]
+		},
+		"data-ln-form": {
+			"direction": "author",
+			"sources": [
+				"helpers.js"
+			]
+		},
+		"data-ln-hash": {
+			"direction": "author",
+			"sources": [
+				"hash.js"
+			]
+		},
+		"data-ln-key": {
+			"direction": "both",
+			"sources": [
+				"helpers.js"
+			]
+		},
+		"data-ln-persist": {
+			"direction": "author",
+			"sources": [
+				"persist.js"
+			]
+		},
+		"data-ln-search": {
+			"direction": "author",
+			"sources": [
+				"hash.js"
+			]
+		},
+		"data-ln-search-for": {
+			"direction": "author",
+			"sources": [
+				"hash.js"
+			]
+		},
+		"data-ln-show": {
+			"direction": "author",
+			"sources": [
+				"helpers.js"
+			]
+		},
+		"data-ln-sort": {
+			"direction": "author",
+			"sources": [
+				"hash.js"
+			]
+		},
+		"data-ln-template": {
+			"direction": "author",
+			"sources": [
+				"helpers.js"
+			]
+		},
+		"data-ln-value": {
+			"direction": "author",
+			"sources": [
+				"helpers.js"
+			]
+		}
+	}
+}

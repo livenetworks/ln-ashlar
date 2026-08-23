@@ -1,7 +1,7 @@
 <!-- ln-page: title="Density — ln-ashlar" h1="Density" -->
 
 <h1>Density</h1>
-				<p>Global spacing compression toggle. Add the <code>density-compact</code> class to any element — the subtree tightens. Tables show more rows, form inputs pack denser, cards shrink padding. Same components, same markup, same selectors — only the internal spacing tokens change.</p>
+				<p>Global spacing compression toggle. Add the <code>data-density="compact"</code> attribute to any element — the subtree tightens. Tables show more rows, form inputs pack denser, cards shrink padding. Same components, same markup, same selectors — only the internal spacing tokens change.</p>
 
 				<section class="density-demo-controls">
 					<header><h3>Try it</h3></header>
@@ -38,7 +38,7 @@
 					</main>
 					<script type="text/plain" data-demo-scss>
 // Scoped density compaction:
-.density-compact {
+[data-density="compact"] {
     // Re-tunes spacing and font tokens in this subtree
     --padding-y: var(--size-xs-up); // 4px (normally 12px)
     --font-size: var(--text-body-sm);
@@ -101,8 +101,8 @@
 						</div>
 					</main>
 					<script type="text/plain" data-demo-scss>
-// Tables react automatically to compact class:
-.density-compact table {
+// Tables react automatically to density:
+[data-density="compact"] table {
     // row height reduces:
     --density-row-h: 2.25rem; // normally 2.75rem
 }
@@ -116,14 +116,14 @@
 							<p data-ln-stat-label>Total documents</p>
 							<p data-ln-stat-value>1,247</p>
 							<p data-ln-stat-trend="up">
-								<svg class="ln-icon" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg>
 								12% from last month
 							</p>
 						</article>
 					</main>
 					<script type="text/plain" data-demo-scss>
 // Stat cards reduce padding and header/value text size:
-.density-compact [data-ln-stat-card] {
+[data-density="compact"] [data-ln-stat-card] {
     --text-heading-lg: 1.75rem; // gentle reduction for stat number
 }
 					</script>
@@ -134,12 +134,12 @@
 					<main>
 						<p>Three activation paths — see <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/css/density.md">density.md</a> for the full spec.</p>
 						<pre><code>&lt;!-- Global --&gt;
-&lt;html class="density-compact"&gt;
+&lt;html data-density="compact"&gt;
 
 &lt;!-- Scoped --&gt;
-&lt;main class="density-compact"&gt;
+&lt;main data-density="compact"&gt;
 
-&lt;!-- Default (no class) --&gt;
+&lt;!-- Default (no attribute / dense) --&gt;
 &lt;html&gt;</code></pre>
 					</main>
 				</section>
@@ -171,16 +171,61 @@ button {
 	const globalCb = document.querySelector('[data-demo-density-global]');
 	const scopedCb = document.querySelector('[data-demo-density-scoped]');
 
+	function syncCheckboxes() {
+		const current = htmlEl.getAttribute('data-density') || 'compact';
+		
+		if (globalCb) {
+			globalCb.checked = (current === 'compact');
+		}
+
+		if (scopedCb) {
+			scopedCb.checked = (scopedTarget.getAttribute('data-density') === 'compact');
+		}
+
+		// Sync top-right buttons too
+		document.querySelectorAll('[data-demo-density]').forEach(function (btn) {
+			if (btn.getAttribute('data-demo-density') === current) {
+				btn.setAttribute('aria-current', 'true');
+			} else {
+				btn.removeAttribute('aria-current');
+			}
+		});
+	}
+
+	// Default to comfortable on this demo page if no preference is stored
+	if (!localStorage.getItem('ln-demo-density')) {
+		htmlEl.setAttribute('data-density', 'comfortable');
+	}
+
 	if (globalCb) {
 		globalCb.addEventListener('change', function () {
-			htmlEl.classList.toggle('density-compact', globalCb.checked);
+			const target = globalCb.checked ? 'compact' : 'comfortable';
+			htmlEl.setAttribute('data-density', target);
+			try { localStorage.setItem('ln-demo-density', target); } catch (e) { /* ignore */ }
 		});
 	}
 
 	if (scopedCb && scopedTarget) {
 		scopedCb.addEventListener('change', function () {
-			scopedTarget.classList.toggle('density-compact', scopedCb.checked);
+			if (scopedCb.checked) {
+				scopedTarget.setAttribute('data-density', 'compact');
+			} else {
+				scopedTarget.removeAttribute('data-density');
+			}
 		});
 	}
+
+	// Listen for changes to data-density on html element to keep page toggles in sync
+	const observer = new MutationObserver(function (mutations) {
+		mutations.forEach(function (mutation) {
+			if (mutation.attributeName === 'data-density') {
+				syncCheckboxes();
+			}
+		});
+	});
+	observer.observe(htmlEl, { attributes: true, attributeFilter: ['data-density'] });
+
+	// Initial sync
+	syncCheckboxes();
 })();
 </script>

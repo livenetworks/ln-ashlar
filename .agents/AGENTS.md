@@ -1,5 +1,7 @@
 # ln-ashlar Project Rules
 
+> 📜 **Standalone Document:** Full human- and AI-readable engineering doctrines are maintained in [DOCTRINE.md](../DOCTRINE.md).
+
 ## 1. Ashlar Architecture & Component Authoring Doctrines
 
 ### A. Three-Layer Architecture
@@ -14,13 +16,16 @@
 - **Queries (Reading State)**: Coordinators MAY read component state properties directly (`el.lnProfile.currentId`).
 - **Component Isolation**: Components NEVER import or reference sibling components. Communication is 100% event-driven via CustomEvents (`{ bubbles: true }`) or attribute bridging by coordinators.
 
-### C. Attribute Bridge Pattern (Single Source of Truth)
-- Prototype methods that change state MUST ONLY call `setAttribute` (e.g. `this.dom.setAttribute('data-ln-toggle', 'open')`).
+### C. Attribute Bridge Pattern & Observable Single Source of Truth
+- **All `data-ln-*` Attributes Are Observable**: Every state attribute is observed via `MutationObserver` registered at the core/component level. The attribute in the DOM is the **Single Source of Truth** at all times.
+- **Instant DOM Attribute Writes**: Prototype methods and input controls MUST write state directly to target DOM attributes via `setAttribute` (e.g. `this.dom.setAttribute('data-ln-toggle', 'open')`, `target.setAttribute('data-ln-search', input.value)`).
+- **Attribute Observer Debouncing**: Debounce timers (e.g., for search throttling) MUST reside in the component's attribute observer (`_syncAttribute`), NOT in the input control event handlers. This ensures input events update the DOM attribute immediately, while `_syncAttribute` handles debouncing the heavy work (events / fetches). Programmatic resets (`setAttribute('data-ln-search', '')`) or `0ms` debounces execute instantly without delay.
 - `MutationObserver` detects attribute changes and triggers internal state synchronization (`_syncAttribute()`).
 - **Forbidden ("Checkbox Hack")**: Using `<input type="checkbox">` for toggle state is strictly forbidden (breaks `MutationObserver`, teleportation, ARIA semantics, and encapsulation).
 
 ### D. HTML Template System & Zero JS Display Text
 - **HTML-First DOM Structure**: Component DOM structures belong in `<template data-ln-template="...">` in HTML, cloned via `cloneTemplate()` and populated via `fill()`. Never build DOM trees via `createElement` chains in JS.
+  - **Micro-Component Exception**: Behavioral button decorators (e.g. `ln-confirm`) are exempt from `<template>` cloning to avoid over-engineering. They use Two-Element Mode (`data-ln-confirm-idle`/`data-ln-confirm-active`) or declarative attribute strings (`data-ln-confirm="..."`). Hardcoded JS strings are strictly developer failsafes.
 - **Zero Display Text in JS**: Hardcoded UI text/labels in JS are strictly forbidden. Translatable text lives in `<ul hidden><li data-{component}-dict="key">...</li></ul>` (read via `buildDict`) or relies on browser `Intl` APIs (`Intl.DateTimeFormat`, `Intl.NumberFormat`).
 - **Semantic HTML5 & Accessibility First**:
   - Always use semantic HTML5 elements for data presentation instead of generic `<div>` or `<span>` containers:
@@ -33,20 +38,24 @@
 - **Paired Events**: Components emit `ln-{name}:before-{action}` (cancelable) before state changes, and `ln-{name}:{action}` (post-fact, bubbling) after state changes.
 - **Detail Guard Pattern**: Always check `e.detail && e.detail.prop` when listening to external events.
 
-## 2. Codebase Integrity and Realistic Modeling
-- **No Hallucinated Attributes/Components**: Never invent attributes or components that do not exist (e.g., `data-ln-action` or `ln-action`). Only reference actual components found in the `js/` directory (e.g., `ln-toggle`, `ln-modal`, `ln-table`, `ln-form`, `ln-validate`, `ln-data-store`, `ln-data-coordinator`).
+### F. Local Encapsulation vs. Window-Level Coordinators (Multi-Instance Isolation)
+- **Local Multi-Instance Isolation**: Components that can be instantiated multiple times on a page (`form`, `ln-validate`, `ln-autosave`, `ln-accordion`, `ln-tabs`) are strictly self-contained. The validator (`ln-validate`) operates as an encapsulated child of its parent `<form>`. Multiple instances or forms on the same page operate completely independently.
+- **Window-Level Scope Boundary (`ln-ui-coordinator`)**: Window-level coordinators manage only shared, window-wide UI services (hash routing for modals `#modal-id`, toast dispatching, global AJAX success/error toast mediation, upload notifications). They MUST NEVER couple with, inspect, or manage the internal validation/submission state of local forms or components.
 
-## 3. Architecture Documentation Structure & Component Template
-- All component documentation in `architecture_docs_draft/components/` MUST strictly follow the unified structure defined in [`../COMPONENT_DOCUMENTATION_TEMPLATE.md`](../COMPONENT_DOCUMENTATION_TEMPLATE.md).
+## 2. Codebase Integrity and Realistic Modeling
+- **No Hallucinated Attributes/Components**: Never invent attributes or components that do not exist (e.g., `data-ln-action` or `ln-action`). Only reference actual components found in the `components/` directory (e.g., `ln-toggle`, `ln-modal`, `ln-table`, `ln-form`, `ln-validate`, `ln-data-store`, `ln-data-coordinator`).
+
+## 3. Architecture Documentation Structure & Component Standards
+- All component documentation in `docs-mcp/components/` MUST strictly follow the unified English structure.
 - **Mandatory Section Headings**:
-  1. `## 1. Заднинско дејство и одговорност`
-  2. `## 2. Минимален HTML Маркап и Варијанти на Употреба`
-  3. `## 3. Декларативен API Договор (Атрибути и Настани)`
-  4. `## 4. CSS Стилизирање и Поведенски Концепт`
-  5. `## 5. Пристапност (ARIA) и Чести Грешки`
-  6. `## 6. Дијаграм на Текот и Животен Циклус` (Mermaid sequence diagram saved for the end of the doc)
-  7. `## 7. Поврзани Компоненти` (For listing related components & coordinators)
-- **Relative Links Requirement**: Always use relative paths for file links in component documentation (e.g. `../../js/ln-tooltip/src/ln-tooltip.js`, `./ln-confirm.md`), NEVER absolute `file:///` URLs.
+  1. `## 1. Core Behavior & Responsibility`
+  2. `## 2. Minimal HTML Markup & Usage Variants`
+  3. `## 3. Declarative API Contract (Attributes & Events)`
+  4. `## 4. CSS Styling & Behavioral Concept`
+  5. `## 5. Accessibility (ARIA) & Common Pitfalls`
+  6. `## 6. Sequence & Lifecycle Flow` (Mermaid sequence diagram)
+  7. `## 7. Related Components & Coordinators`
+- **Relative Links Requirement**: Always use relative paths for file links in component documentation (e.g. `../../components/ln-tooltip/src/ln-tooltip.js`, `./ln-confirm.md`), NEVER absolute `file:///` URLs.
 - Lead documentation with user/developer usage examples; keep internal JS engine code dumps out of consumer docs.
 - **Conciseness & Compactness**: Keep documentation lean, focused, and direct. Consolidate related HTML markup variants into compact code blocks, use clean concise API tables, and keep Mermaid sequence diagrams focused on high-level lifecycle flows (3-4 key participants max). Avoid multi-paragraph over-explanations.
 
@@ -54,10 +63,10 @@
 - **Separation of Concerns:** Clearly separate visual styling (HTML chrome/wrappers and CSS classes, e.g. `.search`, `.collapsible`) from functional JS triggers (`data-ln-*` attributes). Visual markup classes are recommended globally as design standards even if JS logic is absent.
 - **Search Debounce Guidelines:**
   - **Local DOM Search (Markup Search):** When searching locally within the DOM, always explicitly set `data-ln-search-debounce="0"` on the input to ensure instant filtering on keyup/input.
-  - **Remote Search (API Search):** When searching via backend APIs (e.g., using `ln-table` or custom fetches), always use a debounce of `150` milliseconds or higher to throttle requests and protect the server.
+  - **Remote Search (API Search):** When searching via backend APIs (e.g., using `ln-data-store`, `ln-table` remote mode, or custom fetches), always use a debounce of `500` milliseconds (the standard default in `ln-search`) to throttle requests and protect the server.
 
 ## 5. UI/UX Confirmation & Gating Guidelines
-- **Single-Element Actions (`ln-confirm`):** The `ln-confirm` component (in-place two-click confirmation) is strictly reserved for **single-element, low-impact actions** (e.g., deleting a single table row, archiving a single document). It must never be used for complex or high-risk actions.
+- **Single-Element Actions (`ln-confirm`):** The `ln-confirm` component (in-place two-click confirmation) is strictly reserved for **single-element, low-impact actions** (e.g., deleting a single table row, archiving a single document). It must never be used for complex or high-risk actions. Prefers Two-Element Mode (`data-ln-confirm-idle`/`data-ln-confirm-active`) for HTML-first clarity.
 - **Bulk Actions & High-Impact Operations (`ln-modal`):** For actions that affect multiple items simultaneously (e.g., bulk deleting selected tenants, batch status updates) or actions with major side effects, using in-place `ln-confirm` is strictly forbidden. Instead, a confirmation modal (`ln-modal`) MUST be shown. The modal must clearly list the affected resources, show the impact summary, and offer explicit, separate "Confirm" and "Cancel" buttons.
 
 ## 6. Global Restrictions

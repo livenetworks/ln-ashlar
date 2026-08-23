@@ -1,0 +1,67 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-api-connector",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-api-base-url": {
+			"direction": "author",
+			"sources": [
+				"src/ln-api-connector.js"
+			]
+		},
+		"data-ln-api-connector": {
+			"direction": null,
+			"sources": [
+				"src/ln-api-connector.js"
+			]
+		},
+		"data-ln-api-connector-query-debounce": {
+			"direction": "author",
+			"sources": [
+				"src/ln-api-connector.js"
+			]
+		},
+		"data-ln-api-headers": {
+			"direction": "author",
+			"sources": [
+				"src/ln-api-connector.js"
+			]
+		},
+		"data-ln-api-param-limit": {
+			"direction": "author",
+			"sources": [
+				"src/ln-api-connector.js"
+			]
+		},
+		"data-ln-api-param-offset": {
+			"direction": "author",
+			"sources": [
+				"src/ln-api-connector.js"
+			]
+		},
+		"data-ln-api-param-search": {
+			"direction": "author",
+			"sources": [
+				"src/ln-api-connector.js"
+			]
+		},
+		"data-ln-api-param-sort-dir": {
+			"direction": "author",
+			"sources": [
+				"src/ln-api-connector.js"
+			]
+		},
+		"data-ln-api-param-sort-field": {
+			"direction": "author",
+			"sources": [
+				"src/ln-api-connector.js"
+			]
+		},
+		"data-ln-api-path": {
+			"direction": "author",
+			"sources": [
+				"src/ln-api-connector.js"
+			]
+		}
+	}
+}

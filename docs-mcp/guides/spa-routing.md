@@ -4,7 +4,7 @@ classification: guide
 status: draft
 domain: frontend
 summary: Client-side routing and hash-state architecture in ln-ashlar - compound URL fragments, navigation lifecycles, and view teardowns.
-source: docs/architecture/hash-state.md, js/ln-router/README.md
+source: docs/architecture/hash-state.md, components/ln-router/README.md
 tags: [router, navigation, hash-state, spa, history]
 ---
 
@@ -62,7 +62,7 @@ Direct literal strings must **never** be assigned directly to `location.hash` (e
 Clicking a native `<a href="#modal:12">` anchor would replace the entire hash string, breaking Rule 2. Components must intercept clicks on their own anchors, invoke `hashLinkClick(e)`, and redirect the write through `hashSet(ns, value)`.
 
 ### Rule 4: Decouple Form Fills (Coordinator Pattern)
-Components must remain generic. A modal component handles open/close states in the hash and dispatches events, but it does **not** fetch data or populate forms. Cross-component wiring belongs inside a coordinator (such as `ln-modal-coordinator`), which catches `ln-modal:open` and fills the nested form.
+Components must remain generic. A modal component handles open/close states in the hash and dispatches events, but it does **not** fetch data or populate forms. Cross-component wiring belongs inside a coordinator (such as `ln-ui-coordinator`), which catches `ln-modal:open` and fills the nested form.
 
 ### Rule 5: Router Fragment Guard
 The router ignores `popstate` history transitions where the new URL differs from the old URL **only in the fragment** (path and query remain identical). This allows the browser's Back button to dismiss open modals without reloading or tearing down the under-modal page view.

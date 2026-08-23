@@ -4,7 +4,7 @@ classification: service
 status: stable
 domain: frontend
 summary: Shared utility primitives, DOM binding engines, template cloning, and component initialization helpers for ln-ashlar.
-source: js/ln-core/index.js
+source: components/ln-core/index.js
 tags: [core, helpers, dom-binding, templates, service]
 ---
 
@@ -18,7 +18,7 @@ tags: [core, helpers, dom-binding, templates, service]
 
 `ln-core` serves as the base layer of the `ln-ashlar` architecture. It exports common DOM utilities, template rendering functions, event dispatchers, form serialization, component registration, dictionary builders, and reactive state management primitives.
 
-The JavaScript source is entry-pointed at [index.js](../../js/ln-core/index.js) and implemented across modular sub-files in [js/ln-core/](../../js/ln-core/).
+The JavaScript source is entry-pointed at [index.js](../../components/ln-core/index.js) and implemented across modular sub-files in [components/ln-core/](../../components/ln-core/).
 
 Key responsibilities include:
 - **Component Lifecycle Registration (`registerComponent`):** Registers component classes with MutationObserver-based lifecycle management (childList, attribute observation, auto-instantiation, and automatic `destroy()` teardown on DOM removal).
@@ -99,6 +99,10 @@ This service module exposes no declarative HTML attributes directly on itself.
 | `parseHeaders` | `(str: String, componentName?: String)` | `Object` | Safely parses a JSON header string, returning an empty object on error. |
 | `registerDataMapper` | `(name: String, mapper: { ingress: Function, egress: Function })` | `void` | Registers domain data mappers for record transformation in connectors/stores. |
 | `getDataMapper` | `(name: String)` | `Object` | Retrieves a registered data mapper (or identity fallback). |
+| `holdInit` | `()` | `void` | Increments the global boot holds counter to block component initialization. |
+| `releaseInit` | `()` | `void` | Decrements the global boot holds counter, draining the boot queue when it reaches zero. |
+| `pendingCount` | `()` | `Number` | Returns the current active boot hold count. |
+| `queueBoot` | `(fn: Function)` | `void` | Queues a component boot function if holds are active, otherwise calls it via setTimeout. |
 
 ### Events API
 

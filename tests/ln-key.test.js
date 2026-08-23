@@ -10,7 +10,7 @@ import {
 	normalizeShortcut,
 	parseShortcutList,
 	shortcutMatches
-} from '../js/ln-key/src/key-model.js';
+} from '../components/ln-key/src/key-model.js';
 
 test('shortcut normalization is case-insensitive and uses deterministic modifier order', () => {
 	assert.equal(normalizeShortcut('shift + ctrl + s'), 'Ctrl+Shift+S');

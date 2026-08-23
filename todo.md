@@ -18,7 +18,7 @@
 - [x] ln-filter
 - [x] ln-form
 - [x] ln-http
-- [x] ln-icons
+- [x] ln-icon
 - [x] ln-link
 - [x] ln-list
 - [x] ln-modal
@@ -40,5 +40,5 @@
 - [x] ln-toggle
 - [x] ln-tooltip
 - [ ] ln-translations
-- [ ] ln-upload
+- [x] ln-upload
 - [x] ln-validate

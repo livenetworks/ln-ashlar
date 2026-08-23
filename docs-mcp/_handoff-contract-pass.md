@@ -130,7 +130,7 @@ Networks" беше повремено disconnected — треба да е акт
   (`_temp/**`, `docs/**`, `plans/**`, root `README.md`, `ln-fill.md`) — НЕ ги
   собирај. Секогаш `git add <path>` експлицитно, никогаш `git add -A`.
   Верификувај со `git show --name-only`.
-- **Изворот е вистина:** defaults/events/attributes се читаат од `js/ln-*/src`,
+- **Изворот е вистина:** defaults/events/attributes се читаат од `components/ln-*/src`,
   не се погодуваат. Не пипај `js/` и `demo/`.
 - **Timeless docs:** без „иден/planned/previously" фрази.
 - **plan-фајлови** (`.claude/plans/*.md`) се **gitignored** (submodule) → НЕ се

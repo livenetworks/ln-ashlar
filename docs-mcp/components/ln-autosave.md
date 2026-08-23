@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Saves draft form states in localStorage on field boundaries, restoring them on load and clearing them on submit or reset.
-source: js/ln-autosave/src/ln-autosave.js
+source: components/ln-autosave/src/ln-autosave.js
 tags: [forms, inputs, state, localstorage]
 ---
 
@@ -21,14 +21,14 @@ tags: [forms, inputs, state, localstorage]
 - **Opt-in Debounced Input:** Optionally performs debounced auto-saving on native `input` events while typing (configured via `data-ln-autosave-debounce-input`).
 - **Clean Invalidation:** Clears the stored draft when the form is submitted (`submit`), reset (`reset`), or when an element marked with `data-ln-autosave-clear` is clicked.
 - **Decoupled Event Restoration:** Restores form state on initialization and dispatches standard native `input` and `change` events on all restored fields. This automatically triggers sibling primitives (such as `ln-validate` and `ln-autoresize`) to re-evaluate their state without direct integration logic in `ln-autosave`.
-- Located in [`js/ln-autosave/src/ln-autosave.js`](../../js/ln-autosave/src/ln-autosave.js).
+- Located in [`components/ln-autosave/src/ln-autosave.js`](../../components/ln-autosave/src/ln-autosave.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
 > - **Does NOT directly query or control sibling components** — It is completely unaware of [`ln-autoresize`](./ln-autoresize.md) or [`ln-validate`](./ln-validate.md). Instead, it relies on standard, decoupled native DOM events (`input` and `change`) during form restoration, which naturally trigger those components.
 > - **Does NOT submit data or perform network requests** — Form submissions and remote server sync are managed by [`ln-form`](./ln-form.md) or [`ln-data-coordinator`](./ln-data-coordinator.md).
 > - **Does NOT validate input constraints** — Form validation is delegated to [`ln-validate`](./ln-validate.md).
-> - **Does NOT persist sensitive fields or nameless inputs** — Avoids saving credentials or custom inputs by ignoring fields without a `name` attribute, fields of type `file`, or elements decorated with `data-ln-autosave-exclude`.
+> - **Does NOT persist sensitive fields or nameless inputs** — Automatically excludes fields of type `password` and `file`, fields without a `name` attribute, and elements decorated with `data-ln-autosave-exclude`.
 
 ---
 
@@ -54,7 +54,7 @@ Standard implementation showing how to activate draft persistence on a form:
 
 ### Variant 1: Debounced Continuous Input with Clear Action
 
-Shows how to configure continuous debounced auto-saving while typing, excluding a sensitive verification pin field, and adding a cancel/clear draft button:
+Shows how to configure continuous debounced auto-saving while typing, manually excluding an ephemeral one-time code field, and adding a cancel/clear draft button (passwords and file inputs are already excluded automatically):
 
 ```html
 <form id="editor-form" 
@@ -72,10 +72,10 @@ Shows how to configure continuous debounced auto-saving while typing, excluding 
         <textarea id="content" name="content" data-ln-autoresize></textarea>
     </div>
 
-    <!-- Sensitive inputs can be excluded -->
+    <!-- Ephemeral or custom sensitive fields can be manually excluded -->
     <div class="form-element">
-        <label for="passcode">Verification Pin</label>
-        <input type="password" id="passcode" name="pin" data-ln-autosave-exclude />
+        <label for="otp">One-Time Code (OTP)</label>
+        <input type="text" id="otp" name="otp" autocomplete="one-time-code" data-ln-autosave-exclude />
     </div>
 
     <ul class="form-actions">

@@ -11,6 +11,9 @@ When I share plans, specs, or ask architectural questions — DON'T immediately 
 
 This applies to architecture discussions, spec reviews, and planning. For trivial implementation tasks ("create this file", "fix this bug"), execute directly.
 
+> 📜 **Engineering Doctrines & Standards:**  
+> Refer to [DOCTRINE.md](DOCTRINE.md) for official component authoring doctrines, CQS guidelines, state observability, and 3-Layer architecture.
+
 ---
 
 ## Pre-Code Standards Verification (CRITICAL CHECKLIST)
@@ -58,7 +61,7 @@ Before recommending an architecture, refactor, or claiming that a behavior/metho
 | **Primitives vs Vocabulary** | [docs/architecture/reference.md#token-surface-primitives-vocabulary](docs/architecture/reference.md#token-surface-primitives-vocabulary) |
 | **Breakpoints** | [docs/architecture/reference.md#breakpoint-tokens-use-the-mixin-not-the-literal](docs/architecture/reference.md#breakpoint-tokens-use-the-mixin-not-the-literal) |
 | **Icons (Tabler CDN)** | [docs/architecture/reference.md#icons](docs/architecture/reference.md#icons) |
-| **Reactive / core.md** | [js/ln-core/README.md](js/ln-core/README.md) & [docs/architecture/component-guide.md](docs/architecture/component-guide.md) |
+| **Reactive / core.md** | [components/ln-core/README.md](components/ln-core/README.md) & [docs/architecture/component-guide.md](docs/architecture/component-guide.md) |
 | **Global Standards** | `.claude/skills/` (html, css, js files) |
 
 ---
@@ -66,6 +69,21 @@ Before recommending an architecture, refactor, or claiming that a behavior/metho
 ## Build Commands
 
 ```bash
-npm run build        # Build library into demo/dist/ + compile demo pages
-npm run dev          # Watch mode (library only)
+npm run build              # Build library into demo/dist/ + compile demo pages
+npm run dev                # Watch mode (library only)
+npm run sync:ln-schemas    # Regenerate components/ln-*/ln-*.schema.json from source code
+npm run sync:ln-schemas:check   # Report schema drift without writing (exit 1 on drift)
 ```
+
+`sync:ln-schemas` scans each component's `src/**.js` and co-located `*.scss` for
+`data-ln-*` attributes and writes the per-component schema. Compiled bundles at
+`components/ln-*/ln-*.js` are deliberately skipped, so build order does not affect the result.
+
+It is **non-destructive**: it owns only the keys it generates (`$comment`, `component`,
+`generator`, and each attribute's `direction` and `sources`) and preserves every other
+key, so hand-authored fields survive regeneration. It writes only when something
+actually changed.
+
+`npm run build` runs it first, so schemas cannot go stale. `npm test` runs the `:check`
+variant, which never writes and exits 1 on drift. `npm run dev` deliberately does **not**
+run it — watch mode would capture half-typed attribute names.

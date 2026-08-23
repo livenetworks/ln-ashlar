@@ -12,7 +12,7 @@
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
-									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-icon-info-circle"></use></svg>
 									The Swapping Doctrine
 								</h4>
 								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
@@ -202,7 +202,7 @@ window.lnAjax(document.getElementById('new-container'));</code></pre>
 										<tr><td><code>ln-ajax:before-start</code></td><td>Before everything (cancelable — can cancel request)</td><td><code>{ method, url }</code></td></tr>
 										<tr><td><code>ln-ajax:start</code></td><td>After adding spinner, before fetch</td><td><code>{ method, url }</code></td></tr>
 										<tr><td><code>ln-ajax:success</code></td><td>After successful response</td><td><code>{ method, url, data }</code></td></tr>
-										<tr><td><code>ln-ajax:error</code></td><td>After fetch error</td><td><code>{ method, url, error }</code></td></tr>
+										<tr><td><code>ln-ajax:error</code></td><td>After fetch error</td><td><code>{ method, url, status, data, error }</code></td></tr>
 										<tr><td><code>ln-ajax:complete</code></td><td>After completion (always)</td><td><code>{ method, url }</code></td></tr>
 									</tbody>
 								</table>
@@ -210,8 +210,8 @@ window.lnAjax(document.getElementById('new-container'));</code></pre>
 								<p>Events are dispatched on the element that initiated the request (<code>&lt;a&gt;</code> or <code>&lt;form&gt;</code>) and bubble up.</p>
 							</article>
 							<article>
-								<h4>Integration with ln-toast</h4>
-								<p>If the response contains a <code>message</code> object, <code>ln-ajax</code> dispatches <code>ln-toast:enqueue</code> on <code>window</code>. The <code>ln-toast</code> component listens for this event by default; any other listener can intercept.</p>
+								<h4>Layer 2 Coordination &amp; Toast Integration</h4>
+								<p><code>ln-ajax</code> stays isolated and emits <code>ln-ajax:success</code> and <code>ln-ajax:error</code>. The Layer 2 coordinator (<code>ln-ui-coordinator</code>) intercepts these bubbling events, inspects the response <code>data.message</code> envelope, and dispatches <code>ln-toast:enqueue</code> on <code>window</code>.</p>
 								<pre><code>// Cancel a request conditionally (ln-ajax:before-start is cancelable)
 document.addEventListener('ln-ajax:before-start', function(e) {
     if (!userIsAuthenticated()) {

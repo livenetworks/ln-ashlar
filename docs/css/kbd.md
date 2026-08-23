@@ -1,6 +1,6 @@
 # Kbd
 
-File: `scss/config/mixins/_kbd.scss` — applied to `kbd` in `scss/base/_typography.scss`.
+File: `theme/config/mixins/_kbd.scss` — applied to `kbd` in `theme/base/_typography.scss`.
 
 Keycap styling for inline keyboard shortcut documentation.
 

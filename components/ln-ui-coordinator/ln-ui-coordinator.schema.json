@@ -1,0 +1,60 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-ui-coordinator",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-ui-coordinator-dev.scss"
+			]
+		},
+		"data-ln-field": {
+			"direction": "author",
+			"sources": [
+				"src/ln-ui-coordinator.js"
+			]
+		},
+		"data-ln-fill-id": {
+			"direction": "author",
+			"sources": [
+				"src/ln-ui-coordinator.js"
+			]
+		},
+		"data-ln-modal": {
+			"direction": "author",
+			"sources": [
+				"src/ln-ui-coordinator.js"
+			]
+		},
+		"data-ln-modal-for": {
+			"direction": "author",
+			"sources": [
+				"src/ln-ui-coordinator.js"
+			]
+		},
+		"data-ln-modal-mode": {
+			"direction": "both",
+			"sources": [
+				"src/ln-ui-coordinator.js"
+			]
+		},
+		"data-ln-ui-coordinator": {
+			"direction": "author",
+			"sources": [
+				"ln-ui-coordinator-dev.scss",
+				"src/ln-ui-coordinator.js"
+			]
+		},
+		"data-ln-ui-coordinator-dict": {
+			"direction": null,
+			"sources": [
+				"src/ln-ui-coordinator.js"
+			]
+		},
+		"data-ln-validate-error": {
+			"direction": null,
+			"sources": []
+		}
+	}
+}

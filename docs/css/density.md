@@ -1,6 +1,6 @@
 # Density
 
-File: `scss/config/_density.scss`. Added in v1.2, refactored in v1.3.
+File: `theme/config/_density.scss`. Added in v1.2, refactored in v1.3.
 
 ## Philosophy
 

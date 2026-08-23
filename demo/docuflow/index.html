@@ -16,11 +16,11 @@
 	<div id="app">
 		<header id="app-header">
 			<a href="/" id="app-brand">
-				<svg class="ln-icon" aria-hidden="true"><use href="#ln-files"></use></svg>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-files"></use></svg>
 				<span>DocuFlow Admin</span>
 			</a>
 			<label id="app-search">
-				<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 				<input type="search" placeholder="Search…" aria-label="Global search">
 			</label>
 		</header>
@@ -29,19 +29,19 @@
 				<ul>
 					<li>
 						<a href="/">
-							<svg class="ln-icon" aria-hidden="true"><use href="#ln-layout-dashboard"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-dashboard"></use></svg>
 							Dashboard
 						</a>
 					</li>
 					<li>
 						<a href="/packages">
-							<svg class="ln-icon" aria-hidden="true"><use href="#ln-package"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-package"></use></svg>
 							Packages
 						</a>
 					</li>
 					<li>
 						<a href="/tenants">
-							<svg class="ln-icon" aria-hidden="true"><use href="#ln-building"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-building"></use></svg>
 							Tenants
 						</a>
 					</li>
@@ -84,7 +84,7 @@
 				</li>
 			</ul>
 			<section data-view-error hidden>
-				<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
+				<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg>
 				<h3>Failed to load stats</h3>
 				<p data-view-error-msg></p>
 				<button type="button" data-view-retry>Retry</button>
@@ -95,22 +95,23 @@
 	<!-- Packages list -->
 	<template data-ln-route="/packages" data-ln-route-title="Packages — DocuFlow">
 		<section id="packages-view">
+			<section data-ln-table-coordinator>
 			<section data-ln-table="packages" data-ln-table-source="packages" id="packages-table">
 				<header class="ln-table__toolbar">
 					<div>
 						<h2>Packages</h2>
 					</div>
 					<label class="search">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-						<input type="search" placeholder="Search…" data-ln-search="packages-table">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+						<input type="search" placeholder="Search…" data-ln-search-for="packages">
 						<button type="button" data-ln-search-clear aria-label="Clear search">
-							<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 						</button>
 					</label>
 					<button type="button" id="new-package" class="btn"
 						data-ln-modal-for="package-modal"
 						data-ln-fill-form="package-form">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
 						New
 					</button>
 				</header>
@@ -118,10 +119,26 @@
 				<table>
 					<thead>
 						<tr>
-							<th data-ln-table-col="name">Name <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
-							<th data-ln-table-col="max_users">Max users <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
-							<th data-ln-table-col="max_documents">Max docs <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
-							<th data-ln-table-col="max_storage">Max storage <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+							<th data-ln-table-col="name">Name <ul data-ln-sort="packages" data-ln-sort-field="name">
+								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+							</ul></th>
+							<th data-ln-table-col="max_users">Max users <ul data-ln-sort="packages" data-ln-sort-field="max_users">
+								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+							</ul></th>
+							<th data-ln-table-col="max_documents">Max docs <ul data-ln-sort="packages" data-ln-sort-field="max_documents">
+								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+							</ul></th>
+							<th data-ln-table-col="max_storage">Max storage <ul data-ln-sort="packages" data-ln-sort-field="max_storage">
+								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+							</ul></th>
 							<th data-ln-table-col="active">Status</th>
 							<th>Actions</th>
 						</tr>
@@ -155,8 +172,8 @@
 						data-ln-fill-max-storage="{{ max_storage }}"
 						data-ln-fill-active="{{ active }}"
 						data-ln-modal-name="{{ name }}"
-					><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
-								<li><button type="button" data-ln-table-row-action="delete" aria-label="Delete package" data-ln-confirm="Delete package?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+					><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg></button></li>
+								<li><button type="button" data-ln-table-row-action="delete" aria-label="Delete package" data-ln-confirm="Delete package?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg></button></li>
 							</ul>
 						</td>
 					</tr>
@@ -174,7 +191,7 @@
 				<template data-ln-template="packages-empty-filtered">
 					<tr><td colspan="99">
 						<article class="ln-table__empty-state">
-							<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
+							<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 							<h3>No results</h3>
 							<p>Try adjusting your search or filters.</p>
 							<button type="button" data-ln-table-clear-all class="btn">Clear all filters</button>
@@ -182,9 +199,10 @@
 					</td></tr>
 				</template>
 			</section>
+			</section>
 
 			<section data-view-error hidden>
-				<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
+				<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg>
 				<h3>Failed to load packages</h3>
 				<p data-view-error-msg></p>
 				<button type="button" data-view-retry>Retry</button>
@@ -195,22 +213,23 @@
 	<!-- Tenants list -->
 	<template data-ln-route="/tenants" data-ln-route-title="Tenants — DocuFlow">
 		<section id="tenants-view">
+			<section data-ln-table-coordinator>
 			<section data-ln-table="tenants" data-ln-table-source="tenants" id="tenants-table">
 				<header class="ln-table__toolbar">
 					<div>
 						<h2>Tenants</h2>
 					</div>
 					<label class="search">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-						<input type="search" placeholder="Search…" data-ln-search="tenants-table">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+						<input type="search" placeholder="Search…" data-ln-search-for="tenants">
 						<button type="button" data-ln-search-clear aria-label="Clear search">
-							<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 						</button>
 					</label>
 					<button type="button" id="new-tenant" class="btn"
 						data-ln-modal-for="tenant-modal"
 						data-ln-fill-form="tenant-form">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
 						New
 					</button>
 				</header>
@@ -218,8 +237,16 @@
 				<table>
 					<thead>
 						<tr>
-							<th data-ln-table-col="name">Name <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
-							<th data-ln-table-col="slug">Slug <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+							<th data-ln-table-col="name">Name <ul data-ln-sort="tenants" data-ln-sort-field="name">
+								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+							</ul></th>
+							<th data-ln-table-col="slug">Slug <ul data-ln-sort="tenants" data-ln-sort-field="slug">
+								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+							</ul></th>
 							<th data-ln-table-col="package_id">Package</th>
 							<th data-ln-table-col="auth_method">Auth method</th>
 							<th data-ln-table-col="active">Status</th>
@@ -259,8 +286,8 @@
 						data-ln-fill-read-confirmation="{{ read_confirmation }}"
 						data-ln-fill-active="{{ active }}"
 						data-ln-modal-name="{{ name }}"
-					><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
-								<li><button type="button" data-ln-table-row-action="delete" aria-label="Delete tenant" data-ln-confirm="Delete tenant?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+					><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg></button></li>
+								<li><button type="button" data-ln-table-row-action="delete" aria-label="Delete tenant" data-ln-confirm="Delete tenant?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg></button></li>
 							</ul>
 						</td>
 					</tr>
@@ -278,7 +305,7 @@
 				<template data-ln-template="tenants-empty-filtered">
 					<tr><td colspan="99">
 						<article class="ln-table__empty-state">
-							<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
+							<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 							<h3>No results</h3>
 							<p>Try adjusting your search or filters.</p>
 							<button type="button" data-ln-table-clear-all class="btn">Clear all filters</button>
@@ -286,9 +313,10 @@
 					</td></tr>
 				</template>
 			</section>
+			</section>
 
 			<section data-view-error hidden>
-				<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
+				<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg>
 				<h3>Failed to load tenants</h3>
 				<p data-view-error-msg></p>
 				<button type="button" data-view-retry>Retry</button>
@@ -299,24 +327,26 @@
 	<!-- ── Data layer (persistent, outside outlet) ──────────────── -->
 
 	<!-- Packages data layer -->
-	<div data-ln-data-coordinator="packages" data-ln-data-mapper="packages" hidden>
+	<div data-ln-data-coordinator="packages" data-ln-data-mapper="packages" id="packages-coordinator" hidden>
 		<div data-ln-data-store="packages"
 		     data-ln-data-store-stale="-1"
 		     data-ln-data-store-indexes="active"
 		     data-ln-data-store-search-fields="name"
-		     id="packages-store"></div>
+		     data-ln-search=""
+		     id="packages"></div>
 		<div data-ln-api-connector
 		     data-ln-api-base-url="/demo/docuflow/api"
 		     data-ln-api-path="/packages"></div>
 	</div>
 
 	<!-- Tenants data layer -->
-	<div data-ln-data-coordinator="tenants" data-ln-data-mapper="tenants" hidden>
+	<div data-ln-data-coordinator="tenants" data-ln-data-mapper="tenants" id="tenants-coordinator" hidden>
 		<div data-ln-data-store="tenants"
 		     data-ln-data-store-stale="-1"
 		     data-ln-data-store-indexes="package_id,auth_method,active"
 		     data-ln-data-store-search-fields="name,slug,custom_domain"
-		     id="tenants-store"></div>
+		     data-ln-search=""
+		     id="tenants"></div>
 		<div data-ln-api-connector
 		     data-ln-api-base-url="/demo/docuflow/api"
 		     data-ln-api-path="/tenants"></div>
@@ -342,7 +372,7 @@
 					<span data-ln-modal-when="edit">Edit package — <span data-ln-field="name"></span></span>
 				</h3>
 				<button type="button" aria-label="Close" data-ln-modal-close>
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 				</button>
 			</header>
 			<main>
@@ -398,7 +428,7 @@
 					<span data-ln-modal-when="edit">Edit tenant — <span data-ln-field="name"></span></span>
 				</h3>
 				<button type="button" aria-label="Close" data-ln-modal-close>
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 				</button>
 			</header>
 			<main>

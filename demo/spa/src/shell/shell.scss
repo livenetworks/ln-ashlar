@@ -1,4 +1,4 @@
-@use '../../../../scss/config/mixins' as *;
+@use '../../../../theme/config/mixins' as *;
 
 // ─── App frame (shell mixin contract — _app-shell.scss) ───────────
 .app-wrapper { @include app-wrapper; }

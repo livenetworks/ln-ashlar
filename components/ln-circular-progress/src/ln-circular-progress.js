@@ -1,0 +1,127 @@
+import { dispatch, registerComponent } from '../../ln-core';
+
+(function () {
+	const DOM_SELECTOR = 'data-ln-circular-progress';
+	const DOM_ATTRIBUTE = 'lnCircularProgress';
+
+	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	const SVG_NS = 'http://www.w3.org/2000/svg';
+	const VIEW_SIZE = 36;
+	const RADIUS = 16;
+	const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+	function _constructor(dom) {
+		this.dom = dom;
+		this.svg = null;
+		this.trackCircle = null;
+		this.progressCircle = null;
+		this.labelEl = null;
+		_buildSvg.call(this);
+		_render.call(this);
+		return this;
+	}
+
+	_constructor.prototype.destroy = function () {
+		if (!this.dom[DOM_ATTRIBUTE]) return;
+		if (this.svg) {
+			this.svg.remove();
+		}
+		if (this.labelEl) {
+			this.labelEl.remove();
+		}
+		this.dom.removeAttribute('role');
+		this.dom.removeAttribute('aria-valuemin');
+		this.dom.removeAttribute('aria-valuemax');
+		this.dom.removeAttribute('aria-valuenow');
+		this.dom.removeAttribute('aria-valuetext');
+		delete this.dom[DOM_ATTRIBUTE];
+	};
+
+	function _createSvgElement(tag, attrs) {
+		const el = document.createElementNS(SVG_NS, tag);
+		for (const key in attrs) {
+			el.setAttribute(key, attrs[key]);
+		}
+		return el;
+	}
+
+	function _buildSvg() {
+		this.svg = _createSvgElement('svg', {
+			viewBox: '0 0 ' + VIEW_SIZE + ' ' + VIEW_SIZE,
+			'aria-hidden': 'true'
+		});
+
+		this.trackCircle = _createSvgElement('circle', {
+			cx: VIEW_SIZE / 2,
+			cy: VIEW_SIZE / 2,
+			r: RADIUS,
+			fill: 'none',
+			'stroke-width': '3'
+		});
+		this.trackCircle.classList.add('ln-circular-progress__track');
+
+		this.progressCircle = _createSvgElement('circle', {
+			cx: VIEW_SIZE / 2,
+			cy: VIEW_SIZE / 2,
+			r: RADIUS,
+			fill: 'none',
+			'stroke-width': '3',
+			'stroke-linecap': 'round',
+			'stroke-dasharray': CIRCUMFERENCE,
+			'stroke-dashoffset': CIRCUMFERENCE,
+			transform: 'rotate(-90 ' + (VIEW_SIZE / 2) + ' ' + (VIEW_SIZE / 2) + ')'
+		});
+		this.progressCircle.classList.add('ln-circular-progress__fill');
+
+		this.svg.appendChild(this.trackCircle);
+		this.svg.appendChild(this.progressCircle);
+
+		this.labelEl = document.createElement('strong');
+		this.labelEl.classList.add('ln-circular-progress__label');
+
+		this.dom.appendChild(this.svg);
+		this.dom.appendChild(this.labelEl);
+	}
+
+	function _render() {
+		const value = parseFloat(this.dom.getAttribute('data-ln-circular-progress')) || 0;
+		const max = parseFloat(this.dom.getAttribute('data-ln-circular-progress-max')) || 100;
+		let percentage = (max > 0) ? (value / max) * 100 : 0;
+
+		if (percentage < 0) percentage = 0;
+		if (percentage > 100) percentage = 100;
+
+		const offset = CIRCUMFERENCE - (percentage / 100) * CIRCUMFERENCE;
+		this.progressCircle.setAttribute('stroke-dashoffset', offset);
+
+		const label = this.dom.getAttribute('data-ln-circular-progress-label');
+		const labelText = label !== null ? label : Math.round(percentage) + '%';
+		this.labelEl.textContent = labelText;
+
+		// Sync ARIA properties
+		this.dom.setAttribute('role', 'progressbar');
+		this.dom.setAttribute('aria-valuemin', '0');
+		this.dom.setAttribute('aria-valuemax', String(max));
+		const clampedValue = Math.max(0, Math.min(value, max));
+		this.dom.setAttribute('aria-valuenow', String(clampedValue));
+		this.dom.setAttribute('aria-valuetext', labelText);
+
+		dispatch(this.dom, 'ln-circular-progress:change', {
+			target: this.dom,
+			value: value,
+			max: max,
+			percentage: percentage
+		});
+	}
+
+	// ─── Init ──────────────────────────────────────────────────
+
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _constructor, 'ln-circular-progress', {
+		extraAttributes: ['data-ln-circular-progress-max', 'data-ln-circular-progress-label'],
+		onAttributeChange: function (el) {
+			const inst = el[DOM_ATTRIBUTE];
+			if (inst) _render.call(inst);
+		}
+	});
+})();

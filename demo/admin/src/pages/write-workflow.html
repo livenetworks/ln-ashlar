@@ -16,10 +16,10 @@
 	<header><h3>Declarative Data Layer Markup (Copy/Paste)</h3></header>
 	<main>
 		<!-- Coordinator wrapper: headless store + connector children (the scoped form lives outside — matched by name) -->
-		<div data-ln-data-coordinator="wwf-documents" id="wwf-coordinator">
+		<div data-ln-data-coordinator id="wwf-coordinator">
 
 			<!-- Tier 1: Local Cache Store (IndexedDB backed) -->
-			<div data-ln-data-store="wwf-documents" id="wwf-store"></div>
+			<div data-ln-data-store id="wwf-documents"></div>
 
 			<!-- Tier 2: Transport Gateway — path is read/sync fallback only; mutation URL comes from the form's action -->
 			<div data-ln-api-connector
@@ -34,13 +34,13 @@
 <section class="section-card">
 	<header><h3>Interactive Documents Manager</h3></header>
 	<main>
-		<section data-ln-table="wwf-documents" data-ln-table-source="wwf-documents" data-ln-table-store="wwf-documents" id="wwf-table" class="data-table-demo">
+		<section data-ln-table="wwf-documents" data-ln-table-source="wwf-documents" id="wwf-table" class="data-table-demo">
 			<header class="ln-table__toolbar">
 				<div>
 					<h3>Documents</h3>
 				</div>
 				<button type="button" class="btn" data-ln-modal-for="wwf-modal" data-ln-fill-form="wwf-form">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
 					New Document
 				</button>
 			</header>
@@ -74,12 +74,12 @@
 								        data-ln-fill-status="{{ status }}"
 								        data-ln-fill-expected-version="{{ expected_version }}"
 								        data-ln-modal-mode="edit">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg>
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg>
 								</button>
 							</li>
 							<li>
 								<button data-ln-table-row-action="delete" aria-label="Delete" data-ln-confirm="Delete this document?">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
 								</button>
 							</li>
 						</ul>
@@ -113,7 +113,7 @@
 				<span data-ln-modal-when="edit">Edit Document</span>
 			</h3>
 			<button type="button" aria-label="Close" data-ln-modal-close>
-				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 			</button>
 		</header>
 		<main>

@@ -1,0 +1,13 @@
+// ==========================================================================
+// ln-editor — Functional Link Popover Mechanics
+// ==========================================================================
+
+.ln-editor__link-popover {
+	display: flex;
+	align-items: center;
+
+	> input {
+		flex: 1;
+		min-width: 0;
+	}
+}

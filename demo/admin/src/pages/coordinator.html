@@ -10,7 +10,7 @@
 
 		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 			<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
-				<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+				<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-icon-info-circle"></use></svg>
 				The Orchestrator Doctrine
 			</h4>
 			<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
@@ -36,7 +36,9 @@
 			<!-- Tier 1: Local Cache Store (IndexedDB backed) -->
 			<div data-ln-data-store="demo-docs"
 			     data-ln-data-store-indexes="status,department,updated_at"
-			     data-ln-data-store-search-fields="title,department,owner">
+			     data-ln-data-store-search-fields="title,department,owner"
+			     data-ln-search=""
+			     id="demo-docs">
 			</div>
 
 			<!-- Tier 2: Transport Gateway (REST Connector pointing to mocked server endpoints) -->
@@ -105,6 +107,7 @@
 </section>
 
 <!-- Interactive Live Demo Grid -->
+<section data-ln-table-coordinator>
 <section class="section-card">
 	<header><h3>Interactive Documents Manager Usecase</h3></header>
 	<main>
@@ -115,14 +118,14 @@
 					<h3>IndexedDB-backed Documents Table</h3>
 				</div>
 				<label class="search">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-					<input type="search" placeholder="Search cache…" data-ln-search="demo-table">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+					<input type="search" placeholder="Search cache…" data-ln-search-for="demo-docs">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 					</button>
 				</label>
 				<button type="button" id="open-modal-btn" class="btn" data-ln-modal-for="doc-modal" data-ln-fill-form="doc-form">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
 					New Document
 				</button>
 			</header>
@@ -130,12 +133,24 @@
 			<table>
 				<thead>
 					<tr>
-						<th data-ln-table-col="title">Title <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
-						<th data-ln-table-col="department" data-ln-table-filter-col="department">Department <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button> <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-demo-table-dept" aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
-						<th data-ln-table-col="status" data-ln-table-filter-col="status">Status <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-demo-table-status" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+						<th data-ln-table-col="title">Title <ul data-ln-sort="demo-docs" data-ln-sort-field="title">
+							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+						</ul></th>
+						<th data-ln-table-col="department" data-ln-table-filter-col="department">Department <ul data-ln-sort="demo-docs" data-ln-sort-field="department">
+							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+						</ul> <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-demo-table-dept" aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button></th>
+						<th data-ln-table-col="status" data-ln-table-filter-col="status">Status <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-demo-table-status" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button></th>
 						<th data-ln-table-col="file_size">Size</th>
 						<th data-ln-table-col="author_name">Author</th>
-						<th data-ln-table-col="updated_at">Last Updated <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="updated_at">Last Updated <ul data-ln-sort="demo-docs" data-ln-sort-field="updated_at">
+							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+						</ul></th>
 						<th>Actions</th>
 					</tr>
 				</thead>
@@ -165,8 +180,8 @@
 						data-ln-fill-status="{{ status }}"
 						data-ln-fill-author-name="{{ author_name }}"
 						data-ln-modal-mode="edit"
-					><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
-							<li><button data-ln-table-row-action="delete" aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+					><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg></button></li>
+							<li><button data-ln-table-row-action="delete" aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg></button></li>
 						</ul>
 					</td>
 				</tr>
@@ -186,7 +201,7 @@
 			<template data-ln-template="demo-docs-empty-filtered">
 				<tr><td colspan="99">
 					<article class="ln-table__empty-state">
-						<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
+						<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 						<h3>No matching records</h3>
 						<p>Try adjusting your search query or column filters.</p>
 						<button data-ln-table-clear-all class="btn">Clear Filters</button>
@@ -201,13 +216,13 @@
 <!-- Department filter popover -->
 <div data-ln-popover id="filter-demo-table-dept">
 	<label class="search">
-		<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-		<input type="search" placeholder="Search..." data-ln-search="filter-demo-table-dept-list" data-ln-search-items="label">
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+		<input type="search" placeholder="Search..." data-ln-search-for="filter-demo-table-dept-list" data-ln-search-debounce="0">
 		<button type="button" data-ln-search-clear aria-label="Clear search">
-			<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+			<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 		</button>
 	</label>
-	<ul id="filter-demo-table-dept-list" data-ln-filter="demo-table">
+	<ul id="filter-demo-table-dept-list" data-ln-filter="demo-docs" data-ln-search="" data-ln-search-items="label">
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Finance"> Finance</label></li>
@@ -221,7 +236,7 @@
 
 <!-- Status filter popover -->
 <div data-ln-popover id="filter-demo-table-status">
-	<ul id="filter-demo-table-status-list" data-ln-filter="demo-table">
+	<ul id="filter-demo-table-status-list" data-ln-filter="demo-docs">
 		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Draft"> Draft</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Pending"> Pending</label></li>
@@ -229,6 +244,7 @@
 		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Archived"> Archived</label></li>
 	</ul>
 </div>
+</section>
 
 <!-- Modal Document Form -->
 <dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="doc-modal">
@@ -244,7 +260,7 @@
 				<span data-ln-modal-when="edit">Edit Document</span>
 			</h3>
 			<button type="button" aria-label="Close" data-ln-modal-close>
-				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 			</button>
 		</header>
 		<main>
@@ -302,6 +318,10 @@
 
 <!-- Register Mapper securely in global registry -->
 <script class="demo-mapper">
+// The library bundle is deferred, so window.lnCore only exists once it has run.
+// Registering on DOMContentLoaded and re-resolving lets the already-constructed
+// coordinator pick the mapper up.
+document.addEventListener('DOMContentLoaded', function () {
 	window.lnCore.registerDataMapper('demo-docs', {
 		// INGRESS: Server Raw JSON -> Clean Local DB record
 		ingress(serverRaw) {
@@ -339,6 +359,9 @@
 			};
 		}
 	});
+	const coordEl = document.getElementById('demo-coordinator');
+	if (coordEl && coordEl.lnDataCoordinator) coordEl.lnDataCoordinator.refreshMapper();
+});
 </script>
 
 <!-- Interactive Live Demo Wiring & Event Routing -->

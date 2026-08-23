@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Automatically adjusts textarea height based on content size to prevent scroll bars.
-source: js/ln-autoresize/src/ln-autoresize.js
+source: components/ln-autoresize/src/ln-autoresize.js
 tags: [forms, inputs, textarea, layout]
 ---
 
@@ -20,7 +20,7 @@ tags: [forms, inputs, textarea, layout]
 - **Real-Time Resizing:** Monitors the native `input` event on textareas and matches the CSS height property to the element's current `scrollHeight`.
 - **Pre-filled Content Recognition:** Computes and sets initial heights immediately upon page load to accommodate pre-populated server-rendered content (such as edit states).
 - **Cleanup Mechanics:** Restores original styling properties and clears event listeners when the instance is torn down.
-- Located in [`js/ln-autoresize/src/ln-autoresize.js`](../../js/ln-autoresize/src/ln-autoresize.js).
+- Located in [`components/ln-autoresize/src/ln-autoresize.js`](../../components/ln-autoresize/src/ln-autoresize.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

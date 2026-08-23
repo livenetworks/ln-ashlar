@@ -7,7 +7,7 @@
 
 		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 			<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
-				<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+				<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-icon-info-circle"></use></svg>
 				Simulated Offline Mode
 			</h4>
 			<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
@@ -22,10 +22,10 @@
 	<header><h3>Declarative 3-Tier + Queue Markup (Copy/Paste)</h3></header>
 	<main>
 		<!-- 3-Tier Data Layer + Outbox: Coordinator encloses store cache, REST connector, and offline queue -->
-		<div data-ln-data-coordinator="queue-demo" id="demo-queue-coordinator">
+		<div data-ln-data-coordinator id="demo-queue-coordinator">
 
 			<!-- Tier 1: Local Cache Store (IndexedDB backed) -->
-			<div data-ln-data-store="tasks" id="demo-queue-store"></div>
+			<div data-ln-data-store id="demo-queue-store"></div>
 
 			<!-- Tier 2: Transport Gateway (mocked REST endpoint, see mock-api-queue.js) -->
 			<div data-ln-api-connector

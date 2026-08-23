@@ -1,9 +1,9 @@
 # Typography
 
 Files:
-- `scss/config/_tokens.scss` — role and tracking tokens
-- `scss/config/mixins/_typography.scss` — `text-*` primitives + `typography($role)` mixin
-- `scss/base/_typography.scss` — default heading and paragraph styling
+- `theme/config/_tokens.scss` — role and tracking tokens
+- `theme/config/mixins/_typography.scss` — `text-*` primitives + `typography($role)` mixin
+- `theme/base/_typography.scss` — default heading and paragraph styling
 
 ## Two layers
 
@@ -38,7 +38,7 @@ ln-ashlar typography has two layers:
 ## Usage
 
 ```scss
-@use 'ln-ashlar/scss/config/mixins' as *;
+@use 'ln-ashlar/theme/config/mixins' as *;
 
 .document-title { @include typography(display-sm); @include font-bold; }
 .meta           { @include typography(caption); color: var(--fg-muted); }
@@ -64,6 +64,6 @@ numeric columns align vertically by default. Apply manually elsewhere:
 
 ## Defaults
 
-`scss/base/_typography.scss` maps `h1`–`h6` to role tokens so
+`theme/base/_typography.scss` maps `h1`–`h6` to role tokens so
 unstyled HTML is correct out of the box. Consuming projects can
 override per-page with their own `@include typography(...)` calls.

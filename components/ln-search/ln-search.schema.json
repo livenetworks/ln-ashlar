@@ -1,0 +1,81 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-search",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-search-dev.scss"
+			]
+		},
+		"data-ln-hash": {
+			"direction": null,
+			"sources": [
+				"src/ln-search.js"
+			]
+		},
+		"data-ln-list-source": {
+			"direction": "author",
+			"sources": [
+				"src/ln-search.js"
+			]
+		},
+		"data-ln-search": {
+			"direction": "both",
+			"sources": [
+				"ln-search-dev.scss",
+				"src/ln-search.js"
+			]
+		},
+		"data-ln-search-clear": {
+			"direction": "author",
+			"sources": [
+				"src/ln-search.js"
+			]
+		},
+		"data-ln-search-clear-for": {
+			"direction": "author",
+			"sources": [
+				"src/ln-search.js"
+			]
+		},
+		"data-ln-search-exclude": {
+			"direction": "author",
+			"sources": [
+				"src/ln-search.js"
+			]
+		},
+		"data-ln-search-fields": {
+			"direction": "author",
+			"sources": [
+				"src/ln-search.js"
+			]
+		},
+		"data-ln-search-for": {
+			"direction": "author",
+			"sources": [
+				"src/ln-search.js"
+			]
+		},
+		"data-ln-search-hide": {
+			"direction": "runtime",
+			"sources": [
+				"ln-search.scss",
+				"src/ln-search.js"
+			]
+		},
+		"data-ln-search-items": {
+			"direction": "author",
+			"sources": [
+				"src/ln-search.js"
+			]
+		},
+		"data-ln-table-source": {
+			"direction": "author",
+			"sources": [
+				"src/ln-search.js"
+			]
+		}
+	}
+}

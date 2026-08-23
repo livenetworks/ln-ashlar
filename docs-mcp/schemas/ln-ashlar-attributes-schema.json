@@ -277,6 +277,143 @@
 				}
 			}
 		},
+		"ln-chart": {
+			"element": {
+				"recommended_tag": "figure, section, div",
+				"tag_enforced": false,
+				"note": "Responsive SVG line/area renderer bound to an ordered numeric dataset."
+			},
+			"attributes": {
+				"data-ln-chart": {
+					"type": "string",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Component name and chart event identity."
+				},
+				"data-ln-chart-source": {
+					"type": "string",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Data-driven source name and coordinator fallback binding."
+				},
+				"data-ln-chart-store": {
+					"type": "string",
+					"read_by": "ln-data-coordinator",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Local data-store name served by ln-data-coordinator."
+				},
+				"data-ln-chart-x": {
+					"type": "string",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Record field used as the ordered category label."
+				},
+				"data-ln-chart-y": {
+					"type": "string",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Record field containing the numeric series value."
+				},
+				"data-ln-chart-type": {
+					"type": "string",
+					"enum": [
+						"line",
+						"area",
+						"polygon"
+					],
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "SVG rendering mode; polygon aliases area."
+				},
+				"data-ln-chart-sort": {
+					"type": "string",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Optional query sort formatted as field:asc or field:desc."
+				},
+				"data-ln-chart-padding": {
+					"type": "number",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Inner padding measured in authored SVG viewBox units."
+				},
+				"data-ln-chart-zero": {
+					"type": "string",
+					"enum": [
+						"true",
+						"false"
+					],
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Set false to opt out of the default zero-inclusive y domain."
+				},
+				"data-ln-chart-plot": {
+					"type": "boolean",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Authored SVG plotting surface; requires a valid viewBox."
+				},
+				"data-ln-chart-line": {
+					"type": "boolean",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "output",
+					"description": "Authored polyline receiving calculated points."
+				},
+				"data-ln-chart-area": {
+					"type": "boolean",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "output",
+					"description": "Optional authored polygon receiving area points."
+				},
+				"data-ln-chart-labels": {
+					"type": "boolean",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "output",
+					"description": "Optional container populated from the {chartName}-label template."
+				},
+				"data-ln-chart-empty": {
+					"type": "boolean",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "output",
+					"description": "Authored empty-state element toggled when no valid values exist."
+				},
+				"data-ln-chart-min": {
+					"type": "boolean",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "output",
+					"description": "Optional minimum-value text destination."
+				},
+				"data-ln-chart-max": {
+					"type": "boolean",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "output",
+					"description": "Optional maximum-value text destination."
+				},
+				"data-ln-chart-count": {
+					"type": "boolean",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "output",
+					"description": "Optional rendered-point count destination."
+				}
+			}
+		},
 		"ln-circular-progress": {
 			"element": {
 				"recommended_tag": "div, span, li",
@@ -862,13 +999,6 @@
 					"role": "marker",
 					"description": "Target element to render selected count."
 				},
-				"data-ln-list-clear-all": {
-					"type": "boolean",
-					"read_by": "ln-list",
-					"consumed_by": "js",
-					"role": "input",
-					"description": "Button trigger to clear all active list filters."
-				},
 				"data-ln-list-selectable": {
 					"type": "boolean",
 					"read_by": "ln-list",
@@ -903,13 +1033,6 @@
 					"consumed_by": "js",
 					"role": "state",
 					"description": "Rendered record ID on item root element."
-				},
-				"data-ln-list-clear": {
-					"type": "boolean",
-					"read_by": "ln-list",
-					"consumed_by": "js",
-					"role": "input",
-					"description": "Button to clear search term."
 				},
 				"data-ln-list-field": {
 					"type": "string",
@@ -979,7 +1102,7 @@
 						"new",
 						"edit"
 					],
-					"read_by": "ln-modal-coordinator",
+					"read_by": "ln-ui-coordinator",
 					"consumed_by": "both",
 					"role": "state",
 					"description": "Mode state set on dialog by coordinator ('new' vs 'edit')."
@@ -997,23 +1120,36 @@
 				}
 			}
 		},
-		"ln-modal-coordinator": {
+		"ln-ui-coordinator": {
 			"element": {
-				"recommended_tag": "dialog",
-				"tag_enforced": true,
-				"note": "Layer 2 coordinator attached to dialog modal for form fill/reset."
+				"recommended_tag": "any",
+				"tag_enforced": false,
+				"note": "Layer 2 coordinator for modals, AJAX submit mediation, and toast routing."
 			},
 			"attributes": {
-				"data-ln-modal-coordinator": {
+				"data-ln-ui-coordinator": {
 					"type": "boolean",
-					"read_by": "ln-modal-coordinator",
+					"read_by": "ln-ui-coordinator",
 					"consumed_by": "js",
 					"role": "marker",
-					"description": "Activates modal coordinator for hash navigation and form fill."
+					"description": "Activates UI coordinator for modal hash navigation, AJAX toasts, and dictionary hosting."
+				},
+				"data-ln-ui-coordinator-dict": {
+					"type": "string",
+					"enum": [
+						"network-error",
+						"network-error-title",
+						"server-error",
+						"server-error-title"
+					],
+					"read_by": "ln-ui-coordinator",
+					"consumed_by": "js",
+					"role": "config",
+					"description": "Translatable error messages for network and server toast fallbacks."
 				},
 				"data-ln-modal-for": {
 					"type": "string",
-					"read_by": "ln-modal-coordinator",
+					"read_by": "ln-ui-coordinator",
 					"consumed_by": "js",
 					"role": "input",
 					"description": "Binds trigger button to target modal ID."
@@ -1301,6 +1437,67 @@
 				}
 			}
 		},
+		"ln-sort": {
+			"element": {
+				"recommended_tag": "ul",
+				"tag_enforced": false,
+				"note": "Sort control root <ul data-ln-sort=\"targetId\">; three <li><button data-ln-sort-dir> triggers, only one visible at a time via CSS."
+			},
+			"attributes": {
+				"data-ln-sort": {
+					"type": "string",
+					"read_by": "ln-sort",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "ID of the target element being sorted."
+				},
+				"data-ln-sort-field": {
+					"type": "string",
+					"read_by": "ln-sort",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Record field name for data-driven sorting. Omit inside a <th> to fall back to th.cellIndex (SSR/DOM only) — never combine both on the same instance."
+				},
+				"data-ln-sort-state": {
+					"type": "string",
+					"enum": [
+						"none",
+						"asc",
+						"desc"
+					],
+					"read_by": "ln-sort",
+					"consumed_by": "both",
+					"role": "state",
+					"description": "Current sort state on the root; drives which trigger <button> is visible via CSS."
+				},
+				"data-ln-sort-items": {
+					"type": "string",
+					"read_by": "ln-sort",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "CSS selector for target child items for default-DOM-behaviour reordering (mirrors data-ln-search-items)."
+				},
+				"data-ln-sort-dir": {
+					"type": "string",
+					"enum": [
+						"asc",
+						"desc",
+						"none"
+					],
+					"read_by": "ln-sort",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Identifies which sort action a trigger <button> performs."
+				},
+				"data-ln-persist": {
+					"type": "string",
+					"read_by": "ln-sort",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Opt-in. Persists { field, column, direction } to localStorage, keyed per instance."
+				}
+			}
+		},
 		"ln-sortable": {
 			"element": {
 				"recommended_tag": "ul, ol",
@@ -1374,25 +1571,6 @@
 					"consumed_by": "js",
 					"role": "input",
 					"description": "Maps <th> header column to record payload field key."
-				},
-				"data-ln-table-sort": {
-					"type": "string",
-					"enum": [
-						"string",
-						"number",
-						"date"
-					],
-					"read_by": "ln-table",
-					"consumed_by": "js",
-					"role": "input",
-					"description": "Enables column sorting and specifies sort data type."
-				},
-				"data-ln-table-col-sort": {
-					"type": "boolean",
-					"read_by": "ln-table",
-					"consumed_by": "js",
-					"role": "input",
-					"description": "Sort trigger button inside <th> header."
 				},
 				"data-ln-table-col-filter": {
 					"type": "boolean",
@@ -1537,18 +1715,6 @@
 					"consumed_by": "js",
 					"role": "input",
 					"description": "Accessible aria-label for select-all checkbox."
-				},
-				"data-ln-sort-icon": {
-					"type": "string",
-					"enum": [
-						"none",
-						"asc",
-						"desc"
-					],
-					"read_by": "ln-table (SCSS)",
-					"consumed_by": "css",
-					"role": "input",
-					"description": "SCSS sort icon state selector inside sortable column headers."
 				}
 			}
 		},

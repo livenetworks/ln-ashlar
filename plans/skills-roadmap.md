@@ -11,7 +11,7 @@ Discussion happens in main chat, execution in separate chats.
 - [x] Add state-ownership.md
 - [x] Rendering boundary defined (SSR / IndexedDB / SPA)
 - [x] Add rendering modes section to architecture/SKILL.md (§3b)
-- [x] Fix broken reference: docs/js/ln-store.md → store.md in SKILL.md
+- [x] Fix broken reference: docs/components/ln-store.md → store.md in SKILL.md
 - [x] Fix state-ownership.md "prop watcher" terminology
 
 ## 2. UI Skill — Component Specs (DONE)
@@ -31,7 +31,7 @@ Discussion happens in main chat, execution in separate chats.
 - [x] reactive.md — translate + rewrite as reference doc (pattern now in COMPONENTS.md)
 
 ## 5. ln-acme Component Refactor (DONE except new features)
-- [x] Phase A — _findElements → findElements in 4 files (ln-ajax, ln-link, ln-progress, ln-table-sort)
+- [x] Phase A — _findElements → findElements in 4 files (ln-ajax, ln-link, ln-progress, ln-sort)
 - [x] Phase B1 — ln-store: threshold parsing, visibility staleness, synced event, listener cleanup
 - [x] Phase B2 — ln-data-table: inline styles fix, template scoping (cloneTemplateScoped), ln-core export
 
@@ -44,7 +44,7 @@ Discussion happens in main chat, execution in separate chats.
 - [x] Status badge actionable variant (mixin + component + demo)
 
 ## 7. JS Component Audit (DONE)
-- [x] Review all js/ln-* components — 8 bugs fixed, 4 забелешки discussed and closed
+- [x] Review all components/ln-* components — 8 bugs fixed, 4 забелешки discussed and closed
 - [x] ln-tabs attribute bridge refactor (prompt sent, new chat)
 - [x] Reactive rendering pattern documented in COMPONENTS.md
 - [x] Attribute Bridge principle documented in COMPONENTS.md

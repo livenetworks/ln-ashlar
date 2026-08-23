@@ -1,0 +1,48 @@
+@use '../config/mixins' as *;
+
+[data-ln-toast] {
+	@include toast-container;
+}
+
+// The <li> IS the card: structural (item) + visual (card) styling both bind
+// here, contextually — the <li> carries no static class (no-BEM), only the
+// filled/authored type class.
+[data-ln-toast] > li {
+	@include toast-item;
+	@include toast-card;
+}
+
+[data-ln-toast] > li.ln-enter {
+	@include toast-item-enter;
+}
+
+[data-ln-toast] > li.ln-out {
+	@include toast-item-out;
+}
+
+// Type → tone. The status→tone map lives here (one place): warn maps to the
+// warning family. SSR authors the class; the dynamic path fills it verbatim.
+[data-ln-toast] > li.success { @include semantic-color(success); }
+[data-ln-toast] > li.error   { @include semantic-color(error); }
+[data-ln-toast] > li.warn    { @include semantic-color(warning); }
+[data-ln-toast] > li.info    { @include semantic-color(info); }
+
+[data-ln-toast] .icon {
+	@include toast-icon;
+}
+
+[data-ln-toast] .icon ul {
+	@include toast-icon-list;
+}
+
+[data-ln-toast] .content {
+	@include toast-content;
+}
+
+[data-ln-toast] .title {
+	@include toast-title;
+}
+
+[data-ln-toast] .body {
+	@include toast-body;
+}

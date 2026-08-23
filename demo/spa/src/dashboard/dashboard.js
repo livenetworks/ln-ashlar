@@ -12,8 +12,8 @@
 
 	function renderUsage() {
 		const list = document.querySelector('[data-pkg-usage]');
-		const packagesStoreEl = document.getElementById('packages-store');
-		const tenantsStoreEl = document.getElementById('tenants-store');
+		const packagesStoreEl = document.getElementById('packages');
+		const tenantsStoreEl = document.getElementById('tenants');
 		if (!list || !packagesStoreEl || !tenantsStoreEl) return;
 		const pStore = packagesStoreEl.lnDataStore;
 		const tStore = tenantsStoreEl.lnDataStore;
@@ -67,8 +67,8 @@
 
 	// Register persistent store event listeners to auto-refresh the dashboard usage
 	App.defineModule(function () {
-		const packagesStoreEl = document.getElementById('packages-store');
-		const tenantsStoreEl = document.getElementById('tenants-store');
+		const packagesStoreEl = document.getElementById('packages');
+		const tenantsStoreEl = document.getElementById('tenants');
 
 		if (!packagesStoreEl || !tenantsStoreEl) return;
 

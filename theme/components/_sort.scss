@@ -1,0 +1,10 @@
+@use '../config/mixins' as *;
+
+[data-ln-sort] { @include sort; }
+
+th:hover [data-ln-sort] { opacity: 0.7; }
+
+[data-ln-sort][data-ln-sort-state="asc"],
+[data-ln-sort][data-ln-sort-state="desc"] {
+	@include sort-active;
+}

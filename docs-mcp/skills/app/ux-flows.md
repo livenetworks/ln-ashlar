@@ -9,6 +9,8 @@ tags: [skill, ux, feedback, states, navigation, ln-specific]
 
 # UX Flows
 
+## Summary
+
 Every interaction is a conversation: action → acknowledge → process → respond → next state. If any step is missing, the interaction is broken. No action goes unacknowledged; no edge case goes unplanned.
 
 ---

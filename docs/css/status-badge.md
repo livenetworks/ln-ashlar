@@ -1,6 +1,6 @@
 # Status Badge
 
-Inline semantic indicator with a colored dot. Files: `scss/config/mixins/_status-badge.scss`, `scss/components/_status-badge.scss`.
+Inline semantic indicator with a colored dot. Files: `theme/config/mixins/_status-badge.scss`, `theme/components/_status-badge.scss`.
 
 ## HTML
 

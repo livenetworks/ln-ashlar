@@ -7,7 +7,7 @@ export default defineConfig({
 		outDir: 'demo/dist',
 		emptyOutDir: true,
 		lib: {
-			entry: resolve(__dirname, 'js/index.js'),
+			entry: resolve(__dirname, 'components/index.js'),
 			name: 'LnAshlar',
 			formats: ['es', 'iife'],
 			fileName: (format) => format === 'es' ? 'ln-ashlar.js' : 'ln-ashlar.iife.js'

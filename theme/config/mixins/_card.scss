@@ -1,0 +1,413 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'sizing' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'shadows' as *;
+@use 'transitions' as *;
+@use 'position' as *;
+
+// Card & Section — composite mixins
+
+@mixin card {
+	--color-bg: var(--nested-card-bg, var(--bg-base));
+	--shadow:   var(--nested-card-shadow, var(--shadow-resting));
+
+	background: var(--color-bg);
+	@include border;
+	@include w-full;
+	@include flex-col;
+	border-radius: var(--radius);
+	@include overflow-hidden;
+	@include transition;
+	box-shadow: var(--shadow);
+
+	&:hover {
+		--color-border: color-mix(in srgb, var(--color-accent) 35%, transparent);
+		--shadow: var(--nested-card-shadow-hover, var(--shadow-floating));
+	}
+
+	// Nesting ladder: when nested inside a section-card or another card,
+	// climb to elevated surface to preserve visual depth.
+	.section-card &,
+	.section &,
+	.card & {
+		--color-bg: var(--bg-elevated);
+		--shadow:   var(--shadow-floating);
+	}
+
+	// Bulletproof nesting support for custom/semantic selectors:
+	// sets the elevated background variables on all descendants.
+	& * {
+		--nested-card-bg: var(--bg-elevated);
+		--nested-card-shadow: var(--shadow-floating);
+		--nested-card-shadow-hover: var(--shadow-floating);
+	}
+
+	// Direct-child selectors only — nested <header>/<main>/<footer>
+	// inside card content are consumer-owned and must not inherit the
+	// card's chrome. Same rationale as @mixin section-card.
+	> header { @include panel-header; }
+	> main   { @include panel-body; }
+	> footer { @include panel-footer; }
+
+	// Card-tile behavior: main stretches to equalize heights when
+	// cards are placed in a grid row, and provides rhythm between
+	// stacked children (h3, p, .field) via the logical gap token.
+	> main {
+		@include flex-1;
+		gap: var(--gap);
+	}
+
+	// Whole-card-as-link: <a> wraps card content and fills the card.
+	> a {
+		@include flex-col;
+		@include flex-1;
+		text-decoration: none;
+		color: inherit;
+
+		> header { @include panel-header; }
+		> main   { @include panel-body; }
+		> footer { @include panel-footer; }
+
+		> main {
+			@include flex-1;
+			gap: var(--gap);
+		}
+	}
+
+	// Tile-header h3: when a card carries a title inside > main
+	// without a <header> wrapper, the global h3 cascade (heading-sm)
+	// is too large for tile context. Tighten to tile-title sizing.
+	> main h3 {
+		@include typography(body-sm);
+		@include font-semibold;
+		color: inherit;
+		margin: 0;
+	}
+}
+
+@mixin panel-header {
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	padding: var(--card-padding-y) var(--card-padding-x);
+	@include border-b;
+	--color-bg: var(--bg-sunken);
+	background: var(--color-bg);
+	@include transition;
+	margin-bottom: 0;
+
+	:is(h1, h2, h3, h4, h5, h6) {
+		@include typography(body-sm);
+		@include font-medium;
+		color: var(--color-fg);
+		margin: 0;
+	}
+
+	// Equalize control chrome inside the header. Geometric height lock
+	// matching @mixin app-header-actions: icon-content (1.25rem) + 2 ×
+	// rebound --padding-y + 2 × border-width. Buttons inherit --padding-y
+	// from this rebind; search-icon labels read it from
+	// @mixin form-input-icon-group (same var(--size-xs) value), so the
+	// formula resolves identically for both. Descendant selector — these
+	// controls are commonly wrapped in <aside>/<nav>/<div> inside the
+	// header. panel-header is chrome (no body labels), so descendant
+	// `label` here is always a search-icon-group, never a field label.
+	label {
+		--padding-y: var(--size-xs);
+	}
+
+	button {
+		--btn-padding-y: var(--size-xs);
+	}
+
+	:is(button, label) {
+		min-height: calc(1.25rem + 2 * var(--padding-y) + 2 * var(--border-width));
+	}
+
+	// Close/dismiss and toggle buttons inside the header should be tight and flat.
+	button[data-ln-modal-close],
+	button[aria-label="Close"],
+	button[data-ln-toggle] {
+		--btn-padding-y: var(--size-2xs);
+		--btn-padding-x: var(--size-2xs);
+		--shadow: none;
+	}
+}
+
+@mixin panel-body {
+	padding: var(--card-padding-y) var(--card-padding-x);
+
+	ul, ol {
+		padding-left: 1.5em;
+		margin-bottom: var(--size-md);
+
+		li {
+			margin-bottom: var(--size-xs);
+			line-height: 1.7;
+			list-style: inherit;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+
+	ul {
+		list-style-type: disc;
+	}
+
+	ol {
+		list-style-type: decimal;
+	}
+
+	&:has(> table),
+	&:has(> .table-container) {
+		overflow-x: auto;
+		max-width: 100%;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	// ln-table brings its own chrome and sticky thead/footer — `clip` keeps
+	// this cell from becoming the scroll container that would trap them.
+	&:has(> [data-ln-table]) {
+		overflow-x: clip;
+		max-width: 100%;
+	}
+
+	table {
+		min-width: var(--table-min-width, 600px);
+	}
+
+	// Auto-flush: ONLY when the table (or .table-container) is the
+	// sole child of main — i.e. the card is a pure table card.
+	// Strip padding so the table spans edge-to-edge, and drop the
+	// table's own radius/shadow (card's overflow:hidden handles
+	// rounded corners).
+	//
+	// If main has mixed content (intro <p>, demo-split, <h4>,
+	// then <table>), :only-child doesn't match, padding stays,
+	// and the table keeps its own inset.
+	&:has(> table:only-child),
+	&:has(> .table-container:only-child),
+	&:has(> [data-ln-table]:only-child) {
+		padding: 0;
+
+		> table,
+		> .table-container > table,
+		> [data-ln-table] > table {
+			border-radius: 0;
+			box-shadow: none;
+			margin-bottom: 0;
+		}
+	}
+}
+
+@mixin panel-footer {
+	padding: var(--card-padding-y) var(--card-padding-x);
+	@include border-t;
+	--color-bg: var(--bg-sunken);
+	background: var(--color-bg);
+	@include flex;
+	@include justify-end;
+	gap: var(--gap);
+}
+
+@mixin section {
+	--margin-block: var(--size-xl);
+	margin-bottom: var(--margin-block);
+
+	> header {
+		@include flex;
+		@include items-center;
+		@include justify-between;
+		--margin-block: var(--size-md);
+		margin-bottom: var(--margin-block);
+		--padding-y: var(--size-sm);
+		padding-bottom: var(--padding-y);
+		@include border-b;
+
+		h2 {
+			@include text-xl;
+			@include font-bold;
+			color: var(--color-fg);
+			margin: 0;
+		}
+
+		.section-actions {
+			@include flex;
+			gap: var(--gap);
+		}
+	}
+
+	main {
+		padding: 0;
+	}
+}
+
+// ─── Card accents (Tabler-inspired colored lines) ──────
+// Accent reads --color-accent (solid) for borders, --color-primary
+// (raw triplet) for alpha hover tints — see plan §0.3.
+// Usage: #my-card { @include card; @include card-accent-top; }
+
+@mixin _card-accent-base {
+	&:hover {
+		background-color: color-mix(in srgb, var(--color-accent) 4%, transparent);
+	}
+}
+
+@mixin card-accent-top {
+	@include _card-accent-base;
+	border-top: 3px solid var(--color-accent);
+	&:hover {
+		border-top-color: var(--color-accent);
+	}
+}
+
+@mixin card-accent-bottom {
+	@include _card-accent-base;
+	border-bottom: 3px solid var(--color-accent);
+	&:hover {
+		border-bottom-color: var(--color-accent);
+	}
+}
+
+@mixin card-accent-left {
+	@include _card-accent-base;
+	border-left: 3px solid var(--color-accent);
+	&:hover {
+		border-left-color: var(--color-accent);
+	}
+}
+
+// ─── Card tinted background ────────────────────────────
+
+@mixin card-bg {
+	background-color: color-mix(in srgb, var(--color-accent) 6%, transparent);
+	border-color: color-mix(in srgb, var(--color-accent) 15%, transparent);
+}
+
+// ─── Card stacked (visual depth illusion) ──────────────
+
+@mixin card-stacked {
+	@include relative;
+
+	&::after {
+		content: '';
+		@include absolute;
+		bottom: -5px;
+		left: 6px;
+		right: 6px;
+		height: 10px;
+		background: var(--color-bg);
+		border-radius: var(--radius);
+		--shadow: var(--shadow-resting);
+		box-shadow: var(--shadow);
+		--color-border: var(--border-subtle);
+		border: var(--border-width) solid var(--color-border);
+		z-index: -1;
+	}
+}
+
+@mixin section-card {
+	background: var(--color-bg);
+	@include border;
+	border-radius: var(--radius);
+	// `overflow: clip` not `overflow: hidden` — clips at rounded corners
+	// without establishing a scroll container, so sticky descendants
+	// (e.g. ln-table's <thead>) bind to the outer .app-main > section
+	// scroll surface instead of being trapped inside this card.
+	overflow: clip;
+	@include transition;
+	--shadow: var(--shadow-resting);
+	box-shadow: var(--shadow);
+	--margin-block: var(--size-md);
+	margin-bottom: var(--margin-block);
+
+	// Direct-child selectors only — nested <header>/<main>/<footer>
+	// elements inside the card's content are consumer-owned and
+	// must not inherit the card's own chrome styles.
+	> header { @include panel-header; }
+	> main   { @include panel-body; }
+	> footer { @include panel-footer; }
+}
+
+// ─── Floating panel ────────────────────────────────────
+// Chrome recipe for floating overlays (popover, dropdown menu, toast).
+// Rebinds --color-bg to elevated surface and --shadow to floating
+// shadow so floating panels lift off the page surface correctly.
+
+@mixin floating-panel {
+	--color-bg:     var(--bg-elevated);
+	--color-border: var(--border-subtle);
+	--shadow:       var(--shadow-floating);
+	background: var(--color-bg);
+	border-block-start:  var(--border-block-start,  var(--border-width) solid var(--color-border));
+	border-block-end:    var(--border-block-end,    var(--border-width) solid var(--color-border));
+	border-inline-start: var(--border-inline-start, var(--border-width) solid var(--color-border));
+	border-inline-end:   var(--border-inline-end,   var(--border-width) solid var(--color-border));
+	border-radius: var(--radius);
+	box-shadow: var(--shadow);
+	// z-index is the caller's responsibility: top-layer consumers (dropdown,
+	// popover, tooltip portal) don't need one; standalone consumers do —
+	// see [data-ln-table] .column-filter-dropdown in components/_filter.scss.
+}
+
+// ─── Card field list (label/value rows) ────────────────
+// Dashboard/settings pattern: card body contains .field rows
+// with .label + .value. Separator between rows, none after last.
+// Apply on a scope that contains .field descendants — typically
+// the `.card` global binding, but any container works.
+//
+// Expected HTML:
+//   <div class="card">
+//     <main>
+//       <div class="field"><span class="label">Name</span><span class="value">Marko</span></div>
+//       <div class="field"><span class="label">Email</span><span class="value">m@x</span></div>
+//     </main>
+//   </div>
+
+@mixin card-field-list {
+	.field {
+		@include flex;
+		align-items: baseline;
+		@include justify-between;
+		gap: var(--gap);
+		--padding-y: var(--size-xs-up);
+		padding-block: var(--padding-y);
+		@include border-b;
+
+		&:last-child {
+			@include border-none;
+			padding-bottom: 0;
+		}
+
+		.label {
+			@include text-xs;
+			@include font-semibold;
+			@include uppercase;
+			@include tracking-wider;
+			--color-fg: var(--fg-muted);
+			color: var(--color-fg);
+			@include flex-shrink-0;
+		}
+
+		.value {
+			@include text-sm;
+			@include font-medium;
+			color: var(--color-fg);
+			text-align: right;
+			margin: 0;
+
+			em {
+				--color-fg: var(--fg-subtle);
+				color: var(--color-fg);
+				@include text-xs;
+				font-style: normal;
+				font-weight: normal;
+			}
+		}
+	}
+}

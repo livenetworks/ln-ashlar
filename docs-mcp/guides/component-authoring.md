@@ -4,7 +4,7 @@ classification: guide
 status: draft
 domain: frontend
 summary: Tutorial on authoring reusable progressive JavaScript components in ln-ashlar.
-source: js/COMPONENTS.md, docs/architecture/component-guide.md, docs/architecture/reference.md
+source: components/COMPONENTS.md, docs/architecture/component-guide.md, docs/architecture/reference.md
 tags: [component, authoring, developer, guide, js]
 ---
 

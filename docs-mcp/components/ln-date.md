@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Locale-aware date formatter with native calendar picker and manual input parsing support.
-source: js/ln-date/src/ln-date.js
+source: components/ln-date/src/ln-date.js
 tags: [input, forms, date, localization]
 ---
 
@@ -22,7 +22,7 @@ tags: [input, forms, date, localization]
 - **Two-Way Value Binding:** Intercepts the native `value` property on the visible and hidden inputs to ensure consistent state and programmatic updates.
 - **Manual Input Parsing (Blur):** Gracefully handles manually entered values on blur, supporting dot (European `dd.MM.yyyy`), slash (US `MM/dd/yyyy`), and dash (ISO/standard) separators, with smart 2-digit year pivoting (00–49 → 2000–2049, 50–99 → 1950–1999).
 - **Declarative Dictionary Integration:** Integrates with `ln-core`'s `buildDict` pattern to register local language fallbacks when native browser translation engines are absent.
-- Located in [`js/ln-date/src/ln-date.js`](../../js/ln-date/src/ln-date.js).
+- Located in [`components/ln-date/src/ln-date.js`](../../components/ln-date/src/ln-date.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

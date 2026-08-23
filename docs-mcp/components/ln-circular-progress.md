@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A visual component that displays progress or statistical percentages as a dynamic SVG circle.
-source: js/ln-circular-progress/src/ln-circular-progress.js
+source: components/ln-circular-progress/src/ln-circular-progress.js
 tags: [progress, svg, visualization]
 ---
 
@@ -16,7 +16,7 @@ tags: [progress, svg, visualization]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-circular-progress` component displays visual progress or statistical percentages inside a dynamically generated SVG circle. It is defined in [ln-circular-progress.js](../../js/ln-circular-progress/src/ln-circular-progress.js).
+The `ln-circular-progress` component displays visual progress or statistical percentages inside a dynamically generated SVG circle. It is defined in [ln-circular-progress.js](../../components/ln-circular-progress/src/ln-circular-progress.js).
 
 *   **Dynamic SVG Generation:** Automatically creates and appends an SVG element containing a background path (`track`) and an active overlay path (`fill`), manipulating the `stroke-dashoffset` dynamically.
 *   **Attribute Bridge Pattern:** Leverages a `MutationObserver` to watch for updates to its configuration attributes (`data-ln-circular-progress`, `data-ln-circular-progress-max`, and `data-ln-circular-progress-label`) and instantly updates the UI.

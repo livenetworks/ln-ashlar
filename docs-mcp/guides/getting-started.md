@@ -55,12 +55,12 @@ The npm package ships **source, not a prebuilt bundle** — `scss/` partials and
 
 ```scss
 // your app's main stylesheet
-@use "@livenetworks/ashlar/scss/ln-ashlar";
+@use "@livenetworks/ashlar/theme/ln-ashlar";
 ```
 
 ```js
 // your app's main script — the library self-initializes on import
-import "@livenetworks/ashlar/js/index.js";
+import "@livenetworks/ashlar/components/index.js";
 ```
 
 There is no `dist/` folder inside `node_modules`. If you want ready-made compiled files instead of building them yourself, use Path A, C, or D.

@@ -122,7 +122,7 @@
 							<p><strong>Note about <code>:clicked.detail.text</code>:</strong> it includes the <code>(opens in new tab)</code> hint suffix because <code>link.textContent</code> concatenates all descendant text. See the README "Common mistakes" item 3 for stripping it.</p>
 							<nav class="demo-actions">
 								<button type="button" id="demo-event-clear">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
 									Clear log
 								</button>
 							</nav>
@@ -137,7 +137,7 @@
 							<p>The <code>MutationObserver</code> watches <code>document.body</code> with <code>childList: true, subtree: true</code>. New <code>&lt;a&gt;</code> nodes (and any nested in inserted subtrees) get decorated automatically. Click the button to insert a fragment containing one external and one internal link via <code>innerHTML</code>; watch the inserted external link gain its decoration in DevTools.</p>
 							<nav class="demo-actions">
 								<button type="button" id="demo-insert-link">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
 									Insert links via innerHTML
 								</button>
 								<button type="button" id="demo-insert-clear">Clear</button>
@@ -154,7 +154,7 @@
 							<p><a id="demo-mutating-link" href="/dashboard">Test link (initially internal)</a></p>
 							<nav class="demo-actions">
 								<button type="button" id="demo-href-flip">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-check"></use></svg>
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg>
 									Flip href to external (observer redecorates automatically)
 								</button>
 								<button type="button" id="demo-href-reset">Reset to /dashboard</button>
@@ -270,7 +270,7 @@ window.lnExternalLinks.process(link.parentElement);</code></pre>
 	<form>
 		<header>
 			<h3>Leaving this site</h3>
-			<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 		</header>
 		<main>
 			<p>You are about to leave for:</p>

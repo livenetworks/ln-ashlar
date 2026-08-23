@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A passive linear progress bar component that reactively updates width percentage and native ARIA progressbar state via MutationObserver.
-source: js/ln-progress/src/ln-progress.js
+source: components/ln-progress/src/ln-progress.js
 tags: [progress, visualization, accessibility]
 ---
 
@@ -16,17 +16,17 @@ tags: [progress, visualization, accessibility]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-progress` component is a lightweight (~85 lines JS) passive visualization tool used to render and reactively update linear progress bars. It is located in [`js/ln-progress/src/ln-progress.js`](../../js/ln-progress/src/ln-progress.js).
+The `ln-progress` component is a lightweight (~85 lines JS) passive visualization tool used to render and reactively update linear progress bars. It is located in [`components/ln-progress/src/ln-progress.js`](../../components/ln-progress/src/ln-progress.js).
 
 *   **Attribute Bridge Pattern (Attribute IS State):** There are no imperative mutation methods (e.g. `setValue()`). Developers update `data-ln-progress="N"` on the element, and an internal `MutationObserver` automatically recalculates width (`style.width = "%"`) and ARIA attributes.
 *   **Parent-Child Max Inheritance:** Supports declaring `data-ln-progress-max` on the parent track container (`.progress`). This allows multiple child bars (stacked bars) to share a common denominator. The component observes the parent track for attribute changes via a secondary `MutationObserver`.
 *   **Native ARIA Reflection:** Automatically manages and maintains ARIA properties on every render: `role="progressbar"`, `aria-valuemin="0"`, `aria-valuemax`, and `aria-valuenow` (clamped to `[0, max]`).
-*   **Self-Initialization:** Registers automatically via `registerComponent` from [`ln-core`](../../js/ln-core/src/ln-core.js) targeting elements with `[data-ln-progress]`.
+*   **Self-Initialization:** Registers automatically via `registerComponent` from [`ln-core`](../../components/ln-core/src/ln-core.js) targeting elements with `[data-ln-progress]`.
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
 > - **Does NOT clamp input attributes:** Clamps only the computed percentage applied to `style.width`. `el.getAttribute('data-ln-progress')` retains the raw written string.
-> - **Does NOT handle indeterminate / pulsing states:** For unbounded operations without a known total, use the SCSS [`@mixin loader`](../../scss/config/mixins/_loader.scss).
+> - **Does NOT handle indeterminate / pulsing states:** For unbounded operations without a known total, use the SCSS [`@mixin loader`](../../theme/config/mixins/_loader.scss).
 > - **Does NOT throttle or debounce writes:** Every attribute mutation immediately triggers a render pass and `:change` event.
 > - **Does NOT render internal text labels:** Manages bar width only. Display text must be rendered in separate DOM elements.
 
@@ -72,7 +72,7 @@ Multiple child bars sharing one parent track:
 
 ### Attributes Table
 
-| Attribute | Target Element | Type / Values | Default | Description |
+| Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-progress` | Bar (`div`) | `Float` | `0` | Current progress value. Computed width percentage is clamped to `[0%, 100%]`. |
 | `data-ln-progress-max` | Bar (`div`) | `Float` | `100` | Maximum boundary value (denominator) for this specific bar. |
@@ -94,9 +94,9 @@ Instance interfaces accessed via `element.lnProgress`:
 
 ### Events API
 
-| Event | Direction | Cancelable | Payload `detail` | Description |
+| Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-progress:change` | Emits | No | `{ target: HTMLElement, value: Number, max: Number, percentage: Number }` | Dispatched on construction and every time value or max attributes change. |
+| `ln-progress:change` | Emits | No | Dispatched on construction and every time value or max attributes change. | `{ target: HTMLElement, value: Number, max: Number, percentage: Number }` |
 
 ---
 
@@ -117,8 +117,8 @@ Visual styling is separated from JS logic using SCSS mixins:
 }
 ```
 
-*   **`@mixin progress`** ([`scss/config/mixins/_progress.scss`](../../scss/config/mixins/_progress.scss)): Configures the track height, recessed background (`var(--bg-recessed)`), border-radius, overflow clipping, and inner bar transition (`transition: width var(--transition-base)`).
-*   **Color Variants:** Color modifier classes (`.success`, `.warning`, `.error`) define state HSL colors in [`scss/components/_progress.scss`](../../scss/components/_progress.scss).
+*   **`@mixin progress`** ([`theme/config/mixins/_progress.scss`](../../theme/config/mixins/_progress.scss)): Configures the track height, recessed background (`var(--bg-recessed)`), border-radius, overflow clipping, and inner bar transition (`transition: width var(--transition-base)`).
+*   **Color Variants:** Color modifier classes (`.success`, `.warning`, `.error`) define state HSL colors in [`theme/components/_progress.scss`](../../theme/components/_progress.scss).
 
 ---
 

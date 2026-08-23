@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Declaratively binds keyboard shortcuts to native click or focus behavior on an existing DOM target.
-source: js/ln-key/src/ln-key.js
+source: components/ln-key/src/ln-key.js
 tags: [keyboard, shortcut, focus, activation, simple-component]
 ---
 
@@ -16,7 +16,7 @@ tags: [keyboard, shortcut, focus, activation, simple-component]
 
 `ln-key` maps a normalized keyboard combination to the natural interaction of a DOM target. Buttons and links receive `click()`; editing controls receive `focus()`. The component has no knowledge of other Ashlar components, so the target's existing click/focus event chain remains the integration point.
 
-Source: [ln-key.js](../../js/ln-key/src/ln-key.js).
+Source: [ln-key.js](../../components/ln-key/src/ln-key.js).
 
 ## 2. Minimal HTML Markup & Usage Variants
 

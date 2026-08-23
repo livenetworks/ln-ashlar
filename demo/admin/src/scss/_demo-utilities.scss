@@ -1,4 +1,4 @@
-@use '../../../../scss/config/mixins' as *;
+@use '../../../../theme/config/mixins' as *;
 
 // Demo-only utility classes — pull inline styles out of demo HTML.
 // Tokens-only; no raw literals.
@@ -50,5 +50,33 @@
 
 .text-sunken {
 	color: var(--fg-muted);
+}
+
+// ─── Alert Box ─────────────────────────────────────────
+.alert-box {
+	margin: var(--size-md) 0;
+	padding: var(--size-md);
+	background: var(--bg-sunken);
+	border-left: 4px solid var(--color-primary);
+	border-radius: var(--radius-sm);
+
+	h4 {
+		margin-top: 0;
+		color: var(--color-primary);
+		display: flex;
+		align-items: center;
+		gap: var(--size-xs);
+
+		.ln-icon {
+			width: 1.25rem;
+			height: 1.25rem;
+		}
+	}
+
+	p {
+		margin: 0;
+		font-size: var(--font-size-sm);
+		line-height: 1.6;
+	}
 }
 

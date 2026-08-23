@@ -79,7 +79,7 @@ like this?", the answer is one of these:
 - **Paired before/after events for every state change.** State-changing
   prototype methods dispatch `ln-{name}:before-{action}` (cancelable,
   fires before) and `ln-{name}:{action}` (non-cancelable, fires after).
-  See `## Lifecycle Events` in [js/COMPONENTS.md](../../js/COMPONENTS.md)
+  See `## Lifecycle Events` in [components/COMPONENTS.md](../../components/COMPONENTS.md)
   for the contract.
 
 - **`destroy()` is a contract, not a convenience.** Every component
@@ -481,5 +481,5 @@ try {
 - [ ] Works when injected dynamically (MutationObserver auto-init)
 
 ### Documentation
-- [ ] `js/ln-{name}/README.md` — usage guide: attributes, events, API, HTML examples
+- [ ] `components/ln-{name}/README.md` — usage guide: attributes, events, API, HTML examples
 - [ ] `demo/admin/{name}.html` — interactive demo with live examples

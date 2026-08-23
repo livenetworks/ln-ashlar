@@ -3,8 +3,8 @@
 CSS-only navigation trail. No JS involvement.
 
 **Files:**
-- Mixin: `scss/config/mixins/_breadcrumbs.scss`
-- Component: `scss/components/_breadcrumbs.scss`
+- Mixin: `theme/config/mixins/_breadcrumbs.scss`
+- Component: `theme/components/_breadcrumbs.scss`
 
 ## Usage
 

@@ -1,0 +1,17 @@
+@use '../config/mixins' as *;
+
+// ==========================================================================
+// Tabs — underline style
+// ==========================================================================
+
+[data-ln-tabs] nav {
+	@include tabs-nav;
+}
+
+[data-ln-tabs] [data-ln-tab] {
+	@include tabs-tab;
+}
+
+[data-ln-tabs] [data-ln-panel] {
+	@include tabs-panel;
+}

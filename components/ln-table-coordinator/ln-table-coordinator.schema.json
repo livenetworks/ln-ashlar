@@ -1,0 +1,73 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-table-coordinator",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-filter": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
+		"data-ln-filter-reset": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
+		"data-ln-search": {
+			"direction": "both",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
+		"data-ln-search-for": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
+		"data-ln-table": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
+		"data-ln-table-clear": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
+		"data-ln-table-clear-all": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
+		"data-ln-table-col-filter": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
+		"data-ln-table-coordinator": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
+		"data-ln-table-filter-col": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
+		"data-ln-table-source": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		}
+	}
+}

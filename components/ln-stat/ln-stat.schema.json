@@ -1,0 +1,19 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-stat",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-stat": {
+			"direction": "author",
+			"sources": [
+				"src/ln-stat.js"
+			]
+		},
+		"data-ln-stat-filter": {
+			"direction": "author",
+			"sources": [
+				"src/ln-stat.js"
+			]
+		}
+	}
+}

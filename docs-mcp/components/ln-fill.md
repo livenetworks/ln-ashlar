@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A declarative form and display populator driven by click triggers or custom events.
-source: js/ln-fill/src/ln-fill.js
+source: components/ln-fill/src/ln-fill.js
 tags: [forms, data-binding, programmatic-fill]
 ---
 
@@ -18,7 +18,7 @@ tags: [forms, data-binding, programmatic-fill]
 
 The `ln-fill` component is a global DOM population behavior in `ln-ashlar`. It listens for triggers in the DOM (clicks or request events), extracts record datasets, and populates form fields.
 
-The JavaScript source is located at [ln-fill.js](../../js/ln-fill/src/ln-fill.js).
+The JavaScript source is located at [ln-fill.js](../../components/ln-fill/src/ln-fill.js).
 
 Key responsibilities include:
 - **Click-Triggered Fill:** Listening to delegated document clicks on elements with `data-ln-fill-form`, gathering `data-ln-fill-*` attributes, constructing a camelCased record, and dispatching it.
@@ -98,7 +98,7 @@ When `lnCore.lnFill` populates a `[data-ln-fillable]` container — or a compone
 | `data-ln-show` | Display node | `el.classList.toggle('hidden', !data[prop])` | Shows the node when the bound property is truthy. |
 | `data-ln-class` | Display node | `el.classList.toggle(cls, !!data[prop])` | Comma-separated `cls:prop` pairs, e.g. `active:isSelected`. |
 
-All four skip `null`/`undefined` values, preserving existing content. Source: `js/ln-core/helpers.js` (`fill`).
+All four skip `null`/`undefined` values, preserving existing content. Source: `components/ln-core/helpers.js` (`fill`).
 
 ### Programmatic JS API
 
@@ -108,7 +108,7 @@ All four skip `null`/`undefined` values, preserving existing content. Source: `j
 |---|---|---|---|
 | `window.lnCore.lnFill` | `(container: HTMLElement, record: Object\|null)` | `void` | Dispatches the `ln-fill` CustomEvent (with `record` as `detail`) at every `[data-ln-form]` / `[data-ln-fillable]` element found inside `container`. Guards against nested fillables re-triggering on the same target and is idempotent — safe to call repeatedly without double-binding. |
 
-Coordinators (e.g. [`ln-modal-coordinator`](./ln-modal-coordinator.md)) call `window.lnCore.lnFill` directly when they already hold a resolved record and need to bypass the click/attribute parsing steps. Authors relying purely on declarative markup never call it directly — `data-ln-fill-form` triggers and `ln-fill:request` events cover the common cases and call the helper internally.
+Coordinators (e.g. [`ln-ui-coordinator`](./ln-ui-coordinator.md)) call `window.lnCore.lnFill` directly when they already hold a resolved record and need to bypass the click/attribute parsing steps. Authors relying purely on declarative markup never call it directly — `data-ln-fill-form` triggers and `ln-fill:request` events cover the common cases and call the helper internally.
 
 ### Events API
 
@@ -145,7 +145,7 @@ Coordinators (e.g. [`ln-modal-coordinator`](./ln-modal-coordinator.md)) call `wi
 sequenceDiagram
     participant User
     participant Trigger as Button[data-ln-fill-form]
-    participant Coordinator as Coordinator (ln-modal-coordinator)
+    participant Coordinator as Coordinator (ln-ui-coordinator)
     participant FillJS as ln-fill Global listener
     participant DOM as document DOM
     participant Form as Form[id="formId"]
@@ -175,4 +175,4 @@ sequenceDiagram
 ## 7. Related Components
 
 - [`ln-form`](./ln-form.md) — the primary target for form filling.
-- [`ln-modal-coordinator`](./ln-modal-coordinator.md) — coordinator bridging hash modal opens to `ln-fill` requests.
+- [`ln-ui-coordinator`](./ln-ui-coordinator.md) — coordinator bridging hash modal opens to `ln-fill` requests.

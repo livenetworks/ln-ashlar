@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: An HTML-over-the-wire network orchestration component that converts navigation links and form submissions into AJAX calls.
-source: js/ln-ajax/src/ln-ajax.js
+source: components/ln-ajax/src/ln-ajax.js
 tags: [ajax, navigation, form, network]
 ---
 
@@ -16,14 +16,14 @@ tags: [ajax, navigation, form, network]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-ajax` component implements **HTML-over-the-wire** interactions. It intercepts standard link navigations and form submissions inside an observed container and converts them into AJAX requests, updating designated DOM regions dynamically. It is defined in [ln-ajax.js](../../js/ln-ajax/src/ln-ajax.js).
+The `ln-ajax` component implements **HTML-over-the-wire** interactions. It intercepts standard link navigations and form submissions inside an observed container and converts them into AJAX requests, updating designated DOM regions dynamically. It is defined in [ln-ajax.js](../../components/ln-ajax/src/ln-ajax.js).
 
 *   **Navigation Hijacking:** Intercepts click events on all child `<a>` links and submit events on all child `<form>` elements (unless exempted with `data-ln-ajax="false"`).
 *   **Write Pipeline Precedence:** Form structures that carry the `data-ln-form-scope` write routing attribute are ignored by `ln-ajax` (the coordinator's write workflow handles them). `ln-ajax` prints a single `console.warn` notifying the developer of the override.
 *   **HTML-over-the-wire Updates:** Upon receiving a successful JSON response, `ln-ajax` performs the following updates:
     *   `title`: Updates `document.title`.
     *   `content`: Iterates through a key-value map `{ "target-id": "HTML content" }`, finding each DOM node by ID and overwriting its `innerHTML`.
-    *   `message`: Automatically dispatches `ln-toast:enqueue` to prompt notification popups.
+    *   `message`: Server-provided feedback is passed via `ln-ajax:success` / `ln-ajax:error` event details to Layer 2 coordinators (e.g. `ln-ui-coordinator`) to trigger toast notifications.
 *   **History Synchronization:** Updates the browser's URL address via `window.history.pushState` on successful GET actions or link navigations to preserve Back/Forward capability.
 *   **Visual Loading States:** Disables form submission triggers during in-flight network requests, applies the `.ln-ajax--loading` class to the triggering element, and appends a temporary loader spinner (`.ln-ajax-spinner`).
 *   **Security Integration:** Automatically appends CSRF tokens in headers (`X-CSRF-TOKEN`) and form parameters (`_token`) on non-idempotent actions.
@@ -109,10 +109,10 @@ Excludes specific nested elements (links/forms) from being intercepted inside an
 | `ln-ajax:before-start` | Emits | Yes | Fires before sending the request. Calling `e.preventDefault()` cancels the fetch. | `{ method: String, url: String }` |
 | `ln-ajax:start` | Emits | No | Fires when the request is sent and loading spinners are attached. | `{ method: String, url: String }` |
 | `ln-ajax:success` | Emits | No | Fires upon receiving a successful response (HTTP 2xx). | `{ method: String, url: String, data: Object }` |
-| `ln-ajax:error` | Emits | No | Fires when the request fails (network error or HTTP error codes). | `{ method: String, url: String, status: Number, data: Object }` |
+| `ln-ajax:error` | Emits | No | Fires when the request fails (network error or HTTP error codes). | `{ method: String, url: String, status: Number, data: Object\|null, error: Error\|null }` |
 | `ln-ajax:complete` | Emits | No | Fires after clean-up actions have completed. | `{ method: String, url: String }` |
 
-*Notification Integration:* If the server response contains a `message` envelope (e.g. `{ "message": { "type": "success", "body": "Saved!" } }`), `ln-ajax` automatically dispatches the `ln-toast:enqueue` event to the `window` object.
+*Notification Integration:* Toast notifications upon AJAX success or failure are handled by Layer 2 coordinators (e.g., [`ln-ui-coordinator`](./ln-ui-coordinator.md)), which listen for `ln-ajax:success` and `ln-ajax:error` and dispatch `ln-toast:enqueue`.
 
 ---
 

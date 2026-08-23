@@ -1,0 +1,175 @@
+# ln-circular-progress
+
+> Attribute-driven SVG ring renderer. Set `data-ln-circular-progress="75"` on an
+> empty host; the component builds the SVG, watches the attribute, and redraws on every change. The attribute IS the state — no imperative setter.
+
+## Quick start
+
+```html
+<div data-ln-circular-progress="75" class="success"></div>
+```
+
+One attribute on an empty host element. The constructor creates an `<svg>` with a
+track circle and fill circle, creates a `<strong>` label, and appends both to the
+host. The SVG fills the host's dimensions via CSS (`width: 100%`, `height: 100%`),
+so size comes from the host — or from a size class (`.sm`, `.lg`, `.xl`).
+
+The host element must be empty at init — the constructor `appendChild`s the SVG and label; pre-existing children stay in the DOM and overlap the ring.
+
+## Attributes
+
+| Attribute | On | Description |
+|---|---|---|
+| `data-ln-circular-progress="N"` | host element | Current value. Creates the instance. Number; negative or above-max values are allowed — the rendered percentage clamps to 0–100, but the attribute is left as-written. Empty / non-numeric strings render as 0%. |
+| `data-ln-circular-progress-max="N"` | host element | Maximum value. Default `100`. Used as denominator in `(value / max) × 100`. `max="0"` forces 0% (avoids divide-by-zero). |
+| `data-ln-circular-progress-label="text"` | host element | Custom centre label, replaces the auto-computed percentage. Fully observed and reactive — mutating this attribute alone triggers an immediate re-render and updates the centre text and `aria-valuetext`. |
+
+**Size variants** — apply a class to the host: `.sm` (2.5 rem), default (4 rem), `.lg` (6 rem), `.xl` (8 rem). Each rebinds the label font-size.
+
+**Colour variants** — `.success`, `.warning`, `.error` override the fill stroke via `theme/components/_circular-progress.scss`. The default fill reads `--color-accent` and follows the active theme.
+
+## Events
+
+| Event | Bubbles | Cancelable | `detail` |
+|---|---|---|---|
+| `ln-circular-progress:change` | yes | no | `{ target, value, max, percentage }` |
+
+`detail.value` is the raw `parseFloat` of the attribute — unclamped. `detail.percentage` is clamped 0–100. A value of 150 on a max-100 ring produces `value: 150, percentage: 100`. Read `detail.value` to detect overshoot; read `detail.percentage` to match the visible arc.
+
+`detail.target` is the host element — useful when a single document-level listener handles multiple rings:
+
+```js
+document.addEventListener('ln-circular-progress:change', function (e) {
+	const { target, percentage } = e.detail;
+	if (percentage >= 100) {
+		target.classList.add('done');
+	}
+});
+```
+
+The event fires on the initial render at construction, as well as on every subsequent value or max attribute change. A document-level listener sees a `:change` for every ring on the page during init.
+
+## Accessibility
+
+The component sets `aria-hidden="true"` on the constructed `<svg>` — screen readers skip the SVG element. The component automatically maps and synchronizes ARIA progressbar attributes on the host element (`role="progressbar"`, `aria-valuemin="0"`, `aria-valuemax`, `aria-valuenow` clamped, and `aria-valuetext`). For proper context, screen reader users should be provided with a descriptive label on the host:
+
+```html
+<div data-ln-circular-progress="75"
+     aria-label="Upload progress"
+     class="success">
+</div>
+```
+
+## API
+
+`el.lnCircularProgress` on a constructed host element:
+
+| Property | Type | Description |
+|---|---|---|
+| `dom` | `HTMLElement` | Back-reference to the host element |
+| `svg` | `SVGSVGElement` | The constructed `<svg>` |
+| `trackCircle` | `SVGCircleElement` | Background circle (stroke = `--color-border`) |
+| `progressCircle` | `SVGCircleElement` | Fill circle — `stroke-dashoffset` carries the progress |
+| `labelEl` | `HTMLElement` | The `<strong>` element holding the percentage or custom label text |
+| `destroy()` | method | Disconnects the attribute observer, removes the SVG and label from DOM, deletes `el.lnCircularProgress`. Leaves the value attribute, colour class, and size class in place — setting the value attribute again re-instantiates. |
+
+`window.lnCircularProgress(root)` re-runs the init scan over `root`. The shared `registerComponent` observer already covers AJAX inserts; call this manually only for Shadow DOM roots or foreign documents the observer cannot reach.
+
+## Examples
+
+### Minimal
+
+```html
+<div data-ln-circular-progress="75" class="success"></div>
+```
+
+75% green ring with the default 4 rem diameter. The centre label reads "75%" automatically. No JS required.
+
+### Reactive — button-driven
+
+```html
+<div id="ring" data-ln-circular-progress="0" class="lg"></div>
+<button id="advance">+10%</button>
+```
+
+```js
+let pct = 0;
+document.getElementById('advance').addEventListener('click', function () {
+	pct = Math.min(100, pct + 10);
+	document.getElementById('ring').setAttribute('data-ln-circular-progress', pct);
+});
+```
+
+Each attribute write triggers a re-render and a `:change` event. The CSS
+transition animates the arc from the previous offset to the new one.
+
+### Custom max + label
+
+```html
+<!-- 7 out of 10 — arc fills to 70%, label shows the count -->
+<div data-ln-circular-progress="7"
+     data-ln-circular-progress-max="10"
+     data-ln-circular-progress-label="7/10"
+     class="lg success">
+</div>
+```
+
+`max="10"` shifts the denominator so 7 maps to 70% of the arc. `label="7/10"` overrides the centre text — without it, the centre would read "70%". Both attributes are usually set together for non-percentage scales.
+
+## What it does NOT do
+
+- No indeterminate / spinner mode. An empty value renders 0% (empty track). For an indeterminate spinner use `@mixin loader`.
+- No debounce on rapid attribute writes — each write triggers a synchronous render and a `:change` event.
+- No `setValue()` / `setMax()` / imperative API. `el.setAttribute('data-ln-circular-progress', n)` is the canonical update path.
+
+## Integration and Source Files
+
+This component can be loaded either as part of the unified Ashlar bundle or as a standalone zero-dependency script.
+
+### 1. In-Bundle (Standard Integration)
+Include the main Ashlar bundle in your HTML. This bundle registers all Ashlar components, including `ln-circular-progress`:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+### 2. Standalone (Zero-Dependency IIFE)
+If you only need circular progress indicators without the rest of the Ashlar library, load the component's standalone IIFE script:
+```html
+<script src="components/ln-circular-progress/ln-circular-progress.js" defer></script>
+```
+
+### 3. Source & Reference
+* **Active Development Source**: [components/ln-circular-progress/src/ln-circular-progress.js](file:///c:/laragon/www/ln-ashlar/components/ln-circular-progress/src/ln-circular-progress.js) — The source of truth containing the ES module implementation.
+* **Compiled Standalone Release**: [components/ln-circular-progress/ln-circular-progress.js](file:///c:/laragon/www/ln-ashlar/components/ln-circular-progress/ln-circular-progress.js) — The compiled IIFE distribution file.
+
+## 🔧 Internals
+
+Source: `components/ln-circular-progress/ln-circular-progress.js`. Passive renderer — owns no data; `_render` re-reads all three attributes fresh on every call, no cached value.
+
+### SVG geometry
+
+Fixed module-level constants: `VIEW_SIZE = 36`, `RADIUS = 16`, `CIRCUMFERENCE = 2π·16 ≈ 100.531`. Both circles share `cx=18 cy=18 r=16`, `stroke-width="3"` (1.5 in/out of the radius). The fill circle carries `stroke-dasharray` equal to the full circumference and a `stroke-dashoffset` that shrinks linearly as progress grows (`offset = CIRCUMFERENCE - (pct/100) × CIRCUMFERENCE`), plus `transform="rotate(-90 18 18)"` to start the arc at 12 o'clock instead of 3.
+
+### Render choices
+
+- `parseFloat('') || 0` / `|| 100` — invalid or empty attributes silently fall back to defaults; no warning (consistent with the passive-renderer pattern).
+- Clamping happens at the percentage level, not the attribute level: `detail.value` stays the raw unclamped number, `detail.percentage` is the 0–100 clamp used for the arc — this is how a consumer distinguishes overshoot from the visible fill.
+- ARIA (`role`, `aria-valuemin/max/now`, `aria-valuetext`) is rewritten on every render on the host element itself, not the SVG (which is `aria-hidden`).
+
+### What the per-instance observer watches
+
+`_listenValues` filters to the three state attributes only — deliberately excluding `class`. Colour/size variants are pure CSS; nothing about the SVG geometry depends on the class, so no JS reaction is needed.
+
+### Destroy
+
+Disconnects the attribute observer, removes the SVG and label nodes, removes the ARIA attributes it added, deletes `el.lnCircularProgress`. Leaves the value attribute and any classes in place — a later write to the value attribute re-triggers `registerComponent`'s shared observer and rebuilds the instance from scratch (`_buildSvg` is not idempotent; it always appends new nodes).
+
+---
+
+## See also
+
+- `@mixin circular-progress` (`theme/config/mixins/_circular-progress.scss`) — SVG layout, fill/track stroke tokens, motion-safe transition, size variant mixins.
+- `theme/components/_circular-progress.scss` — default selector application and the `.success` / `.warning` / `.error` colour variant rules.
+- [`ln-progress`](../ln-progress/README.md) — linear sibling. Same contract shape (`data-ln-progress` + `-max`); supports parent-track shared max.
+- `@mixin loader` (`theme/config/mixins/_loader.scss`) — indeterminate spinner for operations with no known fraction.
+- [`docs/architecture/data-flow.md`](../../docs/architecture/data-flow.md) — passive renderer pattern used by this component.

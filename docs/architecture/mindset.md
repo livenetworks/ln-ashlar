@@ -51,11 +51,11 @@ ln-ashlar makes deliberate trade-offs, and its wins and costs are not the ones a
 
 **Ashlar way:** Autonomous IIFE components bind via `data-ln-*` attributes, auto-init via MutationObserver, communicate via CustomEvents addressed by element `id`. No parent-child coupling, no props, no imports between components. DOM position is irrelevant to wiring — teleport-safe by design.
 
-**Why:** A filter inside a popover teleported to `<body>` still dispatches `ln-filter:changed` on `getElementById(tableId)`. The components have no idea they were moved.
+**Why:** A filter inside a popover teleported to `<body>` still dispatches `ln-filter:change` on `getElementById(tableId)`. The components have no idea they were moved.
 
 **Concrete example:**
-- `js/ln-popover/src/ln-popover.js:91` — teleports the entire popover block to `<body>` on open.
-- `js/ln-filter/src/ln-filter.js:293` — `_dispatchOnBoth` dispatches on `getElementById(this.targetId)`. Works regardless of DOM position.
+- `components/ln-popover/src/ln-popover.js:91` — teleports the entire popover block to `<body>` on open.
+- `components/ln-filter/src/ln-filter.js` — dispatches cancelable `ln-filter:change` on `getElementById(this.targetId)`. Works regardless of DOM position.
 
 ---
 
@@ -68,7 +68,7 @@ ln-ashlar makes deliberate trade-offs, and its wins and costs are not the ones a
 **Why:** Single source of truth for appearance. Design token changes propagate automatically. Inspector shows clean semantic markup. Changing a color means editing one token, not hunting JS files.
 
 **Concrete example:**
-`.ln-filter-active` on the filter button → `@mixin table-filter-active` in `scss/config/mixins/_table.scss` renders the accent dot and color change. JS does `btn.classList.toggle('ln-filter-active', ...)`. SCSS owns what that looks like. The `[data-ln-table-col-filter]` attribute is a JS id hook for finding the button — it is never a CSS selector.
+`.ln-filter-active` on the filter button → `@mixin table-filter-active` in `theme/config/mixins/_table.scss` renders the accent dot and color change. JS does `btn.classList.toggle('ln-filter-active', ...)`. SCSS owns what that looks like. The `[data-ln-table-col-filter]` attribute is a JS id hook for finding the button — it is never a CSS selector.
 
 ---
 
@@ -76,7 +76,7 @@ ln-ashlar makes deliberate trade-offs, and its wins and costs are not the ones a
 
 **Mainstream way:** A "filterable table" is a monolithic table component with built-in filter UI — dropdowns, chips, clear button, all owned by one component.
 
-**Ashlar way:** A "table filter" is `ln-popover` + `ln-search` + `ln-filter` composing together, with `ln-table` merely consuming one event (`ln-filter:changed`). Big components do not grow features; they expose events.
+**Ashlar way:** A "table filter" is `ln-popover` + `ln-search` + `ln-filter` composing together, with `ln-table` merely consuming one event (`ln-filter:change`). Big components do not grow features; they expose events.
 
 **Why:** Each component is independently testable and reusable. `ln-filter` works for card grids. `ln-popover` works for any overlay. Neither knows about the other.
 
@@ -120,7 +120,7 @@ A salary cell carries `data-ln-value="120000"` while displaying `"$120,000"`. A 
 **Why:** Per-project patches scatter fixes, diverge over time, and become tech debt. The library is only complete when consumers can compose standard patterns without patching.
 
 **Concrete example:**
-The column filter unification added filter popover content styling (checkbox list layout, optional search input spacing) to `scss/config/mixins/_popover.scss`. No consumer project needs a local patch for this layout.
+The column filter unification added filter popover content styling (checkbox list layout, optional search input spacing) to `theme/config/mixins/_popover.scss`. No consumer project needs a local patch for this layout.
 
 ---
 
@@ -182,7 +182,7 @@ modal.addEventListener('ln-modal:before-open', () => {
 		data-ln-fill-id="{{ id }}" data-ln-fill-name="{{ name }}">Edit</button>
 ```
 
-The four CRUD demos shed ~60 lines of identical coordinator JS this way (see `js/ln-fill/README.md`). A field whose `name` is the backend column (`max_users`) carries `data-ln-fill-as="maxUsers"` to match the camelCased trigger key — `name` stays the wire, the fill key is decoupled.
+The four CRUD demos shed ~60 lines of identical coordinator JS this way (see `components/ln-fill/README.md`). A field whose `name` is the backend column (`max_users`) carries `data-ln-fill-as="maxUsers"` to match the camelCased trigger key — `name` stays the wire, the fill key is decoupled.
 
 **Where the coordinator still earns its place:** when the fill is *not* a user click — store conflict resolution, an import workflow, a deep-link pre-fill. Then `window.lnCore.lnFill(el, record)` dispatched from an event handler is correct. The rule: **click-triggered → declarative; programmatic → coordinator.**
 
@@ -194,7 +194,7 @@ The four CRUD demos shed ~60 lines of identical coordinator JS this way (see `js
 
 ### Symptom
 
-Per-column filter dropdowns clipped by `overflow: clip` in the `table-base` mixin (`scss/config/mixins/_table.scss`) and `overflow-x: auto` on `[data-ln-table]` (`scss/config/mixins/_ln-table.scss`).
+Per-column filter dropdowns clipped by `overflow: clip` in the `table-base` mixin (`theme/config/mixins/_table.scss`) and `overflow-x: auto` on `[data-ln-table]` (`theme/config/mixins/_ln-table.scss`).
 
 ### Disease
 
@@ -216,9 +216,9 @@ When a feature requires fighting the DOM (overflow hacks, `z-index` wars, `posit
 
 **Mainstream way:** A component ships a default template as a string constant (or a `?raw` import injected via `innerHTML`) so it works "out of the box" with zero markup. Overriding it means fighting a buried default.
 
-**Ashlar way:** A `<template>` is markup, and markup is authored — never generated or injected by the library. If a JS component clones a template for runtime data, the PAGE provides it: nested inside the component's container (primary — `cloneTemplateScoped` resolves container-local templates first) or at the bottom of the page markup (global fallback). The library never ships a hidden runtime default. `js/ln-{name}/template.html` files are developer examples to copy, not runtime artifacts. A missing template fails loudly (a console warning at clone time), never a silent fallback.
+**Ashlar way:** A `<template>` is markup, and markup is authored — never generated or injected by the library. If a JS component clones a template for runtime data, the PAGE provides it: nested inside the component's container (primary — `cloneTemplateScoped` resolves container-local templates first) or at the bottom of the page markup (global fallback). The library never ships a hidden runtime default. `components/ln-{name}/template.html` files are developer examples to copy, not runtime artifacts. A missing template fails loudly (a console warning at clone time), never a silent fallback.
 
 **Why:** A `?raw` import injected via `innerHTML` is JS-generated markup in disguise — it violates Principle 1 (Markup Is the Application) exactly like server-side hydration replacement violates Principle 2. The page markup is the single source of truth; developers customize by editing their authored template, not by overriding a buried library default.
 
 **Concrete example:**
-`js/ln-toast/src/ln-toast.js` clones `<template data-ln-template="ln-toast-item">` via `cloneTemplateScoped` — the page authors this template nested inside `[data-ln-toast]` (see `demo/admin/src/shell.html`). `js/ln-toast/template.html` is the copyable starting point; nothing imports it. If no matching `<template>` exists anywhere, the clone fails loudly with `console.warn('[ln-toast] Template "ln-toast-item" not found')`.
+`components/ln-toast/src/ln-toast.js` clones `<template data-ln-template="ln-toast-item">` via `cloneTemplateScoped` — the page authors this template nested inside `[data-ln-toast]` (see `demo/admin/src/shell.html`). `components/ln-toast/template.html` is the copyable starting point; nothing imports it. If no matching `<template>` exists anywhere, the clone fails loudly with `console.warn('[ln-toast] Template "ln-toast-item" not found')`.

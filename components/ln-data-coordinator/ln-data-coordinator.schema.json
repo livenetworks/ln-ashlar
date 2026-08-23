@@ -1,0 +1,143 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-data-coordinator",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-api-connector": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-api-queue": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-chart-source": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-couchdb-connector": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-data-coordinator": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-data-coordinator-dict": {
+			"direction": null,
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-data-coordinator-no-autosync": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-data-coordinator-stale": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-data-mapper": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-data-store": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-data-store-no-autosync": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-data-store-stale": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-form-scope": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-list-source": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-list-window": {
+			"direction": null,
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-mapper": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-options": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-rest-connector": {
+			"direction": null,
+			"sources": []
+		},
+		"data-ln-stat": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-stat-filter": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-table-source": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-table-window": {
+			"direction": null,
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-websocket-connector": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		}
+	}
+}

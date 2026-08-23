@@ -1,4 +1,4 @@
-@use '../../../../../scss/config/mixins' as *;
+@use '../../../../../theme/config/mixins' as *;
 
 // Demo-local tile recipe — surface + border + radius + flex-col layout ONLY.
 // Deliberately NOT @mixin card: card binds panel-header/footer chrome to

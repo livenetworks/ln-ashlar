@@ -7,8 +7,8 @@
 	window.lnCore.registerDataMapper('tenants', identity);
 
 	// ── Store / table / modal element refs ────────────────────────────
-	const packagesStoreEl = document.getElementById('packages-store');
-	const tenantsStoreEl  = document.getElementById('tenants-store');
+	const packagesStoreEl = document.getElementById('packages');
+	const tenantsStoreEl  = document.getElementById('tenants');
 
 	if (!packagesStoreEl || !tenantsStoreEl) {
 		console.warn('[docuflow] Missing store elements — aborting coordinator');

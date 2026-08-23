@@ -26,6 +26,7 @@
 | Component | Use for | Don't use for |
 |---|---|---|
 | `ln-table` | Any tabular data. Sorting, filtering, search, selection, virtual scrolling. SSR **or** data-driven mode | Static tables with no interactivity → plain `<table>`; card grids |
+| `ln-chart` | Ordered numeric datasets shown as responsive line/area SVG, SSR shell or coordinator-backed | Multi-series analytical dashboards or highly interactive charting |
 | `ln-progress` / `ln-circular-progress` | Known-percentage progress: uploads, wizards, form completion | Indeterminate loading → skeletons / `ln-toast` |
 
 ## Forms & Input
@@ -74,6 +75,7 @@
 | Component | Use for | Don't use for |
 |---|---|---|
 | `ln-ajax` | Progressive enhancement: form submit / link load without reload | File uploads; forms claimed by a coordinator |
+| `ln-include` | Loading a `<template>` element's content from an external file, deduplicated, gating boot until initial hosts resolve | Loading page content into the visible DOM → `ln-ajax`; per-record fill → `ln-form` |
 | `ln-data-store` | Local-first cache: offline survival, optimistic writes, encryption at rest | Always-fresh read-only data → fetch on demand |
 | `ln-data-coordinator` | Parent that wires store ↔ connector ↔ mappers ↔ form writes | Read-only views with no local state |
 | `ln-api-connector` / `ln-couchdb-connector` | Network gateway from store to REST / CouchDB backend | Static sites without a backend |
@@ -87,7 +89,7 @@
 | `ln-time` | Auto-updating relative timestamps | Precise absolute dates → plain `<time>` |
 | `ln-translations` | Static text swapping by language key | User-generated content; RTL layout (CSS concern) |
 | `ln-dictionary` | *TODO — confirm scope via `get_component`* | |
-| `ln-icons` | Sprite-based icons, localStorage-cached | Inline one-off SVGs |
+| `ln-icon` | Sprite-based icons, localStorage-cached | Inline one-off SVGs |
 
 ---
 
@@ -112,7 +114,7 @@ Only the flags that change a decision. Everything else → `get_attribute`.
 4. Semantic elements only: `<dialog>`, `<nav>`, `<form>`, `<section>`, `<article>`.
 5. SCSS mixins on IDs/selectors, not utility classes.
 6. JS is transport-agnostic — `ln-form` never submits; `ln-ajax`, the coordinator, or native HTML does.
-7. Icons come from `ln-icons`.
+7. Icons come from `ln-icon`.
 
 **Known exception:** inactive `ln-tabs` panels carry `class="hidden"`. This is the one sanctioned functional class — it does not license utility classes anywhere else.
 

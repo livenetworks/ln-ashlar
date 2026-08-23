@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Dynamically highlights active navigation links matching current URL location pathname with SPA history patch and ARIA aria-current attributes.
-source: js/ln-nav/src/ln-nav.js
+source: components/ln-nav/src/ln-nav.js
 tags: [navigation, routing, active-state, accessibility]
 ---
 
@@ -16,7 +16,7 @@ tags: [navigation, routing, active-state, accessibility]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-nav` component automatically evaluates and highlights active links within navigation menus based on the browser's current `window.location.pathname`. It is located in [`js/ln-nav/src/ln-nav.js`](../../js/ln-nav/src/ln-nav.js).
+The `ln-nav` component automatically evaluates and highlights active links within navigation menus based on the browser's current `window.location.pathname`. It is located in [`components/ln-nav/src/ln-nav.js`](../../components/ln-nav/src/ln-nav.js).
 
 *   **Active Route Highlight:** Queries all child `<a>` elements within host container `[data-ln-nav]`, compares link `href` targets against `window.location.pathname`, and applies the configured active CSS class and `aria-current="page"`.
 *   **SPA Navigation Detection (History Patching):** Listens to `popstate` events and monkey-patches `history.pushState` to re-evaluate active links during client-side SPA route transitions (e.g. via [`ln-router`](./ln-router.md)).
@@ -64,18 +64,18 @@ Disables parent prefix matching. Links are highlighted only if their `href` stri
 
 ### Attributes Table
 
-| Attribute | Target Element | Type | Default | Description |
+| Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-nav` | Host (`<nav>`, `<div>`) | String | `"active"` | Initializes component on container and defines the active CSS class name (e.g. `is-active`, `active`). |
 | `data-ln-nav-exact` | Host (`<nav>`, `<div>`) | Flag | `false` | When present, disables parent prefix matching and requires exact path equality. |
 
 ### Events API
 
-| Event | Direction | Cancelable | Payload `detail` | Description |
+| Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-nav:before-update` | Emits | Yes | `{ target: HTMLElement }` | Dispatched before evaluating and updating active link states. Cancelable. |
-| `ln-nav:update` | Emits | No | `{ target: HTMLElement }` | Dispatched after link active classes and `aria-current` attributes are applied. |
-| `ln-nav:destroyed` | Emits | No | `{ target: HTMLElement }` | Dispatched when `destroy()` is called on the component instance. |
+| `ln-nav:before-update` | Emits | Yes | Dispatched before evaluating and updating active link states. Cancelable. | `{ target: HTMLElement }` |
+| `ln-nav:update` | Emits | No | Dispatched after active link states have been evaluated and CSS classes applied. | `{ activeLinks: Array, target: HTMLElement }` |
+| `ln-nav:destroyed` | Emits | No | Dispatched when `destroy()` is called on the component instance. | `{ target: HTMLElement }` |
 
 ---
 

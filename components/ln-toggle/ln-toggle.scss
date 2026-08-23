@@ -1,0 +1,33 @@
+// ==========================================================================
+// ln-toggle — Functional Grid Collapse & Chevron Mechanics
+// ==========================================================================
+
+.collapsible {
+	display: grid;
+	grid-template-rows: 0fr;
+	transition: grid-template-rows 200ms ease;
+
+	&.open,
+	&[data-ln-toggle="open"] {
+		grid-template-rows: 1fr;
+	}
+
+	> * {
+		overflow: hidden;
+		min-height: 0;
+	}
+}
+
+.collapsible-body {
+	overflow: hidden;
+	min-height: 0;
+}
+
+[data-ln-toggle-for] .ln-chevron {
+	flex-shrink: 0;
+	transition: transform 200ms ease;
+}
+
+[data-ln-toggle-for][aria-expanded="true"] .ln-chevron {
+	transform: rotate(180deg);
+}

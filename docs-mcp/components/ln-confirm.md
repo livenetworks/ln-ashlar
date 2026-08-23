@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A two-click interaction gate primitive for protecting destructive actions in-place.
-source: js/ln-confirm/src/ln-confirm.js
+source: components/ln-confirm/src/ln-confirm.js
 tags: [interactions, confirmation, validation]
 ---
 
@@ -17,10 +17,15 @@ tags: [interactions, confirmation, validation]
 ## 1. Core Behavior & Responsibility
 
 - Intercepts the first user click on protected buttons/links to present an in-place confirmation message.
-- Morphs button contents during confirmation (updates text for text buttons; replaces icon with check and shows a tooltip for icon-only buttons).
+- Morphs button contents during confirmation (swaps `hidden` on child states, updates text, or swaps icon with check and shows a CSS tooltip).
 - Automatically resets back to the idle state if the timeout (default: 3s) expires without a second click.
-- Completely steps out of the way on the second click, letting the native `click` or `submit` event proceed.
-- Located in [`js/ln-confirm/src/ln-confirm.js`](../../js/ln-confirm/src/ln-confirm.js).
+- Steps out of the way of the default action on the second click, letting the native `click` or `submit` event proceed.
+- Stops propagation on both clicks, so neither the arming nor the accepting click reaches an ancestor click surface (clickable card, row handler).
+- Located in [`components/ln-confirm/src/ln-confirm.js`](../../components/ln-confirm/src/ln-confirm.js).
+
+> [!NOTE]
+> **Micro-Component Doctrine & Template Exception:**
+> As an in-place behavioral gate / micro-component, `ln-confirm` is exempt from the `<template>` cloning doctrine to avoid over-engineering. For full HTML-first declarative purity, use **Two-Element Mode** (`data-ln-confirm-idle` / `data-ln-confirm-active`). The hardcoded `'Confirm?'` fallback in JS is strictly a developer failsafe of last resort.
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
@@ -31,8 +36,31 @@ tags: [interactions, confirmation, validation]
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-### Base HTML Markup
+### Variant 1: HTML-First (Two-Element Mode — Recommended)
 
+Recommended for complex button layouts (with icons, badges, or rich HTML). Isolates idle and active states in pure markup with zero string replacement in JS.
+
+#### HTML Markup
+```html
+<button type="button" 
+        class="btn btn-danger" 
+        data-ln-confirm 
+        data-ln-confirm-timeout="4">
+    <span data-ln-confirm-idle>
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
+        Delete Item (<span data-ln-table-selected>3</span>)
+    </span>
+    <span data-ln-confirm-active hidden>
+        Are you sure?
+    </span>
+</button>
+```
+
+### Variant 2: Shorthand Declarative Attribute Mode
+
+Ideal for simple text buttons where the prompt is passed cleanly via the attribute string.
+
+#### HTML Markup
 ```html
 <form action="/account/delete" method="POST">
     <button type="submit" 
@@ -43,39 +71,19 @@ tags: [interactions, confirmation, validation]
 </form>
 ```
 
-### Variant 1: Icon-Only Button with Tooltip
+### Variant 3: Icon-Only Button with Tooltip
 
-For compact layouts. Replaces the SVG icon path with `#ln-check` and shows a CSS tooltip.
+For compact layouts and table rows. Replaces the SVG icon path with `#ln-icon-check` and reveals a CSS tooltip bubble.
 
 #### HTML Markup
 ```html
 <button type="button" 
         class="btn btn-icon" 
-        aria-label="Delete Record" 
+        aria-label="Delete Item" 
         data-ln-confirm="Confirm deletion?">
     <svg class="ln-icon" aria-hidden="true">
-        <use href="#ln-trash"></use>
+        <use href="#ln-icon-trash"></use>
     </svg>
-</button>
-```
-
-### Variant 2: Two-Element Mode
-
-For complex layouts. Controls visibility of separate child nodes for idle and active states.
-
-#### HTML Markup
-```html
-<button type="button" 
-        class="btn btn-danger" 
-        data-ln-confirm
-        data-ln-confirm-timeout="4">
-    <span data-ln-confirm-idle>
-        <svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
-        Delete Selected (<span data-ln-table-selected></span>)
-    </span>
-    <span data-ln-confirm-active hidden>
-        Are you sure?
-    </span>
 </button>
 ```
 
@@ -113,7 +121,7 @@ For complex layouts. Controls visibility of separate child nodes for idle and ac
 
 The visual design for icon-only confirmation bubbles utilizes a CSS tooltip bubble positioned relative to the trigger.
 
-### SCSS Mixin Implementation (`scss/config/mixins/_confirm.scss`)
+### SCSS Mixin Implementation (`theme/config/mixins/_confirm.scss`)
 ```scss
 @use 'tooltip' as *;
 

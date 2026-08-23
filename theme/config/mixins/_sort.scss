@@ -1,0 +1,42 @@
+@use 'display' as *;
+@use 'table' as *;
+
+// ─── Sort control — 3-trigger cycle (none → asc → desc → none) ─────────
+// Only one <button data-ln-sort-dir> is visible at a time; the circular
+// order lives HERE in CSS, not in JS (js/ln-sort/README.md "No cycle
+// logic in JS"). [data-ln-sort-state] on the root decides which trigger
+// shows — the visible button is always the NEXT action, but the icon it
+// carries reports the CURRENT state, not that action (icon-per-button
+// mapping: js/ln-sort/README.md "Icon convention").
+
+@mixin sort {
+	@include inline-flex;
+	list-style: none !important;
+	list-style-type: none !important;
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+
+	li {
+		list-style: none !important;
+		list-style-type: none !important;
+	}
+
+	button {
+		@include table-header-btn-base;
+		display: none;
+	}
+
+	&[data-ln-sort-state="none"] [data-ln-sort-dir="asc"],
+	&[data-ln-sort-state="asc"]  [data-ln-sort-dir="desc"],
+	&[data-ln-sort-state="desc"] [data-ln-sort-dir="none"] {
+		display: inline-flex;
+	}
+}
+
+@mixin sort-active {
+	[data-ln-sort-dir] {
+		opacity: 1;
+		color: var(--color-accent);
+	}
+}

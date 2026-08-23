@@ -1,6 +1,6 @@
 # Tooltip
 
-File: `scss/config/mixins/_tooltip.scss` + `scss/components/_tooltip.scss`.
+File: `theme/config/mixins/_tooltip.scss` + `theme/components/_tooltip.scss`.
 
 CSS-only tooltip that uses a pseudo-element and the `data-ln-tooltip`
 attribute. Zero JS, zero positioning math.
@@ -9,7 +9,7 @@ attribute. Zero JS, zero positioning math.
 
 ```html
 <button type="button" data-ln-tooltip="Save as draft" aria-label="Save">
-	<svg class="ln-icon" aria-hidden="true"><use href="#ln-device-floppy"></use></svg>
+	<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-device-floppy"></use></svg>
 </button>
 ```
 

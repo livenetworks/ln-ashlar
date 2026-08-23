@@ -1,0 +1,5 @@
+@use '../config/mixins' as *;
+
+.chart {
+	@include chart;
+}

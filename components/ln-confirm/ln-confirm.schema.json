@@ -1,0 +1,44 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-confirm",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-confirm": {
+			"direction": "author",
+			"sources": [
+				"ln-confirm.scss",
+				"src/ln-confirm.js"
+			]
+		},
+		"data-ln-confirm-active": {
+			"direction": "author",
+			"sources": [
+				"ln-confirm.scss",
+				"src/ln-confirm.js"
+			]
+		},
+		"data-ln-confirm-idle": {
+			"direction": "author",
+			"sources": [
+				"ln-confirm.scss",
+				"src/ln-confirm.js"
+			]
+		},
+		"data-ln-confirm-timeout": {
+			"direction": "author",
+			"sources": [
+				"src/ln-confirm.js"
+			]
+		},
+		"data-ln-debug": {
+			"direction": "author",
+			"sources": [
+				"src/ln-confirm.js"
+			]
+		},
+		"data-ln-table": {
+			"direction": null,
+			"sources": []
+		}
+	}
+}

@@ -9,6 +9,8 @@ tags: [skill, data-table, list, search, filter, ln-specific]
 
 # Data Views
 
+## Summary
+
 Users work with data, not "pages". The data lives in a client-side cache (store), and search/sort/filter run synchronously against it; the render layer (`ln-table`, `ln-list`) is separate from the data layer (`ln-data-store` + `ln-data-coordinator`). Contracts: `../../components/ln-table.md`, `../../components/ln-data-store.md`, `../../components/ln-filter.md`, `../../components/ln-search.md`.
 
 ---

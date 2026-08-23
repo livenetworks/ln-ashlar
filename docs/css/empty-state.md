@@ -1,6 +1,6 @@
 # Empty state
 
-File: `scss/config/mixins/_empty-state.scss` + `scss/components/_empty-state.scss`.
+File: `theme/config/mixins/_empty-state.scss` + `theme/components/_empty-state.scss`.
 
 Centered, icon-led placeholder for lists with no data.
 
@@ -16,14 +16,14 @@ Distinguished by attribute value:
 
 ```html
 <div data-ln-empty-state="no-data">
-	<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-folder"></use></svg>
+	<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-folder"></use></svg>
 	<h3>No documents yet</h3>
 	<p>Upload your first document to get started.</p>
 	<button type="button">Upload document</button>
 </div>
 
 <div data-ln-empty-state="no-results">
-	<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
+	<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 	<h3>No matches</h3>
 	<p>Try a different search or clear your filters.</p>
 	<button type="button">Clear filters</button>

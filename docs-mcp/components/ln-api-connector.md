@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A stateless RESTful API network connection driver.
-source: js/ln-api-connector/src/ln-api-connector.js
+source: components/ln-api-connector/src/ln-api-connector.js
 tags: [network, REST, sync, fetch]
 ---
 
@@ -21,7 +21,7 @@ tags: [network, REST, sync, fetch]
 - Appends required JSON configuration headers and dynamic `X-LN-Response: data` flags to queries.
 - Dispatches responses or request errors as bubbled CustomEvents back to the DOM tree.
 - Decouples remote storage paths from UI layers.
-- Located in [`js/ln-api-connector/src/ln-api-connector.js`](../../js/ln-api-connector/src/ln-api-connector.js).
+- Located in [`components/ln-api-connector/src/ln-api-connector.js`](../../components/ln-api-connector/src/ln-api-connector.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
@@ -65,32 +65,34 @@ tags: [network, REST, sync, fetch]
 
 | Helper | Signature | Returns | Description |
 |---|---|---|---|
-| `element.lnConnector.refreshConfig` | `()` | `void` | Reloads URL, path, and header configurations. |
-| `element.lnConnector.fetchDelta` | `(since: String)` | `Promise` | Fetches delta updates since sequence tag. |
-| `element.lnConnector.create` | `(payload: Object, url?: String)` | `Promise` | Sends POST request. |
-| `element.lnConnector.update` | `(id: ID, payload: Object, expectedVersion?: Int, url?: String)` | `Promise` | Sends PUT update. |
-| `element.lnConnector.delete` | `(id: ID, url?: String)` | `Promise` | Sends DELETE request. |
-| `element.lnConnector.bulkDelete` | `(ids: Array, url?: String)` | `Promise` | Sends POST/DELETE bulk request. |
-| `element.lnConnector.destroy` | `()` | `void` | Unbinds all listeners. |
+| `element.lnApiConnector.refreshConfig` | `()` | `void` | Reloads URL, path, and header configurations. |
+| `element.lnApiConnector.cancel` | `(key?: String)` | `Boolean` | Aborts active in-flight request for the given key/element. |
+| `element.lnApiConnector.fetchDelta` | `(since: String, targetEl?: Element)` | `Promise` | Fetches delta updates since sequence tag. |
+| `element.lnApiConnector.query` | `(queryParams: Object, targetEl?: Element)` | `Promise` | Sends query request with pagination and filters. |
+| `element.lnApiConnector.create` | `(payload: Object, url?: String, idempotencyKey?: String)` | `Promise` | Sends POST request. |
+| `element.lnApiConnector.update` | `(id: ID, payload: Object, expectedVersion?: Int, url?: String, idempotencyKey?: String)` | `Promise` | Sends PUT update. |
+| `element.lnApiConnector.delete` | `(id: ID, url?: String, idempotencyKey?: String)` | `Promise` | Sends DELETE request. |
+| `element.lnApiConnector.bulkDelete` | `(ids: Array, url?: String, idempotencyKey?: String)` | `Promise` | Sends POST/DELETE bulk request. |
+| `element.lnApiConnector.destroy` | `()` | `void` | Aborts in-flight requests and unbinds all listeners. |
 
 ### Events API
 
-*Responds to events under `ln-api-connector:...` and `ln-rest-connector:...` namespaces for compatibility.*
-
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `:request-sync` / `:request-fetch` | Listens | No | Triggers delta updates query. | `{ since?: String, meta?: Object }` |
-| `:request-create` | Listens | No | Triggers document create request. | `{ data: Object, tempId: String, url?: String, meta?: Object }` |
-| `:request-update` | Listens | No | Triggers document PUT edit. | `{ id: ID, data: Object, expected_version?: Int, url?: String, meta?: Object }` |
-| `:request-delete` | Listens | No | Triggers document DELETE. | `{ id: ID, url?: String, meta?: Object }` |
-| `:request-bulk-delete` | Listens | No | Triggers bulk document deletes. | `{ ids: Array, url?: String, meta?: Object }` |
-| `ln-api-connector:fetched` | Emits | No | Dispatched upon delta sync responses. | `{ data: Array, since: String, meta: Object }` |
+| `ln-api-connector:request-sync` / `ln-api-connector:request-fetch` | Listens | No | Triggers delta updates query. | `{ since?: String, meta?: Object }` |
+| `ln-api-connector:request-query` | Listens | No | Triggers structured query/pagination fetch. | `{ query?: Object, meta?: Object }` |
+| `ln-api-connector:request-cancel` | Listens | No | Aborts in-flight fetch or query for the target element/key. | `{ targetEl?: Element, key?: String, meta?: Object }` |
+| `ln-api-connector:request-create` | Listens | No | Triggers document create request. | `{ data: Object, tempId: String, url?: String, idempotencyKey?: String, meta?: Object }` |
+| `ln-api-connector:request-update` | Listens | No | Triggers document PUT edit. | `{ id: ID, data: Object, expected_version?: Int, url?: String, idempotencyKey?: String, meta?: Object }` |
+| `ln-api-connector:request-delete` | Listens | No | Triggers document DELETE. | `{ id: ID, url?: String, idempotencyKey?: String, meta?: Object }` |
+| `ln-api-connector:request-bulk-delete` | Listens | No | Triggers bulk document deletes. | `{ ids: Array, url?: String, idempotencyKey?: String, meta?: Object }` |
+| `ln-api-connector:fetched` | Emits | No | Dispatched upon delta sync or query responses. | `{ data: Array, total?: Number, filtered?: Number, offset?: Number, queryGen?: Number, since?: String, meta: Object }` |
 | `ln-api-connector:created` | Emits | No | Dispatched upon successful document creation. | `{ record: Object, tempId: String, message: String, meta: Object }` |
 | `ln-api-connector:updated` | Emits | No | Dispatched upon successful document edit. | `{ record: Object, id: ID, message: String, meta: Object }` |
 | `ln-api-connector:deleted` | Emits | No | Dispatched upon successful document deletion. | `{ response: Object, id: ID, message: String, meta: Object }` |
 | `ln-api-connector:bulk-deleted` | Emits | No | Dispatched upon successful bulk deletion. | `{ response: Object, ids: Array, message: String, meta: Object }` |
-| `ln-api-connector:error` | Emits | No | Dispatched upon HTTP or network errors. | `{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }` |
-| `ln-api-connector:config-changed` | Emits | No | Dispatched whenever `refreshConfig()` reloads URL, path, and header configuration (including on init). | `{ baseUrl: String, path: String, headers: Object }` |
+| `ln-api-connector:error` | Emits | No | Dispatched upon HTTP or network errors (silent on AbortError). | `{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }` |
+| `ln-api-connector:config-changed` | Emits | No | Dispatched whenever `refreshConfig()` reloads URL, path, and header configuration (including on init). | `{ baseUrl: String, path: String, headers: Object, paramKeys: Object }` |
 | `ln-api-connector:destroyed` | Emits | No | Dispatched when the component is destroyed. | `{ target: HTMLElement }` |
 
 ---

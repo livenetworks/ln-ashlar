@@ -1,6 +1,6 @@
 # Timeline
 
-File: `scss/config/mixins/_timeline.scss` + `scss/components/_timeline.scss`.
+File: `theme/config/mixins/_timeline.scss` + `theme/components/_timeline.scss`.
 
 Vertical activity feed for audit logs, version history, comment
 threads.

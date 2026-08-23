@@ -4,7 +4,7 @@ classification: coordinator
 status: stable
 domain: frontend
 summary: A DOM coordinator that enforces mutual exclusivity (single-open behavior) among a group of ln-toggle panels.
-source: js/ln-accordion/src/ln-accordion.js
+source: components/ln-accordion/src/ln-accordion.js
 tags: [collapsible, state, accordion, coordinator]
 ---
 
@@ -18,7 +18,7 @@ tags: [collapsible, state, accordion, coordinator]
 
 The `ln-accordion` component is a DOM coordinator whose sole responsibility is to enforce mutual exclusivity (single-open behavior) among a group of [`ln-toggle`](./ln-toggle.md) panels. It does not directly manage the state of individual panels; instead, it listens for the bubbling `ln-toggle:open` event and declaratively closes any other open sibling panels within the same accordion group.
 
-The JavaScript source is located at [ln-accordion.js](../../js/ln-accordion/src/ln-accordion.js).
+The JavaScript source is located at [ln-accordion.js](../../components/ln-accordion/src/ln-accordion.js).
 
 Key responsibilities include:
 - **Mutual Exclusivity:** Ensuring only one collapsible panel is open at a time in the accordion container by toggling sibling states.
@@ -48,7 +48,7 @@ The standard markup uses a `<ul>` list with the `data-ln-accordion` attribute se
         <header data-ln-toggle-for="faq-panel-1" class="accordion-trigger">
             <span>What is Ashlar?</span>
             <svg class="ln-icon ln-chevron" aria-hidden="true">
-                <use href="#ln-arrow-down"></use>
+                <use href="#ln-icon-arrow-down"></use>
             </svg>
         </header>
         <!-- First collapsible panel -->
@@ -63,7 +63,7 @@ The standard markup uses a `<ul>` list with the `data-ln-accordion` attribute se
         <header data-ln-toggle-for="faq-panel-2" class="accordion-trigger">
             <span>What is the role of the coordinator?</span>
             <svg class="ln-icon ln-chevron" aria-hidden="true">
-                <use href="#ln-arrow-down"></use>
+                <use href="#ln-icon-arrow-down"></use>
             </svg>
         </header>
         <!-- Second collapsible panel -->
@@ -177,12 +177,12 @@ accordion.addEventListener('ln-accordion:change', (event) => {
 ## 4. CSS Styling & Behavioral Concept
 
 The styling is split into a reusable mixin and a declarative selector binding:
-- Reusable mixin: `@mixin accordion` defined in [_accordion.scss](../../scss/config/mixins/_accordion.scss)
-- Style binding: `[data-ln-accordion]` defined in [_accordion.scss](../../scss/components/_accordion.scss)
+- Reusable mixin: `@mixin accordion` defined in [_accordion.scss](../../theme/config/mixins/_accordion.scss)
+- Style binding: `[data-ln-accordion]` defined in [_accordion.scss](../../theme/components/_accordion.scss)
 
 ### SCSS Mixin Reference:
 ```scss
-// In scss/config/mixins/_accordion.scss
+// In theme/config/mixins/_accordion.scss
 @mixin accordion {
 	@include border;
 	--radius: var(--radius-lg);
@@ -210,7 +210,7 @@ The styling is split into a reusable mixin and a declarative selector binding:
 
 ### SCSS Component Selector Binding:
 ```scss
-// In scss/components/_accordion.scss
+// In theme/components/_accordion.scss
 [data-ln-accordion] {
 	@include accordion;
 
@@ -309,6 +309,6 @@ sequenceDiagram
 
 - [`ln-toggle`](./ln-toggle.md) — The binary state primitive that manages individual panel expand/collapse states.
 - [`ln-persist`](./ln-persist.md) — Service used by `ln-toggle` to persist panel states.
-- [Source JavaScript](../../js/ln-accordion/src/ln-accordion.js) — Core implementation of the accordion coordinator.
-- [Source Component SCSS](../../scss/components/_accordion.scss) — Core stylesheet for accordion elements.
-- [Source Mixin SCSS](../../scss/config/mixins/_accordion.scss) — Reusable SCSS mixin for accordions.
+- [Source JavaScript](../../components/ln-accordion/src/ln-accordion.js) — Core implementation of the accordion coordinator.
+- [Source Component SCSS](../../theme/components/_accordion.scss) — Core stylesheet for accordion elements.
+- [Source Mixin SCSS](../../theme/config/mixins/_accordion.scss) — Reusable SCSS mixin for accordions.

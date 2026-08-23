@@ -4,7 +4,7 @@ classification: service
 status: stable
 domain: frontend
 summary: DOM-agnostic sliding-window data engine for server-side virtualization — sparse cache, LRU eviction, and stale-response guarding shared by ln-table and ln-list windowed modes.
-source: js/ln-core/window-cache.js
+source: components/ln-core/window-cache.js
 tags: [windowing, virtualization, sliding-window, service]
 ---
 
@@ -18,7 +18,7 @@ tags: [windowing, virtualization, sliding-window, service]
 
 `window-cache.js` exports `createWindowCache(config)`, a pure, DOM-agnostic data engine for server-side sliding-window virtualization. It owns a sparse cache keyed by logical index, logical/grand totals, request de-duplication, a stale-response guard (`queryGen`), LRU eviction to a bounded resident-row cap, and a debounced fetch trigger.
 
-The JavaScript source is located at [window-cache.js](../../js/ln-core/window-cache.js).
+The JavaScript source is located at [window-cache.js](../../components/ln-core/window-cache.js).
 
 Key responsibilities include:
 - **Sparse Windowing:** Holds at most `windowSize` records at any time, regardless of the logical dataset size, evicting the least-recently-touched rows first (LRU by touch-recency, not viewport distance).
@@ -94,7 +94,7 @@ cache.invalidate({ sort: newSort, filters: {}, search: '' });
 | `threshold` | `Number` | `25` | Prefetch margin threshold in rows before reaching unloaded page boundaries. Configurable via HTML (`data-ln-table-window-threshold="25"`). |
 | `fetchDebounce` | `Number` | `120` | Milliseconds `ensure()` coalesces before firing `requestPage`. |
 | `requestPage` | `Function(query, offset, limit)` | no-op | Callback — kick a page-aligned fetch over any transport. |
-| `onChange` | `Function()` | no-op | Callback — cache mutated (page ingested or invalidated), re-render. |
+| `onChange` | `Function()` | no-op | Callback — cache contents changed (page ingested, rows evicted via a `configure()` shrink, grand total set), re-render. |
 
 ---
 
@@ -120,22 +120,24 @@ In `ln-ashlar`, `windowSize`, `pageSize` (`window-page`), and `threshold` (`wind
 | `queryGen` *(getter)* | — | `Number` | Current query generation, bumped by `invalidate()`. |
 | `size` *(getter)* | — | `Number` | Resident row count. |
 | `ensure` | `(startRow: Number, endRow: Number)` | `void` | Render client hands its visible logical range. Stamps in-range resident rows as freshly touched; if any row in range is missing, debounce-fires a padded fetch for the gap. |
-| `ingest` | `(detail: Object)` | `void` | Splices a fetched page (`detail.data` at `detail.offset`) into the cache, updates totals from `detail.total`/`detail.filtered`, evicts over-cap rows, fires `onChange()`. Drops the response if `detail.queryGen` doesn't match the current generation. |
+| `ingest` | `(detail: Object)` | `void` | If a generation change is pending, first clears the resident rows and their LRU stamps, deferring the swap to this call. Then splices the fetched page (`detail.data` at `detail.offset`) into the cache, updates totals from `detail.total`/`detail.filtered`, evicts over-cap rows, fires `onChange()`. Drops the response if `detail.queryGen` doesn't match the current generation. |
 | `requestInitial` | `(query: Object)` | `void` | First load — stores `query`, fetches page 0 at the current generation (no bump). |
-| `invalidate` | `(query: Object)` | `void` | Query change — bumps `queryGen`, clears the cache, stores the new `query`, refetches page 0, fires `onChange()` for an immediate all-placeholder repaint. |
+| `invalidate` | `(query: Object)` | `void` | Query change — bumps `queryGen`, stores the new `query`, clears the in-flight set, and refetches page 0. Resident rows and totals stay in place: the cache drops them at the first `ingest()` of the new generation, so the consumer keeps rendering the previous result until the replacement page lands (stale-while-revalidate). Does not fire `onChange()`. |
+| `revalidate` | `()` | `void` | Refresh in place after a local mutation: bumps `queryGen`, clears the in-flight set, and refetches the page covering the last range handed to `ensure()` rather than page 0. Uses the same deferred swap as `invalidate()`, so the current rows stay visible and the scroll position is untouched until the replacement page arrives. |
+| `release` | `(offset: Number)` | `void` | Drops a failed page fetch from the in-flight set so a later `ensure()` pass can request that offset again. No repaint and no automatic retry: the page is re-requested on the next scroll, filter, or resize. |
 | `configure` | `(partial: Object)` | `void` | Live-mutates any subset of `{windowSize, pageSize, threshold, fetchDebounce}`. Shrinking `windowSize` runs `evict()` before firing `onChange()`; `pageSize`/`threshold`/`fetchDebounce` apply to the next `ensure()` call with no immediate repaint. This is what makes `data-ln-{table\|list}-window-page`/`-window-threshold`/`-window` observable without re-init. |
 | `setGrandTotal` | `(n: Number)` | `void` | Sets `grandTotal`; also moves `logicalTotal` to `n`, but only when the stored `query` has no active `search`/`filters` — a filtered total stays server-owned via `ingest()`. Fires `onChange()`. Backs the observable `data-ln-{table\|list}-count` attribute. |
 | `destroy` | `()` | `void` | Clears the debounce timer and cache contents. |
 
 ---
 
-## 4. CSS Styling & Stacking Constraints
+## 5. CSS Styling & Stacking Constraints
 
-None. `window-cache` has no DOM footprint and applies no styles — see [ln-table](./ln-table.md) / [ln-list](./ln-list.md) for the render-side placeholder-row styling (blank, no shimmer).
+None. `window-cache` has no DOM footprint and applies no styles — see [ln-table](./ln-table.md) / [ln-list](./ln-list.md) for the render-side placeholder-row styling (static fill, no shimmer).
 
 ---
 
-## 5. Accessibility (ARIA) & Common Pitfalls
+## 6. Accessibility (ARIA) & Common Pitfalls
 
 - **Not directly ARIA-relevant** — `window-cache` produces no DOM. Accessibility of placeholder/loading states is owned by the render component (see [ln-table §5](./ln-table.md) / [ln-list §5](./ln-list.md)).
 
@@ -145,7 +147,7 @@ None. `window-cache` has no DOM footprint and applies no styles — see [ln-tabl
 
 ---
 
-## 6. Flow Diagram & Lifecycle
+## 7. Flow Diagram & Lifecycle
 
 ```mermaid
 sequenceDiagram
@@ -177,14 +179,17 @@ sequenceDiagram
     end
 
     Render->>Cache: invalidate(newQuery)
-    Cache->>Cache: Bump queryGen, clear cache
+    Cache->>Cache: Bump queryGen, clear in-flight set, keep resident rows
     Cache->>Coord: requestPage(newQuery, 0, pageSize)
-    Cache->>Render: onChange() → all-placeholder repaint
+    Coord-->>Render: '*:set-data' { data, offset: 0, queryGen: newGen }
+    Render->>Cache: ingest(detail)
+    Cache->>Cache: Swap — clear stale resident rows, splice new page
+    Cache->>Render: onChange() → repaint
 ```
 
 ---
 
-## 7. Related Guides & Components
+## 8. Related Guides & Components
 
 - [`guides/component-authoring`](../guides/component-authoring.md) — Guide on building custom components using ashlar core helpers.
 - [`ln-table`](./ln-table.md) — Consumes `createWindowCache` behind `data-ln-table-window`.

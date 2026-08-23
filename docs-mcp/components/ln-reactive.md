@@ -4,7 +4,7 @@ classification: service
 status: stable
 domain: frontend
 summary: Lightweight Proxy-based reactive state wrappers and microtask render batcher primitives.
-source: js/ln-core/reactive.js
+source: components/ln-core/reactive.js
 tags: [reactive, proxy, state, batcher, performance, service]
 ---
 
@@ -18,7 +18,7 @@ tags: [reactive, proxy, state, batcher, performance, service]
 
 `ln-reactive` provides lightweight, framework-free reactive state management using native JavaScript `Proxy` objects, alongside a microtask-based render batcher to prevent redundant DOM updates.
 
-The JavaScript source is located at [reactive.js](../../js/ln-core/reactive.js).
+The JavaScript source is located at [reactive.js](../../components/ln-core/reactive.js).
 
 Key responsibilities include:
 - **Shallow Reactive Proxy (`reactiveState`):** Wraps an initial state object in a Proxy that triggers a callback when top-level properties are mutated.

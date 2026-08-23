@@ -4,7 +4,7 @@ classification: coordinator
 status: stable
 domain: frontend
 summary: A DOM coordinator that manages positioning, top-layer promotion, accessibility, and dismissal of dropdown overlay menus.
-source: js/ln-dropdown/src/ln-dropdown.js
+source: components/ln-dropdown/src/ln-dropdown.js
 tags: [dropdown, overlay, positioning, coordinator]
 ---
 
@@ -18,7 +18,7 @@ tags: [dropdown, overlay, positioning, coordinator]
 
 The `ln-dropdown` component is a DOM coordinator that manages dropdown menus. It attaches to a wrapper DOM element declared with the `data-ln-dropdown` attribute. Its responsibility is to monitor the visibility state of its internal toggle menu ([`ln-toggle`](./ln-toggle.md)) and dynamically orchestrate its top-layer promotion, placement relative to the trigger button, accessibility semantics, and cleanup behavior (dismissing on click-outside, page scroll, or window resize).
 
-The JavaScript source is located at [ln-dropdown.js](../../js/ln-dropdown/src/ln-dropdown.js).
+The JavaScript source is located at [ln-dropdown.js](../../components/ln-dropdown/src/ln-dropdown.js).
 
 Key responsibilities include:
 - **Top-Layer Promotion:** Promoting the active menu into the browser's top layer via the native Popover API (`popover="manual"`, `showPopover()`) when opened to prevent clipping by parents with `overflow: hidden` or `z-index` stacking context rules.
@@ -48,7 +48,7 @@ Below is a standard copy-paste template for an actions dropdown:
     <!-- Trigger Button -->
     <button type="button" data-ln-toggle-for="options-menu" class="btn">
         Options
-        <svg class="ln-icon" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg>
     </button>
     
     <!-- Dropdown Menu (State Primitive) -->
@@ -73,7 +73,7 @@ When using a dropdown to pick a single value, use the native `aria-current="true
 <div data-ln-dropdown>
     <button type="button" data-ln-toggle-for="lang-menu" class="btn-select">
         English
-        <svg class="ln-icon" aria-hidden="true"><use href="#ln-chevron-down"></use></svg>
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-chevron-down"></use></svg>
     </button>
     <ul id="lang-menu" data-ln-toggle class="dropdown-menu">
         <li><button type="button">Македонски</button></li>
@@ -115,11 +115,14 @@ The dropdown menu can accommodate avatars, dividers (`<hr>`), and complex action
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-dropdown` | Wrapper (`<div>`) | Presence | Required | Initializes the dropdown coordinator on the wrapper element. |
+| `data-ln-dropdown-position` | Wrapper (`<div>`) | Placement String | `"bottom-end"` | Configuration attribute for target placement (`"bottom-start"`, `"bottom-end"`, `"top-start"`, `"top-end"`, etc.). |
+| `data-ln-dropdown-placement` | Menu (`<ul>`) | Placement String (auto) | — | Dynamically written by JS with the computed winning placement for CSS styling hooks. |
 | `data-ln-toggle-for` | Trigger (`<button>`) | Target Menu `id` | Required | Binds the trigger button to the target dropdown menu. |
 | `data-ln-toggle` | Menu (`<ul>`) | `"open"` \| `"close"` | `"close"` | The primary state indicator. Set to `"open"` to show the menu. |
 | `data-ln-dropdown-menu`| Menu (`<ul>`) | Attribute | Added by JS | Automatically applied by JS to bind base dropdown layout styles. |
 | `role="menu"` | Menu (`<ul>`) | Value | Added by JS | Automatically applied to define the semantic structure of the menu. |
-| `role="menuitem"` | Menu Items (`<li>`) | Value | Added by JS | Automatically applied to direct child items of the dropdown list. |
+| `role="none"` | List Items (`<li>`) | Value | Added by JS | Applied to `<li>` wrappers to remove list semantics and prevent ARIA collisions. |
+| `role="menuitem"` | Action Elements (`<button>`, `<a>`) | Value | Added by JS | Applied to interactive actions inside the menu with roving `tabindex`. |
 | `aria-haspopup` | Trigger | `"menu"` | Added by JS | Set automatically to inform screen readers of the pop-up behavior. |
 | `aria-expanded` | Trigger | `"true"` \| `"false"` | `"false"` | Dynamically synced with the open/close state of the dropdown. |
 
@@ -166,11 +169,11 @@ The coordinator listens to the following bubbling events emitted by the inner `l
 
 ## 4. CSS Styling & Behavioral Concept
 
-The visual layer is separated from JavaScript logic. Custom styles are provided via reusable mixins in `scss/config/mixins/_dropdown.scss` and selector bindings in `scss/components/_dropdown.scss`.
+The visual layer is separated from JavaScript logic. Custom styles are provided via reusable mixins in `theme/config/mixins/_dropdown.scss` and selector bindings in `theme/components/_dropdown.scss`.
 
 ### SCSS Mixins Reference
 ```scss
-// In scss/config/mixins/_dropdown.scss
+// In theme/config/mixins/_dropdown.scss
 @mixin dropdown {
 	@include relative;
 }
@@ -262,7 +265,7 @@ The visual layer is separated from JavaScript logic. Custom styles are provided 
 
 ### SCSS Component Selector Bindings
 ```scss
-// In scss/components/_dropdown.scss
+// In theme/components/_dropdown.scss
 @use '../config/mixins' as *;
 
 [data-ln-dropdown] {
@@ -296,20 +299,26 @@ The visual layer is separated from JavaScript logic. Custom styles are provided 
 
 ## 5. Accessibility (ARIA) & Common Pitfalls
 
-### ARIA & Keyboard
+### ARIA & Keyboard Navigation (APG Compliance)
 
 - **Trigger Button:**
   - Receives `aria-haspopup="menu"` on initialization.
   - Toggles `aria-expanded="true"` when the menu is open, and `aria-expanded="false"` when closed.
+  - Pressing `ArrowDown` or `ArrowUp` on the focused trigger opens the menu and immediately focuses the first or last menu item.
 - **Menu Wrapper (`<ul>`):**
   - Receives `role="menu"` automatically.
-- **Menu Items (`<li>`):**
-  - All direct child list items receive `role="menuitem"`.
-- **Selection State (Single-select):**
-  - The currently active choice is marked with `aria-current="true"`.
-- **Keyboard Navigation:**
-  - `Tab` moves focus sequentially through the interactive links or buttons inside the menu.
-  - `Esc` or clicking outside closes the menu and returns focus back to the trigger button.
+- **List Items (`<li>`):**
+  - Receive `role="none"` to strip redundant list semantics and maintain clean hierarchy.
+- **Menu Items (`<button>`, `<a>`):**
+  - Receive `role="menuitem"`.
+  - Implements **Roving Tabindex**: the active/first item has `tabindex="0"` while all sibling items have `tabindex="-1"`.
+- **Keyboard Controls:**
+  - `ArrowDown`: Moves focus to the next menu item (with cyclic wrap-around).
+  - `ArrowUp`: Moves focus to the previous menu item (with cyclic wrap-around).
+  - `Home`: Jumps focus directly to the first menu item.
+  - `End`: Jumps focus directly to the last menu item.
+  - `Escape`: Closes the dropdown (`data-ln-toggle="close"`), calls `e.stopPropagation()`, and returns focus to the trigger button.
+  - `Tab`: Closes the dropdown gracefully and allows native focus movement to the next page element.
 
 ### Common Pitfalls & Anti-patterns
 
@@ -371,6 +380,6 @@ sequenceDiagram
 - [`ln-toggle`](./ln-toggle.md) — The binary state primitive that manages menu expansion.
 - [`ln-popover`](./ln-popover.md) — A visually richer overlay container for complex content.
 - [`ln-modal`](./ln-modal.md) — Blocking overlay dialogs with modal focus traps.
-- [Source JavaScript](../../js/ln-dropdown/src/ln-dropdown.js) — Core implementation of the dropdown coordinator.
-- [Source Component SCSS](../../scss/components/_dropdown.scss) — Core stylesheet for dropdown components.
-- [Source Mixin SCSS](../../scss/config/mixins/_dropdown.scss) — Reusable SCSS mixin for dropdown layout styling.
+- [Source JavaScript](../../components/ln-dropdown/src/ln-dropdown.js) — Core implementation of the dropdown coordinator.
+- [Source Component SCSS](../../theme/components/_dropdown.scss) — Core stylesheet for dropdown components.
+- [Source Mixin SCSS](../../theme/config/mixins/_dropdown.scss) — Reusable SCSS mixin for dropdown layout styling.

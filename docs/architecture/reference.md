@@ -11,8 +11,8 @@ This document contains the detailed architectural patterns, specifications, and 
 Structure is **global**. Color is **semantic** (`type="submit"`) or **explicit** (`@include btn`).
 
 ```
-scss/config/mixins/_btn.scss    →  @mixin btn { ... }           ← recipe
-scss/components/_button.scss    →  .btn { @include btn; }       ← default applied
+theme/config/mixins/_btn.scss    →  @mixin btn { ... }           ← recipe
+theme/components/_button.scss    →  .btn { @include btn; }       ← default applied
 ```
 
 The `.btn` class is available for prototyping and inspector experimentation.
@@ -20,7 +20,7 @@ In production, projects use semantic selectors instead.
 
 ### Global `<button>` — Structure + Neutral (Out of the Box)
 
-Every `<button>` gets full structure and neutral colors from `scss/base/_global.scss` — inline-flex layout, consistent padding, hover and focus states. Cancel, close, toggle, and icon buttons all look usable **without any class or mixin**. See `scss/base/_global.scss` for the implementation and `@mixin btn` in `scss/config/mixins/_btn.scss` for the reusable structure recipe.
+Every `<button>` gets full structure and neutral colors from `theme/base/_global.scss` — inline-flex layout, consistent padding, hover and focus states. Cancel, close, toggle, and icon buttons all look usable **without any class or mixin**. See `theme/base/_global.scss` for the implementation and `@mixin btn` in `theme/config/mixins/_btn.scss` for the reusable structure recipe.
 
 ### `<button type="submit">` — Color Only (Structure Inherited)
 
@@ -50,7 +50,7 @@ For non-submit action buttons that need primary styling. Includes full structure
 
 ### Size Variants
 
-Size variants available via `btn-sm` and `btn-lg` mixins (see `scss/config/mixins/_btn.scss`).
+Size variants available via `btn-sm` and `btn-lg` mixins (see `theme/config/mixins/_btn.scss`).
 
 ### Icon / Close Buttons
 
@@ -87,7 +87,7 @@ Redefining the customization hooks (`--btn-padding-x` and `--btn-padding-y`) loc
 
 <dialog class="ln-modal" data-ln-modal id="my-modal">
     <form>
-        <header><h3>Title</h3><button type="button" aria-label="Close" data-ln-modal-close><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button></header>
+        <header><h3>Title</h3><button type="button" aria-label="Close" data-ln-modal-close><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button></header>
         <main>...</main>
         <footer>
             <button type="button" data-ln-modal-close>Cancel</button>
@@ -105,8 +105,8 @@ Redefining the customization hooks (`--btn-padding-x` and `--btn-padding-y`) loc
 - **Non-submit buttons** need `type="button"` (close, cancel) to prevent form submission
 - **No `.ln-modal__content` class** — select semantically: `.ln-modal > form`
 - **Sizes** via mixins: `#my-modal > form { @include modal-lg; }` — not CSS classes
-- Size variants: `modal-sm`, `modal-md`, `modal-lg`, `modal-xl` — see `scss/config/mixins/_modal.scss` for values.
-- **Entry animation** — modal panel slides in on open via the `ln-modal-slideIn` keyframe, gated through `motion-safe` so reduced-motion users see an instant state change. Keyframe and duration live in `scss/components/_modal.scss` and `scss/config/mixins/_modal.scss`.
+- Size variants: `modal-sm`, `modal-md`, `modal-lg`, `modal-xl` — see `theme/config/mixins/_modal.scss` for values.
+- **Entry animation** — modal panel slides in on open via the `ln-modal-slideIn` keyframe, gated through `motion-safe` so reduced-motion users see an instant state change. Keyframe and duration live in `theme/components/_modal.scss` and `theme/config/mixins/_modal.scss`.
 - **Attribute is the contract** — write `data-ln-modal="open"` or `"close"` on the modal element. Observer applies state, dispatches events.
 - **ESC listener** active only while modal is open (zero listeners when all closed)
 
@@ -122,8 +122,8 @@ Two distinct grouping patterns:
 ```html
 <!-- Action buttons -->
 <ul>
-  <li><button aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
-  <li><button aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+  <li><button aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg></button></li>
+  <li><button aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg></button></li>
 </ul>
 
 <!-- Pill radio -->
@@ -151,12 +151,12 @@ Two distinct grouping patterns:
 Every visual style has **two layers**: a mixin (recipe) and a component (application).
 
 ```
-scss/config/mixins/_table.scss      →  @mixin table-base { ... }         ← recipe
-scss/components/_table.scss         →  table { @include table-base; }    ← applied
+theme/config/mixins/_table.scss      →  @mixin table-base { ... }         ← recipe
+theme/components/_table.scss         →  table { @include table-base; }    ← applied
 ```
 
-**Mixins** (`scss/config/mixins/`) — define HOW something looks. Never generate CSS by themselves.
-**Components** (`scss/components/`) — apply mixins to default selectors. Generate CSS.
+**Mixins** (`theme/config/mixins/`) — define HOW something looks. Never generate CSS by themselves.
+**Components** (`theme/components/`) — apply mixins to default selectors. Generate CSS.
 
 | Situation | Mixin | Component |
 |---|---|---|
@@ -174,7 +174,7 @@ Projects apply the mixin to their own semantic selector (`#my-breadcrumbs { @inc
 #audit-log thead { display: none; } // no header for this one
 ```
 
-### Co-located JS SCSS (`js/ln-*/`)
+### Co-located JS SCSS (`components/ln-*/`)
 
 Co-located SCSS in JS component folders is ONLY for JS-state-driven CSS that
 cannot exist without the JS component:
@@ -183,8 +183,8 @@ cannot exist without the JS component:
 
 Visual styling (padding, border, colors, layout, typography, shadows, z-index)
 ALWAYS belongs in the two-layer architecture:
-- Mixin: `scss/config/mixins/_component.scss`
-- Component: `scss/components/_component.scss`
+- Mixin: `theme/config/mixins/_component.scss`
+- Component: `theme/components/_component.scss`
 
 If a JS component needs visual styling, extract it into a mixin + component.
 The co-located SCSS should be minimal or empty.
@@ -196,41 +196,41 @@ Three tiers:
 1. **Decorating via a hook's bare presence is forbidden.**
    `[data-ln-modal] { padding: ... }` — the attribute is a JS init target, not a CSS selector.
 
-2. **A component styling its OWN state expressed as `data-ln-x="value"` in its OWN co-located `js/ln-x/ln-x.scss` is sanctioned** — the dominant library pattern. The component owns both sides of the contract. Examples: `[data-ln-modal="open"] { display: flex }`, `[data-ln-popover="open"] { display: block }`, `[data-ln-filter-hide="true"] { display: none }`. These are attribute-value selectors (state encoded in the value), not presence selectors.
+2. **A component styling its OWN state expressed as `data-ln-icon-x="value"` in its OWN co-located `components/ln-icon-x/ln-icon-x.scss` is sanctioned** — the dominant library pattern. The component owns both sides of the contract. Examples: `[data-ln-modal="open"] { display: flex }`, `[data-ln-popover="open"] { display: block }`, `[data-ln-filter-hide="true"] { display: none }`. These are attribute-value selectors (state encoded in the value), not presence selectors.
 
 3. **Consumer/app/cross-component CSS reaching through a foreign `data-ln-*` hook is forbidden.** Use a `.ln-*` state class (JS toggles, SCSS styles) or a plain app-owned `data-*`. App state must not enter the `data-ln-*` namespace.
 
-Practical test: *who owns this state, and where does the rule live?* Component's own state → `data-ln-x="value"` styled in co-located SCSS. App/coordinator state → app-owned `data-*` or `.ln-*` class, styled in app SCSS.
+Practical test: *who owns this state, and where does the rule live?* Component's own state → `data-ln-icon-x="value"` styled in co-located SCSS. App/coordinator state → app-owned `data-*` or `.ln-*` class, styled in app SCSS.
 
 ---
 
 ## Adding a New SCSS Mixin + Component
 
-1. Create `scss/config/mixins/_new-component.scss` with `@mixin new-component { ... }`
-2. Register in `scss/config/mixins/_index.scss` with `@forward 'new-component'`
-3. Update `scss/config/_mixins.scss` header comment
-4. Create `scss/components/_new-component.scss` that applies the mixin:
+1. Create `theme/config/mixins/_new-component.scss` with `@mixin new-component { ... }`
+2. Register in `theme/config/mixins/_index.scss` with `@forward 'new-component'`
+3. Update `theme/config/_mixins.scss` header comment
+4. Create `theme/components/_new-component.scss` that applies the mixin:
    ```scss
    @use '../config/mixins' as *;
    #new-component { @include new-component; }
    ```
-5. Add `@use 'components/new-component'` to `scss/ln-ashlar.scss`
+5. Add `@use 'components/new-component'` to `theme/ln-ashlar.scss`
 6. Use `@include` mixins for properties, `var(--token)` for values — **NEVER** hardcoded colors
 
 ---
 
 ## Adding a New JS Component
 
-1. Create `js/ln-{name}/ln-{name}.js`
+1. Create `components/ln-{name}/ln-{name}.js`
 2. Follow the IIFE pattern — import helpers from `ln-core`:
    ```js
    import { dispatch, dispatchCancelable } from '../ln-core';
    ```
 3. Add `data-ln-{name}` data attribute
-4. If CSS needed, create `js/ln-{name}/ln-{name}.scss`
-5. Add `import './ln-{name}/ln-{name}.js'` to `js/index.js`
+4. If CSS needed, create `components/ln-{name}/ln-{name}.scss`
+5. Add `import './ln-{name}/ln-{name}.js'` to `components/index.js`
 6. DOM structure → `<template>` elements in HTML
-7. Create `js/ln-{name}/README.md` — usage guide (attributes, events, API, HTML examples)
+7. Create `components/ln-{name}/README.md` — usage guide (attributes, events, API, HTML examples)
 8. Create `demo/admin/{name}.html` — interactive demo page
 9. Detailed architecture: [docs/architecture/component-guide.md](component-guide.md)
 
@@ -240,7 +240,7 @@ Practical test: *who owns this state, and where does the rule live?* Component's
 
 When modifying component behavior (attributes, events, API, HTML structure):
 
-1. Update `js/ln-{name}/README.md` — reflect new/changed usage
+1. Update `components/ln-{name}/README.md` — reflect new/changed usage
 2. Update `demo/admin/{name}.html` — add/update interactive examples
 
 ---
@@ -248,7 +248,7 @@ When modifying component behavior (attributes, events, API, HTML structure):
 ## Using Existing JS Components
 
 Before using any `data-ln-*` attribute in HTML:
-1. Read `js/ln-{name}/README.md` — check the Attributes table for correct element placement
+1. Read `components/ln-{name}/README.md` — check the Attributes table for correct element placement
 2. Check Examples section for correct HTML structure
 3. Before creating a new data attribute → verify no existing component provides the functionality
 
@@ -259,7 +259,7 @@ Before using any `data-ln-*` attribute in HTML:
 For new or substantial work (new mixin, new component, new pattern, architectural change),
 present the implementation approach **before writing any code**:
 
-- **SCSS**: "Create `@mixin X` in `scss/config/mixins/`, apply in `scss/components/` on `[selector]`, project uses `@include X` on `#element`"
+- **SCSS**: "Create `@mixin X` in `theme/config/mixins/`, apply in `theme/components/` on `[selector]`, project uses `@include X` on `#element`"
 - **JS**: "Component uses `data-ln-X` on `<element>`, dispatches event Y, project wires via Z"
 - **HTML**: "Structure is `<parent> > <child>`, component X on `<element>`, styled via mixin Y"
 
@@ -372,7 +372,7 @@ there.
 Companion tokens live in the cross-cutting `--color-accent-*` family
 in the logical token surface. They are NOT `--btn-accent-*`
 per-component-surface tokens (those would freeze at `:root` and break
-the semantic-color cascade — see `scss/config/mixins/_btn.scss` header).
+the semantic-color cascade — see `theme/config/mixins/_btn.scss` header).
 
 ### What NOT to do (themes)
 
@@ -386,7 +386,7 @@ the semantic-color cascade — see `scss/config/mixins/_btn.scss` header).
 
 All spacing values (padding, margin, gap, inset, positional offsets used
 for layout) reference `--size-*` CSS variables defined in
-`scss/config/_tokens.scss`. No raw `rem` / `px` literals in spacing
+`theme/config/_tokens.scss`. No raw `rem` / `px` literals in spacing
 contexts. No per-component token families (no `--btn-py`, `--card-gap`,
 no private mixin-scoped `--_*`).
 
@@ -412,7 +412,7 @@ naming convention with `-up` suffixes for intermediate steps:
 (12 canonical steps.)
 
 **Monotonic ordering in compact mode.** Every addition to `--size-*`
-MUST be mirrored in `scss/config/_density.scss` under `.density-compact`
+MUST be mirrored in `theme/config/_density.scss` under `.density-compact`
 with a value that preserves ascending order across the whole scale. A
 compact value that inverts ordering (e.g. `md-up=20` while `lg=16`)
 breaks any component that uses both.
@@ -600,7 +600,7 @@ tokens — it does NOT declare `background:` / `color:` /
 4. `@mixin button-base` reads `background: var(--btn-bg)` at consumer
    — resolves through step 3.
 
-See `scss/config/mixins/_btn.scss` header for the full cascade rationale.
+See `theme/config/mixins/_btn.scss` header for the full cascade rationale.
 
 ### What NOT to do
 
@@ -637,7 +637,7 @@ See `scss/config/mixins/_btn.scss` header for the full cascade rationale.
 ## Breakpoint Tokens — Use the Mixin, Not the Literal
 
 All responsive breakpoints resolve through `@mixin mq-up / mq-down /
-cq-up / cq-down` (defined in `scss/config/mixins/_breakpoints.scss`).
+cq-up / cq-down` (defined in `theme/config/mixins/_breakpoints.scss`).
 Never hardcode px values inside `@media` or `@container` in library
 code.
 
@@ -673,37 +673,37 @@ code.
   — OS-level, not a breakpoint.
 
 **When you need a new breakpoint — extend the map, don't silo.**
-Add to `$breakpoints` in `scss/config/_breakpoints.scss`. Never
+Add to `$breakpoints` in `theme/config/_breakpoints.scss`. Never
 hardcode a value in a component.
 
 ---
 
 ## Icons
 
-Icons use SVG sprite injection — `ln-icons.js` fetches icons on demand from Tabler CDN (pinned to `@3.31.0`),
+Icons use SVG sprite injection — `ln-icon.js` fetches icons on demand from Tabler CDN (pinned to `@3.31.0`),
 builds a hidden `<svg>` sprite, and inserts it into `<body>` at init. Fetched SVGs are cached in `localStorage`
 (prefix `lni:`) — subsequent page loads resolve from cache with zero network requests. Icons render via
-`<use href="#ln-{name}">` and inherit `currentColor`.
+`<use href="#ln-icon-{name}">` and inherit `currentColor`.
 
 ```html
 <!-- Standalone icon -->
-<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
 
 <!-- Icon in button with text -->
 <button>
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
     Add
 </button>
 
 <!-- Icon-only button — aria-label required -->
 <button aria-label="Close">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 </button>
 
 <!-- Toggle chevron (CSS rotates it on open — works inside accordion or standalone) -->
 <header data-ln-toggle-for="panel1">
     Title
-    <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+    <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg>
 </header>
 ```
 
@@ -717,24 +717,24 @@ Any icon from [Tabler Icons](https://tabler.io/icons) works — use the Tabler n
 
 Full name list: `scss/tabler-icons.txt`
 
-Custom icons (not in Tabler) use `#lnc-` prefix and are served from `window.LN_ICONS_CUSTOM_CDN`:
-`lnc-file-pdf` `lnc-file-doc` `lnc-file-epub`
+Custom icons (not in Tabler) use `#lnc-` prefix and are served from `window.LN_ICON_CUSTOM_CDN`:
+`ln-icon-custom-file-pdf` `ln-icon-custom-file-doc` `ln-icon-custom-file-epub`
 
 Sizes: `ln-icon--sm` (1rem), default (1.25rem), `ln-icon--lg` (1.5rem), `ln-icon--xl` (4rem).
 
-Color: icons follow the parent's `color` property automatically. Exception: `lnc-file-pdf`, `lnc-file-doc`,
-`lnc-file-epub` have embedded semantic stroke colors.
+Color: icons follow the parent's `color` property automatically. Exception: `ln-icon-custom-file-pdf`, `ln-icon-custom-file-doc`,
+`ln-icon-custom-file-epub` have embedded semantic stroke colors.
 
 To host custom icons in production:
 1. Save the custom SVG icon files in a directory on your production asset server or public CDN (e.g., `/public/assets/icons/` or `https://cdn.mycompany.com/assets/icons/`).
-2. Before the library initializes, define the CDN URL globally using `window.LN_ICONS_CUSTOM_CDN = "https://cdn.mycompany.com/assets/icons";`.
-3. In HTML, reference the icon as `#lnc-{name}` (e.g., `<use href="#lnc-corporate-logo"></use>`). The on-demand sprite generator will fetch, cache, and inject the SVG automatically from your custom CDN.
+2. Before the library initializes, define the CDN URL globally using `window.LN_ICON_CUSTOM_CDN = "https://cdn.mycompany.com/assets/icons";`.
+3. In HTML, reference the icon as `#lnc-{name}` (e.g., `<use href="#ln-icon-custom-corporate-logo"></use>`). The on-demand sprite generator will fetch, cache, and inject the SVG automatically from your custom CDN.
 
 ---
 
 ## Reactive Architecture
 
-See [js/ln-core/README.md](../../js/ln-core/README.md) for the reactive rendering layer: ln-core shared helpers, Proxy-based state, fill/renderList, attribute bridge pattern.
+See [components/ln-core/README.md](../../components/ln-core/README.md) for the reactive rendering layer: ln-core shared helpers, Proxy-based state, fill/renderList, attribute bridge pattern.
 
 ---
 
@@ -747,13 +747,13 @@ See [js/ln-core/README.md](../../js/ln-core/README.md) for the reactive renderin
 <!-- button: data-ln-popover-for opens the popover                           -->
 <!--         data-ln-table-col-filter is a JS id hook — never a CSS selector -->
 <!-- .ln-filter-active on button = filter is active (JS-toggled; SCSS dot)   -->
-<th data-ln-table-sort="string" data-ln-table-filter-col="department">
+<th data-ln-table-filter-col="department">
 	Department
 	<button class="table-filter" type="button"
 	        data-ln-table-col-filter
 	        data-ln-popover-for="filter-my-table-dept"
 	        aria-label="Filter department">
-		<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 	</button>
 </th>
 
@@ -779,19 +779,18 @@ See [js/ln-core/README.md](../../js/ln-core/README.md) for the reactive renderin
 ```
 User checks a checkbox
   → ln-filter handles mutual exclusion (all ↔ values)
-  → ln-filter dispatches ln-filter:changed on the [data-ln-filter] container
-  → ln-filter._dispatchOnBoth (js/ln-filter/src/ln-filter.js:293):
-      also dispatches on getElementById(tableId)
-  → ln-table._onColumnFilter receives the event
-  → updates _columnFilters, toggles .ln-filter-active on the button
-  → SSR: _applyFilterAndSort() + _render()
-  → data-driven: _requestData() → coordinator handles data fetch
-  → ln-table dispatches ln-table:filter
+  → ln-filter dispatches ln-filter:change on the [data-ln-filter] container
+  → Two-Host Bridge:
+      also dispatches cancelable on getElementById(targetId)
+  → ln-table in SSR mode / ln-data-store receives the event with preventDefault()
+  → SSR: _applyFilterAndSort() + _render() + _updateFooter()
+  → data-driven: ln-data-store query-changed → coordinator re-serves data
+  → ln-table-coordinator toggles .ln-filter-active on the button
 ```
 
 ### Teleport Safety
 
-`ln-popover` teleports the entire popover block to `<body>` on open (`js/ln-popover/src/ln-popover.js:91`). The search input and options `<ul>` travel together, so all `id` references remain valid. `ln-filter` binds `change` directly on inputs at init time — post-teleport DOM position does not affect event wiring. `ln-filter` dispatches on `getElementById(targetId)`, a document-global lookup, not a relative DOM traversal. Teleport is transparent to the event flow.
+`ln-popover` teleports the entire popover block to `<body>` on open (`components/ln-popover/src/ln-popover.js:91`). The search input and options `<ul>` travel together, so all `id` references remain valid. `ln-filter` binds `change` directly on inputs at init time — post-teleport DOM position does not affect event wiring. `ln-filter` dispatches on `getElementById(targetId)`, a document-global lookup, not a relative DOM traversal. Teleport is transparent to the event flow.
 
 ### The Two Distinct `ln-search` Targets
 
@@ -802,7 +801,7 @@ These must never share the same target id:
 
 ### Indicator Convention
 
-`.ln-filter-active` class on the filter `<button>` (the element with `data-ln-table-col-filter`). `@mixin table-filter-active` in `scss/config/mixins/_table.scss` styles the button: accent color + `::after` dot. JS toggles the class; SCSS owns the visual output.
+`.ln-filter-active` class on the filter `<button>` (the element with `data-ln-table-col-filter`). `@mixin table-filter-active` in `theme/config/mixins/_table.scss` styles the button: accent color + `::after` dot. JS toggles the class; SCSS owns the visual output.
 
 `[data-ln-table-col-filter]` may remain as a JS identification hook for finding the button. It must never be used as a CSS styling selector (CSS/JS hook boundary doctrine).
 

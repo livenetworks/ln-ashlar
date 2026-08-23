@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A lightweight popover overlay component that leverages the native Popover API for top-layer promotion and placement positioning.
-source: js/ln-popover/src/ln-popover.js
+source: components/ln-popover/src/ln-popover.js
 tags: [popover, overlay, positioning, simple-component]
 ---
 
@@ -18,7 +18,7 @@ tags: [popover, overlay, positioning, simple-component]
 
 The `ln-popover` component is a lightweight floating UI container meant for showing rich contextual content (such as user profile menus, quick forms, filters, or detail cards) positioned relative to a trigger element.
 
-The JavaScript source is located at [ln-popover.js](../../js/ln-popover/src/ln-popover.js).
+The JavaScript source is located at [ln-popover.js](../../components/ln-popover/src/ln-popover.js).
 
 Key responsibilities include:
 - **Top-Layer Promotion:** Automatically setting `popover="manual"` on initialization and calling `showPopover()` / `hidePopover()` to natively display the panel on the browser's top layer. This completely bypasses parent overflow clipping and z-index contexts.
@@ -143,11 +143,11 @@ All events bubble up (`bubbles: true`).
 
 ## 4. CSS Styling & Behavioral Concept
 
-The visual layer is separated from JavaScript logic. Custom styles are provided via mixins in `scss/config/mixins/_popover.scss` and bindings in `scss/components/_popover.scss`.
+The visual layer is separated from JavaScript logic. Custom styles are provided via mixins in `theme/config/mixins/_popover.scss` and bindings in `theme/components/_popover.scss`.
 
 ### SCSS Component Selector Bindings
 ```scss
-// In scss/components/_popover.scss
+// In theme/components/_popover.scss
 [data-ln-popover] {
     @include popover;
 }
@@ -155,7 +155,7 @@ The visual layer is separated from JavaScript logic. Custom styles are provided 
 
 ### SCSS Mixins Reference
 ```scss
-// In scss/config/mixins/_popover.scss
+// In theme/config/mixins/_popover.scss
 @mixin popover {
     @include floating-panel;
     display: none;

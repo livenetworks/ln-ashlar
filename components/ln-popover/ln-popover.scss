@@ -1,0 +1,18 @@
+// ==========================================================================
+// ln-popover — Functional State & Placement Rules
+// ==========================================================================
+
+[data-ln-popover] {
+	position: fixed;
+	inset: auto;
+	margin: 0;
+
+	&:not(:popover-open):not(.open) {
+		display: none;
+	}
+
+	&:popover-open,
+	&.open {
+		display: block;
+	}
+}

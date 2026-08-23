@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A native dialog modal component that manages overlay panels, native focus trapping, scroll locking, and cancel event synchronization.
-source: js/ln-modal/src/ln-modal.js
+source: components/ln-modal/src/ln-modal.js
 tags: [modal, dialog, overlay, simple-component]
 ---
 
@@ -18,7 +18,7 @@ tags: [modal, dialog, overlay, simple-component]
 
 The `ln-modal` component is a **Layer 1 Simple Component** that manages modal overlay windows (dialogs). It wraps the browser's native `<dialog>` element and manages its open/closed visibility state.
 
-The JavaScript source is located at [ln-modal.js](../../js/ln-modal/src/ln-modal.js).
+The JavaScript source is located at [ln-modal.js](../../components/ln-modal/src/ln-modal.js).
 
 Key responsibilities include:
 - **Visibility Management:** Synchronizing the `data-ln-modal` attribute (`"open"` / `"close"`) with native `<dialog>` methods `showModal()` and `close()`.
@@ -30,9 +30,9 @@ Key responsibilities include:
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
 > - **Focus Trapping:** It does not manually trap focus (the native `<dialog>` handles focus trapping automatically when opened via `showModal()`).
-> - **Form Submissions & Auto-close:** It does NOT listen to `ln-form:success` or manage form submit states. Form submission and completion handling belong strictly to **Layer 2 Coordinators** (such as `ln-modal-coordinator` or `ln-data-coordinator`).
+> - **Form Submissions & Auto-close:** It does NOT listen to `ln-ajax:success` or manage form submit states. Form submission and completion handling belong strictly to **Layer 2 Coordinators** (such as `ln-ui-coordinator` or `ln-data-coordinator`).
 > - **Validation Error Inspection:** It does not check form validation classes (`.has-error`, `[data-ln-validate-error]`).
-> - **DOM Data Population:** It does not populate form fields or display elements directly (handled by `ln-fill` / `ln-modal-coordinator`).
+> - **DOM Data Population:** It does not populate form fields or display elements directly (handled by `ln-fill` / `ln-ui-coordinator`).
 
 ---
 
@@ -85,7 +85,7 @@ Triggers communicate with modals via `data-ln-modal-for="modalId"` or URL hash l
 | `data-ln-modal-mode` | `<dialog>` | `"new"` \| `"edit"` | `"new"` | State attribute indicating form mode (toggles `[data-ln-modal-when]` descendants). |
 | `data-ln-modal-when` | Children | `"new"` \| `"edit"` | - | Element is displayed only when its value matches the modal's `data-ln-modal-mode`. |
 
-### Programmatic State Query
+### Programmatic JS API
 
 The initialized instance is exposed on the dialog element via `dom.lnModal`.
 
@@ -93,6 +93,9 @@ The initialized instance is exposed on the dialog element via `dom.lnModal`.
 |---|---|---|
 | `dom.lnModal` | `Object` | The simple component instance attached to the DOM element. |
 | `dom.lnModal.isOpen` | `Boolean` | True if the modal is currently open. |
+| `dom.lnModal.open()` | `Function` | Opens the modal by writing `setAttribute('data-ln-modal', 'open')`. |
+| `dom.lnModal.close()` | `Function` | Closes the modal by writing `setAttribute('data-ln-modal', 'close')`. |
+| `dom.lnModal.toggle()` | `Function` | Toggles the modal between open and closed state. |
 | `dom.lnModal.destroy()` | `Function` | Cleans up events, unlocks body scroll, and destroys the instance. |
 
 ### Events API
@@ -113,7 +116,7 @@ All events bubble (`bubbles: true`) and contain target details in `event.detail`
 
 ## 4. CSS Styling & Behavioral Concept
 
-Styles are defined in `js/ln-modal/ln-modal.scss` and `scss/config/mixins/_modal.scss`.
+Styles are defined in `components/ln-modal/ln-modal.scss` and `theme/config/mixins/_modal.scss`.
 
 ```scss
 [data-ln-modal] {
@@ -161,7 +164,7 @@ body.ln-modal-open {
 
 > [!CAUTION]
 > 1. **Manual Focus Trap Implementation:** Do not write custom focus trap keyboard listeners. Native `<dialog>` handles focus trapping.
-> 2. **Form Event Handling inside Modal:** Do not add form submission or AJAX auto-closing logic inside `ln-modal`. Use a Layer 2 Coordinator (`ln-modal-coordinator` or `ln-data-coordinator`).
+> 2. **Form Event Handling inside Modal:** Do not add form submission or AJAX auto-closing logic inside `ln-modal`. Use a Layer 2 Coordinator (`ln-ui-coordinator` or `ln-data-coordinator`).
 
 ---
 
@@ -218,7 +221,7 @@ sequenceDiagram
 
 ## 7. Related Components
 
-- [`ln-modal-coordinator`](./ln-modal-coordinator.md) — Layer 2 Coordinator that handles triggers, hash addressing, data filling, and form auto-closing.
+- [`ln-ui-coordinator`](./ln-ui-coordinator.md) — Layer 2 Coordinator that handles triggers, hash addressing, data filling, and form auto-closing.
 - [`ln-fill`](./ln-fill.md) — Fills form and display elements from data records.
 - [`ln-form`](./ln-form.md) — Manages form submission pipelines.
 

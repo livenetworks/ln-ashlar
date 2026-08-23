@@ -1,5 +1,5 @@
-@use '../../../scss/config/mixins' as *;
-@use '../../../scss/config/_breakpoints' as bp;
+@use '../../../theme/config/mixins' as *;
+@use '../../../theme/config/breakpoints' as bp;
 
 // ─── App grid ─────────────────────────────────────────────────
 $sidebar-w: 220px;

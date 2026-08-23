@@ -37,8 +37,6 @@
 	</script>
 	<link rel="stylesheet" href="dist/admin.css">
 	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
-	<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
 	<script src="../dist/ln-ashlar.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
 </head>
@@ -49,16 +47,16 @@
 		<li data-ln-toast-item data-ln-attr="class:type">
 			<div class="icon">
 				<ul>
-					<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg></li>
-					<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-x"></use></svg></li>
-					<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg></li>
-					<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg></li>
+					<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg></li>
+					<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-x"></use></svg></li>
+					<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg></li>
+					<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg></li>
 				</ul>
 			</div>
 			<section class="content">
 				<header>
 					<strong class="title" data-ln-field="title"></strong>
-					<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+					<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</header>
 				<main class="body" data-ln-field="message"></main>
 			</section>
@@ -71,14 +69,14 @@
 		<header class="app-header">
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
 				</button>
 				<h1>Upload</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
 					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-palette"></use></svg>
 					</button>
 					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
 						<ul>
@@ -91,7 +89,7 @@
 						</ul>
 					</div>
 					<button type="button" id="demo-density-trigger" data-ln-popover-for="demo-density-picker" aria-label="Choose density">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-adjustments-horizontal"></use></svg>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-adjustments-horizontal"></use></svg>
 					</button>
 					<div class="demo-density-picker" data-ln-popover id="demo-density-picker">
 						<ul>
@@ -112,20 +110,20 @@
 		<!-- Sidebar -->
 		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
 			<header>
-				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
 				<span class="app-name">ashlar-gui</span>
 				<label class="search sidebar-search">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-					<input type="search" placeholder="Filter menu…" data-ln-search="demo-nav" data-ln-search-items="li">
-					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+					<input type="search" placeholder="Filter menu…" data-ln-search-for="demo-nav" data-ln-search-debounce="0">
+					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</label>
 			</header>
 
 			<main>
-				<nav class="nav" id="demo-nav" data-ln-nav="active">
+				<nav class="nav" id="demo-nav" data-ln-nav="active" data-ln-search="" data-ln-search-items="li">
 					<ul>
-						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
 					<h6 class="nav-section">CSS Components</h6>
@@ -164,6 +162,7 @@
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
 						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
+						<li><a href="include.html"><span class="nav-label">Include</span></a></li>
 						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
@@ -208,173 +207,370 @@
 		<section>
 			<div class="app-content-wrapper">
 <h1>Upload</h1>
-					<p>File upload with drag-drop, progress bar, file type validation. A server is required for actual upload.</p>
+<p>File upload with drag-drop, progress bar, file type validation, and SSR hydration.</p>
 
-					<!-- Upload zone -->
-					<section class="section-card" data-demo-html>
-						<header><h3>Upload Zone (demo — no server)</h3></header>
-						<main>
-							<div data-ln-upload="/api/files" data-ln-upload-accept="pdf,doc,docx,jpg,png">
-								<div class="ln-upload__zone">
-									<span>Drop files here or click to upload</span>
-									<small>pdf, doc, docx, jpg, png</small>
-								</div>
-								<ul class="ln-upload__list"></ul>
-								<ul hidden>
-									<li data-ln-upload-dict="remove">Remove</li>
-									<li data-ln-upload-dict="error">Error</li>
-									<li data-ln-upload-dict="invalid-type">This file type is not allowed</li>
-									<li data-ln-upload-dict="upload-failed">Upload failed</li>
-									<li data-ln-upload-dict="delete-error">Failed to delete file</li>
-									<li data-ln-upload-dict="network-error">Network error</li>
-									<li data-ln-upload-dict="invalid-title">Invalid File</li>
-									<li data-ln-upload-dict="error-title">Upload Error</li>
-									<li data-ln-upload-dict="delete-title">Error</li>
-									<li data-ln-upload-dict="connection-error">Could not connect to server</li>
-								</ul>
-							</div>
-						</main>
-						<script type="text/plain" data-demo-scss>
-// Стил за целата upload компонента
-.ln-upload {
+<!-- Upload zone -->
+<section class="section-card" data-demo-html>
+	<header><h3>Upload Zone</h3></header>
+	<main>
+		<div data-ln-upload="/api/files" data-ln-upload-accept="pdf,doc,docx,jpg,png" data-ln-upload-delete="/api/files/{id}">
+			<input type="file" multiple hidden>
+			<template data-ln-template="ln-upload-item">
+				<li data-ln-upload-item>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-file"></use></svg>
+					<span data-ln-field="name"></span>
+					<span data-ln-field="sizeText"></span>
+					<button type="button" data-ln-upload-action="remove" data-ln-attr="aria-label:removeLabel, title:removeLabel">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+					</button>
+					<div data-ln-upload-progress>
+						<div data-ln-progress="0"></div>
+					</div>
+				</li>
+			</template>
+			<div data-ln-upload-zone>
+				<span>Drop files here or click to upload</span>
+				<small>pdf, doc, docx, jpg, png</small>
+			</div>
+			<ul data-ln-upload-list></ul>
+			<ul hidden>
+				<li data-ln-upload-dict="remove">Remove</li>
+				<li data-ln-upload-dict="error">Error</li>
+				<li data-ln-upload-dict="unit-b">B</li>
+				<li data-ln-upload-dict="unit-kb">KB</li>
+				<li data-ln-upload-dict="unit-mb">MB</li>
+				<li data-ln-upload-dict="unit-gb">GB</li>
+			</ul>
+		</div>
+	</main>
+	<script type="text/plain" data-demo-scss>
+// Стил за upload компонентата преку дата-атрибути
+[data-ln-upload] {
   @include upload;
+}
 
-  &__zone {
-    @include upload-zone;
+[data-ln-upload-zone] {
+  @include upload-zone;
 
-    // Стил за dragover состојба
-    &.ln-upload__zone--dragover {
-      @include upload-zone-dragover;
-    }
-  }
-
-  &__list {
-    @include upload-list;
-  }
-
-  &__item {
-    @include upload-item;
-
-    &--error {
-      @include upload-item-error;
-    }
+  // Dragover состојба
+  &[data-ln-upload-state="dragover"] {
+    @include upload-zone-dragover;
   }
 }
-						</script>
-					</section>
 
-					<!-- Custom template -->
-					<section class="section-card" data-demo-html>
-						<header><h3>Custom Item Template (scoped override)</h3></header>
-						<main>
-							<p>This uploader provides its own <code>&lt;template&gt;</code> inside the container — the default is ignored for this instance only.</p>
-							<div data-ln-upload="/api/files" data-ln-upload-accept="pdf,doc,docx,jpg,png">
-								<template data-ln-template="ln-upload-item">
-									<li class="ln-upload__item" data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting">
-										<svg class="ln-icon ln-icon--lg" aria-hidden="true"><use data-ln-attr="href:iconHref" href="#ln-file"></use></svg>
-										<article>
-											<p class="ln-upload__name" data-ln-field="name"></p>
-											<small class="ln-upload__size" data-ln-field="sizeText"></small>
-										</article>
-										<button type="button" class="ln-upload__remove" data-ln-upload-action="remove" data-ln-attr="aria-label:removeLabel, title:removeLabel">
-											<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
-										</button>
-										<div class="ln-upload__progress">
-											<div class="ln-upload__progress-bar"></div>
-										</div>
-									</li>
-								</template>
-								<div class="ln-upload__zone">
-									<span>Drag files here — two-line layout</span>
-								</div>
-								<ul class="ln-upload__list"></ul>
-							</div>
-						</main>
-						<script type="text/plain" data-demo-scss>
-// Прилагодување на внатрешните делови преку соодветни mixins
-.ln-upload {
-  &__name {
+[data-ln-upload-list] {
+  @include upload-list;
+}
+
+[data-ln-upload-item] {
+  @include upload-item;
+
+  &[data-ln-upload-state="error"] {
+    @include upload-item-error;
+  }
+}
+	</script>
+</section>
+
+<!-- Custom template -->
+<section class="section-card" data-demo-html>
+	<header><h3>Custom Item Template (Scoped Override)</h3></header>
+	<main>
+		<p>This uploader provides its own <code>&lt;template&gt;</code> inside the container.</p>
+		<div data-ln-upload="/api/files" data-ln-upload-accept="pdf,doc,docx,jpg,png" data-ln-upload-delete="/api/files/{id}">
+			<input type="file" multiple hidden>
+			<template data-ln-template="ln-upload-item">
+				<li data-ln-upload-item>
+					<svg class="ln-icon ln-icon--lg" aria-hidden="true"><use href="#ln-icon-file"></use></svg>
+					<article>
+						<p data-ln-field="name"></p>
+						<small data-ln-field="sizeText"></small>
+					</article>
+					<button type="button" data-ln-upload-action="remove" data-ln-attr="aria-label:removeLabel, title:removeLabel">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+					</button>
+					<div data-ln-upload-progress>
+						<div data-ln-progress="0"></div>
+					</div>
+				</li>
+			</template>
+			<div data-ln-upload-zone>
+				<span>Drag files here — two-line layout</span>
+			</div>
+			<ul data-ln-upload-list></ul>
+		</div>
+	</main>
+	<script type="text/plain" data-demo-scss>
+// Прилагодување на внатрешните слотови преку соодветни mixins
+[data-ln-upload-item] {
+  [data-ln-field="name"] {
     @include upload-name;
   }
 
-  &__size {
+  [data-ln-field="sizeText"] {
     @include upload-size;
   }
 
-  &__progress {
+  [data-ln-upload-progress] {
     @include upload-progress;
 
-    &-bar {
+    [data-ln-progress] {
       @include upload-progress-bar;
     }
   }
 }
-						</script>
-					</section>
+	</script>
+</section>
 
-					<!-- API Documentation -->
-					<section class="section-card">
-						<header><h3>API &amp; Events</h3></header>
-						<main>
-							<h4>Attributes</h4>
-							<div class="table-container">
-								<table>
-									<thead>
-										<tr>
-											<th>Attribute</th>
-											<th>Description</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr>
-											<td><code>data-ln-upload="URL"</code></td>
-											<td>Upload endpoint.</td>
-										</tr>
-										<tr>
-											<td><code>data-ln-upload-accept="ext,ext"</code></td>
-											<td>Comma-separated list of allowed file extensions.</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
+<!-- SSR Hydration in Edit Forms -->
+<section class="section-card" data-demo-html>
+	<header><h3>SSR Hydration in Edit Forms</h3></header>
+	<main>
+		<p>Pre-rendered server attachments are hydrated on mount without wiping server IDs on new uploads or removals.</p>
+		<div data-ln-upload="/api/files" data-ln-upload-accept="pdf,doc,docx,jpg,png" data-ln-upload-delete="/api/files/{id}">
+			<input type="file" multiple hidden>
+			<input type="hidden" name="file_ids[]" value="101">
+			<input type="hidden" name="file_ids[]" value="102">
+			<template data-ln-template="ln-upload-item">
+				<li data-ln-upload-item>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-file"></use></svg>
+					<span data-ln-field="name"></span>
+					<span data-ln-field="sizeText"></span>
+					<button type="button" data-ln-upload-action="remove" data-ln-attr="aria-label:removeLabel, title:removeLabel">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+					</button>
+					<div data-ln-upload-progress>
+						<div data-ln-progress="0"></div>
+					</div>
+				</li>
+			</template>
+			<div data-ln-upload-zone>
+				<span>Add more attachments or drop files here</span>
+			</div>
+			<ul data-ln-upload-list>
+				<li data-ln-upload-item data-ln-upload-id="101" data-ln-upload-ext="pdf" data-ln-upload-size="1258291">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-file"></use></svg>
+					<span data-ln-field="name">financial_report_2025.pdf</span>
+					<span data-ln-field="sizeText">1.2 MB</span>
+					<button type="button" data-ln-upload-action="remove" aria-label="Remove" title="Remove">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+					</button>
+					<div data-ln-upload-progress>
+						<div data-ln-progress="0"></div>
+					</div>
+				</li>
+				<li data-ln-upload-item data-ln-upload-id="102" data-ln-upload-ext="docx" data-ln-upload-size="450560">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-file"></use></svg>
+					<span data-ln-field="name">project_specifications.docx</span>
+					<span data-ln-field="sizeText">440 KB</span>
+					<button type="button" data-ln-upload-action="remove" aria-label="Remove" title="Remove">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+					</button>
+					<div data-ln-upload-progress>
+						<div data-ln-progress="0"></div>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</main>
+</section>
 
-							<h4 class="mt-4">JS API (available on the container element)</h4>
-							<pre><code>const container = document.querySelector('[data-ln-upload]');
-container.lnUploadAPI.getFileIds();   // [1, 2, 3]
-container.lnUploadAPI.getFiles();     // file objects
-container.lnUploadAPI.clear();        // clear everything</code></pre>
+<!-- Mock Server Simulation for Interactive Demo -->
+<script>
+(function () {
+	// Intercept XHR POST to /api/files to simulate animated progress and successful upload response
+	const _realOpen = XMLHttpRequest.prototype.open;
+	const _realSend = XMLHttpRequest.prototype.send;
 
-							<h4 class="mt-4">Custom Events</h4>
-							<div class="table-container">
-								<table>
-									<thead>
-										<tr>
-											<th>Event</th>
-											<th>Detail</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr>
-											<td><code>ln-upload:uploaded</code></td>
-											<td><code>{id, name, size}</code></td>
-										</tr>
-										<tr>
-											<td><code>ln-upload:removed</code></td>
-											<td><code>{id}</code></td>
-										</tr>
-										<tr>
-											<td><code>ln-upload:error</code></td>
-											<td><code>{message}</code></td>
-										</tr>
-										<tr>
-											<td><code>ln-upload:invalid</code></td>
-											<td><code>{file, reason}</code></td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</main>
-					</section>
+	XMLHttpRequest.prototype.open = function (method, url) {
+		this._mockUrl = url;
+		this._mockMethod = (method || 'GET').toUpperCase();
+		return _realOpen.apply(this, arguments);
+	};
+
+	XMLHttpRequest.prototype.send = function (body) {
+		const self = this;
+		if (this._mockUrl && this._mockUrl.startsWith('/api/files') && this._mockMethod === 'POST') {
+			let file = null;
+			if (body instanceof FormData) {
+				file = body.get('file');
+			}
+			const fileName = file ? file.name : 'uploaded-file.pdf';
+			const fileSize = file ? file.size : 102400;
+
+			// Simulate progress ticks
+			let percent = 0;
+			const interval = setInterval(function () {
+				percent += 25;
+				if (self.upload) {
+					const progressEvent = new ProgressEvent('progress', {
+						lengthComputable: true,
+						loaded: Math.round((percent / 100) * fileSize),
+						total: fileSize
+					});
+					self.upload.dispatchEvent(progressEvent);
+				}
+
+				if (percent >= 100) {
+					clearInterval(interval);
+					setTimeout(function () {
+						Object.defineProperty(self, 'status', { value: 200, writable: false });
+						Object.defineProperty(self, 'responseText', {
+							value: JSON.stringify({
+								id: Math.floor(Math.random() * 9000) + 100,
+								name: fileName,
+								size: fileSize
+							}),
+							writable: false
+						});
+						self.dispatchEvent(new Event('load'));
+					}, 100);
+				}
+			}, 120);
+			return;
+		}
+
+		return _realSend.apply(this, arguments);
+	};
+})();
+</script>
+
+<!-- API Documentation -->
+<section class="section-card">
+	<header><h3>API &amp; Events</h3></header>
+	<main>
+		<h4>Attributes</h4>
+		<div class="table-container">
+			<table>
+				<thead>
+					<tr>
+						<th>Attribute</th>
+						<th>Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><code>data-ln-upload="URL"</code></td>
+						<td>Upload endpoint URL.</td>
+					</tr>
+					<tr>
+						<td><code>data-ln-upload-accept="ext,ext"</code></td>
+						<td>Comma-separated list of allowed file extensions or MIME patterns.</td>
+					</tr>
+					<tr>
+						<td><code>data-ln-upload-delete="URL/{id}"</code></td>
+						<td>Delete endpoint URL pattern containing <code>{id}</code>.</td>
+					</tr>
+					<tr>
+						<td><code>data-ln-upload-max-size="bytes"</code></td>
+						<td>Maximum allowed file size in bytes.</td>
+					</tr>
+					<tr>
+						<td><code>data-ln-upload-max-files="N"</code></td>
+						<td>Maximum total uploaded files limit.</td>
+					</tr>
+					<tr>
+						<td><code>data-ln-upload-file-field="name"</code></td>
+						<td>FormData field name for the file (default: <code>file</code>).</td>
+					</tr>
+					<tr>
+						<td><code>data-ln-upload-ids-field="name"</code></td>
+						<td>Hidden inputs name (default: <code>file_ids[]</code>).</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h4 class="mt-4">JS API (available on the container element)</h4>
+		<pre><code>const container = document.querySelector('[data-ln-upload]');
+container.lnUpload.getFileIds();   // ['42', '43']
+container.lnUpload.getFiles();     // [{ serverId: '42', name: 'doc.pdf', size: 120000 }, ...]
+container.lnUpload.upload(files);  // Programmatic file upload
+container.lnUpload.remove(id);     // Remove by localId or serverId
+container.lnUpload.clear();        // Clear all files
+container.lnUpload.destroy();      // Teardown and cleanup</code></pre>
+
+		<h4 class="mt-4">Custom Events</h4>
+		<div class="table-container">
+			<table>
+				<thead>
+					<tr>
+						<th>Event</th>
+						<th>Type</th>
+						<th>Detail</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><code>ln-upload:request-upload</code></td>
+						<td>Inbound Command</td>
+						<td><code>{ files: FileList | File[] }</code></td>
+					</tr>
+					<tr>
+						<td><code>ln-upload:request-remove</code></td>
+						<td>Inbound Command</td>
+						<td><code>{ localId?, serverId? }</code></td>
+					</tr>
+					<tr>
+						<td><code>ln-upload:request-clear</code></td>
+						<td>Inbound Command</td>
+						<td><code>{}</code></td>
+					</tr>
+					<tr>
+						<td><code>ln-upload:before-upload</code></td>
+						<td>Cancelable Lifecycle</td>
+						<td><code>{ file }</code></td>
+					</tr>
+					<tr>
+						<td><code>ln-upload:before-remove</code></td>
+						<td>Cancelable Lifecycle</td>
+						<td><code>{ localId, serverId }</code></td>
+					</tr>
+					<tr>
+						<td><code>ln-upload:before-clear</code></td>
+						<td>Cancelable Lifecycle</td>
+						<td><code>{}</code></td>
+					</tr>
+					<tr>
+						<td><code>ln-upload:uploaded</code></td>
+						<td>Notification</td>
+						<td><code>{ localId, serverId, name, size, response }</code></td>
+					</tr>
+					<tr>
+						<td><code>ln-upload:progress</code></td>
+						<td>Notification</td>
+						<td><code>{ localId, file, percent, loaded, total }</code></td>
+					</tr>
+					<tr>
+						<td><code>ln-upload:removed</code></td>
+						<td>Notification</td>
+						<td><code>{ localId, serverId }</code></td>
+					</tr>
+					<tr>
+						<td><code>ln-upload:error</code></td>
+						<td>Notification</td>
+						<td><code>{ file, message, status, error }</code></td>
+					</tr>
+					<tr>
+						<td><code>ln-upload:invalid</code></td>
+						<td>Notification</td>
+						<td><code>{ file, reason }</code></td>
+					</tr>
+					<tr>
+						<td><code>ln-upload:cleared</code></td>
+						<td>Notification</td>
+						<td><code>{}</code></td>
+					</tr>
+					<tr>
+						<td><code>ln-upload:destroyed</code></td>
+						<td>Notification</td>
+						<td><code>{ target }</code></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</main>
+</section>
 			</div>
 		</section>
 
@@ -391,7 +587,7 @@ container.lnUploadAPI.clear();        // clear everything</code></pre>
 		<form>
 			<header>
 				<h3>Basic Modal</h3>
-				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 			</header>
 			<main>
 				<p>This is a basic modal with a title and content.</p>
@@ -407,13 +603,13 @@ container.lnUploadAPI.clear();        // clear everything</code></pre>
 		<form id="demo-form-el" data-ln-form>
 			<header>
 				<span class="icon">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-user"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-user"></use></svg>
 				</span>
 				<hgroup>
 					<h3>Edit User</h3>
 					<p>Update the user's details below.</p>
 				</hgroup>
-				<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 			</header>
 			<main>
 				<div class="form-element">
@@ -435,7 +631,7 @@ container.lnUploadAPI.clear();        // clear everything</code></pre>
 			</main>
 			<footer>
 				<button type="button" class="delete-action">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
 					Delete
 				</button>
 				<button type="button" data-ln-modal-close>Cancel</button>

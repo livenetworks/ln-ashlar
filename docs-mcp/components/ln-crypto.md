@@ -4,7 +4,7 @@ classification: service
 status: stable
 domain: frontend
 summary: A client-side encryption and decryption utility wrapper around the Web Crypto API.
-source: js/ln-core/crypto.js
+source: components/ln-core/crypto.js
 tags: [crypto, security, encryption, service]
 ---
 
@@ -16,7 +16,7 @@ tags: [crypto, security, encryption, service]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-crypto` utility is a reusable client-side cryptographic service situated in the core utility layer. It provides a simplified wrapper around the browser's native **Web Crypto API** for secure data encryption and decryption. It is defined in [crypto.js](../../js/ln-core/crypto.js).
+The `ln-crypto` utility is a reusable client-side cryptographic service situated in the core utility layer. It provides a simplified wrapper around the browser's native **Web Crypto API** for secure data encryption and decryption. It is defined in [crypto.js](../../components/ln-core/crypto.js).
 
 *   **AES-GCM Encryption:** Uses Galois/Counter Mode (AES-GCM) симетрично шифрирање to provide high performance and integrity protection (authenticated encryption).
 *   **SHA-256 Key Derivation:** Hashes a user password or string secret to derive a secure 256-bit cryptographic key.

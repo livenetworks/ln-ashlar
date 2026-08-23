@@ -10,11 +10,11 @@
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
-									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-icon-info-circle"></use></svg>
 									The In-Place Action Gate
 								</h4>
 								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
-									The confirmation action IS the platform click. The script intercepts the first click via event prevention and propagation stopping, but releases the second click completely. If clicked within the armed timeout, the form submits, the link navigates, and existing AJAX handlers fire naturally. <strong>There is no rewrite of the default action.</strong>
+									The confirmation action IS the platform click. The script intercepts the first click via event prevention and propagation stopping, and releases the second click's default action. If clicked within the armed timeout, the form submits, the link navigates, and existing AJAX handlers fire naturally. <strong>There is no rewrite of the default action.</strong> Propagation, however, is stopped on both clicks — the click never reaches an ancestor click surface.
 								</p>
 							</div>
 
@@ -35,7 +35,7 @@
 							<h4>How the Interaction Flows</h4>
 							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
 								<li>The user clicks a destructive button. The component intercepts the event, calls <code>e.preventDefault()</code> and <code>e.stopImmediatePropagation()</code>, transitions the button to <code>data-confirming="true"</code>, replaces its label/icon with the armed prompt, schedules an auto-revert timer, and dispatches <code>ln-confirm:waiting</code>.</li>
-								<li>If the user clicks the armed button again before the timer expires, the component intercepts the second click, runs cleanups synchronously, and lets the event pass through. The browser executes the natural submit, navigate, or AJAX handler.</li>
+								<li>If the user clicks the armed button again before the timer expires, the component intercepts the second click, runs cleanups synchronously, calls <code>stopPropagation()</code> so the click stays on the button, and lets the default action proceed. The browser executes the natural submit, navigate, or AJAX handler.</li>
 								<li>If the timer expires before a second click arrives, the button automatically clears the armed state, restores its original text or icon, and disarms.</li>
 							</ol>
 
@@ -45,18 +45,14 @@
 
 					<!-- Anatomy -->
 					<section class="section-card">
-						<header><h3>Anatomy</h3></header>
+						<header><h3>Anatomy &amp; Three Usage Variants</h3></header>
 						<main>
-							<p>The minimum invocation is one attribute on the destructive button:</p>
-<pre><code>&lt;button data-ln-confirm="Are you sure?"&gt;Delete record&lt;/button&gt;</code></pre>
-
-							<h4>Two render modes — text button and icon-only button</h4>
-							<p>The component branches at confirm time on whether the button has any text content at construction (it captures <code>dom.textContent.trim()</code> in the constructor and reads it back later):</p>
+							<p><code>ln-confirm</code> acts as an in-place micro-component gate. It supports three distinct usage modes:</p>
 							<ul>
-								<li><strong>Text button</strong> (constructor saw non-empty text) — confirm-state replaces <code>textContent</code> with the prompt. The button visually says "Are you sure?" while armed and reverts to its original label on revert.</li>
-								<li><strong>Icon-only button</strong> (constructor saw empty text) — confirm-state finds the inner <code>svg.ln-icon use</code>, swaps its <code>href</code> to <code>#ln-check</code>, adds <code>.ln-confirm-tooltip</code> on the button, and writes the prompt text into <code>data-tooltip-text</code>. CSS reads the attribute and renders an <code>::after</code> tooltip bubble above the button. <code>ln-icons</code> watches the <code>&lt;use href&gt;</code> mutation and ensures the swap target icon is in the sprite.</li>
+								<li><strong>1. Two-Element Mode (Recommended &amp; HTML-First):</strong> Separates idle and active contents using <code>[data-ln-confirm-idle]</code> and <code>[data-ln-confirm-active]</code>. Zero string replacement in JS, preserving complex child nodes (icons, badges) and ensuring 100% translatable HTML.</li>
+								<li><strong>2. Shorthand Attribute Mode:</strong> Uses <code>data-ln-confirm="Are you sure?"</code> on simple text buttons. The prompt string is read directly from the HTML attribute.</li>
+								<li><strong>3. Icon-Only Mode:</strong> Automatically detects buttons with only an SVG icon. Swaps the <code>href</code> to <code>#ln-icon-check</code>, applies <code>.ln-confirm-tooltip</code>, and displays the prompt in a CSS tooltip bubble.</li>
 							</ul>
-							<p>The branch is determined ONCE at construction. If you mount <code>data-ln-confirm</code> on an empty-text button and later add text content, the next confirm cycle still treats it as an icon button (because <code>this.originalText</code> was captured empty on construction). Re-init by calling <code>btn.lnConfirm.destroy()</code> followed by re-creating the instance, or set the text BEFORE the attribute lands.</p>
 
 							<h4>What state goes where</h4>
 							<p>"Should this button confirm before action?" lives on <code>data-ln-confirm</code> (presence). "Currently armed?" lives on <code>data-confirming="true"</code> on the button — the public CSS hook. "Auto-revert timeout (seconds)" lives on <code>data-ln-confirm-timeout</code>. "Original label" / "original icon <code>href</code>" live on the JS instance, captured at construction (text) or at first arm (icon).</p>
@@ -73,6 +69,8 @@
 								<thead><tr><th>Attribute</th><th>On element</th><th>Owned by</th><th>Description</th></tr></thead>
 								<tbody>
 									<tr><td><code>data-ln-confirm="text"</code></td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code></td><td>Marks the button as confirm-gated. Value is the prompt text shown on first click. If empty, defaults to <code>"Confirm?"</code>. Captured at construction; mutating later does not propagate to the live instance.</td></tr>
+									<tr><td><code>data-ln-confirm-idle</code></td><td>Child element</td><td>Markup</td><td>The content displayed while the button is in the idle state (Two-Element Mode).</td></tr>
+									<tr><td><code>data-ln-confirm-active</code></td><td>Child element</td><td>Markup</td><td>The content displayed while the button is armed in confirming state (Two-Element Mode). Should initially have <code>hidden</code>.</td></tr>
 									<tr><td><code>data-ln-confirm-timeout="3"</code></td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code></td><td>Auto-revert delay in seconds. Default <code>3</code>. Accepts decimals (<code>"1.5"</code>). Read fresh at first-click time inside <code>_startTimer</code>; mutating mid-armed does NOT extend the running timer (NOT in the observer's <code>attributeFilter</code>).</td></tr>
 									<tr><td><code>data-confirming="true"</code></td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code> (auto)</td><td>Set by JS while the button is armed. Removed on second click, on timer fire, or on <code>destroy()</code>. Public CSS hook for the confirming state.</td></tr>
 									<tr><td><code>.ln-confirm-tooltip</code> (class)</td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code> (auto)</td><td>Added in icon-only mode while armed. Removed on revert. Marker for the tooltip-bubble CSS in <code>@mixin confirm-tooltip</code>.</td></tr>
@@ -83,33 +81,15 @@
 						</main>
 					</section>
 
-					<!-- Basic Example -->
+					<!-- Two-Element Example (Recommended) -->
 					<section class="section-card" data-demo-html>
-						<header><h3>Example — Text buttons</h3></header>
-						<main>
-							<p>Click once: the button morphs into the prompt and turns red. Click within 3 seconds: the click passes through (these have no <code>type="submit"</code> and no <code>onclick</code>, so nothing happens — that's the point: the component does not <em>cause</em> an action, it gates an existing one). Wait 3 seconds: the button auto-reverts.</p>
-							<div class="demo-actions">
-								<button data-ln-confirm="Are you sure?">Delete record</button>
-								<button data-ln-confirm="Reset settings?">Reset defaults</button>
-							</div>
-						</main>
-						<script type="text/plain" data-demo-scss>
-// Gated buttons have data-ln-confirm:
-button[data-ln-confirm] {
-    transition: all var(--transition-base);
-}
-						</script>
-					</section>
-
-					<!-- Two-Element Example -->
-					<section class="section-card" data-demo-html>
-						<header><h3>Example — Two-Element Mode (Recommended)</h3></header>
+						<header><h3>Example 1 — Two-Element Mode (HTML-First &amp; Recommended)</h3></header>
 						<main>
 							<p>Two-element mode isolates the idle content (text, icons, selection counters) from the confirm state content, ensuring no DOM elements are destroyed on first click. Defining both states in the HTML also ensures 100% translatable text with no JS hardcoding.</p>
 							<div class="demo-actions">
 								<button class="btn btn-danger" data-ln-confirm>
 									<span data-ln-confirm-idle>
-										<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
 										Delete selected (<span style="color: var(--color-on-error); font-weight: bold;">3</span>)
 									</span>
 									<span data-ln-confirm-active hidden>
@@ -118,7 +98,7 @@ button[data-ln-confirm] {
 								</button>
 								<button class="btn btn-secondary" data-ln-confirm data-ln-confirm-timeout="5">
 									<span data-ln-confirm-idle>
-										<svg class="ln-icon" aria-hidden="true"><use href="#ln-refresh"></use></svg>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-refresh"></use></svg>
 										Reset defaults
 									</span>
 									<span data-ln-confirm-active hidden>
@@ -135,6 +115,24 @@ button[data-ln-confirm] {
 						</script>
 					</section>
 
+					<!-- Basic Example -->
+					<section class="section-card" data-demo-html>
+						<header><h3>Example 2 — Shorthand Declarative Attribute</h3></header>
+						<main>
+							<p>Click once: the button morphs into the prompt text defined in the <code>data-ln-confirm</code> attribute. Click within 3 seconds: the click passes through to the platform action. Wait 3 seconds: the button auto-reverts.</p>
+							<div class="demo-actions">
+								<button data-ln-confirm="Are you sure?">Delete record</button>
+								<button data-ln-confirm="Reset settings?">Reset defaults</button>
+							</div>
+						</main>
+						<script type="text/plain" data-demo-scss>
+// Gated buttons have data-ln-confirm:
+button[data-ln-confirm] {
+    transition: all var(--transition-base);
+}
+						</script>
+					</section>
+
 					<!-- Icon-only Example -->
 					<section class="section-card" data-demo-html>
 						<header><h3>Example — Icon-only buttons</h3></header>
@@ -143,17 +141,17 @@ button[data-ln-confirm] {
 							<ul class="demo-actions">
 								<li>
 									<button aria-label="Delete" data-ln-confirm="Delete?">
-										<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
 									</button>
 								</li>
 								<li>
 									<button aria-label="Archive" data-ln-confirm="Archive?">
-										<svg class="ln-icon" aria-hidden="true"><use href="#ln-archive"></use></svg>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-archive"></use></svg>
 									</button>
 								</li>
 								<li>
 									<button aria-label="Remove" data-ln-confirm="Remove this?">
-										<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 									</button>
 								</li>
 							</ul>
@@ -212,7 +210,7 @@ button[data-ln-confirm-timeout] {
 							<p>When the destructive action is an AJAX call that does NOT go through a form, attach the destructive code to the button's <code>click</code> listener as you normally would. <code>ln-confirm</code> gates the first click via <code>preventDefault</code> + <code>stopImmediatePropagation</code>, so this listener does NOT run on the first click. On the second click, <code>ln-confirm</code> returns silently (no <code>preventDefault</code>), so this listener runs.</p>
 							<div class="demo-actions">
 								<button id="demo-ajax-btn" data-ln-confirm="Clear cache?">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
 									Clear server cache
 								</button>
 							</div>
@@ -245,6 +243,38 @@ button[data-ln-confirm-timeout] {
 						</script>
 					</section>
 
+					<!-- Clickable card containment -->
+					<section class="section-card" data-demo-html>
+						<header><h3>Example — Confirm inside a clickable card</h3></header>
+						<main>
+							<p>The card carries its own <code>click</code> listener (the "whole card is clickable" pattern). The delete button lives inside it. Both clicks are contained at the button: the first arms it, the second accepts — and neither reaches the card surface, because <code>ln-confirm</code> calls <code>stopPropagation()</code> on both branches.</p>
+							<p>Click the card body: the surface handler fires. Click delete once: nothing logs (the arming click is swallowed — this listener is bound after the bundle, so <code>stopImmediatePropagation</code> blocks it). Click delete again within 3 seconds: the delete handler fires <strong>alone</strong>.</p>
+							<article id="demo-card-surface" class="card">
+								<header><h3>Invoice #2041</h3></header>
+								<main>
+									<div class="field"><span class="label">Client</span><span class="value">Nova Trade</span></div>
+									<div class="field"><span class="label">Amount</span><span class="value">12,400 MKD</span></div>
+								</main>
+								<footer>
+									<button type="button" id="demo-card-delete" class="btn btn-danger" aria-label="Delete invoice" data-ln-confirm="Delete invoice?">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
+									</button>
+								</footer>
+							</article>
+							<p id="demo-card-log" class="demo-log">Click log will appear here.</p>
+							<p><strong>Limitation.</strong> This works because the card surface is a <em>listener</em>. If the card were a real ancestor <code>&lt;a href&gt;</code> wrapping the button, propagation containment would not stop it — navigation is activation behavior, cancelled only by <code>preventDefault</code>, which would also cancel the delete being confirmed. Use <code>data-ln-link</code> on the card instead of nesting the button inside an anchor.</p>
+						</main>
+						<script type="text/plain" data-demo-scss>
+// Reveal the action only on card hover/focus-within:
+#demo-card-surface {
+    footer { visibility: hidden; }
+
+    &:hover footer,
+    &:focus-within footer { visibility: visible; }
+}
+						</script>
+					</section>
+
 					<!-- Button group Example -->
 					<section class="section-card" data-demo-html>
 						<header><h3>Example — Multiple confirms in a button group</h3></header>
@@ -252,16 +282,16 @@ button[data-ln-confirm-timeout] {
 							<p>Each <code>[data-ln-confirm]</code> button is its own instance with its own arm-state. Arming one does NOT arm the others; arming one does NOT reset already-armed siblings. Each runs its own auto-revert timer.</p>
 							<ul class="demo-actions">
 								<li>
-									<button aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button>
+									<button aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg></button>
 								</li>
 								<li>
-									<button aria-label="Duplicate"><svg class="ln-icon" aria-hidden="true"><use href="#ln-copy"></use></svg></button>
+									<button aria-label="Duplicate"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-copy"></use></svg></button>
 								</li>
 								<li>
-									<button aria-label="Archive" data-ln-confirm="Archive?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-archive"></use></svg></button>
+									<button aria-label="Archive" data-ln-confirm="Archive?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-archive"></use></svg></button>
 								</li>
 								<li>
-									<button aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
+									<button aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg></button>
 								</li>
 							</ul>
 						</main>
@@ -288,8 +318,8 @@ button[data-ln-confirm-timeout] {
 											<td>Active</td>
 											<td>
 												<ul>
-													<li><button aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
-													<li><button aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+													<li><button aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg></button></li>
+													<li><button aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg></button></li>
 												</ul>
 											</td>
 										</tr>
@@ -298,8 +328,8 @@ button[data-ln-confirm-timeout] {
 											<td>Archived</td>
 											<td>
 												<ul>
-													<li><button aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
-													<li><button aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+													<li><button aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg></button></li>
+													<li><button aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg></button></li>
 												</ul>
 											</td>
 										</tr>
@@ -396,6 +426,24 @@ window.lnConfirm(root);         // re-run init scan over `root`. Only needed for
 					: '(unknown)';
 				const ts = new Date().toLocaleTimeString();
 				trackLog.textContent = '[' + ts + '] ln-confirm:waiting fired on button "' + original + '"';
+			});
+		}
+
+		// Clickable-card containment demo
+		const cardSurface = document.getElementById('demo-card-surface');
+		const cardDelete = document.getElementById('demo-card-delete');
+		const cardLog = document.getElementById('demo-card-log');
+		if (cardSurface && cardDelete && cardLog) {
+			const logLine = function (text) {
+				const ts = new Date().toLocaleTimeString();
+				cardLog.textContent = '[' + ts + '] ' + text;
+			};
+			cardSurface.addEventListener('click', function () {
+				logLine('CARD surface fired — this is the navigation handler.');
+			});
+			cardDelete.addEventListener('click', function () {
+				// Second click only: the arming click never reaches here.
+				logLine('DELETE fired — and the card surface stayed silent.');
 			});
 		}
 	})();

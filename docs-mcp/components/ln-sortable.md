@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: A touch-friendly drag-and-drop reordering primitive using Pointer Events.
-source: js/ln-sortable/src/ln-sortable.js
+source: components/ln-sortable/src/ln-sortable.js
 tags: [interactions, drag-and-drop, sorting, list]
 ---
 
@@ -18,7 +18,7 @@ tags: [interactions, drag-and-drop, sorting, list]
 
 - **Core Role:** Provides drag-and-drop reordering of direct child DOM elements within a parent container (`[data-ln-sortable]`).
 - **Touch-Friendly Interaction:** Operates exclusively using the modern browser Pointer Events API (`pointerdown`, `pointermove`, `pointerup`, `pointercancel`), supporting mouse, touch, and stylus input without reliance on heavy HTML5 drag-and-drop APIs.
-- Located in [`js/ln-sortable/src/ln-sortable.js`](../../js/ln-sortable/src/ln-sortable.js).
+- Located in [`components/ln-sortable/src/ln-sortable.js`](../../components/ln-sortable/src/ln-sortable.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
@@ -50,13 +50,13 @@ To prevent accidental drags on mobile when clicking text/buttons inside list ite
 <ol data-ln-sortable>
     <li>
         <span data-ln-sortable-handle class="sortable-handle" aria-label="Move item">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-grip-vertical"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-grip-vertical"></use></svg>
         </span>
         <span>Board Configuration</span>
     </li>
     <li>
         <span data-ln-sortable-handle class="sortable-handle" aria-label="Move item">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-grip-vertical"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-grip-vertical"></use></svg>
         </span>
         <span>User Management</span>
     </li>
@@ -82,13 +82,13 @@ An example of how an application script listens to the `ln-sortable:reordered` e
 <ul id="task-list" data-ln-sortable>
     <li data-task-id="101">
         <span data-ln-sortable-handle class="sortable-handle">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-grip-vertical"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-grip-vertical"></use></svg>
         </span>
         <span>Task 1: Database Config</span>
     </li>
     <li data-task-id="102">
         <span data-ln-sortable-handle class="sortable-handle">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-grip-vertical"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-grip-vertical"></use></svg>
         </span>
         <span>Task 2: Implement REST APIs</span>
     </li>
@@ -151,7 +151,7 @@ In accordance with Ashlar architecture, communication is mediated using a projec
     data-project-item-key="task-id">
     <li data-task-id="101">
         <span data-ln-sortable-handle class="sortable-handle">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-grip-vertical"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-grip-vertical"></use></svg>
         </span>
         <span>Task 1</span>
     </li>

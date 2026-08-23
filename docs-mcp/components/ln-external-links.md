@@ -4,7 +4,7 @@ classification: simple
 status: stable
 domain: frontend
 summary: Automatically detects outbound links to apply security attributes (target="_blank", rel="noopener noreferrer"), accessibility hints, and telemetry events.
-source: js/ln-external-links/src/ln-external-links.js
+source: components/ln-external-links/src/ln-external-links.js
 tags: [security, accessibility, telemetry, links]
 ---
 
@@ -16,7 +16,7 @@ tags: [security, accessibility, telemetry, links]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-external-links` component is an automated utility that scans and secures outbound links (`<a>` and `<area>` elements) across the page. It is located in [`js/ln-external-links/src/ln-external-links.js`](../../js/ln-external-links/src/ln-external-links.js).
+The `ln-external-links` component is an automated utility that scans and secures outbound links (`<a>` and `<area>` elements) across the page. It is located in [`components/ln-external-links/src/ln-external-links.js`](../../components/ln-external-links/src/ln-external-links.js).
 
 *   **Outbound Detection:** Automatically checks link hostnames against `window.location.hostname`. Any link targeting a different domain is identified as an external link.
 *   **Security Sanitization (Reverse Tabnabbing Prevention):** Appends `target="_blank"` and ensures `rel` contains `noopener noreferrer` to protect against security vulnerabilities.
@@ -35,7 +35,7 @@ The `ln-external-links` component is an automated utility that scans and secures
 
 Works automatically on all links within `document.body` without requiring manual trigger attributes.
 
-### Markup Transformation Example
+### Base HTML Markup
 
 Before initialization (raw HTML):
 
@@ -69,9 +69,9 @@ After processing by `ln-external-links`:
 
 ### Attributes Table
 
-| Attribute | Element | Type | Description |
-|---|---|---|---|
-| `data-ln-external-link` | `<a>`, `<area>` | `String` | Automatically stamped as `processed` after sanitization to prevent duplicate processing. |
+| Attribute | Element | Type / Values | Default | Description |
+|---|---|---|---|---|
+| `data-ln-external-link` | `<a>`, `<area>` | `String` | — | Automatically stamped as `processed` after sanitization to prevent duplicate processing. |
 
 ### Programmatic JS API (`window.lnExternalLinks`)
 
@@ -81,10 +81,10 @@ After processing by `ln-external-links`:
 
 ### Events API
 
-| Event | Target | Payload `detail` | Description |
-|---|---|---|---|
-| `ln-external-links:processed` | `a, area` | `{ link: HTMLElement, href: String }` | Dispatched after an external link is sanitized and secured. |
-| `ln-external-links:clicked` | `a, area` | `{ link: HTMLElement, href: String, text: String }` | Dispatched when a user clicks on an external link (useful for telemetry/analytics). |
+| Event | Direction | Cancelable | Description | `detail` Object |
+|---|---|---|---|---|
+| `ln-external-links:processed` | Emits | No | Dispatched after an external link is sanitized and secured. | `{ link: HTMLElement, href: String }` |
+| `ln-external-links:clicked` | Emits | No | Dispatched when a user clicks on an external link (useful for telemetry/analytics). | `{ link: HTMLElement, href: String, text: String }` |
 
 ---
 

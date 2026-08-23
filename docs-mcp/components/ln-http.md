@@ -4,7 +4,7 @@ classification: service
 status: stable
 domain: frontend
 summary: A transparent fetch wrapper and explicit-key network request deduplicator.
-source: js/ln-http/src/ln-http.js
+source: components/ln-http/src/ln-http.js
 tags: [http, fetch, request, network]
 ---
 
@@ -16,7 +16,7 @@ tags: [http, fetch, request, network]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-http` utility is a network middleware that wraps the browser's global `window.fetch` to prevent race conditions, avoid data conflicts, and handle request deduplication. It is defined in [ln-http.js](../../js/ln-http/src/ln-http.js).
+The `ln-http` utility is a network middleware that wraps the browser's global `window.fetch` to prevent race conditions, avoid data conflicts, and handle request deduplication. It is defined in [ln-http.js](../../components/ln-http/src/ln-http.js).
 
 It operates through two parallel paths:
 *   **Path A — Transparent Fetch Interception (GET/HEAD):** Intercepts all native calls to `fetch()`. If a new GET or HEAD request is sent to the exact same URL while a previous request is still in-flight, the previous request is automatically cancelled (`abort()`). Non-idempotent methods (POST, PUT, DELETE, etc.) are never auto-cancelled in this path to prevent mutating actions from being aborted.
@@ -81,6 +81,7 @@ triggerEl.addEventListener('ln-http:error', function(e) {
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-http:request` | Listens | No | Dispatched by a consumer (must `bubble` to `document`) to run a deduplicated request; response/error fire back on the dispatching element. | `{ url, method?, body?, key?, signal? }` |
+| `ln-http:cancel` | Listens | No | Dispatched on `document` to cancel in-flight requests by key, URL, or all. | `{ key?: String, url?: String, all?: Boolean }` |
 | `ln-http:response` | Emits | No | Fired on the triggering element when a request completes (any HTTP status, e.g. 200/404/500). | `{ ok: Boolean, status: Number, response: Response }` |
 | `ln-http:error` | Emits | No | Fired on the triggering element on network failure (DNS/CORS/loss); never fires on manual or automatic abort. | `{ ok: false, status: 0, error: Error }` |
 
