@@ -91,6 +91,8 @@ available choices for each primitive. Components rebind the primitive
 own scope to pick a different vocabulary value. Themes override
 vocabulary at theme `:root`.
 
+> **Underlying Model:** `--bg-*` vocabulary tokens are **not an elevation ladder**; their absolute values may invert or shift across themes while preserving their semantic relationship.
+
 #### Background vocabulary
 
 > **Note:** `--bg-sunken` represents a static recessed surface (e.g. `thead`, scrollbar track). Interactive hover/active states use `--bg-hover` and `--bg-active`.

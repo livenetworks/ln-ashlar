@@ -287,6 +287,10 @@
 	// --shadow). Vocabulary provides the value choices. Components rebind
 	// the primitive on their own scope to pick a different vocabulary
 	// value. Themes override vocabulary at theme :root.
+	//
+	// Important: --bg-* vocabulary tokens are not an elevation ladder;
+	// their absolute values may invert or shift across themes while
+	// preserving their semantic relationship.
 	// -----------------------------------------------------------------------
 
 	--bg-base:     hsl(var(--color-white));

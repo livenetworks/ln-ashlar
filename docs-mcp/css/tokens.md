@@ -35,6 +35,7 @@ Primitive Tokens   →  --color-bg, --color-fg, --color-border, --shadow,
 ```
 
 - **Rule:** Mixin bodies read **primitives**. Components rebind primitives on their local scope to select a vocabulary value. Themes and density modes rebind vocabulary at their root scope.
+- **Semantic Relationship:** `--bg-*` vocabulary tokens are **not an elevation ladder**; their absolute values may invert or shift across themes while preserving their semantic relationship.
 
 ---
 
