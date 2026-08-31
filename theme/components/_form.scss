@@ -17,10 +17,8 @@ select {
 }
 
 output {
-	display: block;
-	font-size: var(--text-xs);
+	@include form-slot;
 	color: var(--fg-muted);
-	margin-top: var(--size-2xs);
 	font-family: var(--font-mono);
 }
 
@@ -113,3 +111,10 @@ label:not(:has(> input)) {
 [data-ln-validate-errors] {
 	@include form-validate-errors;
 }
+
+// Any trailing feedback/metadata element inside .form-element automatically gets slot treatment with zero-specificity base styling
+:where(.form-element > :is(input, select, textarea, [data-ln-date-field], .search, [class*="group"]) ~ :not(input)) {
+	@include form-slot;
+	color: var(--fg-muted);
+}
+

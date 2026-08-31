@@ -814,16 +814,27 @@
 	}
 }
 
+// ─── Field feedback slot (Reserved space for errors, output & hints) ──
+
+@mixin form-slot {
+	@include block;
+	min-height: 1.25rem; // Reserves space to prevent form layout shifts
+	font-size: var(--text-xs);
+	line-height: 1.25rem;
+	--margin-block: var(--size-2xs);
+	margin-top: var(--margin-block);
+	margin-bottom: 0;
+}
+
 @mixin form-validate-errors {
+	@include form-slot;
 	// Structural error-list margin (not shell rhythm).
 	--margin-block: var(--size-xs);
 	margin-top: var(--margin-block);
 	@include typography(caption);
 	color: hsl(var(--color-error));
-	min-height: 1.25rem; // Reserves space to prevent form layout shifts when errors appear
 	list-style: none;
 	padding: 0;
-	margin-bottom: 0;
 
 	li {
 		margin: 0;
