@@ -113,9 +113,9 @@
 				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
 				<span class="app-name">ashlar-gui</span>
-				<label class="search sidebar-search">
+				<label class="search sidebar-search" aria-label="Filter menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Filter menu…" data-ln-search-for="demo-nav" data-ln-search-debounce="0">
+					<input type="search" placeholder="Filter menu…" aria-label="Filter menu" data-ln-search-for="demo-nav" data-ln-search-debounce="0">
 					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</label>
 			</header>
@@ -126,7 +126,7 @@
 						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS Components</h6>
+					<h2 class="nav-section">CSS Components</h2>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -149,7 +149,7 @@
 						<li><a href="empty-state.html"><span class="nav-label">Empty State</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS Components</h6>
+					<h2 class="nav-section">JS Components</h2>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -211,24 +211,24 @@
 
 <!-- Overview / philosophy -->
 <section class="section-card">
-	<header><h3>Overview &amp; Philosophy</h3></header>
+	<header><h2>Overview &amp; Philosophy</h2></header>
 	<main>
 		<p>Formatting numbers, currencies, and dates across global enterprise applications is traditionally fraught with heavy, bloated third-party JavaScript dependencies. These often introduce slow parse times, bundle inflation, and conflicting client/server date parsing logic.</p>
 
 		<p>In <code>ln-ashlar</code>, this is resolved by <code>ln-number</code> and <code>ln-date</code> — two zero-dependency, high-performance form input enhancers. Operating on standard HTML inputs, they provide real-time, locale-aware presentation formatting while preserving pristine, raw machine-readable data payloads (numbers and ISO 8601 strings) for backend form submissions via automatically managed hidden inputs.</p>
 
-		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
-			<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
-				<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-icon-info-circle"></use></svg>
+		<div class="alert-box">
+			<h4>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg>
 				The HTML-First Localization Doctrine
 			</h4>
-			<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+			<p>
 				Components do not implement complex custom calendar engines or numerical calculators. They progressively enhance standard HTML5 <code>&lt;input type="number"&gt;</code>, <code>&lt;input type="date"&gt;</code>, and semantic tags (<code>&lt;time&gt;</code>, <code>&lt;strong&gt;</code>, <code>&lt;td&gt;</code>). Formatting and locale rules are offloaded directly to the browser's native <code>Intl.NumberFormat</code> and <code>Intl.DateTimeFormat</code> engines, with instant reactive updates when the parent <code>lang</code> attribute changes.
 			</p>
 		</div>
 
-		<h4>Key Architectural Advantages</h4>
-		<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+		<h3>Key Architectural Advantages</h3>
+		<ol>
 			<li>
 				<strong>Reactive Locale Cascading:</strong> Both components listen for BCP 47 language updates on parent scopes via <code>MutationObserver</code>. Changing the <code>lang</code> attribute instantly triggers a real-time re-format across all child inputs and semantic elements with zero page reload.
 			</li>
@@ -243,15 +243,15 @@
 			</li>
 		</ol>
 
-		<p>For complete technical specifications, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/components/ln-number/README.md"><code>ln-number</code> docs</a> and <a href="https://github.com/livenetworks/ln-ashlar/blob/main/components/ln-date/README.md"><code>ln-date</code> docs</a>.</p>
+		<p>For complete technical specifications, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/components/ln-number/README.md"><code>ln-number</code> documentation</a> and <a href="https://github.com/livenetworks/ln-ashlar/blob/main/components/ln-date/README.md"><code>ln-date</code> documentation</a>.</p>
 	</main>
 </section>
 
 <!-- Attributes Reference -->
 <section class="section-card">
-	<header><h3>Attributes Reference</h3></header>
+	<header><h2>Attributes Reference</h2></header>
 	<main>
-		<h4><code>ln-number</code> Attributes</h4>
+		<h3><code>ln-number</code> Attributes</h3>
 		<div class="table-container">
 		<table>
 			<thead><tr><th>Attribute</th><th>On Element</th><th>Description</th></tr></thead>
@@ -264,7 +264,7 @@
 		</table>
 		</div>
 
-		<h4 style="margin-top: var(--size-lg);"><code>ln-date</code> Attributes</h4>
+		<h3><code>ln-date</code> Attributes</h3>
 		<div class="table-container">
 		<table>
 			<thead><tr><th>Attribute</th><th>On Element</th><th>Description</th></tr></thead>
@@ -300,14 +300,14 @@
 				<span>Locale: English (US) [en-US]</span>
 			</button>
 			<div data-ln-popover id="locale-popover">
-				<label class="search">
+				<label class="search" aria-label="Search locale">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Search locale..." data-ln-search-for="locale-list" data-ln-search-debounce="0">
+					<input type="search" placeholder="Search locale..." aria-label="Search locale" data-ln-search-for="locale-list" data-ln-search-debounce="0">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 					</button>
 				</label>
-				<ul id="locale-list" data-ln-search="" data-ln-search-items="label">
+				<ul id="locale-list" role="radiogroup" aria-label="Select locale" data-ln-search="" data-ln-search-items="label">
 					<li><label><input type="radio" name="demo-locale" value="en-US" checked> English (US)</label></li>
 					<li><label><input type="radio" name="demo-locale" value="en-GB"> English (UK)</label></li>
 					<li><label><input type="radio" name="demo-locale" value="mk"> Македонски (MK)</label></li>
@@ -340,7 +340,7 @@
 		     NUMBER FORMATTING — ln-number
 		     ========================================== -->
 		<section class="section-card" data-demo-html>
-			<header><h3>Number Formatting — ln-number</h3></header>
+			<header><h2>Number Formatting — ln-number</h2></header>
 			<main>
 				<p>Real-time locale-aware number formatting. The component creates a hidden input for form submission and formats the visible input with thousand separators.</p>
 
@@ -370,7 +370,7 @@
 					</div>
 				</form>
 
-				<h4>Non-Input Text Element Formatting (<code>&lt;strong&gt;</code>, <code>&lt;td&gt;</code>)</h4>
+				<h3>Non-Input Text Element Formatting (<code>&lt;strong&gt;</code>, <code>&lt;td&gt;</code>)</h3>
 				<p class="text-sm text-sunken"><code>ln-number</code> can also format static or dynamic text elements directly in HTML according to the active locale.</p>
 				
 				<div class="demo-number-cards">
@@ -401,7 +401,7 @@ input[data-ln-number] {
 		     DATE FORMATTING — ln-date
 		     ========================================== -->
 		<section class="section-card" data-demo-html>
-			<header><h3>Date Formatting — ln-date</h3></header>
+			<header><h2>Date Formatting — ln-date</h2></header>
 			<main>
 				<p>Locale-aware date formatting with native browser picker. The component creates a hidden input for form submission and formats the visible input using Intl.DateTimeFormat or custom patterns.</p>
 
@@ -452,7 +452,7 @@ input[data-ln-number] {
 					</div>
 				</form>
 
-				<h4>Semantic Text Element Formatting (<code>&lt;time&gt;</code>, <code>&lt;td&gt;</code>)</h4>
+				<h3>Semantic Text Element Formatting (<code>&lt;time&gt;</code>, <code>&lt;td&gt;</code>)</h3>
 				<p class="text-sm text-sunken">For semantic HTML5 accessibility, use <code>&lt;time datetime="..."&gt;</code> elements with <code>data-ln-date</code>.</p>
 				
 				<div class="demo-date-cards">

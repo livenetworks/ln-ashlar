@@ -276,6 +276,9 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, getLoca
 		const picker = document.createElement('input');
 		picker.type = 'date';
 		picker.tabIndex = -1;
+		picker.setAttribute('tabindex', '-1');
+		picker.setAttribute('aria-hidden', 'true');
+		picker.setAttribute('aria-label', dom.getAttribute('data-ln-date-label') || 'Date picker');
 		picker.style.cssText = 'position:absolute;opacity:0;width:0;height:0;overflow:hidden;pointer-events:none';
 		hidden.insertAdjacentElement('afterend', picker);
 		this._picker = picker;

@@ -924,6 +924,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 						const cb = document.createElement('input');
 						cb.type = 'checkbox';
 						cb.setAttribute('data-ln-table-row-select', '');
+						cb.setAttribute('aria-label', 'Select row');
 						td.appendChild(cb);
 					} else {
 						const colName = ths[j].getAttribute('data-ln-table-col');

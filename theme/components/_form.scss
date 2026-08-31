@@ -37,7 +37,7 @@ input[type="radio"] {
 // AND a text-ish <input>. Excludes checkbox/radio/file/button types via the
 // :is() allowlist.
 
-label:has(> .ln-icon):has(> :is(
+:is(label, div, span):has(> .ln-icon):has(> :is(
 	input[type="text"],
 	input[type="search"],
 	input[type="email"],

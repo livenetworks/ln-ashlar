@@ -4,22 +4,12 @@
 // `--color-primary` values in scss/config/_theme.scss; update them
 // in lockstep.
 
-@use '../../../../theme/config/mixins' as *;
-
-.demo-theme-picker {
-	padding: var(--size-xs);
-
-	ul {
-		@include menu-items;
-		min-width: 12rem;
-	}
-}
-
+// Preset color swatches for demo theme switcher
 .demo-theme-swatch {
 	display: inline-block;
 	width: 1rem;
 	height: 1rem;
-	margin-right: var(--size-2xs);
+	flex-shrink: 0;
 	border-radius: var(--radius-full);
 	border: var(--border-width) solid hsl(var(--color-border));
 

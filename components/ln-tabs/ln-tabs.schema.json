@@ -25,6 +25,7 @@
 		"data-ln-tab": {
 			"direction": "author",
 			"sources": [
+				"ln-tabs-dev.scss",
 				"src/ln-tabs.js"
 			]
 		},
@@ -56,9 +57,7 @@
 		},
 		"data-ln-tabs-for": {
 			"direction": null,
-			"sources": [
-				"ln-tabs-dev.scss"
-			]
+			"sources": []
 		},
 		"data-ln-tabs-key": {
 			"direction": "author",

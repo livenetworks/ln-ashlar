@@ -34,7 +34,7 @@
 
 	> small,
 	> span:last-child {
-		--color-fg: var(--fg-subtle);
+		--color-fg: var(--fg-muted);
 		color: var(--color-fg);
 		font-size: inherit;
 	}

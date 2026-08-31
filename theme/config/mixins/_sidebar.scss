@@ -27,7 +27,7 @@
 
 @mixin sidebar {
 	// Sidebar-wide horizontal rhythm. All direct children inherit this.
-	--padding-x: var(--size-md);
+	--padding-x: var(--size-sm);
 	@include flex-col;
 	background: var(--color-bg);
 	@include border-r;
@@ -38,13 +38,13 @@
 	}
 
 	> header {
-		--gap: var(--size-sm-up);
+		--gap: var(--size-sm);
 		@include relative;
 		@include flex;
 		@include items-center;
 		@include flex-wrap;
 		gap: var(--gap);
-		--padding-y: var(--size-sm-up);
+		--padding-y: var(--size-sm);
 		padding-block: var(--padding-y);
 		@include border-b;
 		@include shadow-b;

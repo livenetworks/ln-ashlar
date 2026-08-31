@@ -43,7 +43,7 @@
 	}
 
 	li + li {
-		margin-top: 2px;
+		margin-top: var(--size-2xs);
 	}
 
 	form {
@@ -58,9 +58,9 @@
 		display: flex;
 		align-items: center;
 		justify-content: flex-start;
-		gap: var(--size-xs);
-		padding: var(--size-xs) var(--size-sm);
-		border-radius: var(--radius-sm);
+		gap: var(--gap);
+		padding: var(--padding-y) var(--padding-x);
+		border-radius: var(--radius);
 		background: transparent;
 		border: none;
 		outline: none;
@@ -105,7 +105,7 @@
 	@include fixed;
 	inset: auto;
 	margin: 0;
-	padding: var(--size-xs);
+	padding: var(--padding-y);
 	min-width: var(--dropdown-min-width, 14rem);
 	@include enter-scale-fade;
 

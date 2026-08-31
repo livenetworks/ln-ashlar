@@ -4,8 +4,13 @@
 	@include dropdown;
 }
 
-[data-ln-dropdown-menu] {
+[data-ln-dropdown-menu],
+.menu-panel {
 	@include dropdown-menu;
+}
+
+.menu-items {
+	@include menu-items;
 }
 
 @keyframes ln-dropdown-in {

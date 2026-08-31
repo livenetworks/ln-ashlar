@@ -1,23 +1,24 @@
 @use '../../theme/config/mixins' as *;
 
 [data-ln-debug] {
-	// 1. Tabs Configuration Check: [data-ln-tabs] must have an id or data-ln-tabs-key
-	[data-ln-tabs]:not([id]):not([data-ln-tabs-key]) {
-		@include dev-dom-error("[data-ln-tabs] must have an 'id' or 'data-ln-tabs-key' for state tracking.");
+	// 1. Anchor Tabs Namespace Check: URL hash mode (<a> triggers) requires an id or data-ln-tabs-key namespace
+	[data-ln-tabs]:has(a[data-ln-tab]):not([id]):not([data-ln-tabs-key]),
+	[data-ln-tabs]:has(a[href^="#"]):not([id]):not([data-ln-tabs-key]) {
+		@include dev-dom-error("Anchor tabs (URL hash mode) require an 'id' or 'data-ln-tabs-key' namespace on [data-ln-tabs].");
 	}
 
-	// 2. Tab Trigger Empty ID: triggers must point to a target panel ID
-	[data-ln-tabs-for=""] {
-		@include dev-inline-error("data-ln-tabs-for target ID cannot be empty");
+	// 2. Tab Trigger Empty Key: button triggers must have a non-empty key
+	button[data-ln-tab=""] {
+		@include dev-inline-error("data-ln-tab key cannot be empty");
 	}
 
-	// 3. Tab Trigger Type: triggers inside forms must be explicitly type="button" to prevent submit events
-	form [data-ln-tabs-for]:not([type="button"]) {
+	// 3. Tab Trigger Type: button triggers inside forms must be explicitly type="button" to prevent submit events
+	form button[data-ln-tab]:not([type="button"]) {
 		@include dev-inline-error("tab trigger within form must have type='button'");
 	}
 
-	// 4. Tab Trigger Nesting Check: [data-ln-tabs-for] must be nested inside a [data-ln-tabs] parent container
-	[data-ln-tabs-for]:not([data-ln-tabs] *) {
-		@include dev-inline-error("[data-ln-tabs-for] is orphaned (not inside a [data-ln-tabs] container)");
+	// 4. Tab Trigger Nesting Check: [data-ln-tab] must be nested inside a [data-ln-tabs] parent container
+	[data-ln-tab]:not([data-ln-tabs] *) {
+		@include dev-inline-error("[data-ln-tab] is orphaned (not inside a [data-ln-tabs] container)");
 	}
 }

@@ -4,6 +4,7 @@
 @use 'card' as *;
 @use 'form' as *;
 @use 'focus' as *;
+@use 'dropdown' as *;
 
 @mixin popover {
 	@include floating-panel;
@@ -13,7 +14,7 @@
 	margin: 0;
 	min-width: 14rem;
 	max-width: 24rem;
-	padding: var(--size-sm);
+	padding: var(--padding-y);
 
 	&[data-ln-popover="open"] {
 		display: block;
@@ -77,27 +78,33 @@
 		}
 
 		li + li {
-			margin-top: 2px;
+			margin-top: var(--size-2xs);
 		}
 
-		// Nav-link treatment for filter options (accent-tint wash on checked).
-		// Visually-hidden input (below) keeps the checkbox keyboard-focusable.
-		@include check-list-nav;
-
-		> li > label > input {
-			// Override pill's display:none — keep in focus order for keyboard nav
-			display: revert;
-			position: absolute;
-			width: 1px;
-			height: 1px;
-			overflow: hidden;
-			clip-path: inset(50%);
-			white-space: nowrap;
+		// When containing interactive actions/buttons (menus, pickers)
+		&:has(> li > :is(a, button, input[type="submit"], input[type="reset"], input[type="button"])) {
+			@include menu-items;
 		}
 
-		// Focus ring on label when the hidden input receives keyboard focus
-		> li > label:has(> input:focus-visible) {
-			@include focus-ring;
+		// When containing checkbox/radio filter options
+		&:has(> li > label) {
+			@include check-list-nav;
+
+			> li > label > input {
+				// Override pill's display:none — keep in focus order for keyboard nav
+				display: revert;
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				overflow: hidden;
+				clip-path: inset(50%);
+				white-space: nowrap;
+			}
+
+			// Focus ring on label when the hidden input receives keyboard focus
+			> li > label:has(> input:focus-visible) {
+				@include focus-ring;
+			}
 		}
 	}
 }

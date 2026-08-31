@@ -1,10 +1,1 @@
-@use '../../../../theme/config/mixins' as *;
-
-.demo-density-picker {
-	padding: var(--size-xs);
-
-	ul {
-		@include menu-items;
-		min-width: 10rem;
-	}
-}
+// Demo density picker is styled entirely via core ln-ashlar [data-ln-popover] and menu-items architecture.

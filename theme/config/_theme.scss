@@ -23,10 +23,10 @@
 	--color-neutral-200: 220 13% 24%;
 	--color-neutral-300: 220 13% 36%;
 	--color-neutral-400: 218 11% 52%;
-	--color-neutral-500: 220  9% 60%;
-	--color-neutral-600: 220 11% 72%;
-	--color-neutral-700: 220 14% 82%;
-	--color-neutral-800: 220 20% 90%;
+	--color-neutral-500: 220 10% 68%;
+	--color-neutral-600: 220 11% 76%;
+	--color-neutral-700: 220 14% 84%;
+	--color-neutral-800: 220 20% 92%;
 	--color-neutral-900: 221 30% 97%;
 
 	// Vocabulary — bg
@@ -41,8 +41,8 @@
 
 	// Vocabulary — fg
 	--fg-default: hsl(0 0% 95%);
-	--fg-muted:   hsl(220  9% 60%);
-	--fg-subtle:  hsl(218 11% 52%);
+	--fg-muted:   hsl(220 10% 68%);
+	--fg-subtle:  hsl(218 11% 55%);
 
 	--border-subtle:       hsl(220 14% 20%);
 	--border-strong:       hsl(220 13% 36%);
@@ -144,10 +144,12 @@
 	--color-primary-lighter: 218 50% 16%;
 
 	// Flat — zero radius everywhere
+	--radius-xs:   0;
 	--radius-sm:   0;
 	--radius-md:   0;
 	--radius-lg:   0;
 	--radius-xl:   0;
+	--radius-2xl:  0;
 	--radius-full: 0;
 
 	// Flat — no elevation shadows. --shadow-inner kept for recessed

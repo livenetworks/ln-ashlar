@@ -29,8 +29,10 @@
 	}
 }
 
+@mixin rounded-xs   { border-radius: var(--radius-xs); }
 @mixin rounded-sm   { border-radius: var(--radius-sm); }
 @mixin rounded-md   { border-radius: var(--radius-md); }
 @mixin rounded-lg   { border-radius: var(--radius-lg); }
 @mixin rounded-xl   { border-radius: var(--radius-xl); }
+@mixin rounded-2xl  { border-radius: var(--radius-2xl); }
 @mixin rounded-full { border-radius: var(--radius-full); }

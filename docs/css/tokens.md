@@ -75,8 +75,8 @@ The canonical grey layer. Status, vocabulary, and border tokens reference this s
 | `--color-neutral-50` | `220 20% 98%` | `--bg-elevated` |
 | `--color-neutral-100` | `220 16% 96%` | `--bg-sunken`, `--bg-recessed`, `--border-subtle` |
 | `--color-neutral-300` | `220 13% 83%` | `--border-strong` |
-| `--color-neutral-400` | `218 11% 65%` | `--fg-subtle`, placeholder |
-| `--color-neutral-500` | `220  9% 46%` | `--fg-muted`, helper text |
+| `--color-neutral-400` | `218 11% 58%` | `--fg-subtle`, placeholder |
+| `--color-neutral-500` | `220 10% 40%` | `--fg-muted`, helper text (WCAG AA compliant) |
 | `--color-neutral-900` | `221 39% 11%` | `--fg-default` (maximum contrast) |
 
 **Why stored as bare HSL triplets:** enables alpha transparency via
@@ -218,10 +218,13 @@ Mixins read ONLY these single primitives. The primitive defaults wire to the voc
 
 | Token | Value | px |
 |-------|-------|----|
+| `--radius-none` | 0 | 0px |
+| `--radius-xs` | 0.125rem | 2px |
 | `--radius-sm` | 0.25rem | 4px |
-| `--radius-md` | 0.5rem | 8px |
-| `--radius-lg` | 0.75rem | 12px |
-| `--radius-xl` | 1rem | 16px |
+| `--radius-md` | 0.375rem | 6px |
+| `--radius-lg` | 0.5rem | 8px |
+| `--radius-xl` | 0.75rem | 12px |
+| `--radius-2xl` | 1rem | 16px |
 | `--radius-full` | 9999px | circle |
 
 ---

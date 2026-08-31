@@ -33,7 +33,7 @@
 	}
 
 	a {
-		--gap: var(--size-sm-up);
+		--gap: var(--size-sm);
 		--color-fg: var(--fg-muted);
 		@include flex;
 		@include items-center;
@@ -61,7 +61,7 @@
 	}
 
 	.nav-section {
-		--color-fg: var(--fg-subtle);
+		--color-fg: var(--fg-muted);
 		--padding-y: var(--size-sm);
 		padding-block: var(--padding-y);
 		@include text-xs;
