@@ -7,3 +7,7 @@ js/ln-icon/tabler/
  
 # Compiled standalone components are tracked on purpose: consumers may pick
 # individual components via <script src>, without running a build.
+
+# Source material the docs-mcp corpus was written from (drafts, mirrored
+# pre-corpus docs). Not served — the MCP indexer skips `_`-prefixed paths.
+docs-mcp/_incoming/

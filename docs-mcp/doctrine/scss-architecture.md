@@ -12,13 +12,51 @@ tags: [doctrine, scss, css, theming, design-tokens]
 
 ## Summary
 
-This document explains the styling architecture of `ln-ashlar`. It covers the two-layer SCSS system (mixins vs. components), design token structures, the CSS/JS hook boundary rules, how dark mode and custom tenant themes are compiled, and the z-index stacking context strategies.
+This document explains the styling architecture of `ln-ashlar`. It covers the 3-tier stylesheet distribution (Core Functional, Visual Theme, Full Bundle), the two-layer SCSS design system (mixins vs. components), design token structures, the CSS/JS hook boundary rules, how dark mode and custom tenant themes are compiled, and the z-index stacking context strategies.
 
 ---
 
-## 1. The Two-Layer SCSS System
+## 1. The Three-Tier Stylesheet Distribution
 
-To separate styling recipes from DOM applications, `ln-ashlar` divides SCSS files into two distinct layers:
+To support headless usage, custom brand themes, and standard turnkey applications, `ln-ashlar` compiles into three distinct stylesheet artifacts:
+
+```
+┌────────────────────────────────────────────────────────┐
+│ 1. Core Functional CSS (ln-ashlar-core.css)            │
+│ (State-only, behavioral, ZERO tokens, ZERO theme skin) │
+│ Aggregates co-located: components/ln-*/src/*.scss      │
+└──────────────────────────┬─────────────────────────────┘
+                           │ + (Combine for turnkey)
+┌──────────────────────────▼─────────────────────────────┐
+│ 2. Visual Theme CSS (ln-ashlar-theme.css)              │
+│ (Design tokens, resets, typography, mixins, visual skin)│
+│ Source: theme/config/, theme/base/, theme/components/  │
+└──────────────────────────┬─────────────────────────────┘
+                           │ =
+┌──────────────────────────▼─────────────────────────────┐
+│ 3. Master Full Bundle (ln-ashlar.css)                  │
+│ (Core Functional CSS + Visual Theme CSS)               │
+└────────────────────────────────────────────────────────┘
+```
+
+### A. Core Functional Stylesheet (`dist/ln-ashlar-core.css` / `./core.css`)
+- Master aggregator of all component-specific behavioral/state SCSS modules located in `components/ln-{name}/src/ln-{name}.scss`.
+- **Zero design tokens, zero theme colors, zero typography, zero decorative borders.**
+- Manages purely functional mechanics: `[data-ln-toggle-hide] { display: none !important; }`, top-layer promotion (`popover="manual"`), dialog cancel behavior, absolute positioning anchors, and scroll containers.
+- **Headless Mode:** Consumers building with external frameworks (Tailwind, Bootstrap, or custom CSS) can import `./core.css` alone to get full JS component functionality with zero visual styling interference.
+
+### B. Visual Theme Stylesheet (`dist/ln-ashlar-theme.css` / `./theme.css`)
+- Contains the complete design system: design tokens (`theme/config/_tokens.scss`), resets (`theme/base/`), typography, and visual chrome (`theme/config/mixins/` and `theme/components/`).
+- Governs all decorative presentation: cards, tables, buttons, colors, borders, elevation shadows, density modes, and dark-mode theming.
+
+### C. Master Full Bundle (`dist/ln-ashlar.css` / `./full.css`)
+- Turnkey bundle combining `@use 'ln-ashlar-core'` and `@use 'ln-ashlar-theme'`.
+
+---
+
+## 2. The Two-Layer SCSS Design System (Inside `theme/`)
+
+Within the visual theme layer (`theme/`), styling is divided into two distinct layers:
 
 ```
 Mixin Layer (Recipe)        ->  theme/config/mixins/_table.scss   → @mixin table-base { ... }
@@ -43,19 +81,19 @@ Derived mixins add only what differs from the base. Test: if the base changes a 
 
 ---
 
-## 2. Co-located JS Styles vs. Global Styles
+## 3. Co-located Component SCSS vs. Global Theme Styles
 
-Each functional JavaScript component folder (e.g., `components/ln-toggle/`, see [`ln-toggle`](../components/ln-toggle.md)) may contain a local `.scss` file. However, this is strictly constrained:
+Each functional JavaScript component folder (e.g., `components/ln-toggle/`, see [`ln-toggle`](../components/ln-toggle.md)) contains a co-located `.scss` file:
 
-- **Co-located SCSS (State only):** Used *only* to govern active functional state styling controlled by JS (e.g., `[data-ln-toggle-hide] { display: none !important; }` or timing transitions).
-- **Global Mixins/Components (Visual chrome):** All visual design details (padding, font sizes, borders, colors, shadow values) must live under the main SCSS directories (`theme/config/mixins/` or `theme/components/`).
+- **Co-located SCSS (State only):** Used *only* to govern active functional state styling controlled by JS (e.g., `[data-ln-toggle-hide] { display: none !important; }` or timing transitions). These are compiled into `ln-ashlar-core.css`.
+- **Global Mixins/Components (Visual chrome):** All visual design details (padding, font sizes, borders, colors, shadow values) must live under the main SCSS directories (`theme/config/mixins/` or `theme/components/`), compiled into `ln-ashlar-theme.css`.
 
 ### Helper-Class Convention
 Unprefixed helper classes are thin mixin bindings (`.search { @include search; }`) — visual, static presentation. The `ln-` prefix is reserved for JS-state classes exclusively; never mix the two roles on the same class.
 
 ---
 
-## 3. CSS/JS Hook Boundary
+## 4. CSS/JS Hook Boundary
 
 To avoid selector collisions and specificity bugs, follow these selector rules:
 
@@ -166,6 +204,7 @@ Certain visual behaviors are fixed library-wide defaults, not per-component choi
 - **Hover:** Subtle color change only — no transforms, no appearing shadows, no `::before` bars.
 - **Collapse animation:** `grid-template-rows: 0fr/1fr`, never `max-height`.
 - **Required indicator:** CSS-driven from `[required]` via `:has()` — never a manual `*` character authored in HTML.
+- **Lists vs. Prose:** Structural lists (`<ul>`, `<ol>`) are unstyled by default (`list-style: none`, `margin: 0`, `padding: 0`) to serve as clean UI primitives (button groups, tabs, chips, accordions, menus). Editorial/content lists with bullet discs, decimal numbers, and vertical rhythm are opt-in and live strictly within `.prose` (`@include prose`).
 
 ---
 

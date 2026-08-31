@@ -67,3 +67,7 @@ numeric columns align vertically by default. Apply manually elsewhere:
 `theme/base/_typography.scss` maps `h1`–`h6` to role tokens so
 unstyled HTML is correct out of the box. Consuming projects can
 override per-page with their own `@include typography(...)` calls.
+
+### Structural Lists vs. Editorial Prose
+
+In `ln-ashlar`, `<ul>` and `<ol>` are clean UI primitives by default (`list-style: none`, `margin: 0`, `padding: 0` in `_reset.scss`) used for repeating components (menus, tabs, chips, accordions, button groups). For editorial content requiring bullet points, decimal numbering, and vertical rhythm, wrap the content in `.prose` (`@include prose`). See [prose.md](prose.md).

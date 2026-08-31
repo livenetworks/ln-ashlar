@@ -51,19 +51,39 @@ Add the package as a runtime dependency:
 npm install @livenetworks/ashlar
 ```
 
-The npm package ships **source, not a prebuilt bundle** — `scss/` partials and `js/` ES modules. Import them into your own build so your bundler compiles ashlar alongside your application code:
+The npm package ships **prebuilt modular CSS bundles (`dist/`), SCSS source (`theme/`), and JS modules (`components/`)**:
+
+#### Modern Bundlers (Vite, Webpack, Modern Sass `pkg:` importer)
+Bundlers resolving `package.json` exports map subpaths automatically:
 
 ```scss
-// your app's main stylesheet
+// Option 1: Turnkey Master Bundle (Core + Visual Theme)
+@use "@livenetworks/ashlar/full.css"; // or "pkg:@livenetworks/ashlar/full.css"
+
+// Option 2: Core Functional Only (State-only, token-free — ideal for Tailwind / custom design systems)
+@use "@livenetworks/ashlar/core.css"; // or "pkg:@livenetworks/ashlar/core.css"
+
+// Option 3: Visual Theme Only
+@use "@livenetworks/ashlar/theme.css";
+
+// Option 4: Direct SCSS source compilation
 @use "@livenetworks/ashlar/theme/ln-ashlar";
+```
+
+#### Sass CLI / Direct Load-Path (`sass --load-path=node_modules`)
+When compiling with standalone Sass CLI without package exports resolution, reference the direct distribution paths:
+
+```scss
+@use "@livenetworks/ashlar/dist/ln-ashlar.css";      // Master bundle
+@use "@livenetworks/ashlar/dist/ln-ashlar-core.css"; // Core functional only
+@use "@livenetworks/ashlar/dist/ln-ashlar-theme.css";// Visual theme only
+@use "@livenetworks/ashlar/theme/ln-ashlar";         // Direct SCSS source
 ```
 
 ```js
 // your app's main script — the library self-initializes on import
 import "@livenetworks/ashlar/components/index.js";
 ```
-
-There is no `dist/` folder inside `node_modules`. If you want ready-made compiled files instead of building them yourself, use Path A, C, or D.
 
 ### Path C: Precompiled, self-hosted
 

@@ -23,6 +23,7 @@
 - [x] **js-component-model** — `data-ln-*` binding, настани како јазик, ортогоналност, без стилови во JS — извори: `docs/js/component-guide.md`, `docs/js/core.md`, `components/COMPONENTS.md`
 - [x] **data-flow** — `{{ }}` vs `data-ln-field` матрица на одлука — извор: `docs/architecture/data-flow.md`
 - [x] **data-layer** — store / coordinator / конектори, паралелен fan-out (v2) — извори: `docs/architecture/data-store-architecture.md`, `docs/architecture/coordinator.md`
+- [x] **accessibility** — WCAG 2.2 AA design target, гаранции наспроти проектни одговорности, 3-чекорен verification тек — извори: doctrine, tokens, mixins, components
 
 ## Фаза 2 — guides/
 
@@ -131,49 +132,49 @@
 
 ### Темели
 
-- [ ] **tokens**
-- [ ] **mixins**
-- [ ] **breakpoints**
-- [ ] **density**
-- [ ] **theming**
-- [ ] **typography**
-- [ ] **motion**
+- [x] **tokens**
+- [x] **mixins**
+- [x] **breakpoints**
+- [x] **density**
+- [x] **theming**
+- [x] **typography**
+- [x] **motion**
 
 ### Layout
 
-- [ ] **layout**
-- [ ] **app-shell**
-- [ ] **sections**
-- [ ] **page-header**
-- [ ] **navigation**
+- [x] **layout**
+- [x] **app-shell**
+- [x] **sections**
+- [x] **page-header**
+- [x] **navigation**
 
 ### Визуелни компоненти
 
-- [ ] **cards**
-- [ ] **tables**
-- [ ] **forms**
-- [ ] **toggles-and-pills**
-- [ ] **alert**
-- [ ] **avatar**
-- [ ] **breadcrumbs**
-- [ ] **chip**
-- [ ] **empty-state**
-- [ ] **kbd**
-- [ ] **loader**
-- [ ] **prose**
-- [ ] **stat-card**
-- [ ] **status-badge**
-- [ ] **stepper**
-- [ ] **timeline** — ⚠ `docs/css/timeline.md` учи `data-ln-timeline`, а библиотеката врзува `.timeline` класа — да се исправи при пишување
-- [ ] **tooltip** (css слојот; JS-делот е во components/ln-tooltip)
+- [x] **cards**
+- [x] **tables**
+- [x] **forms**
+- [x] **toggles-and-pills**
+- [x] **alert**
+- [x] **avatar**
+- [x] **breadcrumbs**
+- [x] **chip**
+- [x] **empty-state**
+- [x] **kbd**
+- [x] **loader**
+- [x] **prose**
+- [x] **stat-card**
+- [x] **status-badge**
+- [x] **stepper**
+- [x] **timeline**
+- [x] **tooltip** (css слојот; JS-делот е во components/ln-tooltip)
 
 ---
 
 ## Фаза 5 — patterns/ (композитни рецепти — листата се дополнува)
 
-- [ ] **data-table-sync** — табела + store + coordinator + sort/filter/search — извор: `demo/admin/table-sync.html` (канонски showcase)
+- [x] **data-table-sync** — табела + store + coordinator + sort/filter/search — извор: `demo/admin/table-sync.html` (канонски showcase)
 - [ ] **table-filter-popover** — статичен авториран filter markup (popover + search + filter, опции од домен-извор)
-- [ ] **modal-crud** — modal-fill + form + confirm + toast (create/edit/delete тек) — извор: docuflow/admin демоа
+- [x] **modal-crud** — modal-fill + form + confirm + toast (create/edit/delete тек) — извор: docuflow/admin демоа
 - [ ] **search-filter-list** — пребарување и филтрирање врз листи (без табела)
 - [ ] **dashboard-stats** — stat + circular-progress + page-header композиција
 
@@ -244,11 +245,11 @@
 
 | Фаза | Вкупно | Готово |
 |---|---|---|
-| doctrine | 6 | 6 |
+| doctrine | 7 | 7 |
 | guides | 5 | 5 |
 | components — употребливи (3А) | 44 | 44 |
 | components — позадински (3Б) | 9 | 9 |
-| css | 29 | 0 |
-| patterns | 5 | 0 |
+| css | 29 | 29 |
+| patterns | 5 | 2 |
 | skills | 14 | 14 |
-| **Вкупно** | **112** | **78** |
+| **Вкупно** | **113** | **110** |

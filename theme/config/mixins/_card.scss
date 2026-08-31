@@ -136,28 +136,6 @@
 @mixin panel-body {
 	padding: var(--padding-y) var(--padding-x);
 
-	:is(ul, ol):not([class]) {
-		padding-left: 1.5em;
-		margin-bottom: var(--size-md);
-
-		li {
-			margin-bottom: var(--size-xs);
-			line-height: 1.7;
-
-			&:last-child {
-				margin-bottom: 0;
-			}
-		}
-	}
-
-	ul:not([class]) {
-		list-style-type: disc;
-	}
-
-	ol:not([class]) {
-		list-style-type: decimal;
-	}
-
 	&:has(> table),
 	&:has(> .table-container) {
 		overflow-x: auto;

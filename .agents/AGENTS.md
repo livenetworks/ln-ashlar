@@ -35,6 +35,7 @@
     - **Dates & Times**: MUST use `<time datetime="...">` with `data-ln-date` or `data-ln-time` (e.g. `<time datetime="2026-07-25" data-ln-date="long">2026-07-25</time>`).
     - **Numbers & Totals**: MUST use semantic inline tags (`<strong>`, `<b>`, `<data value="...">`, `<td>`) with `data-ln-number`.
     - **Controls & Actions**: MUST use `<button type="button">` / `<button type="submit">`, `<label>`, `<fieldset>`, `<legend>`.
+    - **Structural Lists vs. Editorial Prose**: `<ul>` and `<ol>` are clean UI primitives by default (`list-style: none`, `margin: 0`, `padding: 0`) for repeating components (menus, tabs, chips, accordions, button groups). Editorial text lists with bullet discs, decimal numbers, and vertical rhythm are opt-in and live strictly within `.prose` (`@include prose`).
   - Machine-readable attributes (`datetime`, `data-ln-value`) MUST be preserved for screen readers and ARIA accessibility while the visible text content is formatted dynamically according to locale.
 
 ### E. Lifecycle Events & Detail Guards
