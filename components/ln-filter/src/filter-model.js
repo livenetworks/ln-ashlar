@@ -1,3 +1,5 @@
+import { matchesFilterValues } from '../../ln-core/matching.js';
+
 /**
  * Checks whether two arrays of strings differ in length or content.
  * @param {Array} a
@@ -12,9 +14,6 @@ export function arraysDiffer(a, b) {
 	}
 	return false;
 }
-
-import { matchesFilterValues } from '../../ln-core/matching.js';
-export { matchesFilterValues };
 
 /**
  * Evaluates a row across multiple active column filters (AND across columns, OR within column).

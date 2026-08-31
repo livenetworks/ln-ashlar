@@ -1,17 +1,11 @@
 import { registerComponent } from '../../ln-core';
+import { generateSlug } from './slug-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-slug-from';
 	const DOM_ATTRIBUTE = 'lnSlug';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
-
-	function slugify(s) {
-		return String(s).toLowerCase()
-			.replace(/[^a-z0-9]+/g, '-')
-			.replace(/-+/g, '-')
-			.replace(/^-|-$/g, '');
-	}
 
 	function _component(dom) {
 		if (dom.tagName !== 'INPUT') {
@@ -63,7 +57,7 @@ import { registerComponent } from '../../ln-core';
 
 	_component.prototype._mirror = function () {
 		this._mirroring = true;
-		this.dom.value = slugify(this.source.value);
+		this.dom.value = generateSlug(this.source.value);
 		this.dom.dispatchEvent(new Event('input', { bubbles: true }));
 		this._mirroring = false;
 	};

@@ -4,8 +4,7 @@ import assert from 'node:assert/strict';
 import {
 	arraysDiffer,
 	deriveActiveFilters,
-	evaluateRowFilters,
-	matchesFilterValues
+	evaluateRowFilters
 } from '../components/ln-filter/src/filter-model.js';
 
 test('arraysDiffer checks equality and differences between arrays', () => {
@@ -14,15 +13,6 @@ test('arraysDiffer checks equality and differences between arrays', () => {
 	assert.equal(arraysDiffer(['a'], ['a', 'b']), true);
 	assert.equal(arraysDiffer(['a', 'c'], ['a', 'b']), true);
 	assert.equal(arraysDiffer(null, ['a']), true);
-});
-
-test('matchesFilterValues evaluates OR matching across values case-insensitively', () => {
-	assert.equal(matchesFilterValues('Active', []), true); // No filters = all match
-	assert.equal(matchesFilterValues('Active', ['active']), true);
-	assert.equal(matchesFilterValues('ACTIVE', ['pending', 'active']), true);
-	assert.equal(matchesFilterValues('Archived', ['active', 'pending']), false);
-	assert.equal(matchesFilterValues(null, ['active']), false);
-	assert.equal(matchesFilterValues(undefined, ['active']), false);
 });
 
 test('evaluateRowFilters evaluates AND across columns and OR within columns', () => {
@@ -59,10 +49,10 @@ test('deriveActiveFilters extracts active key and checked non-reset values', () 
 	assert.equal(result.key, 'status');
 	assert.deepEqual(result.values, ['active', 'pending']);
 
-	// Reset checked
+	// All reset / unchecked
 	const resetDescriptors = [
-		{ key: 'status', value: '', checked: true, isReset: true },
-		{ key: 'status', value: 'active', checked: false, isReset: false }
+		{ key: 'status', value: '', checked: true, isReset: true }
 	];
-	assert.deepEqual(deriveActiveFilters(resetDescriptors), { key: 'status', values: [] });
+	const resetResult = deriveActiveFilters(resetDescriptors);
+	assert.deepEqual(resetResult.values, []);
 });

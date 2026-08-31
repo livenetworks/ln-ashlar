@@ -34,14 +34,17 @@
 ---
 
 ### 🚀 Priority 1: Search, Filter & Sort Engines
+- [x] **`ln-core/matching`** (Pure core matching module)
+  - **Module:** `components/ln-core/matching.js`
+  - **Tests:** `tests/ln-core-matching.test.js`
+  - **Domain Logic:** Search term normalization, whitespace tokenization, multi-token AND matching, field selector parsing, text collapsing, and filter OR value matching.
 - [x] **`ln-search`**
-  - **Model:** `components/ln-search/src/search-model.js`
-  - **Tests:** `tests/ln-search.test.js`
-  - **Domain Logic:** Search term normalization, multi-token AND matching, field selector parsing, exclude-tree text extraction.
+  - **Model:** Direct consumption of `ln-core/matching.js`
+  - **Domain Logic:** Search query normalization, DOM exclude-tree text extraction, observer synchronization.
 - [x] **`ln-filter`**
   - **Model:** `components/ln-filter/src/filter-model.js`
   - **Tests:** `tests/ln-filter.test.js`
-  - **Domain Logic:** Active filter derivation, array comparison diffing, multi-value AND/OR matching, URL hash codec integration.
+  - **Domain Logic:** Active filter derivation from descriptors, array diffing, multi-column row filter evaluation, filter summary label extraction.
 - [x] **`ln-sort`**
   - **Model:** `components/ln-sort/src/sort-model.js`
   - **Tests:** `tests/ln-sort.test.js`
@@ -74,26 +77,26 @@
 ---
 
 ### 🚀 Priority 3: Formatting & Text Utilities
-- [ ] **`ln-date` / `ln-time`**
+- [x] **`ln-date` / `ln-time`**
   - **Model:** `components/ln-time/src/time-model.js`
   - **Tests:** `tests/ln-time.test.js`
-  - **Domain Logic:** ISO timestamp parsing, relative time duration math, formatting options resolution, format cache key derivation.
-- [ ] **`ln-slug`**
+  - **Domain Logic:** Unix seconds/ms/ISO date parsing, relative time duration and unit calculation, formatting options resolution.
+- [x] **`ln-slug`**
   - **Model:** `components/ln-slug/src/slug-model.js`
   - **Tests:** `tests/ln-slug.test.js`
   - **Domain Logic:** Unicode normalization, transliteration / diacritic stripping, separator collapsing, URL-safe slug generation.
-- [ ] **`ln-tabs`**
+- [x] **`ln-tabs`**
   - **Model:** `components/ln-tabs/src/tabs-model.js`
   - **Tests:** `tests/ln-tabs.test.js`
   - **Domain Logic:** Trigger key derivation (`data-ln-tab` vs `<a href="#ns:key">`), URL hash fragment extraction, panel key mapping.
-- [ ] **`ln-stat`**
+- [x] **`ln-stat`**
   - **Model:** `components/ln-stat/src/stat-model.js`
   - **Tests:** `tests/ln-stat.test.js`
-  - **Domain Logic:** Numeric diffing, percentage change formulas, trend direction formatting (`up`/`down`/`neutral`).
-- [ ] **`ln-progress` / `ln-circular-progress`**
+  - **Domain Logic:** Structured field-filter parsing, stat numeric value formatting.
+- [x] **`ln-progress` / `ln-circular-progress`**
   - **Model:** `components/ln-progress/src/progress-model.js`
   - **Tests:** `tests/ln-progress.test.js`
-  - **Domain Logic:** Value clamping (`min`/`max`), percentage calculation, SVG stroke-dasharray & stroke-dashoffset math.
+  - **Domain Logic:** Shared clamp/percentage math (`calculateProgress`), effective max resolution with parent precedence (`resolveProgressMax`).
 
 ---
 

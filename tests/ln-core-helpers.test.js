@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+	calculateProgress,
 	compareValues,
 	detectValueType,
 	isEditableTarget,
@@ -74,3 +75,31 @@ test('compareValues performs type-sensitive comparisons', () => {
 	assert.equal(compareValues('banana', 'apple', 'string'), 1);
 	assert.equal(compareValues('apple', 'apple', 'string'), 0);
 });
+
+test('calculateProgress computes accurate percentages and clamps properly', () => {
+	// Standard 50 / 100 -> 50%
+	const p1 = calculateProgress(50, 100);
+	assert.equal(p1.percentage, 50);
+	assert.equal(p1.clampedValue, 50);
+	assert.equal(p1.max, 100);
+
+	// Custom max: 25 / 50 -> 50%
+	const p2 = calculateProgress(25, 50);
+	assert.equal(p2.percentage, 50);
+
+	// Overflow: 150 / 100 -> 100% clamped
+	const p3 = calculateProgress(150, 100);
+	assert.equal(p3.percentage, 100);
+	assert.equal(p3.clampedValue, 100);
+
+	// Underflow: -20 / 100 -> 0% clamped
+	const p4 = calculateProgress(-20, 100);
+	assert.equal(p4.percentage, 0);
+	assert.equal(p4.clampedValue, 0);
+
+	// Custom min range: min 50, val 75, max 100 -> 50%
+	const p5 = calculateProgress(75, 100, 50);
+	assert.equal(p5.percentage, 50);
+	assert.equal(p5.clampedValue, 75);
+});
+

@@ -1,5 +1,5 @@
-import { createBatcher, dispatch, dispatchCancelable, hashFilterDecode, hashFilterEncode, hashGet, hashSet, persistGet, persistSet, queueBoot, registerComponent, resolveHashNamespace } from '../../ln-core';
-import { arraysDiffer, deriveActiveFilters, evaluateRowFilters, matchesFilterValues } from './filter-model.js';
+import { createBatcher, dispatch, dispatchCancelable, hashFilterDecode, hashFilterEncode, hashGet, hashSet, matchesFilterValues, persistGet, persistSet, queueBoot, registerComponent, resolveHashNamespace } from '../../ln-core';
+import { arraysDiffer, deriveActiveFilters, evaluateRowFilters } from './filter-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-filter';

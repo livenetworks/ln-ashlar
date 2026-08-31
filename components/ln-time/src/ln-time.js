@@ -1,4 +1,5 @@
-import { registerComponent, getLocale, getLocaleFallback, ensureLocaleObserver } from '../../ln-core';
+import { ensureLocaleObserver, getLocale, getLocaleFallback, registerComponent } from '../../ln-core';
+import { calculateRelativeTime, parseDateInput, resolveDateFormatOptions } from './time-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-time';
@@ -60,7 +61,7 @@ import { registerComponent, getLocale, getLocaleFallback, ensureLocaleObserver }
 	function _formatFull(date, locale) {
 		const fallback = getLocaleFallback(locale);
 		const langPrefix = (locale || '').toLowerCase().split('-')[0];
-		const formatter = _getFormatter(locale, { dateStyle: 'long', timeStyle: 'short' });
+		const formatter = _getFormatter(locale, resolveDateFormatOptions('full', date));
 		const resolvedLocale = formatter.resolvedOptions().locale.toLowerCase().split('-')[0];
 
 		if (fallback && resolvedLocale !== langPrefix && fallback.monthsLong) {
@@ -75,11 +76,7 @@ import { registerComponent, getLocale, getLocaleFallback, ensureLocaleObserver }
 	}
 
 	function _formatShort(date, locale) {
-		const now = new Date();
-		const options = { month: 'short', day: 'numeric' };
-		if (date.getFullYear() !== now.getFullYear()) {
-			options.year = 'numeric';
-		}
+		const options = resolveDateFormatOptions('short', date);
 		const fallback = getLocaleFallback(locale);
 		const langPrefix = (locale || '').toLowerCase().split('-')[0];
 		const formatter = _getFormatter(locale, options);
@@ -88,44 +85,26 @@ import { registerComponent, getLocale, getLocaleFallback, ensureLocaleObserver }
 		if (fallback && resolvedLocale !== langPrefix && fallback.monthsShort) {
 			const month = fallback.monthsShort[date.getMonth()];
 			const day = date.getDate();
-			const year = date.getFullYear() !== now.getFullYear() ? ' ' + date.getFullYear() : '';
+			const year = options.year ? ' ' + date.getFullYear() : '';
 			return `${day} ${month}${year}`;
 		}
 		return formatter.format(date);
 	}
 
 	function _formatDate(date, locale) {
-		return _getFormatter(locale, { dateStyle: 'medium' }).format(date);
+		return _getFormatter(locale, resolveDateFormatOptions('date', date)).format(date);
 	}
 
 	function _formatTime(date, locale) {
-		return _getFormatter(locale, { timeStyle: 'short' }).format(date);
+		return _getFormatter(locale, resolveDateFormatOptions('time', date)).format(date);
 	}
 
 	function _formatRelative(date, locale) {
-		const nowSec = Math.floor(Date.now() / 1000);
-		const thenSec = Math.floor(date.getTime() / 1000);
-		const diff = thenSec - nowSec;
-		const absDiff = Math.abs(diff);
-
-		if (absDiff < 10) return _getRelativeFormatter(locale).format(0, 'second');
-
-		let unit, value;
-		if (absDiff < 60) {
-			unit = 'second'; value = diff;
-		} else if (absDiff < 3600) {
-			unit = 'minute'; value = Math.round(diff / 60);
-		} else if (absDiff < 86400) {
-			unit = 'hour'; value = Math.round(diff / 3600);
-		} else if (absDiff < 604800) {
-			unit = 'day'; value = Math.round(diff / 86400);
-		} else if (absDiff < 2592000) {
-			unit = 'week'; value = Math.round(diff / 604800);
-		} else {
+		const rel = calculateRelativeTime(date);
+		if (rel.isOlderThanMonth) {
 			return _formatShort(date, locale);
 		}
-
-		return _getRelativeFormatter(locale).format(value, unit);
+		return _getRelativeFormatter(locale).format(rel.value, rel.unit);
 	}
 
 	// ─── Render ───────────────────────────────────────────────
@@ -133,10 +112,9 @@ import { registerComponent, getLocale, getLocaleFallback, ensureLocaleObserver }
 		const raw = instance.dom.getAttribute('datetime');
 		if (!raw) return;
 
-		const timestamp = Number(raw);
-		if (isNaN(timestamp)) return;
+		const date = parseDateInput(raw);
+		if (!date) return;
 
-		const date = new Date(timestamp * 1000);
 		const mode = instance.dom.getAttribute(DOM_SELECTOR) || 'short';
 		const locale = _resolveLocale(instance.dom);
 		let text;

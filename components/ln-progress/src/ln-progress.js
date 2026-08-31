@@ -1,4 +1,5 @@
-import { dispatch, registerComponent } from '../../ln-core';
+import { calculateProgress, dispatch, registerComponent } from '../../ln-core';
+import { resolveProgressMax } from './progress-model.js';
 
 (function () {
 	const DOM_SELECTOR = '[data-ln-progress]';
@@ -44,26 +45,27 @@ import { dispatch, registerComponent } from '../../ln-core';
 	}
 
 	function _render() {
-		const value = parseFloat(this.dom.getAttribute('data-ln-progress')) || 0;
+		const rawVal = this.dom.getAttribute('data-ln-progress');
 		const parent = this.dom.parentElement;
-		const parentMax = parent && parent.hasAttribute('data-ln-progress-max')
-			? parseFloat(parent.getAttribute('data-ln-progress-max'))
-			: null;
-		const max = parentMax || parseFloat(this.dom.getAttribute('data-ln-progress-max')) || 100;
-		let percentage = (max > 0) ? (value / max) * 100 : 0;
+		const rawParentMax = parent ? parent.getAttribute('data-ln-progress-max') : null;
+		const rawElemMax = this.dom.getAttribute('data-ln-progress-max');
 
-		if (percentage < 0) percentage = 0;
-		if (percentage > 100) percentage = 100;
+		const max = resolveProgressMax(rawElemMax, rawParentMax, 100);
+		const result = calculateProgress(rawVal, max);
 
-		this.dom.style.width = percentage + '%';
+		this.dom.style.width = result.percentage + '%';
 
-		const clampedValue = Math.max(0, Math.min(value, max));
 		this.dom.setAttribute('role', 'progressbar');
-		this.dom.setAttribute('aria-valuemin', '0');
-		this.dom.setAttribute('aria-valuemax', String(max));
-		this.dom.setAttribute('aria-valuenow', String(clampedValue));
+		this.dom.setAttribute('aria-valuemin', String(result.min));
+		this.dom.setAttribute('aria-valuemax', String(result.max));
+		this.dom.setAttribute('aria-valuenow', String(result.clampedValue));
 
-		dispatch(this.dom, 'ln-progress:change', { target: this.dom, value: value, max: max, percentage: percentage });
+		dispatch(this.dom, 'ln-progress:change', {
+			target: this.dom,
+			value: result.value,
+			max: result.max,
+			percentage: result.percentage
+		});
 	}
 
 	registerComponent(

@@ -1,4 +1,4 @@
-import { dispatch, registerComponent } from '../../ln-core';
+import { calculateProgress, dispatch, registerComponent } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-circular-progress';
@@ -30,18 +30,13 @@ import { dispatch, registerComponent } from '../../ln-core';
 		if (this.labelEl) {
 			this.labelEl.remove();
 		}
-		this.dom.removeAttribute('role');
-		this.dom.removeAttribute('aria-valuemin');
-		this.dom.removeAttribute('aria-valuemax');
-		this.dom.removeAttribute('aria-valuenow');
-		this.dom.removeAttribute('aria-valuetext');
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
 	function _createSvgElement(tag, attrs) {
 		const el = document.createElementNS(SVG_NS, tag);
-		for (const key in attrs) {
-			el.setAttribute(key, attrs[key]);
+		for (const [key, val] of Object.entries(attrs)) {
+			el.setAttribute(key, val);
 		}
 		return el;
 	}
@@ -49,8 +44,10 @@ import { dispatch, registerComponent } from '../../ln-core';
 	function _buildSvg() {
 		this.svg = _createSvgElement('svg', {
 			viewBox: '0 0 ' + VIEW_SIZE + ' ' + VIEW_SIZE,
-			'aria-hidden': 'true'
+			width: VIEW_SIZE,
+			height: VIEW_SIZE
 		});
+		this.svg.classList.add('ln-circular-progress__svg');
 
 		this.trackCircle = _createSvgElement('circle', {
 			cx: VIEW_SIZE / 2,
@@ -85,33 +82,29 @@ import { dispatch, registerComponent } from '../../ln-core';
 	}
 
 	function _render() {
-		const value = parseFloat(this.dom.getAttribute('data-ln-circular-progress')) || 0;
-		const max = parseFloat(this.dom.getAttribute('data-ln-circular-progress-max')) || 100;
-		let percentage = (max > 0) ? (value / max) * 100 : 0;
+		const rawVal = this.dom.getAttribute('data-ln-circular-progress');
+		const rawMax = this.dom.getAttribute('data-ln-circular-progress-max');
+		const result = calculateProgress(rawVal, rawMax || 100);
 
-		if (percentage < 0) percentage = 0;
-		if (percentage > 100) percentage = 100;
-
-		const offset = CIRCUMFERENCE - (percentage / 100) * CIRCUMFERENCE;
+		const offset = CIRCUMFERENCE - (result.percentage / 100) * CIRCUMFERENCE;
 		this.progressCircle.setAttribute('stroke-dashoffset', offset);
 
 		const label = this.dom.getAttribute('data-ln-circular-progress-label');
-		const labelText = label !== null ? label : Math.round(percentage) + '%';
+		const labelText = label !== null ? label : Math.round(result.percentage) + '%';
 		this.labelEl.textContent = labelText;
 
 		// Sync ARIA properties
 		this.dom.setAttribute('role', 'progressbar');
-		this.dom.setAttribute('aria-valuemin', '0');
-		this.dom.setAttribute('aria-valuemax', String(max));
-		const clampedValue = Math.max(0, Math.min(value, max));
-		this.dom.setAttribute('aria-valuenow', String(clampedValue));
+		this.dom.setAttribute('aria-valuemin', String(result.min));
+		this.dom.setAttribute('aria-valuemax', String(result.max));
+		this.dom.setAttribute('aria-valuenow', String(result.clampedValue));
 		this.dom.setAttribute('aria-valuetext', labelText);
 
 		dispatch(this.dom, 'ln-circular-progress:change', {
 			target: this.dom,
-			value: value,
-			max: max,
-			percentage: percentage
+			value: result.value,
+			max: result.max,
+			percentage: result.percentage
 		});
 	}
 

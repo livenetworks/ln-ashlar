@@ -5,3 +5,5 @@ export { persistGet, persistSet, persistRemove, persistClear } from './persist.j
 export { hashParse, hashGet, hashSet, hashLinkClick, resolveHashNamespace, hashSortEncode, hashSortDecode, hashFilterEncode, hashFilterDecode } from './hash.js';
 export { computePlacement, measureHidden } from './positioning.js';
 export { setCryptoKey, getCryptoKey, encryptData, decryptData } from './crypto.js';
+export { calculateProgress } from './progress.js';
+export { normalizeSearchTerm, tokenizeSearchQuery, parseSearchFields, matchesSearchTokens, collapseSearchParts, matchesFilterValues } from './matching.js';

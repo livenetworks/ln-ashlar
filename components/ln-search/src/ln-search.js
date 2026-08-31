@@ -1,5 +1,5 @@
 import { dispatchCancelable, hashGet, hashSet, queueBoot, registerComponent, resolveHashNamespace } from '../../ln-core';
-import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSearchFields, tokenizeSearchQuery } from './search-model.js';
+import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSearchFields, tokenizeSearchQuery } from '../../ln-core/matching.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-search';

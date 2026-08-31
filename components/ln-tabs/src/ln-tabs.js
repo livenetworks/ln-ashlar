@@ -1,7 +1,6 @@
 /* Live Networks - lnTabs (hash-aware tabs — supports <button> and <a href="#nsKey:key"> triggers) */
-import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
-import { persistGet, persistSet } from '../../ln-core';
-import { hashGet, hashSet, hashLinkClick } from '../../ln-core';
+import { dispatch, dispatchCancelable, hashGet, hashLinkClick, hashSet, persistGet, persistSet, registerComponent } from '../../ln-core';
+import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './tabs-model.js';
 
 (function () {
 	const DOM_SELECTOR = "data-ln-tabs";
@@ -9,61 +8,30 @@ import { hashGet, hashSet, hashLinkClick } from '../../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined && window[DOM_ATTRIBUTE] !== null) return;
 
-
-	function _keyFromTrigger(t, nsKey) {
-		const explicit = (t.getAttribute("data-ln-tab") || "").toLowerCase().trim();
-		if (explicit) return explicit;
-		if (t.tagName !== "A") return "";
-		const href = t.getAttribute("href") || "";
-		if (!href.startsWith("#")) return "";
-		const raw = href.slice(1);
-		if (!raw) return "";
-		const fragments = raw.split("&");
-		if (nsKey) {
-			for (const frag of fragments) {
-				const sep = frag.indexOf(":");
-				if (sep > 0 && frag.slice(0, sep).toLowerCase().trim() === nsKey) {
-					return frag.slice(sep + 1).toLowerCase().trim();
-				}
-			}
-		}
-		const last = fragments[fragments.length - 1] || "";
-		const sep = last.indexOf(":");
-		return (sep > 0 ? last.slice(sep + 1) : last).toLowerCase().trim();
-	}
-
 	function _component(dom) { this.dom = dom; this.activeKey = null; _init.call(this); return this; }
 
 	function _init() {
 		this.tabs   = Array.from(this.dom.querySelectorAll("[data-ln-tab]"));
 		this.panels = Array.from(this.dom.querySelectorAll("[data-ln-panel]"));
 
-		// Mode is declared by the TRIGGER TYPE, not by presence of an id:
-		//   <a href="#…">  → URL hash sync (shareable, back/forward aware)
-		//   <button>       → localStorage persist (opt-in via data-ln-persist)
-		// This decouples the two axes that used to collide on `id`: now
-		// `id`/`data-ln-tabs-key` only NAMESPACE the hash, and
-		// `data-ln-persist` only names the storage key — neither selects the
-		// mode. The markup does. Mixed triggers almost always signal a markup
-		// mistake, so we fall back to persist and warn rather than guess.
-		//
-		// nsKey resolved BEFORE mapTabs build — anchor key derivation in
-		// _keyFromTrigger needs nsKey to pick the right fragment.
-		const anchorTabs = this.tabs.filter(t => t.tagName === "A" && (t.getAttribute("href") || "").startsWith("#"));
-		const allAnchors = anchorTabs.length > 0 && anchorTabs.length === this.tabs.length;
-		this.nsKey       = (this.dom.getAttribute("data-ln-tabs-key") || this.dom.id || "").toLowerCase().trim();
-		this.hashEnabled = allAnchors && !!this.nsKey;
+		const triggerDescriptors = this.tabs.map(t => ({
+			tagName: t.tagName,
+			href: t.getAttribute('href')
+		}));
+		this.nsKey = (this.dom.getAttribute("data-ln-tabs-key") || this.dom.id || "").toLowerCase().trim();
+		const modeInfo = determineTabsMode(triggerDescriptors, this.nsKey);
+		this.hashEnabled = modeInfo.hashEnabled;
 
-		if (anchorTabs.length > 0 && anchorTabs.length !== this.tabs.length) {
+		if (modeInfo.warning === 'mixed') {
 			console.warn('[ln-tabs] Mixed <a href="#…"> and <button> triggers in one group — using persist mode. Pick one: anchors for URL hash, buttons for localStorage persist.', this.dom);
-		} else if (allAnchors && !this.nsKey) {
+		} else if (modeInfo.warning === 'missing-namespace') {
 			console.warn('[ln-tabs] Anchor triggers need a hash namespace — add id or data-ln-tabs-key to the wrapper. Falling back to non-hash mode.', this.dom);
 		}
 
 		this.mapTabs = {};
 		this.mapPanels = {};
 		for (const t of this.tabs) {
-			const key = _keyFromTrigger(t, this.nsKey);
+			const key = deriveKeyFromTrigger(t.getAttribute('data-ln-tab'), t.tagName, t.getAttribute('href'), this.nsKey);
 			if (key) {
 				this.mapTabs[key] = t;
 			} else {
@@ -85,12 +53,8 @@ import { hashGet, hashSet, hashLinkClick } from '../../ln-core';
 			if (t[DOM_ATTRIBUTE + 'Trigger']) continue;
 			const handler = function (e) {
 				const isAnchor = t.tagName === "A";
-				// Buttons keep their plain modifier/middle-click guard. Anchor
-				// triggers route through the shared core hash-link helper, which
-				// owns the guard (incl. shiftKey) AND the preventDefault — the
-				// same path ln-modal uses, so anchor click handling is unified.
 				if (!isAnchor && (e.ctrlKey || e.metaKey || e.button === 1)) return;
-				const key = _keyFromTrigger(t, self.nsKey);
+				const key = deriveKeyFromTrigger(t.getAttribute('data-ln-tab'), t.tagName, t.getAttribute('href'), self.nsKey);
 				if (!key) return;
 				if (isAnchor && !hashLinkClick(e)) return;
 				if (self.hashEnabled) {
@@ -144,7 +108,7 @@ import { hashGet, hashSet, hashLinkClick } from '../../ln-core';
 	};
 
 	_component.prototype._applyActive = function (key) {
-		if (!key || !(key in this.mapPanels)) key = this.defaultKey;
+		key = resolveActiveTabKey(key, Object.keys(this.mapPanels), this.defaultKey);
 		if (key === this.activeKey) return;
 
 		const prevKey = this.activeKey;
