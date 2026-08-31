@@ -1,0 +1,13 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Host Container Check: data-ln-sortable belongs on list or grid containers
+	[data-ln-sortable]:not(ul, ol, div, tbody) {
+		@include dev-inline-error("data-ln-sortable belongs on <ul>, <ol>, <tbody>, or <div> containers");
+	}
+
+	// 2. Handle Nesting Check: sortable handles must be inside a sortable container
+	[data-ln-sortable-handle]:not([data-ln-sortable] *) {
+		@include dev-inline-error("[data-ln-sortable-handle] is orphaned (not inside a [data-ln-sortable] container)");
+	}
+}

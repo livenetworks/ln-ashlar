@@ -16,6 +16,14 @@ select {
 	@include form-select;
 }
 
+output {
+	display: block;
+	font-size: var(--text-xs);
+	color: var(--fg-muted);
+	margin-top: var(--size-2xs);
+	font-family: var(--font-mono);
+}
+
 // ─── Checkbox & Radio ───────────────────────────────────────────
 
 input[type="checkbox"] {

@@ -6,7 +6,14 @@
 		"data-ln-autoresize": {
 			"direction": null,
 			"sources": [
+				"ln-autoresize-dev.scss",
 				"src/ln-autoresize.js"
+			]
+		},
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-autoresize-dev.scss"
 			]
 		}
 	}

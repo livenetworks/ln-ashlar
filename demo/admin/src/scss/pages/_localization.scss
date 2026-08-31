@@ -1,0 +1,88 @@
+@use '../../../../../theme/config/mixins' as *;
+
+// ─── Interactive Localization Scope ───────────────────
+.demo-localization-scope {
+	@include mb(var(--size-xl));
+
+	.alert {
+		@include my(var(--size-md));
+	}
+}
+
+.demo-locale-toolbar {
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	@include flex-wrap;
+	@include gap(var(--size-md));
+	@include p(var(--size-md));
+	@include mb(var(--size-lg));
+	background-color: var(--bg-sunken);
+	@include border;
+	border-radius: var(--radius);
+
+	&__info {
+		@include flex-col;
+		@include gap(var(--size-2xs));
+
+		p {
+			margin: 0;
+		}
+	}
+
+	&__title {
+		@include flex;
+		@include items-center;
+		@include gap(var(--size-xs));
+		color: var(--color-fg);
+		font-size: var(--text-base);
+
+		.ln-icon {
+			color: hsl(var(--color-primary));
+			width: 1.25rem;
+			height: 1.25rem;
+		}
+	}
+
+	&__action {
+		@include flex-shrink-0;
+	}
+}
+
+#demo-input-components {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	@include gap(var(--size-lg));
+
+	@media (max-width: 767px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+// ─── Number & Date formatting demo ─────────────────────
+#demo-number-form,
+#demo-date-form {
+	@include form-grid;
+
+	.form-element { grid-column: span 3; }
+}
+
+.demo-number-cards,
+.demo-date-cards {
+	@include flex;
+	@include flex-wrap;
+	@include gap(var(--size-md));
+	@include mt(var(--size-sm));
+
+	.card {
+		@include flex-1;
+		min-width: 14rem;
+
+		> main {
+			--padding-y: var(--size-sm);
+			--padding-x: var(--size-md);
+			@include flex-col;
+			@include gap(var(--size-2xs));
+		}
+	}
+}

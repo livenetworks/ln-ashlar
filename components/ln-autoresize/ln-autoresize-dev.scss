@@ -1,0 +1,8 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Host Element Check: data-ln-autoresize belongs only on <textarea>
+	[data-ln-autoresize]:not(textarea) {
+		@include dev-inline-error("data-ln-autoresize belongs only on <textarea> elements");
+	}
+}

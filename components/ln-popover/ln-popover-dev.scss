@@ -1,0 +1,13 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Popover Missing ID: popovers controlled by data-ln-popover must have an id for trigger linking
+	[data-ln-popover]:not([id]) {
+		@include dev-dom-error("[data-ln-popover] is missing a required 'id' attribute for trigger linking.");
+	}
+
+	// 2. Popover Trigger Empty ID: trigger elements must point to a target popover ID
+	[data-ln-popover-for=""] {
+		@include dev-inline-error("data-ln-popover-for target ID cannot be empty");
+	}
+}

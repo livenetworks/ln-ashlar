@@ -1,0 +1,8 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. AJAX Form Action Check: forms with data-ln-ajax must declare an action URL
+	form[data-ln-ajax]:not([action]) {
+		@include dev-inline-error("form[data-ln-ajax] is missing a required 'action' attribute");
+	}
+}

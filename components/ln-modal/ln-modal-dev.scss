@@ -1,12 +1,17 @@
 @use '../../theme/config/mixins' as *;
 
 [data-ln-debug] {
-	// 1. Modal Trigger Check: [data-ln-modal-for] cannot have an empty target ID
+	// 1. Modal Missing ID: dialogs controlled by data-ln-modal must have an id for trigger linking
+	dialog[data-ln-modal]:not([id]) {
+		@include dev-dom-error("[data-ln-modal] is missing a required 'id' attribute for trigger linking.");
+	}
+
+	// 2. Modal Trigger Check: [data-ln-modal-for] cannot have an empty target ID
 	[data-ln-modal-for=""] {
 		@include dev-inline-error("data-ln-modal-for is missing a target modal id");
 	}
 
-	// 2. Non-dialog modal: data-ln-modal must be on a <dialog> element (native showModal/close)
+	// 3. Non-dialog modal: data-ln-modal must be on a <dialog> element (native showModal/close)
 	[data-ln-modal]:not(dialog) {
 		@include dev-inline-error("data-ln-modal must be on a <dialog> element");
 	}

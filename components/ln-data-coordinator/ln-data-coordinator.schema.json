@@ -30,6 +30,7 @@
 		"data-ln-data-coordinator": {
 			"direction": "author",
 			"sources": [
+				"ln-data-coordinator-dev.scss",
 				"src/ln-data-coordinator.js"
 			]
 		},
@@ -60,6 +61,7 @@
 		"data-ln-data-store": {
 			"direction": "author",
 			"sources": [
+				"ln-data-coordinator-dev.scss",
 				"src/ln-data-coordinator.js"
 			]
 		},
@@ -73,6 +75,12 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-data-coordinator-dev.scss"
 			]
 		},
 		"data-ln-form-scope": {

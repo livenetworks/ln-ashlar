@@ -122,10 +122,6 @@
 	--btn-padding-y:      var(--size-sm);       // 8px → buttons 38px
 	--btn-padding-x:      var(--size-md);       // 16px
 	--input-padding-y:    var(--size-sm);       // 8px → inputs/selects 38px
-
-	// -- Table cell padding — roomier at comfortable/spacious ------------
-	--table-cell-padding-y:  var(--size-sm-up);    // 12px
-	--table-cell-padding-x:  var(--size-lg);       // 24px
 }
 
 // ---------------------------------------------------------------------------
@@ -192,8 +188,4 @@
 	--btn-padding-y:      var(--size-md);       // 16px → buttons 54px
 	--btn-padding-x:      var(--size-lg);       // 24px — spacious width
 	--input-padding-y:    var(--size-md);       // 16px → inputs/pills ≥48px
-
-	// -- Table cell padding ----------------------------------------------
-	--table-cell-padding-y:  var(--size-md);       // 16px
-	--table-cell-padding-x:  var(--size-xl);       // 32px
 }

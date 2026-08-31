@@ -32,6 +32,7 @@
 		"data-ln-filter-key": {
 			"direction": "author",
 			"sources": [
+				"ln-filter-dev.scss",
 				"src/ln-filter.js"
 			]
 		},

@@ -3,9 +3,16 @@
 	"component": "ln-progress",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-progress-dev.scss"
+			]
+		},
 		"data-ln-progress": {
 			"direction": "author",
 			"sources": [
+				"ln-progress-dev.scss",
 				"src/ln-progress.js"
 			]
 		},
@@ -13,6 +20,12 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-progress.js"
+			]
+		},
+		"data-ln-upload-progress": {
+			"direction": null,
+			"sources": [
+				"ln-progress-dev.scss"
 			]
 		}
 	}

@@ -1,0 +1,18 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Two-Element Mode Incomplete: if [data-ln-confirm-idle] is present, [data-ln-confirm-active] is required
+	[data-ln-confirm]:has([data-ln-confirm-idle]):not(:has([data-ln-confirm-active])) {
+		@include dev-inline-error("ln-confirm two-element mode is missing [data-ln-confirm-active]");
+	}
+
+	// 2. Two-Element Mode Incomplete: if [data-ln-confirm-active] is present, [data-ln-confirm-idle] is required
+	[data-ln-confirm]:has([data-ln-confirm-active]):not(:has([data-ln-confirm-idle])) {
+		@include dev-inline-error("ln-confirm two-element mode is missing [data-ln-confirm-idle]");
+	}
+
+	// 3. Confirm Empty Message: empty string without two-element mode
+	[data-ln-confirm=""]:not(:has([data-ln-confirm-idle])):not(:has([data-ln-confirm-active])) {
+		@include dev-inline-error("data-ln-confirm has empty prompt and no idle/active child elements");
+	}
+}

@@ -1,8 +1,13 @@
 @use '../../theme/config/mixins' as *;
 
 [data-ln-debug] {
-	// 1. Search Trigger Check: data-ln-search must target a component ID and cannot be empty
-	[data-ln-search=""] {
-		@include dev-inline-error("data-ln-search target is empty");
+	// 1. Search Target Missing ID: elements with data-ln-search must have an id for control linking
+	[data-ln-search]:not([id]) {
+		@include dev-dom-error("[data-ln-search] is missing a required 'id' attribute for search control linking.");
+	}
+
+	// 2. Search Control Empty Target: search inputs/controls must target a component ID
+	[data-ln-search-for=""] {
+		@include dev-inline-error("data-ln-search-for target ID cannot be empty");
 	}
 }

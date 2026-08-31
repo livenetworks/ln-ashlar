@@ -1,0 +1,8 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Toast Container Element: data-ln-toast belongs on <ul> or <ol>
+	[data-ln-toast]:not(ul, ol) {
+		@include dev-inline-error("data-ln-toast must be placed on a <ul> or <ol> element");
+	}
+}

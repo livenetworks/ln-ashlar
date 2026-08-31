@@ -1,0 +1,8 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Child Store Check: data-ln-data-coordinator must contain a child [data-ln-data-store]
+	[data-ln-data-coordinator]:not(:has([data-ln-data-store])) {
+		@include dev-dom-error("[data-ln-data-coordinator] must contain a child [data-ln-data-store].");
+	}
+}

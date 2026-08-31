@@ -3,6 +3,12 @@
 	"component": "ln-router",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-router-dev.scss"
+			]
+		},
 		"data-ln-outlet": {
 			"direction": "author",
 			"sources": [
@@ -18,6 +24,7 @@
 		"data-ln-route": {
 			"direction": "author",
 			"sources": [
+				"ln-router-dev.scss",
 				"src/ln-router.js"
 			]
 		},

@@ -3,6 +3,12 @@
 	"component": "ln-list",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-list-dev.scss"
+			]
+		},
 		"data-ln-empty": {
 			"direction": "author",
 			"sources": [
@@ -48,6 +54,7 @@
 		"data-ln-list": {
 			"direction": "author",
 			"sources": [
+				"ln-list-dev.scss",
 				"src/ln-list.js"
 			]
 		},

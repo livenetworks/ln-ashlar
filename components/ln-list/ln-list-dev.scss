@@ -1,0 +1,8 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. List Integration: missing ID warning for sort/search mapping
+	[data-ln-list]:not([id]) {
+		@include dev-dom-error("[data-ln-list] is missing a required 'id' attribute for sort/search mapping.");
+	}
+}

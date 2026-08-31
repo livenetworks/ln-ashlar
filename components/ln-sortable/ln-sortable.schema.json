@@ -3,15 +3,23 @@
 	"component": "ln-sortable",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-sortable-dev.scss"
+			]
+		},
 		"data-ln-sortable": {
 			"direction": "both",
 			"sources": [
+				"ln-sortable-dev.scss",
 				"src/ln-sortable.js"
 			]
 		},
 		"data-ln-sortable-handle": {
 			"direction": "author",
 			"sources": [
+				"ln-sortable-dev.scss",
 				"src/ln-sortable.js"
 			]
 		}

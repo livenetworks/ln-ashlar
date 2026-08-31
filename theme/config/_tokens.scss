@@ -367,10 +367,6 @@
 	--btn-padding-x:    var(--size-sm-up);
 	--btn-padding-y:    var(--size-xs-up);
 
-	// Table cell padding tokens — roomier than base rhythm; density-reactive via _density.scss
-	--table-cell-padding-y:  var(--size-sm);       // 8px dense base (DocuFlow th: 9px / td: 10px)
-	--table-cell-padding-x:  var(--size-md);       // 16px dense base
-
 	// -- Typography — primitives -----------------------------------------
 	// Mixins read these two primitives ONLY (via @include typography(role),
 	// which rebinds them per role on the consuming element's scope — mirror

@@ -3,9 +3,16 @@
 	"component": "ln-toast",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-toast-dev.scss"
+			]
+		},
 		"data-ln-toast": {
 			"direction": "author",
 			"sources": [
+				"ln-toast-dev.scss",
 				"ln-toast.scss",
 				"src/ln-toast.js"
 			]

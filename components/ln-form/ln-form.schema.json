@@ -3,9 +3,16 @@
 	"component": "ln-form",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-form-dev.scss"
+			]
+		},
 		"data-ln-form": {
 			"direction": null,
 			"sources": [
+				"ln-form-dev.scss",
 				"src/ln-form.js"
 			]
 		},

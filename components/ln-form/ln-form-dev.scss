@@ -1,0 +1,8 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Host Element Check: data-ln-form belongs only on <form> elements
+	[data-ln-form]:not(form) {
+		@include dev-inline-error("data-ln-form belongs only on <form> elements");
+	}
+}

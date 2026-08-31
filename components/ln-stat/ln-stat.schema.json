@@ -3,9 +3,16 @@
 	"component": "ln-stat",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-stat-dev.scss"
+			]
+		},
 		"data-ln-stat": {
 			"direction": "author",
 			"sources": [
+				"ln-stat-dev.scss",
 				"src/ln-stat.js"
 			]
 		},

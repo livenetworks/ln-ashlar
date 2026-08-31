@@ -1,0 +1,8 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Progress Nesting Check: data-ln-progress must reside inside a progress container
+	[data-ln-progress]:not(.progress [data-ln-progress]):not([data-ln-upload-progress] [data-ln-progress]) {
+		@include dev-inline-error("data-ln-progress must be a child of a .progress container");
+	}
+}

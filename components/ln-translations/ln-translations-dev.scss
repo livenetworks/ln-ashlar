@@ -1,0 +1,13 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Badges Container Check: [data-ln-translations] must contain an active languages list
+	[data-ln-translations]:not(:has([data-ln-translations-active])) {
+		@include dev-dom-error("[data-ln-translations] is missing a required <ul data-ln-translations-active> container.");
+	}
+
+	// 2. Translatable Field Key Check: translatable field key cannot be empty
+	[data-ln-translatable=""] {
+		@include dev-inline-error("data-ln-translatable field key cannot be empty");
+	}
+}

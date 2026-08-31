@@ -3,9 +3,16 @@
 	"component": "ln-time",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-time-dev.scss"
+			]
+		},
 		"data-ln-time": {
 			"direction": "author",
 			"sources": [
+				"ln-time-dev.scss",
 				"src/ln-time.js"
 			]
 		},

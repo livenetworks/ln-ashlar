@@ -1,0 +1,13 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Host Element Check: data-ln-time belongs on native <time> elements
+	[data-ln-time]:not(time) {
+		@include dev-inline-error("data-ln-time belongs on native <time> elements");
+	}
+
+	// 2. Datetime Attribute Check: <time data-ln-time> requires a datetime attribute
+	time[data-ln-time]:not([datetime]) {
+		@include dev-inline-error("<time data-ln-time> is missing required datetime attribute");
+	}
+}

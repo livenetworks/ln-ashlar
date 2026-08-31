@@ -9,19 +9,45 @@
 @use 'config/mixins' as *;
 
 // --- Modular Component Diagnostics ---
-@use '../components/ln-toggle/ln-toggle-dev';
-@use '../components/ln-table/ln-table-dev';
-@use '../components/ln-modal/ln-modal-dev';
-@use '../components/ln-ui-coordinator/ln-ui-coordinator-dev';
-@use '../components/ln-validate/ln-validate-dev';
-@use '../components/ln-date/ln-date-dev';
-@use '../components/ln-number/ln-number-dev';
-@use '../components/ln-tabs/ln-tabs-dev';
-@use '../components/ln-search/ln-search-dev';
-@use '../components/ln-filter/ln-filter-dev';
-@use '../components/ln-sort/ln-sort-dev';
+@use '../components/ln-accordion/ln-accordion-dev';
+@use '../components/ln-ajax/ln-ajax-dev';
+@use '../components/ln-autoresize/ln-autoresize-dev';
+@use '../components/ln-autosave/ln-autosave-dev';
 @use '../components/ln-chart/ln-chart-dev';
+@use '../components/ln-circular-progress/ln-circular-progress-dev';
+@use '../components/ln-confirm/ln-confirm-dev';
+@use '../components/ln-data-coordinator/ln-data-coordinator-dev';
+@use '../components/ln-data-store/ln-data-store-dev';
+@use '../components/ln-date/ln-date-dev';
+@use '../components/ln-dropdown/ln-dropdown-dev';
+@use '../components/ln-editor/ln-editor-dev';
+@use '../components/ln-filter/ln-filter-dev';
+@use '../components/ln-form/ln-form-dev';
+@use '../components/ln-include/ln-include-dev';
+@use '../components/ln-key/ln-key-dev';
+@use '../components/ln-link/ln-link-dev';
+@use '../components/ln-list/ln-list-dev';
+@use '../components/ln-modal/ln-modal-dev';
+@use '../components/ln-number/ln-number-dev';
+@use '../components/ln-options/ln-options-dev';
+@use '../components/ln-popover/ln-popover-dev';
+@use '../components/ln-progress/ln-progress-dev';
+@use '../components/ln-router/ln-router-dev';
+@use '../components/ln-search/ln-search-dev';
+@use '../components/ln-slug/ln-slug-dev';
+@use '../components/ln-sort/ln-sort-dev';
+@use '../components/ln-sortable/ln-sortable-dev';
+@use '../components/ln-stat/ln-stat-dev';
+@use '../components/ln-table/ln-table-dev';
+@use '../components/ln-tabs/ln-tabs-dev';
+@use '../components/ln-time/ln-time-dev';
+@use '../components/ln-toast/ln-toast-dev';
+@use '../components/ln-toggle/ln-toggle-dev';
 @use '../components/ln-tooltip/ln-tooltip-dev';
+@use '../components/ln-translations/ln-translations-dev';
+@use '../components/ln-ui-coordinator/ln-ui-coordinator-dev';
+@use '../components/ln-upload/ln-upload-dev';
+@use '../components/ln-validate/ln-validate-dev';
 
 // --- General HTML/Accessibility Diagnostics ---
 [data-ln-debug] {

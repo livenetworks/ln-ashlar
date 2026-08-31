@@ -1,0 +1,18 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Upload File Input: [data-ln-upload] must contain an <input type="file">
+	[data-ln-upload]:not(:has(input[type="file"])) {
+		@include dev-dom-error("[data-ln-upload] is missing a required <input type=\"file\"> element.");
+	}
+
+	// 2. Upload Zone: [data-ln-upload] must contain a [data-ln-upload-zone] drop area
+	[data-ln-upload]:not(:has([data-ln-upload-zone])) {
+		@include dev-dom-error("[data-ln-upload] is missing a required [data-ln-upload-zone] element.");
+	}
+
+	// 3. Upload List: [data-ln-upload] must contain a [data-ln-upload-list] list container
+	[data-ln-upload]:not(:has([data-ln-upload-list])) {
+		@include dev-dom-error("[data-ln-upload] is missing a required [data-ln-upload-list] container.");
+	}
+}

@@ -1,0 +1,18 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Editor Target Check: [data-ln-editor] must contain a target <textarea>
+	[data-ln-editor]:not(:has(textarea)) {
+		@include dev-dom-error("[data-ln-editor] is missing a target <textarea> element.");
+	}
+
+	// 2. Editor Action Check: action string cannot be empty
+	[data-ln-editor-action=""] {
+		@include dev-inline-error("data-ln-editor-action cannot be empty");
+	}
+
+	// 3. Editor Action Nesting Check: actions must reside inside an editor
+	[data-ln-editor-action]:not([data-ln-editor] *) {
+		@include dev-inline-error("[data-ln-editor-action] is orphaned (not inside a [data-ln-editor] container)");
+	}
+}

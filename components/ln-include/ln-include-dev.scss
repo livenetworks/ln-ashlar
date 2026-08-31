@@ -1,0 +1,13 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Host Element Check: data-ln-include belongs only on <template>
+	[data-ln-include]:not(template) {
+		@include dev-inline-error("data-ln-include belongs only on <template> elements");
+	}
+
+	// 2. URL Check: data-ln-include URL cannot be empty
+	template[data-ln-include=""] {
+		@include dev-inline-error("data-ln-include URL cannot be empty");
+	}
+}

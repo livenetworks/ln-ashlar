@@ -6,13 +6,21 @@
 		"data-ln-accordion": {
 			"direction": "author",
 			"sources": [
+				"ln-accordion-dev.scss",
 				"ln-accordion.scss",
 				"src/ln-accordion.js"
+			]
+		},
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-accordion-dev.scss"
 			]
 		},
 		"data-ln-toggle": {
 			"direction": "both",
 			"sources": [
+				"ln-accordion-dev.scss",
 				"src/ln-accordion.js"
 			]
 		}

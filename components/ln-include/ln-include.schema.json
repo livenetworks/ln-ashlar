@@ -3,9 +3,16 @@
 	"component": "ln-include",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-include-dev.scss"
+			]
+		},
 		"data-ln-include": {
 			"direction": "author",
 			"sources": [
+				"ln-include-dev.scss",
 				"src/ln-include.js"
 			]
 		}

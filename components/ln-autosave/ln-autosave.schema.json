@@ -6,6 +6,7 @@
 		"data-ln-autosave": {
 			"direction": "author",
 			"sources": [
+				"ln-autosave-dev.scss",
 				"src/ln-autosave.js"
 			]
 		},
@@ -25,6 +26,12 @@
 			"direction": null,
 			"sources": [
 				"src/ln-autosave.js"
+			]
+		},
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-autosave-dev.scss"
 			]
 		}
 	}

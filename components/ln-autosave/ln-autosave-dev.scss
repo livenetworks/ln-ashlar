@@ -1,0 +1,13 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Host Element Check: data-ln-autosave belongs only on <form>
+	[data-ln-autosave]:not(form) {
+		@include dev-inline-error("data-ln-autosave belongs only on <form> elements");
+	}
+
+	// 2. Storage Key Check: form must have an id or explicit data-ln-autosave key
+	form[data-ln-autosave=""]:not([id]) {
+		@include dev-dom-error("form[data-ln-autosave] requires an 'id' or explicit storage key value.");
+	}
+}

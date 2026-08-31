@@ -1,0 +1,8 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Accordion Content Check: [data-ln-accordion] must wrap child collapsible panels
+	[data-ln-accordion]:not(:has([data-ln-toggle])) {
+		@include dev-dom-error("[data-ln-accordion] contains no [data-ln-toggle] collapsible panels.");
+	}
+}

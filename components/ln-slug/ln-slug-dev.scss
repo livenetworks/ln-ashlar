@@ -1,0 +1,18 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Host Element Check: data-ln-slug-from belongs only on <input>
+	[data-ln-slug-from]:not(input) {
+		@include dev-inline-error("data-ln-slug-from belongs only on <input> elements");
+	}
+
+	// 2. Source Key Check: source field name cannot be empty
+	[data-ln-slug-from=""] {
+		@include dev-inline-error("data-ln-slug-from source field name cannot be empty");
+	}
+
+	// 3. Form Nesting Check: slug input must be inside a <form>
+	[data-ln-slug-from]:not(form [data-ln-slug-from]) {
+		@include dev-inline-error("data-ln-slug-from must be nested inside a <form> element");
+	}
+}

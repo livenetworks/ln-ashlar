@@ -1,0 +1,8 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Link Anchor Check: data-ln-link container must contain at least one <a href="...">
+	[data-ln-link]:not(:has(a[href])) {
+		@include dev-dom-error("[data-ln-link] container is missing a required child <a href=\"...\"> link.");
+	}
+}

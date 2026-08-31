@@ -1,0 +1,13 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Host Element Check: data-ln-options belongs only on <select>
+	[data-ln-options]:not(select) {
+		@include dev-inline-error("data-ln-options belongs only on <select> elements");
+	}
+
+	// 2. Store Name Check: source store name cannot be empty
+	[data-ln-options=""] {
+		@include dev-inline-error("data-ln-options store name cannot be empty");
+	}
+}

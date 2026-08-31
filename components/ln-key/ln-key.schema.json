@@ -3,9 +3,16 @@
 	"component": "ln-key",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-key-dev.scss"
+			]
+		},
 		"data-ln-key": {
 			"direction": "author",
 			"sources": [
+				"ln-key-dev.scss",
 				"src/ln-key.js"
 			]
 		},
@@ -18,6 +25,7 @@
 		"data-ln-key-for": {
 			"direction": "author",
 			"sources": [
+				"ln-key-dev.scss",
 				"src/ln-key.js"
 			]
 		},
@@ -30,6 +38,7 @@
 		"data-ln-key-target": {
 			"direction": "author",
 			"sources": [
+				"ln-key-dev.scss",
 				"src/ln-key.js"
 			]
 		}

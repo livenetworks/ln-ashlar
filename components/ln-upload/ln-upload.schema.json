@@ -3,6 +3,12 @@
 	"component": "ln-upload",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-upload-dev.scss"
+			]
+		},
 		"data-ln-field": {
 			"direction": "author",
 			"sources": [
@@ -18,6 +24,7 @@
 		"data-ln-upload": {
 			"direction": "author",
 			"sources": [
+				"ln-upload-dev.scss",
 				"ln-upload.scss",
 				"src/ln-upload.js"
 			]
@@ -81,6 +88,7 @@
 		"data-ln-upload-list": {
 			"direction": "author",
 			"sources": [
+				"ln-upload-dev.scss",
 				"src/ln-upload.js"
 			]
 		},
@@ -124,6 +132,7 @@
 		"data-ln-upload-zone": {
 			"direction": "author",
 			"sources": [
+				"ln-upload-dev.scss",
 				"src/ln-upload.js"
 			]
 		}

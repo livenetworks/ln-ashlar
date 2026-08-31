@@ -1,0 +1,8 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Identification Check: circular progress should have an id for identification/linking
+	[data-ln-circular-progress]:not([id]) {
+		@include dev-dom-error("[data-ln-circular-progress] is missing an 'id' attribute.");
+	}
+}

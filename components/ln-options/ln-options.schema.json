@@ -3,9 +3,16 @@
 	"component": "ln-options",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-options-dev.scss"
+			]
+		},
 		"data-ln-options": {
 			"direction": "author",
 			"sources": [
+				"ln-options-dev.scss",
 				"src/ln-options.js"
 			]
 		},

@@ -6,6 +6,7 @@
 		"data-ln-confirm": {
 			"direction": "author",
 			"sources": [
+				"ln-confirm-dev.scss",
 				"ln-confirm.scss",
 				"src/ln-confirm.js"
 			]
@@ -13,6 +14,7 @@
 		"data-ln-confirm-active": {
 			"direction": "author",
 			"sources": [
+				"ln-confirm-dev.scss",
 				"ln-confirm.scss",
 				"src/ln-confirm.js"
 			]
@@ -20,6 +22,7 @@
 		"data-ln-confirm-idle": {
 			"direction": "author",
 			"sources": [
+				"ln-confirm-dev.scss",
 				"ln-confirm.scss",
 				"src/ln-confirm.js"
 			]
@@ -33,6 +36,7 @@
 		"data-ln-debug": {
 			"direction": "author",
 			"sources": [
+				"ln-confirm-dev.scss",
 				"src/ln-confirm.js"
 			]
 		},

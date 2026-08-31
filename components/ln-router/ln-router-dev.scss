@@ -1,0 +1,13 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Host Element Check: data-ln-route must be on a <template> element
+	[data-ln-route]:not(template) {
+		@include dev-inline-error("data-ln-route must be declared on a <template> element");
+	}
+
+	// 2. Route Pattern Check: route pattern cannot be empty
+	template[data-ln-route=""] {
+		@include dev-inline-error("data-ln-route pattern cannot be empty");
+	}
+}

@@ -3,15 +3,23 @@
 	"component": "ln-editor",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-editor-dev.scss"
+			]
+		},
 		"data-ln-editor": {
 			"direction": null,
 			"sources": [
+				"ln-editor-dev.scss",
 				"src/ln-editor.js"
 			]
 		},
 		"data-ln-editor-action": {
 			"direction": "author",
 			"sources": [
+				"ln-editor-dev.scss",
 				"src/ln-editor.js"
 			]
 		},

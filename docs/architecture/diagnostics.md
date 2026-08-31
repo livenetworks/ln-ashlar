@@ -39,8 +39,8 @@ Best for block elements or component wrappers. It applies a prominent red dashed
 Best for inline elements, labels, or inline warnings. It appends a clean red text label with a warning icon adjacent to the target element.
 *   **SCSS Usage:**
     ```scss
-    [data-ln-search=""] {
-        @include dev-inline-error("data-ln-search target is empty");
+    [data-ln-search-for=""] {
+        @include dev-inline-error("data-ln-search-for target ID cannot be empty");
     }
     ```
 

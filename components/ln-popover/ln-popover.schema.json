@@ -3,9 +3,16 @@
 	"component": "ln-popover",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-popover-dev.scss"
+			]
+		},
 		"data-ln-popover": {
 			"direction": "both",
 			"sources": [
+				"ln-popover-dev.scss",
 				"ln-popover.scss",
 				"src/ln-popover.js"
 			]
@@ -13,6 +20,7 @@
 		"data-ln-popover-for": {
 			"direction": "author",
 			"sources": [
+				"ln-popover-dev.scss",
 				"src/ln-popover.js"
 			]
 		},

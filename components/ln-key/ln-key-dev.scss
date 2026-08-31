@@ -1,0 +1,18 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Shortcut String Check: shortcut combination string cannot be empty
+	[data-ln-key=""] {
+		@include dev-inline-error("data-ln-key shortcut combination cannot be empty");
+	}
+
+	// 2. Map Target Check: map item target selector cannot be empty
+	[data-ln-key-for=""] {
+		@include dev-inline-error("data-ln-key-for target selector cannot be empty");
+	}
+
+	// 3. Separate Declaration Target Check: data-ln-key-target selector cannot be empty
+	[data-ln-key-target=""] {
+		@include dev-inline-error("data-ln-key-target selector cannot be empty");
+	}
+}

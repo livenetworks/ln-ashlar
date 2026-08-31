@@ -3,6 +3,12 @@
 	"component": "ln-translations",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-translations-dev.scss"
+			]
+		},
 		"data-ln-dropdown": {
 			"direction": "author",
 			"sources": [
@@ -18,6 +24,7 @@
 		"data-ln-translatable": {
 			"direction": "author",
 			"sources": [
+				"ln-translations-dev.scss",
 				"src/ln-translations.js"
 			]
 		},
@@ -30,7 +37,14 @@
 		"data-ln-translations": {
 			"direction": "author",
 			"sources": [
+				"ln-translations-dev.scss",
 				"src/ln-translations.js"
+			]
+		},
+		"data-ln-translations-active": {
+			"direction": null,
+			"sources": [
+				"ln-translations-dev.scss"
 			]
 		},
 		"data-ln-translations-lang": {

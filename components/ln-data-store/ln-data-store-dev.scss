@@ -1,0 +1,8 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Store Table Name Check: data-ln-data-store requires an ID to serve as the store table name
+	[data-ln-data-store]:not([id]) {
+		@include dev-dom-error("[data-ln-data-store] requires a unique 'id' attribute as store table name.");
+	}
+}

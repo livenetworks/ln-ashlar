@@ -27,6 +27,10 @@
 	--shadow: var(--shadow-resting);
 	box-shadow: var(--shadow);
 	
+	// Scoped logical rhythm primitives for table cells
+	--padding-y: var(--size-xs-up);
+	--padding-x: var(--size-sm-up);
+
 	@if $sticky {
 		@include relative;
 		border-collapse: separate;
@@ -58,7 +62,7 @@
 
 	th {
 		@include text-left;
-		padding: var(--table-cell-padding-y) var(--table-cell-padding-x);
+		padding: var(--padding-y) var(--padding-x);
 		@include font-semibold;
 		font-size: var(--text-xs);
 		letter-spacing: 0.05em;
@@ -133,7 +137,7 @@
 	}
 
 	td {
-		padding: var(--table-cell-padding-y) var(--table-cell-padding-x);
+		padding: var(--padding-y) var(--padding-x);
 		border-block-end: var(--border-width) solid var(--border-subtle);
 		font-size: var(--text-sm);
 		line-height: var(--line-height);
@@ -164,7 +168,7 @@
 	// Sticky section footer inside sticky/enhanced tables
 	@if $sticky {
 		> footer {
-			padding: var(--table-cell-padding-y) var(--table-cell-padding-x);
+			padding: var(--padding-y) var(--padding-x);
 			border-block-start: var(--border-block-start, var(--border-width) solid var(--color-border));
 			--color-bg: var(--bg-sunken);
 			background: var(--color-bg);

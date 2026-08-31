@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en" data-ln-debug>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Localization (Date & Number) — ln-ashlar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-theme';
+		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-theme', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
+	<!-- Density bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-density';
+		var VALID = ['compact', 'comfortable', 'spacious'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-density', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
+	<link rel="stylesheet" href="dist/admin.css">
+	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css">
+	<script src="../dist/ln-ashlar.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<ul data-ln-toast>
+		<template data-ln-template="ln-toast-item">
+		<li data-ln-toast-item data-ln-attr="class:type">
+			<div class="icon">
+				<ul>
+					<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg></li>
+					<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-x"></use></svg></li>
+					<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg></li>
+					<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg></li>
+				</ul>
+			</div>
+			<section class="content">
+				<header>
+					<strong class="title" data-ln-field="title"></strong>
+					<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+				</header>
+				<main class="body" data-ln-field="message"></main>
+			</section>
+		</li>
+		</template>
+	</ul>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header class="app-header">
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
+				</button>
+				<h1>Localization (Date & Number)</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-palette"></use></svg>
+					</button>
+					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
+						<ul>
+							<li><button type="button" data-demo-theme="light"><span class="demo-theme-swatch" data-preset="light"></span>Light</button></li>
+							<li><button type="button" data-demo-theme="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
+							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
+							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
+							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+							<li><button type="button" data-demo-theme="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
+						</ul>
+					</div>
+					<button type="button" id="demo-density-trigger" data-ln-popover-for="demo-density-picker" aria-label="Choose density">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-adjustments-horizontal"></use></svg>
+					</button>
+					<div class="demo-density-picker" data-ln-popover id="demo-density-picker">
+						<ul>
+							<li><button type="button" data-demo-density="compact">Compact</button></li>
+							<li><button type="button" data-demo-density="comfortable">Comfortable</button></li>
+							<li><button type="button" data-demo-density="spacious">Spacious</button></li>
+						</ul>
+					</div>
+					<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'This is a demo notification.'}}))">
+						<span>Test Toast</span>
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<main class="app-main">
+		<!-- Sidebar -->
+		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
+			<header>
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
+				<span class="app-name">ashlar-gui</span>
+				<label class="search sidebar-search">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+					<input type="search" placeholder="Filter menu…" data-ln-search-for="demo-nav" data-ln-search-debounce="0">
+					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+				</label>
+			</header>
+
+			<main>
+				<nav class="nav" id="demo-nav" data-ln-nav="active" data-ln-search="" data-ln-search-items="li">
+					<ul>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="chip.html"><span class="nav-label">Chip</span></a></li>
+						<li><a href="density.html"><span class="nav-label">Density</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="kbd.html"><span class="nav-label">Kbd</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="page-header.html"><span class="nav-label">Page Header</span></a></li>
+						<li><a href="prose.html"><span class="nav-label">Prose</span></a></li>
+						<li><a href="stat-card.html"><span class="nav-label">Stat Card</span></a></li>
+						<li><a href="status-badge.html"><span class="nav-label">Status Badge</span></a></li>
+						<li><a href="stepper.html"><span class="nav-label">Stepper</span></a></li>
+						<li><a href="timeline.html"><span class="nav-label">Timeline</span></a></li>
+						<li><a href="empty-state.html"><span class="nav-label">Empty State</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autoresize.html"><span class="nav-label">Autoresize</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="editor.html"><span class="nav-label">Editor</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
+						<li><a href="include.html"><span class="nav-label">Include</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="localization.html" aria-current="page"><span class="nav-label">Localization (Date &amp; Number)</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="persist.html"><span class="nav-label">Persist</span></a></li>
+						<li><a href="popover.html"><span class="nav-label">Popover</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="router.html"><span class="nav-label">Router</span></a></li>
+						<li><a href="search.html"><span class="nav-label">Search</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="store.html"><span class="nav-label">Store</span></a></li>
+						<li><a href="store-usecase.html"><span class="nav-label">Store — Usecase</span></a></li>
+						<li><a href="list.html"><span class="nav-label">List &amp; Card Grid</span></a></li>
+						<li><a href="coordinator.html"><span class="nav-label">Data Coordinator</span></a></li>
+						<li><a href="api-connector.html"><span class="nav-label">API Connector</span></a></li>
+						<li><a href="couchdb-connector.html"><span class="nav-label">CouchDB Connector</span></a></li>
+						<li><a href="api-queue.html"><span class="nav-label">API Queue</span></a></li>
+						<li><a href="write-workflow.html"><span class="nav-label">Write Workflow (Form → Data)</span></a></li>
+						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
+						<li><a href="table-filter.html"><span class="nav-label">Table — Filtering</span></a></li>
+						<li><a href="table-sync.html"><span class="nav-label">Table — Data Sync</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="tooltip.html"><span class="nav-label">Tooltip</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+						<li><a href="validate.html"><span class="nav-label">Validate</span></a></li>
+						<li><a href="diagnostics.html"><span class="nav-label">Diagnostics (DOM Linter)</span></a></li>
+					</ul>
+				</nav>
+			</main>
+
+			<footer>
+				<small>ashlar-gui v1.2.0</small>
+			</footer>
+		</aside>
+		<div class="app-scrim"></div>
+
+		<!-- Content -->
+		<section>
+			<div class="app-content-wrapper">
+<h1>Localization (Date &amp; Number)</h1>
+
+<!-- Overview / philosophy -->
+<section class="section-card">
+	<header><h3>Overview &amp; Philosophy</h3></header>
+	<main>
+		<p>Formatting numbers, currencies, and dates across global enterprise applications is traditionally fraught with heavy, bloated third-party JavaScript dependencies. These often introduce slow parse times, bundle inflation, and conflicting client/server date parsing logic.</p>
+
+		<p>In <code>ln-ashlar</code>, this is resolved by <code>ln-number</code> and <code>ln-date</code> — two zero-dependency, high-performance form input enhancers. Operating on standard HTML inputs, they provide real-time, locale-aware presentation formatting while preserving pristine, raw machine-readable data payloads (numbers and ISO 8601 strings) for backend form submissions via automatically managed hidden inputs.</p>
+
+		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+			<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+				<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-icon-info-circle"></use></svg>
+				The HTML-First Localization Doctrine
+			</h4>
+			<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+				Components do not implement complex custom calendar engines or numerical calculators. They progressively enhance standard HTML5 <code>&lt;input type="number"&gt;</code>, <code>&lt;input type="date"&gt;</code>, and semantic tags (<code>&lt;time&gt;</code>, <code>&lt;strong&gt;</code>, <code>&lt;td&gt;</code>). Formatting and locale rules are offloaded directly to the browser's native <code>Intl.NumberFormat</code> and <code>Intl.DateTimeFormat</code> engines, with instant reactive updates when the parent <code>lang</code> attribute changes.
+			</p>
+		</div>
+
+		<h4>Key Architectural Advantages</h4>
+		<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+			<li>
+				<strong>Reactive Locale Cascading:</strong> Both components listen for BCP 47 language updates on parent scopes via <code>MutationObserver</code>. Changing the <code>lang</code> attribute instantly triggers a real-time re-format across all child inputs and semantic elements with zero page reload.
+			</li>
+			<li>
+				<strong>Two-Way Value Interception:</strong> Overrides native DOM <code>value</code> property descriptors. Reading <code>input.value</code> or assigning programmatic values automatically synchronizes both the visible formatted input and the underlying hidden payload field.
+			</li>
+			<li>
+				<strong>Native Platform Integration:</strong> <code>ln-date</code> connects to native browser date pickers (<code>showPicker()</code>) and supports resilient manual typing on blur with smart 2-digit year pivots. <code>ln-number</code> preserves cursor offsets during active typing.
+			</li>
+			<li>
+				<strong>Semantic Accessibility:</strong> Format static or dynamic data using standard HTML5 tags (<code>&lt;time datetime="..."&gt;</code>, <code>&lt;strong data-ln-number&gt;</code>) to preserve machine readability for screen readers while presenting human-friendly localized formats.
+			</li>
+		</ol>
+
+		<p>For complete technical specifications, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/components/ln-number/README.md"><code>ln-number</code> docs</a> and <a href="https://github.com/livenetworks/ln-ashlar/blob/main/components/ln-date/README.md"><code>ln-date</code> docs</a>.</p>
+	</main>
+</section>
+
+<!-- Attributes Reference -->
+<section class="section-card">
+	<header><h3>Attributes Reference</h3></header>
+	<main>
+		<h4><code>ln-number</code> Attributes</h4>
+		<div class="table-container">
+		<table>
+			<thead><tr><th>Attribute</th><th>On Element</th><th>Description</th></tr></thead>
+			<tbody>
+				<tr><td data-label="Attribute"><code>data-ln-number</code></td><td data-label="On Element"><code>&lt;input&gt;</code>, <code>&lt;span&gt;</code>, <code>&lt;td&gt;</code></td><td data-label="Description">Enables locale-aware number formatting. On inputs, initializes the component.</td></tr>
+				<tr><td data-label="Attribute"><code>data-ln-number-decimals="N"</code></td><td data-label="On Element"><code>&lt;input&gt;</code>, text tags</td><td data-label="Description">Locks maximum permitted decimal places (e.g. <code>2</code> for currency).</td></tr>
+				<tr><td data-label="Attribute"><code>data-ln-number-min="N"</code></td><td data-label="On Element"><code>&lt;input&gt;</code></td><td data-label="Description">Minimum numeric threshold (clamped during input).</td></tr>
+				<tr><td data-label="Attribute"><code>data-ln-number-max="N"</code></td><td data-label="On Element"><code>&lt;input&gt;</code></td><td data-label="Description">Maximum numeric threshold (clamped during input).</td></tr>
+			</tbody>
+		</table>
+		</div>
+
+		<h4 style="margin-top: var(--size-lg);"><code>ln-date</code> Attributes</h4>
+		<div class="table-container">
+		<table>
+			<thead><tr><th>Attribute</th><th>On Element</th><th>Description</th></tr></thead>
+			<tbody>
+				<tr><td data-label="Attribute"><code>data-ln-date="style|pattern"</code></td><td data-label="On Element"><code>&lt;input&gt;</code>, <code>&lt;time&gt;</code></td><td data-label="Description">Keyword (<code>short</code>, <code>medium</code>, <code>long</code>) or pattern (e.g. <code>dd.MM.yyyy</code>, <code>MMMM yyyy</code>). Defaults to <code>medium</code>.</td></tr>
+				<tr><td data-label="Attribute"><code>data-ln-date-label="Text"</code></td><td data-label="On Element"><code>&lt;input&gt;</code></td><td data-label="Description">Accessible aria-label override for the calendar picker trigger button.</td></tr>
+				<tr><td data-label="Attribute"><code>data-ln-fill-as="prop"</code></td><td data-label="On Element"><code>&lt;input&gt;</code></td><td data-label="Description">Custom field identifier for integration with <code>ln-fill</code> coordinators.</td></tr>
+				<tr><td data-label="Attribute"><code>data-ln-date-dict="lang"</code></td><td data-label="On Element"><code>&lt;ul hidden&gt;</code></td><td data-label="Description">Declarative HTML dictionary container for language fallbacks (read via <code>buildDict</code>).</td></tr>
+			</tbody>
+		</table>
+		</div>
+	</main>
+</section>
+
+<!-- ==========================================
+     INTERACTIVE LOCALIZATION PLAYGROUND
+     ========================================== -->
+<div id="demo-localization-scope" class="demo-localization-scope" lang="en-US">
+
+	<!-- Interactive Demo Toolbar -->
+	<div class="demo-locale-toolbar">
+		<div class="demo-locale-toolbar__info">
+			<div class="demo-locale-toolbar__title">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg>
+				<strong>Interactive Locale Playground</strong>
+			</div>
+			<p class="text-sm text-sunken">Switch locale to see instant real-time format shifts across number and date components.</p>
+		</div>
+
+		<div class="demo-locale-toolbar__action">
+			<button id="locale-popover-trigger" data-ln-popover-for="locale-popover" type="button" class="btn">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg>
+				<span>Locale: English (US) [en-US]</span>
+			</button>
+			<div data-ln-popover id="locale-popover">
+				<label class="search">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+					<input type="search" placeholder="Search locale..." data-ln-search-for="locale-list" data-ln-search-debounce="0">
+					<button type="button" data-ln-search-clear aria-label="Clear search">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+					</button>
+				</label>
+				<ul id="locale-list" data-ln-search="" data-ln-search-items="label">
+					<li><label><input type="radio" name="demo-locale" value="en-US" checked> English (US)</label></li>
+					<li><label><input type="radio" name="demo-locale" value="en-GB"> English (UK)</label></li>
+					<li><label><input type="radio" name="demo-locale" value="mk"> Македонски (MK)</label></li>
+					<li><label><input type="radio" name="demo-locale" value="de-DE"> Deutsch (DE)</label></li>
+					<li><label><input type="radio" name="demo-locale" value="fr-FR"> Français (FR)</label></li>
+					<li><label><input type="radio" name="demo-locale" value="es-ES"> Español (ES)</label></li>
+					<li><label><input type="radio" name="demo-locale" value="it-IT"> Italiano (IT)</label></li>
+					<li><label><input type="radio" name="demo-locale" value="tr-TR"> Türkçe (TR)</label></li>
+					<li><label><input type="radio" name="demo-locale" value="sq-AL"> Shqip (AL)</label></li>
+					<li><label><input type="radio" name="demo-locale" value="el-GR"> Ελληνικά (GR)</label></li>
+					<li><label><input type="radio" name="demo-locale" value="bg-BG"> Български (BG)</label></li>
+					<li><label><input type="radio" name="demo-locale" value="sr-RS"> Српски (RS)</label></li>
+					<li><label><input type="radio" name="demo-locale" value="hr-HR"> Hrvatski (HR)</label></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div id="chrome-intl-warning-container" class="alert warning" hidden>
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg>
+		<p>
+			<strong>Chromium Warning:</strong> Chrome and Chromium-based browsers use a reduced/truncated <code>Intl</code> locale database. 
+			Some formats or locales may be missing or fall back to English/standard rules.
+		</p>
+	</div>
+
+	<div id="demo-input-components">
+
+		<!-- ==========================================
+		     NUMBER FORMATTING — ln-number
+		     ========================================== -->
+		<section class="section-card" data-demo-html>
+			<header><h3>Number Formatting — ln-number</h3></header>
+			<main>
+				<p>Real-time locale-aware number formatting. The component creates a hidden input for form submission and formats the visible input with thousand separators.</p>
+
+				<form id="demo-number-form" data-ln-form>
+					<div class="form-element">
+						<label for="demo-amount">Amount (free decimals)</label>
+						<input type="number" id="demo-amount" name="amount" data-ln-number>
+						<output id="demo-amount-raw"></output>
+					</div>
+
+					<div class="form-element">
+						<label for="demo-price">Price (2 decimals)</label>
+						<input type="number" id="demo-price" name="price" data-ln-number data-ln-number-decimals="2">
+						<output id="demo-price-raw"></output>
+					</div>
+
+					<div class="form-element">
+						<label for="demo-budget">Budget (pre-filled)</label>
+						<input type="number" id="demo-budget" name="budget" value="1500000" data-ln-number>
+						<output id="demo-budget-raw"></output>
+					</div>
+
+					<div class="form-element">
+						<label for="demo-qty">Quantity (min: 0, max: 999999)</label>
+						<input type="number" id="demo-qty" name="quantity" data-ln-number data-ln-number-min="0" data-ln-number-max="999999">
+						<output id="demo-qty-raw"></output>
+					</div>
+				</form>
+
+				<h4>Non-Input Text Element Formatting (<code>&lt;strong&gt;</code>, <code>&lt;td&gt;</code>)</h4>
+				<p class="text-sm text-sunken"><code>ln-number</code> can also format static or dynamic text elements directly in HTML according to the active locale.</p>
+				
+				<div class="demo-number-cards">
+					<article class="card">
+						<main>
+							<small class="text-sunken">Raw Text standard: <code>1234567.89</code></small>
+							<div>Result: <strong data-ln-number>1234567.89</strong></div>
+						</main>
+					</article>
+
+					<article class="card">
+						<main>
+							<small class="text-sunken">Attribute value + 2 decimals: <code>5000</code></small>
+							<div>Result: €<strong data-ln-number="5000" data-ln-number-decimals="2">5000</strong></div>
+						</main>
+					</article>
+				</div>
+			</main>
+			<script type="text/plain" data-demo-scss>
+// Text fields and formatted numbers use form-input mixin:
+input[data-ln-number] {
+    @include form-input;
+}
+			</script>
+		</section>
+
+		<!-- ==========================================
+		     DATE FORMATTING — ln-date
+		     ========================================== -->
+		<section class="section-card" data-demo-html>
+			<header><h3>Date Formatting — ln-date</h3></header>
+			<main>
+				<p>Locale-aware date formatting with native browser picker. The component creates a hidden input for form submission and formats the visible input using Intl.DateTimeFormat or custom patterns.</p>
+
+				<form id="demo-date-form" data-ln-form>
+					<div class="form-element">
+						<label for="demo-birthday">Birthday (default medium)</label>
+						<input type="date" id="demo-birthday" name="birthday" data-ln-date>
+						<output id="demo-birthday-raw"></output>
+					</div>
+
+					<div class="form-element">
+						<label for="demo-due">Due Date (short)</label>
+						<input type="date" id="demo-due" name="due" data-ln-date="short">
+						<output id="demo-due-raw"></output>
+					</div>
+
+					<div class="form-element">
+						<label for="demo-event">Event Date (long)</label>
+						<input type="date" id="demo-event" name="event" data-ln-date="long">
+						<output id="demo-event-raw"></output>
+					</div>
+
+					<div class="form-element">
+						<label for="demo-custom-date">Custom Pattern (dd.MM.yyyy)</label>
+						<input type="date" id="demo-custom-date" name="custom" data-ln-date="dd.MM.yyyy">
+						<output id="demo-custom-date-raw"></output>
+					</div>
+
+					<div class="form-element">
+						<label for="demo-prefilled-date">Pre-filled (medium)</label>
+						<input type="date" id="demo-prefilled-date" name="prefilled" value="2024-03-15" data-ln-date>
+						<output id="demo-prefilled-date-raw"></output>
+					</div>
+
+					<div class="form-element">
+						<label for="demo-custom-label">Custom Label &amp; Fill Target (data-ln-date-label, data-ln-fill-as)</label>
+						<input type="date" id="demo-custom-label" name="custom_label" data-ln-date-label="Избери датум од календар" data-ln-fill-as="formatted_date" data-ln-date>
+						<output id="demo-custom-label-raw"></output>
+					</div>
+
+					<div class="form-element" lang="mk">
+						<label for="demo-dict-date">Declarative HTML Locale Dictionary (mk fallback via buildDict)</label>
+						<ul hidden data-ln-date-dict="mk">
+							<li data-ln-date-dict-key="months-long">јануари, февруари, март, април, мај, јуни, јули, август, септември, октомври, ноември, декември</li>
+							<li data-ln-date-dict-key="months-short">јан, фев, мар, апр, мај, јун, јул, авг, септ, окт, ноем, дек</li>
+						</ul>
+						<input type="date" id="demo-dict-date" name="dict_date" value="2026-04-19" data-ln-date="MMMM yyyy">
+					</div>
+				</form>
+
+				<h4>Semantic Text Element Formatting (<code>&lt;time&gt;</code>, <code>&lt;td&gt;</code>)</h4>
+				<p class="text-sm text-sunken">For semantic HTML5 accessibility, use <code>&lt;time datetime="..."&gt;</code> elements with <code>data-ln-date</code>.</p>
+				
+				<div class="demo-date-cards">
+					<article class="card">
+						<main>
+							<small class="text-sunken">Medium format: <code>&lt;time datetime="2026-07-25"&gt;</code></small>
+							<div>Result: <time datetime="2026-07-25" data-ln-date="medium">2026-07-25</time></div>
+						</main>
+					</article>
+
+					<article class="card">
+						<main>
+							<small class="text-sunken">Long format: <code>&lt;time datetime="2026-07-25"&gt;</code></small>
+							<div>Result: <time datetime="2026-07-25" data-ln-date="long">2026-07-25</time></div>
+						</main>
+					</article>
+
+					<article class="card">
+						<main>
+							<small class="text-sunken">Custom pattern: <code>dd.MM.yyyy</code></small>
+							<div>Result: <time datetime="2026-07-25" data-ln-date="dd.MM.yyyy">2026-07-25</time></div>
+						</main>
+					</article>
+				</div>
+			</main>
+			<script type="text/plain" data-demo-scss>
+// ln-date wraps its controls in a merged field shell.
+// The wrapper owns the border, radius, and focus ring;
+// the calendar button sits flush on the right.
+[data-ln-date-field] {
+    @include form-field-group;
+}
+			</script>
+		</section>
+
+	</div>
+</div>
+
+<script>
+(function () {
+	// ─── 1 — Number formatting raw outputs ────────────────────
+	const numberFields = [
+		{ inputId: 'demo-amount',  outputId: 'demo-amount-raw' },
+		{ inputId: 'demo-price',   outputId: 'demo-price-raw' },
+		{ inputId: 'demo-budget',  outputId: 'demo-budget-raw' },
+		{ inputId: 'demo-qty',     outputId: 'demo-qty-raw' }
+	];
+
+	const writeNumberRaw = function (input, output) {
+		const inst = input.lnNumber;
+		const raw = inst ? inst.value : NaN;
+		output.textContent = isNaN(raw) ? 'Raw: —' : 'Raw: ' + raw;
+	};
+
+	numberFields.forEach(function (pair) {
+		const input = document.getElementById(pair.inputId);
+		const output = document.getElementById(pair.outputId);
+		if (!input || !output) return;
+		input.addEventListener('input', function () { writeNumberRaw(input, output); });
+	});
+
+	// ─── 2 — Date formatting raw outputs ──────────────────────
+	const dateFields = [
+		{ inputId: 'demo-birthday',       outputId: 'demo-birthday-raw' },
+		{ inputId: 'demo-due',            outputId: 'demo-due-raw' },
+		{ inputId: 'demo-event',          outputId: 'demo-event-raw' },
+		{ inputId: 'demo-custom-date',    outputId: 'demo-custom-date-raw' },
+		{ inputId: 'demo-prefilled-date', outputId: 'demo-prefilled-date-raw' },
+		{ inputId: 'demo-custom-label',   outputId: 'demo-custom-label-raw' }
+	];
+
+	const writeDateRaw = function (input, output) {
+		const inst = input.lnDate;
+		const iso = inst ? inst.value : '';
+		output.textContent = iso ? 'Raw: ' + iso : 'Raw: —';
+	};
+
+	dateFields.forEach(function (pair) {
+		const input = document.getElementById(pair.inputId);
+		const output = document.getElementById(pair.outputId);
+		if (!input || !output) return;
+		input.addEventListener('ln-date:change', function () { writeDateRaw(input, output); });
+	});
+
+	// ─── 3 — Interactive Localization Demo ────────────────────
+	// Detect Chrome/Chromium to show the truncated Intl warning banner
+	const isChromium = !!window.chrome || /HeadlessChrome|Chromium|Chrome/.test(navigator.userAgent);
+	if (isChromium) {
+		const warningEl = document.getElementById('chrome-intl-warning-container');
+		if (warningEl) warningEl.removeAttribute('hidden');
+	}
+
+	// Locale selection logic
+	const localeScope = document.getElementById('demo-localization-scope') || document.getElementById('demo-input-components');
+	const localePopoverTrigger = document.getElementById('locale-popover-trigger');
+	const localePopover = document.getElementById('locale-popover');
+	const localeList = document.getElementById('locale-list');
+
+	if (localeScope && localePopoverTrigger && localePopover && localeList) {
+		localeList.addEventListener('change', function (e) {
+			const radio = e.target.closest('input[type="radio"]');
+			if (!radio) return;
+
+			const newLocale = radio.value;
+			const label = radio.closest('label');
+			const localeName = label ? label.textContent.trim() : newLocale;
+
+			// Update the lang attribute on the parent wrapper container
+			localeScope.setAttribute('lang', newLocale);
+
+			// Update trigger button label
+			const triggerSpan = localePopoverTrigger.querySelector('span');
+			if (triggerSpan) {
+				triggerSpan.textContent = 'Locale: ' + localeName + ' [' + newLocale + ']';
+			}
+
+			// Close the popover
+			if (localePopover.lnPopover) {
+				localePopover.lnPopover.close();
+			} else {
+				localePopover.setAttribute('data-ln-popover', 'closed');
+			}
+		});
+	}
+})();
+</script>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<footer class="app-footer">
+			<span>ashlar-gui &copy; 2026 LiveNetworks</span>
+			<span>ln-ashlar v1.2.0</span>
+		</footer>
+		</main>
+	</div><!-- /.app-wrapper -->
+
+	<!-- Modals (outside app-wrapper) -->
+	<dialog class="ln-modal" data-ln-modal id="demo-basic">
+		<form>
+			<header>
+				<h3>Basic Modal</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+			</header>
+			<main>
+				<p>This is a basic modal with a title and content.</p>
+				<p>Press ESC or click close.</p>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Close</button>
+			</footer>
+		</form>
+	</dialog>
+
+	<dialog class="ln-modal" data-ln-modal id="demo-form">
+		<form id="demo-form-el" data-ln-form>
+			<header>
+				<span class="icon">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-user"></use></svg>
+				</span>
+				<hgroup>
+					<h3>Edit User</h3>
+					<p>Update the user's details below.</p>
+				</hgroup>
+				<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+			</header>
+			<main>
+				<div class="form-element">
+					<label for="modal-name">Name</label>
+					<input type="text" id="modal-name" name="name" placeholder="Enter name...">
+				</div>
+				<div class="form-element">
+					<label for="modal-email">Email</label>
+					<input type="email" id="modal-email" name="email" placeholder="email@example.com">
+				</div>
+				<div class="form-element">
+					<label for="modal-role">Role</label>
+					<select id="modal-role" name="role">
+						<option>User</option>
+						<option>Administrator</option>
+						<option>Moderator</option>
+					</select>
+				</div>
+			</main>
+			<footer>
+				<button type="button" class="delete-action">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
+					Delete
+				</button>
+				<button type="button" data-ln-modal-close>Cancel</button>
+				<button type="submit">Save</button>
+			</footer>
+		</form>
+	</dialog>
+
+	<script>
+	(function () {
+		const KEY = 'ln-demo-theme';
+		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-theme') || 'light';
+			document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-theme') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-theme]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-theme');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-theme', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+
+	(function () {
+		const KEY = 'ln-demo-density';
+		const VALID = ['compact', 'comfortable', 'spacious'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-density') || 'compact';
+			document.querySelectorAll('[data-demo-density]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-density') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-density]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-density');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-density', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-density-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+	</script>
+</body>
+</html>

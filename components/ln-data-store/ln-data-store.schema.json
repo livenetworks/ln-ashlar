@@ -6,6 +6,7 @@
 		"data-ln-data-store": {
 			"direction": "author",
 			"sources": [
+				"ln-data-store-dev.scss",
 				"src/ln-data-store.js"
 			]
 		},
@@ -43,6 +44,12 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-data-store.js"
+			]
+		},
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-data-store-dev.scss"
 			]
 		}
 	}

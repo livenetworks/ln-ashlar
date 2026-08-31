@@ -6,6 +6,7 @@
 		"data-ln-circular-progress": {
 			"direction": "author",
 			"sources": [
+				"ln-circular-progress-dev.scss",
 				"src/ln-circular-progress.js"
 			]
 		},
@@ -19,6 +20,12 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-circular-progress.js"
+			]
+		},
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-circular-progress-dev.scss"
 			]
 		}
 	}

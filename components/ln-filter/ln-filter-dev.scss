@@ -5,4 +5,9 @@
 	[data-ln-filter=""] {
 		@include dev-inline-error("data-ln-filter target is empty");
 	}
+
+	// 2. Filter Key Check: filter input must have a non-empty key name
+	[data-ln-filter-key=""] {
+		@include dev-inline-error("data-ln-filter-key cannot be empty");
+	}
 }

@@ -1,0 +1,8 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Metric Store Name Check: data-ln-stat cannot have an empty store name
+	[data-ln-stat=""] {
+		@include dev-inline-error("data-ln-stat store name cannot be empty");
+	}
+}

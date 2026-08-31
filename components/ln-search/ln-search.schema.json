@@ -55,6 +55,7 @@
 		"data-ln-search-for": {
 			"direction": "author",
 			"sources": [
+				"ln-search-dev.scss",
 				"src/ln-search.js"
 			]
 		},

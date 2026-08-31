@@ -7,6 +7,8 @@
 
 [data-ln-date-field] {
 	@include form-field-group;
+	@include w-full;
+	display: flex;
 	// The submit value input has no visual role — hide it entirely.
 	> input[type="hidden"] {
 		display: none;

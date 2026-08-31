@@ -1,0 +1,13 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Dropdown Menu Check: dropdown coordinator must wrap a menu [data-ln-toggle]
+	[data-ln-dropdown]:not(:has([data-ln-toggle])) {
+		@include dev-dom-error("[data-ln-dropdown] is missing a required child menu [data-ln-toggle].");
+	}
+
+	// 2. Dropdown Trigger Check: dropdown coordinator must wrap a trigger [data-ln-toggle-for]
+	[data-ln-dropdown]:not(:has([data-ln-toggle-for])) {
+		@include dev-dom-error("[data-ln-dropdown] is missing a required child trigger [data-ln-toggle-for].");
+	}
+}

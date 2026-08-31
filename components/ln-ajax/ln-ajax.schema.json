@@ -6,7 +6,14 @@
 		"data-ln-ajax": {
 			"direction": "author",
 			"sources": [
+				"ln-ajax-dev.scss",
 				"src/ln-ajax.js"
+			]
+		},
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-ajax-dev.scss"
 			]
 		},
 		"data-ln-form-scope": {

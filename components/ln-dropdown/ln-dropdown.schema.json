@@ -3,9 +3,16 @@
 	"component": "ln-dropdown",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-dropdown-dev.scss"
+			]
+		},
 		"data-ln-dropdown": {
 			"direction": null,
 			"sources": [
+				"ln-dropdown-dev.scss",
 				"ln-dropdown.scss",
 				"src/ln-dropdown.js"
 			]
@@ -32,12 +39,14 @@
 		"data-ln-toggle": {
 			"direction": "both",
 			"sources": [
+				"ln-dropdown-dev.scss",
 				"src/ln-dropdown.js"
 			]
 		},
 		"data-ln-toggle-for": {
 			"direction": "author",
 			"sources": [
+				"ln-dropdown-dev.scss",
 				"src/ln-dropdown.js"
 			]
 		}
