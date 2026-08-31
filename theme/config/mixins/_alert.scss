@@ -31,6 +31,7 @@
 	padding: var(--padding-y) var(--padding-x);
 	border-radius: var(--radius);
 	@include text-sm;
+	border: var(--border-width) solid color-mix(in srgb, var(--color-accent) 22%, transparent);
 	border-left: 3px solid var(--color-accent);
 	@include tinted-surface(0.08);
 	color: var(--color-fg);

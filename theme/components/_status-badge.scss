@@ -1,4 +1,6 @@
 @use '../config/mixins' as *;
 
-.badge      { @include badge; }
-.badge.live { @include badge-live; }
+.badge         { @include badge; }
+.badge.outline { @include badge-outline; }
+.badge-outline { @include badge-outline; }
+.badge.live    { @include badge-live; }

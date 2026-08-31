@@ -1,6 +1,8 @@
 @use '../../../../theme/config/mixins' as *;
 
 .demo-density-picker {
+	padding: var(--size-xs);
+
 	ul {
 		@include menu-items;
 		min-width: 10rem;

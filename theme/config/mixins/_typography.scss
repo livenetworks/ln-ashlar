@@ -23,8 +23,16 @@
 @mixin capitalize { text-transform: capitalize; }
 @mixin normal-case { text-transform: none; }
 
-@mixin tracking-wide   { letter-spacing: var(--tracking-wide); }
-@mixin tracking-wider  { letter-spacing: 0.05em; }
+@mixin tracking-tighter { letter-spacing: var(--tracking-tighter); }
+@mixin tracking-tight   { letter-spacing: var(--tracking-tight); }
+@mixin tracking-normal  { letter-spacing: var(--tracking-normal); }
+@mixin tracking-wide    { letter-spacing: var(--tracking-wide); }
+@mixin tracking-wider   { letter-spacing: var(--tracking-wider); }
+
+@mixin font-tabular {
+	font-variant-numeric: tabular-nums;
+	font-feature-settings: 'tnum';
+}
 
 @mixin truncate {
 	overflow: hidden;
@@ -53,7 +61,10 @@
 	font-size:     var(--font-size);
 	--line-height: var(--lh-#{$role});
 	line-height:   var(--line-height);
-}
 
-@mixin tracking-tight  { letter-spacing: var(--tracking-tight); }
-@mixin tracking-normal { letter-spacing: var(--tracking-normal); }
+	@if $role == display-lg or $role == display-md or $role == display-sm {
+		letter-spacing: var(--tracking-tighter);
+	} @else if $role == heading-lg or $role == heading-md {
+		letter-spacing: var(--tracking-tight);
+	}
+}

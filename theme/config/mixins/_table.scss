@@ -37,13 +37,12 @@
 	font-variant-numeric: tabular-nums;
 
 	// Row hover transition color. Default to a discrete tint of the primary color
-	// mixed with transparent to create a harmonious background shift across themes.
-	--bg-row-hover: var(--color-row-hover, color-mix(in srgb, var(--color-primary) 6%, transparent));
+	--bg-row-hover: var(--color-row-hover, color-mix(in srgb, var(--color-accent) 4%, var(--bg-sunken)));
 
 	thead {
 		--color-bg: var(--bg-sunken);
 		background: var(--color-bg);
-		border-block-end: var(--border-block-end, var(--border-width-strong) solid var(--color-border));
+		border-block-end: var(--border-block-end, var(--border-width) solid var(--border-subtle));
 		
 		@if $sticky {
 			@include sticky-top;
@@ -61,13 +60,15 @@
 		@include text-left;
 		padding: var(--table-cell-padding-y) var(--table-cell-padding-x);
 		@include font-semibold;
-		@include typography(label-sm);
-		letter-spacing: 0.06em;
+		font-size: var(--text-xs);
+		letter-spacing: 0.05em;
 		@include uppercase;
+		--color-fg: var(--fg-muted);
 		color: var(--color-fg);
 		position: relative;
 		top: auto;
 		z-index: auto;
+		vertical-align: middle;
 
 		// Shared header-button stack — keyed off the unprefixed structural filter button
 		// class and the [data-ln-sort] JS-component selector, so table / ln-table /
@@ -124,18 +125,24 @@
 			--color-bg: var(--bg-row-hover);
 			background: var(--color-bg);
 		}
+
+		&.selected,
+		&:has(input[type="checkbox"]:checked) {
+			background-color: color-mix(in srgb, var(--color-accent) 7%, var(--color-bg));
+		}
 	}
 
 	td {
 		padding: var(--table-cell-padding-y) var(--table-cell-padding-x);
-		@include border-b;
-		font-size: var(--font-size);
+		border-block-end: var(--border-width) solid var(--border-subtle);
+		font-size: var(--text-sm);
 		line-height: var(--line-height);
-		vertical-align: top;
+		vertical-align: middle;
+		color: var(--color-fg);
 	}
 
 	tr:last-child td {
-		@include border-none;
+		border-block-end: none;
 	}
 
 	td.numeric,
@@ -286,8 +293,8 @@
 	transition: all 0.15s ease-in-out;
 
 	&:hover {
-		background-color: hsl(var(--color-primary) / 0.12);
-		color: hsl(var(--color-primary));
+		background-color: color-mix(in srgb, var(--color-accent) 12%, transparent);
+		color: var(--color-accent);
 		opacity: 1;
 	}
 }

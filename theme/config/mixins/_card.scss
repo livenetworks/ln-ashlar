@@ -21,7 +21,7 @@
 	border-radius: var(--radius);
 	@include overflow-hidden;
 	@include transition;
-	box-shadow: var(--shadow);
+	box-shadow: var(--shadow), var(--surface-highlight, inset 0 0 0 0 transparent);
 
 	&:hover {
 		--color-border: color-mix(in srgb, var(--color-accent) 35%, transparent);
@@ -136,14 +136,13 @@
 @mixin panel-body {
 	padding: var(--padding-y) var(--padding-x);
 
-	ul, ol {
+	:is(ul, ol):not([class]) {
 		padding-left: 1.5em;
 		margin-bottom: var(--size-md);
 
 		li {
 			margin-bottom: var(--size-xs);
 			line-height: 1.7;
-			list-style: inherit;
 
 			&:last-child {
 				margin-bottom: 0;
@@ -151,11 +150,11 @@
 		}
 	}
 
-	ul {
+	ul:not([class]) {
 		list-style-type: disc;
 	}
 
-	ol {
+	ol:not([class]) {
 		list-style-type: decimal;
 	}
 
@@ -330,6 +329,13 @@
 	> footer { @include panel-footer; }
 }
 
+// ─── Frosted Glass ──────────────────────────────────────
+@mixin frosted-glass($opacity: 0.85, $blur: 12px) {
+	background-color: color-mix(in srgb, var(--color-bg) calc(#{$opacity} * 100%), transparent);
+	backdrop-filter: blur(#{$blur});
+	-webkit-backdrop-filter: blur(#{$blur});
+}
+
 // ─── Floating panel ────────────────────────────────────
 // Chrome recipe for floating overlays (popover, dropdown menu, toast).
 // Rebinds --color-bg to elevated surface and --shadow to floating
@@ -345,7 +351,8 @@
 	border-inline-start: var(--border-inline-start, var(--border-width) solid var(--color-border));
 	border-inline-end:   var(--border-inline-end,   var(--border-width) solid var(--color-border));
 	border-radius: var(--radius);
-	box-shadow: var(--shadow);
+	box-shadow: var(--shadow), var(--surface-highlight, inset 0 0 0 0 transparent);
+	@include frosted-glass(0.92, 10px);
 	// z-index is the caller's responsibility: top-layer consumers (dropdown,
 	// popover, tooltip portal) don't need one; standalone consumers do —
 	// see [data-ln-table] .column-filter-dropdown in components/_filter.scss.

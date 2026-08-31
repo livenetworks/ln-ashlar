@@ -47,3 +47,9 @@
 .secondary { @include semantic-color(secondary); }
 
 .neutral { --color-primary: var(--color-neutral-400); }
+
+// Numeric & tabular figures
+[data-ln-number],
+.tabular-nums {
+	@include font-tabular;
+}

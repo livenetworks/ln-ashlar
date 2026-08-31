@@ -18,38 +18,38 @@
 :root {
 
 	// -----------------------------------------------------------------------
-	// Colors — Primary
+	// Colors — Primary (Modern vibrant royal blue / Tailwind blue-600)
 	// -----------------------------------------------------------------------
-	--color-primary: 232 75% 52%;
-	--color-primary-light: 232 75% 93%;
-	--color-primary-lighter: 232 75% 97%;
+	--color-primary: 221 83% 53%;
+	--color-primary-light: 221 83% 94%;
+	--color-primary-lighter: 221 83% 97%;
 
 	// -----------------------------------------------------------------------
 	// Colors — Secondary (brand accent — surface/element color, NOT text)
 	// For subdued text color, see --fg-muted in the logical token section.
 	// -----------------------------------------------------------------------
-	--color-secondary: 160 76% 40%;
-	--color-secondary-light:   160 76% 93%;
-	--color-secondary-lighter: 160 76% 97%;
+	--color-secondary: 160 84% 39%;
+	--color-secondary-light:   160 84% 94%;
+	--color-secondary-lighter: 160 84% 97%;
 
 	// -----------------------------------------------------------------------
 	// Colors — Status
 	// -----------------------------------------------------------------------
-	--color-success:         142 76% 36%;
-	--color-success-light:   142 76% 93%;
-	--color-success-lighter: 142 76% 97%;
+	--color-success:         142 71% 42%;
+	--color-success-light:   142 71% 94%;
+	--color-success-lighter: 142 71% 97%;
 
-	--color-error:           0 84% 50%;
-	--color-error-light:     0 84% 93%;
+	--color-error:           0 84% 58%;
+	--color-error-light:     0 84% 94%;
 	--color-error-lighter:   0 84% 97%;
 
-	--color-warning:         32 95% 44%;
-	--color-warning-light:   32 95% 93%;
-	--color-warning-lighter: 32 95% 97%;
+	--color-warning:         38 92% 50%;
+	--color-warning-light:   38 92% 94%;
+	--color-warning-lighter: 38 92% 97%;
 
-	--color-info:            217 91% 60%;
-	--color-info-light:      217 91% 93%;
-	--color-info-lighter:    217 91% 97%;
+	--color-info:            199 89% 48%;
+	--color-info-light:      199 89% 94%;
+	--color-info-lighter:    199 89% 97%;
 
 	// -----------------------------------------------------------------------
 	// Colors — Neutral scale (canonical greys)
@@ -59,17 +59,17 @@
 	// during dark-mode audits -- semantic tokens inherit dark adjustments
 	// automatically, direct-neutral references do not.
 	//
-	--color-neutral-50:  220 20% 98%;
-	--color-neutral-100: 220 16% 96%;
-	--color-neutral-150: 220 14% 93%;
-	--color-neutral-200: 220 13% 91%;
-	--color-neutral-300: 220 13% 83%;
+	--color-neutral-50:  210 20% 98%;
+	--color-neutral-100: 220 14% 96%;
+	--color-neutral-150: 220 13% 93%;
+	--color-neutral-200: 220 13% 90%;
+	--color-neutral-300: 216 12% 84%;
 	--color-neutral-400: 218 11% 65%;
 	--color-neutral-500: 220  9% 46%;
-	--color-neutral-600: 220 11% 34%;
-	--color-neutral-700: 220 14% 24%;
-	--color-neutral-800: 220 20% 15%;
-	--color-neutral-900: 221 39% 11%;
+	--color-neutral-600: 215 14% 34%;
+	--color-neutral-700: 217 19% 27%;
+	--color-neutral-800: 215 28% 17%;
+	--color-neutral-900: 222 47% 11%;
 
 	// -----------------------------------------------------------------------
 	// Colors — Backgrounds
@@ -130,36 +130,38 @@
 	--radius-full: 9999px;
 
 	// -----------------------------------------------------------------------
-	// Shadows — cool-tinted, dual-layer (v1.1)
+	// Shadows — cool-tinted, dual-layer (ambient + key light)
 	// -----------------------------------------------------------------------
 	// Public API surface — full scale exposed; internal usage may skip levels.
 	--shadow-none: none;
 
 	--shadow-xs:
-		0 1px 2px 0 hsl(220 40% 15% / 0.04);
+		0 1px 2px 0 hsl(220 40% 10% / 0.05);
 
 	--shadow-sm:
-		0 1px 3px 0 hsl(220 40% 15% / 0.08),
-		0 1px 2px -1px hsl(220 40% 15% / 0.04);
+		0 1px 3px 0 hsl(220 40% 10% / 0.07),
+		0 1px 2px -1px hsl(220 40% 10% / 0.05);
 
 	--shadow-md:
-		0 4px 12px -2px hsl(220 40% 15% / 0.10),
-		0 2px 4px -2px hsl(220 40% 15% / 0.06);
+		0 4px 6px -1px hsl(220 40% 10% / 0.08),
+		0 2px 4px -2px hsl(220 40% 10% / 0.05);
 
 	--shadow-lg:
-		0 12px 24px -6px hsl(220 40% 15% / 0.12),
-		0 8px 12px -4px hsl(220 40% 15% / 0.08);
+		0 10px 15px -3px hsl(220 40% 10% / 0.08),
+		0 4px 6px -4px hsl(220 40% 10% / 0.04);
 
 	--shadow-xl:
-		0 24px 48px -12px hsl(220 40% 15% / 0.16),
-		0 12px 24px -6px hsl(220 40% 15% / 0.10);
+		0 20px 25px -5px hsl(220 40% 10% / 0.09),
+		0 8px 10px -6px hsl(220 40% 10% / 0.04);
 
 	--shadow-2xl:
-		0 36px 72px -18px hsl(220 40% 15% / 0.20),
-		0 18px 36px -9px hsl(220 40% 15% / 0.12);
+		0 25px 50px -12px hsl(220 40% 10% / 0.18);
 
 	--shadow-inner:
 		inset 0 2px 4px 0 hsl(220 40% 15% / 0.06);
+
+	// Surface highlight — subtle top-edge bevel/illumination for elevated surfaces
+	--surface-highlight: inset 0 1px 0 0 hsl(0 0% 100% / 0.6);
 
 	// Color-aware shadows (for focus halos and coloured CTAs)
 	--shadow-primary: 0 8px 24px -6px hsl(var(--color-primary) / 0.28);
@@ -187,6 +189,7 @@
 	// -----------------------------------------------------------------------
 	--font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 	--font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
+	--font-features: "cv02", "cv03", "cv04", "cv11", "tnum";
 
 	--text-xs: 0.75rem;      // 12px
 	--text-sm: 0.875rem;     // 14px
@@ -223,11 +226,13 @@
 	--text-caption:    0.75rem;   --lh-caption:    1.4;
 
 	// -----------------------------------------------------------------------
-	// Letter spacing
+	// Letter spacing (optical tracking scale)
 	// -----------------------------------------------------------------------
-	--tracking-tight:  -0.025em;
-	--tracking-normal: 0;
+	--tracking-tighter: -0.035em;
+	--tracking-tight:   -0.02em;
+	--tracking-normal:  0;
 	--tracking-wide:    0.025em;
+	--tracking-wider:   0.05em;
 
 	--font-normal: 400;
 	--font-medium: 500;
@@ -293,7 +298,7 @@
 
 	--border-subtle:       hsl(var(--color-neutral-200));
 	--border-strong:       hsl(var(--color-neutral-300));
-	--border-strong-hover: hsl(var(--color-neutral-400));
+	--border-strong-hover: hsl(var(--color-neutral-300));
 
 	--shadow-resting:  var(--shadow-sm);
 	--shadow-floating: var(--shadow-md);
@@ -356,7 +361,7 @@
 	--btn-border:       var(--border-strong);
 	--btn-bg-hover:     var(--bg-sunken);
 	--btn-fg-hover:     var(--color-fg);
-	--btn-border-hover: var(--border-strong-hover);
+	--btn-border-hover: var(--border-strong);
 
 	// Button padding tokens
 	--btn-padding-x:    var(--size-sm-up);

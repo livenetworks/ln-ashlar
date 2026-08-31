@@ -11,6 +11,7 @@
 @use 'transitions' as *;
 @use 'interaction' as *;
 @use 'sidebar' as *;
+@use 'card' as *;
 
 // ─── App Shell ──────────────────────────────────────────────────────────────
 // Mobile-ready application shell: fixed header, sidebar drawer, scrim overlay.
@@ -63,6 +64,7 @@
 	background: var(--color-bg);
 	border-block-end: var(--border-block-end, var(--border-width) solid var(--color-border));
 	box-shadow: var(--shadow);
+	@include frosted-glass(0.88, 12px);
 	@include flex;
 	@include items-center;
 	@include justify-between;
@@ -97,7 +99,7 @@
 	.menu-toggle {
 		@include flex-center;
 		@include size(2rem);
-		@include rounded-sm;
+		border-radius: var(--radius);
 	}
 
 	h1 {
@@ -141,7 +143,7 @@
 		--btn-padding-x: var(--size-sm-up);
 		@include text-xs;
 		font-weight: var(--font-medium);
-		border-radius: var(--radius-sm);
+		border-radius: var(--radius);
 
 		// Label visually-hidden on small viewports — icon remains.
 		> span {

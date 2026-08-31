@@ -20,3 +20,9 @@
 	}
 }
 
+time,
+[data-ln-date],
+[data-ln-time] {
+	@include font-tabular;
+}
+

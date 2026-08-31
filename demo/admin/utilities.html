@@ -247,6 +247,99 @@
 				</div>
 			</main>
 		</section>
+
+		<!-- Button Style Variants -->
+		<section class="section-card">
+			<header><h3>Button Style Variants</h3></header>
+			<main>
+				<p>Modern SaaS button variants built via SCSS mixins and exported as utility classes.</p>
+				<div class="table-container">
+				<table>
+					<thead>
+						<tr><th>Variant</th><th>Default</th><th>Success</th><th>Error</th><th>Warning</th></tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><strong>Solid Primary</strong> (<code>.btn</code>)</td>
+							<td><button type="submit" class="btn">Primary</button></td>
+							<td><button type="submit" class="btn success">Success</button></td>
+							<td><button type="submit" class="btn error">Error</button></td>
+							<td><button type="submit" class="btn warning">Warning</button></td>
+						</tr>
+						<tr>
+							<td><strong>Soft Tint</strong> (<code>.btn-soft</code>)</td>
+							<td><button type="button" class="btn-soft">Soft</button></td>
+							<td><button type="button" class="btn-soft success">Soft</button></td>
+							<td><button type="button" class="btn-soft error">Soft</button></td>
+							<td><button type="button" class="btn-soft warning">Soft</button></td>
+						</tr>
+						<tr>
+							<td><strong>Outline</strong> (<code>.btn-outline</code>)</td>
+							<td><button type="button" class="btn-outline">Outline</button></td>
+							<td><button type="button" class="btn-outline success">Outline</button></td>
+							<td><button type="button" class="btn-outline error">Outline</button></td>
+							<td><button type="button" class="btn-outline warning">Outline</button></td>
+						</tr>
+						<tr>
+							<td><strong>Ghost</strong> (<code>.btn-ghost</code>)</td>
+							<td><button type="button" class="btn-ghost">Ghost</button></td>
+							<td><button type="button" class="btn-ghost success">Ghost</button></td>
+							<td><button type="button" class="btn-ghost error">Ghost</button></td>
+							<td><button type="button" class="btn-ghost warning">Ghost</button></td>
+						</tr>
+						<tr>
+							<td><strong>Link</strong> (<code>.btn-link</code>)</td>
+							<td><button type="button" class="btn-link">Action Link</button></td>
+							<td><button type="button" class="btn-link success">Action Link</button></td>
+							<td><button type="button" class="btn-link error">Action Link</button></td>
+							<td><button type="button" class="btn-link warning">Action Link</button></td>
+						</tr>
+					</tbody>
+				</table>
+				</div>
+			</main>
+		</section>
+
+		<!-- Dual-Layer Shadow Elevation Scale -->
+		<section class="section-card">
+			<header><h3>Dual-Layer Shadow Elevation Scale</h3></header>
+			<main>
+				<p>Layered shadows (ambient light + key light) for natural depth without dark visual clutter.</p>
+				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--size-md); margin-block: var(--size-md);">
+					<div style="padding: var(--size-md); border-radius: var(--radius); background: var(--color-bg); border: var(--border-width) solid var(--border-subtle); box-shadow: var(--shadow-xs); text-align: center;">
+						<code>--shadow-xs</code>
+					</div>
+					<div style="padding: var(--size-md); border-radius: var(--radius); background: var(--color-bg); border: var(--border-width) solid var(--border-subtle); box-shadow: var(--shadow-sm); text-align: center;">
+						<code>--shadow-sm</code>
+					</div>
+					<div style="padding: var(--size-md); border-radius: var(--radius); background: var(--color-bg); border: var(--border-width) solid var(--border-subtle); box-shadow: var(--shadow-md); text-align: center;">
+						<code>--shadow-md</code>
+					</div>
+					<div style="padding: var(--size-md); border-radius: var(--radius); background: var(--color-bg); border: var(--border-width) solid var(--border-subtle); box-shadow: var(--shadow-lg); text-align: center;">
+						<code>--shadow-lg</code>
+					</div>
+					<div style="padding: var(--size-md); border-radius: var(--radius); background: var(--color-bg); border: var(--border-width) solid var(--border-subtle); box-shadow: var(--shadow-xl); text-align: center;">
+						<code>--shadow-xl</code>
+					</div>
+					<div style="padding: var(--size-md); border-radius: var(--radius); background: var(--color-bg); border: var(--border-width) solid var(--border-subtle); box-shadow: var(--shadow-2xl); text-align: center;">
+						<code>--shadow-2xl</code>
+					</div>
+				</div>
+			</main>
+		</section>
+
+		<!-- Skeleton Loading Shimmer -->
+		<section class="section-card">
+			<header><h3>Skeleton Loading Shimmer</h3></header>
+			<main>
+				<p>Animated placeholder blocks via <code>.skeleton</code> utility class for smooth content loading states.</p>
+				<div style="max-width: 24rem; display: flex; flex-direction: column; gap: var(--size-sm); padding: var(--size-md); border: var(--border-width) solid var(--border-subtle); border-radius: var(--radius);">
+					<div class="skeleton" style="height: 1.25rem; width: 60%; border-radius: var(--radius-sm);"></div>
+					<div class="skeleton" style="height: 0.875rem; width: 100%; border-radius: var(--radius-sm);"></div>
+					<div class="skeleton" style="height: 0.875rem; width: 85%; border-radius: var(--radius-sm);"></div>
+				</div>
+			</main>
+		</section>
 			</div>
 		</section>
 

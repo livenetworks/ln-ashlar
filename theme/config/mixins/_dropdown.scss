@@ -2,12 +2,9 @@
 @use 'spacing' as *;
 @use 'colors' as *;
 @use 'borders' as *;
-@use 'shadows' as *;
 @use 'typography' as *;
-@use 'sizing' as *;
 @use 'position' as *;
 @use 'interaction' as *;
-@use 'transitions' as *;
 @use 'motion' as *;
 @use 'card' as *;
 
@@ -25,29 +22,21 @@
 }
 
 // ─── Menu items — shared recipe ────────────────────────
-// The "list of interactive menu items" recipe, without container
-// chrome or positioning. Composes with any floating container
-// (dropdown, popover-with-menu, other future surfaces).
-//
-// Expected HTML:
-//   <ul>
-//     <li><a>…</a></li>
-//     <li><button>…</button></li>
-//     <li><button aria-current="true">Active item</button></li>
-//     <li><hr></li>
-//     <li><form><button type="submit">Logout</button></form></li>
-//   </ul>
-//
-// Selection state — `aria-current="true"` (boolean flavor) marks the
-// active item in single-select pickers (theme, language). NOT the
-// `="page"` / `="step"` flavors — those belong to breadcrumbs /
-// stepper and have their own styling in those mixins.
+// Compact interactive list recipe for floating overlays (dropdown, popover, pickers).
 
 @mixin menu-items {
-	// ─── Row resets ────────────────────────────────────
+	list-style: none;
+	margin: 0;
+	padding: 0;
+
 	li {
 		margin: 0;
 		padding: 0;
+		list-style: none;
+	}
+
+	li + li {
+		margin-top: 2px;
 	}
 
 	form {
@@ -56,86 +45,62 @@
 		display: contents;
 	}
 
-	// ─── Interactive items ─────────────────────────────
-	a,
-	button,
-	input[type="submit"],
-	input[type="reset"],
-	input[type="button"] {
-		@include w-full;
-		@include flex;
-		@include items-center;
+	:is(a, button, input[type="submit"], input[type="reset"], input[type="button"]) {
+		width: 100%;
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
 		justify-content: flex-start;
-		gap: var(--gap);
-		@include text-left;
-		@include text-sm;
-		@include cursor-pointer;
-		@include transition-fast;
-		background: none;
+		gap: var(--size-xs);
+		padding: 0.35rem 0.55rem;
+		border-radius: var(--radius-sm);
+		background: transparent;
 		border: none;
-		border-radius: 0;
-		color: var(--color-fg);
+		outline: none;
+		box-shadow: none;
+		text-align: left;
 		text-decoration: none;
+		cursor: pointer;
+		font-family: inherit;
+		@include typography(body-sm);
+		color: var(--color-fg);
+		transition: background-color 120ms ease, color 120ms ease;
 
-		&:hover:not(:disabled),
-		&:active:not(:disabled) {
-			--color-bg: var(--bg-sunken);
-			background: var(--color-bg);
+		&:hover:not(:disabled) {
+			background-color: color-mix(in srgb, var(--color-accent) 8%, transparent);
 			color: var(--color-fg);
 		}
 
-		&:focus {
-			box-shadow: none;
+		&:active:not(:disabled) {
+			background-color: color-mix(in srgb, var(--color-accent) 14%, transparent);
+			color: var(--color-fg);
 		}
 
-		// Active item — single-select selection state.
-		// Scoped to the boolean flavor so we don't collide with
-		// breadcrumbs (`="page"`) or stepper (`="step"`).
-		&[aria-current="true"] {
-			background: var(--color-accent-tint);
+		// Single-select active state (theme/language pickers)
+		&[aria-current="true"],
+		&.active {
+			background-color: var(--color-accent-tint-strong);
 			color: var(--color-accent);
+			font-weight: var(--font-medium);
 		}
 	}
 
-	a {
-		--padding-y: var(--size-xs);
-		--padding-x: var(--size-sm);
-		padding: var(--padding-y) var(--padding-x);
-	}
-
-	:is(button, input[type="submit"], input[type="reset"], input[type="button"]) {
-		--btn-padding-y: var(--size-xs);
-		--btn-padding-x: var(--size-sm);
-	}
-
-	// Inter-item divider — SOFT --border-block-start primitive read with
-	// `none` fallback. Default theme: no divider. Themes that opt in
-	// (Glass) rebind --border-block-start in scope.
-	li + li {
-		border-block-start: var(--border-block-start, none);
-	}
-
-	// ─── Separator ─────────────────────────────────────
 	hr {
 		border: none;
-		border-block-start: var(--border-block-start, var(--border-width) solid var(--color-border));
-		--margin-block: var(--size-xs);
-		margin-block: var(--margin-block);
+		border-top: var(--border-width) solid var(--color-border);
+		margin: 0.25rem 0;
 	}
 }
 
 // ─── Dropdown menu — floating panel + menu items ───────
-// Dropdown-specific chrome (anchor-positioned absolute panel) plus
-// the shared menu-items recipe.
-
 @mixin dropdown-menu {
 	@include floating-panel;
 	@include fixed;
 	inset: auto;
 	margin: 0;
-	--padding-y: var(--size-xs);
-	padding-block: var(--padding-y);
+	padding: 0.25rem;
 	min-width: 10rem;
+	@include enter-scale-fade;
 
 	@include menu-items;
 }

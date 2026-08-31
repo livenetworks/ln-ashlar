@@ -11,9 +11,13 @@
 // See CLAUDE.md "Button Architecture" and "Button Groups vs Pill Groups"
 // for the production pattern.
 
-.btn    { @include btn; }
-.btn-sm { @include btn-sm; }
-.btn-lg { @include btn-lg; }
+.btn         { @include btn; }
+.btn-soft    { @include btn-soft; }
+.btn-ghost   { @include btn-ghost; }
+.btn-outline { @include btn-outline; }
+.btn-link    { @include btn-link; }
+.btn-sm      { @include btn-sm; }
+.btn-lg      { @include btn-lg; }
 
 .btn-group {
 	@include btn-group;

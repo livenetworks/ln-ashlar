@@ -7,10 +7,15 @@
 @use 'transitions' as *;
 @use 'interaction' as *;
 @use 'focus' as *;
+@use 'motion' as *;
 
 // Buttons
 // button-base  — shared neutral chrome (global button + anchor-as-button)
 // btn          — accent variant of button-base; rebinds --btn-* to accent colors
+// btn-soft     — pastel accent fill with saturated accent text
+// btn-ghost    — transparent background, subtle hover surface, zero border
+// btn-outline  — transparent background with crisp border and subtle hover
+// btn-link     — inline text action with hover underline
 // btn-sm       — smaller size modifier
 // btn-lg       — larger size modifier
 // btn-group    — inline list of peer action buttons (ghost rebind)
@@ -22,37 +27,6 @@
 // --btn-bg-hover/fg-hover/border-hover (hover + active). Both the
 // neutral default and the accent variant are fully token-driven —
 // the difference is which values --btn-* resolves to.
-//
-// Neutral default: --btn-* read from :root, where they wire to
-// --color-bg / --color-fg / --border-strong (and --border-strong-hover
-// companions for the hover state). Theme overrides rebind --btn-*
-// (e.g. Glass rebinds --btn-bg to --bg-elevated, --btn-border
-// to --color-accent for an outlined neutral chrome).
-//
-// Accent variant (submit + @mixin btn): rebinds --btn-* on the
-// consumer element to accent values. Because the rebind happens on
-// the button itself (not at :root), and because @mixin btn first
-// re-declares --color-accent: hsl(var(--color-primary)) at the same
-// scope, .success/.error/.warning/.info classes that override
-// --color-primary cascade through --color-accent → --btn-* →
-// background/color/border-color cleanly. var() always resolves at
-// the declaration site, and the declaration site for both the
-// rebind and button-base's reads is the button element.
-//
-// Why cross-cutting --color-accent-bg-* companions, not per-component
-// --btn-accent-* tokens at :root: a per-component surface declared at
-// :root (--btn-accent-bg: var(--color-accent)) would freeze
-// --color-accent at :root scope and break the
-// .success/.error/.warning/.info cascade for descendant overrides.
-// Cross-cutting --color-accent-bg-* companions (read via fallback to
-// --color-accent / --color-accent-fg) sidestep that: the default
-// theme leaves them unset (mixin falls back to solid + white), Glass
-// rebinds them at theme :root to flip the accent button to
-// translucent. Solid-accent consumers (toast-icon, pill-checked,
-// stepper active/complete) read --color-accent / --color-accent-fg
-// directly and are unaffected by Glass's rebind because Glass leaves
-// --color-accent-fg alone. See CLAUDE.md ## Theme Architecture for
-// the full contract.
 
 @mixin button-base {
 	@include inline-flex;
@@ -81,6 +55,7 @@
 	&:active:not(:disabled) {
 		background: var(--btn-bg-hover);
 		border-color: var(--btn-border-hover);
+		filter: brightness(0.96);
 	}
 
 	&:focus-visible {
@@ -94,61 +69,82 @@
 }
 
 @mixin btn {
-	// Accent variant — rebinds the --btn-* token surface to accent
-	// values. button-base reads --btn-bg/fg/border (idle) and
-	// --btn-bg-hover/fg-hover/border-hover (hover + active), so this
-	// mixin only needs to set tokens. No direct background/color/
-	// border-color, no &:hover/&:active blocks.
-	//
-	// Re-declares --color-accent on the consumer element so
-	// var(--color-primary) re-resolves at this scope.
-	// .success/.error/.warning/.info classes override --color-primary;
-	// without these re-declarations, --color-accent stays frozen at
-	// :root and semantic colors don't cascade.
-	//
-	// --color-accent-fg is NOT re-declared — the :root default
-	// (hsl(var(--color-white))) already cascades, and re-declaring
-	// here would shadow theme companion overrides on solid-only
-	// surfaces (which there are none here, but the redundancy is
-	// noise either way).
+	// Accent variant — rebinds the --btn-* token surface to accent values.
 	--color-accent:       hsl(var(--color-primary));
+	--color-accent-hover: hsl(from var(--color-accent) h s calc(l - 6));
 
-	// Hover state derived from --color-accent at THIS scope via CSS
-	// relative color syntax — same hue + saturation, lightness reduced
-	// by 8. Computing here (consumer scope) instead of reading a
-	// separate :root token means a consumer override (e.g.
-	// `style="--color-primary: var(--color-error)"` or a .error
-	// ancestor via @mixin semantic-color) cascades to BOTH the idle
-	// and hover surfaces — the whole state machine follows from a
-	// single token change.
-	//
-	// IMPORTANT — `calc(l - 8)` not `calc(l - 8%)`. Inside
-	// relative color syntax, channel keywords (h/s/l) evaluate to
-	// <number> tokens, not <percentage>. `l - 8%` mixes types →
-	// invalid color → browser falls back to `transparent` and the
-	// hover bg vanishes. The number form is what the spec mandates;
-	// hsl(216 95 34) without `%` is valid CSS Color 4 and reads as
-	// "lightness 34%" exactly like the legacy hsl(216 95% 34%) form.
-	//
-	// Pattern shared with @mixin pill, @mixin data-table-row-focused,
-	// the anchor hover in _global.scss, and @mixin semantic-color's
-	// status-family cascade. -light / -lighter remain explicit tokens
-	// (theme-controlled, not derivable from base).
-	--color-accent-hover: hsl(from var(--color-accent) h s calc(l - 8));
-
-	// --btn-bg / --btn-fg read translucent companions via fallback.
-	// Default theme: companions unset → falls back to --color-accent
-	// / --color-accent-fg (solid + white). Glass theme: companions
-	// rebound at :root → translucent fill + accent-colored fg. The
-	// var() fallback resolves at the consumer (this button), so the
-	// .success/.error/.warning/.info cascade through --color-primary
-	// still works in both themes.
 	--btn-bg:           var(--color-accent-bg,       var(--color-accent));
 	--btn-fg:           var(--color-accent-bg-fg,    var(--color-accent-fg));
-	--btn-border:       var(--color-accent);
+	--btn-border:       hsl(from var(--color-accent) h s calc(l - 4));
 	--btn-bg-hover:     var(--color-accent-bg-hover, var(--color-accent-hover));
 	--btn-fg-hover:     var(--color-accent-bg-fg,    var(--color-accent-fg));
-	--btn-border-hover: var(--color-accent-hover);
+	--btn-border-hover: hsl(from var(--color-accent) h s calc(l - 6));
+}
+
+@mixin btn-soft {
+	// Soft/Subtle variant — pastel accent surface with saturated text.
+	--color-accent:       hsl(var(--color-primary));
+
+	--btn-bg:           color-mix(in srgb, var(--color-accent) 10%, transparent);
+	--btn-fg:           var(--color-accent);
+	--btn-border:       color-mix(in srgb, var(--color-accent) 20%, transparent);
+	--btn-bg-hover:     color-mix(in srgb, var(--color-accent) 18%, transparent);
+	--btn-fg-hover:     var(--color-accent);
+	--btn-border-hover: color-mix(in srgb, var(--color-accent) 25%, transparent);
+}
+
+@mixin btn-ghost {
+	// Ghost variant — transparent idle, subtle sunken hover surface.
+	--btn-bg:           transparent;
+	--btn-fg:           var(--color-fg);
+	--btn-border:       transparent;
+	--btn-bg-hover:     var(--bg-sunken);
+	--btn-fg-hover:     var(--color-fg);
+	--btn-border-hover: transparent;
+
+	&:is(.success, .error, .warning, .info) {
+		--color-accent:     hsl(var(--color-primary));
+		--btn-fg:           var(--color-accent);
+		--btn-bg-hover:     color-mix(in srgb, var(--color-accent) 10%, transparent);
+		--btn-fg-hover:     var(--color-accent);
+	}
+}
+
+@mixin btn-outline {
+	// Outline variant — transparent idle with crisp border.
+	--btn-bg:           transparent;
+	--btn-fg:           var(--color-fg);
+	--btn-border:       var(--border-strong);
+	--btn-bg-hover:     var(--bg-sunken);
+	--btn-fg-hover:     var(--color-fg);
+	--btn-border-hover: var(--border-strong);
+
+	&:is(.success, .error, .warning, .info) {
+		--color-accent:     hsl(var(--color-primary));
+		--btn-fg:           var(--color-accent);
+		--btn-border:       color-mix(in srgb, var(--color-accent) 30%, transparent);
+		--btn-bg-hover:     color-mix(in srgb, var(--color-accent) 10%, transparent);
+		--btn-fg-hover:     var(--color-accent);
+		--btn-border-hover: color-mix(in srgb, var(--color-accent) 30%, transparent);
+	}
+}
+
+@mixin btn-link {
+	// Link variant — text button with hover underline.
+	--btn-bg:           transparent;
+	--btn-fg:           var(--color-accent, hsl(var(--color-primary)));
+	--btn-border:       transparent;
+	--btn-bg-hover:     transparent;
+	--btn-fg-hover:     hsl(from var(--btn-fg) h s calc(l - 10));
+	--btn-border-hover: transparent;
+	--padding-x:        0;
+	--padding-y:        0;
+	padding: 0;
+	text-decoration: none;
+
+	&:hover:not(:disabled) {
+		text-decoration: underline;
+	}
 }
 
 @mixin btn-sm {

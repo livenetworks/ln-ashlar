@@ -7,6 +7,8 @@
 @use '../../../../theme/config/mixins' as *;
 
 .demo-theme-picker {
+	padding: var(--size-xs);
+
 	ul {
 		@include menu-items;
 		min-width: 12rem;
@@ -17,6 +19,7 @@
 	display: inline-block;
 	width: 1rem;
 	height: 1rem;
+	margin-right: var(--size-2xs);
 	border-radius: var(--radius-full);
 	border: var(--border-width) solid hsl(var(--color-border));
 

@@ -17,3 +17,16 @@
 		@content;
 	}
 }
+
+// Entrance transitions (dropdowns, popovers, tooltips, dialogs)
+@mixin enter-scale-fade($duration: var(--transition-fast)) {
+	@include motion-safe {
+		animation: ln-scale-in $duration cubic-bezier(0.16, 1, 0.3, 1) both;
+	}
+}
+
+@mixin enter-slide-fade($duration: var(--transition-base)) {
+	@include motion-safe {
+		animation: ln-slide-in $duration cubic-bezier(0.16, 1, 0.3, 1) both;
+	}
+}

@@ -85,7 +85,16 @@
 	position: sticky;
 	top: 0;
 	z-index: var(--z-sticky);
-	border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+	border-radius: 0;
+	background: var(--color-bg);
+	border-bottom: var(--border-width) solid var(--border-subtle);
+
+	h3 {
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--color-fg);
+	}
 }
 
 // ─── In-thead toolbar (first thead row, single colspan th) ───────
@@ -117,6 +126,16 @@
 		@include panel-header;
 		justify-content: flex-start;
 		gap: var(--size-md);
+		border-radius: 0;
+		background: var(--color-bg);
+		border-bottom: var(--border-width) solid var(--border-subtle);
+
+		h3 {
+			margin: 0;
+			font-size: 1rem;
+			font-weight: 600;
+			color: var(--color-fg);
+		}
 	}
 }
 
@@ -138,7 +157,8 @@
 // ─── Count badge ──────────────────────────────────────────
 
 @mixin ln-table-count {
-	@include text-sm;
+	font-size: var(--text-xs);
+	font-weight: 500;
 	--color-fg: var(--fg-muted);
 	color: var(--color-fg);
 
@@ -164,14 +184,15 @@
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	--padding-y: var(--size-sm);
+	--padding-y: var(--size-xs-up);
 	--padding-x: var(--size-md);
 	padding: var(--padding-y) var(--padding-x);
-	@include border-t;
+	border-top: var(--border-width) solid var(--border-subtle);
 	--color-bg: var(--bg-sunken);
 	background: var(--color-bg);
-	border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-	@include text-sm;
+	border-radius: 0;
+	font-size: var(--text-xs);
+	font-weight: 500;
 	--color-fg: var(--fg-muted);
 	color: var(--color-fg);
 	position: sticky;
