@@ -105,6 +105,7 @@ Each component ships one file — usage guide plus architecture reference
 | Topic | File |
 |-------|------|
 | Master Architect Overview | [architecture/overview.md](architecture/overview.md) |
+| Component Coding Standards (Two-Tier Model) | [architecture/component-coding-standards.md](architecture/component-coding-standards.md) |
 | JS Component Patterns | [architecture/component-guide.md](architecture/component-guide.md) |
 | Reactive Architecture | [reactive.md](reactive.md) |
 | Container Queries | [ln-ashlar-container-queries.md](ln-ashlar-container-queries.md) |

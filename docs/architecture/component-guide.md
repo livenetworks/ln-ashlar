@@ -1,6 +1,7 @@
 # ln-ashlar JS Component Guide
 
 > Concrete patterns for building ln-ashlar components.
+> For the modern **Two-Tier Isolated Domain Model (`*-model.js` + `ln-*.js`) Archetype** → see [Component Authoring & Code Architecture Standards](component-coding-standards.md).
 > For general JS principles (IIFE, CustomEvent, coordinator pattern) → see `js` skill in claude-skills.
 > This document covers ln-ashlar SPECIFIC conventions that go beyond the generic patterns.
 

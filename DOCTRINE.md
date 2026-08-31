@@ -26,7 +26,7 @@
 └─────────────────────────────────────────────────────────┘
 ```
 
-* **Layer 1: Component (Reusable Data & DOM Layer):** Manages internal component DOM, `MutationObserver` state, CRUD operations, and ARIA attributes. Components **MUST NOT** open modals, show toasts, or read external forms directly.
+* **Layer 1: Component (Reusable Data & DOM Layer):** Manages internal component DOM, `MutationObserver` state, CRUD operations, and ARIA attributes. Follows the **Two-Tier Archetype** (`src/{name}-model.js` for pure logic and `src/ln-{name}.js` for DOM wiring — see [`docs/architecture/component-coding-standards.md`](docs/architecture/component-coding-standards.md)). Components **MUST NOT** open modals, show toasts, or read external forms directly.
 * **Layer 2: Coordinator (Project UI Wiring & Mediator):** Catches UI triggers (clicks, form submits), dispatches request events, bridges attributes across components, and reacts to notification events (toasts/modals).
 * **Layer 3: ln-ashlar Core:** Low-level primitives (`ln-core`), DOM utilities (`fill()`, `buildDict()`, `interceptValueProperty()`), and base component prototypes.
 
