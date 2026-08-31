@@ -425,7 +425,7 @@ export function getComponentFiles(root) {
 export function extractStaticEvents(filesToScan, compDirs) {
 	const componentEvents = new Map();
 	for (const comp of compDirs) {
-		componentEvents.set(comp, { emits: new Set(), listens: new Set() });
+		componentEvents.set(comp, { emits: new Map(), listens: new Map() });
 	}
 
 	const staticUniqueEvents = new Set();
@@ -448,7 +448,7 @@ export function extractStaticEvents(filesToScan, compDirs) {
 
 			if ((beforeTrim.endsWith('{') || beforeTrim.endsWith(',')) && afterTrim.startsWith(':') && !afterTrim.startsWith('::')) {
 				// Object key in handler map -> listen
-				componentEvents.get(comp).listens.add(eventName);
+				componentEvents.get(comp).listens.set(eventName, 'static');
 				continue;
 			}
 			
@@ -474,11 +474,11 @@ export function extractStaticEvents(filesToScan, compDirs) {
 			if (callName) {
 				const calleeLower = callName.toLowerCase();
 				if (calleeLower.includes('dispatch') || callName === 'CustomEvent' || callName.endsWith('.CustomEvent') || callName === 'requestData' || callName.endsWith('.requestData')) {
-					componentEvents.get(comp).emits.add(eventName);
+					componentEvents.get(comp).emits.set(eventName, 'static');
 					continue;
 				}
 				if (calleeLower.includes('addeventlistener') || calleeLower.includes('removeeventlistener')) {
-					componentEvents.get(comp).listens.add(eventName);
+					componentEvents.get(comp).listens.set(eventName, 'static');
 					continue;
 				}
 			}
@@ -498,7 +498,7 @@ export function extractStaticEvents(filesToScan, compDirs) {
 				const forwardText = clean.substring(matchIdx + matchLen, Math.min(clean.length, matchIdx + matchLen + 500));
 				const dispatchWithVarRegex = new RegExp(`dispatch\\s*\\([^,]+,\\s*${varName}\\b`, 'i');
 				if (dispatchWithVarRegex.test(forwardText)) {
-					componentEvents.get(comp).emits.add(eventName);
+					componentEvents.get(comp).emits.set(eventName, 'static');
 					continue;
 				}
 			}
@@ -626,7 +626,7 @@ export function parseDocs(root) {
 
 /**
  * Builds the by-component and flat index catalogs.
- * @param {Map<string, { emits: Set<string>, listens: Set<string> }>} componentEvents
+ * @param {Map<string, { emits: Map<string, string>, listens: Map<string, string> }>} componentEvents
  * @param {Set<string>} staticUniqueEvents
  * @param {Map<string, Array<object>|null>} docEventsByComp
  * @param {Map<string, Array<object>>} docEventsGlobal
@@ -656,30 +656,28 @@ export function buildCatalogs(componentEvents, staticUniqueEvents, docEventsByCo
 
 	for (const comp of sortedCompNames) {
 		const { emits, listens } = componentEvents.get(comp);
-		const sortedEmits = [...emits].sort();
-		const sortedListens = [...listens].sort();
+		const sortedEmits = [...emits.keys()].sort();
+		const sortedListens = [...listens.keys()].sort();
 
 		const emitsArr = sortedEmits.map((name) => {
 			const doc = findDocInfo(name, comp, 'Emits');
-			const isStatic = staticUniqueEvents.has(name);
 			return {
 				name,
 				cancelable: doc ? doc.cancelable : name.includes(':before-'),
 				description: doc ? doc.description : '',
 				detail: doc ? doc.detail : '',
-				source: isStatic ? 'static' : 'dynamic-allowlist'
+				source: emits.get(name)
 			};
 		});
 
 		const listensArr = sortedListens.map((name) => {
 			const doc = findDocInfo(name, comp, 'Listens');
-			const isStatic = staticUniqueEvents.has(name);
 			return {
 				name,
 				cancelable: doc ? doc.cancelable : false,
 				description: doc ? doc.description : '',
 				detail: doc ? doc.detail : '',
-				source: isStatic ? 'static' : 'dynamic-allowlist'
+				source: listens.get(name)
 			};
 		});
 
@@ -691,17 +689,15 @@ export function buildCatalogs(componentEvents, staticUniqueEvents, docEventsByCo
 		for (const item of emitsArr) {
 			if (!allEvents.has(item.name)) {
 				allEvents.set(item.name, {
-					emitted_by: new Set(),
-					listened_by: new Set(),
+					emitted_by: new Map(),
+					listened_by: new Map(),
 					cancelable: item.cancelable,
 					description: item.description,
-					detail: item.detail,
-					source: item.source
+					detail: item.detail
 				});
 			}
 			const entry = allEvents.get(item.name);
-			entry.emitted_by.add(comp);
-			if (item.source === 'static') entry.source = 'static';
+			entry.emitted_by.set(comp, item.source);
 			if (item.cancelable) entry.cancelable = true;
 			if (!entry.description && item.description) entry.description = item.description;
 			if (!entry.detail && item.detail) entry.detail = item.detail;
@@ -710,17 +706,15 @@ export function buildCatalogs(componentEvents, staticUniqueEvents, docEventsByCo
 		for (const item of listensArr) {
 			if (!allEvents.has(item.name)) {
 				allEvents.set(item.name, {
-					emitted_by: new Set(),
-					listened_by: new Set(),
+					emitted_by: new Map(),
+					listened_by: new Map(),
 					cancelable: item.cancelable,
 					description: item.description,
-					detail: item.detail,
-					source: item.source
+					detail: item.detail
 				});
 			}
 			const entry = allEvents.get(item.name);
-			entry.listened_by.add(comp);
-			if (item.source === 'static') entry.source = 'static';
+			entry.listened_by.set(comp, item.source);
 			if (!entry.description && item.description) entry.description = item.description;
 			if (!entry.detail && item.detail) entry.detail = item.detail;
 		}
@@ -739,7 +733,7 @@ export function buildCatalogs(componentEvents, staticUniqueEvents, docEventsByCo
 	const byComponentObj = {
 		$schema: 'http://json-schema.org/draft-07/schema#',
 		title: 'ln-ashlar Events by Component Catalog',
-		description: 'Machine-readable catalog of events emitted and listened to per component. Generated from source by scripts/sync-ln-events.mjs — do not hand-edit. The detail field is a human-readable signature, not a machine-checkable type.',
+		description: "Machine-readable catalog of events emitted and listened to per component. Generated from source by scripts/sync-ln-events.mjs — do not hand-edit. The detail field is a human-readable signature, not a machine-checkable type. The source field indicates per-entry provenance ('static' or 'dynamic-allowlist').",
 		generator: GENERATOR_NAME,
 		components: componentsOut
 	};
@@ -748,20 +742,34 @@ export function buildCatalogs(componentEvents, staticUniqueEvents, docEventsByCo
 	const sortedEventNames = [...allEvents.keys()].sort();
 	for (const eventName of sortedEventNames) {
 		const data = allEvents.get(eventName);
+		const sources = new Set([
+			...data.emitted_by.values(),
+			...data.listened_by.values()
+		]);
+
+		let resolvedSource = 'static';
+		if (sources.has('static') && sources.has('dynamic-allowlist')) {
+			resolvedSource = 'mixed';
+		} else if (sources.has('dynamic-allowlist')) {
+			resolvedSource = 'dynamic-allowlist';
+		} else {
+			resolvedSource = 'static';
+		}
+
 		flatEventsObj[eventName] = {
-			emitted_by: [...data.emitted_by].sort(),
-			listened_by: [...data.listened_by].sort(),
+			emitted_by: [...data.emitted_by.keys()].sort(),
+			listened_by: [...data.listened_by.keys()].sort(),
 			cancelable: Boolean(data.cancelable),
 			description: data.description || '',
 			detail: data.detail || '',
-			source: data.source
+			source: resolvedSource
 		};
 	}
 
 	const indexObj = {
 		$schema: 'http://json-schema.org/draft-07/schema#',
 		title: 'ln-ashlar Flat Events Index',
-		description: 'Flat index of all ln-* events for lookup. Generated — do not hand-edit. The detail field is a human-readable signature, not a machine-checkable type.',
+		description: "Flat index of all ln-* events for lookup. Generated — do not hand-edit. The detail field is a human-readable signature, not a machine-checkable type. The source field is 'static' (all occurrences proven statically), 'dynamic-allowlist' (all occurrences from allowlist), or 'mixed' (different provenance across emitting/listening sides).",
 		generator: GENERATOR_NAME,
 		events: flatEventsObj
 	};
@@ -815,8 +823,17 @@ export function main() {
 		const compMatch = relFile.match(/^components\/([^/]+)/);
 		const comp = compMatch ? compMatch[1] : null;
 		if (comp && componentEvents.has(comp)) {
-			for (const ev of entry.emits) componentEvents.get(comp).emits.add(ev);
-			for (const ev of entry.listens) componentEvents.get(comp).listens.add(ev);
+			const compData = componentEvents.get(comp);
+			for (const ev of entry.emits) {
+				if (!compData.emits.has(ev)) {
+					compData.emits.set(ev, 'dynamic-allowlist');
+				}
+			}
+			for (const ev of entry.listens) {
+				if (!compData.listens.has(ev)) {
+					compData.listens.set(ev, 'dynamic-allowlist');
+				}
+			}
 		}
 	}
 

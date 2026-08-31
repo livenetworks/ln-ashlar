@@ -1,7 +1,7 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"title": "ln-ashlar Events by Component Catalog",
-	"description": "Machine-readable catalog of events emitted and listened to per component. Generated from source by scripts/sync-ln-events.mjs — do not hand-edit. The detail field is a human-readable signature, not a machine-checkable type.",
+	"description": "Machine-readable catalog of events emitted and listened to per component. Generated from source by scripts/sync-ln-events.mjs — do not hand-edit. The detail field is a human-readable signature, not a machine-checkable type. The source field indicates per-entry provenance ('static' or 'dynamic-allowlist').",
 	"generator": "scripts/sync-ln-events.mjs",
 	"components": {
 		"ln-accordion": {
@@ -521,42 +521,42 @@
 					"cancelable": false,
 					"description": "Triggers bulk document deletes.",
 					"detail": "{ ids: Array, url?: String, idempotencyKey?: String, meta?: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-api-connector:request-create",
 					"cancelable": false,
 					"description": "Triggers document create request.",
 					"detail": "{ data: Object, tempId: String, url?: String, idempotencyKey?: String, meta?: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-api-connector:request-delete",
 					"cancelable": false,
 					"description": "Triggers document DELETE.",
 					"detail": "{ id: ID, url?: String, idempotencyKey?: String, meta?: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-api-connector:request-fetch",
 					"cancelable": false,
 					"description": "Triggers delta updates query.",
 					"detail": "{ since?: String, meta?: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-api-connector:request-sync",
 					"cancelable": false,
 					"description": "Triggers delta updates query.",
 					"detail": "{ since?: String, meta?: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-api-connector:request-update",
 					"cancelable": false,
 					"description": "Triggers document PUT edit.",
 					"detail": "{ id: ID, data: Object, expected_version?: Int, url?: String, idempotencyKey?: String, meta?: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-couchdb-connector:request-bulk-delete",
@@ -679,14 +679,14 @@
 					"cancelable": false,
 					"description": "",
 					"detail": "",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-chart:set-loading",
 					"cancelable": false,
 					"description": "",
 					"detail": "",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-data-coordinator:error",
@@ -749,35 +749,35 @@
 					"cancelable": false,
 					"description": "Windowed mode (`data-ln-list-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry.",
 					"detail": "{ offset: Number }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-list:request-invalidate",
 					"cancelable": false,
 					"description": "Windowed mode (`data-ln-list-window`): invalidates the window cache and resets to page 0.",
 					"detail": "*(no payload)*",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-list:request-revalidate",
 					"cancelable": false,
 					"description": "Windowed mode (`data-ln-list-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives.",
 					"detail": "*(no payload)*",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-list:set-data",
 					"cancelable": false,
 					"description": "Populates the list with a dataset, removes loading overlays, and triggers render. Windowed mode (`data-ln-list-window`) additionally reads `offset`/`queryGen` off the payload, routing it into the internal window cache.",
 					"detail": "{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-list:set-loading",
 					"cancelable": false,
 					"description": "Controls the visual loading state of the list.",
 					"detail": "{ loading: Boolean }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-options:set-data",
@@ -798,35 +798,35 @@
 					"cancelable": false,
 					"description": "Windowed mode (`data-ln-table-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry.",
 					"detail": "{ offset: Number }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-table:request-invalidate",
 					"cancelable": false,
 					"description": "",
 					"detail": "",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-table:request-revalidate",
 					"cancelable": false,
 					"description": "Windowed mode (`data-ln-table-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives.",
 					"detail": "*(no payload)*",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-table:set-data",
 					"cancelable": false,
 					"description": "Populates the table with a raw dataset (Data-Driven mode). Windowed mode (`data-ln-table-window`) additionally reads `offset`/`queryGen` off the payload, routing it into the internal window cache.",
 					"detail": "{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-table:set-loading",
 					"cancelable": false,
 					"description": "Toggles the `.ln-table--loading` class (Data-Driven mode).",
 					"detail": "{ loading: Boolean }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-toast:enqueue",
@@ -842,42 +842,42 @@
 					"cancelable": false,
 					"description": "Dispatched upon successful bulk deletion.",
 					"detail": "{ response: Object, ids: Array, message: String, meta: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-api-connector:created",
 					"cancelable": false,
 					"description": "Dispatched upon successful document creation.",
 					"detail": "{ record: Object, tempId: String, message: String, meta: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-api-connector:deleted",
 					"cancelable": false,
 					"description": "Dispatched upon successful document deletion.",
 					"detail": "{ response: Object, id: ID, message: String, meta: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-api-connector:error",
 					"cancelable": false,
 					"description": "Dispatched upon HTTP or network errors (silent on AbortError).",
 					"detail": "{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-api-connector:fetched",
 					"cancelable": false,
 					"description": "Connector response handling (also namespaced under `ln-couchdb-connector:...` — generalized across concrete connector implementations). Reconciles the store, fires toasts, and drives queue ack/nack.",
 					"detail": "*(shape per response — see [`ln-api-connector.md`](./ln-api-connector.md) Events API)*",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-api-connector:updated",
 					"cancelable": false,
 					"description": "Dispatched upon successful document edit.",
 					"detail": "{ record: Object, id: ID, message: String, meta: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-api-queue:failed",
@@ -905,42 +905,42 @@
 					"cancelable": false,
 					"description": "Dispatched upon successful bulk deletion.",
 					"detail": "{ response: Object, ids: Array, message: String, meta: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-couchdb-connector:created",
 					"cancelable": false,
 					"description": "Dispatched upon successful document creation.",
 					"detail": "{ record: Object, tempId: String, message: String, meta: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-couchdb-connector:deleted",
 					"cancelable": false,
 					"description": "Dispatched upon successful document deletion.",
 					"detail": "{ response: Object, id: ID, message: String, meta: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-couchdb-connector:error",
 					"cancelable": false,
 					"description": "Dispatched upon HTTP or network errors.",
 					"detail": "{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-couchdb-connector:fetched",
 					"cancelable": false,
 					"description": "Dispatched upon delta sync responses.",
 					"detail": "{ data: Array, since: String, meta: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-couchdb-connector:updated",
 					"cancelable": false,
 					"description": "Dispatched upon successful document edit.",
 					"detail": "{ record: Object, id: ID, message: String, meta: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-data-coordinator:request-bulk-delete",
@@ -1184,35 +1184,35 @@
 					"cancelable": false,
 					"description": "Optimistically deletes multiple records.",
 					"detail": "{ ids: Array }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-data-store:request-create",
 					"cancelable": false,
 					"description": "Optimistically writes a new record.",
 					"detail": "{ tempId: String, data: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-data-store:request-delete",
 					"cancelable": false,
 					"description": "Optimistically deletes a record.",
 					"detail": "{ id: ID }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-data-store:request-sync-failed",
 					"cancelable": false,
 					"description": "",
 					"detail": "",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-data-store:request-update",
 					"cancelable": false,
 					"description": "Optimistically updates a record or rekeys ID.",
 					"detail": "{ id: ID, data: Object }",
-					"source": "static"
+					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-filter:change",

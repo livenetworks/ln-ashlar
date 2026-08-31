@@ -43,9 +43,11 @@ test('static extraction finds all expected events without unclassified literals'
 	const validateEmits = componentEvents.get('ln-validate').emits;
 	assert.ok(validateEmits.has('ln-validate:valid'), 'ln-validate must emit ln-validate:valid');
 	assert.ok(validateEmits.has('ln-validate:invalid'), 'ln-validate must emit ln-validate:invalid');
+	assert.equal(validateEmits.get('ln-validate:valid'), 'static');
+	assert.equal(validateEmits.get('ln-validate:invalid'), 'static');
 });
 
-test('generated catalogs have strict schemas and valid keys', () => {
+test('generated catalogs have strict schemas, shape preservation, and accurate provenance', () => {
 	const byComponentPath = path.join(root, 'docs-mcp', 'schemas', 'ln-ashlar-events-by-component.json');
 	const indexPath = path.join(root, 'docs-mcp', 'schemas', 'ln-ashlar-events-index.json');
 
@@ -60,7 +62,11 @@ test('generated catalogs have strict schemas and valid keys', () => {
 
 	// Verify all entries in flat index
 	const eventNames = Object.keys(index.events);
-	assert.ok(eventNames.length >= 240, `Flat index event count (${eventNames.length}) must be >= 240`);
+	assert.equal(eventNames.length, 242, 'Flat index event count must be exactly 242');
+
+	const validIndexSources = new Set(['static', 'dynamic-allowlist', 'mixed']);
+	const validByCompSources = new Set(['static', 'dynamic-allowlist']);
+	const expectedKeys = ['emitted_by', 'listened_by', 'cancelable', 'description', 'detail', 'source'];
 
 	for (const name of eventNames) {
 		const ev = index.events[name];
@@ -68,17 +74,64 @@ test('generated catalogs have strict schemas and valid keys', () => {
 		assert.ok(!name.endsWith('-'), `Event name "${name}" must not end with -`);
 		assert.ok(!name.includes('${'), `Event name "${name}" must not contain interpolation marker`);
 
+		// Strict shape assertion: exactly the 6 keys
+		const keys = Object.keys(ev).sort();
+		assert.deepEqual(keys, [...expectedKeys].sort(), `${name}: keys must match expected schema shape exactly`);
+
 		assert.ok(Array.isArray(ev.emitted_by), `${name}: emitted_by must be array`);
+		for (const emitter of ev.emitted_by) {
+			assert.equal(typeof emitter, 'string', `${name}: emitted_by elements must be plain strings`);
+		}
+
 		assert.ok(Array.isArray(ev.listened_by), `${name}: listened_by must be array`);
+		for (const listener of ev.listened_by) {
+			assert.equal(typeof listener, 'string', `${name}: listened_by elements must be plain strings`);
+		}
+
 		assert.equal(typeof ev.cancelable, 'boolean', `${name}: cancelable must be boolean`);
 		assert.equal(typeof ev.description, 'string', `${name}: description must be string`);
 		assert.equal(typeof ev.detail, 'string', `${name}: detail must be string`);
-		assert.ok(ev.source === 'static' || ev.source === 'dynamic-allowlist', `${name}: source must be static or dynamic-allowlist`);
+		assert.ok(validIndexSources.has(ev.source), `${name}: source "${ev.source}" must be one of static, dynamic-allowlist, mixed`);
 	}
 
-	// Verify ln-table:set-data attribution
-	const tableSetData = index.events['ln-table:set-data'];
-	assert.ok(tableSetData, 'ln-table:set-data must exist in index');
-	assert.ok(tableSetData.emitted_by.includes('ln-data-coordinator'), 'ln-table:set-data must be emitted_by ln-data-coordinator');
-	assert.ok(tableSetData.listened_by.includes('ln-table'), 'ln-table:set-data must be listened_by ln-table');
+	// Verify by-component catalog source counts and values
+	let dynamicAllowlistCount = 0;
+	let staticCount = 0;
+
+	for (const [compName, compData] of Object.entries(byComponent.components)) {
+		assert.ok(Array.isArray(compData.emits), `${compName}: emits must be array`);
+		assert.ok(Array.isArray(compData.listens), `${compName}: listens must be array`);
+
+		for (const item of compData.emits) {
+			assert.ok(validByCompSources.has(item.source), `${compName} emits ${item.name}: invalid source ${item.source}`);
+			if (item.source === 'dynamic-allowlist') dynamicAllowlistCount++;
+			else staticCount++;
+		}
+		for (const item of compData.listens) {
+			assert.ok(validByCompSources.has(item.source), `${compName} listens ${item.name}: invalid source ${item.source}`);
+			if (item.source === 'dynamic-allowlist') dynamicAllowlistCount++;
+			else staticCount++;
+		}
+	}
+
+	// 41 allowlist entries across by-component (12 dc emits + 12 dc listens + 5 ds listens + 12 couch listens)
+	assert.equal(dynamicAllowlistCount, 41, 'by-component dynamic-allowlist entries count must be exactly 41');
+	assert.equal(staticCount, 297, 'by-component static entries count must be exactly 297');
+
+	// Acceptance criteria 1, 2, 3: ln-table:set-data
+	const dcEmits = byComponent.components['ln-data-coordinator'].emits;
+	const dcTableSetData = dcEmits.find(e => e.name === 'ln-table:set-data');
+	assert.ok(dcTableSetData, 'ln-data-coordinator must emit ln-table:set-data');
+	assert.equal(dcTableSetData.source, 'dynamic-allowlist', 'ln-data-coordinator emits ln-table:set-data must have source: dynamic-allowlist');
+
+	const tableListens = byComponent.components['ln-table'].listens;
+	const tableSetDataListen = tableListens.find(e => e.name === 'ln-table:set-data');
+	assert.ok(tableSetDataListen, 'ln-table must listen to ln-table:set-data');
+	assert.equal(tableSetDataListen.source, 'static', 'ln-table listens ln-table:set-data must have source: static');
+
+	const flatTableSetData = index.events['ln-table:set-data'];
+	assert.ok(flatTableSetData, 'ln-table:set-data must exist in flat index');
+	assert.equal(flatTableSetData.source, 'mixed', 'flat index ln-table:set-data must have source: mixed');
+	assert.deepEqual(flatTableSetData.emitted_by, ['ln-data-coordinator']);
+	assert.deepEqual(flatTableSetData.listened_by, ['ln-table']);
 });

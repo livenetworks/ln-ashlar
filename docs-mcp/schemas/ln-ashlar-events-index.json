@@ -1,7 +1,7 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"title": "ln-ashlar Flat Events Index",
-	"description": "Flat index of all ln-* events for lookup. Generated — do not hand-edit. The detail field is a human-readable signature, not a machine-checkable type.",
+	"description": "Flat index of all ln-* events for lookup. Generated — do not hand-edit. The detail field is a human-readable signature, not a machine-checkable type. The source field is 'static' (all occurrences proven statically), 'dynamic-allowlist' (all occurrences from allowlist), or 'mixed' (different provenance across emitting/listening sides).",
 	"generator": "scripts/sync-ln-events.mjs",
 	"events": {
 		"ln-accordion:change": {
@@ -88,7 +88,7 @@
 			"cancelable": false,
 			"description": "Dispatched upon successful bulk deletion.",
 			"detail": "{ response: Object, ids: Array, message: String, meta: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-api-connector:config-changed": {
 			"emitted_by": [
@@ -110,7 +110,7 @@
 			"cancelable": false,
 			"description": "Dispatched upon successful document creation.",
 			"detail": "{ record: Object, tempId: String, message: String, meta: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-api-connector:deleted": {
 			"emitted_by": [
@@ -122,7 +122,7 @@
 			"cancelable": false,
 			"description": "Dispatched upon successful document deletion.",
 			"detail": "{ response: Object, id: ID, message: String, meta: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-api-connector:destroyed": {
 			"emitted_by": [
@@ -144,7 +144,7 @@
 			"cancelable": false,
 			"description": "Dispatched upon HTTP or network errors (silent on AbortError).",
 			"detail": "{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-api-connector:fetched": {
 			"emitted_by": [
@@ -156,7 +156,7 @@
 			"cancelable": false,
 			"description": "Dispatched upon delta sync or query responses.",
 			"detail": "{ data: Array, total?: Number, filtered?: Number, offset?: Number, queryGen?: Number, since?: String, meta: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-api-connector:request-bulk-delete": {
 			"emitted_by": [
@@ -169,7 +169,7 @@
 			"cancelable": false,
 			"description": "Triggers bulk document deletes.",
 			"detail": "{ ids: Array, url?: String, idempotencyKey?: String, meta?: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-api-connector:request-cancel": {
 			"emitted_by": [],
@@ -192,7 +192,7 @@
 			"cancelable": false,
 			"description": "Triggers document create request.",
 			"detail": "{ data: Object, tempId: String, url?: String, idempotencyKey?: String, meta?: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-api-connector:request-delete": {
 			"emitted_by": [
@@ -205,7 +205,7 @@
 			"cancelable": false,
 			"description": "Triggers document DELETE.",
 			"detail": "{ id: ID, url?: String, idempotencyKey?: String, meta?: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-api-connector:request-fetch": {
 			"emitted_by": [],
@@ -216,7 +216,7 @@
 			"cancelable": false,
 			"description": "Triggers delta updates query.",
 			"detail": "{ since?: String, meta?: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-api-connector:request-query": {
 			"emitted_by": [
@@ -241,7 +241,7 @@
 			"cancelable": false,
 			"description": "Triggers delta updates query.",
 			"detail": "{ since?: String, meta?: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-api-connector:request-update": {
 			"emitted_by": [
@@ -254,7 +254,7 @@
 			"cancelable": false,
 			"description": "Triggers document PUT edit.",
 			"detail": "{ id: ID, data: Object, expected_version?: Int, url?: String, idempotencyKey?: String, meta?: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-api-connector:updated": {
 			"emitted_by": [
@@ -266,7 +266,7 @@
 			"cancelable": false,
 			"description": "Dispatched upon successful document edit.",
 			"detail": "{ record: Object, id: ID, message: String, meta: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-api-queue:ack": {
 			"emitted_by": [
@@ -562,7 +562,7 @@
 			"cancelable": false,
 			"description": "",
 			"detail": "",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-chart:set-loading": {
 			"emitted_by": [
@@ -574,7 +574,7 @@
 			"cancelable": false,
 			"description": "",
 			"detail": "",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-circular-progress:change": {
 			"emitted_by": [
@@ -630,7 +630,7 @@
 			"cancelable": false,
 			"description": "Dispatched upon successful bulk deletion.",
 			"detail": "{ response: Object, ids: Array, message: String, meta: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-couchdb-connector:config-changed": {
 			"emitted_by": [
@@ -652,7 +652,7 @@
 			"cancelable": false,
 			"description": "Dispatched upon successful document creation.",
 			"detail": "{ record: Object, tempId: String, message: String, meta: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-couchdb-connector:deleted": {
 			"emitted_by": [
@@ -664,7 +664,7 @@
 			"cancelable": false,
 			"description": "Dispatched upon successful document deletion.",
 			"detail": "{ response: Object, id: ID, message: String, meta: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-couchdb-connector:destroyed": {
 			"emitted_by": [
@@ -686,7 +686,7 @@
 			"cancelable": false,
 			"description": "Dispatched upon HTTP or network errors.",
 			"detail": "{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-couchdb-connector:fetched": {
 			"emitted_by": [
@@ -698,7 +698,7 @@
 			"cancelable": false,
 			"description": "Dispatched upon delta sync responses.",
 			"detail": "{ data: Array, since: String, meta: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-couchdb-connector:request-bulk-delete": {
 			"emitted_by": [],
@@ -770,7 +770,7 @@
 			"cancelable": false,
 			"description": "Dispatched upon successful document edit.",
 			"detail": "{ record: Object, id: ID, message: String, meta: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-data-coordinator:error": {
 			"emitted_by": [
@@ -964,7 +964,7 @@
 			"cancelable": false,
 			"description": "Optimistically deletes multiple records.",
 			"detail": "{ ids: Array }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-data-store:request-create": {
 			"emitted_by": [
@@ -976,7 +976,7 @@
 			"cancelable": false,
 			"description": "Optimistically writes a new record.",
 			"detail": "{ tempId: String, data: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-data-store:request-delete": {
 			"emitted_by": [
@@ -988,7 +988,7 @@
 			"cancelable": false,
 			"description": "Optimistically deletes a record.",
 			"detail": "{ id: ID }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-data-store:request-page": {
 			"emitted_by": [
@@ -1024,7 +1024,7 @@
 			"cancelable": false,
 			"description": "",
 			"detail": "",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-data-store:request-update": {
 			"emitted_by": [
@@ -1036,7 +1036,7 @@
 			"cancelable": false,
 			"description": "Optimistically updates a record or rekeys ID.",
 			"detail": "{ id: ID, data: Object }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-data-store:sync-error": {
 			"emitted_by": [
@@ -1439,7 +1439,7 @@
 			"cancelable": false,
 			"description": "Windowed mode (`data-ln-list-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry.",
 			"detail": "{ offset: Number }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-list:ready": {
 			"emitted_by": [
@@ -1493,7 +1493,7 @@
 			"cancelable": false,
 			"description": "Windowed mode (`data-ln-list-window`): invalidates the window cache and resets to page 0.",
 			"detail": "*(no payload)*",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-list:request-revalidate": {
 			"emitted_by": [
@@ -1505,7 +1505,7 @@
 			"cancelable": false,
 			"description": "Windowed mode (`data-ln-list-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives.",
 			"detail": "*(no payload)*",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-list:search": {
 			"emitted_by": [
@@ -1547,7 +1547,7 @@
 			"cancelable": false,
 			"description": "Populates the list with a dataset, removes loading overlays, and triggers render. Windowed mode (`data-ln-list-window`) additionally reads `offset`/`queryGen` off the payload, routing it into the internal window cache.",
 			"detail": "{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-list:set-loading": {
 			"emitted_by": [
@@ -1559,7 +1559,7 @@
 			"cancelable": false,
 			"description": "Controls the visual loading state of the list.",
 			"detail": "{ loading: Boolean }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-list:set-search": {
 			"emitted_by": [],
@@ -2009,7 +2009,7 @@
 			"cancelable": false,
 			"description": "Windowed mode (`data-ln-table-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry.",
 			"detail": "{ offset: Number }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-table:ready": {
 			"emitted_by": [
@@ -2065,7 +2065,7 @@
 			"cancelable": false,
 			"description": "",
 			"detail": "",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-table:request-revalidate": {
 			"emitted_by": [
@@ -2077,7 +2077,7 @@
 			"cancelable": false,
 			"description": "Windowed mode (`data-ln-table-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives.",
 			"detail": "*(no payload)*",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-table:row-action": {
 			"emitted_by": [
@@ -2139,7 +2139,7 @@
 			"cancelable": false,
 			"description": "Populates the table with a raw dataset (Data-Driven mode). Windowed mode (`data-ln-table-window`) additionally reads `offset`/`queryGen` off the payload, routing it into the internal window cache.",
 			"detail": "{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-table:set-loading": {
 			"emitted_by": [
@@ -2151,7 +2151,7 @@
 			"cancelable": false,
 			"description": "Toggles the `.ln-table--loading` class (Data-Driven mode).",
 			"detail": "{ loading: Boolean }",
-			"source": "static"
+			"source": "mixed"
 		},
 		"ln-table:set-search": {
 			"emitted_by": [],
