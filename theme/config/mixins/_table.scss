@@ -41,7 +41,7 @@
 	font-variant-numeric: tabular-nums;
 
 	// Row hover transition color. Default to a discrete tint of the primary color
-	--bg-row-hover: var(--color-row-hover, color-mix(in srgb, var(--color-accent) 4%, var(--bg-sunken)));
+	--bg-row-hover: var(--color-row-hover, color-mix(in srgb, var(--color-accent) var(--tint-hover), var(--bg-sunken)));
 
 	thead {
 		--color-bg: var(--bg-sunken);
@@ -132,7 +132,7 @@
 
 		&.selected,
 		&:has(input[type="checkbox"]:checked) {
-			background-color: color-mix(in srgb, var(--color-accent) 7%, var(--color-bg));
+			background-color: color-mix(in srgb, var(--color-accent) var(--tint-selected), var(--color-bg));
 		}
 	}
 
@@ -297,7 +297,7 @@
 	transition: all 0.15s ease-in-out;
 
 	&:hover {
-		background-color: color-mix(in srgb, var(--color-accent) 12%, transparent);
+		background-color: color-mix(in srgb, var(--color-accent) var(--tint-hover), transparent);
 		color: var(--color-accent);
 		opacity: 1;
 	}

@@ -117,8 +117,9 @@ background-color: hsl(var(--color-primary) / 0.5); /* 50% opacity */
 ```
 
 ### B. Vocabulary and Primitives
-- **Vocabulary Tokens:** Pre-composed colors and shadows representing semantic choices (e.g., `--bg-base`, `--bg-elevated`, `--fg-muted`, `--border-subtle`, `--shadow-resting`).
+- **Vocabulary Tokens:** Pre-composed colors and shadows representing semantic choices (e.g., `--bg-base`, `--bg-elevated`, `--bg-sunken`, `--bg-hover`, `--bg-active`, `--fg-muted`, `--border-subtle`, `--shadow-resting`).
 - **Primitives:** Single CSS variables that SCSS mixins read directly (e.g., `--color-bg`, `--color-fg`, `--color-border`, `--shadow`, `--padding-x`, `--padding-y`). These map by default to vocabulary tokens and theme dimensions.
+- **Interaction States & Freeze Invariant:** Neutral interaction states are vocabulary entries (`--bg-hover`, `--bg-active`). Accent-derived states are tokenised strictly as ratio percentages (`--tint-hover: 7%`, `--tint-selected: 12%`, `--tint-active: 14%`) rather than pre-resolved colors because of the `:root` freeze rule: any CSS token declared at `:root` that embeds `var(--color-accent)` or `var(--color-bg)` freezes at `:root`, breaking dynamic status cascades (`.success`, `.error`, `.warning`, `.info`). By tokenising the ratio literal, `color-mix()` stays at the declaration site where `--color-accent` and `--color-bg` resolve dynamically on the local component scope.
 - **Scope Re-binding:** To change the appearance of a component, rebind the primitive on the local component scope instead of writing static overrides:
 ```css
 .card-dark-mode {

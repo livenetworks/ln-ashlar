@@ -38,6 +38,8 @@
 	--bg-elevated: hsl(220 16% 17%);
 	--bg-sunken:   hsl(220 16% 20%);
 	--bg-recessed: hsl(220 16%  9%);
+	--bg-hover:    hsl(220 16% 20%);   // parity with today's dark --bg-sunken
+	--bg-active:   hsl(220 16% 24%);   // new — one step above hover
 
 	// Vocabulary — fg
 	--fg-default: hsl(0 0% 95%);
@@ -167,7 +169,8 @@
 	// at :root only; library owns structure. See CLAUDE.md
 	// ## Theme Architecture for the contract.
 	--btn-bg:           var(--bg-elevated);
-	--btn-bg-hover:     var(--bg-sunken);
+	--btn-bg-hover:     var(--bg-hover);
+	--btn-bg-active:    var(--bg-active);
 	--btn-border:       var(--color-accent);
 	--btn-border-hover: var(--color-accent-hover);
 

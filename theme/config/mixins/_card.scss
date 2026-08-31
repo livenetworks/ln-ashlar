@@ -221,13 +221,12 @@
 }
 
 // ─── Card accents (Tabler-inspired colored lines) ──────
-// Accent reads --color-accent (solid) for borders, --color-primary
-// (raw triplet) for alpha hover tints — see plan §0.3.
+// Accent reads --color-accent for borders and hover wash tint (--tint-hover).
 // Usage: #my-card { @include card; @include card-accent-top; }
 
 @mixin _card-accent-base {
 	&:hover {
-		background-color: color-mix(in srgb, var(--color-accent) 4%, transparent);
+		background-color: color-mix(in srgb, var(--color-accent) var(--tint-hover), transparent);
 	}
 }
 

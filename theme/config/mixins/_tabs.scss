@@ -46,7 +46,7 @@
 
 	&:hover {
 		color: var(--color-accent);
-		background-color: color-mix(in srgb, var(--color-accent) 5%, transparent);
+		background-color: color-mix(in srgb, var(--color-accent) var(--tint-hover), transparent);
 		border-bottom-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
 	}
 

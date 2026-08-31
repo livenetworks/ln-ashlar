@@ -56,6 +56,8 @@ The `ln-ashlar` theming system enables Dark Mode and customized brand palettes b
 | `data-theme="light"` | token | attribute value | Forces light mode vocabulary ladder |
 | `--bg-base` | token | color | Base canvas surface (inverted in dark mode) |
 | `--bg-elevated` | token | color | Raised card surface (lighter than canvas in dark mode) |
+| `--bg-hover` | token | color | Neutral hover state (hsl(220 16% 20%) in dark mode) |
+| `--bg-active` | token | color | Neutral active state (hsl(220 16% 24%) in dark mode) |
 | `--color-scrim` | token | color | Modal backdrop overlay color |
 
 ---

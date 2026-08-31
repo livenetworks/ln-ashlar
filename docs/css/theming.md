@@ -82,6 +82,8 @@ any per-component dark declarations.
 	--bg-elevated: hsl(220 16% 17%);
 	--bg-sunken:   hsl(220 16% 20%);
 	--bg-recessed: hsl(220 16%  9%);
+	--bg-hover:    hsl(220 16% 20%);
+	--bg-active:   hsl(220 16% 24%);
 
 	// Foreground vocabulary
 	--fg-default: hsl(0 0% 95%);

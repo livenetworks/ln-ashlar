@@ -73,11 +73,12 @@ The canonical grey layer. Status, vocabulary, and border tokens reference this s
 | Token | Value | Feeds vocabulary |
 |---|---|---|
 | `--color-neutral-50` | `220 20% 98%` | `--bg-elevated` |
-| `--color-neutral-100` | `220 16% 96%` | `--bg-sunken`, `--bg-recessed`, `--border-subtle` |
-| `--color-neutral-300` | `220 13% 83%` | `--border-strong` |
+| `--color-neutral-100` | `220 14% 96%` | `--bg-sunken`, `--bg-recessed`, `--bg-hover`, `--border-subtle` |
+| `--color-neutral-150` | `220 13% 93%` | `--bg-active` |
+| `--color-neutral-300` | `216 12% 84%` | `--border-strong` |
 | `--color-neutral-400` | `218 11% 58%` | `--fg-subtle`, placeholder |
 | `--color-neutral-500` | `220 10% 40%` | `--fg-muted`, helper text (WCAG AA compliant) |
-| `--color-neutral-900` | `221 39% 11%` | `--fg-default` (maximum contrast) |
+| `--color-neutral-900` | `222 47% 11%` | `--fg-default` (maximum contrast) |
 
 **Why stored as bare HSL triplets:** enables alpha transparency via
 `hsl(var(--color-neutral-900) / 0.5)`.
@@ -92,12 +93,16 @@ vocabulary at theme `:root`.
 
 #### Background vocabulary
 
+> **Note:** `--bg-sunken` represents a static recessed surface (e.g. `thead`, scrollbar track). Interactive hover/active states use `--bg-hover` and `--bg-active`.
+
 | Token | Value | Role |
 |---|---|---|
 | `--bg-base` | `hsl(var(--color-white))` | Page-level surface (cards, inputs, modals) |
 | `--bg-elevated` | `hsl(var(--color-neutral-50))` | Raised surfaces (floating panels, dropdowns) |
-| `--bg-sunken` | `hsl(var(--color-neutral-100))` | Sunken surfaces (`thead`, panel headers, scrollbar track) |
-| `--bg-recessed` | `hsl(var(--color-neutral-100))` | Recessed fills (chip, code blocks, progress tracks) |
+| `--bg-sunken` | `hsl(var(--color-neutral-100))` | Static sunken surfaces (`thead`, panel headers, scrollbar track) |
+| `--bg-recessed` | `hsl(var(--color-neutral-50))` | Recessed fills (chip, code blocks, progress tracks) |
+| `--bg-hover` | `hsl(var(--color-neutral-100))` | Neutral interactive hover state |
+| `--bg-active` | `hsl(var(--color-neutral-150))` | Neutral interactive active / pressed state |
 
 #### Foreground vocabulary
 
@@ -123,6 +128,16 @@ vocabulary at theme `:root`.
 | `--shadow-floating` | `var(--shadow-md)` | Tooltips, dropdowns, popovers |
 | `--shadow-overlay` | `var(--shadow-xl)` | Modals |
 
+### Accent wash ratios (Interaction states)
+
+Accent-derived interactive states are tokenised as **percentages** (not pre-resolved colors) so that `color-mix()` stays at the declaration site and `--color-accent` / `--color-bg` resolve locally, keeping the semantic color cascade (`.success`, `.error`, etc.) functional.
+
+| Token | Value | Role |
+|---|---|---|
+| `--tint-hover` | `7%` | Hover tint for selectable items, links, and table rows |
+| `--tint-selected` | `12%` | Selected item wash (active nav items, selected table rows) |
+| `--tint-active` | `14%` | Active / pressed accent item wash |
+
 ### Primitives — what mixins read
 
 Mixins read ONLY these single primitives. The primitive defaults wire to the vocabulary. Components rebind the primitive on their own scope.
@@ -138,6 +153,8 @@ Mixins read ONLY these single primitives. The primitive defaults wire to the voc
 | `--color-accent-fg` | `hsl(var(--color-white))` | Text color on solid accent background |
 | `--color-accent-tint` | `hsl(var(--color-primary-lighter))` | Light accent wash (checked pills, active nav item background) |
 | `--color-accent-tint-strong` | `hsl(var(--color-primary-light))` | Stronger light accent wash (focus halos, upload active zones) |
+| `--btn-bg-hover` | `var(--bg-hover)` | Button hover background (neutral) |
+| `--btn-bg-active` | `var(--bg-active)` | Button pressed background (neutral) |
 | `--font-size` | `var(--text-body-md)` | Base font size |
 | `--line-height` | `var(--lh-body-md)` | Base line height |
 | `--transition` | `var(--transition-base)` | Standard transition timing/curve |

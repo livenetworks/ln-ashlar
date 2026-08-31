@@ -128,7 +128,7 @@
 			border-color     150ms ease;
 
 		&:hover {
-			background-color: color-mix(in srgb, var(--color-accent) 7%, transparent);
+			background-color: color-mix(in srgb, var(--color-accent) var(--tint-hover), transparent);
 		}
 
 		&.active {
@@ -158,12 +158,12 @@
 
 		&:hover {
 			box-shadow: inset 2px 0 0 color-mix(in srgb, var(--color-accent) 30%, transparent);
-			background-color: color-mix(in srgb, var(--color-accent) 4%, transparent);
+			background-color: color-mix(in srgb, var(--color-accent) var(--tint-hover), transparent);
 		}
 
 		&.active {
 			box-shadow: inset 3px 0 0 var(--color-accent);
-			background-color: color-mix(in srgb, var(--color-accent) 7%, transparent);
+			background-color: color-mix(in srgb, var(--color-accent) var(--tint-selected), transparent);
 		}
 	}
 }
@@ -214,11 +214,11 @@
 		transition: background-color 150ms ease, color 150ms ease;
 
 		&:hover {
-			background-color: color-mix(in srgb, var(--color-accent) 4%, transparent);
+			background-color: color-mix(in srgb, var(--color-accent) var(--tint-hover), transparent);
 		}
 
 		&.active {
-			background-color: color-mix(in srgb, var(--color-accent) 7%, transparent);
+			background-color: color-mix(in srgb, var(--color-accent) var(--tint-selected), transparent);
 		}
 	}
 }

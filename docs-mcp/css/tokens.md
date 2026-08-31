@@ -73,8 +73,13 @@ Primitive Tokens   →  --color-bg, --color-fg, --color-border, --shadow,
 | `--color-info` | token | `200 95% 38%` | Info status bare HSL triplet |
 | `--bg-base` | token | color | Base canvas background |
 | `--bg-elevated` | token | color | Raised card background |
-| `--bg-sunken` | token | color | Sunken well and table header background |
+| `--bg-sunken` | token | color | Static sunken well and table header background |
 | `--bg-recessed` | token | color | Recessed input background |
+| `--bg-hover` | token | color | Neutral interactive hover background |
+| `--bg-active` | token | color | Neutral interactive active/pressed background |
+| `--tint-hover` | token | percentage (`7%`) | Accent-wash ratio for interactive hover |
+| `--tint-selected` | token | percentage (`12%`) | Accent-wash ratio for selected/current items |
+| `--tint-active` | token | percentage (`14%`) | Accent-wash ratio for active/pressed items |
 | `--fg-default` | token | color | High-contrast primary text |
 | `--fg-muted` | token | color | Muted secondary text and captions |
 | `--border-subtle` | token | color | Subtle separator border |

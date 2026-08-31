@@ -53,9 +53,8 @@
 	}
 
 	&:active:not(:disabled) {
-		background: var(--btn-bg-hover);
+		background: var(--btn-bg-active);
 		border-color: var(--btn-border-hover);
-		filter: brightness(0.96);
 	}
 
 	&:focus-visible {
@@ -98,7 +97,7 @@
 	--btn-bg:           transparent;
 	--btn-fg:           var(--color-fg);
 	--btn-border:       transparent;
-	--btn-bg-hover:     var(--bg-sunken);
+	--btn-bg-hover:     var(--bg-hover);
 	--btn-fg-hover:     var(--color-fg);
 	--btn-border-hover: transparent;
 
@@ -115,7 +114,7 @@
 	--btn-bg:           transparent;
 	--btn-fg:           var(--color-fg);
 	--btn-border:       var(--border-strong);
-	--btn-bg-hover:     var(--bg-sunken);
+	--btn-bg-hover:     var(--bg-hover);
 	--btn-fg-hover:     var(--color-fg);
 	--btn-border-hover: var(--border-strong);
 

@@ -91,7 +91,7 @@
 button[data-ln-toggle-for]:has(> .ln-icon:only-child) {
 	--btn-bg:           transparent;
 	--btn-border:       transparent;
-	--btn-bg-hover:     var(--bg-sunken);
+	--btn-bg-hover:     var(--bg-hover);
 	--btn-border-hover: transparent;
 	--btn-fg-hover:     var(--color-fg);
 }

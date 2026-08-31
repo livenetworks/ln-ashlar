@@ -294,6 +294,11 @@
 	--bg-sunken:   hsl(var(--color-neutral-100));
 	--bg-recessed: hsl(var(--color-neutral-50));
 
+	// Interaction states — neutral. NOT surfaces: only ever applied by a
+	// :hover / :active selector. Static recessed fills stay on --bg-sunken.
+	--bg-hover:  hsl(var(--color-neutral-100));
+	--bg-active: hsl(var(--color-neutral-150));
+
 	--fg-default: hsl(var(--color-neutral-900));
 	--fg-muted:   hsl(var(--color-neutral-500));
 	--fg-subtle:  hsl(var(--color-neutral-400));
@@ -321,6 +326,14 @@
 	--color-accent-fg:     hsl(var(--color-white));
 	--color-accent-tint:         hsl(var(--color-primary-lighter));
 	--color-accent-tint-strong:  hsl(var(--color-primary-light));
+
+	// Accent-wash strengths. Ratios, not colors — color-mix() stays at the
+	// declaration site so --color-accent / --color-bg resolve locally and the
+	// semantic-color cascade keeps working. Ladder taken from _dropdown.scss,
+	// the only component that had all three states.
+	--tint-hover:    7%;
+	--tint-selected: 12%;
+	--tint-active:   14%;
 
 	// Translucent accent surface — companions for themes that opt in to a
 	// non-solid accent button. NO defaults — `@mixin btn` reads these via
@@ -361,7 +374,8 @@
 	--btn-bg:           var(--color-bg);
 	--btn-fg:           var(--color-fg);
 	--btn-border:       var(--border-strong);
-	--btn-bg-hover:     var(--bg-sunken);
+	--btn-bg-hover:     var(--bg-hover);
+	--btn-bg-active:    var(--bg-active);
 	--btn-fg-hover:     var(--color-fg);
 	--btn-border-hover: var(--border-strong);
 

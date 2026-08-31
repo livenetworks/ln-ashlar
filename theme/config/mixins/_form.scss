@@ -775,7 +775,7 @@
 
 		// Hover (unchecked) — subtle accent wash (nav hover).
 		&:hover:not(:has(> input:checked)) {
-			background-color: color-mix(in srgb, var(--color-accent) 7%, transparent);
+			background-color: color-mix(in srgb, var(--color-accent) var(--tint-hover), transparent);
 		}
 
 		// Selected — nav active vocabulary (replaces solid-accent + white).
