@@ -1,12 +1,14 @@
 import { registerComponent, dispatch } from '../../ln-core';
+import { isTwoElementMode, parseConfirmTimeout, resolveConfirmText, shouldIgnoreConfirmClick } from './confirm-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-confirm';
 	const DOM_ATTRIBUTE = 'lnConfirm';
 	const TIMEOUT_ATTR = 'data-ln-confirm-timeout';
-	const DEFAULT_TIMEOUT = 3;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	const instances = new Set();
 
 	function _log(...args) {
 		const isDebug = document.documentElement.hasAttribute('data-ln-debug') ||
@@ -28,19 +30,21 @@ import { registerComponent, dispatch } from '../../ln-core';
 		// Detect two-element mode
 		this.idleEl = dom.querySelector('[data-ln-confirm-idle]');
 		this.activeEl = dom.querySelector('[data-ln-confirm-active]');
-		this.isTwoElementMode = !!(this.idleEl || this.activeEl);
+		this.isTwoElementMode = isTwoElementMode(this.idleEl, this.activeEl);
 
 		if (this.isTwoElementMode) {
 			this.originalText = '';
 			this.confirmText = '';
 		} else {
 			this.originalText = dom.textContent.trim();
-			this.confirmText = dom.getAttribute(DOM_SELECTOR) || 'Confirm?';
+			this.confirmText = resolveConfirmText(dom.getAttribute(DOM_SELECTOR));
 		}
 
 		const self = this;
 		this._onClick = function (e) {
+			if (shouldIgnoreConfirmClick(e)) return;
 			_log('click handler, confirming:', self.confirming, 'submitted:', self._submitted, 'target:', e.target);
+
 			if (!self.confirming) {
 				e.preventDefault();
 				e.stopImmediatePropagation();
@@ -50,21 +54,16 @@ import { registerComponent, dispatch } from '../../ln-core';
 				self._submitted = true;
 				// Second click — the gate opens for THIS button's own default
 				// action (submit / href), but the click still must not reach
-				// an ancestor click surface. Same containment as the first
-				// click, without cancelling the action being confirmed.
+				// an ancestor click surface.
 				e.stopPropagation();
 				self._reset();
 			}
 		};
 
 		dom.addEventListener('click', this._onClick);
+		instances.add(this);
 		return this;
 	}
-
-	_component.prototype._getTimeout = function () {
-		const val = parseFloat(this.dom.getAttribute(TIMEOUT_ATTR));
-		return (isNaN(val) || val <= 0) ? DEFAULT_TIMEOUT : val;
-	};
 
 	_component.prototype._enterConfirm = function () {
 		this.confirming = true;
@@ -83,7 +82,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 				this.dom.setAttribute('aria-live', 'polite');
 			}
 		} else {
-			var iconUse = this.dom.querySelector('svg.ln-icon use');
+			const iconUse = this.dom.querySelector('svg.ln-icon use');
 			if (iconUse && this.originalText === '') {
 				this.isIconButton = true;
 				this.originalIconHref = iconUse.getAttribute('href');
@@ -98,7 +97,6 @@ import { registerComponent, dispatch } from '../../ln-core';
 		}
 
 		this._startTimer();
-
 		dispatch(this.dom, 'ln-confirm:waiting', { target: this.dom });
 	};
 
@@ -107,10 +105,10 @@ import { registerComponent, dispatch } from '../../ln-core';
 			clearTimeout(this.revertTimer);
 		}
 		const self = this;
-		const ms = this._getTimeout() * 1000;
+		const seconds = parseConfirmTimeout(this.dom.getAttribute(TIMEOUT_ATTR));
 		this.revertTimer = setTimeout(function () {
 			self._reset();
-		}, ms);
+		}, seconds * 1000);
 	};
 
 	_component.prototype._reset = function () {
@@ -123,7 +121,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 			if (this.activeEl) this.activeEl.setAttribute('hidden', 'true');
 		} else {
 			if (this.isIconButton) {
-				var iconUse = this.dom.querySelector('svg.ln-icon use');
+				const iconUse = this.dom.querySelector('svg.ln-icon use');
 				if (iconUse && this.originalIconHref) {
 					iconUse.setAttribute('href', this.originalIconHref);
 				}
@@ -162,7 +160,9 @@ import { registerComponent, dispatch } from '../../ln-core';
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		if (this.confirming) this._reset();
 		this.dom.removeEventListener('click', this._onClick);
+		instances.delete(this);
 		delete this.dom[DOM_ATTRIBUTE];
+		dispatch(this.dom, 'ln-confirm:destroyed', { target: this.dom });
 	};
 
 	// ─── Init ──────────────────────────────────────────────────

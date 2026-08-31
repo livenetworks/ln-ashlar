@@ -21,12 +21,11 @@ When refactoring a component, ensure:
 
 ## 🟢 Phase 1: Primitive & Micro-Components (Start Here)
 
-- [ ] **`ln-toggle`** *(Refinement)*
-  - Model: `components/ln-toggle/src/toggle-model.js` *(exists)*
-  - Scope: Refactor global click listener to lazy listener pattern (`_ensureClickListener`/`_maybeRemoveClickListener`), clean instance Set tracking, verify unit tests.
-- [ ] **`ln-confirm`**
+- [x] **`ln-toggle`** *(Refined & Complete)*
+  - Model: `components/ln-toggle/src/toggle-model.js`
+- [x] **`ln-confirm`** *(Complete)*
   - Model: `components/ln-confirm/src/confirm-model.js`
-  - Scope: Extract single vs two-element mode detection, timeout parsing, icon swapping predicates into pure model. Unit test suite.
+  - Tests: `tests/ln-confirm.test.js`
 - [ ] **`ln-accordion`**
   - Model: `components/ln-accordion/src/accordion-model.js`
   - Scope: Multi vs single expansion rules, target resolving, panel state derivations. Unit test suite.
