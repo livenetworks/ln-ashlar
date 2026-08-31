@@ -1,27 +1,21 @@
-import { registerComponent, dispatch } from '../../ln-core';
-import { isTwoElementMode, parseConfirmTimeout, resolveConfirmText, shouldIgnoreConfirmClick } from './confirm-model.js';
+import { registerComponent, dispatch, shouldIgnoreClick } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-confirm';
 	const DOM_ATTRIBUTE = 'lnConfirm';
 	const TIMEOUT_ATTR = 'data-ln-confirm-timeout';
+	const DEFAULT_TIMEOUT = 3;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-	const instances = new Set();
-
-	function _log(...args) {
-		const isDebug = document.documentElement.hasAttribute('data-ln-debug') ||
-			(document.body && document.body.hasAttribute('data-ln-debug'));
-		if (isDebug) {
-			console.warn('[ln-confirm]', ...args);
-		}
+	function _getTimeout(dom) {
+		const val = parseFloat(dom.getAttribute(TIMEOUT_ATTR));
+		return (isNaN(val) || val <= 0) ? DEFAULT_TIMEOUT : val;
 	}
 
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
-		_log('constructor called on', dom);
 		this.dom = dom;
 		this.confirming = false;
 		this.revertTimer = null;
@@ -30,20 +24,19 @@ import { isTwoElementMode, parseConfirmTimeout, resolveConfirmText, shouldIgnore
 		// Detect two-element mode
 		this.idleEl = dom.querySelector('[data-ln-confirm-idle]');
 		this.activeEl = dom.querySelector('[data-ln-confirm-active]');
-		this.isTwoElementMode = isTwoElementMode(this.idleEl, this.activeEl);
+		this.isTwoElementMode = Boolean(this.idleEl || this.activeEl);
 
 		if (this.isTwoElementMode) {
 			this.originalText = '';
 			this.confirmText = '';
 		} else {
 			this.originalText = dom.textContent.trim();
-			this.confirmText = resolveConfirmText(dom.getAttribute(DOM_SELECTOR));
+			this.confirmText = dom.getAttribute(DOM_SELECTOR) || 'Confirm?';
 		}
 
 		const self = this;
 		this._onClick = function (e) {
-			if (shouldIgnoreConfirmClick(e)) return;
-			_log('click handler, confirming:', self.confirming, 'submitted:', self._submitted, 'target:', e.target);
+			if (shouldIgnoreClick(e)) return;
 
 			if (!self.confirming) {
 				e.preventDefault();
@@ -61,7 +54,6 @@ import { isTwoElementMode, parseConfirmTimeout, resolveConfirmText, shouldIgnore
 		};
 
 		dom.addEventListener('click', this._onClick);
-		instances.add(this);
 		return this;
 	}
 
@@ -105,10 +97,10 @@ import { isTwoElementMode, parseConfirmTimeout, resolveConfirmText, shouldIgnore
 			clearTimeout(this.revertTimer);
 		}
 		const self = this;
-		const seconds = parseConfirmTimeout(this.dom.getAttribute(TIMEOUT_ATTR));
+		const ms = _getTimeout(this.dom) * 1000;
 		this.revertTimer = setTimeout(function () {
 			self._reset();
-		}, seconds * 1000);
+		}, ms);
 	};
 
 	_component.prototype._reset = function () {
@@ -156,11 +148,9 @@ import { isTwoElementMode, parseConfirmTimeout, resolveConfirmText, shouldIgnore
 	};
 
 	_component.prototype.destroy = function () {
-		_log('destroy called on', this.dom);
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		if (this.confirming) this._reset();
 		this.dom.removeEventListener('click', this._onClick);
-		instances.delete(this);
 		delete this.dom[DOM_ATTRIBUTE];
 		dispatch(this.dom, 'ln-confirm:destroyed', { target: this.dom });
 	};

@@ -3,10 +3,13 @@ import assert from 'node:assert/strict';
 
 import {
 	getNextToggleState,
-	isTargetDisabled,
-	normalizeToggleState,
-	shouldIgnoreClick
+	normalizeToggleState
 } from '../components/ln-toggle/src/toggle-model.js';
+
+import {
+	isTargetDisabled,
+	shouldIgnoreClick
+} from '../components/ln-core/helpers.js';
 
 test('normalizeToggleState returns open only for open, close for anything else', () => {
 	assert.equal(normalizeToggleState('open'), 'open');

@@ -1,5 +1,5 @@
-import { dispatch, dispatchCancelable, persistGet, persistSet, registerComponent } from '../../ln-core';
-import { getNextToggleState, isTargetDisabled, normalizeToggleState, shouldIgnoreClick } from './toggle-model.js';
+import { dispatch, dispatchCancelable, isTargetDisabled, persistGet, persistSet, registerComponent, shouldIgnoreClick } from '../../ln-core';
+import { getNextToggleState, normalizeToggleState } from './toggle-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-toggle';

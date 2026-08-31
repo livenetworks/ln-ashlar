@@ -34,10 +34,9 @@
 			]
 		},
 		"data-ln-debug": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
-				"ln-confirm-dev.scss",
-				"src/ln-confirm.js"
+				"ln-confirm-dev.scss"
 			]
 		},
 		"data-ln-table": {

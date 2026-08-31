@@ -1,117 +1,67 @@
-# 📋 ln-ashlar Component Refactoring Roadmap (Two-Tier Model Archetype)
+# 📋 ln-ashlar Domain Model Refactoring Roadmap
 
 > **Multi-Agent Task Tracking Document**  
-> This file coordinates the refactoring of all `ln-ashlar` components to the **Two-Tier Isolated Domain Model & Lazy Lifecycle** standard established by `ln-key`.  
-> 📖 **Specification & Standards:** [`docs/architecture/component-coding-standards.md`](docs/architecture/component-coding-standards.md)
+> This file tracks the refactoring of complex `ln-ashlar` components to the **Two-Tier Isolated Domain Model** standard.  
+> 📖 **Specification & Criteria:** [`docs/architecture/component-coding-standards.md`](docs/architecture/component-coding-standards.md)
 
 ---
 
-## 🎯 Definition of Done (DoD) per Component
+## 🎯 The Pragmatic Rule: Which Components Get a Model?
 
-When refactoring a component, ensure:
-1. **`src/{name}-model.js`:** Pure functions only (string parsing, tokenizing, math, normalization, predicates). **Zero DOM / window / document dependencies**.
-2. **`src/ln-{name}.js`:** Lightweight DOM shell, `registerComponent`, `instances = new Set()` for global listeners, event delegation (no per-element listener arrays).
-3. **Guard Clauses:** Centralized `_isUsableTarget` or `isEditableEventTarget` checks.
-4. **Lifecycle Events:** Paired cancelable `ln-{name}:before-{action}` and post-fact `ln-{name}:{action}`.
-5. **Zero Display Text:** Uses `<template>` or `buildDict()`; no hardcoded user strings in JS.
-6. **Tests:** Dedicated unit tests for `*-model.js` in `tests/{name}.test.js`.
-7. **Clean `destroy()`:** Clean teardown in 3–5 lines without memory leaks.
+* **YES (`src/{name}-model.js` + `tests/{name}.test.js`):** Components with non-trivial domain logic, string parsing, tokenization, sorting/filtering algorithms, math formulas, or validation rules that benefit from 100% isolated unit testing.
+* **NO (Single-File DOM Component):** Micro-components and behavioral triggers (`ln-confirm`, `ln-accordion`, `ln-dropdown`, `ln-popover`, `ln-tooltip`, `ln-modal`) rely directly on shared `ln-core` primitives (`shouldIgnoreClick`, `isTargetDisabled`, `isUsableTarget`, `computePlacement`).
 
 ---
 
-## 🟢 Phase 1: Primitive & Micro-Components (Start Here)
+## ✅ Reference Implementations (Complete)
 
-- [x] **`ln-toggle`** *(Refined & Complete)*
-  - Model: `components/ln-toggle/src/toggle-model.js`
-- [x] **`ln-confirm`** *(Complete)*
-  - Model: `components/ln-confirm/src/confirm-model.js`
-  - Tests: `tests/ln-confirm.test.js`
-- [ ] **`ln-accordion`**
-  - Model: `components/ln-accordion/src/accordion-model.js`
-  - Scope: Multi vs single expansion rules, target resolving, panel state derivations. Unit test suite.
-- [ ] **`ln-tooltip`**
-  - Model: `components/ln-tooltip/src/tooltip-model.js`
-  - Scope: Positioning math, title stashing/restoration logic, placement attribute resolvers. Unit test suite.
-- [ ] **`ln-dropdown`**
-  - Model: `components/ln-dropdown/src/dropdown-model.js`
-  - Scope: Toggle state, outside-click detection predicate, keyboard item traversal. Unit test suite.
-- [ ] **`ln-popover`**
-  - Model: `components/ln-popover/src/popover-model.js`
-  - Scope: Position placement math, trigger binding resolution, dismiss guards. Unit test suite.
-- [ ] **`ln-modal`**
-  - Model: `components/ln-modal/src/modal-model.js`
-  - Scope: Dialog open/close state transitions, ESC stack handling, focus target placement logic. Unit test suite.
+- [x] **`ln-key`** — `components/ln-key/src/key-model.js` + `tests/ln-key.test.js` (shortcut normalization, key aliases, event mapping)
+- [x] **`ln-number`** — `components/ln-number/src/number-model.js` + `tests/ln-number.test.js` (locale-aware parsing, formatting, cursor calculation)
+- [x] **`ln-chart`** — `components/ln-chart/src/chart-model.js` + `tests/chart-model.test.js` (SVG path generation, coordinate math, value scales)
+- [x] **`ln-toggle`** — `components/ln-toggle/src/toggle-model.js` + `tests/ln-toggle.test.js` (state normalization, next state transitions)
 
 ---
 
-## 🟡 Phase 2: Interactive UI & Navigation Components
+## 🚀 Active Roadmap: Complex Domain Components to Refactor
 
-- [ ] **`ln-tabs`**
-  - Model: `components/ln-tabs/src/tabs-model.js`
-  - Scope: URL hash parsing, tab-to-panel key derivation, replace `_clickHandlers` loop with container event delegation.
+### Priority 1: Search, Filter & Sort Engines
 - [ ] **`ln-search`**
   - Model: `components/ln-search/src/search-model.js`
-  - Scope: Query tokenization, AND substring filtering, field parser, extract clear button resolver.
+  - Tests: `tests/ln-search.test.js`
+  - Scope: Query tokenization, multi-word AND matching, field extraction, exclude-subtree filtering logic.
 - [ ] **`ln-filter`**
   - Model: `components/ln-filter/src/filter-model.js`
-  - Scope: Active filter derivation, `_arraysDiffer`, hash filter encode/decode, plain table column filter logic.
+  - Tests: `tests/ln-filter.test.js`
+  - Scope: Active filter derivation, array comparison (`_arraysDiffer`), AND/OR matching logic, URL hash codec integration.
 - [ ] **`ln-sort`**
   - Model: `components/ln-sort/src/sort-model.js`
-  - Scope: Direction cycling (`asc`/`desc`/`none`), comparator builders, hash sort encode/decode.
+  - Tests: `tests/ln-sort.test.js`
+  - Scope: Direction cycling (`asc`/`desc`/`none`), comparator generation, type-aware value comparison, multi-sort state.
+
+### Priority 2: Validation, Data & Persistence
 - [ ] **`ln-validate`**
   - Model: `components/ln-validate/src/validate-model.js`
-  - Scope: Constraint validation mappings, error list resolution, custom error state handling.
-
----
-
-## 🟠 Phase 3: Data, Forms & Persistence
-
-- [ ] **`ln-table`**
-  - Model: `components/ln-table/src/table-model.js`
-  - Scope: Column metadata parsing, row selection state, pagination calculations, sort/filter integration.
-- [ ] **`ln-options`**
-  - Model: `components/ln-options/src/options-model.js`
-  - Scope: Option value extraction, multi/single select state, keyboard arrow index navigation.
+  - Tests: `tests/ln-validate.test.js`
+  - Scope: Constraint validation mappings, error key resolution, custom error state registry, validation aggregation.
 - [ ] **`ln-data-store`**
   - Model: `components/ln-data-store/src/data-store-model.js`
-  - Scope: In-memory CRUD mutations, indexing, query filtering engine.
-- [ ] **`ln-form`**
-  - Model: `components/ln-form/src/form-model.js`
-  - Scope: Form data serialization, method resolution, dirty state tracking.
-- [ ] **`ln-autosave`**
-  - Model: `components/ln-autosave/src/autosave-model.js`
-  - Scope: Dirty comparison diffing, debounce timer orchestration, payload formatting.
-- [ ] **`ln-upload`**
-  - Model: `components/ln-upload/src/upload-model.js`
-  - Scope: File size/mime validation, dropzone state transitions, upload queue math.
-- [ ] **`ln-list`**
-  - Model: `components/ln-list/src/list-model.js`
-  - Scope: Item template rendering orchestration, data binding extraction.
+  - Tests: `tests/ln-data-store.test.js`
+  - Scope: In-memory CRUD mutations, indexing, query filtering engine, pagination slicing.
+- [ ] **`ln-table`**
+  - Model: `components/ln-table/src/table-model.js`
+  - Tests: `tests/ln-table.test.js`
+  - Scope: Column metadata parsing, selection state, pagination slicing math, sort/filter integration.
 
----
-
-## 🔵 Phase 4: Formatting, Numbers & Utilities
-
-- [x] **`ln-key`** *(Reference Standard - Complete)*
-  - Model: `components/ln-key/src/key-model.js`
-- [x] **`ln-number`** *(Complete)*
-  - Model: `components/ln-number/src/number-model.js`
-- [x] **`ln-chart`** *(Complete)*
-  - Model: `components/ln-chart/src/chart-model.js`
+### Priority 3: Formatting & Text Utilities
 - [ ] **`ln-date` / `ln-time`**
   - Model: `components/ln-time/src/time-model.js`
-  - Scope: ISO timestamp parsing, relative time math, `Intl` formatter key caching.
-- [ ] **`ln-stat`**
-  - Model: `components/ln-stat/src/stat-model.js`
-  - Scope: Numeric diffing, percentage change formulas, trend direction formatting.
-- [ ] **`ln-progress` / `ln-circular-progress`**
-  - Model: `components/ln-progress/src/progress-model.js`
-  - Scope: Value clamping (`min`/`max`), stroke-dasharray SVG math, percentage calculation.
-- [ ] **`ln-slug` / `ln-autoresize`**
+  - Tests: `tests/ln-time.test.js`
+  - Scope: ISO timestamp parsing, relative time duration math, format cache key derivation.
+- [ ] **`ln-slug`**
   - Model: `components/ln-slug/src/slug-model.js`
-  - Scope: String slugification, unicode normalization, textarea line height math.
-- [ ] **`ln-toast`**
-  - Model: `components/ln-toast/src/toast-model.js`
-  - Scope: Toast queue stack, auto-dismiss timeout management, deduplication.
-- [ ] **`ln-nav` / `ln-link` / `ln-external-links` / `ln-router` / `ln-sortable`**
-  - Scope: Utility model separation and lightweight shell bindings.
+  - Tests: `tests/ln-slug.test.js`
+  - Scope: Unicode normalization, diacritic stripping, separator collapsing, URL-safe slug generation.
+- [ ] **`ln-tabs`**
+  - Model: `components/ln-tabs/src/tabs-model.js`
+  - Tests: `tests/ln-tabs.test.js`
+  - Scope: Trigger key derivation (`data-ln-tab` vs `<a href="#ns:key">`), URL hash fragment extraction, panel key mapping.
