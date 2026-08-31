@@ -3,73 +3,74 @@ name: ln-debug
 classification: simple
 status: stable
 domain: frontend
-summary: Development diagnostics component providing console log suppression control, DOM element inspection seams, and CSS visual linter integration.
+summary: Development diagnostics and contract verifier providing console log suppression, generic cross-reference validation (*-for, *-source), typo detection, and CSS visual linter integration.
 source: components/ln-debug/src/ln-debug.js
-tags: [debug, diagnostics, linter, dev-tooling]
+tags: [debug, diagnostics, verifier, contracts, linter, dev-tooling]
 ---
 
 # 🛠️ ln-debug
 
-> **Classification:** 🟢 Simple Component / Service (Layer 1 - Developer Tooling)
+> **Classification:** 🟢 Simple Component / Service (Layer 1 - Developer Tooling & Contract Verifier)
 
 ---
 
 ## 1. Core Behavior & Responsibility
 
-`ln-debug` provides lightweight runtime developer diagnostics and visual HTML linting for the `ln-ashlar` design system. It fulfills three primary functions:
+`ln-debug` provides runtime developer diagnostics, cross-element contract verification, and visual HTML linting for `ln-ashlar`. It fulfills four primary functions:
 
-1. **Global Warning Suppressor / Filter:** Intercepts console warnings prefixed with `[ln-` or `[lnCore`. By default, these warnings are muted to keep production browser logs clean. When `data-ln-debug` is placed on `<html>` or `<body>`, warnings are unmuted and printed to the console.
-2. **Developer Inspection Seam:** When applied to individual DOM elements, registers the component instance on `element.lnDebug` for inspection in browser developer tools.
-3. **Visual HTML Linter (Dev CSS):** In conjunction with `ln-ashlar-dev.css`, visually flags HTML structural errors, invalid attribute usages, missing required `id`s, and un-semantic markup directly in the browser UI.
+1. **Global Warning Suppressor / Filter:** Intercepts console warnings prefixed with `[ln-` or `[lnCore`. By default, these warnings are suppressed to keep production browser logs clean. When `data-ln-debug` is placed on `<html>` or `<body>`, warnings are logged to the console.
+2. **Generic Cross-Reference Contract Verifier:**
+   - **ID References (`*-for`):** Scans all `data-ln-*-for` attributes (e.g. `data-ln-toggle-for`, `data-ln-modal-for`, `data-ln-tabs-for`, `data-ln-search-for`, `data-ln-popover-for`) and verifies that the referenced element `id` exists in the document.
+   - **Store References (`*-source`, `*-store`):** Scans consumer store attributes (e.g. `data-ln-table-source`, `data-ln-list-source`, `data-ln-chart-source`, `data-ln-editor-source`) and verifies that a matching `[data-ln-data-store="NAME"]` exists.
+   - **Store Uniqueness:** Flags duplicate `[data-ln-data-store]` instances with identical names.
+   - **Attribute Typo Detection:** Compares unknown `data-ln-*` attributes against the schema-generated attribute manifest via Levenshtein distance and suggests closest matches.
+3. **Lifecycle Timing Coordination:** Waits for asynchronous boot holds (`pendingCount() === 0` via `queueBoot`) and debounces rapid DOM mutations so newly mounted elements and templates settle before running assertions.
+4. **Visual HTML Linter (Dev CSS):** In conjunction with `ln-ashlar-dev.css`, visually highlights local HTML structural errors and un-semantic markup directly in the browser UI.
 
-The JavaScript source is located at [ln-debug.js](../../components/ln-debug/src/ln-debug.js).
+JavaScript source: [`ln-debug.js`](../../components/ln-debug/src/ln-debug.js) and [`debug-verifier.js`](../../components/ln-debug/src/debug-verifier.js).
 
 > [!IMPORTANT]
-> **What the component does NOT do (Orthogonality Doctrine):**
-> - **No Production DOM Mutations:** Does not alter element structure or behavior in production builds.
-> - **No Network Activity:** Does not issue HTTP/AJAX requests or telemetry.
-> - **No Production CSS Impact:** Diagnostic SCSS files (`*-dev.scss`) are strictly compiled into `ln-ashlar-dev.css` and are excluded from `ln-ashlar.css`.
-> - **No App Crash Generation:** Never throws unhandled runtime exceptions that disrupt app execution.
+> **Zero Production Overhead Guarantee:**
+> - **Production Mode:** When `data-ln-debug` is omitted from `<html>` and `<body>`, the verifier remains dormant and console warnings are silenced.
+> - **Standalone Dev Bundle:** The verifier is compiled into `dist/ln-ashlar-dev.js` and `demo/dist/ln-ashlar-dev.js`, maintaining 0 bytes in pure production bundles.
 
 ---
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-### Base HTML Markup
+### Base Development Setup
 
-Place `data-ln-debug` on `<html>` or `<body>` and load `ln-ashlar-dev.css`:
+Place `data-ln-debug` on `<html>` or `<body>`:
 
 ```html
 <!DOCTYPE html>
 <html lang="en" data-ln-debug>
 <head>
-  <!-- Include dev stylesheet containing diagnostic visual lint rules -->
   <link rel="stylesheet" href="dist/ln-ashlar-dev.css" />
   <script src="dist/ln-ashlar.iife.js" defer></script>
 </head>
 <body>
-  <!-- HTML markup issues (e.g. input without id) will be visually highlighted -->
+  <!-- Valid connection -->
+  <button data-ln-toggle-for="user-menu">Toggle Menu</button>
+  <div id="user-menu">Menu Content</div>
+
+  <!-- Broken connection: will trigger [ln-debug] Unresolved ID reference warning -->
+  <button data-ln-toggle-for="missing-sidebar">Broken Toggle</button>
 </body>
 </html>
 ```
 
----
+### Programmatic Diagnostics API
 
-### Component Seam Inspection
-
-Place `data-ln-debug` on a target element to attach the debug seam instance:
-
-```html
-<table data-ln-table="users" data-ln-debug id="users-debug-table">
-  <!-- Table content -->
-</table>
-```
-
-Inspect via browser DevTools console:
 ```javascript
-// Access the table component instance via its debug seam
-const tableInstance = document.getElementById('users-debug-table').lnTable;
-console.log(tableInstance);
+// Perform a synchronous scan and inspect the diagnostic report
+const report = window.lnDebug.verify(document.body, { silent: false });
+console.log(report.total, report.idIssues, report.storeIssues, report.spellingIssues);
+
+// Schedule a debounced verification respecting boot queue holds
+window.lnDebug.schedule(document.body, 50, (report) => {
+  console.log('Verification finished:', report);
+});
 ```
 
 ---
@@ -78,115 +79,77 @@ console.log(tableInstance);
 
 ### Attributes Table
 
-| Attribute | Element | Type / Values | Default | Description |
-|---|---|---|---|---|
-| `data-ln-debug` | `html` / `body` | `Flag` | — | Unmutes `[ln-` console warnings globally and activates the visual CSS linter. |
-| `data-ln-debug` | Any element | `Flag` | — | Attaches component debug instance to `dom.lnDebug`. |
+| Attribute | Target Element | Type | Description |
+|---|---|---|---|
+| `data-ln-debug` | `html` / `body` | `Flag` | Activates dev warnings, runs contract verification, and enables visual CSS dev styles. |
+| `data-ln-debug` | Any element | `Flag` | Attaches component debug instance to `element.lnDebug`. |
+
+### Generic Verification Rules
+
+| Rule Category | Attribute Pattern | Checked Invariant | Diagnostic Output (`console.warn`) |
+|---|---|---|---|
+| **ID References** | `data-ln-*-for="id"` | Target `#id` must exist in document. | `[ln-debug] Unresolved ID reference: <button data-ln-toggle-for="menu"> targets "#menu", but no element with id="menu" exists in the document.` |
+| **Store References** | `data-ln-*-source="name"` | `[data-ln-data-store="name"]` must exist. | `[ln-debug] Unresolved store reference: <table data-ln-table-source="users"> targets store "users", but no [data-ln-data-store="users"] exists in the document.` |
+| **Store Uniqueness** | `[data-ln-data-store]` | Store names must be unique across the document. | `[ln-debug] Duplicate store name: Multiple elements declare data-ln-data-store="users". Store names must be unique across the document.` |
+| **Attribute Spelling** | `data-ln-*` | Must exist in schema manifest. | `[ln-debug] Unknown attribute "data-ln-table-sorce" on <table>. Did you mean "data-ln-table-source"?` |
 
 ### Events API
 
-This component emits and listens to no custom ln-* events.
+This component emits and listens to no custom `ln-*` events.
 
 ---
 
-## 4. CSS Diagnostics & Behavioral Concept
+## 4. CSS Styling & Behavioral Concept
 
-Visual lint rules are isolated from production builds to avoid performance degradation or visual pollution.
-
-### Diagnostic SCSS Architecture
-1. **Modular Rule Files:** Components maintain individual diagnostic rules in `*-dev.scss` files (e.g. [ln-date-dev.scss](../../components/ln-date/ln-date-dev.scss), [ln-number-dev.scss](../../components/ln-number/ln-number-dev.scss)).
-2. **Dev Bundle Aggregator:** All modular diagnostic files are imported into [ln-ashlar-dev.scss](../../theme/ln-ashlar-dev.scss) and compiled to `ln-ashlar-dev.css`.
-3. **Runtime Scoping:** All CSS diagnostic rules are scoped under `[data-ln-debug]`, ensuring rules remain inactive unless `data-ln-debug` is present on the page root.
-
-### Visual Error Styles
-- **Structural Errors:** Rendered with dashed red borders and top alert banners (e.g. `[data-ln-validate]` outside a `.form-element` wrapper).
-- **Inline Warnings:** Displayed as red warning labels with `⚠` icons immediately following the target element (e.g. `<time data-ln-date>` misuse or empty `data-ln-search`).
+The visual diagnostic styling lives strictly within `ln-ashlar-dev.css` (compiled from [ln-ashlar-dev.scss](../../theme/ln-ashlar-dev.scss)):
+- **Scope Isolation:** All CSS lint rules are nested under `:is(html, body)[data-ln-debug]`.
+- **Structural Errors:** Outlines invalid nesting (e.g. form controls outside form wrappers) with high-visibility dashed borders and warning badges.
+- **Separation of Concerns:** Pure visual/local validation is performed by CSS, while cross-element resolution (IDs, store providers) is handled by `debug-verifier.js`.
 
 ---
 
 ## 5. Accessibility (ARIA) & Common Pitfalls
 
-- **ARIA Verification:** Helps catch missing `id` attributes on trigger targets (`data-ln-toggle`, `data-ln-tabs`) required for keyboard and screen reader accessibility.
+- **Broken Target Detection:** Identifies missing target IDs on triggers (`data-ln-toggle-for`, `data-ln-modal-for`, `data-ln-tabs-for`) which would otherwise break keyboard focus and screen reader navigation.
 - **Common Pitfalls:**
-  - **Deploying `ln-ashlar-dev.css` to Production:** Contains heavy `:not()` selectors intended only for local developer testing. Do not bundle in production deployments.
-  - **Expecting Visual Errors without `data-ln-debug`:** Diagnostic CSS rules remain dormant unless `data-ln-debug` is present on `<html>` or `<body>`.
+  - **Shipping `ln-ashlar-dev.css` / `ln-ashlar-dev.js` to Production:** Include only `ln-ashlar.css` and `ln-ashlar.js` in production builds.
+  - **Expecting Instant Scans During SSR/Boot:** The verifier deliberately defers assertions until `queueBoot` holds are released to prevent false positives while partial DOM trees load.
 
 ---
 
-## 6. Sequence & Lifecycle Diagram
+## 6. Sequence & Lifecycle Flow
 
 ```mermaid
 sequenceDiagram
-    participant WebApp as Web Application
-    participant Console as console.warn Interceptor
-    participant DOM as Element [data-ln-debug]
-    participant DebugJS as ln-debug.js
+    participant DOM as Document DOM
+    participant Core as ln-core (queueBoot)
+    participant Debug as ln-debug (Verifier)
+    participant Console as Browser Console
 
-    Note over Console: On Script Load
-    DebugJS->>Console: Intercepts global console.warn
-    
-    rect rgb(240, 240, 240)
-        Note over WebApp, Console: Warning Test
-        WebApp->>Console: console.warn("[ln-table] Missing source")
-        alt No data-ln-debug on html/body
-            Console-->>WebApp: Warning Muted (Suppressed)
-        else data-ln-debug present on html/body
-            Console-->>WebApp: Warning Logged to Console
-        end
-    end
-
-    rect rgb(230, 245, 230)
-        Note over DOM, DebugJS: Inspection Seam Lifecycle
-        DOM->>DebugJS: Mount element with data-ln-debug
-        DebugJS->>DOM: Set property: element.lnDebug = instance
-        Note over DOM: Unmount (Component Destroy)
-        DOM->>DebugJS: Element removed from DOM
-        DebugJS->>DOM: Delete element.lnDebug
+    Note over DOM, Debug: DOM Boot with [data-ln-debug]
+    DOM->>Debug: Initialize lnDebug
+    Debug->>Core: Check pendingCount() & queueBoot
+    Core-->>Debug: Boot holds drained & DOM settled
+    Debug->>DOM: Scan ID refs (*-for), Store refs (*-source), Typo attributes
+    alt Unresolved Reference Found
+        Debug->>Console: console.warn("[ln-debug] Unresolved reference...")
+    else Clean Valid Markup
+        Debug->>Console: (Silent - 0 warnings)
     end
 ```
 
 ---
 
-## 7. Related Components
+## 7. Related Components & Coordinators
 
-- **Source Code:** [`ln-debug.js` (Source)](../../components/ln-debug/src/ln-debug.js) | [`ln-debug.js` (Dist)](../../components/ln-debug/ln-debug.js) | [Aggregator SCSS](../../theme/ln-ashlar-dev.scss)
+- **Source Modules:**
+  - [`ln-debug.js` (Component Shell)](../../components/ln-debug/src/ln-debug.js)
+  - [`debug-verifier.js` (Verification Engine)](../../components/ln-debug/src/debug-verifier.js)
+  - [`generated-attributes.js` (Attribute Manifest)](../../components/ln-debug/src/generated-attributes.js)
+- **Coordinators & Core:**
+  - [`ln-core/helpers.js` (queueBoot, pendingCount)](../../components/ln-core/helpers.js)
+  - [`ln-ui-coordinator.js`](../../components/ln-ui-coordinator/src/ln-ui-coordinator.js)
 - **Modular Component Dev Styles:**
-  - [ln-accordion-dev.scss](../../components/ln-accordion/ln-accordion-dev.scss)
-  - [ln-ajax-dev.scss](../../components/ln-ajax/ln-ajax-dev.scss)
-  - [ln-autoresize-dev.scss](../../components/ln-autoresize/ln-autoresize-dev.scss)
-  - [ln-autosave-dev.scss](../../components/ln-autosave/ln-autosave-dev.scss)
-  - [ln-chart-dev.scss](../../components/ln-chart/ln-chart-dev.scss)
-  - [ln-circular-progress-dev.scss](../../components/ln-circular-progress/ln-circular-progress-dev.scss)
-  - [ln-confirm-dev.scss](../../components/ln-confirm/ln-confirm-dev.scss)
-  - [ln-data-coordinator-dev.scss](../../components/ln-data-coordinator/ln-data-coordinator-dev.scss)
-  - [ln-data-store-dev.scss](../../components/ln-data-store/ln-data-store-dev.scss)
-  - [ln-date-dev.scss](../../components/ln-date/ln-date-dev.scss)
-  - [ln-dropdown-dev.scss](../../components/ln-dropdown/ln-dropdown-dev.scss)
-  - [ln-editor-dev.scss](../../components/ln-editor/ln-editor-dev.scss)
-  - [ln-filter-dev.scss](../../components/ln-filter/ln-filter-dev.scss)
-  - [ln-form-dev.scss](../../components/ln-form/ln-form-dev.scss)
-  - [ln-include-dev.scss](../../components/ln-include/ln-include-dev.scss)
-  - [ln-key-dev.scss](../../components/ln-key/ln-key-dev.scss)
-  - [ln-link-dev.scss](../../components/ln-link/ln-link-dev.scss)
-  - [ln-list-dev.scss](../../components/ln-list/ln-list-dev.scss)
-  - [ln-modal-dev.scss](../../components/ln-modal/ln-modal-dev.scss)
-  - [ln-number-dev.scss](../../components/ln-number/ln-number-dev.scss)
-  - [ln-options-dev.scss](../../components/ln-options/ln-options-dev.scss)
-  - [ln-popover-dev.scss](../../components/ln-popover/ln-popover-dev.scss)
-  - [ln-progress-dev.scss](../../components/ln-progress/ln-progress-dev.scss)
-  - [ln-router-dev.scss](../../components/ln-router/ln-router-dev.scss)
-  - [ln-search-dev.scss](../../components/ln-search/ln-search-dev.scss)
-  - [ln-slug-dev.scss](../../components/ln-slug/ln-slug-dev.scss)
-  - [ln-sort-dev.scss](../../components/ln-sort/ln-sort-dev.scss)
-  - [ln-sortable-dev.scss](../../components/ln-sortable/ln-sortable-dev.scss)
-  - [ln-stat-dev.scss](../../components/ln-stat/ln-stat-dev.scss)
   - [ln-table-dev.scss](../../components/ln-table/ln-table-dev.scss)
-  - [ln-tabs-dev.scss](../../components/ln-tabs/ln-tabs-dev.scss)
-  - [ln-time-dev.scss](../../components/ln-time/ln-time-dev.scss)
-  - [ln-toast-dev.scss](../../components/ln-toast/ln-toast-dev.scss)
   - [ln-toggle-dev.scss](../../components/ln-toggle/ln-toggle-dev.scss)
-  - [ln-tooltip-dev.scss](../../components/ln-tooltip/ln-tooltip-dev.scss)
-  - [ln-translations-dev.scss](../../components/ln-translations/ln-translations-dev.scss)
-  - [ln-ui-coordinator-dev.scss](../../components/ln-ui-coordinator/ln-ui-coordinator-dev.scss)
-  - [ln-upload-dev.scss](../../components/ln-upload/ln-upload-dev.scss)
-  - [ln-validate-dev.scss](../../components/ln-validate/ln-validate-dev.scss)
+  - [ln-modal-dev.scss](../../components/ln-modal/ln-modal-dev.scss)
