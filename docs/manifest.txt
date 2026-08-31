@@ -1,86 +1,86 @@
-[data-ln-popover]                                  ×150
-  ul > li > button > span                          ×372
-  ul > li > button                                 ×186
+[data-ln-popover]                                  ×153
+  ul > li > button > span                          ×378
+  ul > li > button                                 ×189
   ul[data-ln-filter][data-ln-search][data-ln-search-items] > li > label > input[data-ln-filter-key][data-ln-filter-value] ×53
   ul[data-ln-filter] > li > label > input[data-ln-filter-key][data-ln-filter-value] ×34
+  ul[data-ln-search][data-ln-search-items] > li > label > input ×13
   ul[data-ln-filter] > li > label > input[data-ln-filter-key][data-ln-filter-reset] ×10
+  label.search > svg.ln-icon > use                 ×7
+  label.search > input[data-ln-search-for][data-ln-search-debounce] ×7
+  label.search > button[data-ln-search-clear] > svg.ln-icon > use ×7
   p > strong                                       ×7
-  label.search > svg.ln-icon > use                 ×6
-  label.search > input[data-ln-search-for][data-ln-search-debounce] ×6
-  label.search > button[data-ln-search-clear] > svg.ln-icon > use ×6
   ul[data-ln-filter][data-ln-search][data-ln-search-items] > li > label > input[data-ln-filter-key][data-ln-filter-reset] ×6
   nav > a                                          ×2
   p > code                                         ×2
   form > div > button                              ×2
   nav > br                                         ×1
-  p > em                                           ×1
 
-[data-ln-modal]                                    ×141
-  [data-ln-form] > main > div.form-element > label ×220
-  [data-ln-form] > main > div.form-element > input ×133
-  form > main > p                                  ×130
-  [data-ln-form] > header > button[data-ln-modal-close] > svg.ln-icon ×72
-  form > header > h3                               ×69
-  form > header > button[data-ln-modal-close] > svg.ln-icon ×69
-  [data-ln-form] > main > div.form-element > select ×68
-  form > footer > button[data-ln-modal-close]      ×63
-  [data-ln-form] > footer > button[data-ln-modal-close] ×63
-  [data-ln-form] > footer > button                 ×63
-  [data-ln-form] > header > span.icon > svg.ln-icon ×62
-  [data-ln-form] > header > hgroup > h3            ×62
-  [data-ln-form] > header > hgroup > p             ×62
-  [data-ln-form] > footer > button.delete-action > svg.ln-icon ×62
+[data-ln-modal]                                    ×143
+  [data-ln-form] > main > div.form-element > label ×223
+  [data-ln-form] > main > div.form-element > input ×135
+  form > main > p                                  ×132
+  [data-ln-form] > header > button[data-ln-modal-close] > svg.ln-icon ×73
+  form > header > h3                               ×70
+  form > header > button[data-ln-modal-close] > svg.ln-icon ×70
+  [data-ln-form] > main > div.form-element > select ×69
+  form > footer > button[data-ln-modal-close]      ×64
+  [data-ln-form] > footer > button[data-ln-modal-close] ×64
+  [data-ln-form] > footer > button                 ×64
+  [data-ln-form] > header > span.icon > svg.ln-icon ×63
+  [data-ln-form] > header > hgroup > h3            ×63
+  [data-ln-form] > header > hgroup > p             ×63
+  [data-ln-form] > footer > button.delete-action > svg.ln-icon ×63
   [data-ln-form] > header > h3[data-ln-fillable] > span[data-ln-modal-when] ×14
   состојби: .ln-modal-open  .ln-out  .ln-enter  [open]
 
 [data-ln-date]                                     ×111
 
 [data-ln-toggle]                                   ×95
-  main > nav.nav[data-ln-nav][data-ln-search][data-ln-search-items] > ul > li ×3844
-  main > nav.nav[data-ln-nav][data-ln-search][data-ln-search-items] > h6.nav-section ×124
-  header > button[data-ln-toggle-for][data-ln-toggle-action] > svg.ln-icon > use ×63
-  header > span.app-name                           ×63
-  header > img.logo                                ×62
-  header > label.search.sidebar-search > svg.ln-icon > use ×62
-  header > label.search.sidebar-search > input[data-ln-search-for][data-ln-search-debounce] ×62
-  header > label.search.sidebar-search > button[data-ln-search-clear] > svg.ln-icon ×62
-  footer > small                                   ×62
+  main > nav.nav[data-ln-nav][data-ln-search][data-ln-search-items] > ul > li ×3969
+  main > nav.nav[data-ln-nav][data-ln-search][data-ln-search-items] > h6.nav-section ×126
+  header > button[data-ln-toggle-for][data-ln-toggle-action] > svg.ln-icon > use ×64
+  header > span.app-name                           ×64
+  header > img.logo                                ×63
+  header > label.search.sidebar-search > svg.ln-icon > use ×63
+  header > label.search.sidebar-search > input[data-ln-search-for][data-ln-search-debounce] ×63
+  header > label.search.sidebar-search > button[data-ln-search-clear] > svg.ln-icon ×63
+  footer > small                                   ×63
   article.collapsible-body.prose > ul > li > a     ×14
   article.collapsible-body > p                     ×13
-  ul[data-ln-search] > li > button.locale-btn      ×13
   li > button                                      ×10
   article.collapsible-body > p > code              ×8
   svg.ln-icon > use                                ×5
+  button[data-ln-toggle-for][data-ln-toggle-action] > svg.ln-icon > use ×5
   состојби: [open]  .open
 
-[data-ln-search]                                   ×90
-  ul > li > a > span.nav-label                     ×3844
+[data-ln-search]                                   ×91
+  ul > li > a > span.nav-label                     ×3969
   table > tbody > tr > td                          ×170
-  h6.nav-section                                   ×124
-  ul > li > a > svg.ln-icon                        ×62
+  h6.nav-section                                   ×126
+  ul > li > a > svg.ln-icon                        ×63
   li > label > input[data-ln-filter-key][data-ln-filter-value] ×53
   li                                               ×51
   section.section-card > main > div.icon-grid > div.icon-cell ×47
   table > tbody > tr > td.numeric[data-ln-value][data-ln-number] ×40
-  li > button.locale-btn                           ×13
+  li > label > input                               ×13
   section > ul > li.icon-cell                      ×11
-  table > thead > tr > th[data-ln-table-col]       ×10
-  template[data-ln-template] > tr[data-ln-table-row] > td ×9
-  table > thead > tr > th                          ×8
   section.section-card > header > h3               ×7
   li > label > input[data-ln-filter-key][data-ln-filter-reset] ×6
+  label > input[data-ln-filter-key][data-ln-filter-value] ×6
+  table > thead > tr > th                          ×6
+  table > thead > tr > th[data-ln-table-filter-col] ×5
 
-[data-ln-form]                                     ×80
-  main > div.form-element > label                  ×215
-  main > div.form-element > select > option        ×213
-  main > div.form-element > input                  ×133
-  header > button[data-ln-modal-close] > svg.ln-icon > use ×72
-  footer > button[data-ln-modal-close]             ×63
-  footer > button                                  ×63
-  header > span.icon > svg.ln-icon > use           ×62
-  header > hgroup > h3                             ×62
-  header > hgroup > p                              ×62
-  footer > button.delete-action > svg.ln-icon > use ×62
+[data-ln-form]                                     ×81
+  main > div.form-element > label                  ×218
+  main > div.form-element > select > option        ×216
+  main > div.form-element > input                  ×135
+  header > button[data-ln-modal-close] > svg.ln-icon > use ×73
+  footer > button[data-ln-modal-close]             ×64
+  footer > button                                  ×64
+  header > span.icon > svg.ln-icon > use           ×63
+  header > hgroup > h3                             ×63
+  header > hgroup > p                              ×63
+  footer > button.delete-action > svg.ln-icon > use ×63
   div.form-element > label                         ×27
   main > fieldset > div.form-grid > div.form-element ×16
   main > div.form-element > input[data-ln-fill-as] ×11
@@ -88,17 +88,17 @@
   div.form-element > output                        ×10
   состојби: .is-loading
 
-[data-ln-nav]                                      ×68
-  ul > li > a > span.nav-label                     ×3847
-  h6.nav-section                                   ×124
-  ul > li > a > svg.ln-icon                        ×65
+[data-ln-nav]                                      ×69
+  ul > li > a > span.nav-label                     ×3972
+  h6.nav-section                                   ×126
+  ul > li > a > svg.ln-icon                        ×66
   a                                                ×12
   ul > li > a > svg.ln-icon.nav-icon               ×3
 
-[data-ln-toast]                                    ×64
-  template[data-ln-template] > li[data-ln-toast-item][data-ln-attr] > div.icon > ul ×62
-  template[data-ln-template] > li[data-ln-toast-item][data-ln-attr] > section.content > header ×62
-  template[data-ln-template] > li[data-ln-toast-item][data-ln-attr] > section.content > main.body[data-ln-field] ×62
+[data-ln-toast]                                    ×65
+  template[data-ln-template] > li[data-ln-toast-item][data-ln-attr] > div.icon > ul ×63
+  template[data-ln-template] > li[data-ln-toast-item][data-ln-attr] > section.content > header ×63
+  template[data-ln-template] > li[data-ln-toast-item][data-ln-attr] > section.content > main.body[data-ln-field] ×63
   li.success[data-ln-toast-item] > div.icon > svg.ln-icon > use ×1
   li.success[data-ln-toast-item] > section.content > header > strong.title ×1
   li.success[data-ln-toast-item] > section.content > header > button[data-ln-toast-close] ×1
@@ -108,22 +108,22 @@
   li.error[data-ln-toast-item][data-ln-toast-timeout] > section.content > header > button[data-ln-toast-close] ×1
   li.error[data-ln-toast-item][data-ln-toast-timeout] > section.content > main.body > p ×1
 
-[data-ln-debug]                                    ×62
-  head > link                                      ×310
-  head > meta                                      ×124
-  head > title                                     ×62
-  body > ul[data-ln-toast] > template[data-ln-template] > li[data-ln-toast-item][data-ln-attr] ×62
-  body > div.app-wrapper > header.app-header > div.header-left ×62
-  body > div.app-wrapper > header.app-header > div.header-right ×62
-  body > div.app-wrapper > main.app-main > [data-ln-toggle] ×62
-  body > div.app-wrapper > main.app-main > div.app-scrim ×62
-  body > div.app-wrapper > main.app-main > section ×62
-  body > div.app-wrapper > main.app-main > footer.app-footer ×60
-  body > [data-ln-modal] > form > header           ×60
-  body > [data-ln-modal] > form > main             ×60
-  body > [data-ln-modal] > form > footer           ×60
-  body > [data-ln-modal] > [data-ln-form] > header ×60
-  body > [data-ln-modal] > [data-ln-form] > main   ×60
+[data-ln-debug]                                    ×63
+  head > link                                      ×315
+  head > meta                                      ×126
+  head > title                                     ×63
+  body > ul[data-ln-toast] > template[data-ln-template] > li[data-ln-toast-item][data-ln-attr] ×63
+  body > div.app-wrapper > header.app-header > div.header-left ×63
+  body > div.app-wrapper > header.app-header > div.header-right ×63
+  body > div.app-wrapper > main.app-main > [data-ln-toggle] ×63
+  body > div.app-wrapper > main.app-main > div.app-scrim ×63
+  body > div.app-wrapper > main.app-main > section ×63
+  body > div.app-wrapper > main.app-main > footer.app-footer ×61
+  body > [data-ln-modal] > form > header           ×61
+  body > [data-ln-modal] > form > main             ×61
+  body > [data-ln-modal] > form > footer           ×61
+  body > [data-ln-modal] > [data-ln-form] > header ×61
+  body > [data-ln-modal] > [data-ln-form] > main   ×61
 
 [data-ln-number]                                   ×61
 
@@ -181,13 +181,13 @@
 
 [data-ln-data-coordinator]                         ×12
   div[data-ln-api-connector][data-ln-api-base-url][data-ln-api-path] ×10
-  div[data-ln-data-store][data-ln-data-store-stale][data-ln-data-store-indexes][data-ln-data-store-search-fields][data-ln-search] ×4
+  div[data-ln-data-store][data-ln-data-store-stale][data-ln-data-store-indexes][data-ln-data-store-search-fields][data-ln-search] ×6
   ul[data-ln-data-coordinator-dict][hidden] > li[data-ln-data-coordinator-dict] ×4
-  div[data-ln-data-store][data-ln-data-store-stale][data-ln-data-store-indexes][data-ln-data-store-search-fields] ×3
   div[data-ln-data-store]                          ×2
   div[data-ln-api-queue]                           ×1
   div[data-ln-data-store][data-ln-data-store-indexes][data-ln-data-store-search-fields][data-ln-search] ×1
   div[data-ln-data-store][data-ln-data-store-indexes][data-ln-data-store-search-fields][data-ln-data-store-window][data-ln-data-store-window-page][data-ln-search] ×1
+  div[data-ln-data-store][data-ln-data-store-stale][data-ln-data-store-indexes][data-ln-data-store-search-fields] ×1
   div[data-ln-api-connector][data-ln-api-endpoint] ×1
   li[data-ln-data-store][data-ln-data-store-indexes][data-ln-data-store-search-fields][data-ln-data-store-window][data-ln-data-store-window-page][data-ln-search] ×1
   li[data-ln-api-connector][data-ln-api-base-url][data-ln-api-path] ×1
@@ -245,24 +245,23 @@
   [data-ln-form] > footer > button.btn.btn-secondary[data-ln-modal-close] ×2
   [data-ln-form] > footer > button.btn.btn-primary ×2
 
-[data-ln-dropdown]                                 ×8
-  [data-ln-toggle] > ul[data-ln-search] > li > button.locale-btn ×13
+[data-ln-key]                                      ×8
+  kbd                                              ×13
+  svg.ln-icon > use                                ×3
+  option                                           ×3
+
+[data-ln-stat]                                     ×8
+
+[data-ln-autoresize]                               ×7
+
+[data-ln-dropdown]                                 ×7
   [data-ln-toggle] > li > button                   ×10
   button[data-ln-toggle-for]                       ×3
   [data-ln-toggle] > li > a                        ×3
   button[data-ln-translations-add][data-ln-toggle-for] > svg.ln-icon > use ×3
   [data-ln-toggle]                                 ×3
-  button.btn[data-ln-toggle-for] > svg.ln-icon > use ×1
-  button.btn[data-ln-toggle-for] > span            ×1
-  [data-ln-toggle] > div > label.search > svg.ln-icon ×1
-  [data-ln-toggle] > div > label.search > input[data-ln-search-for][data-ln-search-debounce] ×1
-  [data-ln-toggle] > div > label.search > button[data-ln-search-clear] ×1
   button.btn[data-ln-toggle-for]                   ×1
   состојби: [open]  .open
-
-[data-ln-stat]                                     ×8
-
-[data-ln-autoresize]                               ×7
 
 [data-ln-time]                                     ×6
 
@@ -294,7 +293,7 @@
   li > span.sortable-handle[data-ln-sortable-handle] > svg.ln-icon > use ×12
   li > span                                        ×12
   li                                               ×5
-  состојби: .ln-sortable--dragging  .ln-sortable--drop-before  .ln-sortable--drop-after  .ln-sortable--active
+  состојби: .ln-sortable--dragging  .ln-sortable--drop-before  .ln-sortable--drop-after
 
 [data-ln-upload]                                   ×4
   ul[hidden] > li[data-ln-upload-dict]             ×6
