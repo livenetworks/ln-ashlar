@@ -92,7 +92,8 @@
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	padding: var(--card-padding-y) var(--card-padding-x);
+	padding: var(--size-xs-up) var(--padding-x);
+	min-height: 2.5rem;
 	@include border-b;
 	--color-bg: var(--bg-sunken);
 	background: var(--color-bg);
@@ -106,25 +107,18 @@
 		margin: 0;
 	}
 
-	// Equalize control chrome inside the header. Geometric height lock
-	// matching @mixin app-header-actions: icon-content (1.25rem) + 2 ×
-	// rebound --padding-y + 2 × border-width. Buttons inherit --padding-y
-	// from this rebind; search-icon labels read it from
-	// @mixin form-input-icon-group (same var(--size-xs) value), so the
-	// formula resolves identically for both. Descendant selector — these
-	// controls are commonly wrapped in <aside>/<nav>/<div> inside the
-	// header. panel-header is chrome (no body labels), so descendant
-	// `label` here is always a search-icon-group, never a field label.
 	label {
 		--padding-y: var(--size-xs);
 	}
 
 	button {
-		--btn-padding-y: var(--size-xs);
-	}
-
-	:is(button, label) {
-		min-height: calc(1.25rem + 2 * var(--padding-y) + 2 * var(--border-width));
+		--btn-padding-y: var(--size-2xs);
+		--btn-padding-x: var(--size-xs);
+		font-size: var(--text-xs);
+		height: 1.75rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	// Close/dismiss and toggle buttons inside the header should be tight and flat.
@@ -134,11 +128,13 @@
 		--btn-padding-y: var(--size-2xs);
 		--btn-padding-x: var(--size-2xs);
 		--shadow: none;
+		height: 1.75rem;
+		width: 1.75rem;
 	}
 }
 
 @mixin panel-body {
-	padding: var(--card-padding-y) var(--card-padding-x);
+	padding: var(--padding-y) var(--padding-x);
 
 	ul, ol {
 		padding-left: 1.5em;
@@ -206,7 +202,7 @@
 }
 
 @mixin panel-footer {
-	padding: var(--card-padding-y) var(--card-padding-x);
+	padding: var(--padding-y) var(--padding-x);
 	@include border-t;
 	--color-bg: var(--bg-sunken);
 	background: var(--color-bg);

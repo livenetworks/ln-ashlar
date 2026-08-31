@@ -52,11 +52,6 @@
 	--color-bg: var(--bg-base);
 	gap: var(--size-sm-up);
 
-	:is(h1, h2, h3, h4, h5, h6) {
-		@include typography(heading-sm);
-		font-weight: var(--font-semibold);
-	}
-
 	button[data-ln-modal-close] {
 		--btn-bg: transparent;
 		--btn-border: transparent;
@@ -107,8 +102,8 @@
 	// Explicit role-scale read — modals use max elevation (deeper than
 	// the --shadow-floating default used by floating panels).
 	box-shadow: var(--shadow-xl);
-	display: grid;
-	grid-template-rows: auto 1fr auto;
+	display: flex;
+	flex-direction: column;
 	max-width: 600px;
 	width: 90%;
 	max-height: 90vh;
@@ -116,15 +111,20 @@
 		animation: ln-modal-slideIn var(--transition-slow);
 	}
 
+	> header {
+		@include modal-header;
+		flex-shrink: 0;
+	}
+
 	> main {
 		min-height: 0;
 		overflow-y: auto;
 		overflow-x: hidden;
+		flex: 1 1 auto;
 	}
 
 	> footer {
-		position: sticky;
-		bottom: 0;
+		flex-shrink: 0;
 
 		// Destructive footer split: add class="delete-action" to the first
 		// button to push it left. The footer gap still applies between all buttons.
@@ -141,9 +141,5 @@
 			backdrop-filter: blur(4px);
 			-webkit-backdrop-filter: blur(4px);
 		}
-	}
-
-	> header {
-		@include modal-header;
 	}
 }

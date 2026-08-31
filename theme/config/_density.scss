@@ -118,16 +118,12 @@
 	// -- Row height ------------------------------------------------------
 	--density-row-h:      2.75rem;   // 44px (was dense 2.25rem)
 
-	// -- Interactive controls — WCAG 2.5.5 AAA ≥44px --------------------
-	// btn-padding-y: 2×12px + 20px line-height + 2px borders = 46px
-	// input-padding-y: indirection token read by form-input + pill-outline
-	--btn-padding-y:      var(--size-sm-up);    // 12px → buttons 46px
-	--btn-padding-x:      var(--size-md);       // 16px — restore roomy width
-	--input-padding-y:    var(--size-sm-up);    // 12px → inputs/pills ≥44px
+	// -- Interactive controls — Tailwind / shadcn standard (38px height) ---
+	--btn-padding-y:      var(--size-sm);       // 8px → buttons 38px
+	--btn-padding-x:      var(--size-md);       // 16px
+	--input-padding-y:    var(--size-sm);       // 8px → inputs/selects 38px
 
-	// -- Card and table padding — roomier at comfortable/spacious --------
-	--card-padding-y:        var(--size-md);       // 16px
-	--card-padding-x:        var(--size-lg);       // 24px
+	// -- Table cell padding — roomier at comfortable/spacious ------------
 	--table-cell-padding-y:  var(--size-sm-up);    // 12px
 	--table-cell-padding-x:  var(--size-lg);       // 24px
 }
@@ -197,9 +193,7 @@
 	--btn-padding-x:      var(--size-lg);       // 24px — spacious width
 	--input-padding-y:    var(--size-md);       // 16px → inputs/pills ≥48px
 
-	// -- Card and table padding ------------------------------------------
-	--card-padding-y:        var(--size-lg);       // 24px
-	--card-padding-x:        var(--size-xl);       // 32px
+	// -- Table cell padding ----------------------------------------------
 	--table-cell-padding-y:  var(--size-md);       // 16px
 	--table-cell-padding-x:  var(--size-xl);       // 32px
 }

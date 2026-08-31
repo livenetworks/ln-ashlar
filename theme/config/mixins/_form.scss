@@ -18,10 +18,10 @@
 @mixin form-label {
 	@include block;
 	@include typography(label-sm);
-	@include font-semibold;
+	@include font-medium;
 	color: var(--color-fg);
 	// Structural label-to-input gap (not shell rhythm).
-	--margin-block: var(--size-xs);
+	--margin-block: 0.375rem;
 	margin-bottom: var(--margin-block);
 
 	// Required indicator — red * after label text.

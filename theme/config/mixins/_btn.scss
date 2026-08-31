@@ -59,6 +59,8 @@
 	@include items-center;
 	@include justify-center;
 	gap: var(--gap);
+	--padding-y: var(--btn-padding-y, var(--size-sm));
+	--padding-x: var(--btn-padding-x, var(--size-md));
 	padding: var(--padding-y) var(--padding-x);
 	@include text-sm;
 	@include font-medium;

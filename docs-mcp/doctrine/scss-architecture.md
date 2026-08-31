@@ -80,7 +80,7 @@ background-color: hsl(var(--color-primary) / 0.5); /* 50% opacity */
 
 ### B. Vocabulary and Primitives
 - **Vocabulary Tokens:** Pre-composed colors and shadows representing semantic choices (e.g., `--bg-base`, `--bg-elevated`, `--fg-muted`, `--border-subtle`, `--shadow-resting`).
-- **Primitives:** Single CSS variables that SCSS mixins read directly (e.g., `--color-bg`, `--color-fg`, `--color-border`, `--shadow`, `--card-padding-x`, `--card-padding-y`). These map by default to vocabulary tokens and theme dimensions.
+- **Primitives:** Single CSS variables that SCSS mixins read directly (e.g., `--color-bg`, `--color-fg`, `--color-border`, `--shadow`, `--padding-x`, `--padding-y`). These map by default to vocabulary tokens and theme dimensions.
 - **Scope Re-binding:** To change the appearance of a component, rebind the primitive on the local component scope instead of writing static overrides:
 ```css
 .card-dark-mode {
@@ -92,7 +92,7 @@ background-color: hsl(var(--color-primary) / 0.5); /* 50% opacity */
 ### C. Mixin Inclusion Grouping and Overrides
 When styling custom, project-specific components (e.g. by unique IDs like `#user-edit-modal` and `#packages-filter-drawer`), follow these grouping and overriding guidelines:
 1. **Group shared mixins:** Group selectors sharing the exact same base mixin using comma-separated rules to keep the compiled CSS clean and unified.
-2. **Rebind primitives for overrides:** Rather than writing direct custom styling overrides (like `padding: 2rem` or `border: 1px solid red`) which break layout architectures, rebind the component's internal design primitives (like `--card-padding-x`, `--card-padding-y`, `--color-bg`, or `--color-border`) in a separate block underneath.
+2. **Rebind primitives for overrides:** Rather than writing direct custom styling overrides (like `padding: 2rem` or `border: 1px solid red`) which break layout architectures, rebind the component's internal design primitives (like `--padding-x`, `--padding-y`, `--color-bg`, or `--color-border`) in a separate block underneath.
 
 #### Correct SCSS Binding and Overriding:
 ```scss
@@ -108,8 +108,8 @@ When styling custom, project-specific components (e.g. by unique IDs like `#user
 #packages-filter-drawer {
     --color-bg: var(--bg-recessed);           // Changes background to recessed base
     --color-border: hsl(var(--color-danger));  // Overrides border to danger red
-    --card-padding-x: 2rem;                    // Overrides horizontal padding primitive
-    --card-padding-y: 2rem;                    // Overrides vertical padding primitive
+    --padding-x: 2rem;                         // Overrides horizontal padding primitive
+    --padding-y: 2rem;                         // Overrides vertical padding primitive
 }
 ```
 
