@@ -133,10 +133,10 @@ Dynamic HTML injected into the page (via AJAX, router transitions, or raw `inner
 - **Instant Inspector Activation:** Because the observer tracks target attribute additions globally across the document tree, a developer can dynamically add a component selector (e.g. `data-ln-toggle="close"`) to any element directly inside the browser's developer tools inspector, and the framework will instantly bootstrap the component instance without requiring a page refresh.
 
 ### The Three Core Assertions of DOM-First Architecture
-1. **Zero Hidden State in JS Memory (No Inaccessible Closures):**
-   State is never trapped inside private JavaScript closures, component instances, or hidden memory trees. The true state lives openly and visibly on the DOM element's attributes (`data-ln-*`).
-2. **100% Declarative, Testable & Reproducible:**
-   Any given UI state (e.g. searching a term, opening a modal, toggling an accordion, deep-linking) can be authored, inspected, automated, restored, or server-rendered purely via HTML attributes without orchestration scripts.
+1. **Control State Lives on the DOM (No Inaccessible Closures):**
+   Component control state — open/closed, active, sort direction, mode, validation status — is never trapped inside private closures or hidden memory trees. It lives openly and visibly on the DOM element's attributes (`data-ln-*`). Application data (records, caches, sync queues) lives in `ln-data-store` and IndexedDB; operational mechanics (in-flight requests, observers, query generations, batchers) live in JS memory. Those are runtime internals, not application state, and never belong on attributes.
+2. **Declarative, Testable & Reproducible:**
+   Any control state — a search term, an open modal, an expanded accordion, a deep-linked view — can be authored, inspected, automated, restored, or server-rendered from HTML attributes alone, with no orchestration script. Application data is restored by the store from its own cache, not from markup.
 3. **DevTools Inspector as the Control Plane:**
    Editing any attribute in the browser's DevTools Inspector immediately activates the component's functionality in real-time. The underlying `MutationObserver` instantly synchronizes the internal engine, updates the DOM, syncs matching controls (`[data-ln-*-for]`), and dispatches lifecycle events.
 

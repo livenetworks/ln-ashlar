@@ -22,8 +22,20 @@ This document elaborates on the philosophical and technical background behind th
 ```
 
 1. **Design System Layer:** SCSS tokens and semantic `@include` mixins. HTML markup remains 100% semantic (`#user-table { @include table-base; }`) without polluting markup with utility classes.
-2. **DOM Runtime Layer:** Attribute-driven components (`data-ln-modal`, `data-ln-table`, `data-ln-validate`). Zero hidden state in JS memory — the live W3C DOM is the single source of truth and inspectable control plane.
+2. **DOM Runtime Layer:** Attribute-driven components (`data-ln-modal`, `data-ln-table`, `data-ln-validate`). Zero hidden control state in JS memory — the live W3C DOM is the single source of truth and inspectable control plane.
 3. **Application Runtime Layer:** Local-first storage (`ln-data-store`), decoupled network gateways (`ln-api-connector`), optimistic writes with FIFO sync queues (`ln-data-coordinator`), and full client-side routing (`ln-router`).
+
+### State Tiers — What Lives Where
+
+| Tier | Lives in | Examples | Inspectable via |
+| :--- | :--- | :--- | :--- |
+| **Control state** | DOM attributes | open/closed, active tab, sort direction, mode, filter, current page | DevTools HTML inspector |
+| **Application data** | `ln-data-store` + IndexedDB | records, row caches, sync queue, window index | DevTools → Application → IndexedDB |
+| **Operational mechanics** | JS memory | in-flight requests, `MutationObserver` instances, query generations, render batchers, route registry | Not inspectable — by design |
+
+The third tier is deliberate. In-flight promises and observer instances are runtime
+internals, not application state; putting them on attributes would pollute the
+control plane without making anything more debuggable.
 
 ---
 
@@ -40,6 +52,22 @@ This document elaborates on the philosophical and technical background behind th
 * **Ashlar SPA Execution Model:**  
   `HTML / Template → Independent Components → DOM Attributes / CustomEvents → Coordinator → Local Data Store + Sync`  
   *DOM is the live, inspectable application surface.*
+
+### The DOM as the Event Bus
+
+Component-tree frameworks couple components in JavaScript memory: for a button to refresh a table, both must import the same context, hook, or store. That coupling is invisible in the markup and permanent in the bundle.
+
+`ln-ashlar` uses the DOM itself as the message bus. A button dispatches `ln-table:request-refresh`. It never learns whether a table is listening, whether that table is an `ln-table`, or whether one exists at all.
+
+| Property | Consequence |
+| :--- | :--- |
+| **No sibling imports** | Components never reference one another. Adding, removing, or replacing a component cannot break its neighbours. |
+| **Structural scope** | Events bubble, so a coordinator inside a modal receives only what is raised beneath it. A global bus (mitt, RxJS) delivers to every subscriber on the page; here the DOM tree supplies the boundary for free. |
+| **Platform agnostic** | `el.dispatchEvent(new CustomEvent('ln-table:request-data', { bubbles: true }))` works from a Blade template, a Django view, a browser extension, or the console. Participating needs no package and no class instance. |
+| **Native debugging** | `monitorEvents($0)` in any DevTools console traces the whole protocol. No framework extension, no time-travel plugin. |
+| **Command/Query separation** | Commands are `ln-{component}:request-{action}` events or attribute writes. Queries read attributes or public getters. The two never share a path. |
+
+**What it costs.** Event names and `detail` shapes are strings, checked at runtime and never at build time. A misspelled event name does not fail loudly — it simply never arrives. There is no static graph of which component listens to what, so tracing a flow means reading the components rather than an import tree. This is the deliberate price of decoupling: the same indirection that lets a component be replaced without touching its neighbours also prevents a compiler from proving they still fit together.
 
 ---
 

@@ -9,11 +9,12 @@
 
 ## 🏛️ The Paradigm: DOM as the Runtime State Surface
 
-`ln-ashlar` rejects the mainstream premise that applications must build a secondary UI tree in JavaScript memory (Virtual DOM, Signals, or fine-grained reactivity trees). Instead, it establishes **DOM-First Architecture**:
+`ln-ashlar` rejects the mainstream premise that the UI must be mirrored into a secondary tree in JavaScript memory (Virtual DOM diffing, or a component tree from which the real DOM is re-derived). Instead, it establishes **DOM-First Architecture**:
 
-1. 🔍 **Zero Hidden State in JS Memory:** Application state is never trapped inside private JavaScript closures, reactivity signals, or hidden memory trees. The true state lives openly and visibly on the DOM element's attributes (`data-ln-*`).
+1. 🔍 **Control State Lives on the DOM:** Every piece of state that drives component behavior — open/closed, active, sort direction, mode, validation status — lives openly on the element's `data-ln-*` attributes, never inside a private closure. Application *data* (records, caches, sync queues) lives where data belongs: `ln-data-store` and IndexedDB. The split is deliberate — the control plane is inspectable, the data plane is efficient.
 2. 🎛️ **DevTools Inspector as the Control Plane:** Modifying any attribute directly in browser DevTools immediately activates the component's behavior in real-time. Native `MutationObserver` instantly synchronizes the internal engine, updates the DOM, and dispatches lifecycle events.
 3. 🤖 **AI-Native & Contract-Driven:** AI agents (via MCP, `.agents/`, and `docs-mcp/`) generate declarative, schema-validated HTML contracts rather than complex JavaScript program trees.
+4. 🔌 **The DOM Is the Bus:** Components never import one another. They communicate through bubbling `CustomEvent`s (`ln-{component}:{action}`), so a trigger neither knows nor cares what handles it — and the DOM tree, rather than a global registry, defines the scope. Any backend, template engine, or third-party script can take part by dispatching an event, with no package to install.
 
 ---
 
@@ -25,7 +26,7 @@
 | **Primary Code Artifact** | JavaScript program (JSX, hooks, signals, state closures). | **Declarative Semantic HTML Contract**. |
 | **AI Agent Suitability** | Must generate full program logic, state handlers & reactivity trees. | Resolves intent directly to **declarative markup contracts** (⭐⭐⭐⭐⭐). |
 | **Runtime Dependencies** | Framework core + extensive npm package ecosystem. | **Zero runtime npm dependencies** (pure native Web APIs). |
-| **Observability & Inspection** | Requires specialized DevTools extensions to inspect hidden memory state. | **100% Inspectable**: DevTools HTML Inspector is the native Control Plane. |
+| **Observability & Inspection** | Requires specialized DevTools extensions to inspect hidden memory state. | **Control plane fully inspectable**: every behavioral state is a visible `data-ln-*` attribute in the native DOM inspector. |
 | **Long-Term Longevity** | Managed via framework LTS cycles and automated refactoring (`ng update`). | Built directly on **permanent W3C browser standards** (`<dialog>`, Popover API, CustomEvent). |
 | **Server & Client Harmony** | Primarily JSON/SPA focused; SSR requires complex hydration pipelines. | **Dual-Core**: Native SSR progressive enhancement (Laravel, Go, Django) & SPA (`ln-router`). |
 | **Optimal Use Cases** | High-frequency continuous client state (collaborative editors, games, canvas). | Enterprise CRUD, Admin Panels, ERPs, long-lived apps with strong backend integration. |

@@ -158,12 +158,8 @@ All coordinator events are dispatched from the **main wrapper element (`[data-ln
 | `ln-dropdown:open` | Emits | No | Fires after the menu is promoted to the top layer, positioned, and visually opened. | `{ target: HTMLElement }` |
 | `ln-dropdown:close` | Emits | No | Fires after the menu is closed, exits the top layer, and listeners cleaned. | `{ target: HTMLElement }` |
 | `ln-dropdown:destroyed` | Emits | No | Fires when the coordinator's `destroy()` method is executed. | `{ target: HTMLElement }` |
-
-#### Subscribed Events
-
-The coordinator listens to the following bubbling events emitted by the inner `ln-toggle` menu:
-- `ln-toggle:open` — Triggers top-layer promotion (`showPopover()`), placement calculations, ARIA updates, and window event listeners binding.
-- `ln-toggle:close` — Triggers listeners cleanup, positioning styles removal, and `hidePopover()`.
+| `ln-toggle:open` | Listens | No | Triggers top-layer promotion (`showPopover()`), placement calculations, ARIA updates, and window event listeners binding. | — |
+| `ln-toggle:close` | Listens | No | Triggers listeners cleanup, positioning styles removal, and `hidePopover()`. | — |
 
 ---
 

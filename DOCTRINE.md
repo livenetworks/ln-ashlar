@@ -53,7 +53,7 @@
 
 ## 🔄 3. Attribute Bridge Pattern & Observable Single Source of Truth
 
-* **All `data-ln-*` Attributes Are Observable:** Every state attribute is observed via `MutationObserver` registered at the component level. The attribute in the DOM is the **Single Source of Truth** at all times.
+* **All `data-ln-*` Attributes Are Observable:** Every state attribute is observed via `MutationObserver` registered at the component level. For all component control state, the attribute in the DOM is the **Single Source of Truth** — a component never keeps a private mirror of a value it also writes to an attribute. Row caches, record sets, and sync queues are data, not control state; they live in `ln-data-store` (Layer 3), never on attributes.
 * **Instant DOM Attribute Writes:** Prototype methods and input controls **MUST** write state directly to target DOM attributes via `setAttribute` (e.g. `this.dom.setAttribute('data-ln-toggle', 'open')`, `target.setAttribute('data-ln-search', input.value)`).
 * **Attribute Observer Debouncing:** Debounce timers (e.g. for search throttling) **MUST** reside in the component's attribute observer (`_syncAttribute`), **NOT** in input control event handlers. This ensures input events update the DOM attribute immediately, while `_syncAttribute` handles debouncing heavy work (events / fetches). Programmatic resets (`setAttribute('data-ln-search', '')`) or `0ms` debounces execute instantly without delay.
 * **Forbidden ("Checkbox Hack"):** Using `<input type="checkbox">` for toggle state is strictly forbidden (breaks `MutationObserver`, teleportation, ARIA semantics, and encapsulation).

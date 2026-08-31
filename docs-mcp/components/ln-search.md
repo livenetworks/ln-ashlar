@@ -193,7 +193,7 @@ Clear triggers work universally without external coordinators:
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-search:change` | Target (State Host) | Yes | Dispatched when search term updates. `preventDefault()` skips default DOM show/hide. | `{ term: string, tokens: string[], targetId: string, fields: string[]\|null }` |
+| `ln-search:change` | Emits | Yes | Dispatched when search term updates. `preventDefault()` skips default DOM show/hide. | `{ term: string, tokens: string[], targetId: string, fields: string[]\|null }` |
 
 ---
 

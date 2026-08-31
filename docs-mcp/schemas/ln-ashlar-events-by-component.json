@@ -1,0 +1,2647 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "ln-ashlar Events by Component Catalog",
+	"description": "Machine-readable catalog of events emitted and listened to per component. Generated from source by scripts/sync-ln-events.mjs — do not hand-edit. The detail field is a human-readable signature, not a machine-checkable type.",
+	"generator": "scripts/sync-ln-events.mjs",
+	"components": {
+		"ln-accordion": {
+			"emits": [
+				{
+					"name": "ln-accordion:change",
+					"cancelable": false,
+					"description": "Fires from the wrapper after the coordinator has closed other sibling panels.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-accordion:destroyed",
+					"cancelable": false,
+					"description": "Fires from the wrapper when the component's `destroy()` method is invoked.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-toggle:open",
+					"cancelable": false,
+					"description": "Bubbles up from an internal `ln-toggle` panel when opened. Triggers the coordinator to close siblings.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-ajax": {
+			"emits": [
+				{
+					"name": "ln-ajax:before-start",
+					"cancelable": true,
+					"description": "Fires before sending the request. Calling `e.preventDefault()` cancels the fetch.",
+					"detail": "{ method: String, url: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-ajax:complete",
+					"cancelable": false,
+					"description": "Fires after clean-up actions have completed.",
+					"detail": "{ method: String, url: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-ajax:error",
+					"cancelable": false,
+					"description": "Fires when the request fails (network error or HTTP error codes).",
+					"detail": "{ method: String, url: String, status: Number, data: Object|null, error: Error|null }",
+					"source": "static"
+				},
+				{
+					"name": "ln-ajax:start",
+					"cancelable": false,
+					"description": "Fires when the request is sent and loading spinners are attached.",
+					"detail": "{ method: String, url: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-ajax:success",
+					"cancelable": false,
+					"description": "Fires upon receiving a successful response (HTTP 2xx).",
+					"detail": "{ method: String, url: String, data: Object }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-api-connector": {
+			"emits": [
+				{
+					"name": "ln-api-connector:bulk-deleted",
+					"cancelable": false,
+					"description": "Dispatched upon successful bulk deletion.",
+					"detail": "{ response: Object, ids: Array, message: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:config-changed",
+					"cancelable": false,
+					"description": "Dispatched whenever `refreshConfig()` reloads URL, path, and header configuration (including on init).",
+					"detail": "{ baseUrl: String, path: String, headers: Object, paramKeys: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:created",
+					"cancelable": false,
+					"description": "Dispatched upon successful document creation.",
+					"detail": "{ record: Object, tempId: String, message: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:deleted",
+					"cancelable": false,
+					"description": "Dispatched upon successful document deletion.",
+					"detail": "{ response: Object, id: ID, message: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when the component is destroyed.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:error",
+					"cancelable": false,
+					"description": "Dispatched upon HTTP or network errors (silent on AbortError).",
+					"detail": "{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:fetched",
+					"cancelable": false,
+					"description": "Dispatched upon delta sync or query responses.",
+					"detail": "{ data: Array, total?: Number, filtered?: Number, offset?: Number, queryGen?: Number, since?: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:updated",
+					"cancelable": false,
+					"description": "Dispatched upon successful document edit.",
+					"detail": "{ record: Object, id: ID, message: String, meta: Object }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-api-connector:request-bulk-delete",
+					"cancelable": false,
+					"description": "Triggers bulk document deletes.",
+					"detail": "{ ids: Array, url?: String, idempotencyKey?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-cancel",
+					"cancelable": false,
+					"description": "Aborts in-flight fetch or query for the target element/key.",
+					"detail": "{ targetEl?: Element, key?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-create",
+					"cancelable": false,
+					"description": "Triggers document create request.",
+					"detail": "{ data: Object, tempId: String, url?: String, idempotencyKey?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-delete",
+					"cancelable": false,
+					"description": "Triggers document DELETE.",
+					"detail": "{ id: ID, url?: String, idempotencyKey?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-fetch",
+					"cancelable": false,
+					"description": "Triggers delta updates query.",
+					"detail": "{ since?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-query",
+					"cancelable": false,
+					"description": "Triggers structured query/pagination fetch.",
+					"detail": "{ query?: Object, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-sync",
+					"cancelable": false,
+					"description": "Triggers delta updates query.",
+					"detail": "{ since?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-update",
+					"cancelable": false,
+					"description": "Triggers document PUT edit.",
+					"detail": "{ id: ID, data: Object, expected_version?: Int, url?: String, idempotencyKey?: String, meta?: Object }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-api-queue": {
+			"emits": [
+				{
+					"name": "ln-api-queue:auth-required",
+					"cancelable": false,
+					"description": "Dispatched when auth pause occurs.",
+					"detail": "{ entryId: ID, chainKey: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when the instance is torn down.",
+					"detail": "{ scope: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:drained",
+					"cancelable": false,
+					"description": "Dispatched when the outbox becomes empty.",
+					"detail": "{ scope: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:enqueued",
+					"cancelable": false,
+					"description": "Dispatched when a task is written.",
+					"detail": "{ entryId: ID, chainKey: String, count: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:error",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:failed",
+					"cancelable": false,
+					"description": "Dispatched when 8 retry attempts are exhausted.",
+					"detail": "{ entryId: ID, chainKey: String, attempts: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:paused",
+					"cancelable": false,
+					"description": "Dispatched when draining pauses for a scope (e.g. after an `auth` nack or manual request-pause).",
+					"detail": "{ reason: \"auth\" | \"manual\", restored?: Boolean }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:pending-count",
+					"cancelable": false,
+					"description": "Emits pending count updates for UI widgets.",
+					"detail": "{ count: Number, scope: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:resumed",
+					"cancelable": false,
+					"description": "Dispatched when draining resumes for a scope.",
+					"detail": "{}",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:send",
+					"cancelable": false,
+					"description": "Dispatched to coordinator to execute request.",
+					"detail": "{ entryId: ID, chainKey: String, op: String, payload: Object }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-api-queue:ack",
+					"cancelable": false,
+					"description": "Acknowledges successful delivery; removes entry.",
+					"detail": "{ entryId: ID }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:nack",
+					"cancelable": false,
+					"description": "Rejects transmission; triggers retry, drop, or pause.",
+					"detail": "{ entryId: ID, reason: \"retry\" | \"drop\" | \"auth\" }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:request-clear",
+					"cancelable": false,
+					"description": "Empties the queue local store.",
+					"detail": "{}",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:request-drain",
+					"cancelable": false,
+					"description": "Manually triggers a drain attempt — the canonical way to retry `failed` entries (e.g. a UI \"retry failed\" action).",
+					"detail": "{}",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:request-enqueue",
+					"cancelable": false,
+					"description": "Enqueues a transaction.",
+					"detail": "{ chainKey: String, op: String, targetId: ID, payload: Object, expectedVersion?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:request-pause",
+					"cancelable": false,
+					"description": "Manually pauses queue drainage for this scope.",
+					"detail": "{}",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:request-remap",
+					"cancelable": false,
+					"description": "Triggers temporary ID remapping.",
+					"detail": "{ oldKey: String, newId: ID }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:request-resume",
+					"cancelable": false,
+					"description": "Triggers queue drainage resumption.",
+					"detail": "{}",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:resolve-create",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				}
+			]
+		},
+		"ln-autoresize": {
+			"emits": [],
+			"listens": []
+		},
+		"ln-autosave": {
+			"emits": [
+				{
+					"name": "ln-autosave:before-restore",
+					"cancelable": true,
+					"description": "Dispatched before filling the form. Prevent default to abort restoration.",
+					"detail": "{ target: HTMLFormElement, data: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-autosave:cleared",
+					"cancelable": false,
+					"description": "Dispatched after the form's draft entry is removed from localStorage.",
+					"detail": "{ target: HTMLFormElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-autosave:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when the component is torn down via `.destroy()`.",
+					"detail": "{ target: HTMLFormElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-autosave:restored",
+					"cancelable": false,
+					"description": "Dispatched after filling the form and triggering synthetic events.",
+					"detail": "{ target: HTMLFormElement, data: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-autosave:saved",
+					"cancelable": false,
+					"description": "Dispatched after successfully writing the serialized form state to localStorage.",
+					"detail": "{ target: HTMLFormElement, data: Object }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-chart": {
+			"emits": [
+				{
+					"name": "ln-chart:rendered",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-chart:request-data",
+					"cancelable": false,
+					"description": "Query from a chart to fetch an ordered dataset.",
+					"detail": "{ target: HTMLElement, sort, filters, search }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-chart:request-refresh",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-chart:set-data",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-chart:set-loading",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				}
+			]
+		},
+		"ln-circular-progress": {
+			"emits": [
+				{
+					"name": "ln-circular-progress:change",
+					"cancelable": false,
+					"description": "Fires after the progress values change and the visual SVG is updated.",
+					"detail": "{ target: HTMLElement, value: Number, max: Number, percentage: Number }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-confirm": {
+			"emits": [
+				{
+					"name": "ln-confirm:destroyed",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-confirm:waiting",
+					"cancelable": false,
+					"description": "Dispatched upon the first click when confirming begins.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-core": {
+			"emits": [
+				{
+					"name": "ln-core:locale-change",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-couchdb-connector": {
+			"emits": [
+				{
+					"name": "ln-couchdb-connector:bulk-deleted",
+					"cancelable": false,
+					"description": "Dispatched upon successful bulk deletion.",
+					"detail": "{ response: Object, ids: Array, message: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:config-changed",
+					"cancelable": false,
+					"description": "Dispatched whenever `refreshConfig()` reloads URL, headers, and credentials (including on init).",
+					"detail": "{ url: String, db: String, auth: String, headers: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:created",
+					"cancelable": false,
+					"description": "Dispatched upon successful document creation.",
+					"detail": "{ record: Object, tempId: String, message: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:deleted",
+					"cancelable": false,
+					"description": "Dispatched upon successful document deletion.",
+					"detail": "{ response: Object, id: ID, message: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when the component is destroyed.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:error",
+					"cancelable": false,
+					"description": "Dispatched upon HTTP or network errors.",
+					"detail": "{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:fetched",
+					"cancelable": false,
+					"description": "Dispatched upon delta sync responses.",
+					"detail": "{ data: Array, since: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:updated",
+					"cancelable": false,
+					"description": "Dispatched upon successful document edit.",
+					"detail": "{ record: Object, id: ID, message: String, meta: Object }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-api-connector:request-bulk-delete",
+					"cancelable": false,
+					"description": "Triggers bulk document deletes.",
+					"detail": "{ ids: Array, url?: String, idempotencyKey?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-create",
+					"cancelable": false,
+					"description": "Triggers document create request.",
+					"detail": "{ data: Object, tempId: String, url?: String, idempotencyKey?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-delete",
+					"cancelable": false,
+					"description": "Triggers document DELETE.",
+					"detail": "{ id: ID, url?: String, idempotencyKey?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-fetch",
+					"cancelable": false,
+					"description": "Triggers delta updates query.",
+					"detail": "{ since?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-sync",
+					"cancelable": false,
+					"description": "Triggers delta updates query.",
+					"detail": "{ since?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-update",
+					"cancelable": false,
+					"description": "Triggers document PUT edit.",
+					"detail": "{ id: ID, data: Object, expected_version?: Int, url?: String, idempotencyKey?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:request-bulk-delete",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-couchdb-connector:request-create",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-couchdb-connector:request-delete",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-couchdb-connector:request-fetch",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-couchdb-connector:request-sync",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-couchdb-connector:request-update",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "dynamic-allowlist"
+				}
+			]
+		},
+		"ln-data-coordinator": {
+			"emits": [
+				{
+					"name": "ln-api-connector:request-bulk-delete",
+					"cancelable": false,
+					"description": "Triggers bulk document deletes.",
+					"detail": "{ ids: Array, url?: String, idempotencyKey?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-create",
+					"cancelable": false,
+					"description": "Dispatched to the connector child — direct path (no queue) or the queued-transport path via `ln-api-queue:send`.",
+					"detail": "{ data?, id?, ids?, url?, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-delete",
+					"cancelable": false,
+					"description": "Triggers document DELETE.",
+					"detail": "{ id: ID, url?: String, idempotencyKey?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-query",
+					"cancelable": false,
+					"description": "Triggers structured query/pagination fetch.",
+					"detail": "{ query?: Object, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-sync",
+					"cancelable": false,
+					"description": "Dispatched to the connector on `ln-data-store:request-remote-sync`, to trigger the delta fetch.",
+					"detail": "{ since: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:request-update",
+					"cancelable": false,
+					"description": "Triggers document PUT edit.",
+					"detail": "{ id: ID, data: Object, expected_version?: Int, url?: String, idempotencyKey?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:ack",
+					"cancelable": false,
+					"description": "Confirms or rejects a queue message.",
+					"detail": "{ entryId: ID, reason?: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:nack",
+					"cancelable": false,
+					"description": "Rejects transmission; triggers retry, drop, or pause.",
+					"detail": "{ entryId: ID, reason: \"retry\" | \"drop\" | \"auth\" }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:request-enqueue",
+					"cancelable": false,
+					"description": "Enqueues a transaction if offline.",
+					"detail": "{ chainKey: String, op: String, payload: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:resolve-create",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-chart:set-data",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-chart:set-loading",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-coordinator:error",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:offline",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:online",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:request-bulk-delete",
+					"cancelable": false,
+					"description": "Optimistically deletes multiple records.",
+					"detail": "{ ids: Array }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:request-create",
+					"cancelable": false,
+					"description": "Dispatched to the store child as the local-write half of the parallel fan-out.",
+					"detail": "{ tempId?, id?, ids?, data? }` (shape per op)",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:request-delete",
+					"cancelable": false,
+					"description": "Optimistically deletes a record.",
+					"detail": "{ id: ID }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:request-sync-failed",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:request-update",
+					"cancelable": false,
+					"description": "Optimistically updates a record or rekeys ID.",
+					"detail": "{ id: ID, data: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:page-failed",
+					"cancelable": false,
+					"description": "Windowed mode (`data-ln-list-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry.",
+					"detail": "{ offset: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:request-invalidate",
+					"cancelable": false,
+					"description": "Windowed mode (`data-ln-list-window`): invalidates the window cache and resets to page 0.",
+					"detail": "*(no payload)*",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:request-revalidate",
+					"cancelable": false,
+					"description": "Windowed mode (`data-ln-list-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives.",
+					"detail": "*(no payload)*",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:set-data",
+					"cancelable": false,
+					"description": "Populates the list with a dataset, removes loading overlays, and triggers render. Windowed mode (`data-ln-list-window`) additionally reads `offset`/`queryGen` off the payload, routing it into the internal window cache.",
+					"detail": "{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:set-loading",
+					"cancelable": false,
+					"description": "Controls the visual loading state of the list.",
+					"detail": "{ loading: Boolean }",
+					"source": "static"
+				},
+				{
+					"name": "ln-options:set-data",
+					"cancelable": false,
+					"description": "Delivers all records to a bound options binder.",
+					"detail": "{ data: Array }",
+					"source": "static"
+				},
+				{
+					"name": "ln-stat:set-count",
+					"cancelable": false,
+					"description": "Delivers the resolved count to a bound stat binder.",
+					"detail": "{ count: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:page-failed",
+					"cancelable": false,
+					"description": "Windowed mode (`data-ln-table-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry.",
+					"detail": "{ offset: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:request-invalidate",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:request-revalidate",
+					"cancelable": false,
+					"description": "Windowed mode (`data-ln-table-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives.",
+					"detail": "*(no payload)*",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:set-data",
+					"cancelable": false,
+					"description": "Populates the table with a raw dataset (Data-Driven mode). Windowed mode (`data-ln-table-window`) additionally reads `offset`/`queryGen` off the payload, routing it into the internal window cache.",
+					"detail": "{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:set-loading",
+					"cancelable": false,
+					"description": "Toggles the `.ln-table--loading` class (Data-Driven mode).",
+					"detail": "{ loading: Boolean }",
+					"source": "static"
+				},
+				{
+					"name": "ln-toast:enqueue",
+					"cancelable": false,
+					"description": "Dispatched to `window` for success/error alerts.",
+					"detail": "{ message: String, type: String }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-api-connector:bulk-deleted",
+					"cancelable": false,
+					"description": "Dispatched upon successful bulk deletion.",
+					"detail": "{ response: Object, ids: Array, message: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:created",
+					"cancelable": false,
+					"description": "Dispatched upon successful document creation.",
+					"detail": "{ record: Object, tempId: String, message: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:deleted",
+					"cancelable": false,
+					"description": "Dispatched upon successful document deletion.",
+					"detail": "{ response: Object, id: ID, message: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:error",
+					"cancelable": false,
+					"description": "Dispatched upon HTTP or network errors (silent on AbortError).",
+					"detail": "{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:fetched",
+					"cancelable": false,
+					"description": "Connector response handling (also namespaced under `ln-couchdb-connector:...` — generalized across concrete connector implementations). Reconciles the store, fires toasts, and drives queue ack/nack.",
+					"detail": "*(shape per response — see [`ln-api-connector.md`](./ln-api-connector.md) Events API)*",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-connector:updated",
+					"cancelable": false,
+					"description": "Dispatched upon successful document edit.",
+					"detail": "{ record: Object, id: ID, message: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:failed",
+					"cancelable": false,
+					"description": "Terminal retry-exhaustion notification from the queue — surfaces a `network` toast via the dict.",
+					"detail": "{ entryId: ID, chainKey: String, attempts: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-api-queue:send",
+					"cancelable": false,
+					"description": "Processes outbound offline queue writes.",
+					"detail": "{ entryId: ID, op: String, payload: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-chart:request-data",
+					"cancelable": false,
+					"description": "Query from a chart to fetch an ordered dataset.",
+					"detail": "{ target: HTMLElement, sort, filters, search }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:bulk-deleted",
+					"cancelable": false,
+					"description": "Dispatched upon successful bulk deletion.",
+					"detail": "{ response: Object, ids: Array, message: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:created",
+					"cancelable": false,
+					"description": "Dispatched upon successful document creation.",
+					"detail": "{ record: Object, tempId: String, message: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:deleted",
+					"cancelable": false,
+					"description": "Dispatched upon successful document deletion.",
+					"detail": "{ response: Object, id: ID, message: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:error",
+					"cancelable": false,
+					"description": "Dispatched upon HTTP or network errors.",
+					"detail": "{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:fetched",
+					"cancelable": false,
+					"description": "Dispatched upon delta sync responses.",
+					"detail": "{ data: Array, since: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:updated",
+					"cancelable": false,
+					"description": "Dispatched upon successful document edit.",
+					"detail": "{ record: Object, id: ID, message: String, meta: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-coordinator:request-bulk-delete",
+					"cancelable": false,
+					"description": "Intake event to delete multiple records.",
+					"detail": "{ ids: Array }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-coordinator:request-create",
+					"cancelable": false,
+					"description": "Intake event to create a record via fan-out.",
+					"detail": "{ data: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-coordinator:request-delete",
+					"cancelable": false,
+					"description": "Intake event to delete a record.",
+					"detail": "{ id: ID }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-coordinator:request-update",
+					"cancelable": false,
+					"description": "Intake event to update a record via fan-out.",
+					"detail": "{ id: ID, data: Object, expected_version?: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:created",
+					"cancelable": false,
+					"description": "Emitted after optimistic creation is done.",
+					"detail": "{ store: String, record: Object, tempId: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:deleted",
+					"cancelable": false,
+					"description": "Emitted after optimistic deletion is done.",
+					"detail": "{ store: String, id: ID }` | `{ store: String, ids: Array }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:initialized",
+					"cancelable": false,
+					"description": "Triggers sync if cache is empty or stale.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:mutation-error",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:query-changed",
+					"cancelable": false,
+					"description": "Emitted when store filters, search, or sort are modified.",
+					"detail": "{ store: String, query: { filters: Object, search: String, sort: Object|null } }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:ready",
+					"cancelable": false,
+					"description": "Store change notifications — on any of these, re-queries and re-serves all non-windowed bound view elements using their last cached query. Windowed views (carrying `data-ln-table-window` / `data-ln-list-window`) instead receive `ln-{kind}:request-revalidate` and refresh through their own window cache, since a partial store cannot answer an offset-based slice.",
+					"detail": "*(handler-internal; no detail consumed)*",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:request-page",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:request-remote-sync",
+					"cancelable": false,
+					"description": "Requests remote delta synchronization.",
+					"detail": "{ since: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:synced",
+					"cancelable": false,
+					"description": "Same re-serve as above, but only when `detail.changed` is true.",
+					"detail": "{ changed: Boolean }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:updated",
+					"cancelable": false,
+					"description": "Emitted after optimistic update/rekey is done.",
+					"detail": "{ store: String, record: Object, previous: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:request-data",
+					"cancelable": false,
+					"description": "Query from a list to fetch items (same handling as `ln-table:request-data`).",
+					"detail": "{ target: HTMLElement, sort, filters, search }",
+					"source": "static"
+				},
+				{
+					"name": "ln-options:request-data",
+					"cancelable": false,
+					"description": "Query from an `<select>`/options binder to fetch all records.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-stat:request-count",
+					"cancelable": false,
+					"description": "Query from a stat/counter binder to fetch a record count.",
+					"detail": "{ target: HTMLElement, filters?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:request-data",
+					"cancelable": false,
+					"description": "Query from a table to fetch items.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-data-store": {
+			"emits": [
+				{
+					"name": "ln-data-store:created",
+					"cancelable": false,
+					"description": "Emitted after optimistic creation is done.",
+					"detail": "{ store: String, record: Object, tempId: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:deleted",
+					"cancelable": false,
+					"description": "Emitted after optimistic deletion is done.",
+					"detail": "{ store: String, id: ID }` | `{ store: String, ids: Array }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:destroyed",
+					"cancelable": false,
+					"description": "Emitted when the store instance is destroyed.",
+					"detail": "{ store: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:initialization-error",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:initialized",
+					"cancelable": false,
+					"description": "Emitted when store IndexedDB is configured.",
+					"detail": "{ store: String, hasCache: Boolean, lastSyncedAt: Number|null, count: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:loaded",
+					"cancelable": false,
+					"description": "Emitted on initial load sync completion.",
+					"detail": "{ store: String, count: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:mutation-error",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:query-changed",
+					"cancelable": false,
+					"description": "Emitted when store filters, search, or sort are modified.",
+					"detail": "{ store: String, query: { filters: Object, search: String, sort: Object|null } }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:quota-exceeded",
+					"cancelable": false,
+					"description": "Emitted on `document` if database storage runs out of quota.",
+					"detail": "{ error: Error }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:ready",
+					"cancelable": false,
+					"description": "Emitted when data is ready for viewing.",
+					"detail": "{ store: String, count: Number, source: 'cache'|'server' }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:request-page",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:request-remote-sync",
+					"cancelable": false,
+					"description": "Triggers network sync request.",
+					"detail": "{ since: Number|null }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:sync-error",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:synced",
+					"cancelable": false,
+					"description": "Emitted after subsequent delta sync completes.",
+					"detail": "{ store: String, added: Number, deleted: Number, changed: Boolean }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:updated",
+					"cancelable": false,
+					"description": "Emitted after optimistic update/rekey is done.",
+					"detail": "{ store: String, record: Object, previous: Object }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-data-store:request-bulk-delete",
+					"cancelable": false,
+					"description": "Optimistically deletes multiple records.",
+					"detail": "{ ids: Array }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:request-create",
+					"cancelable": false,
+					"description": "Optimistically writes a new record.",
+					"detail": "{ tempId: String, data: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:request-delete",
+					"cancelable": false,
+					"description": "Optimistically deletes a record.",
+					"detail": "{ id: ID }",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:request-sync-failed",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-data-store:request-update",
+					"cancelable": false,
+					"description": "Optimistically updates a record or rekeys ID.",
+					"detail": "{ id: ID, data: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-filter:change",
+					"cancelable": false,
+					"description": "Updates `query.filters[key]` and dispatches `ln-data-store:query-changed`.",
+					"detail": "{ key: String, values: Array, targetId: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-search:change",
+					"cancelable": false,
+					"description": "Updates `query.search` and dispatches `ln-data-store:query-changed`.",
+					"detail": "{ term: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-sort:change",
+					"cancelable": false,
+					"description": "Updates `query.sort` and dispatches `ln-data-store:query-changed`.",
+					"detail": "{ field: String, direction: String }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-date": {
+			"emits": [
+				{
+					"name": "ln-date:change",
+					"cancelable": false,
+					"description": "Dispatched on value change (via calendar selection, text blur, or programmatically).",
+					"detail": "{ value: String, formatted: String, date: Date }",
+					"source": "static"
+				},
+				{
+					"name": "ln-date:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when the date picker instance is destroyed.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-core:locale-change",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				}
+			]
+		},
+		"ln-debug": {
+			"emits": [],
+			"listens": []
+		},
+		"ln-dropdown": {
+			"emits": [
+				{
+					"name": "ln-dropdown:close",
+					"cancelable": false,
+					"description": "Fires after the menu is closed, exits the top layer, and listeners cleaned.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-dropdown:destroyed",
+					"cancelable": false,
+					"description": "Fires when the coordinator's `destroy()` method is executed.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-dropdown:open",
+					"cancelable": false,
+					"description": "Fires after the menu is promoted to the top layer, positioned, and visually opened.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-dropdown:request-close",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-dropdown:request-open",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-dropdown:request-toggle",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-toggle:close",
+					"cancelable": false,
+					"description": "Triggers listeners cleanup, positioning styles removal, and `hidePopover()`.",
+					"detail": "—",
+					"source": "static"
+				},
+				{
+					"name": "ln-toggle:open",
+					"cancelable": false,
+					"description": "Triggers top-layer promotion (`showPopover()`), placement calculations, ARIA updates, and window event listeners binding.",
+					"detail": "—",
+					"source": "static"
+				}
+			]
+		},
+		"ln-editor": {
+			"emits": [
+				{
+					"name": "ln-editor:before-change",
+					"cancelable": true,
+					"description": "Dispatched before formatting changes. Canceling aborts format application.",
+					"detail": "{ action: String, target: Node }",
+					"source": "static"
+				},
+				{
+					"name": "ln-editor:blur",
+					"cancelable": false,
+					"description": "Dispatched when focus leaves the contenteditable workspace.",
+					"detail": "{ target: Node }",
+					"source": "static"
+				},
+				{
+					"name": "ln-editor:changed",
+					"cancelable": false,
+					"description": "Dispatched upon user keypress or markup updates.",
+					"detail": "{ html: String, target: Node }",
+					"source": "static"
+				},
+				{
+					"name": "ln-editor:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when the rich text instance is destroyed.",
+					"detail": "{ target: Node }",
+					"source": "static"
+				},
+				{
+					"name": "ln-editor:focus",
+					"cancelable": false,
+					"description": "Dispatched when the contenteditable workspace gains focus.",
+					"detail": "{ target: Node }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-editor:set-content",
+					"cancelable": false,
+					"description": "Triggered to set content programmatically.",
+					"detail": "{ html: String }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-external-links": {
+			"emits": [
+				{
+					"name": "ln-external-links:clicked",
+					"cancelable": false,
+					"description": "Dispatched when a user clicks on an external link (useful for telemetry/analytics).",
+					"detail": "{ link: HTMLElement, href: String, text: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-external-links:processed",
+					"cancelable": false,
+					"description": "Dispatched after an external link is sanitized and secured.",
+					"detail": "{ link: HTMLElement, href: String }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-fill": {
+			"emits": [],
+			"listens": [
+				{
+					"name": "ln-fill:request",
+					"cancelable": false,
+					"description": "Dispatched by coordinators to initiate DOM population.",
+					"detail": "{ id: String|null }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-filter": {
+			"emits": [
+				{
+					"name": "ln-filter:change",
+					"cancelable": false,
+					"description": "Fired on both the filter root and target whenever the filter selection changes. Consumers calling `preventDefault()` claim filtration and prevent default DOM item hiding.",
+					"detail": "{ key: String, values: String[], targetId: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-filter:reset",
+					"cancelable": false,
+					"description": "Fired only when transitioning from an active filter state back to the reset sentinel (\"All\").",
+					"detail": "{ targetId: String }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-form": {
+			"emits": [
+				{
+					"name": "ln-form:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when the form instance is destroyed.",
+					"detail": "{ target: HTMLFormElement }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-http": {
+			"emits": [
+				{
+					"name": "ln-http:error",
+					"cancelable": false,
+					"description": "Fired on the triggering element on network failure (DNS/CORS/loss); never fires on manual or automatic abort.",
+					"detail": "{ ok: false, status: 0, error: Error }",
+					"source": "static"
+				},
+				{
+					"name": "ln-http:response",
+					"cancelable": false,
+					"description": "Fired on the triggering element when a request completes (any HTTP status, e.g. 200/404/500).",
+					"detail": "{ ok: Boolean, status: Number, response: Response }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-http:cancel",
+					"cancelable": false,
+					"description": "Dispatched on `document` to cancel in-flight requests by key, URL, or all.",
+					"detail": "{ key?: String, url?: String, all?: Boolean }",
+					"source": "static"
+				},
+				{
+					"name": "ln-http:request",
+					"cancelable": false,
+					"description": "Dispatched by a consumer (must `bubble` to `document`) to run a deduplicated request; response/error fire back on the dispatching element.",
+					"detail": "{ url, method?, body?, key?, signal? }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-icon": {
+			"emits": [],
+			"listens": []
+		},
+		"ln-include": {
+			"emits": [
+				{
+					"name": "ln-include:error",
+					"cancelable": false,
+					"description": "Dispatched on the host `<template>` when the fetch fails (network error or non-2xx response).",
+					"detail": "{ target: HTMLElement, url: String, error: Error }",
+					"source": "static"
+				},
+				{
+					"name": "ln-include:loaded",
+					"cancelable": false,
+					"description": "Dispatched on the host `<template>` when the partial has been successfully fetched, parsed, and appended to `.content`.",
+					"detail": "{ target: HTMLElement, url: String }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-key": {
+			"emits": [
+				{
+					"name": "ln-key:before-trigger",
+					"cancelable": true,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-key:destroyed",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-key:trigger",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-link": {
+			"emits": [
+				{
+					"name": "ln-link:navigate",
+					"cancelable": true,
+					"description": "Fires on the host element before initiating redirection.",
+					"detail": "{ target: HTMLElement, href: String, link: HTMLAnchorElement }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-list": {
+			"emits": [
+				{
+					"name": "ln-list:clear-filters",
+					"cancelable": false,
+					"description": "Dispatched to instruct coordinator/store to reset active filters.",
+					"detail": "{ list: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:empty",
+					"cancelable": false,
+					"description": "Dispatched when the empty state template is drawn.",
+					"detail": "{ term: String, total: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:filter",
+					"cancelable": false,
+					"description": "Dispatched in SSR mode when search/filter narrows visible items.",
+					"detail": "{ term: String, matched: Number, total: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:item-action",
+					"cancelable": false,
+					"description": "Dispatched when clicking a button marked with `data-ln-item-action`.",
+					"detail": "{ list: String, id: String, action: String, record: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:item-click",
+					"cancelable": false,
+					"description": "Dispatched on item click (ignoring action button, checkbox, and link clicks).",
+					"detail": "{ list: String, id: String, record: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:ready",
+					"cancelable": false,
+					"description": "Dispatched after hydration or initial SSR item parsing completes.",
+					"detail": "{ total: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:rendered",
+					"cancelable": false,
+					"description": "Dispatched after items are appended/redrawn in the DOM.",
+					"detail": "{ list: String, total: Number, visible: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:request-data",
+					"cancelable": false,
+					"description": "Dispatched on initialization or parameter changes (sort, search, filter) to request data. Windowed mode (`data-ln-list-window`) additionally emits `offset`/`limit`/`queryGen`.",
+					"detail": "{ list: String, sort: Object, filters: Object, search: String, offset?: Number, limit?: Number, queryGen?: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:search",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:select",
+					"cancelable": false,
+					"description": "Dispatched when item selection changes.",
+					"detail": "{ list: String, selectedIds: Set, count: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:select-all",
+					"cancelable": false,
+					"description": "Dispatched when the global \"Select All\" checkbox status changes.",
+					"detail": "{ list: String, selected: Boolean }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:sorted",
+					"cancelable": false,
+					"description": "Dispatched in SSR mode when items are sorted.",
+					"detail": "{ field: String, direction: String, matched: Number, total: Number }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-filter:change",
+					"cancelable": true,
+					"description": "In SSR mode, filters in-memory records by key/values and updates the virtual view. In Data-Driven mode, `ln-filter` targets the Store directly.",
+					"detail": "{ key: String, values: Array, targetId: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:page-failed",
+					"cancelable": false,
+					"description": "Windowed mode (`data-ln-list-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry.",
+					"detail": "{ offset: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:request-clear-filters",
+					"cancelable": false,
+					"description": "Resets all active filters and search term. In Data-Driven mode, dispatches `ln-list:clear-filters` and requests fresh data; in SSR mode, re-evaluates in-memory filters.",
+					"detail": "*(no payload)*",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:request-invalidate",
+					"cancelable": false,
+					"description": "Windowed mode (`data-ln-list-window`): invalidates the window cache and resets to page 0.",
+					"detail": "*(no payload)*",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:request-revalidate",
+					"cancelable": false,
+					"description": "Windowed mode (`data-ln-list-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives.",
+					"detail": "*(no payload)*",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:set-data",
+					"cancelable": false,
+					"description": "Populates the list with a dataset, removes loading overlays, and triggers render. Windowed mode (`data-ln-list-window`) additionally reads `offset`/`queryGen` off the payload, routing it into the internal window cache.",
+					"detail": "{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:set-loading",
+					"cancelable": false,
+					"description": "Controls the visual loading state of the list.",
+					"detail": "{ loading: Boolean }",
+					"source": "static"
+				},
+				{
+					"name": "ln-list:set-search",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-search:change",
+					"cancelable": true,
+					"description": "In SSR mode, filters in-memory records by search tokens and updates the virtual view. In Data-Driven mode, `ln-search` targets the Store directly.",
+					"detail": "{ term: String, targetId: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-sort:change",
+					"cancelable": true,
+					"description": "In Data-Driven mode with `field !== null`, sets `currentSort`, re-sorts `_filteredData` locally (non-windowed) or calls `_requestData()` for fresh slice (windowed). In SSR mode, sorts in-memory records by field/value and updates the virtual view.",
+					"detail": "{ field: String|null, column: Number|null, direction: 'asc'|'desc'|'none', targetId: String }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-modal": {
+			"emits": [
+				{
+					"name": "ln-modal:before-close",
+					"cancelable": true,
+					"description": "Dispatched upon request to close; calling `preventDefault()` cancels closing.",
+					"detail": "{ modalId: String, target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-modal:before-open",
+					"cancelable": true,
+					"description": "Dispatched when state changes to `\"open\"`, before styles or focus are applied.",
+					"detail": "{ modalId: String, target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-modal:close",
+					"cancelable": false,
+					"description": "Dispatched after modal closes, before focus restoration.",
+					"detail": "{ modalId: String, target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-modal:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when the component instance is destroyed.",
+					"detail": "{ modalId: String, target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-modal:open",
+					"cancelable": false,
+					"description": "Dispatched once modal is natively open, body scroll locked, and initial focus set.",
+					"detail": "{ modalId: String, target: HTMLElement, hashNs: String?, param: String? }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-modal:request-close",
+					"cancelable": false,
+					"description": "Command request event sent to close the modal.",
+					"detail": "{}",
+					"source": "static"
+				},
+				{
+					"name": "ln-modal:request-open",
+					"cancelable": false,
+					"description": "Command request event sent to open the modal.",
+					"detail": "{}",
+					"source": "static"
+				}
+			]
+		},
+		"ln-nav": {
+			"emits": [
+				{
+					"name": "ln-nav:before-update",
+					"cancelable": true,
+					"description": "Dispatched before evaluating and updating active link states. Cancelable.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-nav:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when `destroy()` is called on the component instance.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-nav:update",
+					"cancelable": false,
+					"description": "Dispatched after active link states have been evaluated and CSS classes applied.",
+					"detail": "{ activeLinks: Array, target: HTMLElement }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-number": {
+			"emits": [
+				{
+					"name": "ln-number:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when the component is destroyed.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-number:input",
+					"cancelable": false,
+					"description": "Dispatched upon user input or programmatic value changes.",
+					"detail": "{ value: Number, formatted: String }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-core:locale-change",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				}
+			]
+		},
+		"ln-options": {
+			"emits": [
+				{
+					"name": "ln-options:request-data",
+					"cancelable": false,
+					"description": "Dispatched on load to request option records.",
+					"detail": "{ options: String }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-options:set-data",
+					"cancelable": false,
+					"description": "Listens for the array of options to render.",
+					"detail": "{ data: Array }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-popover": {
+			"emits": [
+				{
+					"name": "ln-popover:before-close",
+					"cancelable": true,
+					"description": "Fires before close, letting the app prevent closing via `e.preventDefault()`.",
+					"detail": "{ popoverId: String, target: HTMLElement, trigger: HTMLElement? }",
+					"source": "static"
+				},
+				{
+					"name": "ln-popover:before-open",
+					"cancelable": true,
+					"description": "Fires after attribute changes to `\"open\"`, before top-layer promotion or placement calculations.",
+					"detail": "{ popoverId: String, target: HTMLElement, trigger: HTMLElement? }",
+					"source": "static"
+				},
+				{
+					"name": "ln-popover:close",
+					"cancelable": false,
+					"description": "Fires after popover is hidden, inline styles cleared, and focus restored.",
+					"detail": "{ popoverId: String, target: HTMLElement, trigger: HTMLElement? }",
+					"source": "static"
+				},
+				{
+					"name": "ln-popover:destroyed",
+					"cancelable": false,
+					"description": "Fires when the popover instance is destroyed.",
+					"detail": "{ popoverId: String, target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-popover:open",
+					"cancelable": false,
+					"description": "Fires once the popover is visible in the top layer, positioned, and focus set.",
+					"detail": "{ popoverId: String, target: HTMLElement, trigger: HTMLElement? }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-popover:request-close",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-popover:request-open",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-popover:request-toggle",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				}
+			]
+		},
+		"ln-progress": {
+			"emits": [
+				{
+					"name": "ln-progress:change",
+					"cancelable": false,
+					"description": "Dispatched on construction and every time value or max attributes change.",
+					"detail": "{ target: HTMLElement, value: Number, max: Number, percentage: Number }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-router": {
+			"emits": [
+				{
+					"name": "ln-router:before-navigate",
+					"cancelable": true,
+					"description": "Dispatched before navigation starts. Calling `preventDefault()` aborts route swap.",
+					"detail": "{ from: String, to: String, params: Object, query: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-router:navigated",
+					"cancelable": false,
+					"description": "Dispatched on each updated target container after DOM replacement and focus setup.",
+					"detail": "{ path, params, query, route, target, region }",
+					"source": "static"
+				},
+				{
+					"name": "ln-router:not-found",
+					"cancelable": false,
+					"description": "Dispatched when no route matches the requested URL.",
+					"detail": "{ path: String }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-search": {
+			"emits": [
+				{
+					"name": "ln-search:change",
+					"cancelable": true,
+					"description": "Dispatched when search term updates. `preventDefault()` skips default DOM show/hide.",
+					"detail": "{ term: string, tokens: string[], targetId: string, fields: string[]|null }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-slug": {
+			"emits": [],
+			"listens": []
+		},
+		"ln-sort": {
+			"emits": [
+				{
+					"name": "ln-sort:change",
+					"cancelable": true,
+					"description": "Dispatched on the **target** (never on the sort control itself) on trigger click or persisted-state restore. `preventDefault()` hands the sort intent fully to the consumer and skips the default DOM reorder.",
+					"detail": "{ field: String|null, column: Number|null, direction: 'asc'|'desc'|'none', targetId: String }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-sort:change",
+					"cancelable": false,
+					"description": "Listens on target container to enforce mutual exclusion across sibling `ln-sort` controls and synchronize duplicate controls.",
+					"detail": "{ field: String|null, column: Number|null, direction: 'asc'|'desc'|'none', targetId: String }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-sortable": {
+			"emits": [
+				{
+					"name": "ln-sortable:before-drag",
+					"cancelable": true,
+					"description": "Dispatched on `pointerdown` before starting a drag. If canceled, dragging is aborted.",
+					"detail": "{ item: HTMLElement, index: number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-sortable:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when the instance is destroyed.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-sortable:disabled",
+					"cancelable": false,
+					"description": "Dispatched when `data-ln-sortable` changes to `\"disabled\"`.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-sortable:drag-start",
+					"cancelable": false,
+					"description": "Dispatched when dragging commences and pointer capture is acquired.",
+					"detail": "{ item: HTMLElement, index: number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-sortable:enabled",
+					"cancelable": false,
+					"description": "Dispatched when transitioning from `\"disabled\"` to active.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-sortable:reordered",
+					"cancelable": false,
+					"description": "Dispatched upon pointer release ONLY if the DOM index changed.",
+					"detail": "{ item: HTMLElement, oldIndex: number, newIndex: number }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-stat": {
+			"emits": [
+				{
+					"name": "ln-stat:request-count",
+					"cancelable": false,
+					"description": "Dispatched on initialization to ask the coordinator to resolve the count.",
+					"detail": "{ stat: String, filters: Object }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-stat:set-count",
+					"cancelable": false,
+					"description": "Received from the coordinator when the count is resolved, triggers rendering.",
+					"detail": "{ count: Number }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-table": {
+			"emits": [
+				{
+					"name": "ln-table:clear-filters",
+					"cancelable": false,
+					"description": "Emitted on clear-all button click, before requesting fresh data (Data-Driven mode).",
+					"detail": "{ table: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:empty",
+					"cancelable": false,
+					"description": "Emitted when the empty-state template is rendered (SSR and Data-Driven modes).",
+					"detail": "{ term: String, total: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:filter",
+					"cancelable": false,
+					"description": "Emitted after applying search, column filter, or clear actions locally (SSR mode).",
+					"detail": "{ term: String, matched: Number, total: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:ready",
+					"cancelable": false,
+					"description": "Fired once after initial row hydration/parsing completes (SSR and Data-Driven modes).",
+					"detail": "{ total: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:rendered",
+					"cancelable": false,
+					"description": "Fired after `ln-table:set-data` finishes rendering (Data-Driven mode).",
+					"detail": "{ table: String, total: Number, visible: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:request-data",
+					"cancelable": false,
+					"description": "Requests a new data page from the coordinator whenever sort/filter/search state changes, including the initial mount (Data-Driven mode). Windowed mode (`data-ln-table-window`) additionally emits `offset`/`limit`/`queryGen`.",
+					"detail": "{ table: String, sort: Object|null, filters: Object, search: String, offset?: Number, limit?: Number, queryGen?: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:row-action",
+					"cancelable": false,
+					"description": "Emitted on a row action button click (Data-Driven mode).",
+					"detail": "{ table: String, id: String, action: String, record: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:row-click",
+					"cancelable": false,
+					"description": "Emitted on row left-click or `Enter` keypress (Data-Driven mode).",
+					"detail": "{ table: String, id: String, record: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:search",
+					"cancelable": false,
+					"description": "Emitted when receiving an `ln-table:set-search` command (dispatched by `ln-table-coordinator` in response to `ln-search:change`), before requesting fresh data (Data-Driven mode).",
+					"detail": "{ table: String, query: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:select",
+					"cancelable": false,
+					"description": "Emitted on individual row selection toggle and after select-all (Data-Driven mode).",
+					"detail": "{ table: String, selectedIds: Set, count: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:select-all",
+					"cancelable": false,
+					"description": "Emitted when the header \"select all\" checkbox is toggled (Data-Driven mode).",
+					"detail": "{ table: String, selected: Boolean }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:sorted",
+					"cancelable": false,
+					"description": "Emitted after applying a local sort (SSR mode).",
+					"detail": "{ column: Number, direction: String|null, matched: Number, total: Number }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-filter:change",
+					"cancelable": false,
+					"description": "Consumed directly on itself in SSR mode only (`!this.isDataDriven`), applying column filters to the in-memory `_data` cache.",
+					"detail": "{ key: String, values: Array, targetId: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-search:change",
+					"cancelable": false,
+					"description": "Consumed directly on itself in SSR mode only, triggering local in-memory search matching. In Data-Driven mode `ln-table-coordinator` intercepts this event on the search input's target and dispatches `ln-table:set-search` instead.",
+					"detail": "{ term: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-sort:change",
+					"cancelable": false,
+					"description": "Column sort intent from [`ln-sort`](./ln-sort.md). SSR mode re-orders in-memory rows locally and dispatches `ln-table:sorted`; Data-Driven mode sets `currentSort` and dispatches a fresh `ln-table:request-data`. `ln-table` always calls `preventDefault()`, superseding `ln-sort`'s own default DOM-reorder fallback.",
+					"detail": "{ field: String|null, column: Number|null, direction: 'asc'|'desc'|'none', targetId: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:page-failed",
+					"cancelable": false,
+					"description": "Windowed mode (`data-ln-table-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry.",
+					"detail": "{ offset: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:request-clear-filters",
+					"cancelable": false,
+					"description": "Dispatched to child SSR `[data-ln-table]` element on clear button click.",
+					"detail": "{ table: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:request-invalidate",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:request-revalidate",
+					"cancelable": false,
+					"description": "Windowed mode (`data-ln-table-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives.",
+					"detail": "*(no payload)*",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:set-data",
+					"cancelable": false,
+					"description": "Populates the table with a raw dataset (Data-Driven mode). Windowed mode (`data-ln-table-window`) additionally reads `offset`/`queryGen` off the payload, routing it into the internal window cache.",
+					"detail": "{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:set-loading",
+					"cancelable": false,
+					"description": "Toggles the `.ln-table--loading` class (Data-Driven mode).",
+					"detail": "{ loading: Boolean }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:set-search",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				}
+			]
+		},
+		"ln-table-coordinator": {
+			"emits": [
+				{
+					"name": "ln-table:request-clear-filters",
+					"cancelable": false,
+					"description": "Dispatched to child SSR `[data-ln-table]` element on clear button click.",
+					"detail": "{ table: String }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-filter:change",
+					"cancelable": false,
+					"description": "Caught on `data-ln-filter` inside the wrapper container to update header indicators.",
+					"detail": "{ key: String, values: Array, targetId: String }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-tabs": {
+			"emits": [
+				{
+					"name": "ln-tabs:before-change",
+					"cancelable": true,
+					"description": "Dispatched before switching active tab. Calling `preventDefault()` cancels switch and reverts state.",
+					"detail": "{ key: String, previousKey: String, tab: HTMLElement, panel: HTMLElement, target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-tabs:change",
+					"cancelable": false,
+					"description": "Dispatched after panel visibility, ARIA attributes, focus, and persistence updates complete.",
+					"detail": "{ key: String, previousKey: String, tab: HTMLElement, panel: HTMLElement, target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-tabs:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when `destroy()` is called on the instance.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-tabs:request-select",
+					"cancelable": false,
+					"description": "Command request event sent to switch active tab.",
+					"detail": "{ key: String }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-time": {
+			"emits": [],
+			"listens": [
+				{
+					"name": "ln-core:locale-change",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				}
+			]
+		},
+		"ln-toast": {
+			"emits": [
+				{
+					"name": "ln-toast:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when `destroy()` is called on the container instance.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-modal:open",
+					"cancelable": false,
+					"description": "Adopts hash parameter and emits `ln-fill:request` for `\"edit\"` mode.",
+					"detail": "{ modalId, target, hashNs, param }",
+					"source": "static"
+				},
+				{
+					"name": "ln-toast:clear",
+					"cancelable": false,
+					"description": "Clears all active toast notifications (optionally filtered by container).",
+					"detail": "{ container }",
+					"source": "static"
+				},
+				{
+					"name": "ln-toast:enqueue",
+					"cancelable": false,
+					"description": "Dispatches a request to construct and append a new toast notification.",
+					"detail": "{ type, title, message, data, timeout, container }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-toggle": {
+			"emits": [
+				{
+					"name": "ln-toggle:before-close",
+					"cancelable": true,
+					"description": "Fires when the state is about to switch to `\"close\"`. Prevent default to block the close sequence.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-toggle:before-open",
+					"cancelable": true,
+					"description": "Fires when the state is about to switch to `\"open\"`. Prevent default to block the open sequence.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-toggle:close",
+					"cancelable": false,
+					"description": "Fires after the panel has fully closed.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-toggle:destroyed",
+					"cancelable": false,
+					"description": "Fires when the component instance is torn down.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-toggle:open",
+					"cancelable": false,
+					"description": "Fires after the panel has fully opened and classes are updated.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-toggle:request-close",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-toggle:request-open",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				},
+				{
+					"name": "ln-toggle:request-toggle",
+					"cancelable": false,
+					"description": "",
+					"detail": "",
+					"source": "static"
+				}
+			]
+		},
+		"ln-tooltip": {
+			"emits": [
+				{
+					"name": "ln-tooltip:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when the trigger component instance is destroyed.",
+					"detail": "{ trigger: HTMLElement }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
+		"ln-translations": {
+			"emits": [
+				{
+					"name": "ln-translations:added",
+					"cancelable": false,
+					"description": "Fires after a language's fields are cloned and the menu/badges are updated.",
+					"detail": "{ target: HTMLElement, lang: String, langName: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-translations:before-add",
+					"cancelable": true,
+					"description": "Fires before a language's fields are cloned. `preventDefault()` aborts the activation.",
+					"detail": "{ target: HTMLElement, lang: String, langName: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-translations:before-remove",
+					"cancelable": true,
+					"description": "Fires before a language's cloned fields are removed. `preventDefault()` aborts the removal.",
+					"detail": "{ target: HTMLElement, lang: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-translations:removed",
+					"cancelable": false,
+					"description": "Fires after a language's cloned fields are removed and the menu/badges are updated.",
+					"detail": "{ target: HTMLElement, lang: String }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-translations:request-add",
+					"cancelable": false,
+					"description": "Requests activation of a language programmatically. Event listener is bound to the container element (`data-ln-translations`), not `document`.",
+					"detail": "{ lang: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-translations:request-remove",
+					"cancelable": false,
+					"description": "Requests deactivation of a language programmatically. Event listener is bound to the container element (`data-ln-translations`), not `document`.",
+					"detail": "{ lang: String }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-ui-coordinator": {
+			"emits": [
+				{
+					"name": "ln-fill:request",
+					"cancelable": false,
+					"description": "Sent to form layer to fill fields with record data upon open.",
+					"detail": "{ id: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-modal:request-close",
+					"cancelable": false,
+					"description": "Sent to target `ln-modal` to request panel closing.",
+					"detail": "{}",
+					"source": "static"
+				},
+				{
+					"name": "ln-modal:request-open",
+					"cancelable": false,
+					"description": "Sent to target `ln-modal` to request panel opening.",
+					"detail": "{}",
+					"source": "static"
+				},
+				{
+					"name": "ln-toast:enqueue",
+					"cancelable": false,
+					"description": "Dispatched upon AJAX response `message` or network/server/upload error fallbacks.",
+					"detail": "{ type, title, message }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-ajax:error",
+					"cancelable": false,
+					"description": "Relays error `message` or network/server fallback toast, keeps modal open.",
+					"detail": "{ method, url, status, data, error }",
+					"source": "static"
+				},
+				{
+					"name": "ln-ajax:success",
+					"cancelable": false,
+					"description": "Relays response `message` as toast, auto-closes parent modal, resets forms.",
+					"detail": "{ method, url, data }",
+					"source": "static"
+				},
+				{
+					"name": "ln-modal:before-open",
+					"cancelable": false,
+					"description": "Clears form fields if modal mode is `\"new\"`.",
+					"detail": "{ modalId, target }",
+					"source": "static"
+				},
+				{
+					"name": "ln-modal:close",
+					"cancelable": false,
+					"description": "Cleans up modal hash segment and resets fields if mode is `\"new\"`.",
+					"detail": "{ modalId, target }",
+					"source": "static"
+				},
+				{
+					"name": "ln-modal:open",
+					"cancelable": false,
+					"description": "Adopts hash parameter and emits `ln-fill:request` for `\"edit\"` mode.",
+					"detail": "{ modalId, target, hashNs, param }",
+					"source": "static"
+				},
+				{
+					"name": "ln-upload:error",
+					"cancelable": false,
+					"description": "Enqueues error toast on upload failure.",
+					"detail": "{ file, message, status, error }",
+					"source": "static"
+				},
+				{
+					"name": "ln-upload:invalid",
+					"cancelable": false,
+					"description": "Enqueues error toast on file validation failure.",
+					"detail": "{ file, reason }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-upload": {
+			"emits": [
+				{
+					"name": "ln-upload:before-clear",
+					"cancelable": true,
+					"description": "Fires before clearing all files.",
+					"detail": "{}",
+					"source": "static"
+				},
+				{
+					"name": "ln-upload:before-remove",
+					"cancelable": true,
+					"description": "Fires before a file is deleted/removed.",
+					"detail": "{ localId: String, serverId: String|Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-upload:before-upload",
+					"cancelable": true,
+					"description": "Fires before an upload starts.",
+					"detail": "{ file: File }",
+					"source": "static"
+				},
+				{
+					"name": "ln-upload:cleared",
+					"cancelable": false,
+					"description": "Fires after `clear()` wipes all file instances.",
+					"detail": "{}",
+					"source": "static"
+				},
+				{
+					"name": "ln-upload:destroyed",
+					"cancelable": false,
+					"description": "Fires when component instance is torn down.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-upload:error",
+					"cancelable": false,
+					"description": "Fires when an upload or delete request fails.",
+					"detail": "{ file, message, status, error }",
+					"source": "static"
+				},
+				{
+					"name": "ln-upload:invalid",
+					"cancelable": false,
+					"description": "Fires when a file fails extension/size/count validation.",
+					"detail": "{ file, reason }",
+					"source": "static"
+				},
+				{
+					"name": "ln-upload:progress",
+					"cancelable": false,
+					"description": "Fires on XHR upload progress updates.",
+					"detail": "{ localId, file, percent, loaded, total }",
+					"source": "static"
+				},
+				{
+					"name": "ln-upload:removed",
+					"cancelable": false,
+					"description": "Fires after a file is deleted from server and removed from DOM.",
+					"detail": "{ localId, serverId }",
+					"source": "static"
+				},
+				{
+					"name": "ln-upload:uploaded",
+					"cancelable": false,
+					"description": "Fires after a file successfully uploads (2xx response).",
+					"detail": "{ localId, serverId, name, size, response }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-upload:request-clear",
+					"cancelable": false,
+					"description": "Inbound command to clear all files.",
+					"detail": "{}",
+					"source": "static"
+				},
+				{
+					"name": "ln-upload:request-remove",
+					"cancelable": false,
+					"description": "Inbound command to remove a file.",
+					"detail": "{ localId?: String, serverId?: String|Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-upload:request-upload",
+					"cancelable": false,
+					"description": "Inbound command to upload files.",
+					"detail": "{ files: FileList | File[] }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-validate": {
+			"emits": [
+				{
+					"name": "ln-validate:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when the component is destroyed.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-validate:invalid",
+					"cancelable": false,
+					"description": "Dispatched when the field transitions to an invalid state.",
+					"detail": "{ target: HTMLElement, field: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-validate:request-validate",
+					"cancelable": false,
+					"description": "The submit gate — the first `data-ln-validate` field to initialize on a form injects `novalidate` and attaches a form-level `submit` listener that dispatches this event on the form to collect invalid fields before allowing submission.",
+					"detail": "{ invalidFields: Array<HTMLElement> }",
+					"source": "static"
+				},
+				{
+					"name": "ln-validate:valid",
+					"cancelable": false,
+					"description": "Dispatched when the field transitions to a valid state.",
+					"detail": "{ target: HTMLElement, field: String }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-validate:clear-custom",
+					"cancelable": false,
+					"description": "Clears a custom error key.",
+					"detail": "{ error?: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-validate:request-validate",
+					"cancelable": false,
+					"description": "Every `data-ln-validate` field instance listens for this event on its parent form; when received, it marks itself touched, runs `validate()`, and pushes itself into `invalidFields` if invalid.",
+					"detail": "{ invalidFields: Array<HTMLElement> }",
+					"source": "static"
+				},
+				{
+					"name": "ln-validate:set-custom",
+					"cancelable": false,
+					"description": "Sets a manual custom error key on the input.",
+					"detail": "{ error: String }",
+					"source": "static"
+				}
+			]
+		}
+	}
+}
