@@ -1,4 +1,5 @@
 import { dispatch, getLocale, registerComponent, interceptValueProperty, ensureLocaleObserver } from '../../ln-core';
+import { getSeparators, cleanNumericString, parseNumber, formatNumber, calculateCursorPosition } from './number-model';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-number';
@@ -6,39 +7,7 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, ensureL
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-	// ─── Formatter Cache ──────────────────────────────────────
-
-	const _formatters = {};
 	const _inputValueDesc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
-
-	function _getFormatter(locale) {
-		if (!_formatters[locale]) {
-			const fmt = new Intl.NumberFormat(locale, { useGrouping: true });
-			const parts = fmt.formatToParts(1234.5);
-			let groupSep = '';
-			let decimalSep = '.';
-			for (let i = 0; i < parts.length; i++) {
-				if (parts[i].type === 'group') groupSep = parts[i].value;
-				if (parts[i].type === 'decimal') decimalSep = parts[i].value;
-			}
-			_formatters[locale] = { fmt: fmt, groupSep: groupSep, decimalSep: decimalSep };
-		}
-		return _formatters[locale];
-	}
-
-	function _formatNum(locale, num, maxDecimals) {
-		if (maxDecimals !== null) {
-			const max = parseInt(maxDecimals, 10);
-			const key = locale + '|d' + max;
-			if (!_formatters[key]) {
-				_formatters[key] = new Intl.NumberFormat(locale, { useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: max });
-			}
-			return _formatters[key].format(num);
-		}
-		return _getFormatter(locale).fmt.format(num);
-	}
-
-	// ─── Component ─────────────────────────────────────────────
 
 	// ─── Component ─────────────────────────────────────────────
 
@@ -84,13 +53,14 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, ensureL
 				return _inputValueDesc.get.call(hidden);
 			},
 			set: function (val) {
-				_inputValueDesc.set.call(hidden, val);                      // store raw natively
+				_inputValueDesc.set.call(hidden, val);
 				if (val !== '' && !isNaN(parseFloat(val))) {
-					self._setDisplayRaw(_formatNum(getLocale(self.dom), parseFloat(val), self.dom.getAttribute('data-ln-number-decimals')));
+					const maxDecimals = self.dom.getAttribute('data-ln-number-decimals');
+					self._setDisplayRaw(formatNumber(parseFloat(val), getLocale(self.dom), { maxDecimals }));
 				} else {
 					self._setDisplayRaw('');
 				}
-				self.dom.dispatchEvent(new Event('input', { bubbles: true })); // single ecosystem signal → _handleInput emits ln-number:input
+				self.dom.dispatchEvent(new Event('input', { bubbles: true }));
 			}
 		});
 
@@ -106,13 +76,14 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, ensureL
 					dom.dispatchEvent(new Event('input', { bubbles: true }));
 					return;
 				}
-				const num = typeof val === 'number' ? val : parseFloat(String(val).replace(/[^\d.-]/g, ''));
+				const num = typeof val === 'number' ? val : parseNumber(String(val), getLocale(dom));
 				if (isNaN(num)) {
 					self._setDisplayRaw(String(val));
 					self._setHiddenRaw('');
 				} else {
 					self._setHiddenRaw(num);
-					self._setDisplayRaw(_formatNum(getLocale(dom), num, dom.getAttribute('data-ln-number-decimals')));
+					const maxDecimals = dom.getAttribute('data-ln-number-decimals');
+					self._setDisplayRaw(formatNumber(num, getLocale(dom), { maxDecimals }));
 				}
 				dom.dispatchEvent(new Event('input', { bubbles: true }));
 			}
@@ -124,23 +95,34 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, ensureL
 		};
 		dom.addEventListener('input', this._onInput);
 
+		// ── Bind keydown event (Backspace over group separators) ──
+		this._onKeyDown = function (e) {
+			if (e.key !== 'Backspace') return;
+			const start = dom.selectionStart;
+			const end = dom.selectionEnd;
+
+			if (start !== end || start === 0) return;
+
+			const info = getSeparators(getLocale(dom));
+			const val = _inputValueDesc.get.call(dom);
+			const charBefore = val[start - 1];
+
+			if (charBefore === info.groupSep || /\s/.test(charBefore)) {
+				e.preventDefault();
+				const deleteIdx = start - 2 >= 0 ? start - 2 : 0;
+				const newVal = val.slice(0, deleteIdx) + val.slice(start);
+				_inputValueDesc.set.call(dom, newVal);
+				dom.setSelectionRange(deleteIdx, deleteIdx);
+				dom.dispatchEvent(new Event('input', { bubbles: true }));
+			}
+		};
+		dom.addEventListener('keydown', this._onKeyDown);
+
 		// ── Bind paste event ────────────────────────────────
 		this._onPaste = function (e) {
 			e.preventDefault();
 			const pasted = (e.clipboardData || window.clipboardData).getData('text');
-			const info = _getFormatter(getLocale(dom));
-			const decSepEscaped = info.decimalSep.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-			// Strip everything except digits, minus, and decimal separators
-			let cleaned = pasted.replace(new RegExp('[^0-9\\-' + decSepEscaped + '.]', 'g'), '');
-			// Strip group separators before normalizing decimal
-			if (info.groupSep) {
-				cleaned = cleaned.split(info.groupSep).join('');
-			}
-			// Normalize: if locale decimal is not '.', replace it
-			if (info.decimalSep !== '.') {
-				cleaned = cleaned.replace(info.decimalSep, '.');
-			}
-			const num = parseFloat(cleaned);
+			const num = parseNumber(pasted, getLocale(dom));
 			self.value = isNaN(num) ? NaN : num;
 		};
 		dom.addEventListener('paste', this._onPaste);
@@ -148,42 +130,16 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, ensureL
 		// ── Handle pre-filled value ─────────────────────────
 		const initial = dom.value;
 		if (initial !== '') {
-			const num = parseFloat(initial);
+			const num = parseNumber(initial, getLocale(dom));
 			if (!isNaN(num)) {
+				const maxDecimals = dom.getAttribute('data-ln-number-decimals');
 				this._setHiddenRaw(num);
-				this._setDisplayRaw(_formatNum(getLocale(dom), num, dom.getAttribute('data-ln-number-decimals')));
+				this._setDisplayRaw(formatNumber(num, getLocale(dom), { maxDecimals }));
 				dom.dispatchEvent(new Event('input', { bubbles: true }));
 			}
 		}
 
 		return this;
-	}
-
-	function _parseRawNumber(val) {
-		if (typeof val === 'number') return isNaN(val) ? null : val;
-		if (!val || typeof val !== 'string') return null;
-		let str = val.trim();
-		if (str === '') return null;
-		// Remove spaces/non-breaking spaces/currency symbols
-		str = str.replace(/[\s\u00A0$€£]/g, '');
-
-		// Handle "1.234,56" (DE/MK) vs "1,234.56" (EN)
-		if (str.indexOf(',') !== -1 && str.indexOf('.') !== -1) {
-			if (str.indexOf('.') < str.indexOf(',')) {
-				// DE/MK style: 1.234,56 -> 1234.56
-				str = str.replace(/\./g, '').replace(',', '.');
-			} else {
-				// EN style: 1,234.56 -> 1234.56
-				str = str.replace(/,/g, '');
-			}
-		} else if (str.indexOf(',') !== -1) {
-			// Only comma e.g. "1499,50" -> 1499.50
-			str = str.replace(',', '.');
-		}
-		// Strip any remaining invalid chars
-		str = str.replace(/[^\d.-]/g, '');
-		const num = parseFloat(str);
-		return isNaN(num) ? null : num;
 	}
 
 	_component.prototype._initTextElement = function () {
@@ -200,8 +156,8 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, ensureL
 			candidate = dom.textContent.trim();
 		}
 
-		const num = _parseRawNumber(candidate);
-		if (num !== null) {
+		const num = parseNumber(candidate, getLocale(dom));
+		if (!isNaN(num)) {
 			this._rawValue = num;
 			if (!dom.hasAttribute('data-ln-value')) {
 				dom.setAttribute('data-ln-value', String(num));
@@ -214,26 +170,26 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, ensureL
 
 	_component.prototype._formatTextContent = function () {
 		if (this._rawValue !== null && !isNaN(this._rawValue)) {
-			const decimals = this.dom.getAttribute('data-ln-number-decimals');
-			this.dom.textContent = _formatNum(getLocale(this.dom), this._rawValue, decimals);
+			const maxDecimals = this.dom.getAttribute('data-ln-number-decimals');
+			this.dom.textContent = formatNumber(this._rawValue, getLocale(this.dom), { maxDecimals });
 		}
 	};
 
 	_component.prototype._handleInput = function () {
 		const dom = this.dom;
-		const info = _getFormatter(getLocale(dom));
 		const raw = _inputValueDesc.get.call(dom);
 
-		// Edge case: empty
+		// Branch 1: empty
 		if (raw === '') {
 			this._setHiddenRaw('');
 			dispatch(dom, 'ln-number:input', { value: NaN, formatted: '' });
 			return;
 		}
 
-		// Edge case: just minus sign
+		// Branch 2: just minus sign
 		if (raw === '-') {
 			this._setHiddenRaw('');
+			dispatch(dom, 'ln-number:input', { value: NaN, formatted: '-' });
 			return;
 		}
 
@@ -244,87 +200,84 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, ensureL
 			if (/[0-9]/.test(raw[i])) digitsBeforeCursor++;
 		}
 
-		// Parse: strip group separators, normalize decimal
-		let cleaned = raw;
-		if (info.groupSep) {
-			cleaned = cleaned.split(info.groupSep).join('');
-		}
-		cleaned = cleaned.replace(info.decimalSep, '.');
+		const locale = getLocale(dom);
+		const info = getSeparators(locale);
+		let workingStr = raw;
+		let cleaned = cleanNumericString(raw, info.groupSep, info.decimalSep);
+		let num = parseFloat(cleaned);
 
-		// Edge case: trailing decimal separator (user about to type decimals)
-		if (raw.endsWith(info.decimalSep) || raw.endsWith('.')) {
-			const beforeDecimal = cleaned.replace(/\.$/, '');
-			const num = parseFloat(beforeDecimal);
-			if (!isNaN(num)) {
-				this._setHiddenRaw(num);
-			}
+		if (isNaN(num)) {
+			this._setHiddenRaw('');
+			dispatch(dom, 'ln-number:input', { value: NaN, formatted: raw });
 			return;
 		}
 
-		// Edge case: trailing zeros after decimal (user still typing)
+		// Transformation (Non-Terminal): Apply data-ln-number-decimals truncation
+		const maxDecimalsAttr = dom.getAttribute('data-ln-number-decimals');
 		const decimalIndex = cleaned.indexOf('.');
-		if (decimalIndex !== -1) {
-			const afterDecimal = cleaned.slice(decimalIndex + 1);
-			if (afterDecimal.endsWith('0')) {
-				const num = parseFloat(cleaned);
-				if (!isNaN(num)) {
-					this._setHiddenRaw(num);
-				}
+		if (maxDecimalsAttr !== null && decimalIndex !== -1) {
+			const allowed = parseInt(maxDecimalsAttr, 10);
+			const afterDec = cleaned.slice(decimalIndex + 1);
+			if (allowed === 0) {
+				cleaned = cleaned.slice(0, decimalIndex);
+				workingStr = workingStr.split(info.decimalSep)[0];
+				num = parseFloat(cleaned);
+				this._setDisplayRaw(workingStr);
+			} else if (afterDec.length > allowed) {
+				cleaned = cleaned.slice(0, decimalIndex + 1 + allowed);
+				const parts = workingStr.split(info.decimalSep);
+				workingStr = parts[0] + info.decimalSep + parts[1].slice(0, allowed);
+				num = parseFloat(cleaned);
+				this._setDisplayRaw(workingStr);
+			}
+		}
+
+		// Max Clamping: Evaluated BEFORE trailing separator / zero branches
+		const maxAttr = dom.getAttribute('data-ln-number-max');
+		if (maxAttr !== null && num > parseFloat(maxAttr)) {
+			const maxVal = parseFloat(maxAttr);
+			const formatted = formatNumber(maxVal, locale, { maxDecimals: maxDecimalsAttr });
+			this._setDisplayRaw(formatted);
+			this._setHiddenRaw(maxVal);
+			dom.setSelectionRange(formatted.length, formatted.length);
+			dispatch(dom, 'ln-number:input', { value: maxVal, formatted: formatted });
+			return;
+		}
+
+		// Trailing Decimal Separator (user is about to type decimals)
+		if (workingStr.endsWith(info.decimalSep) || (info.decimalSep !== '.' && workingStr.endsWith('.'))) {
+			this._setHiddenRaw(num);
+			dispatch(dom, 'ln-number:input', { value: num, formatted: workingStr });
+			return;
+		}
+
+		// Trailing Zeros after Decimal (user is still typing fractional part)
+		const curDecIdx = cleaned.indexOf('.');
+		if (curDecIdx !== -1) {
+			const afterDec = cleaned.slice(curDecIdx + 1);
+			if (afterDec.endsWith('0')) {
+				this._setHiddenRaw(num);
+				dispatch(dom, 'ln-number:input', { value: num, formatted: workingStr });
 				return;
 			}
 		}
 
-		// Enforce decimal limit
-		const maxDecimals = dom.getAttribute('data-ln-number-decimals');
-		if (maxDecimals !== null && decimalIndex !== -1) {
-			const allowed = parseInt(maxDecimals, 10);
-			const afterDec = cleaned.slice(decimalIndex + 1);
-			if (afterDec.length > allowed) {
-				cleaned = cleaned.slice(0, decimalIndex + 1 + allowed);
-			}
-		}
-
-		const num = parseFloat(cleaned);
-		if (isNaN(num)) return;
-
-		// Enforce min/max
-		const minAttr = dom.getAttribute('data-ln-number-min');
-		const maxAttr = dom.getAttribute('data-ln-number-max');
-		if (minAttr !== null && num < parseFloat(minAttr)) return;
-		if (maxAttr !== null && num > parseFloat(maxAttr)) return;
-
-		// Format
+		// Standard Formatting
 		let formatted;
-		if (maxDecimals !== null) {
-			formatted = _formatNum(getLocale(dom), num, maxDecimals);
+		if (maxDecimalsAttr !== null) {
+			formatted = formatNumber(num, locale, { maxDecimals: maxDecimalsAttr });
 		} else {
-			// Preserve the user's decimal places
-			const userDecimals = decimalIndex !== -1 ? cleaned.slice(decimalIndex + 1).length : 0;
-			if (userDecimals > 0) {
-				const key = getLocale(dom) + '|u' + userDecimals;
-				if (!_formatters[key]) {
-					_formatters[key] = new Intl.NumberFormat(getLocale(dom), { useGrouping: true, minimumFractionDigits: userDecimals, maximumFractionDigits: userDecimals });
-				}
-				formatted = _formatters[key].format(num);
-			} else {
-				formatted = info.fmt.format(num);
-			}
+			const userDecimals = curDecIdx !== -1 ? cleaned.slice(curDecIdx + 1).length : 0;
+			formatted = formatNumber(num, locale, { userDecimals });
 		}
 
 		this._setDisplayRaw(formatted);
 
 		// Restore cursor position
-		let targetDigits = digitsBeforeCursor;
-		let newPos = 0;
-		for (let i = 0; i < formatted.length && targetDigits > 0; i++) {
-			newPos = i + 1;
-			if (/[0-9]/.test(formatted[i])) targetDigits--;
-		}
-		// If we didn't consume all digits, put cursor at end
-		if (targetDigits > 0) newPos = formatted.length;
+		const newPos = calculateCursorPosition(formatted, digitsBeforeCursor);
 		dom.setSelectionRange(newPos, newPos);
 
-		// Update hidden input (bypass our setter to avoid feedback loop)
+		// Update hidden input
 		this._setHiddenRaw(num);
 
 		dispatch(dom, 'ln-number:input', { value: num, formatted: formatted });
@@ -348,7 +301,8 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, ensureL
 		if (this.isTextElement) {
 			this._formatTextContent();
 		} else {
-			this._setDisplayRaw(_formatNum(getLocale(this.dom), num, this.dom.getAttribute('data-ln-number-decimals')));
+			const maxDecimals = this.dom.getAttribute('data-ln-number-decimals');
+			this._setDisplayRaw(formatNumber(num, getLocale(this.dom), { maxDecimals }));
 		}
 	};
 
@@ -382,7 +336,8 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, ensureL
 				return;
 			}
 			this._setHiddenRaw(num);
-			this._setDisplayRaw(_formatNum(getLocale(this.dom), num, this.dom.getAttribute('data-ln-number-decimals')));
+			const maxDecimals = this.dom.getAttribute('data-ln-number-decimals');
+			this._setDisplayRaw(formatNumber(num, getLocale(this.dom), { maxDecimals }));
 			this.dom.dispatchEvent(new Event('input', { bubbles: true }));
 		}
 	});
@@ -403,6 +358,7 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, ensureL
 		}
 		if (!this.isTextElement) {
 			this.dom.removeEventListener('input', this._onInput);
+			this.dom.removeEventListener('keydown', this._onKeyDown);
 			this.dom.removeEventListener('paste', this._onPaste);
 			if (this._hidden) {
 				this.dom.name = this._hidden.name;

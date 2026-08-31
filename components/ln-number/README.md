@@ -34,6 +34,7 @@ To load `ln-number` as a standalone component, include its compiled IIFE under t
 ### Source Files
 
 * **Active Development Source**: [components/ln-number/src/ln-number.js](file:///c:/laragon/www/ln-ashlar/components/ln-number/src/ln-number.js) (source of truth)
+* **Pure Mathematical & Formatting Model**: [components/ln-number/src/number-model.js](file:///c:/laragon/www/ln-ashlar/components/ln-number/src/number-model.js)
 * **Compiled Standalone**: [components/ln-number/ln-number.js](file:///c:/laragon/www/ln-ashlar/components/ln-number/ln-number.js)
 
 ## Attributes
@@ -130,15 +131,42 @@ display update.
 
 ## 🔧 Internals
 
-Source: `components/ln-number/ln-number.js`. Each `[data-ln-number]` gets a `_component` instance at `element.lnNumber`, holding `dom` (visible input), `_hidden` (hidden input), and bound `_onInput`/`_onPaste` handlers.
+Source: `components/ln-number/src/ln-number.js` and `components/ln-number/src/number-model.js`. Each `[data-ln-number]` gets a `_component` instance at `element.lnNumber`, holding `dom` (visible input), `_hidden` (hidden input), and bound `_onInput`/`_onKeyDown`/`_onPaste` handlers.
 
 ### Formatter cache
 
-One `Intl.NumberFormat` instance per unique locale, cached at module level (`_formatters[locale]`), storing the formatter plus `groupSep`/`decimalSep` extracted once via `formatToParts()`. Separate cache keys (`locale + '|d' + max`, `locale + '|u' + n`) exist for decimal-fixed and user-decimal-preserving formatters. Reused across all instances sharing a locale — `Intl.NumberFormat` construction is the expensive part, not the format call.
+One `Intl.NumberFormat` instance per unique locale, cached at module level (`_formatterCache[locale]`), storing the formatter plus `groupSep`/`decimalSep` extracted once via `formatToParts()`. Supports standard spaces, commas, dots, and Unicode narrow no-break space (`\u202F` for `fr-FR`). Separate cache keys exist for decimal-capped and user-decimal-preserving formatters.
 
 ### Input flow
 
-On every `input` event: empty value clears the hidden input and dispatches; a bare `-` (user starting a negative number) is left alone. Otherwise: cursor position is saved as a digit-count left of `selectionStart` (not a raw index — formatting inserts/removes separators, so digit-count is the only stable anchor). The typed string is parsed (strip `groupSep`, swap `decimalSep` for `.`); a trailing decimal point or trailing zeros after the decimal point short-circuit to a hidden-only update (so `"12."` doesn't get reformatted mid-type and eat the point the user just typed). Otherwise the decimal limit is enforced (truncated, not rounded), the value is formatted via `Intl.NumberFormat`, `dom.value` is set, the cursor is restored by walking the formatted string until the saved digit-count is reached, and `hidden.value` is set to the raw numeric string. `ln-number:input` dispatches last.
+```mermaid
+flowchart TD
+    A["Read dom.value as raw"] --> B{"raw === '' or raw === '-'"}
+    B -->|Yes| C["Set _hidden = '', dispatch ln-number:input, Return"]
+    B -->|No| D["Extract locale separators and clean numeric string"]
+    D --> E{"isNaN(num)"}
+    E -->|Yes| F["Set _hidden = '', dispatch ln-number:input, Return"]
+    E -->|No| G["Transformation: Apply data-ln-number-decimals cap"]
+    G --> H{"maxAttr !== null && num > max"}
+    H -->|Yes| I["Clamp num = max, Format max, Set _hidden = max, Set dom.value = max, Dispatch ln-number:input, Return"]
+    H -->|No| J{"workingStr ends with decimalSep"}
+    J -->|Yes| K["Set _hidden = num, Keep workingStr, Dispatch ln-number:input, Return"]
+    J -->|No| L{"afterDecimal ends with '0'"}
+    L -->|Yes| M["Set _hidden = num, Keep workingStr, Dispatch ln-number:input, Return"]
+    L -->|No| N["Standard Format: Format num, Restore cursor, Set _hidden = num, Set dom.value = formatted, Dispatch ln-number:input"]
+```
+
+On every `input` event:
+1. **Empty / Minus Sign:** Clears `_hidden` and dispatches `ln-number:input`.
+2. **Parsing & Cleaning:** Numeric strings are cleaned of separators and parsed according to active locale rules.
+3. **Decimal Cap Transformation:** `data-ln-number-decimals` truncates excessive decimal digits *before* trailing zero/separator checks.
+4. **Max Clamping:** Evaluated *before* trailing separators/zeros to strictly prevent typing values beyond `max`.
+5. **Trailing Decimals & Zeros:** Preserves input text during active progressive decimal typing, synchronizes `_hidden`, and dispatches `ln-number:input`.
+6. **Standard Formatting:** `Intl.NumberFormat` formats the display value, restores cursor position via digit-count index calculation, synchronizes `_hidden`, and dispatches `ln-number:input`.
+
+### Backspace Separator Interception
+
+When the cursor is positioned directly after a thousand separator (e.g. `1,|234`), pressing Backspace is intercepted by `_onKeyDown` (guarded against active range selections). It deletes the preceding digit directly and dispatches a native `input` event, keeping parent form validations (`ln-validate`, `ln-autosave`) synchronized and preventing infinite cursor traps.
 
 ### Hidden input value interceptor
 

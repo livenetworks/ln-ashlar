@@ -304,7 +304,7 @@ input[data-ln-number] {
 		const input = document.getElementById(pair.inputId);
 		const output = document.getElementById(pair.outputId);
 		if (!input || !output) return;
-		input.addEventListener('input', function () { writeNumberRaw(input, output); });
+		input.addEventListener('ln-number:input', function () { writeNumberRaw(input, output); });
 	});
 
 	// ─── 2 — Date formatting raw outputs ──────────────────────
