@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-	hashSortEncode,
-	hashSortDecode,
-	hashFilterEncode,
 	hashFilterDecode,
+	hashFilterEncode,
+	hashSortDecode,
+	hashSortEncode,
 	resolveHashNamespace
 } from '../components/ln-core/hash.js';
 
@@ -58,8 +58,8 @@ test('resolveHashNamespace resolves explicit and fallback namespaces', () => {
 	assert.equal(resolveHashNamespace(elTargetFallback, 'sort'), 'users-table-sort');
 
 	const elNoHash = {
-		hasAttribute: (attr) => false,
-		getAttribute: (attr) => null
+		hasAttribute: () => false,
+		getAttribute: () => null
 	};
 	assert.equal(resolveHashNamespace(elNoHash, 'sort'), null);
 });

@@ -102,7 +102,24 @@ This service module exposes no declarative HTML attributes directly on itself.
 | `holdInit` | `()` | `void` | Increments the global boot holds counter to block component initialization. |
 | `releaseInit` | `()` | `void` | Decrements the global boot holds counter, draining the boot queue when it reaches zero. |
 | `pendingCount` | `()` | `Number` | Returns the current active boot hold count. |
-| `queueBoot` | `(fn: Function)` | `void` | Queues a component boot function if holds are active, otherwise calls it via setTimeout. |
+| `calculateProgress` | `(rawValue: unknown, rawMax?: unknown, min?: Number)` | `Object` | Computes `{ value, min, max, clampedValue, percentage }` with numerical clamping. |
+| `parseDateInput` | `(raw: unknown)` | `Date\|null` | Parses ISO strings, Unix timestamps (seconds or ms), or Date objects into a valid `Date` or `null`. |
+| `formatDateToISO` | `(date: Date)` | `String` | Formats a Date object to standard `YYYY-MM-DD` string. |
+| `getSeparators` | `(locale?: String)` | `Object` | Extracts localized grouping and decimal separators (`{ groupSep, decimalSep, fmt }`). |
+| `cleanNumericString` | `(raw: String, groupSep: String, decimalSep: String)` | `String` | Normalizes localized user numeric input by stripping currency/whitespace and standardizing decimal separator to `.`. |
+| `parseNumber` | `(raw: unknown, locale?: String)` | `Number` | Parses localized numeric strings into a valid `Number` or `NaN`. |
+| `formatNumber` | `(num: Number, locale?: String, options?: Object)` | `String` | Formats a number with `Intl.NumberFormat` with cached formatters and decimal limits. |
+| `shouldIgnoreClick` | `(event: MouseEvent)` | `Boolean` | Returns true if click was with modifier keys (Ctrl/Meta/Shift/Alt) or non-primary mouse button (`button !== 0`). |
+| `isTargetDisabled` | `(element: HTMLElement)` | `Boolean` | Returns true if element or any ancestor is disabled, has `aria-disabled="true"`, or is inside `[inert]`. |
+| `isUsableTarget` | `(element: HTMLElement, action: String)` | `Boolean` | Returns true if element is connected, visible, enabled, and supports the requested action method. |
+| `isEditableTarget` | `(element: HTMLElement)` | `Boolean` | Returns true if element is an `<input>`, `<textarea>`, `<select>`, or `[contenteditable]` container. |
+| `ensureLocaleObserver` | `(callback: Function)` | `void` | Subscribes a callback to `MutationObserver` watching `document.documentElement` (`lang` / `dir` attribute changes). |
+| `detectValueType` | `(values: Iterable<any>)` | `'number'\|'string'` | Detects if all non-empty values in a collection are finite numbers, otherwise resolves to `'string'`. |
+| `compareValues` | `(a: any, b: any, type: String, locale?: String)` | `Number` | Performs type-aware null-safe comparison (-1, 0, 1) using numeric subtraction or localized `Intl.Collator`. |
+| `normalizeSearchTerm` | `(raw: unknown)` | `String` | Trims and lowercases search input. |
+| `tokenizeSearchQuery` | `(raw: unknown)` | `Array<String>` | Tokenizes search queries on whitespace for multi-term AND matching. |
+| `matchesSearchTokens` | `(text: String, tokens: Array<String>)` | `Boolean` | Evaluates case-insensitive AND matching of tokens across text content. |
+| `matchesFilterValues` | `(text: String, values: Array<String>)` | `Boolean` | Evaluates case-insensitive OR matching of active filter values. |
 
 ### Events API
 
@@ -114,14 +131,19 @@ This service module exposes no declarative HTML attributes directly on itself.
 
 ## 4. Sub-Module Export Summary
 
-`ln-core` re-exports infrastructure modules from sub-files:
+`ln-core` re-exports infrastructure modules and pure primitives from sub-files:
 
 - [`ln-reactive`](./ln-reactive.md) — `reactiveState`, `deepReactive`, `createBatcher`
 - [`window-cache`](./window-cache.md) — `createWindowCache`
 - [`ln-persist`](./ln-persist.md) — `persistGet`, `persistSet`, `persistRemove`, `persistClear`
-- [`ln-hash`](./ln-hash.md) — `hashParse`, `hashGet`, `hashSet`, `hashLinkClick`
+- [`ln-hash`](./ln-hash.md) — `hashParse`, `hashGet`, `hashSet`, `hashLinkClick`, `hashSortEncode`, `hashSortDecode`, `hashFilterEncode`, `hashFilterDecode`, `resolveHashNamespace`
 - [`positioning`](./positioning.md) — `computePlacement`, `measureHidden`
 - [`ln-crypto`](./ln-crypto.md) — `setCryptoKey`, `getCryptoKey`, `encryptData`, `decryptData`
+- **`date.js`** — `parseDateInput`, `formatDateToISO`
+- **`number.js`** — `getSeparators`, `cleanNumericString`, `parseNumber`, `formatNumber`
+- **`progress.js`** — `calculateProgress`
+- **`matching.js`** — `normalizeSearchTerm`, `tokenizeSearchQuery`, `parseSearchFields`, `matchesSearchTokens`, `collapseSearchParts`, `matchesFilterValues`
+- **`compare.js`** — `detectValueType`, `compareValues`
 
 ---
 

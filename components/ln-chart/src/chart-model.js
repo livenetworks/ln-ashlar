@@ -14,6 +14,11 @@ function clampPadding(padding, width, height) {
 	return Math.min(parsed, Math.min(width, height) / 2);
 }
 
+/**
+ * Parses SVG viewBox string into coordinates and dimensions.
+ * @param {string} value
+ * @returns {{ x: number, y: number, width: number, height: number }|null}
+ */
 export function parseChartViewBox(value) {
 	if (typeof value !== 'string') return null;
 	const parts = value.trim().split(/[\s,]+/).map(Number);
@@ -22,6 +27,28 @@ export function parseChartViewBox(value) {
 	return { x: parts[0], y: parts[1], width: parts[2], height: parts[3] };
 }
 
+/**
+ * Parses chart sort string (e.g. "field:desc" or "field:asc").
+ * @param {string} raw
+ * @returns {{ field: string, direction: 'asc' | 'desc' }|null}
+ */
+export function parseChartSort(raw) {
+	if (!raw || typeof raw !== 'string') return null;
+	const parts = raw.split(':');
+	const field = parts[0].trim();
+	if (!field) return null;
+	return {
+		field,
+		direction: parts[1] && parts[1].trim().toLowerCase() === 'desc' ? 'desc' : 'asc'
+	};
+}
+
+/**
+ * Builds points, geometries, and domain metadata for chart rendering.
+ * @param {Array<object>} records
+ * @param {object} options
+ * @returns {object}
+ */
 export function buildChartModel(records, options) {
 	options = options || {};
 	const viewBox = options.viewBox || { x: 0, y: 0, width: 1000, height: 320 };
@@ -58,44 +85,60 @@ export function buildChartModel(records, options) {
 		};
 	}
 
-	const rawValues = values.map(item => item.value);
-	const min = Math.min(...rawValues);
-	const max = Math.max(...rawValues);
-	let domainMin = includeZero ? Math.min(0, min) : min;
-	let domainMax = includeZero ? Math.max(0, max) : max;
+	let min = values[0].value;
+	let max = values[0].value;
+	for (let i = 1; i < values.length; i++) {
+		if (values[i].value < min) min = values[i].value;
+		if (values[i].value > max) max = values[i].value;
+	}
 
+	let domainMin = min;
+	let domainMax = max;
+	if (includeZero) {
+		domainMin = Math.min(0, domainMin);
+		domainMax = Math.max(0, domainMax);
+	}
 	if (domainMin === domainMax) {
-		if (domainMin === 0) {
+		if (domainMax === 0) {
 			domainMax = 1;
+		} else if (domainMax > 0) {
+			domainMin = 0;
 		} else {
-			const delta = Math.max(Math.abs(domainMin) * 0.1, 1);
-			domainMin -= delta;
-			domainMax += delta;
+			domainMax = 0;
 		}
 	}
 
-	const left = viewBox.x + padding;
-	const top = viewBox.y + padding;
-	const plotWidth = Math.max(0, viewBox.width - padding * 2);
-	const plotHeight = Math.max(0, viewBox.height - padding * 2);
-	const xStep = values.length > 1 ? plotWidth / (values.length - 1) : 0;
-	const range = domainMax - domainMin;
-	const scaleY = value => top + ((domainMax - value) / range) * plotHeight;
+	const usableWidth = Math.max(1, viewBox.width - padding * 2);
+	const usableHeight = Math.max(1, viewBox.height - padding * 2);
+	const valueRange = domainMax - domainMin;
+	const baselineY = viewBox.y + viewBox.height - padding - ((0 - domainMin) / valueRange) * usableHeight;
 
-	const points = values.map((item, index) => ({
-		...item,
-		x: values.length === 1 ? left + plotWidth / 2 : left + index * xStep,
-		y: scaleY(item.value)
-	}));
+	const points = [];
+	for (let i = 0; i < values.length; i++) {
+		const item = values[i];
+		const progress = values.length === 1 ? 0.5 : i / (values.length - 1);
+		const x = viewBox.x + padding + progress * usableWidth;
+		const y = viewBox.y + viewBox.height - padding - ((item.value - domainMin) / valueRange) * usableHeight;
+		points.push({
+			record: item.record,
+			sourceIndex: item.sourceIndex,
+			label: item.label,
+			value: item.value,
+			x,
+			y,
+			pointString: coordinate(x) + ',' + coordinate(y)
+		});
+	}
 
-	const baselineValue = domainMin <= 0 && domainMax >= 0 ? 0 : domainMin;
-	const baselineY = scaleY(baselineValue);
-	const linePoints = points.map(point => coordinate(point.x) + ',' + coordinate(point.y)).join(' ');
-	const areaPoints = [
-		coordinate(points[0].x) + ',' + coordinate(baselineY),
-		linePoints,
-		coordinate(points[points.length - 1].x) + ',' + coordinate(baselineY)
-	].join(' ');
+	const linePoints = points.map(point => point.pointString).join(' ');
+	let areaPoints = '';
+	if (points.length > 0) {
+		const first = points[0];
+		const last = points[points.length - 1];
+		const startBaseline = coordinate(first.x) + ',' + coordinate(baselineY);
+		const endBaseline = coordinate(last.x) + ',' + coordinate(baselineY);
+		areaPoints = startBaseline + ' ' + linePoints + ' ' + endBaseline;
+	}
 
 	return {
 		points,

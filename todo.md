@@ -23,13 +23,19 @@
 
 ---
 
-### 🔄 Modernization of Existing Models (DOM Shell Alignment)
-- [ ] **`ln-number`** *(Model exists, DOM shell needs modernization)*
-  - **Files:** `components/ln-number/src/number-model.js` + `components/ln-number/src/ln-number.js`
-  - **Scope:** Clean up 395-line DOM shell: remove redundant registration boilerplate, decouple text vs input paths, modernize global locale subscription.
-- [ ] **`ln-chart`** *(Model exists, DOM shell needs modernization)*
-  - **Files:** `components/ln-chart/src/chart-model.js` + `components/ln-chart/src/ln-chart.js`
-  - **Scope:** Move leftover helpers (`parseSort`, `formatNumber`) from `ln-chart.js` into `chart-model.js` / `ln-core`, add `onAttributeChange` observer for dynamic chart attributes.
+### 🔄 Modernization of Existing Models & Input Engines
+- [x] **`ln-date`**
+  - **Model:** `components/ln-date/src/date-model.js`
+  - **Tests:** `tests/ln-date.test.js`
+  - **Domain Logic:** Custom token parsing (`yyyy/MM/dd/HH/mm`), keyword format options (`short`, `medium`, `long datetime`), typed input parsing (`DD.MM.YYYY`, `MM/DD/YYYY`), ISO date conversion (`ln-core/date.js`).
+- [x] **`ln-number`**
+  - **Model:** `components/ln-number/src/number-model.js`
+  - **Tests:** `tests/ln-number.test.js`
+  - **Domain Logic:** Group/decimal separator extraction from `Intl.NumberFormat`, locale numeric cleaning, parsing, formatting, and cursor position tracking.
+- [x] **`ln-chart`**
+  - **Model:** `components/ln-chart/src/chart-model.js`
+  - **Tests:** `tests/ln-chart.test.js`
+  - **Domain Logic:** SVG viewBox parsing, sort descriptor parsing (`parseChartSort`), SVG line/area geometry point mapping, zero-baseline domain scaling.
 
 ---
 
@@ -77,7 +83,7 @@
 ---
 
 ### 🚀 Priority 3: Formatting & Text Utilities
-- [x] **`ln-date` / `ln-time`**
+- [x] **`ln-time`**
   - **Model:** `components/ln-time/src/time-model.js`
   - **Tests:** `tests/ln-time.test.js`
   - **Domain Logic:** Unix seconds/ms/ISO date parsing, relative time duration and unit calculation, formatting options resolution.

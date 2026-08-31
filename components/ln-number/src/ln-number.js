@@ -1,5 +1,5 @@
-import { dispatch, getLocale, registerComponent, interceptValueProperty, ensureLocaleObserver } from '../../ln-core';
-import { getSeparators, cleanNumericString, parseNumber, formatNumber, calculateCursorPosition } from './number-model';
+import { cleanNumericString, dispatch, ensureLocaleObserver, formatNumber, getLocale, getSeparators, interceptValueProperty, parseNumber, registerComponent } from '../../ln-core';
+import { calculateCursorPosition } from './number-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-number';

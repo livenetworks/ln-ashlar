@@ -9,16 +9,6 @@ export const ERROR_MAP = {
 };
 
 /**
- * Maps a declarative data-ln-validate-error key to the native ValidityState property name.
- * @param {string} errorKey
- * @returns {string|null}
- */
-export function mapErrorKeyToValidityProp(errorKey) {
-	if (!errorKey) return null;
-	return ERROR_MAP[errorKey] || null;
-}
-
-/**
  * Checks if a field is valid given its native validity state and custom errors count.
  * @param {{ valid?: boolean } | null | undefined} validityState
  * @param {number} [customErrorsCount=0]

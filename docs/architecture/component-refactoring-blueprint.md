@@ -62,23 +62,26 @@ function _maybeRemoveListener() {
 
 ---
 
-## 3. Candidate Components for Future Refactoring
+## 3. Completed & Future Architecture Allocations
 
-| Component | Current Weakness | Refactoring Goal |
+| Component | Architecture Category | Solution & Implementation |
 |---|---|---|
-| [`ln-toggle`](file:///c:/laragon/www/ln-ashlar/components/ln-toggle/src/ln-toggle.js) | Global `click` listener attached unconditionally on load | Move toggle logic to `toggle-model.js`, make `click` listener lazy. |
-| [`ln-tooltip`](file:///c:/laragon/www/ln-ashlar/components/ln-tooltip/src/ln-tooltip.js) | Hover/focus event bindings directly coupled to DOM | Extract positioning math & boundary calculations into `tooltip-model.js`. |
-| [`ln-tabs`](file:///c:/laragon/www/ln-ashlar/components/ln-tabs/src/ln-tabs.js) | Keyboard navigation logic mixed with DOM manipulation | Extract ARIA keyboard navigation & panel indexing into `tabs-model.js`. |
-| [`ln-search`](file:///c:/laragon/www/ln-ashlar/components/ln-search/src/ln-search.js) | Throttling & string matching tied to DOM inputs | Extract search matching, normalization & debounce logic into `search-model.js`. |
+| [`ln-key`](file:///c:/laragon/www/ln-ashlar/components/ln-key/src/ln-key.js) | Category A: Domain Model | `key-model.js` (pure shortcut parsing, key matching, action inference) |
+| [`ln-date`](file:///c:/laragon/www/ln-ashlar/components/ln-date/src/ln-date.js) | Category A: Domain Model | `date-model.js` (custom token parsing) + `ln-core/date.js` |
+| [`ln-number`](file:///c:/laragon/www/ln-ashlar/components/ln-number/src/ln-number.js) | Category A: Domain Model | `number-model.js` (cursor mapping) + `ln-core/number.js` |
+| [`ln-tabs`](file:///c:/laragon/www/ln-ashlar/components/ln-tabs/src/ln-tabs.js) | Category A: Domain Model | `tabs-model.js` (hash fragment & trigger/panel mapping) |
+| [`ln-search`](file:///c:/laragon/www/ln-ashlar/components/ln-search/src/ln-search.js) | Category B: Single-File | Consumes pure primitives from `ln-core/matching.js` |
+| [`ln-filter`](file:///c:/laragon/www/ln-ashlar/components/ln-filter/src/ln-filter.js) | Category B: Single-File | Consumes pure primitives from `ln-core/matching.js` |
+| [`ln-toggle`](file:///c:/laragon/www/ln-ashlar/components/ln-toggle/src/ln-toggle.js) | Category B: Behavioral Decorator | Direct DOM trigger consuming `ln-core` helpers (`shouldIgnoreClick`) |
 
 ---
 
 ## 4. Refactoring Step-by-Step Checklist
 
-When refactoring any existing component to this pattern:
+When authoring or refactoring components:
 
-- [ ] **Step 1:** Create `src/{component}-model.js` and extract pure logic functions.
-- [ ] **Step 2:** Write Node test suite `tests/{component}.test.js` targeting `*-model.js`.
-- [ ] **Step 3:** Update `src/{component}.js` to import model helpers and use `Set` instance tracking.
-- [ ] **Step 4:** Implement lazy event listener registration/teardown (`_ensureListener` / `_maybeRemoveListener`).
-- [ ] **Step 5:** Ensure full compatibility with `ln-core` `registerComponent` and `onAttributeChange`.
+- [x] **Step 1:** Assess algorithmic complexity: if domain-heavy, create `src/{component}-model.js`; if shared by 2+ components, lift to `ln-core/{submodule}.js`.
+- [x] **Step 2:** Write isolated Node test suite `tests/ln-{component}.test.js` targeting pure logic.
+- [x] **Step 3:** Update `src/ln-{component}.js` to delegate domain logic to pure imports.
+- [x] **Step 4:** For global keyboard/click interceptors, implement lazy listener registration/teardown.
+- [x] **Step 5:** Ensure full compatibility with `ln-core` `registerComponent` and `onAttributeChange`.

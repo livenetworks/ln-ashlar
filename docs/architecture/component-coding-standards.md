@@ -23,77 +23,81 @@ In `ln-ashlar`, the decision to extract a standalone `src/{component}-model.js` 
        │ + 100% Unit Tests    │      │ Consumes ln-core helpers    │
        │                      │      │ (shouldIgnoreClick,         │
        │ (ln-key, ln-number,  │      │  isTargetDisabled,          │
-       │  ln-chart, ln-search,│      │  isUsableTarget...)         │
-       │  ln-sort, ln-filter, │      │                             │
-       │  ln-validate,        │      │ (ln-confirm, ln-toggle,     │
-       │  ln-date, ln-table,  │      │  ln-accordion, ln-dropdown, │
-       │  ln-data-store)      │      │  ln-tooltip, ln-popover)    │
+       │  ln-chart, ln-tabs,  │      │  isUsableTarget,            │
+       │  ln-sortable,        │      │  isEditableTarget,          │
+       │  ln-validate,        │      │  matching, progress, date,  │
+       │  ln-date, ln-slug,   │      │  number...)                 │
+       │  ln-upload,          │      │                             │
+       │  ln-autosave,        │      │ (ln-search, ln-filter,      │
+       │  ln-data-store)      │      │  ln-confirm, ln-toggle,     │
+       │                      │      │  ln-accordion, ln-dropdown, │
+       │                      │      │  ln-tooltip, ln-popover)    │
        └──────────────────────┘      └─────────────────────────────┘
 ```
 
-### The Honest Model Boundary
+### The Honest Model Boundary & Definition of Done (DoD)
 * A **Model (`*-model.js`)** must be **deterministic, pure, and free of global dependencies**.
 * **Zero Globals & Zero Side-Effects:** No access to `window`, `document`, or `localStorage`. Functions take inputs and return outputs.
+* **No Speculative Code:** A function enters a model **only if the DOM shell or system already actively calls it** — never for hypothetical "might be needed" utilities.
+* **The 2-Consumer Lifting Rule:** If a pure helper is consumed by 2 or more distinct components (e.g. `calculateProgress`, `parseDateInput`, `formatNumber`, `matchesSearchTokens`, `matchesFilterValues`), it is lifted to `ln-core` sub-modules (`progress.js`, `date.js`, `number.js`, `matching.js`, `compare.js`) to guarantee **0 sibling cross-component imports**.
 * **Testing Value:** If a function merely wraps `a || b` or `Boolean(x)`, it does **not** belong in a separate model file. Model files exist to protect complex business and algorithmic logic against regressions.
 
 ---
 
 ## 2. Core Shared Primitives in `ln-core`
 
-General browser event predicates and DOM guards belong centrally in **`ln-core`** to eliminate duplication across components:
+General browser event predicates, DOM guards, and domain primitives belong centrally in **`ln-core`** to eliminate duplication across components:
 
 * **`shouldIgnoreClick(event)`**: Detects modifier keys (`Ctrl`, `Meta`, `Shift`, `Alt`) or non-primary mouse buttons (`button !== 0`).
 * **`isTargetDisabled(element)`**: Checks `.disabled`, `aria-disabled="true"`, or `[inert]` ancestors.
 * **`isUsableTarget(element, action)`**: Full predicate verifying connection, enablement, visibility (`isVisible`), and method support.
+* **`isEditableTarget(element)`**: Detects if the target is an editable input, textarea, select, or `[contenteditable]` container.
 
 ---
 
 ## 3. Two-Tier Component Structure (For Domain-Heavy Components)
 
-When a component meets the Pragmatic Model Principle (e.g. `ln-search`, `ln-filter`, `ln-sort`, `ln-validate`, `ln-key`), it is structured into two tiers:
+When a component meets the Pragmatic Model Principle (e.g. `ln-key`, `ln-validate`, `ln-date`, `ln-number`, `ln-chart`, `ln-tabs`, `ln-slug`), it is structured into two tiers:
 
 ```
 components/ln-{name}/
 ├── src/
-│   ├── {name}-model.js    <-- Pure domain logic & algorithms (Tested in tests/{name}.test.js)
+│   ├── {name}-model.js    <-- Pure domain logic & algorithms (Tested in tests/ln-{name}.test.js)
 │   └── ln-{name}.js       <-- DOM shell (registerComponent, MutationObserver, events)
 └── ln-{name}.js           <-- Compiled bundle
 ```
 
-### Example: Domain Model (`src/search-model.js`)
+### Example: Domain Model (`src/key-model.js`)
 ```javascript
 /**
- * Normalizes a raw query string.
- * @param {unknown} value
+ * Normalizes shortcut keys to canonical forms and sorts modifiers.
+ * @param {string} raw
  * @returns {string}
  */
-export function normalizeSearchTerm(value) {
-    return String(value || '').trim().toLowerCase();
+export function normalizeShortcut(raw) {
+    if (!raw || typeof raw !== 'string') return '';
+    const parts = raw.split('+').map(p => p.trim()).filter(Boolean);
+    if (!parts.length) return '';
+    // ... modifier sorting and key canonicalization ...
+    return parts.join('+');
 }
 
 /**
- * Splits query into search tokens for AND-based substring matching.
- * @param {string} term
- * @returns {string[]}
+ * Normalizes keyboard event to shortcut string descriptor.
+ * @param {KeyboardEvent} event
+ * @returns {string}
  */
-export function tokenizeSearchQuery(term) {
-    if (!term) return [];
-    return term.split(/\s+/).filter(Boolean);
-}
-
-/**
- * Evaluates whether text matches all search tokens.
- * @param {string} text
- * @param {string[]} tokens
- * @returns {boolean}
- */
-export function matchesSearchTokens(text, tokens) {
-    if (!tokens || tokens.length === 0) return true;
-    if (!text) return false;
-    for (let i = 0; i < tokens.length; i++) {
-        if (text.indexOf(tokens[i]) === -1) return false;
-    }
-    return true;
+export function eventToShortcut(event) {
+    if (!event) return '';
+    const key = canonicalKey(event.key);
+    if (!key || MODIFIER_ORDER.indexOf(key) !== -1) return '';
+    const parts = [];
+    if (event.ctrlKey) parts.push('Ctrl');
+    if (event.altKey) parts.push('Alt');
+    if (event.shiftKey) parts.push('Shift');
+    if (event.metaKey) parts.push('Meta');
+    parts.push(key);
+    return parts.join('+');
 }
 ```
 

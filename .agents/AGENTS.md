@@ -14,7 +14,9 @@
 - **Coordinators** (e.g., `ln-accordion`, custom project JS controllers): Listen to events bubbling from simple components and orchestrate state across components strictly via `setAttribute` or request events.
 - **Commands (Mutations)**: Coordinators MUST NOT call prototype mutation methods directly (`el.lnProfile.create()`). They ALWAYS dispatch request events (`ln-profile:request-create`).
 - **Queries (Reading State)**: Coordinators MAY read component state properties directly (`el.lnProfile.currentId`).
-- **Component Isolation**: Components NEVER import or reference sibling components. Communication is 100% event-driven via CustomEvents (`{ bubbles: true }`) or attribute bridging by coordinators.
+- **Component Isolation & Zero Sibling Imports**: Components NEVER import or reference sibling components. Communication is 100% event-driven via CustomEvents (`{ bubbles: true }`) or attribute bridging by coordinators.
+- **The 2-Consumer Lifting Rule**: If a pure helper/math algorithm is needed by 2+ components (e.g. `calculateProgress`, `parseDateInput`, `formatNumber`), it MUST be lifted into `ln-core` (`progress.js`, `date.js`, `number.js`, `matching.js`, `compare.js`) rather than cross-imported.
+- **No Speculative Code (DoD)**: Functions enter a model ONLY if the DOM shell or system already actively calls them. Uncalled or dead functions are strictly forbidden.
 
 ### C. Attribute Bridge Pattern & Observable Single Source of Truth
 - **All `data-ln-*` Attributes Are Observable**: Every state attribute is observed via `MutationObserver` registered at the core/component level. The attribute in the DOM is the **Single Source of Truth** at all times.

@@ -119,11 +119,6 @@ export function eventToShortcut(event) {
 	return parts.join('+');
 }
 
-export function shortcutMatches(shortcut, event) {
-	const normalized = normalizeShortcut(shortcut);
-	return normalized !== '' && normalized === eventToShortcut(event);
-}
-
 export function inferKeyAction(target) {
 	if (!target || !target.tagName) return null;
 

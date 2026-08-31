@@ -6,4 +6,6 @@ export { hashParse, hashGet, hashSet, hashLinkClick, resolveHashNamespace, hashS
 export { computePlacement, measureHidden } from './positioning.js';
 export { setCryptoKey, getCryptoKey, encryptData, decryptData } from './crypto.js';
 export { calculateProgress } from './progress.js';
+export { parseDateInput, formatDateToISO } from './date.js';
+export { getSeparators, cleanNumericString, parseNumber, formatNumber } from './number.js';
 export { normalizeSearchTerm, tokenizeSearchQuery, parseSearchFields, matchesSearchTokens, collapseSearchParts, matchesFilterValues } from './matching.js';

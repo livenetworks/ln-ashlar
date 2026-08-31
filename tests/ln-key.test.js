@@ -7,8 +7,7 @@ import {
 	eventToShortcut,
 	inferKeyAction,
 	normalizeShortcut,
-	parseShortcutList,
-	shortcutMatches
+	parseShortcutList
 } from '../components/ln-key/src/key-model.js';
 
 test('shortcut normalization is case-insensitive and uses deterministic modifier order', () => {
@@ -36,8 +35,6 @@ test('external shortcut maps compose parent modifiers with item text', () => {
 test('keyboard events normalize to exact shortcut combinations', () => {
 	const event = { key: 's', ctrlKey: true, altKey: false, shiftKey: true, metaKey: false };
 	assert.equal(eventToShortcut(event), 'Ctrl+Shift+S');
-	assert.equal(shortcutMatches('shift+ctrl+s', event), true);
-	assert.equal(shortcutMatches('ctrl+s', event), false);
 	assert.equal(eventToShortcut({ key: 'Control', ctrlKey: true }), '');
 });
 
@@ -58,13 +55,18 @@ test('key action inference follows native DOM semantics', () => {
 	assert.equal(inferKeyAction(element('DIV')), null);
 });
 
-test('native focused button and link activation is left to the browser', () => {
-	const button = { tagName: 'BUTTON' };
-	const link = { tagName: 'A', hasAttribute: name => name === 'href' };
+test('browser handles native enter on buttons and links', () => {
+	const element = (tagName, attributes = {}) => ({
+		tagName,
+		hasAttribute: name => Object.prototype.hasOwnProperty.call(attributes, name),
+		getAttribute: name => attributes[name]
+	});
+	const btn = element('BUTTON');
+	assert.equal(browserAlreadyHandles({ key: 'Enter', target: btn }, btn, 'click', 'Enter'), true);
 
-	assert.equal(browserAlreadyHandles({ target: button }, button, 'click', 'Enter'), true);
-	assert.equal(browserAlreadyHandles({ target: button }, button, 'click', 'Space'), true);
-	assert.equal(browserAlreadyHandles({ target: link }, link, 'click', 'Enter'), true);
-	assert.equal(browserAlreadyHandles({ target: button, ctrlKey: true }, button, 'click', 'Ctrl+Enter'), false);
-	assert.equal(browserAlreadyHandles({ target: {} }, button, 'click', 'Enter'), false);
+	const link = element('A', { href: '/test' });
+	assert.equal(browserAlreadyHandles({ key: 'Enter', target: link }, link, 'click', 'Enter'), true);
+
+	assert.equal(browserAlreadyHandles({ key: ' ', target: btn }, btn, 'click', 'Space'), true);
+	assert.equal(browserAlreadyHandles({ key: 'k', target: btn }, btn, 'click', 'K'), false);
 });

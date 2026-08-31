@@ -1,5 +1,5 @@
-import { ensureLocaleObserver, getLocale, getLocaleFallback, registerComponent } from '../../ln-core';
-import { calculateRelativeTime, parseDateInput, resolveDateFormatOptions } from './time-model.js';
+import { ensureLocaleObserver, getLocale, getLocaleFallback, parseDateInput, registerComponent } from '../../ln-core';
+import { calculateRelativeTime, resolveDateFormatOptions } from './time-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-time';

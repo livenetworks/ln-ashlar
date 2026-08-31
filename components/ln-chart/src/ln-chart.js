@@ -1,5 +1,5 @@
-import { cloneTemplateScoped, dispatch, fillTemplate, getLocale, registerComponent } from '../../ln-core';
-import { buildChartModel, parseChartViewBox } from './chart-model';
+import { cloneTemplateScoped, dispatch, fillTemplate, formatNumber, getLocale, registerComponent } from '../../ln-core';
+import { buildChartModel, parseChartSort, parseChartViewBox } from './chart-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-chart';
@@ -7,26 +7,6 @@ import { buildChartModel, parseChartViewBox } from './chart-model';
 	const DEFAULT_VIEW_BOX = { x: 0, y: 0, width: 1000, height: 320 };
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
-
-	function parseSort(raw) {
-		if (!raw) return null;
-		const parts = raw.split(':');
-		const field = parts[0].trim();
-		if (!field) return null;
-		return {
-			field,
-			direction: parts[1] && parts[1].trim().toLowerCase() === 'desc' ? 'desc' : 'asc'
-		};
-	}
-
-	function formatNumber(value, dom) {
-		if (value === null || value === undefined || !Number.isFinite(value)) return '';
-		try {
-			return new Intl.NumberFormat(getLocale(dom)).format(value);
-		} catch (_) {
-			return String(value);
-		}
-	}
 
 	function setText(element, value) {
 		if (element) element.textContent = value;
@@ -102,11 +82,12 @@ import { buildChartModel, parseChartViewBox } from './chart-model';
 		const prototype = cloneTemplateScoped(this.dom, templateName, 'ln-chart');
 		if (!prototype) return;
 
+		const locale = getLocale(this.dom);
 		for (const point of model.points) {
 			const clone = prototype.cloneNode(true);
 			fillTemplate(clone, {
 				label: point.label,
-				value: formatNumber(point.value, this.dom)
+				value: formatNumber(point.value, locale)
 			});
 			this.labels.appendChild(clone);
 		}
@@ -129,9 +110,11 @@ import { buildChartModel, parseChartViewBox } from './chart-model';
 		const isEmpty = model.count === 0;
 		this.dom.classList.toggle('ln-chart--empty', isEmpty);
 		if (this.empty) this.empty.toggleAttribute('hidden', !isEmpty);
-		setText(this.minimum, formatNumber(model.min, this.dom));
-		setText(this.maximum, formatNumber(model.max, this.dom));
-		setText(this.count, formatNumber(model.count, this.dom));
+
+		const locale = getLocale(this.dom);
+		setText(this.minimum, formatNumber(model.min, locale));
+		setText(this.maximum, formatNumber(model.max, locale));
+		setText(this.count, formatNumber(model.count, locale));
 		this._renderLabels(model);
 
 		dispatch(this.dom, 'ln-chart:rendered', {
@@ -147,7 +130,7 @@ import { buildChartModel, parseChartViewBox } from './chart-model';
 		dispatch(this.dom, 'ln-chart:request-data', {
 			chart: this.name,
 			source: this.source,
-			sort: parseSort(this.dom.getAttribute('data-ln-chart-sort')),
+			sort: parseChartSort(this.dom.getAttribute('data-ln-chart-sort')),
 			filters: {},
 			search: ''
 		});

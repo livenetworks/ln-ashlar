@@ -42,8 +42,12 @@
   Coordinators **MUST NOT** call prototype mutation methods directly (e.g. `el.lnProfile.create()`). They **ALWAYS** dispatch request events (e.g. `ln-profile:request-create`).
 * **Queries (Reading State):**
   Coordinators **MAY** read component state properties directly (e.g. `el.lnProfile.currentId`).
-* **Component Isolation:**
+* **Component Isolation & Zero Sibling Imports:**
   Components **NEVER** import or reference sibling components. Communication is 100% event-driven via CustomEvents (`{ bubbles: true }`) or attribute bridging by coordinators.
+* **The 2-Consumer Lifting Rule:**
+  If a pure algorithm, parsing logic, or math formula is needed by 2 or more distinct components (e.g. `calculateProgress`, `parseDateInput`, `formatNumber`, `matchesSearchTokens`), it **MUST** be lifted centrally into `ln-core` sub-modules (`progress.js`, `date.js`, `number.js`, `matching.js`, `compare.js`) rather than cross-imported between components.
+* **No Speculative Code (Definition of Done):**
+  Functions enter a model **only if the DOM shell or system already actively calls them** — never for hypothetical "might be needed" utilities. Uncalled or dead functions are strictly forbidden.
 
 ---
 

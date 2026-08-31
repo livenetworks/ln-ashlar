@@ -1,32 +1,4 @@
 /**
- * Parses raw input (Unix seconds, milliseconds, or ISO string) into a Date object.
- * @param {unknown} raw
- * @returns {Date|null}
- */
-export function parseDateInput(raw) {
-	if (raw === null || raw === undefined || raw === '') return null;
-
-	if (raw instanceof Date) {
-		return isNaN(raw.getTime()) ? null : raw;
-	}
-
-	const num = Number(raw);
-	if (!isNaN(num) && num > 0) {
-		// If timestamp is in seconds (< 10^11), convert to ms
-		const ms = num < 1e11 ? num * 1000 : num;
-		const d = new Date(ms);
-		return isNaN(d.getTime()) ? null : d;
-	}
-
-	if (typeof raw === 'string') {
-		const d = new Date(raw);
-		return isNaN(d.getTime()) ? null : d;
-	}
-
-	return null;
-}
-
-/**
  * Calculates relative time difference and optimal unit.
  * @param {Date} date Target date
  * @param {Date|number} [now=Date.now()] Reference date

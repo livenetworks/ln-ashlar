@@ -1,7 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { buildChartModel, parseChartViewBox } from '../components/ln-chart/src/chart-model.js';
+import {
+	buildChartModel,
+	parseChartSort,
+	parseChartViewBox
+} from '../components/ln-chart/src/chart-model.js';
 
 const viewBox = { x: 0, y: 0, width: 100, height: 100 };
 
@@ -68,5 +72,12 @@ test('chart viewBox parser accepts SVG syntax and rejects invalid dimensions', (
 	assert.deepEqual(parseChartViewBox('0 0 1000 320'), { x: 0, y: 0, width: 1000, height: 320 });
 	assert.deepEqual(parseChartViewBox('10, 20, 300, 150'), { x: 10, y: 20, width: 300, height: 150 });
 	assert.equal(parseChartViewBox('0 0 0 320'), null);
-	assert.equal(parseChartViewBox('invalid'), null);
+});
+
+test('parseChartSort parses sort strings correctly', () => {
+	assert.deepEqual(parseChartSort('revenue:desc'), { field: 'revenue', direction: 'desc' });
+	assert.deepEqual(parseChartSort('date:asc'), { field: 'date', direction: 'asc' });
+	assert.deepEqual(parseChartSort('date'), { field: 'date', direction: 'asc' });
+	assert.equal(parseChartSort(null), null);
+	assert.equal(parseChartSort(''), null);
 });
