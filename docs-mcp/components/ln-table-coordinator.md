@@ -106,12 +106,12 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
                 <tr>
                     <td data-label="Name">Ana Petrova</td>
                     <td data-label="Department">Engineering</td>
-                    <td data-label="Status"><span class="pass">Active</span></td>
+                    <td data-label="Status"><span class="badge success">Active</span></td>
                 </tr>
                 <tr>
                     <td data-label="Name">Marko Nikolov</td>
                     <td data-label="Department">Design</td>
-                    <td data-label="Status"><span class="warn">On Leave</span></td>
+                    <td data-label="Status"><span class="badge warning">On Leave</span></td>
                 </tr>
             </tbody>
         </table>

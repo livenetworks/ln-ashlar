@@ -26,7 +26,7 @@ File: `theme/config/mixins/_table.scss`. Applied: `theme/components/_table.scss`
     <tbody>
         <tr>
             <td>Marko</td>
-            <td><span class="pass">OK</span></td>
+            <td><span class="badge success">OK</span></td>
             <td class="numeric">95</td>
         </tr>
         <tr class="section-header">
@@ -77,19 +77,20 @@ These describe the **role** of a cell or row — acceptable in HTML:
 
 ---
 
-## Status classes
+## Status badges
 
-Inline status indicators — apply to a `<span>` inside `<td>`:
+Inline status indicators — apply `.badge` with tone modifiers inside `<td>`:
 
 | Class | Color |
 |-------|-------|
-| `.pass` | Green (`--color-success`) |
-| `.fail` | Red (`--color-error`) |
-| `.warn` | Yellow (`--color-warning`) |
+| `.badge.success` | Green (`--color-success`) |
+| `.badge.error` | Red (`--color-error`) |
+| `.badge.warning` | Amber (`--color-warning`) |
 
 ```html
-<td><span class="pass">Active</span></td>
-<td><span class="fail">Blocked</span></td>
+<td><span class="badge success">Active</span></td>
+<td><span class="badge error">Blocked</span></td>
+<td><span class="badge warning">On Leave</span></td>
 ```
 
 ---

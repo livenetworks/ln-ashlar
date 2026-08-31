@@ -113,11 +113,6 @@
 	padding-top: var(--padding-y);
 	background: var(--color-accent);
 	color: var(--color-accent-fg);
-
-	&::before {
-		width: 2rem;
-		height: 2rem;
-	}
 }
 
 // The icon variant list — 4 authored icons, CSS shows the one matching the

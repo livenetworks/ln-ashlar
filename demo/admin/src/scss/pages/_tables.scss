@@ -5,15 +5,6 @@
 // as project-level styles. Real projects should use semantic selectors
 // instead of these classes.
 
-// Status badges — thin wrapper around @include badge + status cascade.
-.pass,
-.fail,
-.warn { @include badge; }
-
-.pass { --color-primary: var(--color-success); }
-.fail { --color-primary: var(--color-error); }
-.warn { --color-primary: var(--color-warning); }
-
 // Table container
 .table-container { @include overflow-x-auto; }
 

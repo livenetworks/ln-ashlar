@@ -22,10 +22,10 @@
 
 // Type → tone. The status→tone map lives here (one place): warn maps to the
 // warning family. SSR authors the class; the dynamic path fills it verbatim.
-[data-ln-toast] > li.success { @include semantic-color(success); }
-[data-ln-toast] > li.error   { @include semantic-color(error); }
-[data-ln-toast] > li.warn    { @include semantic-color(warning); }
-[data-ln-toast] > li.info    { @include semantic-color(info); }
+[data-ln-toast] > li.success             { @include semantic-color(success); }
+[data-ln-toast] > li.error               { @include semantic-color(error); }
+[data-ln-toast] > li:is(.warn, .warning) { @include semantic-color(warning); }
+[data-ln-toast] > li.info                { @include semantic-color(info); }
 
 [data-ln-toast] .icon {
 	@include toast-icon;
