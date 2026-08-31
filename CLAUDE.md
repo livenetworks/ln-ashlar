@@ -1,5 +1,35 @@
 # CLAUDE.md — ln-ashlar Project (AI Core Rules)
 
+## Rule Zero
+
+**Read the source before you write. Never invent. Never assume — ask.**
+
+This holds for every task, including the ones that look trivial.
+No rule below this line creates an exemption from it.
+
+### What Rule Zero means
+
+**Read the source before you write.** Markup, attributes, events, mixins,
+tokens, method names — query the live source every time, including when you
+are confident and when the name "obviously" follows the convention.
+Order: doctrine → router → contract → grep. Never from memory. Never from a
+skill file's example code. Before claiming that a behavior, method or event
+exists, run a cross-component `grep` first: **claim → grep → propose**,
+never claim → propose → discover-too-late.
+
+**Never invent.** If it is not in the source, it does not exist. Do not close
+the gap with a plausible name, a "safe default", or defensive logic nobody
+asked for. Report the gap.
+
+**Never assume — ask.** Two stop conditions, both binding:
+- *Unclear* — more than one valid reading, or more than one valid approach.
+- *New* — no precedent in the codebase for this pattern or area.
+  Novelty is a stop condition, not a licence to improvise.
+
+Findings are reported, never silently solved. The user owns the decision.
+
+---
+
 ## Working Mode
 
 When I share plans, specs, or ask architectural questions — DON'T immediately execute. Instead:
@@ -9,7 +39,7 @@ When I share plans, specs, or ask architectural questions — DON'T immediately 
 4. **Ask before building** — if the request is ambiguous or has multiple valid approaches, discuss first.
 5. **Proactive feedback** — bring up missing states, edge cases, or contradictions with other specs.
 
-This applies to architecture discussions, spec reviews, and planning. For trivial implementation tasks ("create this file", "fix this bug"), execute directly.
+This applies to architecture discussions, spec reviews, and planning. For trivial implementation tasks ("create this file", "fix this bug"), execute directly. **This scopes the discussion duty, not Rule Zero** — trivial tasks still get read-first, and still never get invented names.
 
 > 📜 **Engineering Doctrines & Standards:**  
 > Refer to [DOCTRINE.md](DOCTRINE.md) for official component authoring doctrines, CQS guidelines, state observability, and 3-Layer architecture.
@@ -34,13 +64,6 @@ To completely avoid refactoring and off-doctrine mistakes, **BEFORE writing or m
 3. **JS & Component Behavior**:
    - **JS Data Attributes**: Are all JS behavior bindings linked via `data-ln-*` or `data-*` attributes? **NEVER** bind JS behaviors to CSS classes (like `.js-toggle`).
    - **No style-setting in JS**: Is JS setting CSS properties directly (e.g., `el.style.display = 'block'`)? (Must toggle CSS classes/attributes instead, styling states in SCSS).
-
----
-
-## Grep before claiming (non-negotiable)
-
-Before recommending an architecture, refactor, or claiming that a behavior/method/event exists, run a cross-component `grep` first. Trust the code, not your mental model.
-**claim → grep → propose**. Never claim → propose → discover-too-late.
 
 ---
 
