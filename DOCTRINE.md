@@ -75,7 +75,7 @@
 
 ---
 
-## ⏱️ 5. Lifecycle Events & Detail Guards
+## ⏱️ 5. Lifecycle Events, Detail Guards & Async Invariants
 
 * **Paired Events:** Components emit cancelable `ln-{name}:before-{action}` before state changes, and post-fact bubbling `ln-{name}:{action}` after state changes.
   ```js
@@ -95,6 +95,14 @@
     // Handle verified search query
   });
   ```
+* **Async Lifecycle & Cancellation Protocol:**
+  Any component performing asynchronous operations (`fetch`, IndexedDB transactions, streaming, network queues, debounced timers) MUST adhere to the **Destroyed Component Invariant**:
+  - **Zero Post-Destroy Side Effects:** A destroyed component MUST NOT mutate the DOM, MUST NOT dispatch state updates or CustomEvents, and MUST NOT commit asynchronous results.
+  - **Explicit Cancellation on Teardown:** The component MUST manage an active `AbortController` (or equivalent cancellation handle). When `destroy()` is called:
+    1. In-flight network requests MUST be aborted immediately (`this._abortController.abort()`).
+    2. Active timers/intervals MUST be cleared (`clearTimeout` / `clearInterval`).
+    3. Outstanding pending receipts/promises MUST be rejected or safely discarded.
+  - **Generation Tracking (`queryGen`):** Data-consuming components (`ln-table`, `ln-list`, `ln-data-store`, `createWindowIndex`) MUST track request generation counters (`queryGen` / `requestId`) to silently drop stale asynchronous responses that arrive after a subsequent reset or query transition.
 
 ---
 

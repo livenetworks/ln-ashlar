@@ -63,6 +63,7 @@ Every component is written as an Immediately Invoked Function Expression (IIFE) 
 1. **Paired Selectors:** The HTML hook `data-ln-{name}` corresponds directly to the JavaScript instance identifier `el.ln{Name}` (e.g., `data-ln-modal` maps to `el.lnModal`).
 2. **DOM-Bound Instances:** Component instances reside directly on the DOM element (`el.ln{Name}`), not in a global JavaScript registry. Multiple instances coexist safely on the same page.
 3. **The `destroy()` Contract:** Every component must implement a prototype `destroy()` method to clean up memory. It must disconnect observers, remove all event listeners added to parent elements or document hooks, remove shared pool memberships, and delete the DOM element reference.
+4. **The Async Cancellation & Destroyed Invariant:** Any component performing asynchronous operations (`fetch`, IndexedDB, streaming, timers) MUST maintain an `AbortController`. When `destroy()` is called, in-flight operations MUST be aborted immediately (`this._abortController.abort()`) and timers cleared. A destroyed component MUST NOT mutate the DOM, dispatch CustomEvents, or commit asynchronous state updates. Data-consuming components MUST use generation tracking (`queryGen`) to discard stale responses.
 
 ### Global Service Variant
 A component with no own DOM — no instances, no observer — is a document-level listener that any element dispatches to (`window` registration = `true`, in place of an instance constructor).

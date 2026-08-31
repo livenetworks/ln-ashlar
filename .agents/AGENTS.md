@@ -38,9 +38,10 @@
     - **Structural Lists vs. Editorial Prose**: `<ul>` and `<ol>` are clean UI primitives by default (`list-style: none`, `margin: 0`, `padding: 0`) for repeating components (menus, tabs, chips, accordions, button groups). Editorial text lists with bullet discs, decimal numbers, and vertical rhythm are opt-in and live strictly within `.prose` (`@include prose`).
   - Machine-readable attributes (`datetime`, `data-ln-value`) MUST be preserved for screen readers and ARIA accessibility while the visible text content is formatted dynamically according to locale.
 
-### E. Lifecycle Events & Detail Guards
+### E. Lifecycle Events, Detail Guards & Async Cancellation Invariants
 - **Paired Events**: Components emit `ln-{name}:before-{action}` (cancelable) before state changes, and `ln-{name}:{action}` (post-fact, bubbling) after state changes.
 - **Detail Guard Pattern**: Always check `e.detail && e.detail.prop` when listening to external events.
+- **Async Cancellation & Destroyed Invariant**: Components running asynchronous operations (`fetch`, timers, IndexedDB) MUST maintain an `AbortController`. On `destroy()`, in-flight requests MUST be aborted (`abort()`) and timers cleared. A destroyed component MUST NOT mutate DOM, commit async state, or dispatch events. Data consumers MUST use generation counters (`queryGen`) to discard stale responses.
 
 ### F. Local Encapsulation vs. Window-Level Coordinators (Multi-Instance Isolation)
 - **Local Multi-Instance Isolation**: Components that can be instantiated multiple times on a page (`form`, `ln-validate`, `ln-autosave`, `ln-accordion`, `ln-tabs`) are strictly self-contained. The validator (`ln-validate`) operates as an encapsulated child of its parent `<form>`. Multiple instances or forms on the same page operate completely independently.
