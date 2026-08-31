@@ -89,4 +89,14 @@ p {
 	@include mt(4rem);
 	font-size: 0.875rem;
 	color: var(--fg-muted);
+
+	a {
+		color: inherit;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+
+		&:hover {
+			color: hsl(var(--color-primary));
+		}
+	}
 }

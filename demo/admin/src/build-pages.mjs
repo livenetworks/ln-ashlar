@@ -61,6 +61,26 @@ try {
 	}
 
 	console.log(`Built ${pages.length} pages.`);
+
+	// Generate demo sitemap.xml
+	const sitemapEntries = [
+		'\t<!-- Main Demos -->',
+		'\t<url>\n\t\t<loc>index.html</loc>\n\t\t<changefreq>weekly</changefreq>\n\t\t<priority>1.0</priority>\n\t</url>',
+		'\t<url>\n\t\t<loc>admin/index.html</loc>\n\t\t<changefreq>weekly</changefreq>\n\t\t<priority>0.9</priority>\n\t</url>',
+		'\t<url>\n\t\t<loc>spa/index.html</loc>\n\t\t<changefreq>weekly</changefreq>\n\t\t<priority>0.8</priority>\n\t</url>',
+		'\t<url>\n\t\t<loc>docuflow/index.html</loc>\n\t\t<changefreq>weekly</changefreq>\n\t\t<priority>0.7</priority>\n\t</url>',
+		'',
+		'\t<!-- Admin Demo Pages -->'
+	];
+
+	for (const file of pages.sort()) {
+		if (file === 'index.html') continue;
+		sitemapEntries.push(`\t<url>\n\t\t<loc>admin/${file}</loc>\n\t\t<changefreq>monthly</changefreq>\n\t\t<priority>0.6</priority>\n\t</url>`);
+	}
+
+	const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapEntries.join('\n')}\n</urlset>\n`;
+	await writeFile(join(__dir, '..', '..', 'sitemap.xml'), sitemapXml, 'utf8');
+	console.log('  updated sitemap.xml');
 } catch (err) {
 	console.error('[build-pages]', err.message);
 	process.exit(1);
