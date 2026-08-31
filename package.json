@@ -38,6 +38,7 @@
     "./theme.css": "./dist/ln-ashlar-theme.css",
     "./full.css": "./dist/ln-ashlar.css",
     "./dev.css": "./dist/ln-ashlar-dev.css",
+    "./dev.js": "./dist/ln-ashlar-dev.js",
     "./theme/*": "./theme/*",
     "./components/*": "./components/*"
   },

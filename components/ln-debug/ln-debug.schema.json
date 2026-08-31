@@ -3,10 +3,22 @@
 	"component": "ln-debug",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-data-store": {
+			"direction": "author",
+			"sources": [
+				"src/debug-verifier.js"
+			]
+		},
 		"data-ln-debug": {
 			"direction": null,
 			"sources": [
 				"src/ln-debug.js"
+			]
+		},
+		"data-ln-store": {
+			"direction": "author",
+			"sources": [
+				"src/debug-verifier.js"
 			]
 		}
 	}

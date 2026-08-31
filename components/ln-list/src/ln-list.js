@@ -293,7 +293,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				const btn = e.target.closest('[data-ln-item-action]');
 				if (!btn) return;
 
-				e.stopPropagation();
 				const itemEl = btn.closest('[data-ln-item]');
 				if (!itemEl) return;
 

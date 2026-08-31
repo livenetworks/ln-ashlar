@@ -98,6 +98,30 @@ async function run() {
 		fs.copyFileSync(join(demoDistDir, 'ln-ashlar.iife.js'), join(distDir, 'ln-ashlar.iife.js'));
 	}
 
+	const devJsConfig = {
+		configFile: false,
+		build: {
+			outDir: 'demo/dist',
+			emptyOutDir: false,
+			lib: {
+				entry: resolve(__dirname, 'components/ln-debug/src/ln-debug.js'),
+				name: 'LnAshlarDev',
+				formats: ['es', 'iife'],
+				fileName: (format) => format === 'es' ? 'ln-ashlar-dev.js' : 'ln-ashlar-dev.iife.js'
+			},
+			watch: isWatch ? {} : null
+		}
+	};
+
+	console.log('Building Dev JS Bundle (ln-ashlar-dev)...');
+	await build(devJsConfig);
+	if (fs.existsSync(join(demoDistDir, 'ln-ashlar-dev.js'))) {
+		fs.copyFileSync(join(demoDistDir, 'ln-ashlar-dev.js'), join(distDir, 'ln-ashlar-dev.js'));
+	}
+	if (fs.existsSync(join(demoDistDir, 'ln-ashlar-dev.iife.js'))) {
+		fs.copyFileSync(join(demoDistDir, 'ln-ashlar-dev.iife.js'), join(distDir, 'ln-ashlar-dev.iife.js'));
+	}
+
 	compileSassFiles();
 
 	console.log('Building Standalone Components (sequentially to prevent resource issues)...');

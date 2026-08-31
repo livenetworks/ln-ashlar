@@ -283,7 +283,6 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 				const btn = e.target.closest('[data-ln-table-row-action]');
 				if (!btn) return;
 
-				e.stopPropagation();
 				const tr = btn.closest('[data-ln-table-row]');
 				if (!tr) return;
 

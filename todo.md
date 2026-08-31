@@ -138,3 +138,18 @@ These components manage DOM state directly using `ln-core` shared helpers (`shou
 - **`ln-ui-coordinator`** — Window-level UI service mediator (modal routing, global toast bridge).
 - **`ln-http` / `ln-ajax` / `ln-api-connector` / `ln-api-queue` / `ln-couchdb-connector`** — Network primitives.
 - **`ln-debug` / `ln-fill`** — Developer diagnostics & DOM filling.
+
+---
+
+## 🔮 Ashlar 10/10 Quality & Evolution Roadmap
+
+Tracked decisions regarding formalization, correctness, and framework guarantees:
+
+| Feature / Initiative | Scope & Description | Status | Decision Rationale |
+|---|---|---|---|
+| **`ln-debug` Contract Verifier & Dev Warnings** | Intelligent dev-mode checks (missing data sources, wrong attribute spelling, missing templates). Zero prod overhead. | ✅ **Complete** | Generic reference resolvers (`*-for`, `*-source`, `*-store`), manifest typo checker, lifecycle queueBoot timing. |
+| **Crypto & Security Hardening** | Fail-closed (`throw` on failure), PBKDF2 with salt, versioned AES-GCM payloads in `ln-core/crypto.js`. | ⏳ **Deferred (Later Phase)** | Голем зафат, се остава за крајна фаза на безбедносно заокружување. |
+| **Async Lifecycle & AbortController** | Standardized `AbortController` and `_destroyed` guards across async components (`ln-upload`, `ln-autosave`, etc.). | ⏸️ **On Hold** | Се одложува за следна фаза. |
+| **Component Conformance Suite** | Generic multi-invariant test runner (mount/destroy/reattach/leak tests) across all 50 components. | ⏸️ **On Hold** | Не е критично во моментов; ќе се разгледа понатаму. |
+| **Data Coordinator Refactor & Query Planner** | Splitting coordinator into 6 sub-modules + building SQL-style query planner for `ln-data-store`. | ❌ **Rejected (Over-engineering)** | Оценето како непотребно усложнување и наметнување туѓа архитектура надвор од DOM-first филозофијата. |
+
