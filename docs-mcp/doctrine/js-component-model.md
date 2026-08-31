@@ -70,9 +70,19 @@ A component with no own DOM — no instances, no observer — is a document-leve
 
 ---
 
-## 3. The Attribute Bridge Pattern & Two-Host Architecture
+## 3. The Attribute Bridge Pattern & Observable Control Plane
 
-To maintain the HTML DOM as the single source of truth, `ln-ashlar` enforces the **Attribute Bridge Pattern** across all components:
+> **Core Axiom:** *The DOM is the public/observable state surface (Control Plane), while JS maintains implementation state and local-first application data.*
+
+### State Tiers — What Lives Where
+
+| State Tier | Primary Location | Examples | Inspectability |
+|---|---|---|---|
+| **Public Control State** | DOM Attributes (`data-ln-*`) | Open/closed, active tab, sort direction, search term, mode | Inspectable & mutable directly via DevTools / DOM APIs |
+| **Application Data Layer** | `ln-data-store` + IndexedDB | Records, row caches, sync queues, conflict logs | Stored in Layer 3 / IndexedDB |
+| **Operational Mechanics** | JavaScript Memory | In-flight promises, `AbortController`, `queryGen`, `createBatcher` queues | Internal runtime mechanics |
+
+To maintain the HTML DOM as the single source of truth for all UI control state, `ln-ashlar` enforces the **Attribute Bridge Pattern** across all components:
 
 ### The Two-Host Pattern (Control vs. State Host)
 Components with separate triggers/inputs and targets use a decoupled two-host architecture:

@@ -53,7 +53,13 @@
 
 ## 🔄 3. Attribute Bridge Pattern & Observable Single Source of Truth
 
-* **All `data-ln-*` Attributes Are Observable:** Every state attribute is observed via `MutationObserver` registered at the component level. For all component control state, the attribute in the DOM is the **Single Source of Truth** — a component never keeps a private mirror of a value it also writes to an attribute. Row caches, record sets, and sync queues are data, not control state; they live in `ln-data-store` (Layer 3), never on attributes.
+> **Core Axiom:** *The DOM is the public/observable state surface (Control Plane), while JS maintains implementation state and local-first application data.*
+
+* **DOM as Public Control Plane:** Every control state attribute (`data-ln-*`) is observed via `MutationObserver` registered at the component level. For all component control state (e.g. open/closed, active tab, sort direction, search term, page offset, validation state), the attribute in the DOM is the **Single Source of Truth** — a component never keeps a private mirror of a control value it also writes to an attribute.
+* **Separation of Control State vs. Implementation State:**
+  1. **Public Control State (DOM Attributes):** Observable, inspectable in DevTools, and mutable via standard DOM APIs (`setAttribute`).
+  2. **Application Data Layer (`ln-data-store` + IndexedDB):** Row caches, record sets, sync queues, and conflict metadata live in Layer 3 storage, never serialized as DOM attribute strings.
+  3. **Operational Mechanics (JS Memory):** In-flight promises, `AbortController` handles, `MutationObserver` instances, query generations (`queryGen`), and render batching queues (`createBatcher`) are runtime implementation mechanics managed in JS memory.
 * **Instant DOM Attribute Writes:** Prototype methods and input controls **MUST** write state directly to target DOM attributes via `setAttribute` (e.g. `this.dom.setAttribute('data-ln-toggle', 'open')`, `target.setAttribute('data-ln-search', input.value)`).
 * **Attribute Observer Debouncing:** Debounce timers (e.g. for search throttling) **MUST** reside in the component's attribute observer (`_syncAttribute`), **NOT** in input control event handlers. This ensures input events update the DOM attribute immediately, while `_syncAttribute` handles debouncing heavy work (events / fetches). Programmatic resets (`setAttribute('data-ln-search', '')`) or `0ms` debounces execute instantly without delay.
 * **Forbidden ("Checkbox Hack"):** Using `<input type="checkbox">` for toggle state is strictly forbidden (breaks `MutationObserver`, teleportation, ARIA semantics, and encapsulation).
