@@ -1,4 +1,5 @@
-import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, resolveHashNamespace } from '../../ln-core';
+import { dispatchCancelable, hashGet, hashSet, queueBoot, registerComponent, resolveHashNamespace } from '../../ln-core';
+import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSearchFields, tokenizeSearchQuery } from './search-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-search';
@@ -13,9 +14,8 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-	// ─── Helpers ───────────────────────────────────────────────
+	// ─── DOM Helpers ───────────────────────────────────────────
 
-	// Resolves the hash namespace for search from target or its control
 	function _resolveSearchHashNamespace(target) {
 		const fromTarget = resolveHashNamespace(target, 'search');
 		if (fromTarget) return fromTarget;
@@ -29,31 +29,8 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		return null;
 	}
 
-	// Matching form of the term — unchanged from the previous implementation.
-	// The attribute keeps the raw string, so writing it back into the input is
-	// byte-identical and the caret never jumps.
-	function _normalizeTerm(value) {
-		return (value || '').trim().toLowerCase();
-	}
-
-	// Whitespace separates tokens. Every token must be found (AND), order does
-	// not matter. Plain substring tests only — never a RegExp built from input.
-	function _tokenize(term) {
-		if (!term) return [];
-		return term.split(/\s+/).filter(Boolean);
-	}
-
-	// Control host is the input itself, or a wrapper around it.
 	function _resolveInput(host) {
 		return host.matches('input, textarea') ? host : host.querySelector('input, textarea');
-	}
-
-	// Forwarded to consumers in the event detail; never matched here.
-	function _parseFields(target) {
-		const raw = target.getAttribute(FIELDS_ATTR);
-		if (raw === null) return null;
-		const fields = raw.split(',').map(function (f) { return f.trim(); }).filter(Boolean);
-		return fields.length ? fields : null;
 	}
 
 	function _collectText(node, parts) {
@@ -70,23 +47,15 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		}
 	}
 
-	// Item text minus every [data-ln-search-exclude] subtree. Parts join with a
-	// space so a token cannot match across an element boundary. Same collapse +
-	// lower-case the previous textContent path applied.
-	// Results are cached on el._lnSearchText to avoid repetitive DOM walks during keystrokes;
-	// cache is automatically invalidated when childList or characterData mutates.
-	// Never called for an exempt item — _apply short-circuits those before here.
 	function _searchText(el) {
 		if (el._lnSearchText !== undefined) return el._lnSearchText;
 		const parts = [];
 		_collectText(el, parts);
-		const text = parts.join(' ').replace(/\s+/g, ' ').toLowerCase();
+		const text = collapseSearchParts(parts);
 		el._lnSearchText = text;
 		return text;
 	}
 
-	// Attribute is the truth: push it back into every control pointing here.
-	// The target holds no control reference, so the lookup is by id.
 	function _syncControls(target, term) {
 		if (!target.id) return;
 		const controls = document.querySelectorAll('[' + CONTROL_SELECTOR + '="' + target.id + '"]');
@@ -96,7 +65,7 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		}
 	}
 
-	// ─── State Component (the target) ──────────────────────────
+	// ─── State Component (Search Target) ───────────────────────
 
 	function _stateComponent(dom) {
 		this.dom = dom;
@@ -107,7 +76,6 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		this.nsKey = _resolveSearchHashNamespace(dom);
 		this.hashEnabled = !!this.nsKey;
 
-		// Hash change listener
 		this._onHashChange = function () {
 			if (self._destroyed || !self.hashEnabled) return;
 			const query = hashGet(self.nsKey);
@@ -118,13 +86,11 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 				self.dom.setAttribute(DOM_SELECTOR, '');
 			}
 		};
+
 		if (this.hashEnabled) {
 			window.addEventListener('hashchange', this._onHashChange);
 		}
 
-		// Seed an authored / deep-linked term. Deferred through queueBoot so
-		// consumers on this same element have finished init and can prevent
-		// the default before the first dispatch.
 		queueBoot(function () {
 			if (self._destroyed) return;
 			if (self.hashEnabled) {
@@ -137,7 +103,7 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 					return;
 				}
 			}
-			if (_normalizeTerm(self.term)) {
+			if (normalizeSearchTerm(self.term)) {
 				_syncControls(self.dom, self.term);
 				self._apply();
 			}
@@ -146,53 +112,36 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		return this;
 	}
 
-
 	_stateComponent.prototype._apply = function () {
 		const dom = this.dom;
-		const term = _normalizeTerm(this.term);
-		const tokens = _tokenize(term);
+		const term = normalizeSearchTerm(this.term);
+		const tokens = tokenizeSearchQuery(term);
 
 		if (this.hashEnabled) {
 			hashSet(this.nsKey, this.term ? this.term : null);
 		}
 
-		// Consumers (ln-table, ln-list, ln-data-store) call preventDefault() to
-		// filter their own records. term keeps exactly its previous meaning;
-		// tokens and fields are forwarded for them to adopt.
+		const fields = parseSearchFields(dom.getAttribute(FIELDS_ATTR));
 		const evt = dispatchCancelable(dom, 'ln-search:change', {
 			term: term,
 			tokens: tokens,
 			targetId: dom.id,
-			fields: _parseFields(dom)
+			fields: fields
 		});
 		if (evt.defaultPrevented) return;
 
-		// Default behaviour: show/hide items in the target.
-		// data-ln-search-items="selector" enables deep targeting.
 		const itemsSelector = dom.getAttribute(ITEMS_ATTR);
 		const items = itemsSelector ? dom.querySelectorAll(itemsSelector) : dom.children;
 
 		for (let i = 0; i < items.length; i++) {
 			const el = items[i];
-
-			// Removal first: an item that just became exempt, or that no longer
-			// fails a token, has to come back into view.
 			el.removeAttribute(HIDE_ATTR);
-
-			// data-ln-search-exclude on the item itself means "do not search me":
-			// exempt from filtering, never walked, never tested, never hidden.
 			if (el.hasAttribute(EXCLUDE_ATTR)) continue;
-
-			// No tokens = no query = nothing to hide.
 			if (tokens.length === 0) continue;
 
-			// AND across tokens, order-independent, plain substring per token.
 			const text = _searchText(el);
-			for (let t = 0; t < tokens.length; t++) {
-				if (text.indexOf(tokens[t]) === -1) {
-					el.setAttribute(HIDE_ATTR, 'true');
-					break;
-				}
+			if (!matchesSearchTokens(text, tokens)) {
+				el.setAttribute(HIDE_ATTR, 'true');
 			}
 		}
 	};
@@ -206,7 +155,7 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	// ─── Control Component (the input side) ────────────────────
+	// ─── Control Component (Search Input / Proxy) ──────────────
 
 	function _controlComponent(dom) {
 		this.dom = dom;
@@ -215,16 +164,11 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 
 		this._attachHandler();
 
-		// The browser can fill the input with no event fired — form restore on reload /
-		// back-forward, or a server-rendered value attribute. Only a read catches that.
-		// Deferred through queueBoot so consumers on the target finish init first.
 		if (this.input && this.input.value.trim()) {
 			const self = this;
 			queueBoot(function () {
 				const target = document.getElementById(self.targetId);
 				if (!target) return;
-				// An authored or deep-linked term wins; a restored input fills only an
-				// empty attribute, so there is nothing to reconcile.
 				if ((target.getAttribute(DOM_SELECTOR) || '').trim()) return;
 				self._write(self.input.value);
 			});
@@ -233,7 +177,6 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		return this;
 	}
 
-	// Target resolved per write, never at init — the control may boot first.
 	_controlComponent.prototype._write = function (value) {
 		const target = document.getElementById(this.targetId);
 		if (!target) return;
@@ -261,11 +204,6 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 	};
 
 	// ─── Global Delegated Clear Triggers ───────────────────────
-	// Handles clearing search on:
-	// 1. <button data-ln-search-clear-for="targetId"> (explicit target, anywhere on page / data-driven empty states)
-	// 2. <button data-ln-search-clear> inside [data-ln-search] (SSR empty states in lists, tables, sections)
-	// 3. <button data-ln-search-clear> inside [data-ln-search-for] control wrapper
-	// 4. <button data-ln-search-clear> sibling to input inside .search chrome
 
 	function _resolveTargetAndInputFromClearBtn(btn) {
 		const explicitId = btn.getAttribute('data-ln-search-clear-for');
@@ -276,7 +214,6 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 			return { target: target, input: input };
 		}
 
-		// 1. Clear button is inside a search state target (e.g. SSR empty-state inside [data-ln-search])
 		const target = btn.closest('[' + DOM_SELECTOR + ']');
 		if (target) {
 			const control = target.id ? document.querySelector('[' + CONTROL_SELECTOR + '="' + target.id + '"]') : null;
@@ -284,7 +221,6 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 			return { target: target, input: input };
 		}
 
-		// 1b. Clear button is inside a view bound to a search target (data-ln-table-source / data-ln-list-source)
 		const view = btn.closest('[data-ln-table-source], [data-ln-list-source]');
 		if (view) {
 			const sourceId = view.getAttribute('data-ln-table-source') || view.getAttribute('data-ln-list-source');
@@ -296,7 +232,6 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 			}
 		}
 
-		// 2. Clear button is inside a search control wrapper (when data-ln-search-for is on wrapper)
 		const controlWrap = btn.closest('[' + CONTROL_SELECTOR + ']');
 		if (controlWrap) {
 			const targetId = controlWrap.getAttribute(CONTROL_SELECTOR);
@@ -305,7 +240,6 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 			return { target: target, input: input };
 		}
 
-		// 3. Clear button is a sibling to the search input in the chrome (when data-ln-search-for is on <input>)
 		const parent = btn.parentElement;
 		if (parent) {
 			const controlEl = parent.querySelector('[' + CONTROL_SELECTOR + ']');
@@ -339,7 +273,7 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		}
 	});
 
-	// ─── Attribute Sync (state is the single source of truth) ──
+	// ─── Attribute Sync ────────────────────────────────────────
 
 	function _syncAttribute(el, attrName) {
 		const instance = el[DOM_ATTRIBUTE];
@@ -354,7 +288,6 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		}
 
 		const next = el.getAttribute(DOM_SELECTOR) || '';
-		// Breaks the input → attribute → input round trip.
 		if (next === instance.term) return;
 
 		instance.term = next;
@@ -362,7 +295,7 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 		instance._apply();
 	}
 
-	// ─── Init ──────────────────────────────────────────────────
+	// ─── Registration ──────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _stateComponent, 'ln-search', {
 		extraAttributes: [HASH_ATTR],
@@ -378,4 +311,3 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 
 	registerComponent(CONTROL_SELECTOR, CONTROL_ATTRIBUTE, _controlComponent, 'ln-search-control');
 })();
-

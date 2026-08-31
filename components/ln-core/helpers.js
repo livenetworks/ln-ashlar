@@ -354,6 +354,24 @@ export function shouldIgnoreClick(event) {
 }
 
 /**
+ * Checks if a target element is an active editable field or contenteditable element.
+ * @param {Element|Object} [target]
+ * @returns {boolean}
+ */
+export function isEditableTarget(target) {
+	if (!target) return false;
+	if (typeof target.closest === 'function') {
+		return Boolean(target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])'));
+	}
+	const tag = String(target.tagName || '').toLowerCase();
+	return tag === 'input' || tag === 'textarea' || tag === 'select' || Boolean(target.isContentEditable);
+}
+
+// ─── Value Comparison Primitives ───────────────────────────
+
+export { compareValues, detectValueType } from './compare.js';
+
+/**
  * Checks if a target element is disabled, aria-disabled, or inside an inert container.
  * @param {Element|Object} [target]
  * @returns {boolean}
@@ -589,41 +607,7 @@ export function readValue(el) {
 		: el.textContent.trim();
 }
 
-// ─── Value Comparison Primitives ───────────────────────────
-
-/**
- * Detect the comparison type for a column/field from its current value set.
- * Type is locked ONCE per sort operation (not per pair) — comparing types
- * per-pair breaks comparator transitivity and produces wrong ordering.
- * All non-empty values must be finite numbers for 'number'; otherwise 'string'.
- */
-export function detectValueType(values) {
-	let hasValue = false;
-	for (let i = 0; i < values.length; i++) {
-		const v = values[i];
-		if (v === '' || v == null) continue;
-		hasValue = true;
-		if (!Number.isFinite(Number(v))) return 'string';
-	}
-	return hasValue ? 'number' : 'string';
-}
-
-/**
- * Compare two raw values given a pre-locked type (see detectValueType).
- * Pass an Intl.Collator instance for locale-aware string comparison —
- * built once by the caller outside the sort loop, never per pair.
- */
-export function compareValues(a, b, type, collator) {
-	if (type === 'number') {
-		const na = parseFloat(a);
-		const nb = parseFloat(b);
-		return (isNaN(na) ? 0 : na) - (isNaN(nb) ? 0 : nb);
-	}
-	const strA = a != null ? String(a) : '';
-	const strB = b != null ? String(b) : '';
-	if (collator) return collator.compare(strA, strB);
-	return strA < strB ? -1 : strA > strB ? 1 : 0;
-}
+// ─── Value Property Interception ───────────────────────────
 
 // ─── Value Property Interception ───────────────────────────
 

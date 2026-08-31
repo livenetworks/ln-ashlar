@@ -1,5 +1,5 @@
-import { dispatch, dispatchCancelable, isVisible, registerComponent } from '../../ln-core';
-import { browserAlreadyHandles, composeExternalShortcut, eventToShortcut, inferKeyAction, isEditableEventTarget, parseShortcutList } from './key-model.js';
+import { dispatch, dispatchCancelable, isEditableTarget, isUsableTarget, registerComponent } from '../../ln-core';
+import { browserAlreadyHandles, composeExternalShortcut, eventToShortcut, inferKeyAction, parseShortcutList } from './key-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-key';
@@ -23,7 +23,7 @@ import { browserAlreadyHandles, composeExternalShortcut, eventToShortcut, inferK
 			const key = eventToShortcut(event);
 			if (!key) return;
 
-			const editing = isEditableEventTarget(event.target);
+			const editing = isEditableTarget(event.target);
 			const hosts = document.querySelectorAll('[' + DOM_SELECTOR + '], [' + FOR_ATTRIBUTE + ']');
 			let winner = null;
 			let hasDuplicate = false;
@@ -37,7 +37,7 @@ import { browserAlreadyHandles, composeExternalShortcut, eventToShortcut, inferK
 
 				const target = instance.resolveTarget();
 				const action = inferKeyAction(target);
-				if (!action || !_isUsableTarget(target, action)) continue;
+				if (!action || !isUsableTarget(target, action)) continue;
 				if (browserAlreadyHandles(event, target, action, key)) {
 					nativeActivation = true;
 					continue;
@@ -77,14 +77,6 @@ import { browserAlreadyHandles, composeExternalShortcut, eventToShortcut, inferK
 		if (instances.size > 0 || !keydownListener) return;
 		document.removeEventListener('keydown', keydownListener);
 		keydownListener = null;
-	}
-
-	function _isUsableTarget(target, action) {
-		if (!target || !document.contains(target)) return false;
-		if (target.disabled || target.getAttribute('aria-disabled') === 'true') return false;
-		if (typeof target.closest === 'function' && target.closest('[inert]')) return false;
-		if (typeof target[action] !== 'function') return false;
-		return isVisible(target);
 	}
 
 	function _component(dom) {

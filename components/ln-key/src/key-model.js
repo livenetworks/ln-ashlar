@@ -141,14 +141,6 @@ export function inferKeyAction(target) {
 	return null;
 }
 
-export function isEditableEventTarget(target) {
-	if (!target) return false;
-	if (typeof target.closest === 'function') {
-		return !!target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])');
-	}
-	return inferKeyAction(target) === 'focus';
-}
-
 export function browserAlreadyHandles(event, target, action, key) {
 	if (!event || !target || action !== 'click' || event.target !== target) return false;
 	if (event.ctrlKey || event.altKey || event.shiftKey || event.metaKey) return false;

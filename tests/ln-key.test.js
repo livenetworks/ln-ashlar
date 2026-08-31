@@ -6,7 +6,6 @@ import {
 	composeExternalShortcut,
 	eventToShortcut,
 	inferKeyAction,
-	isEditableEventTarget,
 	normalizeShortcut,
 	parseShortcutList,
 	shortcutMatches
@@ -57,11 +56,6 @@ test('key action inference follows native DOM semantics', () => {
 	assert.equal(inferKeyAction(element('SELECT')), 'focus');
 	assert.equal(inferKeyAction(element('DIV', { contenteditable: '' })), 'focus');
 	assert.equal(inferKeyAction(element('DIV')), null);
-});
-
-test('editable event target detection protects nested editing surfaces', () => {
-	assert.equal(isEditableEventTarget({ closest: selector => selector.includes('input') ? {} : null }), true);
-	assert.equal(isEditableEventTarget({ closest: () => null }), false);
 });
 
 test('native focused button and link activation is left to the browser', () => {

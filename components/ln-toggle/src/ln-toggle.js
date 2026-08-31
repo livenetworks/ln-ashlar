@@ -1,5 +1,4 @@
 import { dispatch, dispatchCancelable, isTargetDisabled, persistGet, persistSet, registerComponent, shouldIgnoreClick } from '../../ln-core';
-import { getNextToggleState, normalizeToggleState } from './toggle-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-toggle';
@@ -12,6 +11,12 @@ import { getNextToggleState, normalizeToggleState } from './toggle-model.js';
 
 	const instances = new Set();
 	let clickListener = null;
+
+	function _getNextState(current, action) {
+		if (action === 'open') return 'open';
+		if (action === 'close') return 'close';
+		return current === 'open' ? 'close' : 'open';
+	}
 
 	function _ensureClickListener() {
 		if (clickListener) return;
@@ -30,8 +35,7 @@ import { getNextToggleState, normalizeToggleState } from './toggle-model.js';
 			e.preventDefault();
 			const action = trigger.getAttribute(ACTION_ATTRIBUTE) || 'toggle';
 			const current = target.getAttribute(DOM_SELECTOR);
-			const nextState = getNextToggleState(current, action);
-			target.setAttribute(DOM_SELECTOR, nextState);
+			target.setAttribute(DOM_SELECTOR, _getNextState(current, action));
 		};
 		document.addEventListener('click', clickListener);
 	}
@@ -76,7 +80,7 @@ import { getNextToggleState, normalizeToggleState } from './toggle-model.js';
 		if (dom.hasAttribute(PERSIST_ATTRIBUTE)) {
 			const saved = persistGet('toggle', dom);
 			if (saved !== null) {
-				dom.setAttribute(DOM_SELECTOR, normalizeToggleState(saved));
+				dom.setAttribute(DOM_SELECTOR, saved === 'open' ? 'open' : 'close');
 			}
 		}
 
@@ -104,7 +108,7 @@ import { getNextToggleState, normalizeToggleState } from './toggle-model.js';
 
 	_component.prototype.toggle = function () {
 		const current = this.dom.getAttribute(DOM_SELECTOR);
-		this.dom.setAttribute(DOM_SELECTOR, getNextToggleState(current, 'toggle'));
+		this.dom.setAttribute(DOM_SELECTOR, _getNextState(current, 'toggle'));
 	};
 
 	_component.prototype.destroy = function () {

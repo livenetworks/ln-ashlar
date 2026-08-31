@@ -1,4 +1,5 @@
-import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatcher, persistGet, persistSet, hashGet, hashSet, resolveHashNamespace, hashFilterEncode, hashFilterDecode } from '../../ln-core';
+import { createBatcher, dispatch, dispatchCancelable, hashFilterDecode, hashFilterEncode, hashGet, hashSet, persistGet, persistSet, queueBoot, registerComponent, resolveHashNamespace } from '../../ln-core';
+import { arraysDiffer, deriveActiveFilters, evaluateRowFilters, matchesFilterValues } from './filter-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-filter';
@@ -16,22 +17,23 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	function _isReset(input) {
-		return input.hasAttribute(RESET_ATTR) || input.getAttribute(VALUE_ATTR) === '';
+		return input.hasAttribute(RESET_ATTR) || !input.getAttribute(VALUE_ATTR);
 	}
 
 	function _deriveActive(self) {
 		const inputs = self.dom.querySelectorAll('[' + KEY_ATTR + ']');
-		let key = null;
-		const values = [];
+		const descriptors = [];
 		for (let i = 0; i < inputs.length; i++) {
 			const input = inputs[i];
-			if (!key) key = input.getAttribute(KEY_ATTR);
-			if (input.checked && !_isReset(input)) {
-				const v = input.getAttribute(VALUE_ATTR);
-				if (v) values.push(v);
-			}
+			descriptors.push({
+				key: input.getAttribute(KEY_ATTR),
+				value: input.getAttribute(VALUE_ATTR) || '',
+				checked: input.checked,
+				isReset: _isReset(input)
+			});
 		}
-		return { key: key, values: values, targetId: self.targetId };
+		const active = deriveActiveFilters(descriptors);
+		return { key: active.key, values: active.values, targetId: self.targetId };
 	}
 
 	function _applyInputValues(dom, key, values) {
@@ -47,12 +49,6 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 				input.checked = false;
 			}
 		}
-	}
-
-	function _arraysDiffer(a, b) {
-		if (a.length !== b.length) return true;
-		for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return true;
-		return false;
 	}
 
 	// ─── Component ─────────────────────────────────────────────
@@ -74,12 +70,11 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 
 		const self = this;
 
-		const queueRender = createBatcher(
-			function () { self._render(); }
-		);
+		const queueRender = createBatcher(function () {
+			self._render();
+		});
 
 		this._queueRender = queueRender;
-
 		this._attachHandlers();
 
 		// Hash change listener
@@ -94,12 +89,12 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 			}
 			self._render();
 		};
+
 		if (this.hashEnabled) {
 			window.addEventListener('hashchange', this._onHashChange);
 		}
 
 		// ─── Restore State on Boot ─────────────────────────────────
-		// Precedence: 1. URL Hash  2. LocalStorage Persist  3. Pre-checked HTML inputs
 		let restored = false;
 
 		if (this.hashEnabled) {
@@ -128,7 +123,6 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 		}
 
 		if (!restored) {
-			// DOM is already canonical — schedule boot render if anything is pre-checked
 			const inputs = dom.querySelectorAll('[' + KEY_ATTR + ']');
 			for (let i = 0; i < inputs.length; i++) {
 				if (inputs[i].checked && !_isReset(inputs[i])) {
@@ -144,7 +138,6 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 		return this;
 	}
 
-
 	// ─── Handlers (Delegated) ──────────────────────────────────
 
 	_component.prototype._attachHandlers = function () {
@@ -157,7 +150,6 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 			const allInputs = Array.from(self.dom.querySelectorAll('[' + KEY_ATTR + ']'));
 
 			if (_isReset(input)) {
-				// Reset sentinel — enforce checked on reset, uncheck all values
 				for (let i = 0; i < allInputs.length; i++) {
 					if (!_isReset(allInputs[i])) allInputs[i].checked = false;
 				}
@@ -167,11 +159,9 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 			}
 
 			if (input.checked) {
-				// Mutual exclusion: uncheck all reset sentinels
 				for (let i = 0; i < allInputs.length; i++) {
 					if (_isReset(allInputs[i])) allInputs[i].checked = false;
 				}
-				// If all non-reset inputs are now checked → collapse to sentinel
 				let hasReset = false;
 				for (let ri = 0; ri < allInputs.length; ri++) {
 					if (_isReset(allInputs[ri])) { hasReset = true; break; }
@@ -192,7 +182,6 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 					}
 				}
 			} else {
-				// If no non-reset values remain checked, fall back to reset sentinel
 				let anyChecked = false;
 				for (let i = 0; i < allInputs.length; i++) {
 					if (!_isReset(allInputs[i]) && allInputs[i].checked) {
@@ -221,9 +210,8 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 		const prev = this._lastSnapshot;
 		const changed = !prev
 			|| prev.key !== active.key
-			|| _arraysDiffer(prev.values, active.values);
+			|| arraysDiffer(prev.values, active.values);
 
-		// Event-diff gating: only dispatch and render when filter state actually moved
 		if (!changed) return;
 
 		const isReset = active.key === null || active.values.length === 0;
@@ -234,8 +222,7 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 			targetId: self.targetId
 		};
 
-		// Two-Host Bridge:
-		// 1. Dispatch on this.dom (Control Host) -> bubbles to ln-table-coordinator for UI headers
+		// 1. Dispatch on this.dom (Control Host) -> bubbles to ln-table-coordinator
 		dispatch(self.dom, 'ln-filter:change', detail);
 
 		// 2. Dispatch cancelable on target (State/Data Host) -> bubbles to ln-data-store / ln-table
@@ -245,7 +232,7 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 			if (evt.defaultPrevented) defaultPrevented = true;
 		}
 
-		// Fire ln-filter:reset only on transition into reset state
+		// Fire ln-filter:reset on transition into reset state
 		const wasActive = prev && prev.values.length > 0;
 		const nowReset = active.values.length === 0;
 		if (wasActive && nowReset) {
@@ -256,10 +243,8 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 			}
 		}
 
-		// Update diff cache snapshot
 		this._lastSnapshot = { key: active.key, values: active.values.slice() };
 
-		// Persist current filter state
 		if (this.dom.hasAttribute('data-ln-persist')) {
 			if (active.key && active.values.length > 0) {
 				persistSet('filter', this.dom, { key: active.key, values: active.values.slice() });
@@ -268,46 +253,27 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 			}
 		}
 
-		// Sync URL Hash if enabled
 		if (this.hashEnabled) {
 			const encoded = hashFilterEncode(active.key, active.values);
 			hashSet(this.nsKey, encoded);
 		}
 
-		// If a consumer (ln-table, ln-list, ln-data-store) claimed the event, skip default DOM filtering
 		if (defaultPrevented) return;
 
-		// Build lowercase lookup for target filtering
-		const lowerValues = [];
-		for (let i = 0; i < active.values.length; i++) {
-			lowerValues.push(active.values[i].toLowerCase());
-		}
-
-		// Apply default DOM filtering
 		if (self.colIndex !== null) {
-			// Plain table column filtering — shared multi-column logic
 			self._filterTableRows(active);
 		} else {
-			// Standard target-children filtering by data-[key] attribute
 			if (!target) return;
-
 			const children = target.children;
 			for (let i = 0; i < children.length; i++) {
 				const el = children[i];
-
-				if (isReset) {
-					el.removeAttribute(HIDE_ATTR);
-					continue;
-				}
+				el.removeAttribute(HIDE_ATTR);
+				if (isReset) continue;
 
 				const attr = el.getAttribute('data-' + active.key);
-				el.removeAttribute(HIDE_ATTR);
-
-				// Elements without data-{key} are exempt from filtering
 				if (attr === null) continue;
 
-				// OR logic: visible if attr matches ANY active value
-				if (lowerValues.indexOf(attr.toLowerCase()) === -1) {
+				if (!matchesFilterValues(attr, active.values)) {
 					el.setAttribute(HIDE_ATTR, 'true');
 				}
 			}
@@ -326,52 +292,28 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 		const key = active.key || (this.dom.getAttribute('data-ln-filter-key') || 'col' + this.colIndex);
 		const values = active.values;
 
-		// Get or create shared filter map for this plain table
 		if (!_tableFilters.has(table)) {
 			_tableFilters.set(table, {});
 		}
 		const filters = _tableFilters.get(table);
 
-		// Update this filter's entry
 		if (key && values.length > 0) {
-			const lower = [];
-			for (let i = 0; i < values.length; i++) {
-				lower.push(values[i].toLowerCase());
-			}
-			filters[key] = { col: this.colIndex, values: lower };
+			filters[key] = { col: this.colIndex, values: values.slice() };
 		} else if (key) {
 			delete filters[key];
 		}
 
-		// Check if any column filters are active
-		const filterKeys = Object.keys(filters);
-		const hasFilters = filterKeys.length > 0;
-
-		// Apply all active filters to all rows (AND across columns, OR within column)
 		const bodies = table.tBodies;
 		for (let b = 0; b < bodies.length; b++) {
 			const rows = bodies[b].rows;
 			for (let r = 0; r < rows.length; r++) {
 				const row = rows[r];
-
-				if (!hasFilters) {
-					row.removeAttribute(HIDE_ATTR);
-					continue;
+				const cellValuesByCol = {};
+				for (let c = 0; c < row.cells.length; c++) {
+					cellValuesByCol[c] = row.cells[c].textContent.trim();
 				}
 
-				let visible = true;
-				for (let f = 0; f < filterKeys.length; f++) {
-					const filter = filters[filterKeys[f]];
-					const cell = row.cells[filter.col];
-					const cellText = cell ? cell.textContent.trim().toLowerCase() : '';
-					// OR within column: visible if cell text matches ANY filter value
-					if (filter.values.indexOf(cellText) === -1) {
-						visible = false;
-						break; // AND across columns: fail fast
-					}
-				}
-
-				if (visible) {
+				if (evaluateRowFilters(cellValuesByCol, filters)) {
 					row.removeAttribute(HIDE_ATTR);
 				} else {
 					row.setAttribute(HIDE_ATTR, 'true');
@@ -386,7 +328,6 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this._destroyed = true;
 
-		// Clean up plain table filter registry
 		if (this.colIndex !== null) {
 			const target = document.getElementById(this.targetId);
 			if (target) {
@@ -430,7 +371,7 @@ import { dispatch, dispatchCancelable, registerComponent, queueBoot, createBatch
 		}
 	}
 
-	// ─── Init ──────────────────────────────────────────────────
+	// ─── Registration ──────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-filter', {
 		extraAttributes: [HASH_ATTR],

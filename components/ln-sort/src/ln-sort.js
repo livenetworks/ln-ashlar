@@ -1,4 +1,5 @@
-import { dispatchCancelable, readValue, getLocale, detectValueType, compareValues, registerComponent, persistGet, persistSet, queueBoot, hashGet, hashSet, resolveHashNamespace, hashSortEncode, hashSortDecode } from '../../ln-core';
+import { compareValues, detectValueType, dispatchCancelable, getLocale, hashGet, hashSet, hashSortDecode, hashSortEncode, persistGet, persistSet, queueBoot, readValue, registerComponent, resolveHashNamespace } from '../../ln-core';
+import { createSortComparator, getAriaSortValue, isSameSortTarget, normalizeSortDirection } from './sort-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-sort';
@@ -12,13 +13,8 @@ import { dispatchCancelable, readValue, getLocale, detectValueType, compareValue
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	// Target-scoped initial DOM order cache.
-	// Preserves the true pre-sort DOM order per target across mutual-exclusion resets
-	// and multi-column switching.
 	const _targetInitialOrders = new WeakMap();
 
-	// Read the value a default-DOM sort compares by: field-matched descendant
-	// first, else the item itself. Never the column-index fallback — that
-	// path is SSR/DOM-payload only (see README "No index/field bridge").
 	function _readItemValue(item, field) {
 		if (field) {
 			const el = item.querySelector('[data-ln-field="' + field + '"]');
@@ -34,16 +30,13 @@ import { dispatchCancelable, readValue, getLocale, detectValueType, compareValue
 		this.targetId = dom.getAttribute(DOM_SELECTOR);
 		this.field = dom.getAttribute(FIELD_ATTR) || null;
 
-		// Index fallback — resolved once, only when no field is authored.
-		// SSR/DOM-payload path only; never bridged back to `field`.
 		const th = dom.closest('th');
 		this.column = (!this.field && th) ? th.cellIndex : null;
 
 		this.itemsSelector = dom.getAttribute(ITEMS_ATTR) || null;
-		this._state = dom.getAttribute(STATE_ATTR) || 'none';
+		this._state = normalizeSortDirection(dom.getAttribute(STATE_ATTR));
 		this._destroyed = false;
 
-		// URL Hash Namespace resolution
 		this.nsKey = resolveHashNamespace(dom, 'sort');
 		this.hashEnabled = !!this.nsKey;
 
@@ -52,13 +45,11 @@ import { dispatchCancelable, readValue, getLocale, detectValueType, compareValue
 		this._onClick = function (e) {
 			const btn = e.target.closest('[' + DIR_ATTR + ']');
 			if (!btn) return;
-			const nextDir = btn.getAttribute(DIR_ATTR);
+			const nextDir = normalizeSortDirection(btn.getAttribute(DIR_ATTR));
 			self._apply(nextDir);
 		};
 		dom.addEventListener('click', this._onClick);
 
-		// Mutual exclusion and sibling synchronization — delegated via document.
-		// Catches bubbling ln-sort:change even if target mounts/boots asynchronously.
 		this._onSortChange = function (e) {
 			if (self._destroyed || !e.detail) return;
 			const target = self._resolveTarget();
@@ -66,16 +57,17 @@ import { dispatchCancelable, readValue, getLocale, detectValueType, compareValue
 				|| (e.detail.targetId && e.detail.targetId === self.targetId);
 			if (!isOurTarget) return;
 
-			// Controls are identical only when sharing a non-null identifier (field or column index).
-			const same = (self.field !== null && e.detail.field === self.field)
-				|| (self.column !== null && e.detail.column === self.column);
+			const same = isSameSortTarget(
+				{ field: self.field, column: self.column },
+				{ field: e.detail.field, column: e.detail.column }
+			);
 
 			if (same) {
-				// Synchronize duplicate controls targeting the same field/column
-				if (e.detail.direction && dom.getAttribute(STATE_ATTR) !== e.detail.direction) {
-					self._state = e.detail.direction;
-					dom.setAttribute(STATE_ATTR, e.detail.direction);
-					self._updateAriaSort(e.detail.direction);
+				const nextDir = normalizeSortDirection(e.detail.direction);
+				if (nextDir && dom.getAttribute(STATE_ATTR) !== nextDir) {
+					self._state = nextDir;
+					dom.setAttribute(STATE_ATTR, nextDir);
+					self._updateAriaSort(nextDir);
 				}
 				return;
 			}
@@ -86,7 +78,6 @@ import { dispatchCancelable, readValue, getLocale, detectValueType, compareValue
 				dom.setAttribute(STATE_ATTR, 'none');
 				self._updateAriaSort('none');
 			}
-			// Single-sort invariant holds in storage too — losing instance drops its key
 			if (dom.hasAttribute('data-ln-persist')) persistSet('sort', dom, null);
 		};
 		document.addEventListener('ln-sort:change', this._onSortChange);
@@ -126,12 +117,12 @@ import { dispatchCancelable, readValue, getLocale, detectValueType, compareValue
 				}
 			}
 		};
+
 		if (this.hashEnabled) {
 			window.addEventListener('hashchange', this._onHashChange);
 		}
 
 		// ─── Restore State on Boot ─────────────────────────────────
-		// Precedence: 1. URL Hash  2. LocalStorage Persist  3. Authored HTML default
 		let restored = false;
 
 		if (this.hashEnabled) {
@@ -158,13 +149,12 @@ import { dispatchCancelable, readValue, getLocale, detectValueType, compareValue
 					self._apply(saved.direction, true);
 				});
 			}
-			// When data-ln-persist is active, storage is authoritative
 			restored = true;
 		}
 
 		if (!restored) {
-			const initialDir = dom.getAttribute(STATE_ATTR);
-			if (initialDir && (initialDir === 'asc' || initialDir === 'desc')) {
+			const initialDir = normalizeSortDirection(dom.getAttribute(STATE_ATTR));
+			if (initialDir && initialDir !== 'none') {
 				queueBoot(function () {
 					if (self._destroyed) return;
 					self._apply(initialDir, true);
@@ -182,23 +172,18 @@ import { dispatchCancelable, readValue, getLocale, detectValueType, compareValue
 	_component.prototype._updateAriaSort = function (direction) {
 		const th = this.dom.closest('th');
 		if (!th) return;
-		if (direction === 'asc') {
-			th.setAttribute('aria-sort', 'ascending');
-		} else if (direction === 'desc') {
-			th.setAttribute('aria-sort', 'descending');
-		} else {
-			th.setAttribute('aria-sort', 'none');
-		}
+		th.setAttribute('aria-sort', getAriaSortValue(direction));
 	};
 
 	_component.prototype._apply = function (direction, skipStorage) {
 		if (this._destroyed) return;
-		this._state = direction;
-		if (this.dom.getAttribute(STATE_ATTR) !== direction) {
-			this.dom.setAttribute(STATE_ATTR, direction);
+		const normalized = normalizeSortDirection(direction);
+		this._state = normalized;
+		if (this.dom.getAttribute(STATE_ATTR) !== normalized) {
+			this.dom.setAttribute(STATE_ATTR, normalized);
 		}
 
-		this._updateAriaSort(direction);
+		this._updateAriaSort(normalized);
 
 		const target = this._resolveTarget();
 		if (!target) return;
@@ -206,16 +191,16 @@ import { dispatchCancelable, readValue, getLocale, detectValueType, compareValue
 		const detail = {
 			field: this.field,
 			column: this.column,
-			direction: direction,
+			direction: normalized,
 			targetId: this.targetId
 		};
 
 		if (!skipStorage) {
 			if (this.dom.hasAttribute('data-ln-persist')) {
-				persistSet('sort', this.dom, direction === 'none' ? null : detail);
+				persistSet('sort', this.dom, normalized === 'none' ? null : detail);
 			}
 			if (this.hashEnabled) {
-				const encoded = hashSortEncode(this.field !== null ? this.field : this.column, direction);
+				const encoded = hashSortEncode(this.field !== null ? this.field : this.column, normalized);
 				hashSet(this.nsKey, encoded);
 			}
 		}
@@ -223,10 +208,10 @@ import { dispatchCancelable, readValue, getLocale, detectValueType, compareValue
 		const evt = dispatchCancelable(target, 'ln-sort:change', detail);
 		if (evt.defaultPrevented) return;
 
-		this._defaultSort(target, direction);
+		this._defaultSort(target, normalized);
 	};
 
-	// ─── Default DOM behaviour (no consumer claimed the event) ────
+	// ─── Default DOM behaviour ─────────────────────────────────
 
 	_component.prototype._defaultSort = function (target, direction) {
 		const items = this.itemsSelector
@@ -235,7 +220,6 @@ import { dispatchCancelable, readValue, getLocale, detectValueType, compareValue
 		if (!items.length) return;
 		const parent = items[0].parentNode;
 
-		// Capture the true un-mutated DOM order on first sort of this target
 		if (!_targetInitialOrders.has(target)) {
 			_targetInitialOrders.set(target, items.slice());
 		}
@@ -253,11 +237,12 @@ import { dispatchCancelable, readValue, getLocale, detectValueType, compareValue
 			const collator = typeof Intl !== 'undefined'
 				? new Intl.Collator(getLocale(this.dom), { sensitivity: 'base' })
 				: null;
-			const multiplier = direction === 'desc' ? -1 : 1;
 
-			ordered = items.slice().sort(function (a, b) {
-				return compareValues(_readItemValue(a, field), _readItemValue(b, field), type, collator) * multiplier;
+			const comparator = createSortComparator(direction, type, collator, function (el) {
+				return _readItemValue(el, field);
 			});
+
+			ordered = items.slice().sort(comparator);
 		}
 
 		const frag = document.createDocumentFragment();
@@ -290,7 +275,7 @@ import { dispatchCancelable, readValue, getLocale, detectValueType, compareValue
 		} else if (attrName === ITEMS_ATTR) {
 			instance.itemsSelector = el.getAttribute(ITEMS_ATTR) || null;
 		} else if (attrName === STATE_ATTR) {
-			const nextState = el.getAttribute(STATE_ATTR) || 'none';
+			const nextState = normalizeSortDirection(el.getAttribute(STATE_ATTR));
 			if (nextState !== instance._state) {
 				instance._apply(nextState);
 			}
@@ -308,13 +293,10 @@ import { dispatchCancelable, readValue, getLocale, detectValueType, compareValue
 		}
 	}
 
-	// ─── Init ──────────────────────────────────────────────────
+	// ─── Registration ──────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-sort', {
 		extraAttributes: [FIELD_ATTR, ITEMS_ATTR, STATE_ATTR, HASH_ATTR],
 		onAttributeChange: _syncAttribute
 	});
 })();
-
-
-
