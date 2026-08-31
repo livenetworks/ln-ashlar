@@ -114,6 +114,7 @@ All display text comes from outside the component:
 - Console messages: `console.warn('[ln-time] Missing datetime')` — developer-only, not user-facing
 - Attribute values: `'true'`, `'false'`, class names — technical, not display
 - Event names: `'ln-data-store:request-create'` — internal, not display
+- Exceptions & unit fallbacks: see [DOCTRINE.md](../../DOCTRINE.md#4-html-template-system--zero-js-display-text) for authoritative rules and fallback exceptions.
 
 ```javascript
 // WRONG — hardcoded display text

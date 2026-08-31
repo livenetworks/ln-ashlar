@@ -1,4 +1,5 @@
 import { dispatch, registerComponent } from '../../ln-core';
+import { isFieldValid, resolveActiveErrorKeys } from './validate-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-validate';
@@ -7,16 +8,6 @@ import { dispatch, registerComponent } from '../../ln-core';
 	const ERROR_SELECTOR = 'data-ln-validate-error';
 	const CSS_VALID = 'ln-validate-valid';
 	const CSS_INVALID = 'ln-validate-invalid';
-
-	const ERROR_MAP = {
-		required: 'valueMissing',
-		typeMismatch: 'typeMismatch',
-		tooShort: 'tooShort',
-		tooLong: 'tooLong',
-		patternMismatch: 'patternMismatch',
-		rangeUnderflow: 'rangeUnderflow',
-		rangeOverflow: 'rangeOverflow'
-	};
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -67,7 +58,6 @@ import { dispatch, registerComponent } from '../../ln-core';
 					if (el) el.classList.add('hidden');
 				}
 			} else {
-				// clear all custom errors
 				self._customErrors.forEach(function (err) {
 					if (parent) {
 						const el = parent.querySelector('[' + ERROR_SELECTOR + '="' + err + '"]');
@@ -76,7 +66,6 @@ import { dispatch, registerComponent } from '../../ln-core';
 				});
 				self._customErrors.clear();
 			}
-			// Re-run native validation to update visual state
 			if (self._touched) self.validate();
 		};
 
@@ -89,8 +78,6 @@ import { dispatch, registerComponent } from '../../ln-core';
 
 		const form = dom.form;
 		if (form) {
-			// One validated field is enough to own the form's gate —
-			// browser bubbles must yield to ln-validate's own error display.
 			if (!form.hasAttribute('novalidate')) {
 				form.setAttribute('novalidate', '');
 			}
@@ -108,16 +95,6 @@ import { dispatch, registerComponent } from '../../ln-core';
 			form.addEventListener('reset', this._onFormReset);
 			form.addEventListener('ln-validate:request-validate', this._onValidateRequest);
 
-			// Submit gate — attached once per form, by whichever validated
-			// field initializes first (marker lives on the form itself,
-			// same one-shot-guard shape as ln-fill's _fillBound). Runs on
-			// every method, GET included — this is a straight replacement
-			// for the native browser validation `novalidate` just silenced
-			// above, and native validation never had a method condition
-			// either. ln-data-coordinator's own POST/PUT/PATCH method gate
-			// for the write pipeline is a separate, later decision — it
-			// reads e.defaultPrevented first, so it never claims a submit
-			// this gate already blocked.
 			if (!form._lnValidateGateBound) {
 				form._lnValidateGateBound = true;
 				form.addEventListener('submit', function (e) {
@@ -131,15 +108,10 @@ import { dispatch, registerComponent } from '../../ln-core';
 						});
 						validationDetail.invalidFields[0].focus();
 					}
-					// Valid — nothing left to do. Native submit continues;
-					// ln-data-coordinator (document, bubble phase) or plain
-					// HTML/ln-ajax decides what happens to it next.
 				});
 			}
 		}
 
-		// Initial value check — if the field already contains a value
-		// upon instantiation, trigger validation immediately to sync DOM state.
 		const hasInitialValue = (dom.value && dom.value.trim() !== '') || dom.checked;
 		if (hasInitialValue) {
 			this._touched = true;
@@ -152,10 +124,9 @@ import { dispatch, registerComponent } from '../../ln-core';
 	_component.prototype.validate = function () {
 		const dom = this.dom;
 		const validity = dom.validity;
-		const nativeValid = dom.checkValidity();
-		const isValid = nativeValid && this._customErrors.size === 0;
+		const isValid = isFieldValid(validity, this._customErrors.size);
+		const activeErrors = resolveActiveErrorKeys(validity, this._customErrors);
 
-		// Show/hide error messages
 		const parent = dom.closest('.form-element');
 		if (parent) {
 			const errorList = parent.querySelector('[' + ERRORS_SELECTOR + ']');
@@ -163,27 +134,17 @@ import { dispatch, registerComponent } from '../../ln-core';
 				const items = errorList.querySelectorAll('[' + ERROR_SELECTOR + ']');
 				for (let i = 0; i < items.length; i++) {
 					const errorKey = items[i].getAttribute(ERROR_SELECTOR);
-					const validityProp = ERROR_MAP[errorKey];
-					if (!validityProp) continue; // custom error — managed by set-custom/clear-custom
-					if (validity[validityProp]) {
-						items[i].classList.remove('hidden');
-					} else {
-						items[i].classList.add('hidden');
-					}
+					items[i].classList.toggle('hidden', !activeErrors.includes(errorKey));
 				}
 			}
 		}
 
-		// Toggle CSS classes on input
 		dom.classList.toggle(CSS_VALID, isValid);
 		dom.classList.toggle(CSS_INVALID, !isValid);
-
-		// Manage ARIA invalid attribute
 		dom.setAttribute('aria-invalid', isValid ? 'false' : 'true');
 
-		// Emit event
 		const eventName = isValid ? 'ln-validate:valid' : 'ln-validate:invalid';
-		dispatch(dom, eventName, { target: dom, field: dom.name });
+		dispatch(dom, eventName, { target: dom, field: dom.name, errors: activeErrors });
 
 		return isValid;
 	};
@@ -204,7 +165,9 @@ import { dispatch, registerComponent } from '../../ln-core';
 	};
 
 	Object.defineProperty(_component.prototype, 'isValid', {
-		get: function () { return this.dom.checkValidity() && this._customErrors.size === 0; }
+		get: function () {
+			return isFieldValid(this.dom.validity, this._customErrors.size);
+		}
 	});
 
 	_component.prototype.destroy = function () {

@@ -726,9 +726,10 @@ RIGHT:  text comes from data-ln-* attribute set by server
 RIGHT:  text comes from Intl API (dates, numbers — browser-native i18n)
 ```
 
-**Intl APIs are the exception** — `Intl.DateTimeFormat`, `Intl.NumberFormat`, `Intl.RelativeTimeFormat` produce locale-aware output from the browser's own translations. These are acceptable because the browser handles i18n, not the component.
+**Exceptions:**
+- `Intl` APIs and standardized measurement unit fallbacks are defined in [DOCTRINE.md](../DOCTRINE.md#4-html-template-system--zero-js-display-text).
 
-If a component needs display text that Intl can't provide, the text must come from HTML (template or data attribute) so the server can translate it.
+If a component needs display text that Intl or universal unit symbols cannot provide, the text must come from HTML (template or dictionary).
 
 ```
 HTML:  <template> defines structures (inert, not rendered)

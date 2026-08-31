@@ -1,4 +1,5 @@
-import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent, readValue, createWindowCache, createBatcher, getLocale, detectValueType, compareValues } from '../../ln-core';
+import { cloneTemplateScoped, createBatcher, createWindowCache, dispatch, fill, fillTemplate, getLocale, readValue, registerComponent, requestData } from '../../ln-core';
+import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, toggleSelectAll } from './table-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-table';
@@ -647,17 +648,17 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			viewportH = window.innerHeight;
 		}
 
-		let startRow = Math.max(0, Math.floor(scrollIntoData / rowH) - BUFFER_ROWS);
-		startRow = Math.min(startRow, total);
-		const endRow = Math.min(startRow + Math.ceil(viewportH / rowH) + (BUFFER_ROWS * 2), total);
+		const vw = calculateVirtualWindow(scrollIntoData, viewportH, rowH, total, BUFFER_ROWS);
+		const startRow = vw.start;
+		const endRow = vw.end;
 
 		if (startRow === this._vStart && endRow === this._vEnd) return;
 		this._vStart = startRow;
 		this._vEnd = endRow;
 
 		const colSpan = this.ths.length || 1;
-		const topH = startRow * rowH;
-		const bottomH = (total - endRow) * rowH;
+		const topH = vw.topPadding;
+		const bottomH = vw.bottomPadding;
 
 		if (this.isDataDriven) {
 			const frag = document.createDocumentFragment();
@@ -756,13 +757,13 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			viewportH = window.innerHeight;
 		}
 
-		let startRow = Math.max(0, Math.floor(scrollIntoData / rowH) - BUFFER_ROWS);
-		startRow = Math.min(startRow, total);
-		const endRow = Math.min(startRow + Math.ceil(viewportH / rowH) + (BUFFER_ROWS * 2), total);
+		const vw = calculateVirtualWindow(scrollIntoData, viewportH, rowH, total, BUFFER_ROWS);
+		const startRow = vw.start;
+		const endRow = vw.end;
 
 		const colSpan = this.ths.length || 1;
-		const topH = startRow * rowH;
-		const bottomH = (total - endRow) * rowH;
+		const topH = vw.topPadding;
+		const bottomH = vw.bottomPadding;
 
 		const frag = document.createDocumentFragment();
 
@@ -1072,15 +1073,14 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	_component.prototype._updateSelectAll = function () {
 		if (!this._selectAllCheckbox || !this.tbody) return;
 		const rows = this.tbody.querySelectorAll('[data-ln-table-row]');
-		let allSelected = rows.length > 0;
+		const ids = [];
 		for (let i = 0; i < rows.length; i++) {
 			const id = rows[i].getAttribute('data-ln-table-row-id');
-			if (id != null && !this.selectedIds.has(id)) {
-				allSelected = false;
-				break;
-			}
+			if (id != null) ids.push(id);
 		}
-		this._selectAllCheckbox.checked = allSelected;
+		const state = calculateSelectionState(ids, this.selectedIds);
+		this._selectAllCheckbox.checked = state.isAllSelected;
+		this._selectAllCheckbox.indeterminate = state.isIndeterminate;
 	};
 
 	// SSR re-render replays cached row HTML — reapply live selection state.
@@ -1115,13 +1115,8 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			const id = tr.getAttribute('data-ln-table-row-id');
 			if (id == null) return;
 
-			if (checkbox.checked) {
-				self.selectedIds.add(id);
-				tr.classList.add('ln-row-selected');
-			} else {
-				self.selectedIds.delete(id);
-				tr.classList.remove('ln-row-selected');
-			}
+			self.selectedIds = toggleRowSelection(self.selectedIds, id, checkbox.checked);
+			tr.classList.toggle('ln-row-selected', checkbox.checked);
 
 			self.selectedCount = self.selectedIds.size;
 			self._updateSelectAll();
@@ -1151,22 +1146,18 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			this._onSelectAll = function () {
 				const checked = self._selectAllCheckbox.checked;
 				const rows = self.tbody ? self.tbody.querySelectorAll('[data-ln-table-row]') : [];
+				const ids = [];
 
 				for (let i = 0; i < rows.length; i++) {
 					const id = rows[i].getAttribute('data-ln-table-row-id');
 					const rowCb = rows[i].querySelector('[data-ln-table-row-select]');
 					if (id == null) continue;
-
-					if (checked) {
-						self.selectedIds.add(id);
-						rows[i].classList.add('ln-row-selected');
-					} else {
-						self.selectedIds.delete(id);
-						rows[i].classList.remove('ln-row-selected');
-					}
+					ids.push(id);
+					rows[i].classList.toggle('ln-row-selected', checked);
 					if (rowCb) rowCb.checked = checked;
 				}
 
+				self.selectedIds = toggleSelectAll(self.selectedIds, ids, checked);
 				self.selectedCount = self.selectedIds.size;
 				dispatch(self.dom, 'ln-table:select-all', {
 					table: self.name,
@@ -1188,7 +1179,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				const cb = rows[i].querySelector('[data-ln-table-row-select]');
 				const id = rows[i].getAttribute('data-ln-table-row-id');
 				if (cb && cb.checked && id != null) {
-					this.selectedIds.add(id);
+					self.selectedIds = toggleRowSelection(self.selectedIds, id, true);
 					rows[i].classList.add('ln-row-selected');
 				}
 			}
@@ -1217,7 +1208,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		}
 		this._selectAllCheckbox = null;
 
-		this.selectedIds.clear();
+		this.selectedIds = toggleSelectAll(this.selectedIds, Array.from(this.selectedIds), false);
 		this.selectedCount = 0;
 
 		if (this.tbody) {

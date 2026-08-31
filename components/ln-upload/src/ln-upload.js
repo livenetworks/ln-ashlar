@@ -1,4 +1,5 @@
-import { registerComponent, dispatch, dispatchCancelable, buildDict, cloneTemplateScoped, fill, getLocale } from '../../ln-core';
+import { buildDict, cloneTemplateScoped, dispatch, dispatchCancelable, fill, getLocale, registerComponent } from '../../ln-core';
+import { formatFileSize, isFileTypeAllowed, parseAcceptExtensions } from './upload-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-upload';
@@ -15,55 +16,8 @@ import { registerComponent, dispatch, dispatchCancelable, buildDict, cloneTempla
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-	function _parseAccept(acceptStr) {
-		if (!acceptStr) return null;
-		return acceptStr
-			.split(',')
-			.map(function (s) { return s.trim().toLowerCase(); })
-			.filter(Boolean)
-			.map(function (s) { return s.startsWith('.') ? s.slice(1) : s; });
-	}
-
-	function _getExtension(filename) {
-		if (!filename || !filename.includes('.')) return '';
-		return filename.split('.').pop().toLowerCase();
-	}
-
-	function _isValidFile(file, allowedExts) {
-		if (!allowedExts || allowedExts.length === 0) return true;
-		const ext = _getExtension(file.name);
-		const mime = (file.type || '').toLowerCase();
-		return allowedExts.some(function (allowed) {
-			if (allowed.includes('/')) {
-				if (allowed.endsWith('/*')) {
-					const prefix = allowed.slice(0, -1);
-					return mime.startsWith(prefix);
-				}
-				return mime === allowed;
-			}
-			return ext === allowed;
-		});
-	}
-
 	function _formatSize(bytes, locale, dict) {
-		if (typeof bytes !== 'number' || isNaN(bytes) || bytes === 0) {
-			return '0 ' + (dict['unit-b'] || 'B');
-		}
-		const k = 1024;
-		const sizes = [
-			dict['unit-b'] || 'B',
-			dict['unit-kb'] || 'KB',
-			dict['unit-mb'] || 'MB',
-			dict['unit-gb'] || 'GB'
-		];
-		const i = Math.floor(Math.log(bytes) / Math.log(k));
-		const unitIndex = Math.min(i, sizes.length - 1);
-		const num = bytes / Math.pow(k, unitIndex);
-		const formattedNum = new Intl.NumberFormat(locale, {
-			maximumFractionDigits: 1,
-			minimumFractionDigits: 0
-		}).format(num);
-		return formattedNum + ' ' + sizes[unitIndex];
+		return formatFileSize(bytes, locale, dict);
 	}
 
 	function _getCsrfToken() {
@@ -94,7 +48,7 @@ import { registerComponent, dispatch, dispatchCancelable, buildDict, cloneTempla
 		this.maxFiles = +dom.getAttribute(MAX_FILES_ATTR) || 0;
 
 		const acceptStr = dom.getAttribute(ACCEPT_ATTR) || (this.input ? this.input.getAttribute('accept') : '');
-		this.allowedExts = _parseAccept(acceptStr);
+		this.allowedExts = parseAcceptExtensions(acceptStr);
 
 		this.uploadedFiles = new Map();
 		this.fileIdCounter = 0;
@@ -296,7 +250,7 @@ import { registerComponent, dispatch, dispatchCancelable, buildDict, cloneTempla
 			}
 
 			// Validate file extension / MIME type
-			if (!_isValidFile(file, self.allowedExts)) {
+			if (!isFileTypeAllowed(file, self.allowedExts)) {
 				dispatch(self.dom, 'ln-upload:invalid', {
 					file: file,
 					reason: 'accept'

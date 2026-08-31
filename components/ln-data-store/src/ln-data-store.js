@@ -1,5 +1,6 @@
 import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, decryptData } from '../../ln-core';
-import { createWindowIndex } from './window-index';
+import { createWindowIndex } from './window-index.js';
+import { aggregateRecords, decorateRecords, queryRecords } from './data-store-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-data-store';
@@ -532,30 +533,7 @@ import { createWindowIndex } from './window-index';
 		}));
 	}
 
-	// ─── Query Engine (In-Memory over Cache) ───────────────
-
 	const _collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
-
-	function _sort(records, sort) {
-		if (!sort || !sort.field) return records;
-		const { field, direction } = sort;
-		const desc = direction === 'desc';
-
-		return [...records].sort((a, b) => {
-			const va = a[field];
-			const vb = b[field];
-
-			if (va == null && vb == null) return 0;
-			if (va == null) return desc ? 1 : -1;
-			if (vb == null) return desc ? -1 : 1;
-
-			const result = (typeof va === 'string' && typeof vb === 'string')
-				? _collator.compare(va, vb)
-				: (va < vb ? -1 : va > vb ? 1 : 0);
-
-			return desc ? -result : result;
-		});
-	}
 
 	function _filterKeys(filters) {
 		if (!filters) return [];
@@ -566,16 +544,6 @@ import { createWindowIndex } from './window-index';
 		return keys.every(field => filters[field].map(String).includes(String(record[field])));
 	}
 
-	function _filter(records, filters) {
-		const keys = _filterKeys(filters);
-		if (!keys.length) return records;
-		return records.filter(record => _matchesFilters(record, keys, filters));
-	}
-
-	// Whitespace splits tokens; every token must appear in at least one field —
-	// AND across tokens, OR across fields. Same rule ln-search applies to DOM text
-	// and the one the term is built for, so a local answer and a server answer
-	// describe the same set. Plain substring only, never a RegExp built from input.
 	function _tokenize(query) {
 		return String(query || '').toLowerCase().split(/\s+/).filter(Boolean);
 	}
@@ -589,40 +557,12 @@ import { createWindowIndex } from './window-index';
 		);
 	}
 
-	function _search(records, query, searchFields) {
-		if (!query || !searchFields || !searchFields.length) return records;
-		const tokens = _tokenize(query);
-		if (!tokens.length) return records;
-		return records.filter(record => _matchesTokens(record, tokens, searchFields));
-	}
-
 	function _aggregate(records, field, fn) {
-		if (!records.length) return 0;
-		if (fn === 'count') return records.length;
-
-		const numbers = records.map(r => parseFloat(r[field])).filter(v => !isNaN(v));
-		const sum = numbers.reduce((a, b) => a + b, 0);
-
-		if (fn === 'sum') return sum;
-		if (fn === 'avg') return numbers.length ? sum / numbers.length : 0;
-		return 0;
+		return aggregateRecords(records, field, fn);
 	}
 
 	function _decorate(self, records) {
-		if (!self.presenters || !self.presenters.computed) return records;
-		const computed = self.presenters.computed;
-		return records.map(record => {
-			if (!record) return null;
-			const copy = { ...record };
-			for (const [fieldName, fn] of Object.entries(computed)) {
-				try {
-					copy[fieldName] = fn(record);
-				} catch (err) {
-					console.error(`[ln-data-store] Decorator computed field failed for ${fieldName}`, err);
-				}
-			}
-			return copy;
-		});
+		return decorateRecords(records, self.presenters && self.presenters.computed);
 	}
 
 	// ─── Public CRUD & Sync APIs ───────────────────────────
@@ -679,22 +619,7 @@ import { createWindowIndex } from './window-index';
 	}
 
 	function _queryLocal(self, records, options) {
-		const total = records.length;
-
-		if (options.filters) records = _filter(records, options.filters);
-		if (options.search) records = _search(records, options.search, self._searchFields);
-
-		const filtered = records.length;
-
-		if (options.sort) records = _sort(records, options.sort);
-
-		if (options.offset || options.limit) {
-			const offset = options.offset || 0;
-			const limit = options.limit || records.length;
-			records = records.slice(offset, offset + limit);
-		}
-
-		return { records: records, total: total, filtered: filtered };
+		return queryRecords(records, options, self._searchFields, _collator);
 	}
 
 	function _positionalPage(self, offset, limit) {

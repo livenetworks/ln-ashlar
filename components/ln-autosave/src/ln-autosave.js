@@ -1,4 +1,5 @@
-import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComponent } from '../../ln-core';
+import { dispatch, dispatchCancelable, populateForm, registerComponent, serializeForm } from '../../ln-core';
+import { buildAutosaveKey, parseAutosaveDebounce } from './autosave-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-autosave';
@@ -6,15 +7,21 @@ import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComp
 	const CLEAR_SELECTOR = 'data-ln-autosave-clear';
 	const DEBOUNCE_SELECTOR = 'data-ln-autosave-debounce-input';
 	const EXCLUDE_SELECTOR = '[data-ln-autosave-exclude], input[type="password"]';
-	const STORAGE_PREFIX = 'ln-autosave:';
-	const DEFAULT_DEBOUNCE_MS = 1000;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	function _isFormField(el) {
+		const tag = el.tagName;
+		return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+	}
 
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(form) {
-		const key = _getStorageKey(form);
+		const value = form.getAttribute(DOM_SELECTOR);
+		const identifier = value || form.id;
+		const key = buildAutosaveKey(window.location.pathname, identifier);
+
 		if (!key) {
 			console.warn('ln-autosave: form needs an id or data-ln-autosave value', form);
 			return;
@@ -25,20 +32,30 @@ import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComp
 
 		let inputTimer = null;
 
-		// Closure-scoped helpers (NOT on prototype — internal only)
 		function _save() {
 			const data = serializeForm(form, { exclude: EXCLUDE_SELECTOR });
-			try { localStorage.setItem(key, JSON.stringify(data)); }
-			catch (e) { return; }
+			try {
+				localStorage.setItem(key, JSON.stringify(data));
+			} catch (_) {
+				return;
+			}
 			dispatch(form, 'ln-autosave:saved', { target: form, data: data });
 		}
 
 		function _restore() {
 			let raw;
-			try { raw = localStorage.getItem(key); } catch (e) { return; }
+			try {
+				raw = localStorage.getItem(key);
+			} catch (_) {
+				return;
+			}
 			if (!raw) return;
 			let data;
-			try { data = JSON.parse(raw); } catch (e) { return; }
+			try {
+				data = JSON.parse(raw);
+			} catch (_) {
+				return;
+			}
 			const before = dispatchCancelable(form, 'ln-autosave:before-restore', { target: form, data: data });
 			if (before.defaultPrevented) return;
 			const restored = populateForm(form, data);
@@ -50,11 +67,14 @@ import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComp
 		}
 
 		function _clear() {
-			try { localStorage.removeItem(key); } catch (e) { return; }
+			try {
+				localStorage.removeItem(key);
+			} catch (_) {
+				return;
+			}
 			dispatch(form, 'ln-autosave:cleared', { target: form });
 		}
 
-		// Listener handlers (held on `this` for symmetric removal in destroy)
 		this._onFocusout = function (e) {
 			const el = e.target;
 			if (_isFormField(el) && el.name && !el.matches(EXCLUDE_SELECTOR)) _save();
@@ -65,9 +85,13 @@ import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComp
 			if (_isFormField(el) && el.name && !el.matches(EXCLUDE_SELECTOR)) _save();
 		};
 
-		this._onSubmit = function () { _clear(); };
+		this._onSubmit = function () {
+			_clear();
+		};
 
-		this._onReset = function () { _clear(); };
+		this._onReset = function () {
+			_clear();
+		};
 
 		this._onClearClick = function (e) {
 			const btn = e.target.closest('[' + CLEAR_SELECTOR + ']');
@@ -75,13 +99,12 @@ import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComp
 		};
 
 		form.addEventListener('focusout', this._onFocusout);
-		form.addEventListener('change',   this._onChange);
-		form.addEventListener('submit',   this._onSubmit);
-		form.addEventListener('reset',    this._onReset);
-		form.addEventListener('click',    this._onClearClick);
+		form.addEventListener('change', this._onChange);
+		form.addEventListener('submit', this._onSubmit);
+		form.addEventListener('reset', this._onReset);
+		form.addEventListener('click', this._onClearClick);
 
-		// Optional debounced input listener (opt-in via data-ln-autosave-debounce-input)
-		const debounceMs = _resolveDebounceMs(form);
+		const debounceMs = parseAutosaveDebounce(form.getAttribute(DEBOUNCE_SELECTOR));
 		if (debounceMs > 0) {
 			this._onInput = function (e) {
 				const el = e.target;
@@ -92,21 +115,21 @@ import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComp
 			form.addEventListener('input', this._onInput);
 		}
 
-		// Thunk so destroy() can reach the closure-scoped inputTimer
-		this._getInputTimer = function () { return inputTimer; };
+		this._getInputTimer = function () {
+			return inputTimer;
+		};
 
 		_restore();
-
 		return this;
 	}
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this.dom.removeEventListener('focusout', this._onFocusout);
-		this.dom.removeEventListener('change',   this._onChange);
-		this.dom.removeEventListener('submit',   this._onSubmit);
-		this.dom.removeEventListener('reset',    this._onReset);
-		this.dom.removeEventListener('click',    this._onClearClick);
+		this.dom.removeEventListener('change', this._onChange);
+		this.dom.removeEventListener('submit', this._onSubmit);
+		this.dom.removeEventListener('reset', this._onReset);
+		this.dom.removeEventListener('click', this._onClearClick);
 		if (this._onInput) {
 			this.dom.removeEventListener('input', this._onInput);
 			const t = this._getInputTimer();
@@ -115,32 +138,6 @@ import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComp
 		dispatch(this.dom, 'ln-autosave:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
-
-	// ─── Helpers ───────────────────────────────────────────────
-
-	function _getStorageKey(form) {
-		const value = form.getAttribute(DOM_SELECTOR);
-		const identifier = value || form.id;
-		if (!identifier) return null;
-		return STORAGE_PREFIX + window.location.pathname + ':' + identifier;
-	}
-
-	function _isFormField(el) {
-		const tag = el.tagName;
-		return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
-	}
-
-	function _resolveDebounceMs(form) {
-		if (!form.hasAttribute(DEBOUNCE_SELECTOR)) return 0;
-		const raw = form.getAttribute(DEBOUNCE_SELECTOR);
-		if (raw === '' || raw === null) return DEFAULT_DEBOUNCE_MS;
-		const ms = parseInt(raw, 10);
-		if (isNaN(ms) || ms < 0) {
-			console.warn('ln-autosave: invalid debounce value, using default', form);
-			return DEFAULT_DEBOUNCE_MS;
-		}
-		return ms;
-	}
 
 	// ─── Init ──────────────────────────────────────────────────
 

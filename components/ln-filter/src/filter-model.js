@@ -13,24 +13,8 @@ export function arraysDiffer(a, b) {
 	return false;
 }
 
-/**
- * Evaluates whether a cell or attribute value matches any of the filter's values (OR logic).
- * @param {unknown} value
- * @param {string[]} filterValues
- * @returns {boolean}
- */
-export function matchesFilterValues(value, filterValues) {
-	if (!filterValues || filterValues.length === 0) return true;
-	if (value === null || value === undefined) return false;
-
-	const lowerVal = String(value).trim().toLowerCase();
-	for (let i = 0; i < filterValues.length; i++) {
-		if (String(filterValues[i]).trim().toLowerCase() === lowerVal) {
-			return true;
-		}
-	}
-	return false;
-}
+import { matchesFilterValues } from '../../ln-core/matching.js';
+export { matchesFilterValues };
 
 /**
  * Evaluates a row across multiple active column filters (AND across columns, OR within column).

@@ -50,30 +50,26 @@
 ---
 
 ### 🚀 Priority 2: Validation, Data & Persistence
-- [ ] **`ln-validate`**
+- [x] **`ln-validate`**
   - **Model:** `components/ln-validate/src/validate-model.js`
   - **Tests:** `tests/ln-validate.test.js`
   - **Domain Logic:** HTML5 validity state mapping (`valueMissing`, `typeMismatch`, `patternMismatch`), error list item resolution, custom error state registry, form validity aggregation.
-- [ ] **`ln-data-store`**
+- [x] **`ln-data-store`**
   - **Model:** `components/ln-data-store/src/data-store-model.js`
   - **Tests:** `tests/ln-data-store.test.js`
   - **Domain Logic:** In-memory record CRUD mutations, primary key indexing, query filtering predicate engine, pagination window slicing.
-- [ ] **`ln-table`**
+- [x] **`ln-table`**
   - **Model:** `components/ln-table/src/table-model.js`
   - **Tests:** `tests/ln-table.test.js`
-  - **Domain Logic:** Column metadata parsing, row selection state math, pagination offset/limit calculations, sort/filter integration.
-- [ ] **`ln-autosave`**
+  - **Domain Logic:** Column metadata parsing, row selection state math, pagination offset/limit calculations, virtual scrolling window math.
+- [x] **`ln-autosave`**
   - **Model:** `components/ln-autosave/src/autosave-model.js`
   - **Tests:** `tests/ln-autosave.test.js`
-  - **Domain Logic:** Dirty field comparison diffing, payload serialization formatting, debounce interval calculations.
-- [ ] **`ln-options`**
-  - **Model:** `components/ln-options/src/options-model.js`
-  - **Tests:** `tests/ln-options.test.js`
-  - **Domain Logic:** Multi/single select option value extraction, keyboard arrow circular index math, tag badge collection.
-- [ ] **`ln-upload`**
+  - **Domain Logic:** Deterministic path-scoped storage key generation, debounce interval parsing and sanitization.
+- [x] **`ln-upload`**
   - **Model:** `components/ln-upload/src/upload-model.js`
   - **Tests:** `tests/ln-upload.test.js`
-  - **Domain Logic:** File size/mime-type validation rules, queue progress calculations, aggregate status derivation.
+  - **Domain Logic:** File size/mime-type validation rules, extension extraction, human-readable byte formatting.
 
 ---
 
@@ -121,6 +117,7 @@ These components manage DOM state directly using `ln-core` shared helpers (`shou
 - [ ] **`ln-router`** — Client-side route hash synchronizer.
 - [ ] **`ln-form`** — Form submission gate and serialization coordinator.
 - [ ] **`ln-list`** — Template-based list renderer.
+- [ ] **`ln-options`** — Dynamic select option population from store records.
 
 ---
 
