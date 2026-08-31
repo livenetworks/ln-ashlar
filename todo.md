@@ -19,7 +19,33 @@ When refactoring a component, ensure:
 
 ---
 
-## 🚀 Phase 1: High-Priority State & Search Components
+## 🟢 Phase 1: Primitive & Micro-Components (Start Here)
+
+- [ ] **`ln-toggle`** *(Refinement)*
+  - Model: `components/ln-toggle/src/toggle-model.js` *(exists)*
+  - Scope: Refactor global click listener to lazy listener pattern (`_ensureClickListener`/`_maybeRemoveClickListener`), clean instance Set tracking, verify unit tests.
+- [ ] **`ln-confirm`**
+  - Model: `components/ln-confirm/src/confirm-model.js`
+  - Scope: Extract single vs two-element mode detection, timeout parsing, icon swapping predicates into pure model. Unit test suite.
+- [ ] **`ln-accordion`**
+  - Model: `components/ln-accordion/src/accordion-model.js`
+  - Scope: Multi vs single expansion rules, target resolving, panel state derivations. Unit test suite.
+- [ ] **`ln-tooltip`**
+  - Model: `components/ln-tooltip/src/tooltip-model.js`
+  - Scope: Positioning math, title stashing/restoration logic, placement attribute resolvers. Unit test suite.
+- [ ] **`ln-dropdown`**
+  - Model: `components/ln-dropdown/src/dropdown-model.js`
+  - Scope: Toggle state, outside-click detection predicate, keyboard item traversal. Unit test suite.
+- [ ] **`ln-popover`**
+  - Model: `components/ln-popover/src/popover-model.js`
+  - Scope: Position placement math, trigger binding resolution, dismiss guards. Unit test suite.
+- [ ] **`ln-modal`**
+  - Model: `components/ln-modal/src/modal-model.js`
+  - Scope: Dialog open/close state transitions, ESC stack handling, focus target placement logic. Unit test suite.
+
+---
+
+## 🟡 Phase 2: Interactive UI & Navigation Components
 
 - [ ] **`ln-tabs`**
   - Model: `components/ln-tabs/src/tabs-model.js`
@@ -39,33 +65,7 @@ When refactoring a component, ensure:
 
 ---
 
-## 🪟 Phase 2: Overlays, Disclosures & Action Buttons
-
-- [ ] **`ln-modal`**
-  - Model: `components/ln-modal/src/modal-model.js`
-  - Scope: Dialog open/close state transitions, ESC stack handling, focus target placement logic.
-- [ ] **`ln-dropdown`**
-  - Model: `components/ln-dropdown/src/dropdown-model.js`
-  - Scope: Toggle state, outside-click detection predicate, keyboard item traversal.
-- [ ] **`ln-popover`**
-  - Model: `components/ln-popover/src/popover-model.js`
-  - Scope: Position placement math, trigger binding resolution, dismiss guards.
-- [ ] **`ln-tooltip`**
-  - Model: `components/ln-tooltip/src/tooltip-model.js`
-  - Scope: Tooltip positioning math, title stashing/restoration logic, timer triggers.
-- [ ] **`ln-accordion`**
-  - Model: `components/ln-accordion/src/accordion-model.js`
-  - Scope: Multi vs single expansion rules, panel height/state derivations.
-- [ ] **`ln-confirm`**
-  - Model: `components/ln-confirm/src/confirm-model.js`
-  - Scope: Single vs two-element mode detection, auto-revert timeout state, icon swap rules.
-- [ ] **`ln-toggle`** *(Refinement)*
-  - Model: `components/ln-toggle/src/toggle-model.js` *(already exists)*
-  - Scope: Refactor global click listener to lazy listener pattern.
-
----
-
-## 📊 Phase 3: Data, Forms & Persistence
+## 🟠 Phase 3: Data, Forms & Persistence
 
 - [ ] **`ln-table`**
   - Model: `components/ln-table/src/table-model.js`
@@ -91,7 +91,7 @@ When refactoring a component, ensure:
 
 ---
 
-## 🎨 Phase 4: Formatting, Numbers & Utilities
+## 🔵 Phase 4: Formatting, Numbers & Utilities
 
 - [x] **`ln-key`** *(Reference Standard - Complete)*
   - Model: `components/ln-key/src/key-model.js`
