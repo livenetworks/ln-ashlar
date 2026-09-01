@@ -8,7 +8,7 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 |----------|------|----------|
 | `CLAUDE.md` (root) | Project AI Core Rules & Pre-Code Checklist | AI — loaded every session |
 | `docs/README.md` | This file — documentation index | Humans |
-| `docs/css/*.md` | CSS architecture per topic (tokens, mixins, cards, forms, etc.) | Humans + AI on-demand |
+| `docs-mcp/css/*.md` | CSS architecture per topic (tokens, mixins, cards, forms, etc.) | Humans + AI on-demand |
 | `components/ln-*/README.md` | Per-component usage guide (attributes, API, HTML, events) plus architecture reference (internal state, render flow, design decisions) | Humans |
 
 ---
@@ -19,14 +19,14 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 
 | Topic | Source | Docs |
 |-------|--------|------|
-| Design Tokens | `theme/config/_tokens.scss` | [tokens.md](css/tokens.md) |
-| Breakpoints | `theme/config/_breakpoints.scss` | [breakpoints.md](css/breakpoints.md) |
-| Typography | `theme/config/mixins/_typography.scss` | [typography.md](css/typography.md) |
-| Theming (Dark Mode) | `theme/config/_theme.scss` | [theming.md](css/theming.md) |
-| Density | `theme/config/_density.scss` | [density.md](css/density.md) |
-| Motion | `theme/config/mixins/_motion.scss` | [motion.md](css/motion.md) |
-| Layout | `theme/config/mixins/_layout.scss` | [layout.md](css/layout.md) |
-| Mixins Reference | `theme/config/mixins/` | [mixins.md](css/mixins.md) |
+| Design Tokens | `theme/config/_tokens.scss` | [tokens.md](../docs-mcp/css/tokens.md) |
+| Breakpoints | `theme/config/_breakpoints.scss` | [breakpoints.md](../docs-mcp/css/breakpoints.md) |
+| Typography | `theme/config/mixins/_typography.scss` | [typography.md](../docs-mcp/css/typography.md) |
+| Theming (Dark Mode) | `theme/config/_theme.scss` | [theming.md](../docs-mcp/css/theming.md) |
+| Density | `theme/config/_density.scss` | [density.md](../docs-mcp/css/density.md) |
+| Motion | `theme/config/mixins/_motion.scss` | [motion.md](../docs-mcp/css/motion.md) |
+| Layout | `theme/config/mixins/_layout.scss` | [layout.md](../docs-mcp/css/layout.md) |
+| Mixins Reference | `theme/config/mixins/` | [mixins.md](../docs-mcp/css/mixins.md) |
 | Icons (CSS) | `theme/config/_icons.scss` | [../components/ln-icon/README.md](../components/ln-icon/README.md) |
 | Container Queries | — | [ln-ashlar-container-queries.md](ln-ashlar-container-queries.md) |
 
@@ -34,26 +34,26 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 
 | Topic | Source | Docs |
 |-------|--------|------|
-| Alert | `theme/components/_alert.scss` | [alert.md](css/alert.md) |
-| Avatar | `theme/components/_avatar.scss` | [avatar.md](css/avatar.md) |
-| Breadcrumbs | `theme/components/_breadcrumbs.scss` | [breadcrumbs.md](css/breadcrumbs.md) |
-| Cards | `theme/components/_card.scss` | [cards.md](css/cards.md) |
-| Chip | `theme/components/_chip.scss` | [chip.md](css/chip.md) |
-| Empty State | `theme/components/_empty-state.scss` | [empty-state.md](css/empty-state.md) |
-| Forms | `theme/components/_form.scss` | [forms.md](css/forms.md) |
-| Kbd | `theme/config/mixins/_kbd.scss` | [kbd.md](css/kbd.md) |
-| Loader | `theme/components/_loader.scss` | [loader.md](css/loader.md) |
-| Navigation | `theme/components/_nav.scss` | [navigation.md](css/navigation.md) |
-| Page Header | `theme/components/_page-header.scss` | [page-header.md](css/page-header.md) |
-| Prose | `theme/components/_prose.scss` | [prose.md](css/prose.md) |
-| Sections | `theme/components/_sections.scss` | [sections.md](css/sections.md) |
-| Stat Card | `theme/components/_stat-card.scss` | [stat-card.md](css/stat-card.md) |
-| Status Badge | `theme/components/_status-badge.scss` | [status-badge.md](css/status-badge.md) |
-| Stepper | `theme/components/_stepper.scss` | [stepper.md](css/stepper.md) |
-| Tables | `theme/components/_table.scss` | [tables.md](css/tables.md) |
-| Timeline | `theme/components/_timeline.scss` | [timeline.md](css/timeline.md) |
-| Tooltip | `theme/components/_tooltip.scss` | [tooltip.md](css/tooltip.md) |
-| Pills & Switches | `theme/components/_form.scss` | [toggles-and-pills.md](css/toggles-and-pills.md) |
+| Alert | `theme/components/_alert.scss` | [alert.md](../docs-mcp/css/alert.md) |
+| Avatar | `theme/components/_avatar.scss` | [avatar.md](../docs-mcp/css/avatar.md) |
+| Breadcrumbs | `theme/components/_breadcrumbs.scss` | [breadcrumbs.md](../docs-mcp/css/breadcrumbs.md) |
+| Cards | `theme/components/_card.scss` | [cards.md](../docs-mcp/css/cards.md) |
+| Chip | `theme/components/_chip.scss` | [chip.md](../docs-mcp/css/chip.md) |
+| Empty State | `theme/components/_empty-state.scss` | [empty-state.md](../docs-mcp/css/empty-state.md) |
+| Forms | `theme/components/_form.scss` | [forms.md](../docs-mcp/css/forms.md) |
+| Kbd | `theme/config/mixins/_kbd.scss` | [kbd.md](../docs-mcp/css/kbd.md) |
+| Loader | `theme/components/_loader.scss` | [loader.md](../docs-mcp/css/loader.md) |
+| Navigation | `theme/components/_nav.scss` | [navigation.md](../docs-mcp/css/navigation.md) |
+| Page Header | `theme/components/_page-header.scss` | [page-header.md](../docs-mcp/css/page-header.md) |
+| Prose | `theme/components/_prose.scss` | [prose.md](../docs-mcp/css/prose.md) |
+| Sections | `theme/components/_sections.scss` | [sections.md](../docs-mcp/css/sections.md) |
+| Stat Card | `theme/components/_stat-card.scss` | [stat-card.md](../docs-mcp/css/stat-card.md) |
+| Status Badge | `theme/components/_status-badge.scss` | [status-badge.md](../docs-mcp/css/status-badge.md) |
+| Stepper | `theme/components/_stepper.scss` | [stepper.md](../docs-mcp/css/stepper.md) |
+| Tables | `theme/components/_table.scss` | [tables.md](../docs-mcp/css/tables.md) |
+| Timeline | `theme/components/_timeline.scss` | [timeline.md](../docs-mcp/css/timeline.md) |
+| Tooltip | `theme/components/_tooltip.scss` | [tooltip.md](../docs-mcp/css/tooltip.md) |
+| Pills & Switches | `theme/components/_form.scss` | [toggles-and-pills.md](../docs-mcp/css/toggles-and-pills.md) |
 
 ---
 

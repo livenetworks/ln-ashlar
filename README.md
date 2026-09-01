@@ -191,15 +191,15 @@ For detailed manual instructions, properties, attributes, and events of individu
 
 | Guide | Scope |
 |---|---|
-| 🎨 **[Design Tokens](docs/css/tokens.md)** | All CSS custom properties: colors, spacing, borders, typography scale, z-index. |
-| 🎛️ **[Mixins Reference](docs/css/mixins.md)** | Extensive list of all SCSS `@include` recipes available for semantic styling. |
-| 📑 **[Forms](docs/css/forms.md)** | Declarative layout patterns, spacing, grids, and input validation states. |
-| 📇 **[Cards](docs/css/cards.md)** | Custom properties and mixins for basic card structures and section headers. |
-| 📊 **[Tables](docs/css/tables.md)** | Tabular layout patterns, striped themes, and responsive screen-overflow. |
-| 🗺️ **[Navigation](docs/css/navigation.md)** | Semantic navigation bar mixins, sidebar layouts, and collapsible drawer states. |
-| 📏 **[Layout](docs/css/layout.md)** | Flexbox, grid utilities, container query states, and collapsible selectors. |
-| 📁 **[Sections](docs/css/sections.md)** | Visual separation blocks and responsive layout containers. |
-| 🧭 **[Breadcrumbs](docs/css/breadcrumbs.md)** | Horizontal navigation trail styling mixins. |
+| 🎨 **[Design Tokens](docs-mcp/css/tokens.md)** | All CSS custom properties: colors, spacing, borders, typography scale, z-index. |
+| 🎛️ **[Mixins Reference](docs-mcp/css/mixins.md)** | Extensive list of all SCSS `@include` recipes available for semantic styling. |
+| 📑 **[Forms](docs-mcp/css/forms.md)** | Declarative layout patterns, spacing, grids, and input validation states. |
+| 📇 **[Cards](docs-mcp/css/cards.md)** | Custom properties and mixins for basic card structures and section headers. |
+| 📊 **[Tables](docs-mcp/css/tables.md)** | Tabular layout patterns, striped themes, and responsive screen-overflow. |
+| 🗺️ **[Navigation](docs-mcp/css/navigation.md)** | Semantic navigation bar mixins, sidebar layouts, and collapsible drawer states. |
+| 📏 **[Layout](docs-mcp/css/layout.md)** | Flexbox, grid utilities, container query states, and collapsible selectors. |
+| 📁 **[Sections](docs-mcp/css/sections.md)** | Visual separation blocks and responsive layout containers. |
+| 🧭 **[Breadcrumbs](docs-mcp/css/breadcrumbs.md)** | Horizontal navigation trail styling mixins. |
 | 📦 **[Container Queries](docs/ln-ashlar-container-queries.md)** | Mobile-first component layouts reacting to the width of their parent container. |
 
 ### JS Components Reference

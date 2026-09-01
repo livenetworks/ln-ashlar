@@ -69,6 +69,7 @@ try {
 		'\t<url>\n\t\t<loc>admin/index.html</loc>\n\t\t<changefreq>weekly</changefreq>\n\t\t<priority>0.9</priority>\n\t</url>',
 		'\t<url>\n\t\t<loc>spa/index.html</loc>\n\t\t<changefreq>weekly</changefreq>\n\t\t<priority>0.8</priority>\n\t</url>',
 		'\t<url>\n\t\t<loc>docuflow/index.html</loc>\n\t\t<changefreq>weekly</changefreq>\n\t\t<priority>0.7</priority>\n\t</url>',
+		'\t<url>\n\t\t<loc>scoped-theme.html</loc>\n\t\t<changefreq>weekly</changefreq>\n\t\t<priority>0.7</priority>\n\t</url>',
 		'',
 		'\t<!-- Admin Demo Pages -->'
 	];

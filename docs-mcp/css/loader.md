@@ -1,11 +1,11 @@
 ---
 name: loader
 classification: css
-status: draft
+status: active
 domain: frontend
-summary: Pure CSS loading spinners, size variants, and is-loading container overlays.
+summary: Lightweight CSS-only animated spinner scaling proportionally via font-size and inheriting theme primary color.
 source: theme/config/mixins/_loader.scss
-tags: [loader, spinner, loading, progress, feedback]
+tags: [loader, spinner, loading, progress, animation, feedback]
 ---
 
 # ⏳ loader
@@ -14,28 +14,35 @@ tags: [loader, spinner, loading, progress, feedback]
 
 ## 1. Core Behavior & Responsibility
 
-The `loader` component (`theme/components/_loader.scss` and `theme/config/mixins/_loader.scss`) provides lightweight visual loading feedback:
-- **`@include loader` / `.loader`:** Pure CSS spinning ring using CSS border animations.
-- **Sizes:** Supports `.loader-sm` (16px), default (24px), and `.loader-lg` (36px).
-- **Container Overlay (`.is-loading`):** Centered overlay on parent containers during async data fetches.
+The `loader` module (`theme/config/mixins/_loader.scss` and `theme/components/_loader.scss`) provides a pure CSS rotating spinner:
+
+- **CSS-Only Geometry:** Constructed using animated pseudo-elements and `box-shadow` with zero external SVG assets or image dependencies.
+- **Proportional Font-Size Scaling:** All dimensions use relative `em` units; setting `font-size: 24px` scales the entire spinner, stroke thickness, and radius proportionally.
+- **Primary Hue Inheritance:** Automatically renders in the active `--color-primary` theme color.
 
 ---
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-### Base HTML Markup
+### Base HTML Markup (Page Spinner)
 
 ```html
 <div class="loader" role="status" aria-label="Loading content..."></div>
 ```
 
-### Variant 1: Button Loading State
+### Variant 1: Inline Sized Spinner
 
 ```html
-<button type="button" class="btn is-loading" disabled>
-    <div class="loader loader-sm" aria-hidden="true"></div>
-    <span>Saving...</span>
-</button>
+<div id="section-spinner" role="status" aria-label="Loading data..."></div>
+```
+
+```scss
+// SCSS Usage:
+#section-spinner {
+    @include loader;
+    font-size: 32px;
+    @include my(var(--size-lg));
+}
 ```
 
 ---
@@ -44,24 +51,22 @@ The `loader` component (`theme/components/_loader.scss` and `theme/config/mixins
 
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
-| `loader` | mixin | — | Base CSS spinning ring with accent border color |
-| `loader-sm` | mixin | — | Small spinner size (16px) |
-| `loader-lg` | mixin | — | Large spinner size (36px) |
-| `.loader` | class | — | Default component class applying @include loader |
-| `.loader-sm` | class | — | Small size modifier class |
-| `.loader-lg` | class | — | Large size modifier class |
-| `.is-loading` | class | — | State class applied to buttons and containers during async operations |
+| `loader` | mixin | — | Base CSS spinner recipe scaling with `font-size` |
+| `.loader` | class | — | Prototyping class with default page-level vertical margin |
 
 ---
 
 ## 4. Accessibility & Common Pitfalls
 
 > [!CAUTION]
-> 1. **Add `role="status"`:** Standalone loaders must carry `role="status"` and an `aria-label` so screen readers inform users that content is loading.
+> 1. **Screen Reader Announcement:** Always add `role="status"` and `aria-label="Loading..."` on loader elements so screen readers announce the in-progress activity.
+> 2. **Avoid Inner Text:** The CSS spinner uses pseudo-elements; do not place visible inner text inside the loader container.
+> 3. **Indeterminate vs. Determinate:** For operations with a known completion percentage, use `ln-progress` instead of an indeterminate loader.
 
 ---
 
 ## 5. Related Documents
 
-- [`empty-state`](./empty-state.md) — Zero-data state vs loading states.
-- [`motion`](./motion.md) — Motion-safe animations.
+- [`tokens`](./tokens.md) — Primary brand colors and transition durations.
+- [`motion`](./motion.md) — Motion gating and keyframe standards.
+- [`ln-progress`](../components/ln-progress.md) — Determinate progress bars.

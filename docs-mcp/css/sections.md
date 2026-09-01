@@ -1,46 +1,46 @@
 ---
 name: sections
 classification: css
-status: draft
+status: active
 domain: frontend
-summary: Page section layout mixins providing section headers, divider margins, and section-card containers.
-source: theme/components/_sections.scss
-tags: [sections, section, card, layout, structure]
+summary: Section containers, section-cards, and auto-flush table embedding via :has(> table:only-child).
+source: theme/config/mixins/_card.scss
+tags: [sections, containers, layout, tables, cards, auto-flush]
 ---
 
-# 📑 sections
+# 📁 sections
 
 ---
 
 ## 1. Core Behavior & Responsibility
 
-The `sections` styling module (`theme/components/_sections.scss` and `theme/config/mixins/_card.scss`) formats major content divisions on a page:
-- **`@include section` / `.section`:** Applies top-level page section margins (`--margin-block: var(--size-xl)`), structured `<header>` flex alignment, and bottom borders.
-- **`@include section-card`:** Card container with `overflow: clip` ensuring sticky table headers inside remain attached to the outer scroll viewport.
+The `sections` module (`theme/components/_sections.scss` and `theme/config/mixins/_card.scss`) governs page section wrappers and structured layout blocks:
+
+- **Opt-In Section Wrapper (`.section` / `@include section`):** Defines clean vertical separation and constrained widths without colliding with generic HTML `<section>` elements.
+- **Section Cards (`.section-card` / `@include section-card`):** Composed surface cards featuring distinct `<header>`, `<main>`, and `<footer>` sections.
+- **Auto-Flush Table Embedding:** When a `<table>` or `.table-container` is the **only child** of `.section-card > main` (`:has(> table:only-child)`), outer padding and duplicate table borders are automatically stripped so the table sits flush against the card edges.
 
 ---
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-### Base HTML Markup
+### Base HTML Markup (Section with Header)
 
 ```html
 <section class="section">
     <header>
-        <h2>Organization Settings</h2>
+        <h2>Account Settings</h2>
         <div class="section-actions">
-            <button type="button" class="btn">Edit</button>
+            <button type="button" class="btn btn-ghost">Discard</button>
         </div>
     </header>
     <main>
-        <div class="card">
-            <p>Section body content...</p>
-        </div>
+        <p>Manage security preferences and API credentials.</p>
     </main>
 </section>
 ```
 
-### Variant 1: Section Card with Table
+### Variant 1: Auto-Flush Table Section Card
 
 ```html
 <section class="section-card">
@@ -48,12 +48,13 @@ The `sections` styling module (`theme/components/_sections.scss` and `theme/conf
         <h3>Audit Records</h3>
     </header>
     <main>
-        <table>
+        <!-- Table sits completely flush with the card boundary -->
+        <table class="table">
             <thead>
-                <tr><th>Event</th><th>Date</th></tr>
+                <tr><th>ID</th><th>Timestamp</th><th>Status</th></tr>
             </thead>
             <tbody>
-                <tr><td>Login</td><td>2026-08-31</td></tr>
+                <tr><td>#1024</td><td>2026-09-01</td><td>Success</td></tr>
             </tbody>
         </table>
     </main>
@@ -66,20 +67,25 @@ The `sections` styling module (`theme/components/_sections.scss` and `theme/conf
 
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
-| `section` | mixin | — | Applies vertical rhythm and header alignment for page sections |
-| `section-card` | mixin | — | Panel container with overflow: clip for sticky descendants |
-| `.section` | class | — | Default component class applying @include section |
+| `section` | mixin | — | Base page section wrapper with header bottom border and vertical margin |
+| `section-card` | mixin | — | Composed card section with structured header, body, and footer |
+| `.section` | class | — | Prototyping class for `section` |
+| `.section-card` | class | — | Prototyping class for `section-card` |
+| `.section-actions` | class | — | Action button container in section headers |
+| `--margin-block` | token | `var(--size-xl)` | Bottom separation margin for sections |
 
 ---
 
 ## 4. Accessibility & Common Pitfalls
 
 > [!CAUTION]
-> 1. **Opt-in Class vs Bare Tag:** In `ln-ashlar`, the bare `<section>` tag is not automatically styled to prevent unwanted double borders when nested inside cards. Always apply `.section` or `@include section` explicitly to major page sections.
+> 1. **Auto-Flush Trigger Invariant:** Auto-flush table padding removal triggers strictly on `:has(> table:only-child)`. If introductory text or headings are placed alongside the table in `<main>`, the card retains its regular padding to preserve layout rhythm.
+> 2. **Opt-In Section Classes:** Do not assume bare `<section>` tags receive decorative borders or margins automatically; use `class="section"` or `@include section` explicitly.
 
 ---
 
 ## 5. Related Documents
 
-- [`cards`](./cards.md) — Card panel surfaces.
-- [`layout`](./layout.md) — Grid and flex layout helpers.
+- [`cards`](./cards.md) — Card container recipes and nested elevation.
+- [`tables`](./tables.md) — Data table styling.
+- [`page-header`](./page-header.md) — Top-of-page headers.

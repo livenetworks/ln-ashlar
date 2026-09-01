@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ln-ashlar — Scoped Theme Islands</title>
+    <link rel="stylesheet" href="dist/ln-ashlar.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Dark Top Header Island inside Light Page -->
+        <header class="app-header" data-theme="dark">
+            <div class="app-header-brand">
+                <a href="index.html" class="logo">ln-ashlar</a>
+                <span class="status-badge" data-ln-status="info">Dark Header Scope</span>
+            </div>
+
+            <nav class="nav" aria-label="Main Navigation">
+                <ul class="nav-list">
+                    <li><a href="#" class="nav-link active">Dashboard</a></li>
+                    <li><a href="#" class="nav-link">Analytics</a></li>
+                    <li><a href="#" class="nav-link">Settings</a></li>
+                </ul>
+            </nav>
+
+            <div class="app-header-actions">
+                <ul class="button-group">
+                    <li><button type="button" class="btn">Profile</button></li>
+                    <li><button type="submit" class="btn">New Project</button></li>
+                </ul>
+            </div>
+        </header>
+
+        <!-- Main Light Root Canvas -->
+        <main class="page-body">
+            <div class="page-header">
+                <div>
+                    <h1>Scoped Theme Demonstration</h1>
+                    <p>Testing nested and independent <code>data-theme</code> scopes at arbitrary DOM depths.</p>
+                </div>
+                <div class="page-header-actions">
+                    <ul class="button-group">
+                        <li><button type="button" class="btn">Default Neutral</button></li>
+                        <li><button type="submit" class="btn">Light Primary CTA</button></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Light Card Section -->
+            <section class="section">
+                <h2>1. Root Light Canvas Section</h2>
+                <div class="grid grid-cols-2">
+                    <div class="card">
+                        <header class="card-header">
+                            <h3>Light Mode Form Card</h3>
+                        </header>
+                        <div class="card-body">
+                            <form>
+                                <div class="form-group">
+                                    <label for="light-name">Workspace Name</label>
+                                    <input type="text" id="light-name" value="Core Platform" class="input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="light-tier">Deployment Tier</label>
+                                    <select id="light-tier" class="select">
+                                        <option>Production (Stable)</option>
+                                        <option>Staging</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <footer class="card-footer">
+                            <ul class="button-group">
+                                <li><button type="button" class="btn">Cancel</button></li>
+                                <li><button type="submit" class="btn">Save Changes</button></li>
+                            </ul>
+                        </footer>
+                    </div>
+
+                    <div class="card">
+                        <header class="card-header">
+                            <h3>Light Status Indicators</h3>
+                        </header>
+                        <div class="card-body">
+                            <p>Semantic status classes cascade local colors without freezing root variables:</p>
+                            <ul class="stack">
+                                <li><span class="status-badge" data-ln-status="success">Active Online</span></li>
+                                <li><span class="status-badge" data-ln-status="warning">Maintenance Pending</span></li>
+                                <li><span class="status-badge" data-ln-status="error">Cluster Alert</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dark Island Section -->
+            <section class="section card" data-theme="dark">
+                <header class="card-header">
+                    <h2>2. Scoped Dark Island Container (<code>data-theme="dark"</code>)</h2>
+                    <p>Background, foreground, borders, shadows, and button surfaces are completely dark-themed.</p>
+                </header>
+                <div class="card-body grid grid-cols-2">
+                    <div class="card">
+                        <header class="card-header">
+                            <h3>Dark Island Card</h3>
+                        </header>
+                        <div class="card-body">
+                            <form>
+                                <div class="form-group">
+                                    <label for="dark-server">Server Endpoint</label>
+                                    <input type="text" id="dark-server" value="https://api.ashlar.internal" class="input">
+                                </div>
+                            </form>
+                        </div>
+                        <footer class="card-footer">
+                            <ul class="button-group">
+                                <li><button type="button" class="btn">Reset</button></li>
+                                <li><button type="submit" class="btn">Connect</button></li>
+                            </ul>
+                        </footer>
+                    </div>
+
+                    <!-- Inverse Light Island nested inside Dark Container -->
+                    <section class="card" data-theme="light">
+                        <header class="card-header">
+                            <h3>3. Inverse Light Island (Nested in Dark)</h3>
+                            <span class="status-badge" data-ln-status="info">data-theme="light"</span>
+                        </header>
+                        <div class="card-body">
+                            <p>This nested section flips cleanly back to the light palette within its dark parent.</p>
+                            <div class="form-group">
+                                <label for="nested-input">Nested Light Input</label>
+                                <input type="text" id="nested-input" value="Clean White Canvas" class="input">
+                            </div>
+                        </div>
+                        <footer class="card-footer">
+                            <button type="submit" class="btn">Nested Action</button>
+                        </footer>
+                    </section>
+                </div>
+            </section>
+        </main>
+
+        <!-- Dark Bottom Footer Island -->
+        <footer class="app-footer" data-theme="dark">
+            <div class="app-footer-content">
+                <p>ln-ashlar &bull; Scoped Theme Verification Demo &copy; 2026</p>
+                <nav class="nav" aria-label="Footer Navigation">
+                    <ul class="nav-list">
+                        <li><a href="index.html" class="nav-link">Home</a></li>
+                        <li><a href="sitemap.xml" class="nav-link">Sitemap</a></li>
+                    </ul>
+                </nav>
+                <button type="button" class="btn">Scroll to Top</button>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

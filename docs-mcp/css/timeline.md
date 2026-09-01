@@ -1,11 +1,11 @@
 ---
 name: timeline
 classification: css
-status: draft
+status: active
 domain: frontend
-summary: Chronological event history and audit logs using ordered lists, time elements, and connecting rails.
+summary: Vertical chronological activity feed and audit trail layout with connecting rail and node bullets.
 source: theme/config/mixins/_timeline.scss
-tags: [timeline, audit-log, events, history, chronological]
+tags: [timeline, audit-trail, history, events, feed]
 ---
 
 # ⏱️ timeline
@@ -14,31 +14,29 @@ tags: [timeline, audit-log, events, history, chronological]
 
 ## 1. Core Behavior & Responsibility
 
-The `timeline` component (`theme/components/_timeline.scss` and `theme/config/mixins/_timeline.scss`) styles chronological history trails:
-- **Semantic Structure:** Ordered list (`<ol class="timeline">`) with `<time datetime="...">` timestamps.
-- **Visual Rail:** Continuous vertical connecting line anchored to the left of the event list.
+The `timeline` module (`theme/config/mixins/_timeline.scss` and `theme/components/_timeline.scss`) formats vertical chronological event logs:
+
+- **Vertical Connecting Rail:** A 2px connecting line (`::before` on `<ol>`) joining event nodes.
+- **Node Bullets:** 12px primary bullets with surface-colored separation rings that adapt automatically across light and dark themes.
+- **Semantic Event Nodes:** Each entry formats `<time>`, `<h4>` title, and `<p>` description with standard vertical typography rhythm.
 
 ---
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-### Base HTML Markup
+### Base HTML Markup (Audit Trail Feed)
 
 ```html
-<ol class="timeline">
+<ol class="timeline" data-ln-timeline>
     <li>
-        <time datetime="2026-08-31T14:30">Aug 31, 14:30</time>
-        <div>
-            <strong>Password Changed</strong>
-            <p>User updated authentication credentials.</p>
-        </div>
+        <time datetime="2026-09-01T10:00:00Z">Sep 1, 10:00</time>
+        <h4>Document Published</h4>
+        <p>Revision 2.4 approved and deployed to production.</p>
     </li>
     <li>
-        <time datetime="2026-08-30T09:15">Aug 30, 09:15</time>
-        <div>
-            <strong>Account Created</strong>
-            <p>Initial registration completed.</p>
-        </div>
+        <time datetime="2026-09-01T09:30:00Z">Sep 1, 09:30</time>
+        <h4>Security Review Passed</h4>
+        <p>Automated static analysis completed with zero warnings.</p>
     </li>
 </ol>
 ```
@@ -49,20 +47,20 @@ The `timeline` component (`theme/components/_timeline.scss` and `theme/config/mi
 
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
-| `timeline` | mixin | — | Styles vertical chronological event list with left border rail |
-| `.timeline` | class | — | Default component class applying @include timeline |
+| `timeline` | mixin | — | Vertical timeline list with connecting rail and bullet nodes |
+| `.timeline` | class | — | Prototyping class for `timeline` |
 
 ---
 
 ## 4. Accessibility & Common Pitfalls
 
 > [!CAUTION]
-> 1. **Use Semantic `<time>` Tags:** Always wrap timestamps in `<time datetime="ISO_DATE">` for machine-readable dates.
-> 2. **Timeline vs Stepper:** Use `timeline` for past historical event logs; use `stepper` for forward multi-step form wizards.
+> 1. **Machine-Readable Dates:** Always provide a machine-readable ISO datetime string on `<time datetime="...">` elements.
+> 2. **Chronological Ordering:** Order events newest-first for audit feeds, using `<ol>` to indicate sequential ordering.
 
 ---
 
 ## 5. Related Documents
 
-- [`stepper`](./stepper.md) — Forward wizard progress indicators.
-- [`typography`](./typography.md) — Tabular numbers for timestamps.
+- [`stepper`](./stepper.md) — Horizontal sequential wizard steps.
+- [`typography`](./typography.md) — Semantic heading and caption roles.

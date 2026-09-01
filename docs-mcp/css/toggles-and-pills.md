@@ -1,11 +1,11 @@
 ---
 name: toggles-and-pills
 classification: css
-status: draft
+status: active
 domain: frontend
-summary: Selection pills, joined-group pills, segmented track controls, and toggle switches for forms.
+summary: Accessible form pill selectors, outline checkboxes, segmented radio controls, and sliding switch toggles with symmetric HTML.
 source: theme/config/mixins/_form.scss
-tags: [pills, toggles, switches, radio, checkbox, controls, form]
+tags: [pills, switches, toggles, checkboxes, radio-buttons, form-controls]
 ---
 
 # 🔘 toggles-and-pills
@@ -14,41 +14,55 @@ tags: [pills, toggles, switches, radio, checkbox, controls, form]
 
 ## 1. Core Behavior & Responsibility
 
-The `toggles-and-pills` module (`theme/config/mixins/_form.scss` and `theme/components/_form.scss`) converts standard radio buttons and checkboxes into styled interactive selection controls:
-- **Joined Pills (`@include pills` / `.pills`):** Horizontal list of mutually exclusive option pills with connected rounded corners.
-- **Segmented Controls (`@include pills-segmented` / `.pills-segmented`):** Recessed track control where active items pop to an elevated white surface.
-- **Toggle Switches (`@include toggle-switch` / `.pill-switch` / `.pills-switch`):** Binary on/off sliding switch decorators on checkboxes.
+The `toggles-and-pills` styling module (`theme/config/mixins/_form.scss` and `theme/components/_form.scss`) provides 4 visual treatments for native `<input type="checkbox">` and `<input type="radio">` controls:
+
+1. **Filled Pills (`pills` / `@include pills`):** Joined horizontal pill group for mutually exclusive radio options or multi-select filters.
+2. **Outline Pills (`pills-outline` / `@include pills-outline`):** Bordered options maintaining visible check indicators.
+3. **Segmented Pills (`pills-segmented` / `@include pills-segmented`):** Sunken track container with floating active selection pills.
+4. **Switch Pills (`pills-switch` / `@include pills-switch`):** Sliding iOS/macOS-style switches for binary preference toggles.
+
+All four variants share the exact same clean, symmetric `<ul> > <li> > <label> > <input>` HTML structure.
 
 ---
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-### Base HTML Markup
+### Base HTML Markup (Sliding Switches)
 
 ```html
-<ul class="pills">
+<ul class="pills-switch">
     <li>
         <label>
-            <input type="radio" name="billing" value="monthly" checked>
-            <span>Monthly</span>
+            <input type="checkbox" name="notifications" checked>
+            Enable email notifications
         </label>
     </li>
     <li>
         <label>
-            <input type="radio" name="billing" value="annual">
-            <span>Annual</span>
+            <input type="checkbox" name="dark_mode">
+            Dark theme preference
         </label>
     </li>
 </ul>
 ```
 
-### Variant 1: Toggle Switch
+### Variant 1: Segmented Radio Control
 
 ```html
-<label class="pill-switch">
-    <input type="checkbox" name="notifications" value="1" checked>
-    <span>Email Notifications</span>
-</label>
+<ul class="pills-segmented">
+    <li>
+        <label>
+            <input type="radio" name="billing_period" value="monthly" checked>
+            Monthly
+        </label>
+    </li>
+    <li>
+        <label>
+            <input type="radio" name="billing_period" value="annual">
+            Annual (Save 20%)
+        </label>
+    </li>
+</ul>
 ```
 
 ---
@@ -57,26 +71,24 @@ The `toggles-and-pills` module (`theme/config/mixins/_form.scss` and `theme/comp
 
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
-| `pills` | mixin | — | Joined-corner pill group on a `<ul>` of radio/checkbox labels |
-| `pills-segmented` | mixin | — | Segmented recessed track control with elevated active pill |
-| `toggle-switch` | mixin | — | Slider switch styling on native checkbox input |
-| `pill-switch` | mixin | — | Label row wrapping toggle-switch checkbox and label text |
-| `pills-switch` | mixin | — | Vertical list of pill switches |
-| `.pills` | class | — | Default component class applying @include pills |
-| `.pills-segmented` | class | — | Default component class applying @include pills-segmented |
-| `.pill-switch` | class | — | Default component class applying @include pill-switch |
+| `pills` | mixin | — | Joined horizontal filled pill button group |
+| `pills-outline` | mixin | — | Joined horizontal outline control |
+| `pills-segmented` | mixin | — | Sunken track container with floating selection indicator |
+| `pills-switch` | mixin | — | iOS-style sliding switch toggle control |
+| `.pills`, `.pills-outline`, `.pills-segmented`, `.pills-switch` | class | — | Prototyping classes for outer `<ul>` containers |
 
 ---
 
 ## 4. Accessibility & Common Pitfalls
 
 > [!CAUTION]
-> 1. **Keep Native Input in DOM:** Never delete or detach the native `<input type="radio">` or `<input type="checkbox">` from the markup. Keep it inside the `<label>` for keyboard and screen reader accessibility.
-> 2. **Never Use Checkboxes for JS Toggles:** JS UI toggles (e.g. accordion, drawer) must use `<button>` and `data-ln-toggle`, not checkbox hacks.
+> 1. **Maintain Native Checkbox / Radio Semantics:** Never replace native `<input type="checkbox">` or `<input type="radio">` with custom div click handlers. Native inputs ensure standard keyboard navigation (Space/Arrow keys) and assistive technology compatibility.
+> 2. **Symmetric HTML Invariant:** Always place the `<input>` as a direct child inside `<label>`. This avoids requiring explicit `id`/`for` attributes for every option.
+> 3. **Avoid Checkbox Hack for Disclosure Widgets:** Using `<input type="checkbox">` to control panel collapse is strictly forbidden in `ln-ashlar` (use `ln-toggle` and `data-ln-toggle` instead).
 
 ---
 
 ## 5. Related Documents
 
-- [`chip`](./chip.md) — Dismissible filter tokens vs selection pills.
-- [`forms`](./forms.md) — Form controls and layouts.
+- [`forms`](./forms.md) — Form inputs and grid layout.
+- [`ln-toggle`](../components/ln-toggle.md) — JavaScript binary state primitive for collapsibles.

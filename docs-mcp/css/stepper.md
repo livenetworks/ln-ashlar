@@ -1,23 +1,26 @@
 ---
 name: stepper
 classification: css
-status: draft
+status: active
 domain: frontend
-summary: Linear multi-step wizard progress indicator using CSS counters, connector lines, and aria-current="step".
+summary: Sequential step progress indicators with CSS counter numbering, connector lines, and step state highlights.
 source: theme/config/mixins/_stepper.scss
-tags: [stepper, wizard, progress, multi-step, form]
+tags: [stepper, wizard, progress, steps, workflow]
 ---
 
-# 🪜 stepper
+# 🔢 stepper
 
 ---
 
 ## 1. Core Behavior & Responsibility
 
-The `stepper` component (`theme/components/_stepper.scss` and `theme/config/mixins/_stepper.scss`) visualizes forward progress through sequential multi-step wizards:
-- **CSS Counters:** Step numbers (1, 2, 3...) are automatically calculated and rendered via CSS `counter(ln-step)` inside numbered circular bullets.
-- **Connectors:** Horizontal lines connect consecutive steps, changing to primary accent color upon completion.
-- **States:** Controlled declaratively via `data-ln-step="complete"` and `data-ln-step="current"`. Unmarked steps represent pending steps.
+The `stepper` module (`theme/config/mixins/_stepper.scss` and `theme/components/_stepper.scss`) formats linear multi-step progress indicators:
+
+- **Sequential `<ol>` Structure:** Uses ordered list semantics with CSS `counter()` numbering for automatic step numbering.
+- **State Progression:**
+  - `complete`: Filled primary circle with completed connector line.
+  - `current`: Highlighted primary circle with focus halo.
+  - `upcoming`: Neutral muted circle and line.
 
 ---
 
@@ -26,15 +29,15 @@ The `stepper` component (`theme/components/_stepper.scss` and `theme/config/mixi
 ### Base HTML Markup
 
 ```html
-<ol data-ln-stepper>
+<ol class="stepper" data-ln-stepper>
     <li data-ln-step="complete">
-        <span data-ln-step-label>Account Details</span>
+        <span>Account Info</span>
     </li>
     <li data-ln-step="current" aria-current="step">
-        <span data-ln-step-label>Subscription Plan</span>
+        <span>Verification</span>
     </li>
-    <li>
-        <span data-ln-step-label>Payment</span>
+    <li data-ln-step="upcoming">
+        <span>Confirmation</span>
     </li>
 </ol>
 ```
@@ -45,22 +48,21 @@ The `stepper` component (`theme/components/_stepper.scss` and `theme/config/mixi
 
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
-| `stepper` | mixin | — | Renders horizontal step list with numbered circles and connecting rails |
-| `[data-ln-stepper]` | class | — | Automatic component binding in theme layer |
-| `data-ln-step="complete"` | token | attribute value | Completed step: filled accent circle and filled rail |
-| `data-ln-step="current"` | token | attribute value | Active step: filled accent circle with halo ring |
+| `stepper` | mixin | — | Linear horizontal stepper with CSS counter numbers and connectors |
+| `.stepper` | class | — | Prototyping class for `stepper` |
+| `data-ln-step` | attribute | `complete` \| `current` \| `upcoming` | Step completion state |
 
 ---
 
 ## 4. Accessibility & Common Pitfalls
 
 > [!CAUTION]
-> 1. **Do Not Hardcode Numbers:** Do not hardcode numbers into the HTML; CSS counters generate numbers automatically.
-> 2. **Ordered List:** Always use `<ol>` to semantically convey sequence to screen readers, and place `aria-current="step"` on the active step.
+> 1. **ARIA Current Step Semantics:** Always place `aria-current="step"` on the currently active `<li>` item.
+> 2. **Ordered List Invariant:** Always use `<ol>` rather than `<ul>` so assistive technologies announce total steps and sequential progress.
 
 ---
 
 ## 5. Related Documents
 
-- [`timeline`](./timeline.md) — Past event history vs forward-looking wizards.
-- [`forms`](./forms.md) — Multi-step wizard forms.
+- [`timeline`](./timeline.md) — Vertical chronological timeline events.
+- [`ln-progress`](../components/ln-progress.md) — Determinate percentage progress bars.

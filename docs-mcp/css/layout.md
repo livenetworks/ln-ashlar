@@ -1,11 +1,11 @@
 ---
 name: layout
 classification: css
-status: draft
+status: active
 domain: frontend
-summary: Structural layout mixins providing flexbox rows, stacks, CSS grid presets, and container query wrappers.
+summary: Grid systems, flexbox stack and row primitives, flat-stack joined panels, and container query contexts.
 source: theme/config/mixins/_layout.scss
-tags: [layout, grid, flexbox, stack, row, container]
+tags: [layout, grid, flexbox, stack, row, container-queries, flat-stack]
 ---
 
 # 📐 layout
@@ -14,58 +14,62 @@ tags: [layout, grid, flexbox, stack, row, container]
 
 ## 1. Core Behavior & Responsibility
 
-The `layout` mixin module (`theme/config/mixins/_layout.scss`) provides atomic structural helpers for content flow:
-- **Rows & Stacks:** `@include stack($gap)` for vertical flex columns, and `@include row($gap)`, `@include row-between($gap)`, `@include row-center($gap)` for horizontal flex alignment.
-- **Grid Presets:** Responsive column layouts (`@include grid`, `@include grid-2`, `@include grid-4`) shifting at media breakpoints `$bp-md` (768px) and `$bp-lg` (1024px).
-- **Containers:** `@include container($name)` for container query contexts.
-- **Flat Stack:** `@include flat-stack` for flush vertical joined-panel borders.
+The `layout` mixin module (`theme/config/mixins/_layout.scss`) provides foundational layout primitives for both macro and micro component structure:
+
+- **Flexbox Primitives:** `stack` (vertical column with gap) and `row` / `row-between` / `row-center` (horizontal rows).
+- **Responsive Grids:** `grid`, `grid-2`, and `grid-4` generating responsive CSS Grid column structures with standard gaps.
+- **Flat Stack (`flat-stack`):** Joins vertical sibling cards/panels into a seamless flush list with a shared horizontal divider rule, flattening inner radii and elevation shadows.
+- **Container Query Contexts (`container`):** Declares `container-type: inline-size` on parents so child components adapt responsive styling to their immediate available width.
 
 ---
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-### Base HTML Markup
+### Base HTML Markup (Semantic Grid List)
 
 ```html
-<main>
-    <div class="user-grid">
-        <article class="card">
-            <h3>Card 1</h3>
-        </article>
-        <article class="card">
-            <h3>Card 2</h3>
-        </article>
-    </div>
-</main>
-```
-
-```scss
-.user-grid {
-    @include grid-2;
-}
-```
-
-### Variant 1: Stack & Row Alignment
-
-```html
-<section class="action-panel">
-    <div class="header-row">
-        <h2>Users</h2>
-        <button type="button" class="btn">Add User</button>
-    </div>
-    <div class="list-stack">
-        <article class="card">User A</article>
-        <article class="card">User B</article>
-    </div>
+<section id="metrics-overview">
+    <ul>
+        <li><div class="stat-card"><strong>$48.2k</strong><span>Revenue</span></div></li>
+        <li><div class="stat-card"><strong>1,240</strong><span>Users</span></div></li>
+        <li><div class="stat-card"><strong>99.8%</strong><span>Uptime</span></div></li>
+        <li><div class="stat-card"><strong>4.9★</strong><span>Rating</span></div></li>
+    </ul>
 </section>
 ```
 
 ```scss
-.header-row {
-    @include row-between;
+#metrics-overview > ul {
+    @include grid-4;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li > .stat-card {
+        @include stat-card;
+    }
 }
-.list-stack {
-    @include stack(var(--size-md));
+```
+
+### Variant 1: Flat Stack Joined Panels
+
+```html
+<ul class="notification-feed">
+    <li><article class="card"><p>First notification</p></article></li>
+    <li><article class="card"><p>Second notification</p></article></li>
+</ul>
+```
+
+```scss
+.notification-feed {
+    @include flat-stack;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    > li > .card {
+        @include card;
+    }
 }
 ```
 
@@ -75,28 +79,33 @@ The `layout` mixin module (`theme/config/mixins/_layout.scss`) provides atomic s
 
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
-| `grid` | mixin | — | 1-col mobile, 2-col at md (768px), 3-col at lg (1024px) |
-| `grid-2` | mixin | — | 1-col mobile, 2-col at md (768px) |
-| `grid-4` | mixin | — | 1-col mobile, 2-col at md (768px), 4-col at lg (1024px) |
-| `stack` | mixin | `$gap: var(--gap)` | Vertical flex column with gap spacing |
-| `row` | mixin | `$gap: var(--gap)` | Horizontal flex row aligned items-center |
-| `row-between` | mixin | `$gap: var(--gap)` | Horizontal flex row with justify-content: space-between |
-| `row-center` | mixin | `$gap: var(--gap)` | Horizontal flex row with justify-content: center |
-| `container` | mixin | `$name: null` | Declares container-type: inline-size with optional container-name |
-| `flat-stack` | mixin | — | Joins vertical child panels flush with shared 1px borders |
+| `stack` | mixin | `$gap: var(--gap)` | Vertical flex container with configurable gap |
+| `row` | mixin | `$gap: var(--gap)` | Horizontal flex container with centered vertical alignment |
+| `row-between` | mixin | `$gap: var(--gap)` | Horizontal flex row with `justify-content: space-between` |
+| `row-center` | mixin | `$gap: var(--gap)` | Horizontal flex row centered on both axes |
+| `grid` | mixin | — | Responsive 1→2→3 column CSS Grid |
+| `grid-2` | mixin | — | Responsive 1→2 column CSS Grid |
+| `grid-4` | mixin | — | Responsive 1→2→4 column CSS Grid |
+| `flat-stack` | mixin | — | Parent-scope rebind joining card children flush with shared divider rule |
+| `container` | mixin | `$name: null` | Declares container query context (`container-type: inline-size`) |
+| `.grid`, `.grid-2`, `.grid-4` | class | — | Prototyping classes for grid layouts |
+| `.stack`, `.row` | class | — | Prototyping classes for flex layouts |
+| `.flat-stack` | class | — | Prototyping class for joined flush list |
 
 ---
 
 ## 4. Accessibility & Common Pitfalls
 
 > [!CAUTION]
-> 1. **Do Not Combine Container-Type with Overflow-Hidden:** Never set `container-type: inline-size` on an element that also has `overflow: hidden`, as it breaks container-query resolution in multiple browser engines.
-> 2. **Avoid Margin Collapse Bugs:** Use `@include stack` and flex `gap` instead of vertical margin stacking.
+> 1. **Do Not Put Presentational Grid Classes in Markup:** Avoid `<div class="grid-4">` in production code. Apply `@include grid-4` in SCSS to semantic HTML lists (`<ul>`, `<ol>`) or semantic containers.
+> 2. **Parent vs. Child Container Rule:** Always declare `@include container` on the parent wrapper element, and query it using native `@container` inside the child selector. Never declare container context on the element being queried.
+> 3. **Block Axis Only for Flat-Stack:** `flat-stack` is designed strictly for block-axis lists. For horizontal button joining, use `btn-group` or `pill-group`.
 
 ---
 
 ## 5. Related Documents
 
-- [`breakpoints`](./breakpoints.md) — Media and container query breakpoints.
-- [`sections`](./sections.md) — Card and section structures.
-- [`app-shell`](./app-shell.md) — Application shell layout scaffolding.
+- [`breakpoints`](./breakpoints.md) — Viewport media queries and container query threshold tokens.
+- [`cards`](./cards.md) — Card components and joined panel styling.
+- [`mixins`](./mixins.md) — General SCSS mixin index.
+- [`scss-architecture`](../doctrine/scss-architecture.md) — Responsive layout and SCSS doctrine.

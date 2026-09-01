@@ -4,7 +4,7 @@
 //   [data-ln-accordion] { @include accordion; }   // library default
 //   #my-list             { @include accordion; }   // custom selector
 //
-// Expected DOM (see docs/css/mixins.md §accordion):
+// Expected DOM (see docs-mcp/css/mixins.md §accordion):
 //   <ul data-ln-accordion>
 //     <li>
 //       <header data-ln-toggle-for="p1">Title</header>

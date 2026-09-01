@@ -1,117 +1,35 @@
+@use 'palette' as *;
+
 // ==========================================================================
 // Theme — ln-ashlar
 // ==========================================================================
-// Dark-mode overrides. Inverts the neutral scale in place, re-tunes
-// shadows and primary tint layers.
+// Theme activation and preset definitions.
 //
-// Activation (any of the three):
-//   <html data-theme="dark">               ← explicit force
-//   @media (prefers-color-scheme: dark)    ← system preference
+// Activation paths:
+//   <html data-theme="dark">               ← explicit dark mode
+//   <element data-theme="dark">            ← scoped dark theme island
+//   @media (prefers-color-scheme: dark)    ← system preference (auto)
 //   :root:not([data-theme="light"])        ← opt-out of auto
 //
-// See docs/css/theming.md for the full guide.
+// See docs-mcp/css/theming.md for the full guide.
 // ==========================================================================
 
 // ---------------------------------------------------------------------------
-// Shared dark overrides — used by both activation paths.
+// Activation — ashlar values at zero specificity, derivations at every scope
 // ---------------------------------------------------------------------------
-@mixin ln-dark-tokens {
-	// Neutral scale — inverted
-	--color-neutral-50:  220 20%  8%;
-	--color-neutral-100: 220 16% 12%;
-	--color-neutral-150: 220 14% 18%;
-	--color-neutral-200: 220 13% 24%;
-	--color-neutral-300: 220 13% 36%;
-	--color-neutral-400: 218 11% 52%;
-	--color-neutral-500: 220 10% 68%;
-	--color-neutral-600: 220 11% 76%;
-	--color-neutral-700: 220 14% 84%;
-	--color-neutral-800: 220 20% 92%;
-	--color-neutral-900: 221 30% 97%;
 
-	// Vocabulary — bg
-	// Explicit ladder: body (darkest) < base < elevated < sunken (mid).
-	// Dark UI convention keeps elevated = lighter; the neutral-scale
-	// inversion alone would flip elevation direction, so we restate
-	// the four vocabulary entries explicitly.
-	--bg-base:     hsl(220 16% 13%);
-	--bg-elevated: hsl(220 16% 17%);
-	--bg-sunken:   hsl(220 16% 20%);
-	--bg-recessed: hsl(220 16%  9%);
-	--bg-hover:    hsl(220 16% 20%);   // parity with today's dark --bg-sunken
-	--bg-active:   hsl(220 16% 24%);   // new — one step above hover
+// Ashlar values — zero specificity, a client file always outranks them
+:where(:root),
+:where([data-theme="light"]) { @include ln-values-light; }
+:where([data-theme="dark"])  { @include ln-values-dark; }
 
-	// Vocabulary — fg
-	--fg-default: hsl(0 0% 95%);
-	--fg-muted:   hsl(220 10% 68%);
-	--fg-subtle:  hsl(218 11% 55%);
-
-	--border-subtle:       hsl(220 14% 20%);
-	--border-strong:       hsl(220 13% 36%);
-	--border-strong-hover: hsl(220 13% 36%);
-
-	// Scrim — keep dark overlay in dark mode (neutral-900 inverts to
-	// near-white, which would produce a LIGHT scrim; explicit override
-	// preserves conventional modal-darkening behavior).
-	--color-scrim: hsl(0 0% 0% / 0.6);
-
-	// Primary tint layers — re-tuned for dark surfaces
-	--color-primary-light:   232 60% 22%;
-	--color-primary-lighter: 232 50% 15%;
-
-	// Status tint layers — re-tuned for dark surfaces (parallel to primary)
-	--color-success-light:   142 50% 18%;
-	--color-success-lighter: 142 40% 13%;
-	--color-warning-light:   32 55% 20%;
-	--color-warning-lighter: 32 45% 14%;
-	--color-info-light:      217 55% 22%;
-	--color-info-lighter:    217 45% 15%;
-	--color-error-light:     0 50% 20%;
-	--color-error-lighter:   0 40% 14%;
-
-	// Secondary tint layers — re-tuned for dark surfaces
-	--color-secondary-light:   160 55% 20%;
-	--color-secondary-lighter: 160 45% 14%;
-
-	// Shadows — solid black, boosted alpha, dual-layer
-	--shadow-xs:
-		0 1px 2px 0 hsl(0 0% 0% / 0.35);
-	--shadow-sm:
-		0 1px 3px 0 hsl(0 0% 0% / 0.40),
-		0 1px 2px -1px hsl(0 0% 0% / 0.25);
-	--shadow-md:
-		0 4px 6px -1px hsl(0 0% 0% / 0.45),
-		0 2px 4px -2px hsl(0 0% 0% / 0.30);
-	--shadow-lg:
-		0 10px 15px -3px hsl(0 0% 0% / 0.50),
-		0 4px 6px -4px hsl(0 0% 0% / 0.35);
-	--shadow-xl:
-		0 20px 25px -5px hsl(0 0% 0% / 0.60),
-		0 8px 10px -6px hsl(0 0% 0% / 0.40);
-	--shadow-2xl:
-		0 25px 50px -12px hsl(0 0% 0% / 0.70);
-	--shadow-inner:
-		inset 0 2px 4px 0 hsl(0 0% 0% / 0.32);
-
-	// Surface highlight — crisp top-edge bevel on dark elevated surfaces
-	--surface-highlight: inset 0 1px 0 0 hsl(0 0% 100% / 0.08);
-}
-
-// ---------------------------------------------------------------------------
-// Explicit attribute activation
-// ---------------------------------------------------------------------------
-[data-theme="dark"] {
-	@include ln-dark-tokens;
-}
-
-// ---------------------------------------------------------------------------
-// System preference activation (opt-out via data-theme="light")
-// ---------------------------------------------------------------------------
 @media (prefers-color-scheme: dark) {
-	:root:not([data-theme="light"]) {
-		@include ln-dark-tokens;
-	}
+	:where(:root:not([data-theme="light"])) { @include ln-values-dark; }
 }
+
+// Derivations — library-owned, normal specificity, every theme scope
+:root,
+[data-theme] { @include ln-color-chain; }
 
 // ---------------------------------------------------------------------------
 // Named presets — demo theme picker. Activation:
@@ -119,31 +37,25 @@
 // ---------------------------------------------------------------------------
 
 [data-theme="ocean"] {
-	--color-primary:         190 80% 35%;
-	--color-primary-light:   190 60% 90%;
-	--color-primary-lighter: 190 50% 95%;
+	@include ln-values-light;
+	--brand-primary: 190 80% 35%;
 }
 
 [data-theme="sunset"] {
-	--color-primary:         10 80% 50%;
-	--color-primary-light:   10 70% 92%;
-	--color-primary-lighter: 10 60% 96%;
+	@include ln-values-light;
+	--brand-primary: 10 80% 50%;
 }
 
 [data-theme="midnight"] {
-	@include ln-dark-tokens;
-	--color-primary:         265 70% 60%;
-	--color-primary-light:   265 50% 22%;
-	--color-primary-lighter: 265 40% 15%;
+	@include ln-values-dark;
+	--brand-primary: 265 70% 60%;
 }
 
 [data-theme="glass"] {
-	@include ln-dark-tokens;
+	@include ln-values-dark;
 
 	// Electric blue accent — luminescent on dark navy glass
-	--color-primary:         218 95% 62%;
-	--color-primary-light:   218 55% 24%;
-	--color-primary-lighter: 218 50% 16%;
+	--brand-primary: 218 95% 62%;
 
 	// Flat — zero radius everywhere
 	--radius-xs:   0;
@@ -199,13 +111,11 @@
 	--nav-link-border-color-active: var(--color-accent);
 	--nav-list-bleed:               calc(-1 * var(--padding-x));
 
-	// Active-nav wash — Glass shifts --color-accent-tint one step
-	// darker (var(--color-primary-light) instead of -lighter) for
-	// stronger contrast on the deep dark surface. Replaces the
-	// pre-refactor descendant override on a.active. Side-effect:
-	// dropdown active items + upload drop-zone also pick up the
+	// Active-nav wash — Glass computes a stronger 24% tint mix against
+	// local --bg-base for contrast on the deep dark surface.
+	// Side-effect: dropdown active items + upload drop-zone also pick up the
 	// slightly darker tint — improvement, not regression.
-	--color-accent-tint: hsl(var(--color-primary-light));
+	--color-accent-tint: color-mix(in srgb, hsl(var(--color-primary)) 24%, var(--bg-base));
 
 	// ── Dropdown / menu-items dividers ─────────────────────────────
 	// @mixin menu-items reads SOFT --border-block-start on `li + li`

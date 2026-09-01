@@ -1,11 +1,11 @@
 ---
 name: prose
 classification: css
-status: draft
+status: active
 domain: frontend
-summary: Longform editorial typography styling headings, paragraphs, bulleted lists, blockquotes, and code blocks.
+summary: Editorial rich-text typographic styling for articles, release notes, and WYSIWYG editor output with bullet lists and blockquotes.
 source: theme/config/mixins/_prose.scss
-tags: [prose, typography, editorial, articles, markdown, lists]
+tags: [prose, typography, rich-text, articles, lists, editor]
 ---
 
 # 📖 prose
@@ -14,28 +14,38 @@ tags: [prose, typography, editorial, articles, markdown, lists]
 
 ## 1. Core Behavior & Responsibility
 
-The `prose` module (`theme/components/_prose.scss` and `theme/config/mixins/_prose.scss`) styles editorial reading content:
-- **Structural vs Editorial Separation:** In `ln-ashlar`, base `<ul>` and `<ol>` tags are unstyled to serve as UI primitives (tabs, menus, button groups). The `.prose` wrapper opt-in restores standard editorial bullet discs, decimal numbers, and paragraph line spacing.
-- **Reading Measure:** Caps line width at optimal readability (`65ch` max width).
+The `prose` module (`theme/config/mixins/_prose.scss` and `theme/components/_prose.scss`) delivers typographic styling for editorial and rich-text content:
+
+- **Editorial Rhythm:** Restores bullet discs on `<ul>`, decimal counters on `<ol>`, blockquote left accent borders, code block formatting, and paragraph vertical rhythm.
+- **Reading Measure Constraint:** Constrains line length to `--max-w-prose` (65ch) for optimal reading comfort.
+- **Editor Output Formatting:** Turnkey styling wrapper for TipTap, CKEditor, or Markdown rendered HTML.
 
 ---
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-### Base HTML Markup
+### Base HTML Markup (Article Prose Container)
 
 ```html
 <article class="prose">
-    <h1>Terms of Service</h1>
-    <p>Welcome to our platform. Please review the following guidelines:</p>
+    <h2>Release Notes</h2>
+    <p>Version 2.0 introduces an inverted density architecture.</p>
     <ul>
-        <li>Keep your account credentials secure.</li>
-        <li>Do not share API keys across unverified environments.</li>
+        <li>Compact base density at 14px</li>
+        <li>Accessible focus indicators</li>
     </ul>
     <blockquote>
-        Security is a shared responsibility across teams.
+        <p>Design systems thrive on clear boundaries and strict invariants.</p>
     </blockquote>
 </article>
+```
+
+### Variant 1: Semantic SCSS Mixin Inclusion
+
+```scss
+#help-center-article {
+    @include prose;
+}
 ```
 
 ---
@@ -44,19 +54,21 @@ The `prose` module (`theme/components/_prose.scss` and `theme/config/mixins/_pro
 
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
-| `prose` | mixin | — | Applies editorial typography, bulleted list styles, and reading rhythm |
-| `.prose` | class | — | Default component class applying @include prose |
+| `prose` | mixin | — | Editorial typography recipe with styled lists, blockquotes, and code |
+| `.prose` | class | — | Prototyping wrapper class for rich-text content |
+| `--max-w-prose` | token | `65ch` | Optimal reading measure width constraint |
 
 ---
 
 ## 4. Accessibility & Common Pitfalls
 
 > [!CAUTION]
-> 1. **Do Not Style Global Lists:** Never set `list-style: disc` globally on `ul` at the root stylesheet level. Always confine editorial bullet styling to `.prose` containers.
+> 1. **Lists in UI vs. Editorial Prose:** Structural UI lists (menus, tabs, chips, accordions) must NEVER use `.prose` (they use unstyled `<ul>`). Use `.prose` only for editorial prose and documentation.
+> 2. **Line Length Constraint:** Do not override `--max-w-prose` to 100% on ultra-wide screens, as lines beyond 75ch cause tracking strain for readers.
 
 ---
 
 ## 5. Related Documents
 
-- [`typography`](./typography.md) — Semantic typography scale.
-- [`kbd`](./kbd.md) — Keycap styles inside prose.
+- [`typography`](./typography.md) — Typography roles and scales.
+- [`tokens`](./tokens.md) — Font families and line heights.

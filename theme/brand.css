@@ -1,0 +1,69 @@
+/**
+ * ============================================================================
+ * ln-ashlar — Brand Configuration Template (brand.css)
+ * ============================================================================
+ *
+ * This file allows client applications to override corporate brand colors
+ * and typography for both light and dark themes in a single place without
+ * modifying or recompiling core library files.
+ *
+ * HOW TO USE:
+ * 1. Copy this file into your project (e.g., as `assets/css/brand.css`).
+ * 2. Link this file in your HTML. Thanks to zero-specificity `:where()` selectors
+ *    in ln-ashlar, your definitions here will ALWAYS win regardless of stylesheet
+ *    loading order (even if loaded before `ln-ashlar.css`).
+ *
+ * IMPORTANT RULES:
+ * - Bare HSL Triplets: Values for `--brand-primary` and `--brand-secondary` MUST
+ *   be specified as bare HSL triplets (e.g. `221 83% 48%`), NEVER wrapped in `hsl(...)`.
+ *   The library internally composes alpha transparency over these values using CSS
+ *   color slash syntax: `hsl(var(--color-primary) / 0.2)`. Wrapping them in `hsl()`
+ *   would produce invalid syntax like `hsl(hsl(...) / 0.2)` and drop declarations.
+ *
+ * - Tint Overrides: By default, `--color-accent-tint` and `--color-accent-tint-strong`
+ *   are automatically computed via `color-mix()` against local surface backgrounds.
+ *   If your brand requires custom hand-tuned tint shades, uncomment and set
+ *   `--brand-primary-tint` and `--brand-primary-tint-strong`.
+ *
+ * - Additional Overrides: You may also customize font families (`--font-sans`, `--font-mono`)
+ *   or override any neutral color tokens (`--color-neutral-50` ... `--color-neutral-900`)
+ *   within the respective theme blocks below.
+ * ============================================================================
+ */
+
+/* -------------------------------------------------------------------------- */
+/* Light Mode Brand Values                                                    */
+/* -------------------------------------------------------------------------- */
+:root,
+[data-theme="light"] {
+	/* Primary brand color (bare HSL triplet: hue saturation% lightness%) */
+	--brand-primary:   221 83% 48%;
+
+	/* Secondary brand accent color (bare HSL triplet) */
+	--brand-secondary: 160 84% 36%;
+
+	/* Typography font stacks (optional) */
+	--font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	--font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+
+	/* Optional manual accent tint overrides (defaults are computed via color-mix) */
+	/* --brand-primary-tint:        hsl(221 83% 97%); */
+	/* --brand-primary-tint-strong: hsl(221 83% 94%); */
+}
+
+/* -------------------------------------------------------------------------- */
+/* Dark Mode Brand Values                                                     */
+/* -------------------------------------------------------------------------- */
+[data-theme="dark"] {
+	/* Primary brand color for dark surfaces (defaults to matching light mode per R8; */
+	/* adjust if your brand requires custom dark mode contrast or hue tuning) */
+	--brand-primary:   221 83% 48%;
+
+	/* Secondary brand accent color for dark surfaces (defaults to matching light mode; */
+	/* adjust if your brand requires custom dark mode contrast or hue tuning) */
+	--brand-secondary: 160 84% 36%;
+
+	/* Optional manual dark accent tint overrides */
+	/* --brand-primary-tint:        hsl(232 50% 15%); */
+	/* --brand-primary-tint-strong: hsl(232 60% 22%); */
+}

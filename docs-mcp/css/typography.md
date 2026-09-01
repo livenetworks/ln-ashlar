@@ -1,11 +1,11 @@
 ---
 name: typography
 classification: css
-status: draft
+status: active
 domain: frontend
-summary: Semantic role typography system, font family stacks, tabular numbers, and text alignment mixins.
+summary: Semantic typography roles, font scales, line-heights, tracking, font-features, and prose vs structural list distinctions.
 source: theme/config/mixins/_typography.scss
-tags: [typography, fonts, text-scale, font-weight, accessibility]
+tags: [typography, font-size, line-height, tracking, headings, prose]
 ---
 
 # 🔤 typography
@@ -14,27 +14,48 @@ tags: [typography, fonts, text-scale, font-weight, accessibility]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-ashlar` typography system enforces **Semantic Roles** through the `@include typography($role)` mixin.
-- **Rule:** Mixins and components never set raw `font-size` or read `--text-*` directly. They invoke `@include typography($role)` which rebinds `--font-size` and `--line-height` primitives at the element's scope.
-- **Font Stack:** Standard UI font is **Inter** (`var(--font-sans)`), with monospace support via `var(--font-mono)` for code, hashes, and data values.
-- **Tabular Numbers:** Numeric data (tables, timestamps, metrics) must use `@include font-tabular` for monospaced figure alignment.
+The `typography` system (`theme/config/mixins/_typography.scss` and `theme/base/_typography.scss`) manages type hierarchy and rhythm across two layers:
+
+1. **Semantic Typography Roles (`typography($role)`):** The primary abstraction. Rebinds `--font-size` and `--line-height` dynamically on the consuming element scope based on role (`display-sm`, `heading-md`, `title-md`, `body-md`, `label-md`, `caption`). Automatically scales across density tiers.
+2. **Typography Primitives (`text-xs` through `text-2xl`):** Direct font-size helpers for un-roled micro-components.
+3. **Structural Lists vs. Editorial Prose:** Structural lists (`<ul>`, `<ol>`) are clean UI primitives by default (`list-style: none`, `margin: 0`, `padding: 0`). Editorial prose with bullets, numbering, and vertical rhythm is opt-in via `@include prose` / `.prose`.
+4. **Tabular Numerals:** Numerics in tables and stat-cards default to `tnum` (`font-variant-numeric: tabular-nums`).
 
 ---
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-### Base HTML Markup
+### Base HTML Markup (Semantic Heading Hierarchy)
 
 ```html
-<h1>Dashboard Overview</h1>
-<p class="subtitle">System metrics for current billing period</p>
-<span class="user-id">#USR-98421</span>
+<article class="article-card">
+    <header>
+        <span class="meta"><time datetime="2026-09-01">Sep 1, 2026</time></span>
+        <h1>Design Token Architecture</h1>
+    </header>
+    <main>
+        <p>Primitives cascade seamlessly across light and dark modes.</p>
+    </main>
+</article>
 ```
 
 ```scss
-h1 { @include typography(heading-lg); }
-.subtitle { @include typography(body-md); color: var(--fg-muted); }
-.user-id { @include font-mono; @include font-tabular; }
+// SCSS Usage:
+.article-card {
+    header {
+        .meta {
+            @include typography(caption);
+            color: var(--fg-muted);
+        }
+        h1 {
+            @include typography(display-sm);
+            @include font-bold;
+        }
+    }
+    main > p {
+        @include typography(body-md);
+    }
+}
 ```
 
 ---
@@ -43,26 +64,34 @@ h1 { @include typography(heading-lg); }
 
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
-| `typography` | mixin | `$role: keyword` | Rebinds font-size and line-height primitives |
-| `font-tabular` | mixin | — | Applies tabular-nums for numeric column alignment |
-| `truncate` | mixin | — | Single-line text truncation with ellipsis |
-| `font-sans` | mixin | — | Applies Inter font-sans stack |
-| `font-mono` | mixin | — | Applies JetBrains Mono / monospace font stack |
-| `text-xs`, `text-sm`, `text-base` | mixin | — | Raw size helper mixins |
-| `font-medium`, `font-semibold`, `font-bold` | mixin | — | Font weight helper mixins |
+| `typography` | mixin | `$role: keyword` | Applies font-size and line-height for given semantic role |
+| `text-xs`, `text-sm`, `text-base`, `text-lg`, `text-xl`, `text-2xl` | mixin | — | Direct font-size steps |
+| `font-normal`, `font-medium`, `font-semibold`, `font-bold` | mixin | — | Font-weight presets (400, 500, 600, 700) |
+| `tracking-tight`, `tracking-normal`, `tracking-wide` | mixin | — | Optical tracking letter-spacing presets |
+| `truncate` | mixin | — | Single-line ellipsis overflow clipping |
+| `--font-sans` | token | `'Inter', sans-serif` | Primary sans-serif font stack |
+| `--font-mono` | token | `'JetBrains Mono', monospace` | Monospace code font stack |
+| `--text-display-sm` | token | `1.875rem` / `1.1` | Page `h1` display title size |
+| `--text-heading-md` | token | `1.25rem` / `1.2` | Section `h2` heading size |
+| `--text-title-md` | token | `1rem` / `1.3` | Card `h4` title size |
+| `--text-body-md` | token | `0.875rem` / `1.5` | Standard body copy (14px) |
+| `--text-label-md` | token | `0.8125rem` / `1.4` | Form label size |
+| `--text-caption` | token | `0.75rem` / `1.4` | Timestamp & caption size |
 
 ---
 
 ## 4. Accessibility & Common Pitfalls
 
 > [!CAUTION]
-> 1. **Do Not Skip Heading Levels:** Visual styling via `@include typography(...)` is decoupled from HTML heading levels (`<h1>` to `<h6>`). Always maintain sequential semantic HTML headings for screen readers.
-> 2. **Tabular Numerics in Tables:** All numeric table cells (`<td>`) and metric tiles (`stat-card`) must use tabular numbers to prevent jitter on value updates.
+> 1. **Prefer Semantic Roles Over Raw Sizes:** Always use `@include typography($role)` so that typography inherits density scaling adjustments correctly.
+> 2. **Never Use Unstyled Lists for Editorial Content:** Raw `<ul>` and `<ol>` tags have bullets and padding removed for layout usage. For articles, blog posts, or release notes, wrap content in `.prose` or `@include prose`.
+> 3. **Preserve Semantic HTML Tags:** Using `<time datetime="...">` for dates and `<strong>` / `<data>` for numerical values ensures full screen-reader and machine readability.
 
 ---
 
 ## 5. Related Documents
 
-- [`tokens`](./tokens.md) — 3-layer design tokens.
-- [`density`](./density.md) — Typography scaling across density modes.
-- [`prose`](./prose.md) — Longform editorial typography.
+- [`prose`](./prose.md) — Editorial typography, prose styling, and text formatting.
+- [`tokens`](./tokens.md) — Typography scales and design token values.
+- [`density`](./density.md) — Information density scaling of type roles.
+- [`page-header`](./page-header.md) — Page title headers.

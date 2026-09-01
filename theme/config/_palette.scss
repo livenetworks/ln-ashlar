@@ -1,0 +1,218 @@
+// ==========================================================================
+// Palette & Color Derivation Mixins — ln-ashlar
+// ==========================================================================
+// Pure mixin partial — no CSS output.
+// Defines theme values (light and dark) and the unified color derivation chain.
+// ==========================================================================
+
+@mixin ln-values-light {
+	// Brand colors — bare HSL triplets
+	--brand-primary:   221 83% 48%;
+	--brand-secondary: 160 84% 36%;
+
+	// Secondary tint layers
+	--color-secondary-light:   160 84% 94%;
+	--color-secondary-lighter: 160 84% 97%;
+
+	// Status colors
+	--color-success:         142 76% 36%;
+	--color-success-light:   142 71% 94%;
+	--color-success-lighter: 142 71% 97%;
+
+	--color-error:           0 84% 48%;
+	--color-error-light:     0 84% 94%;
+	--color-error-lighter:   0 84% 97%;
+
+	--color-warning:         32 95% 38%;
+	--color-warning-light:   38 92% 94%;
+	--color-warning-lighter: 38 92% 97%;
+
+	--color-info:            200 95% 38%;
+	--color-info-light:      199 89% 94%;
+	--color-info-lighter:    199 89% 97%;
+
+	// Neutral scale (canonical greys)
+	--color-neutral-50:  210 20% 98%;
+	--color-neutral-100: 220 14% 96%;
+	--color-neutral-150: 220 13% 93%;
+	--color-neutral-200: 220 13% 90%;
+	--color-neutral-300: 216 12% 84%;
+	--color-neutral-400: 218 11% 58%;
+	--color-neutral-500: 220 10% 40%;
+	--color-neutral-600: 215 14% 34%;
+	--color-neutral-700: 217 19% 27%;
+	--color-neutral-800: 215 28% 17%;
+	--color-neutral-900: 222 47% 11%;
+
+	// Base canvas background
+	--color-white: 0 0% 100%;
+
+	// Shadows — cool-tinted, dual-layer (ambient + key light)
+	--shadow-none: none;
+
+	--shadow-xs:
+		0 1px 2px 0 hsl(220 40% 10% / 0.05);
+
+	--shadow-sm:
+		0 1px 3px 0 hsl(220 40% 10% / 0.07),
+		0 1px 2px -1px hsl(220 40% 10% / 0.05);
+
+	--shadow-md:
+		0 4px 6px -1px hsl(220 40% 10% / 0.08),
+		0 2px 4px -2px hsl(220 40% 10% / 0.05);
+
+	--shadow-lg:
+		0 10px 15px -3px hsl(220 40% 10% / 0.08),
+		0 4px 6px -4px hsl(220 40% 10% / 0.04);
+
+	--shadow-xl:
+		0 20px 25px -5px hsl(220 40% 10% / 0.09),
+		0 8px 10px -6px hsl(220 40% 10% / 0.04);
+
+	--shadow-2xl:
+		0 25px 50px -12px hsl(220 40% 10% / 0.18);
+
+	--shadow-inner:
+		inset 0 2px 4px 0 hsl(220 40% 15% / 0.06);
+
+	// Surface highlight — subtle top-edge bevel/illumination for elevated surfaces
+	--surface-highlight: inset 0 1px 0 0 hsl(0 0% 100% / 0.6);
+
+	// Value vocabulary — what bg/fg/border/shadow values exist
+	--bg-base:     hsl(var(--color-white));
+	--bg-elevated: var(--bg-base);
+	--bg-sunken:   hsl(var(--color-neutral-100));
+	--bg-recessed: hsl(var(--color-neutral-50));
+
+	--bg-hover:  hsl(var(--color-neutral-100));
+	--bg-active: hsl(var(--color-neutral-150));
+
+	--fg-default: hsl(var(--color-neutral-900));
+	--fg-muted:   hsl(var(--color-neutral-500));
+	--fg-subtle:  hsl(var(--color-neutral-400));
+
+	--border-subtle:       hsl(var(--color-neutral-200));
+	--border-strong:       hsl(var(--color-neutral-300));
+	--border-strong-hover: hsl(var(--color-neutral-300));
+
+	--color-scrim:  hsl(var(--color-neutral-900) / 0.5);
+}
+
+@mixin ln-values-dark {
+	// Brand colors — bare HSL triplets (default dark matches light per R8)
+	--brand-primary:   221 83% 48%;
+	--brand-secondary: 160 84% 36%;
+
+	// Neutral scale — inverted
+	--color-neutral-50:  220 20%  8%;
+	--color-neutral-100: 220 16% 12%;
+	--color-neutral-150: 220 14% 18%;
+	--color-neutral-200: 220 13% 24%;
+	--color-neutral-300: 220 13% 36%;
+	--color-neutral-400: 218 11% 52%;
+	--color-neutral-500: 220 10% 68%;
+	--color-neutral-600: 220 11% 76%;
+	--color-neutral-700: 220 14% 84%;
+	--color-neutral-800: 220 20% 92%;
+	--color-neutral-900: 221 30% 97%;
+
+	// Vocabulary — bg
+	--bg-base:     hsl(220 16% 13%);
+	--bg-elevated: hsl(220 16% 17%);
+	--bg-sunken:   hsl(220 16% 20%);
+	--bg-recessed: hsl(220 16%  9%);
+	--bg-hover:    hsl(220 16% 20%);
+	--bg-active:   hsl(220 16% 24%);
+
+	// Vocabulary — fg
+	--fg-default: hsl(0 0% 95%);
+	--fg-muted:   hsl(220 10% 68%);
+	--fg-subtle:  hsl(218 11% 55%);
+
+	--border-subtle:       hsl(220 14% 20%);
+	--border-strong:       hsl(220 13% 36%);
+	--border-strong-hover: hsl(220 13% 36%);
+
+	// Scrim
+	--color-scrim: hsl(0 0% 0% / 0.6);
+
+	// Status tint layers — re-tuned for dark surfaces
+	--color-success-light:   142 50% 18%;
+	--color-success-lighter: 142 40% 13%;
+	--color-warning-light:   32 55% 20%;
+	--color-warning-lighter: 32 45% 14%;
+	--color-info-light:      217 55% 22%;
+	--color-info-lighter:    217 45% 15%;
+	--color-error-light:     0 50% 20%;
+	--color-error-lighter:   0 40% 14%;
+
+	// Secondary tint layers — re-tuned for dark surfaces
+	--color-secondary-light:   160 55% 20%;
+	--color-secondary-lighter: 160 45% 14%;
+
+	// Shadows — solid black, boosted alpha, dual-layer
+	--shadow-xs:
+		0 1px 2px 0 hsl(0 0% 0% / 0.35);
+	--shadow-sm:
+		0 1px 3px 0 hsl(0 0% 0% / 0.40),
+		0 1px 2px -1px hsl(0 0% 0% / 0.25);
+	--shadow-md:
+		0 4px 6px -1px hsl(0 0% 0% / 0.45),
+		0 2px 4px -2px hsl(0 0% 0% / 0.30);
+	--shadow-lg:
+		0 10px 15px -3px hsl(0 0% 0% / 0.50),
+		0 4px 6px -4px hsl(0 0% 0% / 0.35);
+	--shadow-xl:
+		0 20px 25px -5px hsl(0 0% 0% / 0.60),
+		0 8px 10px -6px hsl(0 0% 0% / 0.40);
+	--shadow-2xl:
+		0 25px 50px -12px hsl(0 0% 0% / 0.70);
+	--shadow-inner:
+		inset 0 2px 4px 0 hsl(0 0% 0% / 0.32);
+
+	// Surface highlight — crisp top-edge bevel on dark elevated surfaces
+	--surface-highlight: inset 0 1px 0 0 hsl(0 0% 100% / 0.08);
+}
+
+@mixin ln-color-chain {
+	// brand → semantic
+	--color-primary:   var(--brand-primary);
+	--color-secondary: var(--brand-secondary);
+
+	// colour-aware shadows
+	--shadow-primary:  0 8px 24px -6px hsl(var(--color-primary) / 0.28);
+	--shadow-success:  0 8px 24px -6px hsl(var(--color-success) / 0.28);
+	--shadow-error:    0 8px 24px -6px hsl(var(--color-error)   / 0.28);
+
+	--app-scrim-bg:    hsl(var(--color-neutral-900) / 0.4);
+
+	// shadow roles
+	--shadow-resting:  var(--shadow-sm);
+	--shadow-floating: var(--shadow-md);
+	--shadow-overlay:  var(--shadow-xl);
+
+	// primitives — what mixin bodies read
+	--color-bg:     var(--bg-base);
+	--color-fg:     var(--fg-default);
+	--color-border: var(--border-subtle);
+	--shadow:       var(--shadow-resting);
+
+	// accent — tints computed against the LOCAL --bg-base, so one
+	// formula serves both themes. The two override slots are
+	// undeclared by default; a client declares them to win.
+	--color-accent:    hsl(var(--color-primary));
+	--color-accent-fg: hsl(var(--color-white));
+	--color-accent-tint: var(--brand-primary-tint,
+		color-mix(in srgb, hsl(var(--color-primary)) 8%, var(--bg-base)));
+	--color-accent-tint-strong: var(--brand-primary-tint-strong,
+		color-mix(in srgb, hsl(var(--color-primary)) 16%, var(--bg-base)));
+
+	// button surface (neutral default)
+	--btn-bg:           var(--color-bg);
+	--btn-fg:           var(--color-fg);
+	--btn-border:       var(--border-strong);
+	--btn-bg-hover:     var(--bg-hover);
+	--btn-bg-active:    var(--bg-active);
+	--btn-fg-hover:     var(--color-fg);
+	--btn-border-hover: var(--border-strong);
+}

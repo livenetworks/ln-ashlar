@@ -1,11 +1,11 @@
 ---
 name: chip
 classification: css
-status: draft
+status: active
 domain: frontend
-summary: Compact interactive tokens and dismissible filter badges with remove buttons and tone variants.
+summary: Inline metadata tags, active filter chips, and dismissible token badges with status color washes.
 source: theme/config/mixins/_chip.scss
-tags: [chip, badge, token, filter, removable, tag]
+tags: [chip, badge, tag, filters, metadata, dismissible]
 ---
 
 # 🏷️ chip
@@ -14,32 +14,34 @@ tags: [chip, badge, token, filter, removable, tag]
 
 ## 1. Core Behavior & Responsibility
 
-The `chip` component (`theme/components/_chip.scss` and `theme/config/mixins/_chip.scss`) renders compact badges representing active filter criteria, tags, or categorized metadata:
-- **`@include chip` / `.chip`:** Pill-shaped inline element with subtle background and border.
-- **Dismissible Action:** Supports embedded dismiss button (`button[aria-label="Remove"]`) with hover highlight.
-- **Tones:** Supports tone classes (`.success`, `.warning`, `.error`, `.info`).
+The `chip` module (`theme/config/mixins/_chip.scss` and `theme/components/_chip.scss`) formats inline metadata tokens and active filter tags:
+
+- **Passive vs Interactive Labels:** Unlike interactive checkbox/radio pills, chips represent passive metadata tags with an optional dismissal remove button.
+- **Recessed Tone Base:** Uses `--bg-recessed` and `--fg-muted` by default.
+- **Status Washes:** Supports `.success`, `.warning`, `.error`, and `.info` color washes using a 12% alpha status background.
+- **Dismiss Button Styling:** Features a compact remove button with dedicated `:focus-visible` keyboard focus indicators.
 
 ---
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-### Base HTML Markup
+### Base HTML Markup (Active Filter Chip with Remove Action)
 
 ```html
 <span class="chip">
-    <span>Department: Sales</span>
-    <button type="button" aria-label="Remove filter">
+    Category: Electronics
+    <button type="button" aria-label="Remove filter: Category Electronics">
         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
     </button>
 </span>
 ```
 
-### Variant 1: Tone Chip
+### Variant 1: Semantic Status Chips
 
 ```html
-<span class="chip success">
-    <span>Verified</span>
-</span>
+<span class="chip success">Approved</span>
+<span class="chip warning">Under Review</span>
+<span class="chip error">Expired</span>
 ```
 
 ---
@@ -48,24 +50,22 @@ The `chip` component (`theme/components/_chip.scss` and `theme/config/mixins/_ch
 
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
-| `chip` | mixin | — | Base pill container with dismiss button styling |
-| `.chip` | class | — | Default component class applying @include chip |
-| `.success` | class | — | Tone modifier applying success emerald colors |
-| `.warning` | class | — | Tone modifier applying warning amber colors |
-| `.error` | class | — | Tone modifier applying error red colors |
-| `.info` | class | — | Tone modifier applying info sky colors |
+| `chip` | mixin | — | Base chip layout, typography (`label-sm`), and dismiss button rhythm |
+| `.chip` | class | — | Prototyping class for `chip` |
+| `.success`, `.warning`, `.error`, `.info` | class | — | Status color wash modifiers (12% alpha fill) |
 
 ---
 
 ## 4. Accessibility & Common Pitfalls
 
 > [!CAUTION]
-> 1. **Dismiss Button Label:** Always provide an explicit `aria-label="Remove filter"` on the child button inside a chip.
-> 2. **Chip vs Status Badge:** Use `chip` for interactive, dismissible tags and filters; use `status-badge` for read-only state indicators.
+> 1. **Dismiss Button Accessible Description:** Always provide an explicit `aria-label` describing the exact item being removed (e.g. `aria-label="Remove tag JavaScript"`).
+> 2. **Chip vs. Pill Distinction:** Do not use `chip` for mutually exclusive radio/checkbox selection. For selectable option groups, use `pills` from `toggles-and-pills.md`.
 
 ---
 
 ## 5. Related Documents
 
-- [`status-badge`](./status-badge.md) — Read-only state indicators.
-- [`toggles-and-pills`](./toggles-and-pills.md) — Selection pills.
+- [`toggles-and-pills`](./toggles-and-pills.md) — Interactive selection pills and switches.
+- [`status-badge`](./status-badge.md) — Table status badges.
+- [`ln-filter`](../components/ln-filter.md) — Interactive filter coordinator.

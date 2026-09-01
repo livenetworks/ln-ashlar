@@ -1,61 +1,57 @@
 ---
 name: cards
 classification: css
-status: draft
+status: active
 domain: frontend
-summary: Card panel surfaces, nested elevation ladder, panel headers, bodies, footers, and accent borders.
+summary: Card containers, composed section-cards, nested elevation shifts, and structured panel-header/body/footer child regions.
 source: theme/config/mixins/_card.scss
-tags: [card, panel, surfaces, elevation, layout]
+tags: [cards, containers, surfaces, elevation, layout, panels]
 ---
 
-# 🃏 cards
+# 📇 cards
 
 ---
 
 ## 1. Core Behavior & Responsibility
 
-The `cards` mixin module (`theme/config/mixins/_card.scss`) styles surface containers with an automated nesting elevation ladder:
-- **Surface Nesting:** Direct cards use `--bg-base`. When nested inside another card or `.section-card`, descendant cards automatically climb to `--bg-elevated` and `--shadow-floating`.
-- **Structural Slots:** Automatically formats direct children: `> header` (`@include panel-header`), `> main` (`@include panel-body`), and `> footer` (`@include panel-footer`).
-- **Accents:** Provides border accent mixins (`card-accent-top`, `card-accent-bottom`, `card-accent-left`) for status highlights.
+The `cards` module (`theme/config/mixins/_card.scss` and `theme/components/_card.scss`) provides primary content surface containers:
+
+- **`card`:** Bare content container applying `--color-bg`, `--color-border`, `--radius`, and resting shadow. Automatically elevates nested child cards to `--bg-elevated` and `--shadow-floating`.
+- **`section-card`:** Composed layout card featuring pre-structured `<header>`, `<main>`, and `<footer>` sections with unified borders and paddings.
+- **Direct Child Bindings:** Automatically formats direct child `> header` (`panel-header`), `> main` (`panel-body`), and `> footer` (`panel-footer`) without interfering with nested content components.
+- **Whole-Card Links:** Wrapping content in a direct `> a` child converts the card into a clickable tile while preserving internal layout and inheriting colors.
 
 ---
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-### Base HTML Markup
+### Base HTML Markup (Data Card)
 
 ```html
 <article class="card">
     <header>
-        <h3>Tenant Profile</h3>
+        <h3>Card Title</h3>
     </header>
     <main>
-        <p>Enterprise subscription active through Dec 2026.</p>
+        <p>Card body content and metrics.</p>
     </main>
     <footer>
-        <button type="button" class="btn btn-soft">Edit</button>
+        <button type="button" class="btn btn-ghost">View Details</button>
     </footer>
 </article>
 ```
 
-### Variant 1: Card with Top Accent
+### Variant 1: Clickable Link Card
 
 ```html
-<article class="card accent-top" style="--color-accent: hsl(var(--color-primary));">
-    <header>
-        <h3>Highlighted Metric</h3>
-    </header>
-    <main>
-        <p>Active plan details...</p>
-    </main>
+<article class="card">
+    <a href="/projects/42">
+        <main>
+            <h3>Q4 Security Audit</h3>
+            <p>Completed 2026-09-01</p>
+        </main>
+    </a>
 </article>
-```
-
-```scss
-.accent-top {
-    @include card-accent-top;
-}
 ```
 
 ---
@@ -64,29 +60,30 @@ The `cards` mixin module (`theme/config/mixins/_card.scss`) styles surface conta
 
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
-| `card` | mixin | — | Standard card shell with automatic slot styling and nesting elevation |
-| `section-card` | mixin | — | Panel container with overflow: clip for sticky descendants |
-| `panel-header` | mixin | — | Sunken header bar with integrated bottom border |
-| `panel-body` | mixin | — | Main content container with padding |
-| `panel-footer` | mixin | — | Action footer with right-aligned flex layout |
-| `card-accent-top` | mixin | — | Adds 3px top border using --color-accent |
-| `card-accent-bottom` | mixin | — | Adds 3px bottom border using --color-accent |
-| `card-accent-left` | mixin | — | Adds 3px left border using --color-accent |
-| `card-stacked` | mixin | — | Pseudo-element bottom shadow illusion for stacked deck cards |
-| `card-bg` | mixin | — | Tinted background based on --color-accent |
-| `.card` | class | — | Default component class applying @include card |
+| `card` | mixin | — | Base container card with resting shadow and border |
+| `section-card` | mixin | — | Composed layout card with structured header, body, and footer |
+| `panel-header` | mixin | — | Card header region with title-sm typography and border |
+| `panel-body` | mixin | — | Card content body with standard padding and flex rhythm |
+| `panel-footer` | mixin | — | Card footer region with border-t and action alignment |
+| `.card` | class | — | Prototyping class for `card` |
+| `.section-card` | class | — | Prototyping class for `section-card` |
+| `--color-bg` | token | `var(--bg-base)` | Active card background |
+| `--shadow` | token | `var(--shadow-resting)` | Active card elevation shadow |
 
 ---
 
 ## 4. Accessibility & Common Pitfalls
 
 > [!CAUTION]
-> 1. **Direct Child Scoping:** The card's slot mixins apply only to direct children (`> header`, `> main`, `> footer`). Do not nest arbitrary `<header>` tags inside child components without wrapping them.
+> 1. **Avoid Nested Interactive Elements in Link Cards:** If a card uses the whole-card `> a` link pattern, do not place additional buttons or links inside it, as nested interactive elements violate HTML accessibility standards.
+> 2. **Direct Child Scoping:** Child mixins are scoped to direct children (`> header`, `> main`). Always use semantic HTML5 elements inside the card rather than generic container divs.
+> 3. **Elevation Semantics:** Nested cards automatically elevate. Do not manually override `--color-bg: white` in dark mode.
 
 ---
 
 ## 5. Related Documents
 
-- [`tokens`](./tokens.md) — Surface vocabulary tokens.
-- [`theming`](./theming.md) — Dark mode elevation ladder.
-- [`sections`](./sections.md) — Page section layouts.
+- [`tokens`](./tokens.md) — Surface tokens, border radii, and resting/floating shadows.
+- [`theming`](./theming.md) — Dark mode surface elevation and scoped theme islands.
+- [`sections`](./sections.md) — Macro page sections and container wrappers.
+- [`stat-card`](./stat-card.md) — KPI metric cards.

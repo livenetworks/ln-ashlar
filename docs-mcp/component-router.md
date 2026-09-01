@@ -91,6 +91,19 @@
 | `ln-dictionary` | *TODO — confirm scope via `get_component`* | |
 | `ln-icon` | Sprite-based icons, localStorage-cached | Inline one-off SVGs |
 
+## Styling & SCSS Architecture
+
+| Styling Concern | Route to Document | Don't Do |
+|---|---|---|
+| Surfaces, colors, tokens, interaction tints | `css/tokens`, `doctrine/scss-architecture` | Inventing token names or reading scale tokens inside mixins |
+| Dark mode, scoped theme islands, brand.css, presets | `css/theming` | Overriding colors per component instead of data-theme / brand tokens |
+| Mixin catalogue, recipe binding, override rules | `css/mixins`, `doctrine/scss-architecture` | Writing bespoke CSS utilities or inline style blocks |
+| Spacing scales, density modes (`compact`, `spacious`) | `css/density`, `css/tokens` | Hardcoding pixel/rem spacings in component styles |
+| Breakpoints, media queries, responsive containers | `css/breakpoints`, `css/layout` | Ad-hoc media queries outside defined breakpoint scale |
+| Layout primitives (grid, stack, row, flex) | `css/layout`, `css/mixins` | Adding presentational layout wrapper classes to HTML |
+
+*Styling rule: Never invent a token or mixin name — call `search_docs` / `get_doctrine` first.*
+
 ---
 
 ## Capability signals

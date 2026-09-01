@@ -21,6 +21,11 @@
 		<changefreq>weekly</changefreq>
 		<priority>0.7</priority>
 	</url>
+	<url>
+		<loc>scoped-theme.html</loc>
+		<changefreq>weekly</changefreq>
+		<priority>0.7</priority>
+	</url>
 
 	<!-- Admin Demo Pages -->
 	<url>

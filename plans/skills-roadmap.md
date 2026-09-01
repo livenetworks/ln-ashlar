@@ -85,6 +85,6 @@ One document for humans giving instructions — "read this first."
 - [ ] New project integration guide — what SCSS files to create, how to structure project SCSS
 
 ### Фаза 3: Existing Docs Gap Fill
-- [ ] Audit `docs/css/` — accurate? complete?
+- [x] Audit `docs/css/` — accurate? complete? (retired and ported to `docs-mcp/css/`)
 - [ ] Audit `docs/js/` — accurate? complete?
 - [ ] Audit `.claude/skills/` — fill gaps found in Фаза 2

@@ -4,7 +4,7 @@ classification: doctrine
 status: draft
 domain: frontend
 summary: Two-layer SCSS design system, tokens, mixins vs components, theming strategy, and z-index stacking layers in ln-ashlar.
-source: docs/architecture/reference.md, docs/css/theming.md, docs/css/tokens.md
+source: docs/architecture/reference.md, docs-mcp/css/theming.md, docs-mcp/css/tokens.md
 tags: [doctrine, scss, css, theming, design-tokens]
 ---
 
@@ -103,33 +103,52 @@ To avoid selector collisions and specificity bugs, follow these selector rules:
 
 ---
 
-## 4. Design Tokens and Primitives
+## 5. Design Tokens, Primitives, and the Layer Model
 
-Design values are declared as CSS custom properties in `theme/config/_tokens.scss`.
+Design values are declared as CSS custom properties in `theme/config/_tokens.scss`, `_palette.scss`, and `_theme.scss`.
 
-### A. Bare HSL Triplets
-To allow variable alpha opacity, colors (brand, secondary, and status values) are declared as raw HSL numeric values:
-```css
---color-primary: 216 95% 42%; /* Bare triplet */
+### A. The Four Token Layers
+Styling values flow through four strictly defined layers. A brand token, a scale token, a vocabulary token, and a primitive are **not interchangeable**, even though they all ultimately resolve to CSS values.
 
-/* Composed at use site */
-background-color: hsl(var(--color-primary) / 0.5); /* 50% opacity */
+```
+1. Brand Tokens          ->  --brand-primary: 221 83% 48%; --brand-secondary: 160 84% 36%;
+                             (Bare HSL numbers; allows variable alpha opacity composition)
+            ↓
+2. Scale Tokens          ->  --size-md: 1rem; --color-neutral-100: 220 14% 96%; --color-success: 142 76% 36%;
+                             (Back-end scale plumbing; NEVER read directly inside mixin bodies)
+            ↓ wired at theme scope (ln-values-light / ln-values-dark)
+3. Vocabulary Tokens     ->  --bg-base, --bg-elevated, --bg-sunken, --bg-recessed,
+                             --fg-default, --fg-muted, --border-subtle, --shadow-resting,
+                             --text-title-md, --lh-title-md
+                             (Named semantic design intent; rebound at theme :root or [data-theme])
+            ↓ derived via ln-color-chain at :root AND [data-theme]
+4. Primitive Tokens      ->  --color-bg, --color-fg, --color-border, --shadow,
+                             --padding-x, --padding-y, --gap, --radius, --font-size, --line-height
+                             (The ONLY tokens mixin bodies read and consume)
 ```
 
-### B. Vocabulary and Primitives
-- **Vocabulary Tokens:** Pre-composed colors and shadows representing semantic choices (e.g., `--bg-base`, `--bg-elevated`, `--bg-sunken`, `--bg-hover`, `--bg-active`, `--fg-muted`, `--border-subtle`, `--shadow-resting`).
-- **Primitives:** Single CSS variables that SCSS mixins read directly (e.g., `--color-bg`, `--color-fg`, `--color-border`, `--shadow`, `--padding-x`, `--padding-y`). These map by default to vocabulary tokens and theme dimensions.
-- **Non-Linear Vocabulary Model:** `--bg-*` vocabulary tokens are **not an elevation ladder**; their absolute values may invert or shift across themes (e.g. dark mode surface inversion) while preserving their semantic relationship.
-- **Interaction States & Freeze Invariant:** Neutral interaction states are vocabulary entries (`--bg-hover`, `--bg-active`). Accent-derived states are tokenised strictly as ratio percentages (`--tint-hover: 7%`, `--tint-selected: 12%`, `--tint-active: 14%`) rather than pre-resolved colors because of the `:root` freeze rule: any CSS token declared at `:root` that embeds `var(--color-accent)` or `var(--color-bg)` freezes at `:root`, breaking dynamic status cascades (`.success`, `.error`, `.warning`, `.info`). By tokenising the ratio literal, `color-mix()` stays at the declaration site where `--color-accent` and `--color-bg` resolve dynamically on the local component scope.
-- **Scope Re-binding:** To change the appearance of a component, rebind the primitive on the local component scope instead of writing static overrides:
-```css
-.card-dark-mode {
-    --color-bg: var(--bg-recessed);
-    --color-fg: var(--fg-muted);
-}
-```
+### B. The Rebind Contract (Read vs. Write Boundaries)
+- **Mixins:** Mixin bodies read **primitives only** (`--color-bg`, `--color-fg`, `--color-border`, `--shadow`, `--padding-x`, `--padding-y`, `--gap`, `--radius`, `--font-size`, `--line-height`). They NEVER read vocabulary tokens or raw scale tokens directly.
+- **Components:** Component instances and custom selectors write/rebind **primitives** on their local scope to select a vocabulary role (e.g. `.sunken-card { --color-bg: var(--bg-sunken); }`). Components NEVER rebind `--bg-*` vocabulary tokens.
+- **Themes & Presets:** Themes rebind **vocabulary tokens** at the theme root scope (`:root`, `[data-theme="dark"]`, `[data-theme="preset"]`). Themes change surface tones globally without rewriting component mixins.
+- **Density Tiers:** Density modes (`[data-density="compact"]`) rebind geometric primitives and vocabulary (`--padding-y`, `--gap`, `--text-{role}`, `--lh-{role}`), never color semantics.
 
-### C. Mixin Inclusion Grouping and Overrides
+### C. Architectural Invariants
+1. **Primitives Invariant:** Mixins read primitives only, never vocabulary (`--bg-*`, `--fg-*`) and never raw scales (`--size-*`, `--color-neutral-*`).
+2. **Rebind Scoping Invariant:** Vocabulary is rebound at theme `:root` and `[data-theme]` scopes; primitives are rebound on component-local scopes.
+3. **Semantic Role Invariant:** A theme may change absolute color/shadow values but must preserve semantic relationships across roles.
+4. **Density Invariant:** Density modifies spatial and typographic geometry, never color or surface semantics.
+5. **Visibility Invariant:** `hidden` (attribute or `.hidden` in tabs) is the sole hiding mechanism; there is no `.ln-hidden` or ad-hoc display override class.
+6. **Freeze Rule Invariant:** Accent-derived interaction states are tokenised strictly as ratio percentages (`--tint-hover: 7%`, `--tint-selected: 12%`, `--tint-active: 14%`) rather than pre-resolved `:root` colors. `color-mix()` executes at the local declaration site so `--color-accent` and `--color-bg` resolve dynamically on the component cascade.
+
+### D. Anti-Patterns & Pitfalls
+> [!CAUTION]
+> 1. **Do Not Introduce Surface Aliases:** Never introduce `surface-1`, `surface-2`, or `surface-3` elevation ladders. Use the semantic vocabulary (`--bg-base`, `--bg-elevated`, `--bg-sunken`, `--bg-recessed`).
+> 2. **Do Not Read Neutral Scale for Backgrounds:** Never use `--color-neutral-*` directly for backgrounds or text in mixins. The neutral scale inverts in dark mode, which will turn light surfaces pitch black or vice-versa.
+> 3. **Do Not Infer Tonal Direction from Names:** `--bg-sunken` is darker than `--bg-base` in light mode (96% vs 100%) but **lighter** than `--bg-base` in dark mode (20% vs 13%). This is intentional so sunken wells do not punch through the 9% app-shell ground.
+> 4. **Do Not Rebind Vocabulary on Components:** Never write `.card { --bg-base: ... }`. Always write `.card { --color-bg: var(--bg-elevated); }`.
+
+### E. Mixin Inclusion Grouping and Overrides
 When styling custom, project-specific components (e.g. by unique IDs like `#user-edit-modal` and `#packages-filter-drawer`), follow these grouping and overriding guidelines:
 1. **Group shared mixins:** Group selectors sharing the exact same base mixin using comma-separated rules to keep the compiled CSS clean and unified.
 2. **Rebind primitives for overrides:** Rather than writing direct custom styling overrides (like `padding: 2rem` or `border: 1px solid red`) which break layout architectures, rebind the component's internal design primitives (like `--padding-x`, `--padding-y`, `--color-bg`, or `--color-border`) in a separate block underneath.
@@ -155,7 +174,7 @@ When styling custom, project-specific components (e.g. by unique IDs like `#user
 
 ---
 
-## 5. Theming and Dark Mode Strategy
+## 6. Theming and Dark Mode Strategy
 
 `ln-ashlar` supports dark mode and custom consumer themes through a **vocabulary re-binding layer**.
 
@@ -180,7 +199,7 @@ Because component mixins read primitives like `--color-bg` (which default to `--
 
 ---
 
-## 6. Z-Index and Stacking Contexts
+## 7. Z-Index and Stacking Contexts
 
 Z-indices are defined globally using semantic z-index variables, for ordinary (non-top-layer) elements:
 ```
@@ -198,7 +217,7 @@ enter the top layer (sticky headers, toasts).
 
 ---
 
-## 7. Visual Defaults
+## 8. Visual Defaults
 
 Certain visual behaviors are fixed library-wide defaults, not per-component choices:
 
@@ -210,6 +229,7 @@ Certain visual behaviors are fixed library-wide defaults, not per-component choi
 
 ---
 
-## 8. Responsive Strategy
+## 9. Responsive Strategy
 
 `@container` queries style components (the parent declares `container-type`, the child queries it — never the same element); `@media` is reserved for the layout shell only. Container breakpoints are content-driven, not predetermined by viewport size.
+

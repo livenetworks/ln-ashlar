@@ -1,22 +1,27 @@
 ---
 name: page-header
 classification: css
-status: draft
+status: active
 domain: frontend
-summary: Structured page header container query grid aligning breadcrumbs, title, subtitle, and primary action buttons.
+summary: Standard responsive page header combining top breadcrumb nav, title, subtitle, and right-aligned actions using :has() slotting.
 source: theme/config/mixins/_page-header.scss
-tags: [page-header, layout, typography, breadcrumbs, actions]
+tags: [page-header, header, breadcrumbs, actions, layout, title]
 ---
 
-# 🏷️ page-header
+# 📑 page-header
 
 ---
 
 ## 1. Core Behavior & Responsibility
 
-The `page-header` component (`theme/components/_page-header.scss` and `theme/config/mixins/_page-header.scss`) formats top-level page headers into a self-contained container query grid (`container-name: page-header`):
-- **Stacked Mode (Narrow / Mobile):** Breadcrumbs on top, title/subtitle in the middle, action buttons stacked below.
-- **Split Mode (`cq-up(medium)` ≥ 880px):** Title and subtitle aligned left, action buttons aligned right along the baseline, breadcrumbs above.
+The `page-header` module (`theme/config/mixins/_page-header.scss` and `theme/components/_page-header.scss`) provides the canonical layout for top-of-page headers:
+
+- **CSS-Only Layout:** Fully declarative layout using CSS Grid and `:has()` slot selection without JavaScript.
+- **Slot Composition:**
+  - `> nav`: Top-row breadcrumbs (auto-styled without extra classes).
+  - `> div:has(> h1)`: Title (`display-sm`) and subtitle (`p`).
+  - `> div:has(> button, > a)`: Action button group.
+- **Responsive Stacking:** Below 880px, stacks breadcrumbs → title → actions vertically; at 880px and above, expands to full-width breadcrumbs above a title-left and actions-right grid row.
 
 ---
 
@@ -28,19 +33,27 @@ The `page-header` component (`theme/components/_page-header.scss` and `theme/con
 <header class="page-header">
     <nav aria-label="Breadcrumb">
         <ol>
-            <li><a href="/admin">Admin</a></li>
-            <li><a href="/admin/packages" aria-current="page">Packages</a></li>
+            <li><a href="/">Home</a></li>
+            <li aria-current="page">Documents</li>
         </ol>
     </nav>
     <div>
-        <h1>Subscription Packages</h1>
-        <p>Manage pricing tiers and tenant feature access.</p>
+        <h1>Quality Manual</h1>
+        <p>Version 2.3 — Approved 2026-03-15</p>
     </div>
-    <div class="actions">
-        <button type="button" class="btn btn-soft">Export CSV</button>
-        <button type="button" class="btn" data-ln-modal-for="create-modal">New Package</button>
+    <div>
+        <button type="button" class="btn btn-ghost">Edit</button>
+        <button type="submit" class="btn">Publish</button>
     </div>
 </header>
+```
+
+### Variant 1: Semantic SCSS Mixin Binding
+
+```scss
+#document-view > header {
+    @include page-header;
+}
 ```
 
 ---
@@ -49,21 +62,24 @@ The `page-header` component (`theme/components/_page-header.scss` and `theme/con
 
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
-| `page-header` | mixin | — | Applies responsive container-query grid layout to `<header>` |
-| `.page-header` | class | — | Default component class applying @include page-header |
+| `page-header` | mixin | — | Responsive page header CSS Grid layout with `:has()` slot detection |
+| `.page-header` | class | — | Prototyping class for `page-header` |
+| `--text-display-sm` | token | `1.875rem` / `1.1` | Page header title size |
+| `--margin-block` | token | `var(--size-xl)` | Bottom separation margin |
 
 ---
 
 ## 4. Accessibility & Common Pitfalls
 
 > [!CAUTION]
-> 1. **Do Not Add Margin to `<h1>`:** The page header grid manages vertical rhythm through CSS `gap`. Adding arbitrary bottom margins to `<h1>` disrupts baseline alignment with the action buttons.
-> 2. **Breadcrumb `<nav>`:** Always provide `aria-label="Breadcrumb"` on the navigation container to distinguish it from primary application menus.
+> 1. **Breadcrumb `<nav>` Labeling:** Always include `aria-label="Breadcrumb"` on the inner breadcrumb `<nav>` element.
+> 2. **Heading Level Invariant:** The page header title should always be an `<h1>` element, representing the primary heading for the page.
+> 3. **Action Button Elements:** Ensure all interactive triggers use `<button>` or `<a>` with descriptive text or accessible labels.
 
 ---
 
 ## 5. Related Documents
 
-- [`breadcrumbs`](./breadcrumbs.md) — Breadcrumb navigation.
-- [`typography`](./typography.md) — Typography semantic roles.
-- [`app-shell`](./app-shell.md) — App shell layout integration.
+- [`breadcrumbs`](./breadcrumbs.md) — Breadcrumb navigation trails.
+- [`typography`](./typography.md) — Semantic display and heading roles.
+- [`app-shell`](./app-shell.md) — Main content container and page column wrapper.

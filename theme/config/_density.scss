@@ -24,7 +24,7 @@
 // Interactive controls (buttons, inputs, pills): density-reactive UPWARD.
 // Base (~38px) = WCAG AA. Comfortable (≥46px) and Spacious (≥54px) = AAA.
 // Controls rebind --btn-padding-y and --input-padding-y in up-tier scopes.
-// See docs/css/density.md §wcag for the height math.
+// See docs-mcp/css/density.md §wcag for the height math.
 //
 // No parallel --density-* token scale. Density overrides existing base
 // tokens at the scope root, exactly like theme color overrides.

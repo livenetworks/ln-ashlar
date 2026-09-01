@@ -3,78 +3,13 @@
 // ==========================================================================
 // Design Tokens — ln-ashlar
 // ==========================================================================
-// Single source of truth for all design values.
-// All components reference these CSS variables.
-// For theming: override at :root or scope to an element.
+// Single source of truth for theme-invariant design values (sizes, spacing,
+// radii, typography scales, transitions, and z-index).
 //
-// Colors are stored as bare HSL triplets to enable alpha transparency:
-//   hsl(var(--color-primary))          → solid color
-//   hsl(var(--color-primary) / 0.5)    → 50% transparent
-//
-// Theming example:
-//   .dark-theme { --color-bg: ...; }
+// Color and shadow values reside in `_palette.scss` and `_theme.scss`.
 // ==========================================================================
 
 :root {
-
-	// -----------------------------------------------------------------------
-	// Colors — Primary (Modern vibrant royal blue / Tailwind blue-600)
-	// -----------------------------------------------------------------------
-	--color-primary: 221 83% 48%;
-	--color-primary-light: 221 83% 94%;
-	--color-primary-lighter: 221 83% 97%;
-
-	// -----------------------------------------------------------------------
-	// Colors — Secondary (brand accent — surface/element color, NOT text)
-	// For subdued text color, see --fg-muted in the logical token section.
-	// -----------------------------------------------------------------------
-	--color-secondary: 160 84% 36%;
-	--color-secondary-light:   160 84% 94%;
-	--color-secondary-lighter: 160 84% 97%;
-
-	// -----------------------------------------------------------------------
-	// Colors — Status
-	// -----------------------------------------------------------------------
-	--color-success:         142 76% 36%;
-	--color-success-light:   142 71% 94%;
-	--color-success-lighter: 142 71% 97%;
-
-	--color-error:           0 84% 48%;
-	--color-error-light:     0 84% 94%;
-	--color-error-lighter:   0 84% 97%;
-
-	--color-warning:         32 95% 38%;
-	--color-warning-light:   38 92% 94%;
-	--color-warning-lighter: 38 92% 97%;
-
-	--color-info:            200 95% 38%;
-	--color-info-light:      199 89% 94%;
-	--color-info-lighter:    199 89% 97%;
-
-	// -----------------------------------------------------------------------
-	// Colors — Neutral scale (canonical greys)
-	// -----------------------------------------------------------------------
-	// Mixins may reach into the neutral scale directly when no semantic
-	// token matches the intent. Every such reference must be verified
-	// during dark-mode audits -- semantic tokens inherit dark adjustments
-	// automatically, direct-neutral references do not.
-	//
-	--color-neutral-50:  210 20% 98%;
-	--color-neutral-100: 220 14% 96%;
-	--color-neutral-150: 220 13% 93%;
-	--color-neutral-200: 220 13% 90%;
-	--color-neutral-300: 216 12% 84%;
-	--color-neutral-400: 218 11% 58%;
-	--color-neutral-500: 220 10% 40%;
-	--color-neutral-600: 215 14% 34%;
-	--color-neutral-700: 217 19% 27%;
-	--color-neutral-800: 215 28% 17%;
-	--color-neutral-900: 222 47% 11%;
-
-	// -----------------------------------------------------------------------
-	// Colors — Backgrounds
-	// -----------------------------------------------------------------------
-	--color-white: 0 0% 100%;
 
 	// -----------------------------------------------------------------------
 	// Size scale — canonical spacing primitives
@@ -130,45 +65,6 @@
 	--radius-xl:   0.75rem;    // 12px
 	--radius-2xl:  1rem;       // 16px
 	--radius-full: 9999px;
-
-	// -----------------------------------------------------------------------
-	// Shadows — cool-tinted, dual-layer (ambient + key light)
-	// -----------------------------------------------------------------------
-	// Public API surface — full scale exposed; internal usage may skip levels.
-	--shadow-none: none;
-
-	--shadow-xs:
-		0 1px 2px 0 hsl(220 40% 10% / 0.05);
-
-	--shadow-sm:
-		0 1px 3px 0 hsl(220 40% 10% / 0.07),
-		0 1px 2px -1px hsl(220 40% 10% / 0.05);
-
-	--shadow-md:
-		0 4px 6px -1px hsl(220 40% 10% / 0.08),
-		0 2px 4px -2px hsl(220 40% 10% / 0.05);
-
-	--shadow-lg:
-		0 10px 15px -3px hsl(220 40% 10% / 0.08),
-		0 4px 6px -4px hsl(220 40% 10% / 0.04);
-
-	--shadow-xl:
-		0 20px 25px -5px hsl(220 40% 10% / 0.09),
-		0 8px 10px -6px hsl(220 40% 10% / 0.04);
-
-	--shadow-2xl:
-		0 25px 50px -12px hsl(220 40% 10% / 0.18);
-
-	--shadow-inner:
-		inset 0 2px 4px 0 hsl(220 40% 15% / 0.06);
-
-	// Surface highlight — subtle top-edge bevel/illumination for elevated surfaces
-	--surface-highlight: inset 0 1px 0 0 hsl(0 0% 100% / 0.6);
-
-	// Color-aware shadows (for focus halos and coloured CTAs)
-	--shadow-primary: 0 8px 24px -6px hsl(var(--color-primary) / 0.28);
-	--shadow-success: 0 8px 24px -6px hsl(var(--color-success) / 0.28);
-	--shadow-error:   0 8px 24px -6px hsl(var(--color-error)   / 0.28);
 
 	// -----------------------------------------------------------------------
 	// Transitions — durations
@@ -255,7 +151,6 @@
 	// -----------------------------------------------------------------------
 	--app-header-height: 3.25rem;   // 52px — DocuFlow topbar height
 	--app-sidebar-width: 14.5rem;   // 232px — DocuFlow sidebar width
-	--app-scrim-bg: hsl(var(--color-neutral-900) / 0.4);
 
 	// -----------------------------------------------------------------------
 	// Logical tokens — the public contract mixins read
@@ -280,57 +175,6 @@
 	--gap:             var(--size-xs-up);   // 6px — dense base
 	--radius:          var(--radius-md);
 
-	// -----------------------------------------------------------------------
-	// Value vocabulary — what bg/fg/border/shadow values exist
-	// -----------------------------------------------------------------------
-	// Mixins read primitives (--color-bg, --color-fg, --color-border,
-	// --shadow). Vocabulary provides the value choices. Components rebind
-	// the primitive on their own scope to pick a different vocabulary
-	// value. Themes override vocabulary at theme :root.
-	//
-	// Important: --bg-* vocabulary tokens are not an elevation ladder;
-	// their absolute values may invert or shift across themes while
-	// preserving their semantic relationship.
-	// -----------------------------------------------------------------------
-
-	--bg-base:     hsl(var(--color-white));
-	--bg-elevated: var(--bg-base);
-	--bg-sunken:   hsl(var(--color-neutral-100));
-	--bg-recessed: hsl(var(--color-neutral-50));
-
-	// Interaction states — neutral. NOT surfaces: only ever applied by a
-	// :hover / :active selector. Static recessed fills stay on --bg-sunken.
-	--bg-hover:  hsl(var(--color-neutral-100));
-	--bg-active: hsl(var(--color-neutral-150));
-
-	--fg-default: hsl(var(--color-neutral-900));
-	--fg-muted:   hsl(var(--color-neutral-500));
-	--fg-subtle:  hsl(var(--color-neutral-400));
-
-	--border-subtle:       hsl(var(--color-neutral-200));
-	--border-strong:       hsl(var(--color-neutral-300));
-	--border-strong-hover: hsl(var(--color-neutral-300));
-
-	--shadow-resting:  var(--shadow-sm);
-	--shadow-floating: var(--shadow-md);
-	--shadow-overlay:  var(--shadow-xl);
-
-	// -- Surface colors — primitives -------------------------------------
-	// Mixins read these four primitives. Vocabulary provides the value
-	// choices (--bg-*, --fg-*, --border-*, --shadow-*). Components rebind
-	// a primitive on their own scope to pick a different vocabulary entry.
-	--color-bg:     var(--bg-base);
-	--color-fg:     var(--fg-default);
-	--color-border: var(--border-subtle);
-	--shadow:       var(--shadow-resting);
-	--color-scrim:  hsl(var(--color-neutral-900) / 0.5);
-
-	// -- Accent -----------------------------------------------------------
-	--color-accent:        hsl(var(--color-primary));
-	--color-accent-fg:     hsl(var(--color-white));
-	--color-accent-tint:         hsl(var(--color-primary-lighter));
-	--color-accent-tint-strong:  hsl(var(--color-primary-light));
-
 	// Accent-wash strengths. Ratios, not colors — color-mix() stays at the
 	// declaration site so --color-accent / --color-bg resolve locally and the
 	// semantic-color cascade keeps working. Ladder taken from _dropdown.scss,
@@ -349,9 +193,9 @@
 	// fill computed FROM --color-primary, the rebind must happen at
 	// consumer scope (e.g. `[data-theme="..."] button[type="submit"], .btn
 	// { --btn-bg: ...; }`) so the nested var() resolves at the button —
-	// otherwise --color-primary freezes at theme :root and the
-	// .success/.error/.warning/.info status cascade breaks. Glass uses
-	// the consumer-scope pattern; see scss/config/_theme.scss.
+	// otherwise the .success/.error/.warning/.info status cascade breaks on
+	// elements using semantic-color overrides. Glass uses the consumer-scope
+	// pattern; see theme/config/_theme.scss.
 	// --color-accent-bg
 	// --color-accent-bg-hover
 	// --color-accent-bg-fg
@@ -364,24 +208,6 @@
 	// --nav-link-border-color-hover
 	// --nav-link-border-color-active
 	// --nav-list-bleed
-
-	// -- Button surface (neutral default) --------------------------------
-	// Read by @mixin button-base across idle + hover + active. The
-	// neutral default wires here. Accent variants (submit + @mixin btn)
-	// REBIND --btn-* on the consumer element (not at :root) — this
-	// preserves the .success/.error/.warning/.info semantic-color
-	// cascade because var() resolves at the declaration site. A
-	// companion --btn-accent-* surface AT :ROOT would freeze
-	// --color-accent at :root and break that cascade; the fix is
-	// consumer-scoped rebinding, not a parallel :root surface. See
-	// scss/config/mixins/_btn.scss header for the full rationale.
-	--btn-bg:           var(--color-bg);
-	--btn-fg:           var(--color-fg);
-	--btn-border:       var(--border-strong);
-	--btn-bg-hover:     var(--bg-hover);
-	--btn-bg-active:    var(--bg-active);
-	--btn-fg-hover:     var(--color-fg);
-	--btn-border-hover: var(--border-strong);
 
 	// Button padding tokens
 	--btn-padding-x:    var(--size-sm-up);
