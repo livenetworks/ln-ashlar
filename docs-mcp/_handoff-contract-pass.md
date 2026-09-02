@@ -1,147 +1,140 @@
 # Handoff — docs-mcp Contract-Compliance Pass (2026-07-21)
 
-> За колега што продолжува во нова сесија. Овој фајл е самодоволен — не ти
-> треба претходната разговорна историја. Underscore-префиксот значи дека
-> MCP индексерот НЕ го чита овој фајл (не е дел од корпусот), но git го следи.
+> For a teammate continuing in a new session. This file is self-contained — you do not
+> need prior conversation history. The underscore prefix means that the MCP indexer
+> does NOT read this file (it is not part of the corpus), but git tracks it.
 
 ---
 
-## 1. Цел на задачата
+## 1. Goal of the Task
 
-`validate_docs` (ln-ashlar MCP, конектор „Live Networks") пријавуваше **14
-component докови** што паѓаа на parser-контрактот. Задачата: да се поправат
-контракт-прекршувањата, БЕЗ да се пипаат изворните `js/` и `demo/` фајлови —
-само `docs-mcp/`.
+`validate_docs` (ln-ashlar MCP, "Live Networks" connector) reported **14 component docs**
+failing the parser contract. The task: fix contract violations WITHOUT touching source
+`js/` and `demo/` files — only `docs-mcp/`.
 
-Контрактот е дефиниран во `docs-mcp/README.md` + `docs-mcp/_templates/*.md`.
-
----
-
-## 2. КЛУЧНО: каде живее валидаторот
-
-Parser-от/валидаторот (логиката на `validate_docs`) **НЕ е во ова репо** — тој
-е во **MCP серверскиот пакет** (`/home/mcp/server`). Во работното дрво НЕМА
-`tools/ashlar/lint-cli.js` ниту `npm run lint:docs` (потврдено со grep; постојат
-само `scripts/build.mjs` и `scripts/consolidate-admin-demos.mjs`).
-
-Последици:
-- **Локална реверификација = само grep.** Нема runnable linter локално.
-- **Целосна реверификација = `validate_docs`**, кој чита од серверската копија
-  `/home/mcp/server/resources/ln-ashlar` — ја одразува измената дури откако
-  серверот **re-pull-ира** (по push), не од работното дрво.
-- Секоја промена на parser **ПОНАШАЊЕ** мора да ја примени корисникот на
-  серверот; репото менува само докови, `_templates/` и `README.md`.
+The contract is defined in `docs-mcp/README.md` + `docs-mcp/_templates/*.md`.
 
 ---
 
-## 3. Што е СРЕДЕНО и НА GIT
+## 2. KEY: Where the Validator Lives
 
-Двата commit-а се веќе на `origin/main`:
+The parser/validator logic (`validate_docs`) is **NOT in this repository** — it lives
+in the **MCP server package** (`/home/mcp/server`). In the workspace tree there is NO
+`tools/ashlar/lint-cli.js` nor `npm run lint:docs` (verified via grep; only `scripts/build.mjs`
+and `scripts/consolidate-admin-demos.mjs` exist).
 
-### `c57f685` — contract-compliance pass + none-declaration convention (12 фајлови)
-- `docs-mcp/README.md` — ново правило „none-declaration" во §Normative Tables
-- `docs-mcp/_templates/component.md` — none-sentence fallback коментари под §3
-- `docs-mcp/_parser-none-declaration-spec.md` — **спец за серверски parser change** (види §5)
-- `docs-mcp/components/ln-ajax.md` — додадена `Default` колона
-- `docs-mcp/components/ln-link.md` — додадена `Default` колона
-- `docs-mcp/components/ln-validate.md` — split на комбиниран Direction ред (Emits + Listens)
-- `docs-mcp/components/ln-table.md` — §2 Variant heading + нормативна Events табела (18 реда) + `### Configuration Attributes` → `### Attributes Table` (+ `Type` → `Type / Values`)
-- `docs-mcp/components/ln-modal-fill.md` — none-sentence за атрибути
-- `docs-mcp/components/ln-autoresize.md` — none-sentence за евенти
-- `docs-mcp/components/ln-time.md` — none-sentence за евенти
-- `docs-mcp/components/ln-slug.md` — none-sentence за евенти
-- `docs-mcp/components/ln-filter.md` — вистински Attributes + Events табели (од изворот) + `[!NOTE]` за `data-ln-filter-hide` (state marker, не config)
-
-### `cf01dcd` — service-docs fold (2 фајлови)
-- `docs-mcp/components/ln-http.md` — §3 Events API преструктуиран во нормативна табела (`ln-http:request`=Listens, `response`/`error`=Emits); `detail` полиња како bullet-листа (намерно НЕ втора табела)
-- `docs-mcp/components/positioning.md` — §2/§3 преименувани во пропишаните наслови (service го задржува JS-usage блокот + functions табелата; exempt од html-block правилото)
+Consequences:
+- **Local re-verification = grep only.** There is no runnable local linter.
+- **Full re-verification = `validate_docs`**, which reads from the server copy
+  `/home/mcp/server/resources/ln-ashlar` — reflecting changes only after the server
+  **re-pulls** (after git push), not from the working directory.
+- Any change to parser **BEHAVIOR** must be applied by the user on the server; the repository
+  only modifies docs, `_templates/`, and `README.md`.
 
 ---
 
-## 4. Статус по оригиналните 14 (10 средени, 4 остануваат)
+## 3. What Was Fixed and Pushed to Git
 
-| Фајл | Статус по push |
+Both commits are already on `origin/main`:
+
+### `c57f685` — Contract-compliance pass + none-declaration convention (12 files)
+- `docs-mcp/README.md` — new "none-declaration" rule in §Normative Tables
+- `docs-mcp/_templates/component.md` — none-sentence fallback comments under §3
+- `docs-mcp/_parser-none-declaration-spec.md` — **spec for server parser change** (see §5)
+- `docs-mcp/components/ln-ajax.md` — added `Default` column
+- `docs-mcp/components/ln-link.md` — added `Default` column
+- `docs-mcp/components/ln-validate.md` — split combined Direction row (Emits + Listens)
+- `docs-mcp/components/ln-table.md` — §2 Variant heading + normative Events table (18 rows) + `### Configuration Attributes` → `### Attributes Table` (+ `Type` → `Type / Values`)
+- `docs-mcp/components/ln-modal-fill.md` — none-sentence for attributes
+- `docs-mcp/components/ln-autoresize.md` — none-sentence for events
+- `docs-mcp/components/ln-time.md` — none-sentence for events
+- `docs-mcp/components/ln-slug.md` — none-sentence for events
+- `docs-mcp/components/ln-filter.md` — genuine Attributes + Events tables (from source) + `[!NOTE]` for `data-ln-filter-hide` (state marker, not config)
+
+### `cf01dcd` — Service-docs fold (2 files)
+- `docs-mcp/components/ln-http.md` — §3 Events API restructured into normative table (`ln-http:request`=Listens, `response`/`error`=Emits); `detail` fields formatted as a bullet list (deliberately NOT a second table)
+- `docs-mcp/components/positioning.md` — §2/§3 renamed to prescribed headings (service retains JS-usage block + functions table; exempt from html-block rule)
+
+---
+
+## 4. Status Across the Original 14 Docs (10 Fixed, 4 Remaining)
+
+| File | Status After Push |
 |---|---|
-| ln-ajax, ln-link, ln-validate, ln-table, ln-http, positioning | ✅ ЗЕЛЕНО веднаш штом серверот re-pull-ира (табеларни, конформни) |
-| ln-modal-fill, ln-autoresize, ln-time, ln-slug | 🟡 ЦРВЕНО додека серверот не добие **Rule 1** (држат реченица, не табела) — ОЧЕКУВАНО, не регресија |
-| **ln-api-queue, ln-autosave, ln-data-store, ln-toggle** | ⛔ НЕ Е ПИПНАТО — **§4 група, одлуката ЈА НОСИ КОРИСНИКОТ** (види §6) |
+| ln-ajax, ln-link, ln-validate, ln-table, ln-http, positioning | ✅ GREEN as soon as server re-pulls (tabular, compliant) |
+| ln-modal-fill, ln-autoresize, ln-time, ln-slug | 🟡 RED until server receives **Rule 1** (they hold sentences, not tables) — EXPECTED, not a regression |
+| **ln-api-queue, ln-autosave, ln-data-store, ln-toggle** | ⛔ UNTOUCHED — **§4 group, DECISION BELONGS TO USER** (see §6) |
 
-(`ln-filter` не беше во 14-те, но доби вистински табели како дел од конвенцијата.)
-
----
-
-## 5. none-declaration конвенција + PENDING серверски parser change
-
-**Конвенција (веќе применета во докови):** во `simple`/`coordinator` докови §3
-СЕКОГАШ има и `### Attributes Table` и `### Events API`; празна секција држи
-експлицитна реченица наместо да се изостави:
-- Атрибути: `This component reads no data-ln-* configuration attributes.`
-- Евенти: `This component emits and listens to no custom ln-* events.`
-  (Комбинираната AND реченица е исцрпна — секој евент во било кој правец дава
-  ред во табелата преку `Direction` колоната, па none-реченица значи само
-  нула-евенти. Нема асиметричен случај.)
-
-**Спец за серверот:** `docs-mcp/_parser-none-declaration-spec.md` (на git):
-- **Rule 1 (relaxation):** под `### Attributes Table`/`### Events API`, ако нема
-  pipe-табела → прифати непразна проза (none-declaration); празно тело → грешка.
-- **Rule 2 (enforcement):** за simple/coordinator, §3 мора да има ОБА
-  под-наслова; `service` е exempt.
-- **Redослед:** примени го sweep-от (веќе на git) ПРЕД да го вклучиш Rule 2,
-  инаку тие докови паѓаат.
-
-⚠️ **Додека корисникот не ги примени Rule 1+2 на серверот и не re-pull-ира,
-4-те none-sentence докови ОСТАНУВААТ ЦРВЕНИ. Тоа е очекувано.**
+(`ln-filter` was not in the 14, but received real tables as part of the convention.)
 
 ---
 
-## 6. ШТО ОСТАНУВА (следни чекори)
+## 5. None-Declaration Convention + PENDING Server Parser Change
 
-### (A) §4 група — единствената преостаната репо-работа, ОДЛУКА НА КОРИСНИКОТ
-`ln-toggle`, `ln-autosave`, `ln-data-store`, `ln-api-queue` имаат легитимна
-`## 4. State & Persistence` → 8 нумерирани секции. Шаблонот дозволува
-опционален §4, но валидаторот бара ТОЧНО 7. Вистинска template↔validator
-контрадикција. Две опции:
-- **(a) Конформирај докови** — спушти §4 во `###` под-секција, ренумерирај 5-8→4-7 (само репо, може веднаш).
-- **(b) Олабави го валидаторот** — дозволи опционален §4 (7-или-8) + синхронизирај шаблон (допира серверски parser).
+**Convention (already applied in docs):** In `simple`/`coordinator` docs, §3 ALWAYS contains
+BOTH `### Attributes Table` and `### Events API`; an empty section holds an explicit sentence
+instead of being omitted:
+- Attributes: `This component reads no data-ln-* configuration attributes.`
+- Events: `This component emits and listens to no custom ln-* events.`
+  (The combined AND sentence is exhaustive — any event in either direction gets a row in the
+  table via the `Direction` column, so a none-sentence strictly means zero events. There is no
+  asymmetric case.)
 
-💡 **Синергија:** ако корисникот и онака го менува parser-от за Rule 1+2,
-опција (b) е речиси бесплатна во ИСТАТА серверска сесија. НЕ РЕШАВАЈ САМ — тоа е
-архитектонска одлука на корисникот.
+**Server Spec:** `docs-mcp/_parser-none-declaration-spec.md` (on git):
+- **Rule 1 (relaxation):** Under `### Attributes Table`/`### Events API`, if there is no pipe
+  table → accept non-empty prose (none-declaration); empty body → error.
+- **Rule 2 (enforcement):** For simple/coordinator, §3 must contain BOTH sub-headings; `service`
+  is exempt.
+- **Order:** Apply the documentation sweep (already on git) BEFORE enabling Rule 2, otherwise
+  those docs fail validation.
 
-✅ **РЕШЕНО 2026-07-22 — корисникот избра (b):** §4 е легитимен, доковите
-остануваат како што се. Rule 3 (опционален §4, 7-или-8 скелет) е додаден во
-`_parser-none-declaration-spec.md`. Нема преостаната репо-работа — остатокот
-е серверски (§6 B: Rule 1+2+3, потоа re-pull + реверификација §6 C).
-
-### (B) Серверски parser change (на корисникот)
-Примени Rule 1 + Rule 2 (+ можеби §4 опција b) на MCP серверот, redeploy/re-pull.
-
-### (C) Реверификација
-По re-pull, пушти `validate_docs` пак → потврди дека 10-те средени станале
-зелени и види ги вистинските преостанати падови. (Забелешка: конекторот „Live
-Networks" беше повремено disconnected — треба да е активен за да работи.)
+⚠️ **Until the user applies Rule 1+2 on the server and re-pulls, the 4 none-sentence docs
+REMAIN RED. This is expected.**
 
 ---
 
-## 7. Дисциплина за следната сесија (задолжително)
+## 6. What Remains (Next Steps)
 
-- **git-push scope:** „пушти на гит" = експлицитна листа фајлови ОД СЕСИЈАТА.
-  Работното дрво има многу претходно-валкани фајлови што НЕ се наши
-  (`_temp/**`, `docs/**`, `plans/**`, root `README.md`, `ln-fill.md`) — НЕ ги
-  собирај. Секогаш `git add <path>` експлицитно, никогаш `git add -A`.
-  Верификувај со `git show --name-only`.
-- **Изворот е вистина:** defaults/events/attributes се читаат од `components/ln-*/src`,
-  не се погодуваат. Не пипај `js/` и `demo/`.
-- **Timeless docs:** без „иден/planned/previously" фрази.
-- **plan-фајлови** (`.claude/plans/*.md`) се **gitignored** (submodule) → НЕ се
-  споделуваат преку git. Целата потребна спецификација е во овој handoff +
-  `_parser-none-declaration-spec.md` (двата се на репо-git патека, но handoff-от
-  сè уште не е commit-нат — види долу).
+### (A) §4 Group — Remaining Repository Work, USER DECISION
+`ln-toggle`, `ln-autosave`, `ln-data-store`, `ln-api-queue` have a legitimate
+`## 4. State & Persistence` → resulting in 8 numbered sections. The template allows an optional
+§4, but the validator was enforcing EXACTLY 7. A genuine template↔validator contradiction.
+Two options:
+- **(a) Conform docs** — Demote §4 to a `###` sub-section, renumber 5-8→4-7 (repo-only, immediate).
+- **(b) Relax validator** — Allow optional §4 (7-or-8 skeleton) + sync template (touches server parser).
+
+💡 **Synergy:** If the user is modifying the parser for Rule 1+2 anyway, option (b) is almost
+free in the SAME server session. DO NOT DECIDE ALONE — this is an architectural user decision.
+
+✅ **RESOLVED 2026-07-22 — User selected (b):** §4 is legitimate, docs remain as they are.
+Rule 3 (optional §4, 7-or-8 skeleton) was added to `_parser-none-declaration-spec.md`. No remaining
+repo work — the rest is server-side (§6 B: Rule 1+2+3, followed by re-pull + re-verification §6 C).
+
+### (B) Server Parser Change (User Side)
+Apply Rule 1 + Rule 2 (+ optional §4 Rule 3) on the MCP server, redeploy/re-pull.
+
+### (C) Re-verification
+After re-pull, run `validate_docs` again → confirm that the 10 fixed docs turned green and
+inspect any actual remaining failures. (Note: The "Live Networks" connector was intermittently
+disconnected — it must be active to work.)
 
 ---
 
-## 8. Git состојба на овој handoff
+## 7. Next Session Discipline (Mandatory)
 
-Овој фајл (`docs-mcp/_handoff-contract-pass.md`) е **сè уште НЕ commit-нат** во
-моментот на пишување. Ако сакаш колегата да го добие преку `git pull`, треба да
-се commit-не/push-не (само тој фајл, по scope-дисциплината од §7).
+- **Git-push scope:** "Push to git" = explicit list of files FROM THE SESSION. The workspace has
+  many pre-existing dirty files that are not ours (`_temp/**`, `docs/**`, `plans/**`, root
+  `README.md`, `ln-fill.md`) — DO NOT stage them. Always use `git add <path>` explicitly, never
+  `git add -A`. Verify with `git show --name-only`.
+- **Source is truth:** Defaults/events/attributes are read directly from `components/ln-*/src`,
+  never guessed. Do not touch `js/` and `demo/`.
+- **Timeless docs:** Avoid "future/planned/previously" phrases.
+- **Plan files** (`.claude/plans/*.md`) are **gitignored** (submodule) → NOT shared via git.
+  All required specification is in this handoff + `_parser-none-declaration-spec.md`.
+
+---
+
+## 8. Git Status of this Handoff
+
+This file (`docs-mcp/_handoff-contract-pass.md`) was created during the handoff session.
+If needed by teammates via `git pull`, commit and push following the scope discipline in §7.
