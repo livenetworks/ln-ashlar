@@ -38,7 +38,7 @@ JavaScript source: [`ln-debug.js`](../../components/ln-debug/src/ln-debug.js) an
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-### Base Development Setup
+### Base HTML Markup
 
 Place `data-ln-debug` on `<html>` or `<body>`:
 
@@ -79,10 +79,10 @@ window.lnDebug.schedule(document.body, 50, (report) => {
 
 ### Attributes Table
 
-| Attribute | Target Element | Type | Description |
+| Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|
-| `data-ln-debug` | `html` / `body` | `Flag` | Activates dev warnings, runs contract verification, and enables visual CSS dev styles. |
-| `data-ln-debug` | Any element | `Flag` | Attaches component debug instance to `element.lnDebug`. |
+| `data-ln-debug` | `html` / `body` | Flag | — | Activates dev warnings, runs contract verification, and enables visual CSS dev styles. |
+| `data-ln-debug` | Any element | Flag | — | Attaches component debug instance to `element.lnDebug`. |
 
 ### Generic Verification Rules
 
@@ -95,7 +95,10 @@ window.lnDebug.schedule(document.body, 50, (report) => {
 
 ### Events API
 
-This component emits and listens to no custom `ln-*` events.
+| Event | Direction | Cancelable | Description | `detail` Object |
+|---|---|---|---|---|
+
+*(ln-debug emits and listens to no custom ln-* events)*
 
 ---
 

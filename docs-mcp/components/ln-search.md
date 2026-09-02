@@ -21,7 +21,7 @@ The `ln-search` component is a decoupled search primitive implemented using the 
 2. **State Host Role (`data-ln-search="term"`)**: Sits on the target element (table, list, container). It observes its own attribute changes via `MutationObserver`, syncs matching controls, dispatches `ln-search:change`, and runs tokenized DOM filtering if not prevented.
 
 *   **Dual Search Operations (Local vs Remote):**
-    *   **Local DOM Filtering (Markup Search):** Configured with `data-ln-search-debounce="0"` on the control for instant per-keyup text matching. Matches stay visible, non-matching elements receive `data-ln-search-hide="true"`.
+    *   **Local DOM Filtering (Markup Search):** Configured with `` on the control for instant per-keyup text matching. Matches stay visible, non-matching elements receive `data-ln-search-hide="true"`.
     *   **Remote API Search:** Uses default `500ms` debounce (or custom `data-ln-search-debounce="150"`) to throttle queries.
 *   **Tokenized AND Matching & Text Caching:** Matches whitespace-separated tokens order-independently using substring tests (`indexOf`). Searchable text per item is cached dynamically (`_lnSearchText`) to guarantee $O(1)$ per-item lookups on keystrokes, and automatically invalidated via `MutationObserver` on DOM/text mutations.
 *   **Exempt & Subtree Exclusion (`data-ln-search-exclude`):**
@@ -75,7 +75,7 @@ if ($search !== '') {
 
 ### Base HTML Markup (Instant Local DOM Filter)
 
-Recommended visual wrapper with `data-ln-search-debounce="0"`:
+Recommended visual wrapper with ``:
 
 ```html
 <label class="search">
@@ -83,7 +83,7 @@ Recommended visual wrapper with `data-ln-search-debounce="0"`:
     <input type="search" 
            placeholder="Search items..." 
            data-ln-search-for="items-list" 
-           data-ln-search-debounce="0" 
+            
            aria-label="Search items">
     <button type="button" data-ln-search-clear aria-label="Clear search">
         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
@@ -107,7 +107,7 @@ Targets specific descendant elements inside tables or complex trees:
     <input type="search" 
            placeholder="Search users..." 
            data-ln-search-for="user-table" 
-           data-ln-search-debounce="0"
+           
            aria-label="Search users">
     <button type="button" data-ln-search-clear aria-label="Clear search">
         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
@@ -175,7 +175,6 @@ Clear triggers work universally without external coordinators:
 | `data-ln-search-items` | Target (State Host) | String | `null` | Optional CSS selector (e.g. `tbody tr`) targeting items instead of direct children. |
 | `data-ln-search-fields` | Target (State Host) | String | `null` | Comma-separated list of fields forwarded in `event.detail.fields`. |
 | `data-ln-search-exclude` | Item root or descendant | Flag | — | On item root: exempt from filtering (always visible). On descendant: subtree omitted from search text. |
-| `data-ln-search-debounce` | Control | Number | `500` | Debounce time in ms. Set `0` for instant local DOM filtering. |
 | `data-ln-search-clear` | Button | Flag | — | Universal clear button (inside control wrapper or inside target empty state). Clears input and resets target state. |
 | `data-ln-search-clear-for` | Button | String | — | Remote clear button referencing target element ID. Clears linked input and resets target state. |
 | `data-ln-search-hide` | Target Children | Boolean | `false` | State attribute added to non-matching DOM elements (`"true"`). |
@@ -227,7 +226,7 @@ label.search {
 
 > [!CAUTION]
 > 1. **Using `data-ln-search="targetId"` on inputs:** `data-ln-search` is the state attribute on the target. Controls must use `data-ln-search-for="targetId"`.
-> 2. **Omitting `data-ln-search-debounce="0"` for Local Search:** Omitting `debounce="0"` for local DOM filtering introduces a default 500ms delay.
+> 2. **Omitting `` for Local Search:** Omitting `debounce="0"` for local DOM filtering introduces a default 500ms delay.
 
 ---
 

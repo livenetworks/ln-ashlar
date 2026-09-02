@@ -192,5 +192,5 @@ sequenceDiagram
 
 ## 7. Related Components
 
-- [`ln-nav.md`](./ln-nav.md) — Listens to router navigation to update active link states.
+- [`ln-nav.md`](./ln-nav.md) — Patches `history.pushState`/`replaceState` and listens to `popstate` to update active link states upon navigation.
 - [`ln-ajax.md`](./ln-ajax.md) — Asynchronous content loader for template elements.

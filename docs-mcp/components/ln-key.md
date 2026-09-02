@@ -54,19 +54,23 @@ Opt in while the user is editing:
 
 ## 3. Declarative API Contract (Attributes & Events)
 
-| Attribute | Type | Default | Description |
-|---|---|---|---|
-| `data-ln-key` | Shortcut list | Required | Comma- or whitespace-separated combinations using `Ctrl`, `Alt`, `Shift`, and `Meta`. |
-| `data-ln-key-target` | CSS selector | Host element | Resolves the action target at trigger time. |
-| `data-ln-key-modifier` | Modifier combination | None | Nearest external-map context, for example `Ctrl` or `Ctrl+Shift`. |
-| `data-ln-key-for` | CSS selector | Required on map item | Points an external-map item to an existing target; trimmed item text supplies the key. |
-| `data-ln-key-allow-input` | Presence | Off | Allows the shortcut when the event originates in an editing control; inherited from a modifier container by map items. |
+### Attributes Table
 
-| Event | Cancelable | Detail |
-|---|---:|---|
-| `ln-key:before-trigger` | Yes | `{ source, target, action, key, event }` |
-| `ln-key:trigger` | No | `{ source, target, action, key, event }` |
-| `ln-key:destroyed` | No | `{ target }` |
+| Attribute | Element | Type / Values | Default | Description |
+|---|---|---|---|---|
+| `data-ln-key` | `button` / `input` | Shortcut list | Required | Comma- or whitespace-separated combinations using `Ctrl`, `Alt`, `Shift`, and `Meta`. |
+| `data-ln-key-target` | `span` / Element | CSS selector | Host element | Resolves the action target at trigger time. |
+| `data-ln-key-modifier` | `ul` / Container | Modifier combination | None | Nearest external-map context, for example `Ctrl` or `Ctrl+Shift`. |
+| `data-ln-key-for` | `li` | CSS selector | Required on map item | Points an external-map item to an existing target; trimmed item text supplies the key. |
+| `data-ln-key-allow-input` | Control | Flag | Off | Allows the shortcut when the event originates in an editing control. |
+
+### Events API
+
+| Event | Direction | Cancelable | Description | `detail` Object |
+|---|---|---|---|---|
+| `ln-key:before-trigger` | Emits | Yes | Dispatched before trigger action executes; cancelable to abort. | `{ source, target, action, key, event }` |
+| `ln-key:trigger` | Emits | No | Dispatched when shortcut trigger successfully executes. | `{ source, target, action, key, event }` |
+| `ln-key:destroyed` | Emits | No | Dispatched when shortcut binding is destroyed. | `{ target }` |
 
 ## 4. CSS Styling & Behavioral Concept
 

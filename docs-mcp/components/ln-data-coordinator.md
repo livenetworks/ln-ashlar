@@ -40,7 +40,7 @@ tags: [data, synchronization, local-first]
     <li data-ln-data-store id="users"></li>
     
     <!-- Remote connection endpoint (REST) -->
-    <li data-ln-api-connector="/api/users" id="users-connector"></li>
+    <li data-ln-api-connector data-ln-api-path="/api/users" id="users-connector"></li>
     
     <!-- Offline transaction queue -->
     <li data-ln-api-queue id="users-queue"></li>
@@ -56,7 +56,7 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 <!-- Logical data definition -->
 <ul data-ln-data-coordinator hidden>
     <li data-ln-data-store id="users"></li>
-    <li data-ln-api-connector="/api/users"></li>
+    <li data-ln-api-connector data-ln-api-path="/api/users"></li>
 </ul>
 
 <!-- UI View component consuming data -->

@@ -1,0 +1,32 @@
+name: Docs Contract & Coverage Gate
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  verify-docs-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ln-ashlar
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Clone MCP contract validator tools
+        run: git clone --depth 1 https://github.com/livenetworks/ln-ashlar-mcp.git /tmp/ln-ashlar-mcp
+
+      - name: Install MCP dependencies
+        working-directory: /tmp/ln-ashlar-mcp
+        run: npm ci
+
+      - name: Lint documentation contract conformance
+        run: node /tmp/ln-ashlar-mcp/tools/ashlar/lint-cli.js .
+
+      - name: Audit documentation coverage vs canonical attributes
+        run: node /tmp/ln-ashlar-mcp/scripts/audit-coverage.js --root=.

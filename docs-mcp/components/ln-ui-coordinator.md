@@ -121,7 +121,7 @@ Key responsibilities include:
 
 ### Events API
 
-| Event | Direction | Target | Description | `detail` Object |
+| Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-modal:request-open` | Emits | `<dialog>` | Sent to target `ln-modal` to request panel opening. | `{}` |
 | `ln-modal:request-close` | Emits | `<dialog>` | Sent to target `ln-modal` to request panel closing. | `{}` |

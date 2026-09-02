@@ -93,7 +93,7 @@ Use when the table queries a store and connects through a coordinator rather tha
 ```html
 <div data-ln-data-coordinator id="products-coordinator">
   <div data-ln-data-store id="products"></div>
-  <div data-ln-api-connector="/api/products" id="products-connector"></div>
+  <div data-ln-api-connector data-ln-api-path="/api/products" id="products-connector"></div>
 
   <div id="products-table" data-ln-table="products" data-ln-table-source="products">
     <table>

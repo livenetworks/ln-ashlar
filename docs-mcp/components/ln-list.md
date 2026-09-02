@@ -73,6 +73,7 @@ behavior differs by mode:
 
 In SSR mode, the list is functional immediately with the server-rendered markup. Sort and search filters are run locally.
 
+```html
 <label class="search">
   <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
   <input type="search" placeholder="Search..." data-ln-search-for="ssr-documents-list" data-ln-search-debounce="0">
