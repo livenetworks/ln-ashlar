@@ -283,24 +283,30 @@ Projects can override at any level:
 
 ## Theme Architecture
 
-Themes (e.g. `[data-theme="glass"]`) are a **palette layer**, not a structural
-layer. They override colors via token rebinds at the theme `:root` scope.
-They do NOT redeclare component structure (`background`, `color`,
-`border-color`, hover/active blocks).
+Theming in Ashlar is divided into three orthogonal axes:
+- **Modes** (e.g. `[data-mode="dark"]`) provide the **polarity layer**
+  (light vs dark canvas).
+- **Themes** (e.g. `[data-theme="glass"]`) provide the **palette layer**
+  (brand colors and accents).
+- **Skins** (e.g. `[data-skin="glass"]`) provide the **structural layer**
+  (geometry, shadows, radii).
 
-### Rule — themes rebind at theme `:root`, never via descendant selectors
+Modes, themes, and skins override colors and geometry via token rebinds at
+their respective `:root` scopes. They do NOT redeclare component structure
+(`background`, `color`, `border-color`, hover/active blocks).
+
+### Rule — themes and skins rebind at their respective `:root`, never via descendant selectors
 
 ```scss
-// RIGHT — vocabulary rebind at theme :root only
-[data-theme="glass"] {
-	--bg-elevated:        hsl(var(--color-neutral-950));
+// RIGHT — vocabulary rebind at skin :root only
+[data-skin="glass"] {
+	--btn-bg:             var(--bg-elevated);
 	--color-accent-bg:    hsl(var(--color-primary) / 0.5);
-	--color-accent-bg-fg: hsl(var(--color-primary));
 	// ...
 }
 
 // WRONG — descendant selector at higher specificity, structural override
-[data-theme="glass"] .btn {
+[data-skin="glass"] .btn {
 	background: hsl(var(--color-primary-lighter));
 	color: hsl(var(--color-primary));
 	border-color: hsl(var(--color-primary));
@@ -332,10 +338,10 @@ in the consumer mixin. Do not escalate specificity.
 
 // Default theme — no companion override; mixin falls back to --color-accent / --color-accent-fg (= solid + white)
 
-// Glass theme — rebind vocabulary + accent companions at theme :root
-[data-theme="glass"] {
-	--bg-elevated:           hsl(220 16% 17%);
-	--bg-sunken:             hsl(220 16% 20%);
+// Glass skin — rebind vocabulary + accent companions at skin :root
+[data-skin="glass"] {
+	--btn-bg:                var(--bg-elevated);
+	--radius:                0;
 	--color-accent-bg:       hsl(var(--color-primary) / 0.2);
 	--color-accent-bg-hover: hsl(var(--color-primary) / 0.3);
 	--color-accent-bg-fg:    hsl(var(--color-primary));
@@ -376,7 +382,7 @@ the semantic-color cascade — see `theme/config/mixins/_btn.scss` header).
 
 ### What NOT to do (themes)
 
-- Do not write `[data-theme="..."] .selector { background: ... }`. Rebind tokens at theme `:root` instead.
+- Do not write `[data-theme="..."] .selector { ... }` or `[data-skin="..."] .selector { ... }`. Rebind tokens at skin/theme `:root` instead.
 - Do not duplicate `&:hover`/`&:active` blocks in theme overrides — the library's base mixin handles them via `*-hover` companion tokens.
 - Do not introduce `--btn-accent-*` or any other per-component-surface companion at `:root`. Use cross-cutting `--color-accent-*` companions read via fallback inside the mixin.
 

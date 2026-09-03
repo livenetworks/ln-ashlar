@@ -1,9 +1,3 @@
-// NOTE: swatch `background` values are raw HSL literals on purpose.
-// The picker must visualize what each preset LOOKS LIKE — not apply
-// the currently active token. These literals mirror the
-// `--color-primary` values in scss/config/_theme.scss; update them
-// in lockstep.
-
 // Preset color swatches for demo theme switcher
 .demo-theme-swatch {
 	display: inline-block;
@@ -20,3 +14,79 @@
 	&[data-preset="midnight"] { background: hsl(265 70% 60%); }
 	&[data-preset="glass"]    { background: hsl(218 95% 62%); }
 }
+
+.demo-theme-picker {
+	&,
+	&[data-ln-popover="open"] {
+		display: flex;
+		gap: var(--size-md);
+	}
+
+	width: 25rem;
+	max-width: calc(100vw - 2rem);
+
+	section {
+		flex: 1;
+		min-width: 0;
+	}
+
+	h4 {
+		font-size: var(--text-xs);
+		color: var(--fg-muted);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wider);
+		margin-bottom: var(--size-xs);
+	}
+
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: var(--size-2xs);
+	}
+
+	button {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		gap: var(--size-xs);
+		padding: var(--size-xs) var(--size-sm);
+		border: none;
+		background: none;
+		border-radius: var(--radius);
+		cursor: pointer;
+		text-align: left;
+		color: var(--color-fg);
+		white-space: nowrap;
+
+		&:hover {
+			background: var(--bg-hover);
+		}
+	}
+}
+
+// Parent selector active checkmark
+[data-mode="dark"] [data-demo-mode="dark"],
+[data-mode="light"] [data-demo-mode="light"],
+:root:not([data-mode="dark"]) [data-demo-mode="light"],
+[data-skin="glass"] [data-demo-skin="glass"],
+:root:not([data-skin]) [data-demo-skin="default"],
+[data-theme="ocean"] [data-demo-theme="ocean"],
+[data-theme="sunset"] [data-demo-theme="sunset"],
+[data-theme="midnight"] [data-demo-theme="midnight"],
+[data-theme="glass"] [data-demo-theme="glass"],
+:root:not([data-theme]) [data-demo-theme="default"] {
+	color: var(--color-accent);
+	font-weight: var(--font-medium);
+
+	&::after {
+		content: '✓';
+		margin-left: auto;
+		font-weight: bold;
+	}
+}
+
+

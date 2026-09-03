@@ -35,7 +35,7 @@
 /* Light Mode Brand Values                                                    */
 /* -------------------------------------------------------------------------- */
 :root,
-[data-theme="light"] {
+[data-mode="light"] {
 	/* Primary brand color (bare HSL triplet: hue saturation% lightness%) */
 	--brand-primary:   221 83% 48%;
 
@@ -54,7 +54,7 @@
 /* -------------------------------------------------------------------------- */
 /* Dark Mode Brand Values                                                     */
 /* -------------------------------------------------------------------------- */
-[data-theme="dark"] {
+[data-mode="dark"] {
 	/* Primary brand color for dark surfaces (defaults to matching light mode per R8; */
 	/* adjust if your brand requires custom dark mode contrast or hue tuning) */
 	--brand-primary:   221 83% 48%;

@@ -14,17 +14,18 @@ tags: [theming, dark-mode, colors, tokens, brand, scoped-theme]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand.css`), named theme presets (`ocean`, `sunset`, `midnight`, `glass`), and arbitrary **Scoped Theme Islands** by decoupling raw theme **values** (`_palette.scss`) from the unified **derivation chain** (`_theme.scss`):
+The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand.css`), named theme presets (`ocean`, `sunset`, `midnight`, `glass`), and arbitrary **Scoped Mode/Theme Islands** by decoupling raw theme **values** (`_palette.scss`) from the unified **derivation chain** (`_theme.scss`):
 
-- **Scoped Theme Islands:** Any element at any DOM depth can declare `data-theme="dark"` (or `data-theme="light"` / named preset), and all descendant elements render fully in that theme — including background, text, borders, shadows, buttons, and hover/active states — without requiring component-specific overrides.
+- **Scoped Mode/Theme Islands:** Any element at any DOM depth can declare `data-mode="dark"` (polarity) or `data-theme="glass"` (palette). Descendant elements render fully in that axis — including background, text, borders, shadows, buttons, and hover/active states — without requiring component-specific overrides.
 - **Surface Elevation Inversion:** In dark mode, elevated surfaces become *lighter* (`--bg-elevated: hsl(220 16% 17%)`) than the root canvas (`--bg-base: hsl(220 16% 13%)`), while recessed areas (`--bg-recessed: hsl(220 16% 9%)`) become darker. In light mode, surfaces are flat by design and separated by shadow.
-- **Zero-Specificity Values (`:where()`):** Ashlar's default values are declared with `:where(:root)` and `:where([data-theme="..."])` (specificity 0,0,0). A consumer's `brand.css` at `[data-theme="dark"]` (0,1,0) always wins, regardless of stylesheet loading order.
+- **Zero-Specificity Values (`:where()`):** Ashlar's default values are declared with `:where(:root)` and `:where([data-mode="..."])` (specificity 0,0,0). A consumer's `brand.css` at `[data-mode="dark"]` (0,1,0) always wins, regardless of stylesheet loading order.
 - **Computed Accent Tints:** `--color-accent-tint` and `--color-accent-tint-strong` are computed dynamically via `color-mix()` against the local `--bg-base`.
 - **Activation Paths:**
-  1. Root level override: `<html data-theme="dark">` or `<html data-theme="light">`.
-  2. Scoped island: `<header data-theme="dark">`, `<section data-theme="dark">`, or `<aside data-theme="light">`.
-  3. Automatic system preference: `@media (prefers-color-scheme: dark)` when no explicit root attribute is set.
-- **Brand.css Integration:** Custom brand tokens are injected by declaring bare HSL triplets on `:root` and `[data-theme="dark"]` in a client stylesheet, without editing library sources.
+  1. Root level override: `<html data-mode="dark">`, `<html data-theme="glass">`, or `<html data-skin="glass">`.
+  2. Scoped island: `<header data-mode="dark">` or `<section data-theme="sunset">`.
+  3. Automatic system preference: `@media (prefers-color-scheme: dark)` when no explicit root polarity attribute is set.
+  4. Structural activation: `<html data-skin="glass">` globally applies structural overrides like flatter radii and shadows. (Note: Unlike mode and theme, skin cannot be scoped to deep DOM islands without breaking geometry coherence, and must be applied at `<html>`).
+- **Brand.css Integration:** Custom brand tokens are injected by declaring bare HSL triplets on `:root` and `[data-mode="dark"]` in a client stylesheet, without editing library sources.
 
 ---
 
@@ -33,7 +34,7 @@ The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand
 ### Base HTML Markup (Root Dark Mode)
 
 ```html
-<html lang="en" data-theme="dark">
+<html lang="en" data-mode="dark">
     <body>
         <div class="card">
             <h3>Dark Mode Card</h3>
@@ -46,7 +47,7 @@ The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand
 ### Variant 1: Scoped Dark Island in Light Page
 
 ```html
-<header data-theme="dark" class="app-header">
+<header data-mode="dark" class="app-header">
     <nav class="nav">
         <ul class="nav-list">
             <li><a href="#" class="nav-link active">Dashboard</a></li>
@@ -59,10 +60,10 @@ The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand
 ### Variant 2: Nested Inverse Island (Light inside Dark)
 
 ```html
-<section data-theme="dark" class="card">
+<section data-mode="dark" class="card">
     <h3>Dark Container</h3>
     <!-- Nested Light Island -->
-    <div data-theme="light" class="card">
+    <div data-mode="light" class="card">
         <h3>Clean White Island</h3>
     </div>
 </section>
@@ -73,12 +74,12 @@ The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand
 ```css
 /* brand.css - overrides brand tokens with zero specificity conflict */
 :root,
-[data-theme="light"] {
+[data-mode="light"] {
     --brand-primary:   215 85% 45%;
     --brand-secondary: 195 35% 35%;
 }
 
-[data-theme="dark"] {
+[data-mode="dark"] {
     --brand-primary:   215 90% 65%;
     --brand-secondary: 195 30% 70%;
 }
@@ -93,13 +94,14 @@ The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand
 |---|---|---|---|
 | `ln-values-light` | mixin | — | Injects default light mode neutral scale, status tints, and vocabulary |
 | `ln-values-dark` | mixin | — | Injects dark mode inverted neutral scale, status tints, and vocabulary |
-| `ln-color-chain` | mixin | — | Evaluates semantic colors, shadows, and computed accent tints at `:root` & `[data-theme]` |
-| `data-theme="dark"` | attribute | — | Activates dark mode vocabulary and color chain |
-| `data-theme="light"` | attribute | — | Forces light mode vocabulary and color chain |
-| `data-theme="ocean"` | attribute | — | Oceanic teal accent preset (`--brand-primary: 190 80% 35%`) |
-| `data-theme="sunset"` | attribute | — | Sunset warm coral accent preset (`--brand-primary: 10 80% 50%`) |
-| `data-theme="midnight"` | attribute | — | Midnight deep purple dark preset (`--brand-primary: 265 70% 60%`) |
-| `data-theme="glass"` | attribute | — | Glass luminous flat dark preset (`--brand-primary: 218 95% 62%`) |
+| `ln-color-chain` | mixin | — | Evaluates semantic colors, shadows, and computed accent tints at `:root`, `[data-theme]`, `[data-mode]` |
+| `data-mode="dark"` | attribute | — | Activates dark polarity (bg/fg base values + native color-scheme) |
+| `data-mode="light"` | attribute | — | Forces light polarity vocabulary and color-scheme |
+| `data-theme="ocean"` | attribute | — | Oceanic teal brand palette preset (`--brand-primary: 190 80% 35%`) |
+| `data-theme="sunset"` | attribute | — | Sunset warm coral brand palette preset (`--brand-primary: 10 80% 50%`) |
+| `data-theme="midnight"` | attribute | — | Midnight deep purple brand palette preset (`--brand-primary: 265 70% 60%`); pair with `data-mode="dark"` |
+| `data-theme="glass"` | attribute | — | Glass luminous blue brand palette preset (`--brand-primary: 218 95% 62%`) |
+| `data-skin="glass"` | attribute | — | Glass structural preset — flat radius/shadow, translucent button chrome, accent nav/menu rebinds. Polarity-agnostic |
 | `--brand-primary` | token | `221 83% 48%` | Primary brand color bare HSL triplet |
 | `--brand-secondary` | token | `160 84% 36%` | Secondary brand color bare HSL triplet |
 | `--bg-base` | token | `hsl(var(--color-white)) (light) / hsl(220 16% 13%) (dark)` | Base canvas background |

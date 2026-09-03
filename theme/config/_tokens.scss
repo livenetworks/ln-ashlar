@@ -191,7 +191,7 @@
 	// IMPORTANT — declare at theme :root ONLY when the value is a literal
 	// (no nested var(--color-primary)). If a theme needs the translucent
 	// fill computed FROM --color-primary, the rebind must happen at
-	// consumer scope (e.g. `[data-theme="..."] button[type="submit"], .btn
+	// consumer scope (e.g. `[data-skin="..."] button[type="submit"], .btn
 	// { --btn-bg: ...; }`) so the nested var() resolves at the button —
 	// otherwise the .success/.error/.warning/.info status cascade breaks on
 	// elements using semantic-color overrides. Glass uses the consumer-scope

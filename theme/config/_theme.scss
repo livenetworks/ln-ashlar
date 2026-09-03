@@ -3,13 +3,19 @@
 // ==========================================================================
 // Theme — ln-ashlar
 // ==========================================================================
-// Theme activation and preset definitions.
+// Three orthogonal activation axes:
+//   data-skin   — structure/physics (radius, shadow, button chrome, nav/menu
+//                 rebinds). Polarity-agnostic.
+//   data-mode   — polarity only (bg/fg base values + native color-scheme).
+//   data-theme  — brand palette only (color values).
 //
 // Activation paths:
-//   <html data-theme="dark">               ← explicit dark mode
-//   <element data-theme="dark">            ← scoped dark theme island
-//   @media (prefers-color-scheme: dark)    ← system preference (auto)
-//   :root:not([data-theme="light"])        ← opt-out of auto
+//   <html data-mode="dark">                 ← explicit dark polarity
+//   <element data-mode="dark">              ← scoped dark polarity island
+//   @media (prefers-color-scheme: dark)     ← system preference (auto)
+//   :root:not([data-mode="light"])          ← opt-out of auto
+//   <html data-skin="glass">                ← structural preset (flat, borderless)
+//   <html data-theme="ocean">               ← brand palette preset
 //
 // See docs-mcp/css/theming.md for the full guide.
 // ==========================================================================
@@ -20,52 +26,84 @@
 
 // Ashlar values — zero specificity, a client file always outranks them
 :where(:root),
-:where([data-theme="light"]) {
+:where([data-mode="light"]) {
 	@include ln-values-light;
+	color-scheme: light;
 }
 
-:where([data-theme="dark"]) {
+:where([data-mode="dark"]) {
 	@include ln-values-dark;
+	color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {
-	:where(:root:not([data-theme="light"])) {
+	:where(:root:not([data-mode="light"])) {
 		@include ln-values-dark;
+		color-scheme: dark;
 	}
 }
 
-// Derivations — library-owned, normal specificity, every theme scope
+// Derivations — library-owned, normal specificity, every colour-bearing scope.
+// data-skin is deliberately absent: it declares no colour values, so the chain
+// there could only reproduce the inherited result — while clobbering the
+// preset --btn-* / tint overrides of any ancestor theme.
 :root,
-[data-theme] {
+[data-theme],
+[data-mode] {
 	@include ln-color-chain;
 }
 
 // ---------------------------------------------------------------------------
-// Named presets — demo theme picker. Activation:
+// Named presets — demo theme picker. Brand palette only. Activation:
 //   <html data-theme="ocean">   <html data-theme="sunset">   etc.
 // ---------------------------------------------------------------------------
 
 [data-theme="ocean"] {
-	@include ln-values-light;
 	--brand-primary: 190 80% 35%;
+
+	&[data-mode="dark"],
+	:where([data-mode="dark"]) & {
+		--brand-primary: 190 80% 60%;
+	}
 }
 
 [data-theme="sunset"] {
-	@include ln-values-light;
 	--brand-primary: 10 80% 50%;
+
+	&[data-mode="dark"],
+	:where([data-mode="dark"]) & {
+		--brand-primary: 10 80% 65%;
+	}
 }
 
 [data-theme="midnight"] {
-	@include ln-values-dark;
+	// Pure palette — no polarity opinion. Pair with data-mode="dark" for
+	// intended contrast; without it this renders purple-on-white (accepted).
 	--brand-primary: 265 70% 60%;
+
+	&[data-mode="dark"],
+	:where([data-mode="dark"]) & {
+		--brand-primary: 265 70% 70%;
+	}
 }
 
 [data-theme="glass"] {
-	@include ln-values-dark;
-
 	// Electric blue accent — luminescent on dark navy glass
 	--brand-primary: 218 95% 62%;
 
+	// Active-nav wash — Glass computes a stronger 24% tint mix against
+	// local --bg-base for contrast on the deep dark surface.
+	// Side-effect: dropdown active items + upload drop-zone also pick up the
+	// slightly darker tint — improvement, not regression.
+	--color-accent-tint: color-mix(in srgb, hsl(var(--color-primary)) 24%, var(--bg-base));
+}
+
+// ---------------------------------------------------------------------------
+// Named skins — structural/physics presets. Polarity-agnostic. Activation:
+//   <html data-skin="glass">
+// ---------------------------------------------------------------------------
+
+[data-skin="glass"] {
 	// Flat — zero radius everywhere
 	--radius-xs: 0;
 	--radius-sm: 0;
@@ -86,9 +124,8 @@
 	--shadow-2xl: none;
 
 	// ── Buttons — neutral chrome via --btn-* rebind, accent variant via
-	// cross-cutting --color-accent-bg-* companion tokens. Theme rebinds
-	// at :root only; library owns structure. See CLAUDE.md
-	// ## Theme Architecture for the contract.
+	// cross-cutting --color-accent-bg-* companion tokens. Skin rebinds
+	// at :root only; library owns structure. (See docs/architecture/reference.md ## Theme Architecture for exact mechanics)
 	--btn-bg: var(--bg-elevated);
 	--btn-bg-hover: var(--bg-hover);
 	--btn-bg-active: var(--bg-active);
@@ -96,7 +133,7 @@
 	--btn-border-hover: var(--color-accent-hover);
 
 	// ── Accent buttons — translucent fill via consumer-scope rebind
-	// Rebind --btn-* on the button itself (not at theme :root) so
+	// Rebind --btn-* on the button itself (not at skin :root) so
 	// var(--color-primary) inside the values resolves on the button's
 	// cascade — letting .success / .error / .warning / .info status
 	// overrides reach the fill and text color. Token-only rebinds; no
@@ -120,21 +157,14 @@
 	--nav-link-border-color-active: var(--color-accent);
 	--nav-list-bleed: calc(-1 * var(--padding-x));
 
-	// Active-nav wash — Glass computes a stronger 24% tint mix against
-	// local --bg-base for contrast on the deep dark surface.
-	// Side-effect: dropdown active items + upload drop-zone also pick up the
-	// slightly darker tint — improvement, not regression.
-	--color-accent-tint: color-mix(in srgb, hsl(var(--color-primary)) 24%, var(--bg-base));
-
 	// ── Dropdown / menu-items dividers ─────────────────────────────
 	// @mixin menu-items reads SOFT --border-block-start on `li + li`
 	// and `hr` with `none` fallback. Glass rebinds the slot in scope
-	// so the divider appears for both. Scoped (not theme :root)
+	// so the divider appears for both. Scoped (not skin :root)
 	// because --border-block-start is read by ~10 other mixins
 	// (cards, tables, accordions) where the divider should NOT appear.
 	[data-ln-dropdown-menu],
 	.menu-items {
 		--border-block-start: var(--border-width) solid var(--color-border);
 	}
-
 }

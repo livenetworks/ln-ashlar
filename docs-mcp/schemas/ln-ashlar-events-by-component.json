@@ -377,15 +377,15 @@
 				{
 					"name": "ln-chart:rendered",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Rendering notification emitted after SVG geometry updates.",
+					"detail": "{ chart, count, min, max }",
 					"source": "static"
 				},
 				{
 					"name": "ln-chart:request-data",
 					"cancelable": false,
-					"description": "Query from a chart to fetch an ordered dataset.",
-					"detail": "{ target: HTMLElement, sort, filters, search }",
+					"description": "Renderer asks data coordinator for records.",
+					"detail": "{ chart, source, sort, filters, search }",
 					"source": "static"
 				}
 			],
@@ -400,15 +400,15 @@
 				{
 					"name": "ln-chart:set-data",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Coordinator delivers records to chart.",
+					"detail": "{ data, total?, filtered? }",
 					"source": "static"
 				},
 				{
 					"name": "ln-chart:set-loading",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Coordinator controls busy / loading state.",
+					"detail": "{ loading }",
 					"source": "static"
 				}
 			]
@@ -677,15 +677,15 @@
 				{
 					"name": "ln-chart:set-data",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Coordinator delivers records to chart.",
+					"detail": "{ data, total?, filtered? }",
 					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-chart:set-loading",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Coordinator controls busy / loading state.",
+					"detail": "{ loading }",
 					"source": "dynamic-allowlist"
 				},
 				{
@@ -1502,22 +1502,22 @@
 				{
 					"name": "ln-key:before-trigger",
 					"cancelable": true,
-					"description": "",
-					"detail": "",
+					"description": "Dispatched before trigger action executes; cancelable to abort.",
+					"detail": "{ source, target, action, key, event }",
 					"source": "static"
 				},
 				{
 					"name": "ln-key:destroyed",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Dispatched when shortcut binding is destroyed.",
+					"detail": "{ target }",
 					"source": "static"
 				},
 				{
 					"name": "ln-key:trigger",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Dispatched when shortcut trigger successfully executes.",
+					"detail": "{ source, target, action, key, event }",
 					"source": "static"
 				}
 			],

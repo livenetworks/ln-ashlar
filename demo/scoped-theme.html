@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-mode="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,7 @@
 <body>
     <div class="app-layout">
         <!-- Dark Top Header Island inside Light Page -->
-        <header class="app-header" data-theme="dark">
+        <header class="app-header" data-mode="dark">
             <div class="app-header-brand">
                 <a href="index.html" class="logo">ln-ashlar</a>
                 <span class="status-badge" data-ln-status="info">Dark Header Scope</span>
@@ -36,7 +36,7 @@
             <div class="page-header">
                 <div>
                     <h1>Scoped Theme Demonstration</h1>
-                    <p>Testing nested and independent <code>data-theme</code> scopes at arbitrary DOM depths.</p>
+                    <p>Testing nested and independent <code>data-mode</code> scopes at arbitrary DOM depths.</p>
                 </div>
                 <div class="page-header-actions">
                     <ul class="button-group">
@@ -94,9 +94,9 @@
             </section>
 
             <!-- Dark Island Section -->
-            <section class="section card" data-theme="dark">
+            <section class="section card" data-mode="dark">
                 <header class="card-header">
-                    <h2>2. Scoped Dark Island Container (<code>data-theme="dark"</code>)</h2>
+                    <h2>2. Scoped Dark Island Container (<code>data-mode="dark"</code>)</h2>
                     <p>Background, foreground, borders, shadows, and button surfaces are completely dark-themed.</p>
                 </header>
                 <div class="card-body grid grid-cols-2">
@@ -121,10 +121,10 @@
                     </div>
 
                     <!-- Inverse Light Island nested inside Dark Container -->
-                    <section class="card" data-theme="light">
+                    <section class="card" data-mode="light">
                         <header class="card-header">
                             <h3>3. Inverse Light Island (Nested in Dark)</h3>
-                            <span class="status-badge" data-ln-status="info">data-theme="light"</span>
+                            <span class="status-badge" data-ln-status="info">data-mode="light"</span>
                         </header>
                         <div class="card-body">
                             <p>This nested section flips cleanly back to the light palette within its dark parent.</p>
@@ -142,7 +142,7 @@
         </main>
 
         <!-- Dark Bottom Footer Island -->
-        <footer class="app-footer" data-theme="dark">
+        <footer class="app-footer" data-mode="dark">
             <div class="app-footer-content">
                 <p>ln-ashlar &bull; Scoped Theme Verification Demo &copy; 2026</p>
                 <nav class="nav" aria-label="Footer Navigation">

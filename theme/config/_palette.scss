@@ -143,6 +143,8 @@
 	--color-warning-lighter: 32 45% 14%;
 	--color-info-light:      217 55% 22%;
 	--color-info-lighter:    217 45% 15%;
+	
+	--color-error:           0 84% 65%; // Lighter red for text contrast in dark mode
 	--color-error-light:     0 50% 20%;
 	--color-error-lighter:   0 40% 14%;
 
@@ -186,6 +188,14 @@
 
 	--app-scrim-bg:    hsl(var(--color-neutral-900) / 0.4);
 
+}
+
+// ---------------------------------------------------------------------------
+// Base Defaults — Lazy-evaluated primitives and surfaces.
+// These live in :where(:root) (0,0,0) so they can be overridden by [data-skin] 
+// or [data-theme] (0,1,0) without being clobbered by nested [data-mode] islands.
+// ---------------------------------------------------------------------------
+:where(:root) {
 	// shadow roles
 	--shadow-resting:  var(--shadow-sm);
 	--shadow-floating: var(--shadow-md);

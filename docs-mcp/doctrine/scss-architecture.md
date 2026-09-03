@@ -120,8 +120,8 @@ Styling values flow through four strictly defined layers. A brand token, a scale
 3. Vocabulary Tokens     ->  --bg-base, --bg-elevated, --bg-sunken, --bg-recessed,
                              --fg-default, --fg-muted, --border-subtle, --shadow-resting,
                              --text-title-md, --lh-title-md
-                             (Named semantic design intent; rebound at theme :root or [data-theme])
-            ↓ derived via ln-color-chain at :root AND [data-theme]
+                             (Named semantic design intent; rebound at theme :root, [data-skin], [data-mode], or [data-theme])
+            ↓ derived via ln-color-chain at :root, [data-mode], and [data-theme]
 4. Primitive Tokens      ->  --color-bg, --color-fg, --color-border, --shadow,
                              --padding-x, --padding-y, --gap, --radius, --font-size, --line-height
                              (The ONLY tokens mixin bodies read and consume)
@@ -130,12 +130,12 @@ Styling values flow through four strictly defined layers. A brand token, a scale
 ### B. The Rebind Contract (Read vs. Write Boundaries)
 - **Mixins:** Mixin bodies read **primitives only** (`--color-bg`, `--color-fg`, `--color-border`, `--shadow`, `--padding-x`, `--padding-y`, `--gap`, `--radius`, `--font-size`, `--line-height`). They NEVER read vocabulary tokens or raw scale tokens directly.
 - **Components:** Component instances and custom selectors write/rebind **primitives** on their local scope to select a vocabulary role (e.g. `.sunken-card { --color-bg: var(--bg-sunken); }`). Components NEVER rebind `--bg-*` vocabulary tokens.
-- **Themes & Presets:** Themes rebind **vocabulary tokens** at the theme root scope (`:root`, `[data-theme="dark"]`, `[data-theme="preset"]`). Themes change surface tones globally without rewriting component mixins.
+- **Themes, Modes, and Skins:** These axes rebind **vocabulary tokens** at the theme root scope (`:root`, `[data-mode]`, `[data-theme]`, `[data-skin]`). They change global polarity, palette, and structure without rewriting component mixins.
 - **Density Tiers:** Density modes (`[data-density="compact"]`) rebind geometric primitives and vocabulary (`--padding-y`, `--gap`, `--text-{role}`, `--lh-{role}`), never color semantics.
 
 ### C. Architectural Invariants
 1. **Primitives Invariant:** Mixins read primitives only, never vocabulary (`--bg-*`, `--fg-*`) and never raw scales (`--size-*`, `--color-neutral-*`).
-2. **Rebind Scoping Invariant:** Vocabulary is rebound at theme `:root` and `[data-theme]` scopes; primitives are rebound on component-local scopes.
+2. **Rebind Scoping Invariant:** Vocabulary is rebound at theme `:root`, `[data-mode]`, `[data-theme]`, and `[data-skin]` scopes; primitives are rebound on component-local scopes.
 3. **Semantic Role Invariant:** A theme may change absolute color/shadow values but must preserve semantic relationships across roles.
 4. **Density Invariant:** Density modifies spatial and typographic geometry, never color or surface semantics.
 5. **Visibility Invariant:** `hidden` (attribute or `.hidden` in tabs) is the sole hiding mechanism; there is no `.ln-hidden` or ad-hoc display override class.
@@ -180,15 +180,15 @@ When styling custom, project-specific components (e.g. by unique IDs like `#user
 
 ### A. Non-Destructive Dark Mode
 Dark mode is activated via:
-1. Explicit HTML attribute: `<html data-theme="dark">`
-2. System media query: `@media (prefers-color-scheme: dark)` when no explicit `data-theme` is provided.
-3. Forcing light: `<html data-theme="light">`
+1. Explicit HTML attribute: `<html data-mode="dark">`
+2. System media query: `@media (prefers-color-scheme: dark)` when no explicit `data-mode` is provided.
+3. Forcing light: `<html data-mode="light">`
 
-To apply themes, **rebind vocabulary tokens at the theme root scope**. Never use nested descendant selectors with higher specificity (e.g., `[data-theme="dark"] .card { background: black; }` is forbidden).
+To apply themes, **rebind vocabulary tokens at the theme root scope**. Never use nested descendant selectors with higher specificity (e.g., `[data-mode="dark"] .card { background: black; }` is forbidden).
 
 #### Correct Theme Declaration:
 ```css
-[data-theme="dark"] {
+[data-mode="dark"] {
     --bg-base:     hsl(220 16% 13%);
     --bg-elevated: hsl(220 16% 17%);
     --fg-default:  hsl(0 0% 95%);

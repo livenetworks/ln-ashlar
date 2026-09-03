@@ -3,7 +3,7 @@
 // ==========================================================================
 // Inverted density system. The :root default is DENSE (DocuFlow scale:
 // 14px body, 52px header, 232px sidebar). Density goes UP via the
-// [data-density] attribute, mirroring how [data-theme] works.
+// [data-density] attribute, mirroring how [data-mode] / [data-theme] works.
 //
 // Activation:
 //   <html>                              ← default: dense (DocuFlow look)

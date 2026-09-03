@@ -113,7 +113,7 @@ export function parseTokenSources(root) {
 	const tokensVars = extractCssVariables(tokensRaw);
 	const lightVars = extractCssVariables(extractMixinBody(paletteRaw, 'ln-values-light'));
 	const darkVars = extractCssVariables(extractMixinBody(paletteRaw, 'ln-values-dark'));
-	const colorChainVars = extractCssVariables(extractMixinBody(paletteRaw, 'ln-color-chain'));
+	const colorChainVars = extractCssVariables(paletteRaw);
 
 	return {
 		tokensVars,
@@ -234,13 +234,14 @@ export function generateThemingTable(sources) {
 		'|---|---|---|---|',
 		'| `ln-values-light` | mixin | — | Injects default light mode neutral scale, status tints, and vocabulary |',
 		'| `ln-values-dark` | mixin | — | Injects dark mode inverted neutral scale, status tints, and vocabulary |',
-		'| `ln-color-chain` | mixin | — | Evaluates semantic colors, shadows, and computed accent tints at `:root` & `[data-theme]` |',
-		'| `data-theme="dark"` | attribute | — | Activates dark mode vocabulary and color chain |',
-		'| `data-theme="light"` | attribute | — | Forces light mode vocabulary and color chain |',
-		'| `data-theme="ocean"` | attribute | — | Oceanic teal accent preset (`--brand-primary: 190 80% 35%`) |',
-		'| `data-theme="sunset"` | attribute | — | Sunset warm coral accent preset (`--brand-primary: 10 80% 50%`) |',
-		'| `data-theme="midnight"` | attribute | — | Midnight deep purple dark preset (`--brand-primary: 265 70% 60%`) |',
-		'| `data-theme="glass"` | attribute | — | Glass luminous flat dark preset (`--brand-primary: 218 95% 62%`) |',
+		'| `ln-color-chain` | mixin | — | Evaluates semantic colors, shadows, and computed accent tints at `:root`, `[data-theme]`, `[data-mode]` |',
+		'| `data-mode="dark"` | attribute | — | Activates dark polarity (bg/fg base values + native color-scheme) |',
+		'| `data-mode="light"` | attribute | — | Forces light polarity vocabulary and color-scheme |',
+		'| `data-theme="ocean"` | attribute | — | Oceanic teal brand palette preset (`--brand-primary: 190 80% 35%`) |',
+		'| `data-theme="sunset"` | attribute | — | Sunset warm coral brand palette preset (`--brand-primary: 10 80% 50%`) |',
+		'| `data-theme="midnight"` | attribute | — | Midnight deep purple brand palette preset (`--brand-primary: 265 70% 60%`); pair with `data-mode="dark"` |',
+		'| `data-theme="glass"` | attribute | — | Glass luminous blue brand palette preset (`--brand-primary: 218 95% 62%`) |',
+		'| `data-skin="glass"` | attribute | — | Glass structural preset — flat radius/shadow, translucent button chrome, accent nav/menu rebinds. Polarity-agnostic |',
 		row('--brand-primary', 'token', requireVar(lightVars, '--brand-primary', '_palette.scss (ln-values-light)'), 'Primary brand color bare HSL triplet'),
 		row('--brand-secondary', 'token', requireVar(lightVars, '--brand-secondary', '_palette.scss (ln-values-light)'), 'Secondary brand color bare HSL triplet'),
 		row('--bg-base', 'token', `${requireVar(lightVars, '--bg-base', '_palette.scss (ln-values-light)')} (light) / ${requireVar(darkVars, '--bg-base', '_palette.scss (ln-values-dark)')} (dark)`, 'Base canvas background'),

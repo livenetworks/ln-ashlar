@@ -31,15 +31,15 @@ Within the theme system, design values flow through four strictly defined layers
 3. Vocabulary Tokens     ->  --bg-base, --bg-elevated, --bg-sunken, --bg-recessed,
                              --fg-default, --fg-muted, --border-subtle, --shadow-resting,
                              --text-title-md, --lh-title-md
-                             (Named semantic design intent; rebound at theme :root or [data-theme])
-            ↓ derived via ln-color-chain at :root AND [data-theme]
+                             (Named semantic design intent; rebound at theme :root, [data-skin], [data-mode], or [data-theme])
+            ↓ derived via ln-color-chain at :root, [data-mode], and [data-theme]
 4. Primitive Tokens      ->  --color-bg, --color-fg, --color-border, --shadow,
                              --padding-x, --padding-y, --gap, --radius, --font-size, --line-height
                              (The ONLY tokens mixin bodies read and consume)
 ```
 
 ### Architectural Contract:
-- **Values vs. Derivation Split:** Theme-specific values (`ln-values-light`, `ln-values-dark`) are shipped at zero specificity via `:where()`. The derivation chain (`ln-color-chain`) re-evaluates all dependent primitives at both `:root` and `[data-theme]` scopes.
+- **Values vs. Derivation Split:** Theme-specific values (`ln-values-light`, `ln-values-dark`) are shipped at zero specificity via `:where()`. The derivation chain (`ln-color-chain`) re-evaluates all dependent primitives at `:root`, `[data-mode]`, and `[data-theme]` scopes.
 - **Mixins Read Primitives Only:** Mixin bodies reference `--color-bg`, `--color-fg`, `--color-border`, `--shadow`, `--padding-x`, `--padding-y`, and `--gap`. They never reference `--bg-*` or `--size-*` directly.
 - **Components Rebind Primitives:** Custom components rebind the primitive on their local scope to select a vocabulary role (e.g. `.card-sunken { --color-bg: var(--bg-sunken); }`).
 - **Relational Roles vs. Elevation Ladder:** `--bg-*` tokens represent **relational roles whose tonal direction is theme-defined**, not a static monotonic elevation ladder:

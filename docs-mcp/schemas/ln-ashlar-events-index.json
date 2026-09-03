@@ -526,8 +526,8 @@
 			],
 			"listened_by": [],
 			"cancelable": false,
-			"description": "",
-			"detail": "",
+			"description": "Rendering notification emitted after SVG geometry updates.",
+			"detail": "{ chart, count, min, max }",
 			"source": "static"
 		},
 		"ln-chart:request-data": {
@@ -538,8 +538,8 @@
 				"ln-data-coordinator"
 			],
 			"cancelable": false,
-			"description": "Query from a chart to fetch an ordered dataset.",
-			"detail": "{ target: HTMLElement, sort, filters, search }",
+			"description": "Renderer asks data coordinator for records.",
+			"detail": "{ chart, source, sort, filters, search }",
 			"source": "static"
 		},
 		"ln-chart:request-refresh": {
@@ -560,8 +560,8 @@
 				"ln-chart"
 			],
 			"cancelable": false,
-			"description": "",
-			"detail": "",
+			"description": "Coordinator delivers records to chart.",
+			"detail": "{ data, total?, filtered? }",
 			"source": "mixed"
 		},
 		"ln-chart:set-loading": {
@@ -572,8 +572,8 @@
 				"ln-chart"
 			],
 			"cancelable": false,
-			"description": "",
-			"detail": "",
+			"description": "Coordinator controls busy / loading state.",
+			"detail": "{ loading }",
 			"source": "mixed"
 		},
 		"ln-circular-progress:change": {
@@ -1345,8 +1345,8 @@
 			],
 			"listened_by": [],
 			"cancelable": true,
-			"description": "",
-			"detail": "",
+			"description": "Dispatched before trigger action executes; cancelable to abort.",
+			"detail": "{ source, target, action, key, event }",
 			"source": "static"
 		},
 		"ln-key:destroyed": {
@@ -1355,8 +1355,8 @@
 			],
 			"listened_by": [],
 			"cancelable": false,
-			"description": "",
-			"detail": "",
+			"description": "Dispatched when shortcut binding is destroyed.",
+			"detail": "{ target }",
 			"source": "static"
 		},
 		"ln-key:trigger": {
@@ -1365,8 +1365,8 @@
 			],
 			"listened_by": [],
 			"cancelable": false,
-			"description": "",
-			"detail": "",
+			"description": "Dispatched when shortcut trigger successfully executes.",
+			"detail": "{ source, target, action, key, event }",
 			"source": "static"
 		},
 		"ln-link:navigate": {

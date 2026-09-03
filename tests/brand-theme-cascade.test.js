@@ -19,17 +19,17 @@ test('theme cascade: _theme.scss uses :where() zero-specificity selectors for de
 	});
 	const css = compiled.css;
 
-	// Verify :where(:root) or :where([data-theme=light]) exists in compiled CSS
+	// Verify :where(:root) or :where([data-mode=light]) exists in compiled CSS
 	assert.match(
 		css,
-		/:where\(:root\)|:where\(\[data-theme=["']?light["']?\]\)/,
+		/:where\(:root\)|:where\(\[data-mode=["']?light["']?\]\)/,
 		'_theme.scss must wrap default light theme in :where() for zero specificity'
 	);
 
-	// Verify :where([data-theme=dark]) exists in compiled CSS
+	// Verify :where([data-mode=dark]) exists in compiled CSS
 	assert.match(
 		css,
-		/:where\(\[data-theme=["']?dark["']?\]\)/,
+		/:where\(\[data-mode=["']?dark["']?\]\)/,
 		'_theme.scss must wrap default dark theme in :where() for zero specificity'
 	);
 });
@@ -38,9 +38,9 @@ test('theme cascade (§6.8): brand.css overrides default theme regardless of sty
 	const brandCssPath = path.join(REPO_ROOT, 'theme/brand.css');
 	const brandCss = fs.readFileSync(brandCssPath, 'utf8');
 
-	// brand.css uses standard :root, [data-theme="light"] which has specificity (0,1,0)
-	assert.match(brandCss, /:root,\s*\[data-theme=["']?light["']?\]/);
-	assert.match(brandCss, /\[data-theme=["']?dark["']?\]/);
+	// brand.css uses standard :root, [data-mode="light"] which has specificity (0,1,0)
+	assert.match(brandCss, /:root,\s*\[data-mode=["']?light["']?\]/);
+	assert.match(brandCss, /\[data-mode=["']?dark["']?\]/);
 
 	// Verify bare HSL triplets format
 	assert.match(brandCss, /--brand-primary:\s*\d+\s+\d+%\s+\d+%;/);

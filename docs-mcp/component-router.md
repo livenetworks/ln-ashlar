@@ -96,7 +96,7 @@
 | Styling Concern | Route to Document | Don't Do |
 |---|---|---|
 | Surfaces, colors, tokens, interaction tints | `css/tokens`, `doctrine/scss-architecture` | Inventing token names or reading scale tokens inside mixins |
-| Dark mode, scoped theme islands, brand.css, presets | `css/theming` | Overriding colors per component instead of data-theme / brand tokens |
+| Dark mode, scoped theme islands, brand.css, presets | `css/theming` | Overriding colors per component instead of data-theme / data-mode / data-skin / brand tokens |
 | Mixin catalogue, recipe binding, override rules | `css/mixins`, `doctrine/scss-architecture` | Writing bespoke CSS utilities or inline style blocks |
 | Spacing scales, density modes (`compact`, `spacious`) | `css/density`, `css/tokens` | Hardcoding pixel/rem spacings in component styles |
 | Breakpoints, media queries, responsive containers | `css/breakpoints`, `css/layout` | Ad-hoc media queries outside defined breakpoint scale |
