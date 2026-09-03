@@ -77,9 +77,9 @@ All attributes are dynamically observed. Any runtime changes to these attributes
 | Attribute | Category | Description |
 |-----------|----------|-------------|
 | `data-ln-api-connector` | Selector | Creates the component instance. Optional value serves as name. |
-| `data-ln-api-base-url` | Connection | The base URL of the API gateway (e.g. `https://api.example.com/v1` or `/api`). Fallback: `data-ln-api-connector-base-url`, `data-ln-rest-base-url`. |
-| `data-ln-api-path` | Connection | Resource path endpoint (e.g. `/documents`). Fallback: `data-ln-api-connector-path`, `data-ln-rest-path`. |
-| `data-ln-api-headers` | Credentials | JSON-formatted string of request headers (e.g. `{"Authorization": "Bearer tok_123"}`). Fallback: `data-ln-api-connector-headers`, `data-ln-rest-headers`. |
+| `data-ln-api-base-url` | Connection | The base URL of the API gateway (e.g. `https://api.example.com/v1` or `/api`). |
+| `data-ln-api-path` | Connection | Resource path endpoint (e.g. `/documents`). |
+| `data-ln-api-headers` | Credentials | JSON-formatted string of request headers (e.g. `{"Authorization": "Bearer tok_123"}`). |
 | `data-ln-api-connector-query-debounce="ms"` | Connection | Debounce delay in milliseconds for `request-query` events. Default `300`. Set to `0` to disable. Mutations (create/update/delete) are never debounced. |
 
 ---

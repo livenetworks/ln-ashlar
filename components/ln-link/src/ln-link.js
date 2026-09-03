@@ -39,7 +39,7 @@ import { dispatchCancelable, guardBody } from '../../ln-core';
 		if (!href) return;
 
 		if (e.ctrlKey || e.metaKey || e.button === 1) {
-			window.open(href, '_blank');
+			window.open(href, '_blank', 'noopener,noreferrer');
 			return;
 		}
 

@@ -8,10 +8,10 @@ Instead of bundling thousands of heavy vector paths or requiring complex manual 
 
 ## 🧭 Philosophy & Architecture
 
-1. **Declarative On-Demand Rendering:** Icons are declared directly in HTML. The component monitors the DOM via `MutationObserver` for `<use>` references with `#ln-` and `#lnc-` prefixes. It only fetches and compiles icons that are actively present on the page.
+1. **Declarative On-Demand Rendering:** Icons are declared directly in HTML. The component monitors the DOM via `MutationObserver` for `<use>` references with `#ln-icon-` and `#ln-icon-custom-` prefixes. It only fetches and compiles icons that are actively present on the page.
 2. **Dual-Prefix Routing:**
-   - **`#ln-{name}`**: Automatically routes to the [Tabler Icons](https://tabler.io/icons) library fetched from a public CDN. No configuration required.
-   - **`#lnc-{name}`**: Routes to a custom corporate CDN defined via global window settings.
+   - **`#ln-icon-{name}`**: Automatically routes to the [Tabler Icons](https://tabler.io/icons) library fetched from a public CDN. No configuration required.
+   - **`#ln-icon-custom-{name}`**: Routes to a custom corporate CDN defined via global window settings.
 3. **Local Caching Layer:** Fetched SVG path structures are instantly cached in `localStorage` under `lni:{id}`. Subsequent visits render icons instantly with zero network roundtrips.
 
 ---
@@ -62,7 +62,7 @@ Configure these properties before script initialization:
 | Variable | Default | Description |
 | :--- | :--- | :--- |
 | `LN_ICON_CDN` | `https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline` | Base CDN URL for Tabler Icons. |
-| `LN_ICON_CUSTOM_CDN` | `null` | Base CDN URL for custom `#lnc-` prefixed SVG resources. |
+| `LN_ICON_CUSTOM_CDN` | `null` | Base CDN URL for custom `#ln-icon-custom-` prefixed SVG resources. |
 
 ---
 
@@ -84,7 +84,7 @@ useElement.setAttribute('href', '#ln-icon-check');
 ## ⚠️ Common Pitfalls
 
 - **Forgetting `ln-icon` Class:** Standard SVGs default to `100%` width/height. Failing to include the `ln-icon` class will cause the icon to blow up to full viewport size.
-- **Incorrect Prefix Configuration:** Forgetting to define `window.LN_ICON_CUSTOM_CDN` when using `#lnc-` will cause the loader to fail silently with undefined endpoint errors.
+- **Incorrect Prefix Configuration:** Forgetting to define `window.LN_ICON_CUSTOM_CDN` when using `#ln-icon-custom-` will cause the loader to fail silently with undefined endpoint errors.
 - **Omitting `aria-hidden="true"`:** Screen readers attempt to read SVG nodes. Always decorate decorative icons with `aria-hidden="true"`, or include an `aria-label` on their parent button.
 
 ---
@@ -103,7 +103,7 @@ Two in-memory `Set`s (`loaded`, `pending`), keyed by full `href`, prevent duplic
 
 ### Fetch + symbol injection
 
-On a cache miss: resolve the CDN URL (`lnc-` → `LN_ICON_CUSTOM_CDN`, `ln-` → `LN_ICON_CDN`; `lnc-` bails silently if the custom CDN isn't configured), `fetch()`, then parse the raw SVG string — extract `viewBox` (fallback `'0 0 24 24'`), the inner content between the `<svg>` tags, and root presentation attributes (`fill`, `stroke`, `stroke-width`, `stroke-linecap`, `stroke-linejoin`). A `<symbol>` is built from these and appended to the sprite's `<defs>`; the raw SVG is also written back to `localStorage`. Errors delete the `pending` entry silently — the icon stays blank, no retry.
+On a cache miss: resolve the CDN URL (`#ln-icon-custom-` → `LN_ICON_CUSTOM_CDN`, `#ln-icon-` → `LN_ICON_CDN`; `#ln-icon-custom-` bails silently if the custom CDN isn't configured), `fetch()`, then parse the raw SVG string — extract `viewBox` (fallback `'0 0 24 24'`), the inner content between the `<svg>` tags, and root presentation attributes (`fill`, `stroke`, `stroke-width`, `stroke-linecap`, `stroke-linejoin`). A `<symbol>` is built from these and appended to the sprite's `<defs>`; the raw SVG is also written back to `localStorage`. Errors delete the `pending` entry silently — the icon stays blank, no retry.
 
 ### Sprite element
 
@@ -123,7 +123,7 @@ Tabler SVGs use `stroke="currentColor"`, so rendered icons inherit the nearest a
 
 ### Cross-component icon injection
 
-Several components inject `<use>` elements dynamically rather than authoring them in HTML: `ln-toast` (`#ln-icon-x` dismiss button), `ln-upload` (`#lnc-file[-pdf|-doc|-epub]` per item, `#ln-icon-x` remove button), `ln-confirm` (swaps an existing `<use href>` to `#ln-icon-check` during confirm, restores on reset). All route through the same scan/fetch pipeline — no special-casing needed since detection is attribute-based, not author-time. `ln-sort` is the opposite case: its three trigger icons are statically authored in HTML (see `components/ln-sort/README.md`), never injected.
+Several components inject `<use>` elements dynamically rather than authoring them in HTML: `ln-toast` (`#ln-icon-x` dismiss button), `ln-upload` (`#ln-icon-custom-file[-pdf|-doc|-epub]` per item, `#ln-icon-x` remove button), `ln-confirm` (swaps an existing `<use href>` to `#ln-icon-check` during confirm, restores on reset). All route through the same scan/fetch pipeline — no special-casing needed since detection is attribute-based, not author-time. `ln-sort` is the opposite case: its three trigger icons are statically authored in HTML (see `components/ln-sort/README.md`), never injected.
 
 ### Offline behavior
 

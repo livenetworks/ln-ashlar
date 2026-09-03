@@ -153,3 +153,21 @@ Tracked decisions regarding formalization, correctness, and framework guarantees
 | **Component Conformance Suite** | Generic multi-invariant test runner (mount/destroy/reattach/leak tests) across all 50 components. | ⏸️ **On Hold** | Не е критично во моментов; ќе се разгледа понатаму. |
 | **Data Coordinator Refactor & Query Planner** | Splitting coordinator into 6 sub-modules + building SQL-style query planner for `ln-data-store`. | ❌ **Rejected (Over-engineering)** | Оценето како непотребно усложнување и наметнување туѓа архитектура надвор од DOM-first филозофијата. |
 
+---
+
+## 🚚 Capability Roadmap — New Components
+
+Од gap-аудитот на 1.6.1 ([`.claude/plans/ashlar-1.6.1-gap-audit.md`](.claude/plans/ashlar-1.6.1-gap-audit.md), Табела 2).
+Утврдено со grep врз изворот, не од листа на mainstream компоненти. Ниту една ставка не е одобрена за имплементација — ова е roadmap, не backlog.
+
+| Компонента / Иницијатива | Опсег и образложение | Приоритет | Status |
+|---|---|---|---|
+| **`ln-websocket-connector`** | Во целиот `components/` нема ниту еден `WebSocket` ниту `EventSource`. `ln-couchdb-connector.fetchDelta` вика `_changes?feed=normal` — обичен poll, значи транспортот е **100% pull**. Конекторскиот контракт (`request-sync` / `request-create` / `request-update` / `request-delete`) веќе постои, па ова седнува како sibling транспорт, не како нов слој. | 🔴 | 📋 **Planned** |
+| **`ln-sse-connector`** | Истиот конекторски слот, еднонасочно. Поевтино од WebSocket кога нема двонасочна комуникација — логови, нотификации, прогрес, мониторинг. Природен пар со горното. | 🟠 | 📋 **Planned** |
+| **Service Worker слој** | `ln-api-queue` веќе чита `navigator.onLine` и ги редува мутациите offline, но ништо не го сервира app shell-от offline. Offline приказната е половина завршена. | 🟠 | 💭 **Under consideration** |
+| **Export / download capability** | Нула `csv`, нула `download`, нула `print` во целиот извор. Со `ln-table` + `ln-data-store` + `ln-chart` во библиотеката, „извади го ова" е првото прашање на секој business консумер. | 🟠 | 💭 **Under consideration** |
+| **Проширување на `ln-chart` типови** | Renderer-от знае само `line` и `area` (`chart-model.js:119`). **Не е дефект** — `ln-chart/README.md:8` експлицитно го скопира договорот („The **first** contract supports a single numeric series rendered as a `line` or an `area`"). Архитектонски поволно: рендерерот **веќе** е coordinator-aware (`data-ln-chart-source`, `request-data`/`set-data`), па нови типови (bar/stacked/scatter/donut/gauge) се рендер-работа, не нов слој. | 🟠 | 💭 **Under consideration** |
+| **`ln-broadcast` (cross-tab)** | Нема `BroadcastChannel`. Логично за logout, session промени, cache invalidation — **но** cross-tab по природа е document-global слушач, што директно удира во координатор доктрината (компонентата работи само на свој DOM). Бара архитектонска пресуда пред да биде компонента. | 🟡 | ⚖️ **Ruling required first** |
+
+**Свесно НЕ е ставено:** IndexedDB (веќе постои — `ln-data-store.js:46` и `ln-api-queue/src/queue-storage.js:93`); Web Worker и Observer апстракции (тоа е *како*, не *што* — `ln-intersection` би бил hook без однесување); и целата mainstream UI таксономија (button, alert, badge, chip, menu, breadcrumb, drawer, skeleton, spinner, avatar, pagination) — сите или се CSS, или веќе постојат, или се забранети по доктрина.
+

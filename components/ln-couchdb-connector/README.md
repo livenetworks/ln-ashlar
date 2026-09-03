@@ -35,8 +35,8 @@ All attributes are dynamically observed. Any runtime changes to these attributes
 | Attribute | Category | Description |
 |-----------|----------|-------------|
 | `data-ln-couchdb-connector` | Selector | Creates the component instance. |
-| `data-ln-couchdb-url` | Connection | The base URL of the CouchDB Server or Sync Gateway (e.g. `https://couch.example.com`). Fallbacks: `data-ln-couchdb-connector-url`, `data-ln-api-base-url`, `data-ln-rest-base-url`. |
-| `data-ln-couchdb-db` | Connection | Database name endpoint (e.g. `tasks`). Fallbacks: `data-ln-couchdb-connector-db`, `data-ln-api-path`, `data-ln-rest-path`. |
+| `data-ln-couchdb-url` | Connection | The base URL of the CouchDB Server or Sync Gateway (e.g. `https://couch.example.com`). |
+| `data-ln-couchdb-db` | Connection | Database name endpoint (e.g. `tasks`). |
 | `data-ln-couchdb-auth` | Credentials | Authorization header value (e.g. `Basic dXNlcjpwYXNz` or standard token). |
 | `data-ln-couchdb-headers` | Credentials | JSON-formatted string of custom request headers. |
 

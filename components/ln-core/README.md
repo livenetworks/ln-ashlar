@@ -15,7 +15,7 @@ ln-core exposes helpers in these categories:
 - **Target & Event Predicates** — `shouldIgnoreClick`, `isTargetDisabled`, `isUsableTarget`, `isEditableTarget`
 - **Reactivity** — `reactiveState`, `deepReactive`, `createBatcher`
 - **Windowing** — sliding-window sparse cache for server-side virtualization (`createWindowCache`)
-- **Layout & Positioning** — viewport-aware positioning (`computePlacement`), teleport, measurement (`measureHidden`)
+- **Layout & Positioning** — viewport-aware positioning (`computePlacement`), measurement (`measureHidden`)
 - **Persistence** — localStorage wrappers with `ln:` prefix (`persistGet`, `persistSet`, `persistRemove`, `persistClear`)
 - **Hash codec** — namespaced URL fragment state (`hashParse`, `hashGet`, `hashSet`, `hashSortEncode`, `hashSortDecode`, `hashFilterEncode`, `hashFilterDecode`, `resolveHashNamespace`)
 - **Cryptography** — high-performance Web Crypto helpers for encryption at rest (`crypto.js`)
@@ -573,26 +573,6 @@ panel.setAttribute('data-ln-placement', placement);
 - Fallback chain: tries preferred side → opposite side → perpendicular
   pair → clamps to viewport edge if nothing fits.
 - Pure function. No DOM side effects.
-
-### teleportToBody(el)
-
-Move an element into `<body>`, leaving a comment placeholder so it can
-be restored to its original parent.
-
-```js
-const restore = teleportToBody(panel);
-// ... later
-restore();
-```
-
-- Returns a cleanup function that restores the element to its origin.
-- No-op + no-op cleanup if the element is already in `<body>` or
-  parent is missing.
-- Used for floating UI that needs to escape `overflow: hidden`
-  ancestors (popovers, dropdowns).
-- Does NOT set inline styles — the caller's CSS rule (e.g.
-  `[data-ln-popover] { position: fixed }`) is responsible for
-  positioning context.
 
 ### measureHidden(el)
 

@@ -1,5 +1,5 @@
 import { buildDict, cloneTemplateScoped, dispatch, dispatchCancelable, fill, getLocale, registerComponent } from '../../ln-core';
-import { formatFileSize, isFileTypeAllowed, parseAcceptExtensions } from './upload-model.js';
+import { formatFileSize, getFileExtension, isFileTypeAllowed, parseAcceptExtensions } from './upload-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-upload';
@@ -278,7 +278,7 @@ import { formatFileSize, isFileTypeAllowed, parseAcceptExtensions } from './uplo
 	_component.prototype._uploadSingleFile = function (file) {
 		const self = this;
 		const localId = 'file-' + (++self.fileIdCounter);
-		const ext = _getExtension(file.name);
+		const ext = getFileExtension(file.name);
 
 		let item = null;
 		if (this.list) {

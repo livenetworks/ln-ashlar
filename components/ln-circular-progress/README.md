@@ -71,7 +71,7 @@ The component sets `aria-hidden="true"` on the constructed `<svg>` — screen re
 | `trackCircle` | `SVGCircleElement` | Background circle (stroke = `--color-border`) |
 | `progressCircle` | `SVGCircleElement` | Fill circle — `stroke-dashoffset` carries the progress |
 | `labelEl` | `HTMLElement` | The `<strong>` element holding the percentage or custom label text |
-| `destroy()` | method | Disconnects the attribute observer, removes the SVG and label from DOM, deletes `el.lnCircularProgress`. Leaves the value attribute, colour class, and size class in place — setting the value attribute again re-instantiates. |
+| `destroy()` | method | Removes the SVG and label from DOM, deletes `el.lnCircularProgress`. Leaves the value attribute, colour class, and size class in place — setting the value attribute again re-instantiates. |
 
 `window.lnCircularProgress(root)` re-runs the init scan over `root`. The shared `registerComponent` observer already covers AJAX inserts; call this manually only for Shadow DOM roots or foreign documents the observer cannot reach.
 
@@ -156,13 +156,13 @@ Fixed module-level constants: `VIEW_SIZE = 36`, `RADIUS = 16`, `CIRCUMFERENCE = 
 - Clamping happens at the percentage level, not the attribute level: `detail.value` stays the raw unclamped number, `detail.percentage` is the 0–100 clamp used for the arc — this is how a consumer distinguishes overshoot from the visible fill.
 - ARIA (`role`, `aria-valuemin/max/now`, `aria-valuetext`) is rewritten on every render on the host element itself, not the SVG (which is `aria-hidden`).
 
-### What the per-instance observer watches
+### Attribute observation
 
-`_listenValues` filters to the three state attributes only — deliberately excluding `class`. Colour/size variants are pure CSS; nothing about the SVG geometry depends on the class, so no JS reaction is needed.
+Attribute mutations (`data-ln-circular-progress`, `-max`, `-label`) are handled by `registerComponent`'s shared observer via `onAttributeChange`, calling `_render` directly without any per-instance MutationObserver. Colour/size variants are pure CSS, so no JS reaction to class changes is needed.
 
 ### Destroy
 
-Disconnects the attribute observer, removes the SVG and label nodes, removes the ARIA attributes it added, deletes `el.lnCircularProgress`. Leaves the value attribute and any classes in place — a later write to the value attribute re-triggers `registerComponent`'s shared observer and rebuilds the instance from scratch (`_buildSvg` is not idempotent; it always appends new nodes).
+Removes the SVG and label nodes, deletes `el.lnCircularProgress`. Leaves the host attributes in place — a later write to the value attribute re-triggers `registerComponent`'s shared observer and rebuilds the instance from scratch (`_buildSvg` is not idempotent; it always appends new nodes).
 
 ---
 

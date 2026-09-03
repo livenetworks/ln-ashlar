@@ -145,7 +145,7 @@ For the same reason the shared observer watches `data-ln-confirm` only, **not** 
 
 The tooltip bubble is a CSS `::after` — invisible to AT. So the icon branch also:
 1. swaps `aria-label` to `confirmText` (original captured, restored on reset), and
-2. appends a transient `<span class="sr-only" role="alert">` carrying the prompt — `role="alert"` is announced on insertion, which an `aria-label` change alone is not. Removed on reset.
+2. sets `aria-live="polite"` directly on the button so AT announces the updated confirmation prompt without injecting dynamic DOM nodes. Restored symmetrically on reset.
 
 Text mode needs neither: `textContent` *is* the accessible name.
 

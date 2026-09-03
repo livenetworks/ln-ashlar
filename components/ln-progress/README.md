@@ -112,9 +112,8 @@ the observer cannot see.
 | Property | Type | Description |
 |---|---|---|
 | `dom` | `HTMLElement` | back-reference to the bar element |
-| `_attrObserver` | `MutationObserver` | watches the bar's own `data-ln-progress` and `data-ln-progress-max` |
 | `_parentObserver` | `MutationObserver \| null` | watches the parent track's `data-ln-progress-max` |
-| `destroy()` | method | disconnects both observers, deletes `el.lnProgress`. Does NOT remove `data-ln-progress` itself, the colour class, or the inline `style.width`. |
+| `destroy()` | method | disconnects the parent observer, deletes `el.lnProgress`. Does NOT remove `data-ln-progress` itself, the colour class, or the inline `style.width`. |
 
 There is no `setValue(n)`, `setMax(n)`, `update()`, or `redraw()`
 method. The attribute is the API. A programmatic update is
@@ -385,15 +384,14 @@ renders correctly but visually escapes its track.
 
 Source: `components/ln-progress/src/ln-progress.js` (~85 lines). Passive renderer — `_render` re-reads all three attributes fresh on every call; there is no cached value or max on the instance.
 
-### Three observers, three concerns
+### Two observers, two concerns
 
-1. `registerComponent`'s shared document-level observer instantiates new bars.
-2. `_attrObserver` (per bar) watches the bar's own `data-ln-progress`/`-max`.
-3. `_parentObserver` (per bar, always registered when a parent exists) watches the parent track's `data-ln-progress-max` — this is what makes a runtime change to the shared max re-render every child bar without any bar-side wiring.
+1. `registerComponent`'s shared document-level observer instantiates new bars and handles own attribute mutations via `onAttributeChange` (`data-ln-progress`, `data-ln-progress-max`).
+2. `_parentObserver` (per bar, always registered when a parent exists) watches the parent track's `data-ln-progress-max` — this is what makes a runtime change to the shared max re-render every child bar without any bar-side wiring.
 
 ### Construction order
 
-`_render` runs once immediately (dispatching the first `:change` before either observer is even wired), so a document-level listener attached before the bundle loads sees an event for every bar during the initial `DOMContentLoaded` scan; the two observers are attached after.
+`_render` runs once immediately (dispatching the first `:change` before the parent observer is wired), so a document-level listener attached before the bundle loads sees an event for every bar during the initial `DOMContentLoaded` scan; the parent observer is attached after.
 
 ### Render writes
 

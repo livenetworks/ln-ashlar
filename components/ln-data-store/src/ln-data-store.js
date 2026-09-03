@@ -1,6 +1,6 @@
 import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, decryptData } from '../../ln-core';
 import { createWindowIndex } from './window-index.js';
-import { aggregateRecords, decorateRecords, queryRecords } from './data-store-model.js';
+import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from './data-store-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-data-store';
@@ -723,7 +723,7 @@ import { aggregateRecords, decorateRecords, queryRecords } from './data-store-mo
 			if (this.totalCount != null) return Promise.resolve(this.totalCount);
 			return _countRecords(this._name);
 		}
-		return _getAllRecords(this._name).then(records => _filter(records, filters).length);
+		return _getAllRecords(this._name).then(records => filterRecords(records, filters).length);
 	};
 
 	_component.prototype.aggregate = function (field, fn) {
