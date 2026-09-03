@@ -12,9 +12,10 @@
 `ln-ashlar` rejects the mainstream premise that the UI must be mirrored into a secondary tree in JavaScript memory (Virtual DOM diffing, or a component tree from which the real DOM is re-derived). Instead, it establishes **DOM-First Architecture**:
 
 1. 🔍 **Control State Lives on the DOM:** Every piece of state that drives component behavior — open/closed, active, sort direction, mode, validation status — lives openly on the element's `data-ln-*` attributes, never inside a private closure. Application *data* (records, caches, sync queues) lives where data belongs: `ln-data-store` and IndexedDB. The split is deliberate — the control plane is inspectable, the data plane is efficient.
-2. 🎛️ **DevTools Inspector as the Control Plane:** Modifying any attribute directly in browser DevTools immediately activates the component's behavior in real-time. Native `MutationObserver` instantly synchronizes the internal engine, updates the DOM, and dispatches lifecycle events.
-3. 🤖 **AI-Native & Contract-Driven:** AI agents (via MCP, `.agents/`, and `docs-mcp/`) generate declarative, schema-validated HTML contracts rather than complex JavaScript program trees.
-4. 🔌 **The DOM Is the Bus:** Components never import one another. They communicate through bubbling `CustomEvent`s (`ln-{component}:{action}`), so a trigger neither knows nor cares what handles it — and the DOM tree, rather than a global registry, defines the scope. Any backend, template engine, or third-party script can take part by dispatching an event, with no package to install.
+2. 🎛️ **Zero Virtual DOM Hydration Mismatch:** Because there is only one state store (the DOM) rather than two (the server's HTML output vs. the client's JS memory), the entire class of "server rendered one tree, client hydrated a mismatched tree" errors is structurally eliminated.
+3. 🎛️ **DevTools Inspector as the Control Plane:** Modifying any attribute directly in browser DevTools immediately activates the component's behavior in real-time. Native `MutationObserver` instantly synchronizes the internal engine, updates the DOM, and dispatches lifecycle events.
+4. 🤖 **AI-Native & Contract-Driven:** AI agents (via MCP, `.agents/`, and `docs-mcp/`) generate declarative, schema-validated HTML contracts rather than complex JavaScript program trees.
+5. 🔌 **The DOM Is the Bus:** Components never import one another. They communicate through bubbling `CustomEvent`s (`ln-{component}:{action}`), so a trigger neither knows nor cares what handles it — and the DOM tree, rather than a global registry, defines the scope. Any backend, template engine, or third-party script can take part by dispatching an event, with no package to install.
 
 ---
 
@@ -102,6 +103,7 @@ Combine autonomous components directly in semantic HTML — **zero initializatio
 
 ### 2. 🤖 AI-Native & MCP Surface
 - **Machine-Readable Component Corpus (`docs-mcp/`):** Schema-validated documentation served directly to AI agent workflows via Model Context Protocol (MCP).
+- **Inference-Time Contracts:** AI generation thrives because it does not need to hallucinate JS hook rules, framework version conflicts, or missing npm packages. It simply instantiates a known, declarative HTML contract served in real-time during inference.
 - **MCP Component Router:** Decision matrix resolving user intent into declarative components before generating markup.
 - **In-Repo Agent Protocols (`.agents/`, `CLAUDE.md`, `DOCTRINE.md`):** Strict architectural rules, component templates, and lifecycle constraints loaded automatically into AI coding sessions.
 

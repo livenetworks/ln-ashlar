@@ -37,6 +37,11 @@ The third tier is deliberate. In-flight promises and observer instances are runt
 internals, not application state; putting them on attributes would pollute the
 control plane without making anything more debuggable.
 
+**Stratified, Not Reduced State Management**
+`ln-ashlar` does not have *less* state management than a typical React application; rather, the state is strictly **stratified by observability requirements**. This provides two critical benefits:
+1. **Blast Radius Containment:** If a state bug occurs in a component, it cannot corrupt a global store or affect sibling components because there is no shared mutable memory structure between them.
+2. **Observable Single Source of Truth:** Layer 1 (Control State) is *more* observable than Redux. DevTools displays the actual truth — the living DOM attribute — instead of an external devtools mirror that might have drifted from the render output.
+
 ---
 
 ## 2. React SPA vs. Ashlar SPA Execution Models
@@ -53,6 +58,13 @@ control plane without making anything more debuggable.
   `HTML / Template → Independent Components → DOM Attributes / CustomEvents → Coordinator → Local Data Store + Sync`  
   *DOM is the live, inspectable application surface.*
 
+> **Core Axiom:** The DOM is the state store. Frameworks reimplement it.
+
+This axiom yields three fundamental architectural consequences:
+1. **Hydration Mismatches Are Impossible:** Because the state lives in only one place (the DOM), the entire class of "server rendered one thing, client hydrated another" errors is structurally eliminated.
+2. **CSS Is the Render Function:** When state changes (e.g. `[data-ln-x="open"]`), it is rendered natively by the browser's style engine. The true architectural win is not that the engine is written in C++, but that **we completely skip the JavaScript reconciliation diff step**, mapping attribute writes directly into native style recalculations.
+3. **The Server Owns the State:** Because the DOM is the state, the backend (Laravel, Go, Django) fully orchestrates the view structure without needing complex JSON/hydration pipelines.
+
 ### The DOM as the Event Bus
 
 Component-tree frameworks couple components in JavaScript memory: for a button to refresh a table, both must import the same context, hook, or store. That coupling is invisible in the markup and permanent in the bundle.
@@ -66,8 +78,6 @@ Component-tree frameworks couple components in JavaScript memory: for a button t
 | **Platform agnostic** | `el.dispatchEvent(new CustomEvent('ln-table:request-data', { bubbles: true }))` works from a Blade template, a Django view, a browser extension, or the console. Participating needs no package and no class instance. |
 | **Native debugging** | `monitorEvents($0)` in any DevTools console traces the whole protocol. No framework extension, no time-travel plugin. |
 | **Command/Query separation** | Commands are `ln-{component}:request-{action}` events or attribute writes. Queries read attributes or public getters. The two never share a path. |
-
-**What it costs.** Event names and `detail` shapes are strings, checked at runtime and never at build time. A misspelled event name does not fail loudly — it simply never arrives. There is no static graph of which component listens to what, so tracing a flow means reading the components rather than an import tree. This is the deliberate price of decoupling: the same indirection that lets a component be replaced without touching its neighbours also prevents a compiler from proving they still fit together.
 
 ---
 
@@ -137,11 +147,12 @@ When evaluating tech stacks for enterprise CRUD, admin portals, and long-lived b
 
 1. **Lower Runtime Complexity:** Eliminates 1,000+ transitive npm dependencies and Virtual DOM reconciliation overhead.
 2. **DOM-First Observability:** DevTools Inspector is the native Control Plane (no specialized DevTools extension required to inspect hidden hooks/state closures).
-3. **Local-First Caching & Offline Resilience:** Built-in 3-Tier storage (`ln-data-store`) + FIFO sync queues eliminate skeleton loaders and API request waterfalls.
-4. **Decoupled API Architecture:** Stores and Coordinators isolate UI components from backend API schemas (`ln-mapper`).
-5. **AI-Native Efficiency:** AI coding agents (via MCP) emit declarative, schema-validated HTML contracts rather than writing complex JavaScript program logic.
-6. **15+ Year Longevity:** Built on permanent W3C browser standards (`<dialog>`, Popover API, CustomEvent, Web Crypto API) with zero breaking framework LTS cycles.
-7. **Supply Chain Security:** Zero runtime npm dependencies eliminate third-party package vulnerabilities.
+3. **Team Consolidation:** The backend team can own the entire application without needing a dedicated frontend team to build and maintain a parallel state-management infrastructure.
+4. **Local-First Caching & Offline Resilience:** Built-in 3-Tier storage (`ln-data-store`) + FIFO sync queues eliminate skeleton loaders and API request waterfalls.
+5. **Decoupled API Architecture:** Stores and Coordinators isolate UI components from backend API schemas (`ln-mapper`).
+6. **AI-Native Efficiency:** AI coding agents (via MCP) emit declarative, schema-validated HTML contracts rather than writing complex JavaScript program logic.
+7. **15+ Year Longevity:** Built on permanent W3C browser standards (`<dialog>`, Popover API, CustomEvent, Web Crypto API) with zero breaking framework LTS cycles.
+8. **Supply Chain Security:** Zero runtime npm dependencies eliminate third-party package vulnerabilities.
 
 ---
 

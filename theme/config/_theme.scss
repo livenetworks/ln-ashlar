@@ -20,16 +20,25 @@
 
 // Ashlar values — zero specificity, a client file always outranks them
 :where(:root),
-:where([data-theme="light"]) { @include ln-values-light; }
-:where([data-theme="dark"])  { @include ln-values-dark; }
+:where([data-theme="light"]) {
+	@include ln-values-light;
+}
+
+:where([data-theme="dark"]) {
+	@include ln-values-dark;
+}
 
 @media (prefers-color-scheme: dark) {
-	:where(:root:not([data-theme="light"])) { @include ln-values-dark; }
+	:where(:root:not([data-theme="light"])) {
+		@include ln-values-dark;
+	}
 }
 
 // Derivations — library-owned, normal specificity, every theme scope
 :root,
-[data-theme] { @include ln-color-chain; }
+[data-theme] {
+	@include ln-color-chain;
+}
 
 // ---------------------------------------------------------------------------
 // Named presets — demo theme picker. Activation:
@@ -58,32 +67,32 @@
 	--brand-primary: 218 95% 62%;
 
 	// Flat — zero radius everywhere
-	--radius-xs:   0;
-	--radius-sm:   0;
-	--radius-md:   0;
-	--radius-lg:   0;
-	--radius-xl:   0;
-	--radius-2xl:  0;
+	--radius-xs: 0;
+	--radius-sm: 0;
+	--radius-md: 0;
+	--radius-lg: 0;
+	--radius-xl: 0;
+	--radius-2xl: 0;
 	--radius-full: 0;
 
 	// Flat — no elevation shadows. --shadow-inner kept for recessed
 	// surfaces (code blocks, progress tracks) which read it as a depth
 	// affordance rather than elevation.
-	--shadow-xs:  none;
-	--shadow-sm:  none;
-	--shadow-md:  none;
-	--shadow-lg:  none;
-	--shadow-xl:  none;
+	--shadow-xs: none;
+	--shadow-sm: none;
+	--shadow-md: none;
+	--shadow-lg: none;
+	--shadow-xl: none;
 	--shadow-2xl: none;
 
 	// ── Buttons — neutral chrome via --btn-* rebind, accent variant via
 	// cross-cutting --color-accent-bg-* companion tokens. Theme rebinds
 	// at :root only; library owns structure. See CLAUDE.md
 	// ## Theme Architecture for the contract.
-	--btn-bg:           var(--bg-elevated);
-	--btn-bg-hover:     var(--bg-hover);
-	--btn-bg-active:    var(--bg-active);
-	--btn-border:       var(--color-accent);
+	--btn-bg: var(--bg-elevated);
+	--btn-bg-hover: var(--bg-hover);
+	--btn-bg-active: var(--bg-active);
+	--btn-border: var(--color-accent);
 	--btn-border-hover: var(--color-accent-hover);
 
 	// ── Accent buttons — translucent fill via consumer-scope rebind
@@ -95,8 +104,8 @@
 	// (button-base already handles state via --btn-*-hover).
 	button[type="submit"],
 	.btn {
-		--btn-bg:       hsl(var(--color-primary) / 0.2);
-		--btn-fg:       hsl(var(--color-primary));
+		--btn-bg: hsl(var(--color-primary) / 0.2);
+		--btn-fg: hsl(var(--color-primary));
 		--btn-bg-hover: hsl(var(--color-primary) / 0.3);
 		--btn-fg-hover: hsl(var(--color-primary));
 	}
@@ -107,9 +116,9 @@
 	// ring. --nav-list-bleed shifts the ul to the sidebar's vertical
 	// borders so dividers reach edge-to-edge; @mixin nav reads it with
 	// `0` fallback so default theme is unaffected.
-	--nav-link-border-color-hover:  var(--color-accent);
+	--nav-link-border-color-hover: var(--color-accent);
 	--nav-link-border-color-active: var(--color-accent);
-	--nav-list-bleed:               calc(-1 * var(--padding-x));
+	--nav-list-bleed: calc(-1 * var(--padding-x));
 
 	// Active-nav wash — Glass computes a stronger 24% tint mix against
 	// local --bg-base for contrast on the deep dark surface.

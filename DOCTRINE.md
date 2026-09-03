@@ -55,7 +55,7 @@
 
 > **Core Axiom:** *The DOM is the public/observable state surface (Control Plane), while JS maintains implementation state and local-first application data.*
 
-* **DOM as Public Control Plane:** Every control state attribute (`data-ln-*`) is observed via `MutationObserver` registered at the component level. For all component control state (e.g. open/closed, active tab, sort direction, search term, page offset, validation state), the attribute in the DOM is the **Single Source of Truth** — a component never keeps a private mirror of a control value it also writes to an attribute.
+* **DOM as Public Control Plane:** Every control state attribute (`data-ln-*`) is observed via `MutationObserver` registered at the component level. For all component control state (e.g. open/closed, active tab, sort direction, search term, page offset, validation state), the attribute in the DOM is the **Single Source of Truth** — a component never keeps a private mirror of a control value it also writes to an attribute. **Because there is no global mutable state tree, the blast radius of any state bug is strictly contained to the individual component.**
 * **Separation of Control State vs. Implementation State:**
   1. **Public Control State (DOM Attributes):** Observable, inspectable in DevTools, and mutable via standard DOM APIs (`setAttribute`).
   2. **Application Data Layer (`ln-data-store` + IndexedDB):** Row caches, record sets, sync queues, and conflict metadata live in Layer 3 storage, never serialized as DOM attribute strings.
@@ -116,6 +116,7 @@
 
 * **Local Multi-Instance Isolation:** Components that can be instantiated multiple times on a page (`form`, `ln-validate`, `ln-autosave`, `ln-accordion`, `ln-tabs`) are strictly self-contained. The validator (`ln-validate`) operates as an encapsulated child of its parent `<form>`. Multiple instances or forms on the same page operate completely independently.
 * **Window-Level Scope Boundary (`ln-ui-coordinator`):** Window-level coordinators manage only shared, window-wide UI services (hash routing for modals `#modal-id`, toast dispatching, global AJAX success/error toast mediation, upload notifications). They **MUST NEVER** couple with, inspect, or manage internal validation/submission state of local forms or components.
+* **Cross-Component Invariants:** Any invariant that spans multiple autonomous components (e.g. ensuring Component A and Component B cannot be active simultaneously) **MUST** be explicitly managed via event coordination by a coordinator layer, never by the components themselves. Components remain blind to their siblings.
 
 ---
 

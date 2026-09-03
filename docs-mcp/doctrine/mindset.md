@@ -8,107 +8,227 @@ source: docs/architecture/mindset.md, docs/architecture/philosophy.md
 tags: [doctrine, mindset, DOM-first, performance, security]
 ---
 
-# 🧠 Operational and Strategic Mindset
+# ln-ashlar Operational Mindset
 
-## Summary
-
-This document defines the core philosophy and operational principles of `ln-ashlar`. It outlines why the library employs a **DOM-First (client-side decentralized but server-side rendered)** model, compares IndexedDB caching against typical SPA loading patterns, examines framework longevity and dependency security, and detail eleven core authoring principles that govern the library's behavior.
+> Complements `docs/architecture/philosophy.md` — that document covers the strategic *why* (historical cycles, SPA vs SSR, security, longevity). This document is the operational doctrine for contributors and AI agents: concrete principles that explain how the library behaves and why decisions are made the way they are. **Start with the Honest Ledger below** — it is the calibrated strengths-and-costs assessment; the principles that follow assume you have read it.
 
 ---
 
-## 1. Architectural Philosophy: The Progressive DOM-First Model
+## Honest Ledger — Strengths and Costs
 
-### Computing Cycles and the Pendulum of Architecture
-Historically, computing architectures swing between centralized server processing and distributed client processing:
-1. **Centralized (Mainframe):** Dumb terminals displaying output; all processing on a central mainframe.
-2. **Distributed (Fat Client):** Computational power shifts to local desktop applications.
-3. **Centralized (Early Web):** Server-side HTML generation; the browser simply paints the markup.
-4. **Distributed (Single-Page Apps - SPA):** Frameworks (React, Vue, Angular) ship massive JS bundles to construct the entire UI in browser memory at runtime.
-5. **Progressive / DOM-First (ln-ashlar):** The server renders complete, structured semantic HTML. Lightweight client-side scripts progressively enhance and enliven it, using the browser's native DOM as the single source of truth.
+*Read this first. It is the calibrated assessment of what the library is genuinely good at and what it genuinely costs. Do not invent your own strengths or weaknesses — if you arrive with virtual-DOM-framework priors, calibrate against this ledger before judging any decision below.*
 
-### DOM-First vs. In-Memory Tree Construction
-Browsers natively understand HTML DOM, not an in-memory component tree. Mainstream frameworks download megabytes of JS, construct a component tree in memory, reconcile it against the previous state, and only then apply the result to the real DOM. 
+ln-ashlar makes deliberate trade-offs, and its wins and costs are not the ones a React or Vue background predicts. Judge it against its own contract — **markup owns structure, CSS owns presentation, events own communication** — not against a framework's. It is not a "simpler React"; it is a different contract with a different failure surface.
 
-`ln-ashlar` bypasses this overhead. Ready-to-render HTML is delivered directly from the backend, rendering instantly (First Contentful Paint) while native progressive components take over and activate behavior in milliseconds.
+**Where it genuinely wins.** The interface is authored, semantic HTML that is server-renderable, inspectable, and accessible with zero hydration cost — the whole UI is readable from source without running JS. There are zero runtime dependencies, so the library is immune to npm supply-chain churn and is built on stable W3C primitives (`<dialog>`, the Popover API, `CustomEvent`, `MutationObserver`) that outlive framework cycles. The data layer is local-first with a **closed** error taxonomy — every write failure is classified as auth, transient, or deterministic, never a fourth "unknown" bucket — plus an offline queue with per-chain FIFO ordering and id-remap before acknowledgement; this is *more* rigorous failure handling than the average client stack, not less. Components are teleport-safe: they bind by `data-ln-*` attribute, address each other by element `id` over events, and carry no parent-child coupling, props, or imports.
 
-### The Three Core Assertions of DOM-First Architecture
-1. **Control State Lives on the DOM (No Inaccessible Closures):**
-   Component control state — open/closed, active, sort direction, mode, validation status — is never trapped inside private closures or hidden memory trees. It lives openly and visibly on the DOM element's attributes (`data-ln-*`). Application data (records, caches, sync queues) lives in `ln-data-store` and IndexedDB; operational mechanics (in-flight requests, observers, query generations, batchers) live in JS memory. Those are runtime internals, not application state, and never belong on attributes.
-2. **Declarative, Testable & Reproducible:**
-   Any control state — a search term, an open modal, an expanded accordion, a deep-linked view — can be authored, inspected, automated, restored, or server-rendered from HTML attributes alone, with no orchestration script. Application data is restored by the store from its own cache, not from markup.
-3. **DevTools Inspector as the Control Plane:**
-   Editing any attribute in the browser's DevTools Inspector immediately activates the component's functionality in real-time. The underlying `MutationObserver` instantly synchronizes the internal engine, updates the DOM, syncs matching controls (`[data-ln-*-for]`), and dispatches lifecycle events.
+**What it genuinely costs.** There is no compile-time type safety — nothing stops a malformed payload or a wrong field name at author time, and this is the single largest cost of the zero-dependency stance. Observability is runtime-only through `ln-debug`: there is no time-travel or action log like Redux DevTools, and because communication is via `CustomEvent`, there is no static "who-listens-to-what" graph — tracing a flow means reading the components, not reading an import tree. Derived and computed state is hand-wired through store presenters, not an auto-tracked dependency graph (no signals/memo), so a large web of derived values is manual bookkeeping. And the attribute-plus-event model has a real learning curve precisely because the wiring is implicit in markup rather than explicit in code. Additionally, **client-side composition is limited**: in SPA mode, component composition is prototype-based (cloning templates) rather than functional, meaning complex structural variations rely on CSS/attribute branching instead of parameterized rendering (unlike SSR where template engines handle this natively). Finally, **cross-component invariants** (e.g., ensuring Component A and Component B cannot be active simultaneously) have no natural home by design, requiring explicit event coordination to prevent global coordinator sprawl.
+
+**Where the shape pays off — and where it fights you.** It pays off for administrative panels and CRUD, content-heavy sites with a strong backend, projects that must live for a decade, and teams that own the whole stack. It fights you when the core of the product is continuous high-frequency client state — real-time collaborative cursors, canvas or graphics engines, or deeply nested composition that genuinely needs reconciliation and diffing. For that class of problem, reach for a framework built for it; do not force this contract onto it.
 
 ---
 
-## 2. Performance: Caching over API Waterfalls
+## 1. Markup Is the Application
 
-In typical SPAs, the user interface experiences network latency because pages depend on a waterfall of asynchronous API requests (menus, profiles, settings, tables, statistics). Skeletons and gray loading states are not design features; they are cosmetic workarounds for application architectures that lack a local cache.
+**Mainstream way:** JS frameworks build UI chrome at runtime. React renders nav, modals, dropdown options from component state. If you inspect the initial HTML, it is an empty shell.
 
-`ln-ashlar` solves this via:
-- **Instant FCP:** Complete HTML delivered on initial load.
-- **IndexedDB as Local Cache:** Data queries execute instantly against the local browser database. The UI updates in milliseconds without loading screens, while delta-synchronization runs asynchronously in the background.
+**Ashlar way:** HTML is authored, complete, and semantic. JS never creates UI chrome — buttons, labels, option lists, popover content. `<template>` exists for data-driven row repetition only, not for UI structure.
 
----
+**Why:** Server-renderable, inspectable, accessible by default. Zero FOUC on UI chrome. Developers can read the full interface from source without running JS.
 
-## 3. Stability, Longevity, and Security
-
-### The Framework Obsolescence Trap
-Mainstream JavaScript frameworks suffer from short lifecycles and frequent breaking upgrades:
-- **Angular:** End-Of-Life (EOL) cycles every 6 months; migrations (like AngularJS to Angular 2+) require complete rewrites.
-- **React:** Shifted paradigms multiple times (Class Components → Hooks → Server Components), forcing continuous refactoring.
-- **Vue & Next.js:** Vue 2 EOL forced migrations due to ecosystem incompatibilities; Next.js router and Server Actions caused widespread deprecations.
-
-`ln-ashlar` relies strictly on **permanent W3C web standards** (native HTML attributes, `CustomEvent` interfaces, `MutationObserver`). These specifications guarantee that written code runs securely and natively for decades without forced refactorings.
-
-### NPM Supply Chain Security
-Modern JS apps pull hundreds to thousands of transitive packages into `node_modules`. This creates massive vulnerability surfaces:
-- **Hijacked Packages:** Incidents like `event-stream`, `ua-parser-js`, and `coa` injected malware directly into developer environments via minor version updates.
-- **Unpatched Dependencies:** Hobbyist packages frequently suffer from unpatched CVEs.
-
-`ln-ashlar` enforces a strict **zero-dependency** runtime policy, relying entirely on clean, custom-built native JavaScript.
+**Concrete example:**
+- `demo/admin/src/pages/table-filter.html` — filter popovers are complete HTML, authored once, no JS generation.
+- `<template data-ln-template="documents-row">` in `demo/admin/src/pages/table-sync.html` — row templates are the *sole* `<template>` use case.
 
 ---
 
-## 4. Eleven Core Operational Doctrines
+## 2. SSR and SPA Share Identical Markup
 
-Contributors and AI agents must adhere to the following eleven operational principles:
+**Mainstream way:** SSR renders HTML; hydration replaces it with JS-rendered equivalents. The structure differs between server output and client component tree.
 
-### 1. Markup Is the Application
-The HTML structure is authored, complete, and semantic. JavaScript never dynamically constructs visual chrome (e.g., navigation panels, modal wrappers, dropdown list options). The `<template>` tag is used solely for data-driven list/row repetition, not for building UI shell structures.
+**Ashlar way:** The same HTML is authored whether using Blade, a JS page, or a data layer. Only the data source differs; structure is identical.
 
-### 2. SSR and SPA Share Identical Markup
-The same HTML structure is used whether pages are server-rendered (e.g., Laravel Blade templates) or data-driven. The structure remains identical; only the data-binding source differs. This ensures zero hydration mismatch and progressive enhancement out of the box.
+**Why:** No hydration cost, no structure mismatch, progressive enhancement is free.
 
-### 3. Behavior Is Attached, Not Owned
-Components are self-initializing IIFE modules that attach behavior via `data-ln-*` attributes. They monitor changes using `MutationObserver` and communicate globally via `CustomEvent` flows addressed by target element IDs. Components are completely decoupled from their position in the DOM tree, so behavior never depends on where an element happens to live in the markup.
+**Concrete example:**
+`demo/admin/src/pages/table-filter.html` (SSR pattern) and `demo/admin/src/pages/table-sync.html` (data-driven) share the same `<th>`, `[data-ln-popover]`, `[data-ln-filter]` markup. The table body is the only difference.
 
-### 4. CSS Owns All Presentation and State
-JavaScript toggles state classes (`.ln-state-name`) or semantic attributes, while CSS manages visual changes. JavaScript must never write inline styles for visual states. `data-ln-*` attributes are strictly for behavioral configuration, not CSS selection.
+---
 
-### 5. Composition Over Features
-Features are composed by nesting and wiring distinct, decoupled components together rather than building monolithic components. For example, a filterable list uses `ln-popover` + `ln-search` + `ln-filter` + `ln-list`. Components remain simple and communicate via custom events rather than direct API calls.
+## 3. Behavior Is Attached, Not Owned
 
-### 6. Domain Truth Lives at the Source
-Filter options are defined by the backend domain model (e.g., database lookup, enum), not dynamically derived from the currently visible page dataset. Deriving options from visible rows breaks under pagination and hides valid options that happen to have zero items in the current page window.
+**Mainstream way:** Components own their behavior — a `<Modal>` renders its own close button, manages its own state, knows its own children. Components import each other.
 
-### 7. Raw vs. Formatted Values
-Sorting, filtering, and validation read raw, machine-readable values from `data-ln-value` or `data-ln-filter-value` attributes. The text content (`textContent`) is reserved purely for visual rendering and presentation formatting (e.g., currency symbols, relative dates).
+**Ashlar way:** Autonomous IIFE components bind via `data-ln-*` attributes, auto-init via MutationObserver, communicate via CustomEvents addressed by element `id`. No parent-child coupling, no props, no imports between components. DOM position is irrelevant to wiring — teleport-safe by design.
 
-### 8. Core Owns Standard Layout Compositions
-The library must support standard UI layouts out of the box. Projects must not write custom, local SCSS overrides to fix missing layout styles. If a common composition requires a custom CSS patch in a consumer project, the layout styling belongs in the core library.
+**Why:** A filter inside a popover teleported to `<body>` still dispatches `ln-filter:change` on `getElementById(tableId)`. The components have no idea they were moved.
 
-### 9. Lean JS (CSS affordances over Console Warnings)
-Developer configuration errors (e.g., missing target IDs) should be flagged using CSS `::after` content rules visible only in development mode. Avoid bloating JavaScript files with defensive checks and console statements.
+**Concrete example:**
+- `components/ln-popover/src/ln-popover.js:91` — teleports the entire popover block to `<body>` on open.
+- `components/ln-filter/src/ln-filter.js` — dispatches cancelable `ln-filter:change` on `getElementById(this.targetId)`. Works regardless of DOM position.
 
-### 10. Declarative Wiring Over Coordinators
-Actions triggered directly by user clicks or inputs (e.g., clicking edit to open a modal, typing to search a table) should be defined declaratively in HTML attributes:
-- Use `data-ln-modal-for="id"` to open a modal.
-- Use `data-ln-search-for="id"` to drive a search/filter target.
-- Use `data-ln-toggle-for="id"` to toggle a panel.
-- Use `data-ln-fill-form="form-id"` and `data-ln-fill-*` to bind data.
+---
 
-JavaScript controllers (Coordinators) are reserved for non-declarative actions, such as handling conflicts, offline synch, and deep-linking.
+## 4. CSS Owns All Presentation Including States
 
-### 11. Templates Are Authored Markup
-The library never dynamically generates or injects default templates as raw JS strings. Every `<template>` is explicitly written in the HTML markup. If a component (e.g., [`ln-toast`](../components/ln-toast.md)) clones a template, the container or page must declare it. A missing template fails loudly in development mode.
+**Mainstream way:** JS toggles `style=""` for show/hide, inline transforms for animation, class names encode visual variants (`.btn--danger`, `.modal--large`).
+
+**Ashlar way:** JS only toggles `.ln-*` state classes or semantic attributes. CSS translates those to visual output. Zero inline styles. `data-ln-*` hooks are behavior wiring — never CSS styling selectors.
+
+**Why:** Single source of truth for appearance. Design token changes propagate automatically. Inspector shows clean semantic markup. Changing a color means editing one token, not hunting JS files.
+
+**Concrete example:**
+`.ln-filter-active` on the filter button → `@mixin table-filter-active` in `theme/config/mixins/_table.scss` renders the accent dot and color change. JS does `btn.classList.toggle('ln-filter-active', ...)`. SCSS owns what that looks like. The `[data-ln-table-col-filter]` attribute is a JS id hook for finding the button — it is never a CSS selector.
+
+---
+
+## 5. Composition Over Features
+
+**Mainstream way:** A "filterable table" is a monolithic table component with built-in filter UI — dropdowns, chips, clear button, all owned by one component.
+
+**Ashlar way:** A "table filter" is `ln-popover` + `ln-search` + `ln-filter` composing together, with `ln-table` merely consuming one event (`ln-filter:change`). Big components do not grow features; they expose events.
+
+**Why:** Each component is independently testable and reusable. `ln-filter` works for card grids. `ln-popover` works for any overlay. Neither knows about the other.
+
+**Concrete example:**
+The column filter unification deleted ~145 lines from `ln-table` — the feature still exists via composition. Zero new code in `ln-table`.
+
+---
+
+## 6. Domain Truth Lives at the Source
+
+**Mainstream way:** Filter options are derived from the visible dataset: `[...new Set(rows.map(r => r.category))]`.
+
+**Ashlar way:** Options come from the domain owner — a backend enum, a lookup table — rendered into markup. An option with zero matching records must be expressible.
+
+**Why:** "What is possible" ≠ "What currently exists in the visible window." Dataset derivation breaks under pagination (only page 1 values are visible), creates filter circularity (filtering changes which options appear), and hides valid domain states.
+
+**Concrete example:**
+`demo/admin/src/pages/table-filter.html` — the "Legal" department option exists even if no current employee has that department. The backend enum owns the truth, not the data window.
+
+---
+
+## 7. Raw vs Formatted — Never Sort or Filter Displayed Text
+
+**Mainstream way:** Filter and sort read `td.textContent` — whatever the display layer rendered.
+
+**Ashlar way:** `data-ln-value` on cells and `data-ln-filter-value` on checkboxes carry machine values. `td.textContent` is presentation only. Sorting and filtering never read formatted text.
+
+**Why:** Formatted numbers (`"$1,234.56"`), dates (`"Apr 12, 2026"`), and status badges (`"● Active"`) are not correctly sortable or matchable as text. The raw value is the truth.
+
+**Concrete example:**
+A salary cell carries `data-ln-value="120000"` while displaying `"$120,000"`. A filter checkbox carries `data-ln-filter-value="active"` while the badge displays `"● Active"`.
+
+---
+
+## 8. Out of the Box — Core Owns All Standard Compositions
+
+**Mainstream way:** Each project patches its own CSS to fix framework gaps for common compositions.
+
+**Ashlar way:** Core must cover all standard compositions. If a consumer project had to write a local SCSS patch for a layout that core should provide, that is a doctrine violation — the fix belongs in core.
+
+**Why:** Per-project patches scatter fixes, diverge over time, and become tech debt. The library is only complete when consumers can compose standard patterns without patching.
+
+**Concrete example:**
+The column filter unification added filter popover content styling (checkbox list layout, optional search input spacing) to `theme/config/mixins/_popover.scss`. No consumer project needs a local patch for this layout.
+
+---
+
+## 9. Lean JS — Misuse Is a CSS Affordance, Not a Console Warning
+
+**Mainstream way:** Developer misuse triggers `console.warn()`. Behavior errors throw exceptions. JS files grow with defensive runtime checks.
+
+**Ashlar way:** Zero dependencies, minimal abstractions. JS is thin. Developer misuse surfaces via CSS `::after` affordances in dev mode — a visual signal on the page, not noise in the console. Exceptions never break the page.
+
+**Why:** Console warnings disappear unnoticed. A red `::after` label on the broken element is impossible to miss during development, requires zero JS, and costs nothing in production when the pattern is used correctly.
+
+**Concrete example:**
+A component that requires an `id` on its target and does not find one:
+
+```scss
+/* In component stylesheet — dev-only affordance */
+[data-ln-filter]:not([data-ln-filter=""]):not([id]) {
+	&::after {
+		content: "⚠ data-ln-filter target id missing";
+		color: red;
+		display: block;
+	}
+}
+```
+
+No `console.warn`. No thrown error. The developer sees the warning on the page.
+
+---
+
+## 10. Declarative Wiring Over Coordinators
+
+**Mainstream way:** "Edit this row → open a modal → fill the form" is hand-wired in JS — a click handler stashes the record in a variable, opens the modal, a second handler copies fields into inputs. What a button does is invisible in the markup; you must read the JS to know.
+
+**Ashlar way:** The trigger *declares* the whole flow in attributes — `data-ln-modal-for` opens, `data-ln-fill-form` + `data-ln-fill-*` fill the form, `data-ln-modal-*` set the title. No coordinator. The record rides in the DOM, visible in DevTools. JS is reserved for what the platform genuinely cannot express — submit-to-store, conflict resolution, programmatic fills.
+
+**Why:** Declared behavior has nothing to maintain, is inspectable, and is teleport-safe. A coordinator for the common case is code you read, test, and keep in sync. Deleting it is not losing a feature — it is the feature done right.
+
+**Concrete example:**
+
+```js
+// BEFORE — coordinator JS, re-written on every CRUD page
+let pendingRecord = null;
+table.addEventListener('ln-table:row-action', e => {
+	if (e.detail.action !== 'edit') return;
+	pendingRecord = e.detail.record;
+	modal.setAttribute('data-ln-modal', 'open');
+});
+modal.addEventListener('ln-modal:before-open', () => {
+	window.lnCore.lnFill(modal, pendingRecord);
+	modal.dataset.lnModalMode = pendingRecord ? 'edit' : 'new';
+	pendingRecord = null;
+});
+```
+```html
+<!-- AFTER — zero coordinator JS. The row template stamps per-row values. -->
+<button data-ln-table-row-action="edit"
+		data-ln-modal-for="pkg-modal" data-ln-modal-name="{{ name }}"
+		data-ln-fill-form="pkg-form"
+		data-ln-fill-id="{{ id }}" data-ln-fill-name="{{ name }}">Edit</button>
+```
+
+The four CRUD demos shed ~60 lines of identical coordinator JS this way (see `components/ln-fill/README.md`). A field whose `name` is the backend column (`max_users`) carries `data-ln-fill-as="maxUsers"` to match the camelCased trigger key — `name` stays the wire, the fill key is decoupled.
+
+**Where the coordinator still earns its place:** when the fill is *not* a user click — store conflict resolution, an import workflow, a deep-link pre-fill. Then `window.lnCore.lnFill(el, record)` dispatched from an event handler is correct. The rule: **click-triggered → declarative; programmatic → coordinator.**
+
+**Corollary — reach for the platform first.** This layer invents nothing: `data-*` read via `dataset` (camelCased for free), attribute writes via `setAttribute`, native `form.reset()`. Before building a bespoke mechanism, check whether the browser already is one. "Don't reinvent hot water."
+
+---
+
+## 11. Case Study — The Filter-Clipping Saga
+
+### Symptom
+
+Per-column filter dropdowns clipped by `overflow: clip` in the `table-base` mixin (`theme/config/mixins/_table.scss`) and `overflow-x: auto` on `[data-ln-table]` (`theme/config/mixins/_ln-table.scss`).
+
+### Disease
+
+Three divergent implementations existed (SSR popover, data-driven dropdown builder, SPA options-attribute path). The "fix" kept being re-applied in different ways because the root cause was never addressed. JS was generating UI chrome (the dropdown markup). Any in-tree mounting position clips against the overflow stacking context.
+
+### Cure
+
+Static authored popover markup (`ln-popover`) placed outside the clipping container and teleported to `<body>` on open. `ln-filter` handles mutual exclusion and dispatches to the table by `id`. `ln-table` consumes one event. The table has no filter UI code.
+
+The three divergent code paths collapsed into one authored HTML pattern. ~145 lines removed from `ln-table`. The feature became more capable (no clipping, teleport-safe, domain-driven options) by having *less* code.
+
+### Lesson
+
+When a feature requires fighting the DOM (overflow hacks, `z-index` wars, `position: fixed` workarounds), question whether the feature belongs where it is. The DOM is not an obstacle — the architecture is wrong.
+
+---
+
+## 12. Templates Are Authored Markup
+
+**Mainstream way:** A component ships a default template as a string constant (or a `?raw` import injected via `innerHTML`) so it works "out of the box" with zero markup. Overriding it means fighting a buried default.
+
+**Ashlar way:** A `<template>` is markup, and markup is authored — never generated or injected by the library. If a JS component clones a template for runtime data, the PAGE provides it: nested inside the component's container (primary — `cloneTemplateScoped` resolves container-local templates first) or at the bottom of the page markup (global fallback). The library never ships a hidden runtime default. `components/ln-{name}/template.html` files are developer examples to copy, not runtime artifacts. A missing template fails loudly (a console warning at clone time), never a silent fallback.
+
+**Why:** A `?raw` import injected via `innerHTML` is JS-generated markup in disguise — it violates Principle 1 (Markup Is the Application) exactly like server-side hydration replacement violates Principle 2. The page markup is the single source of truth; developers customize by editing their authored template, not by overriding a buried library default.
+
+**Concrete example:**
+`components/ln-toast/src/ln-toast.js` clones `<template data-ln-template="ln-toast-item">` via `cloneTemplateScoped` — the page authors this template nested inside `[data-ln-toast]` (see `demo/admin/src/shell.html`). `components/ln-toast/template.html` is the copyable starting point; nothing imports it. If no matching `<template>` exists anywhere, the clone fails loudly with `console.warn('[ln-toast] Template "ln-toast-item" not found')`.
