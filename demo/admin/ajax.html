@@ -7,58 +7,22 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-	<!-- Mode bootstrap — runs before first paint to prevent FOUC.
+	<!-- UI state bootstrap (mode, skin, theme, density) — runs before first paint to prevent FOUC.
 	     Uses var/indexOf for maximum compat; no bundler on this path. -->
 	<script>
 	(function () {
-		var KEY = 'ln-demo-mode';
-		var VALID = ['light', 'dark'];
+		var config = [
+			{ key: 'ln-demo-mode', attr: 'data-mode', valid: ['light', 'dark'] },
+			{ key: 'ln-demo-skin', attr: 'data-skin', valid: ['glass', 'outline', 'soft'] },
+			{ key: 'ln-demo-theme', attr: 'data-theme', valid: ['ocean', 'sunset', 'midnight', 'glass'] },
+			{ key: 'ln-demo-density', attr: 'data-density', valid: ['compact', 'comfortable', 'spacious'] }
+		];
 		try {
-			var stored = localStorage.getItem(KEY);
-			if (stored && VALID.indexOf(stored) !== -1) {
-				document.documentElement.setAttribute('data-mode', stored);
-			}
-		} catch (e) { /* localStorage unavailable — fall through */ }
-	})();
-	</script>
-	<!-- Skin bootstrap — runs before first paint to prevent FOUC.
-	     Uses var/indexOf for maximum compat; no bundler on this path. -->
-	<script>
-	(function () {
-		var KEY = 'ln-demo-skin';
-		var VALID = ['glass'];
-		try {
-			var stored = localStorage.getItem(KEY);
-			if (stored && VALID.indexOf(stored) !== -1) {
-				document.documentElement.setAttribute('data-skin', stored);
-			}
-		} catch (e) { /* localStorage unavailable — fall through */ }
-	})();
-	</script>
-	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
-	     Uses var/indexOf for maximum compat; no bundler on this path. -->
-	<script>
-	(function () {
-		var KEY = 'ln-demo-theme';
-		var VALID = ['ocean', 'sunset', 'midnight', 'glass'];
-		try {
-			var stored = localStorage.getItem(KEY);
-			if (stored && VALID.indexOf(stored) !== -1) {
-				document.documentElement.setAttribute('data-theme', stored);
-			}
-		} catch (e) { /* localStorage unavailable — fall through */ }
-	})();
-	</script>
-	<!-- Density bootstrap — runs before first paint to prevent FOUC.
-	     Uses var/indexOf for maximum compat; no bundler on this path. -->
-	<script>
-	(function () {
-		var KEY = 'ln-demo-density';
-		var VALID = ['compact', 'comfortable', 'spacious'];
-		try {
-			var stored = localStorage.getItem(KEY);
-			if (stored && VALID.indexOf(stored) !== -1) {
-				document.documentElement.setAttribute('data-density', stored);
+			for (var i = 0; i < config.length; i++) {
+				var stored = localStorage.getItem(config[i].key);
+				if (stored && config[i].valid.indexOf(stored) !== -1) {
+					document.documentElement.setAttribute(config[i].attr, stored);
+				}
 			}
 		} catch (e) { /* localStorage unavailable — fall through */ }
 	})();
@@ -117,7 +81,9 @@
 						<section>
 							<h4>Skin</h4>
 							<ul>
-								<li><button type="button" data-demo-skin="default">Default</button></li>
+								<li><button type="button" data-demo-skin="default">Solid</button></li>
+								<li><button type="button" data-demo-skin="outline"><span class="demo-theme-swatch" data-preset="outline"></span>Outline</button></li>
+								<li><button type="button" data-demo-skin="soft"><span class="demo-theme-swatch" data-preset="soft"></span>Soft</button></li>
 								<li><button type="button" data-demo-skin="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
 							</ul>
 						</section>
@@ -598,7 +564,7 @@ document.addEventListener('ln-ajax:error', function(e) {
 
 	(function () {
 		const KEY = 'ln-demo-skin';
-		const VALID = ['glass'];
+		const VALID = ['glass', 'outline', 'soft'];
 		const root = document.documentElement;
 
 		function markActive() {

@@ -13,6 +13,8 @@
 	&[data-preset="sunset"]   { background: hsl(10 80% 50%); }
 	&[data-preset="midnight"] { background: hsl(265 70% 60%); }
 	&[data-preset="glass"]    { background: hsl(218 95% 62%); }
+	&[data-preset="outline"]  { background: transparent; border: 2px solid hsl(var(--color-neutral-400)); }
+	&[data-preset="soft"]     { background: var(--bg-elevated); box-shadow: 0 4px 8px rgba(0,0,0,0.2); border-color: transparent; }
 }
 
 .demo-theme-picker {
@@ -73,6 +75,8 @@
 [data-mode="light"] [data-demo-mode="light"],
 :root:not([data-mode="dark"]) [data-demo-mode="light"],
 [data-skin="glass"] [data-demo-skin="glass"],
+[data-skin="outline"] [data-demo-skin="outline"],
+[data-skin="soft"] [data-demo-skin="soft"],
 :root:not([data-skin]) [data-demo-skin="default"],
 [data-theme="ocean"] [data-demo-theme="ocean"],
 [data-theme="sunset"] [data-demo-theme="sunset"],

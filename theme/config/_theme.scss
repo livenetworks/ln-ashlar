@@ -168,3 +168,67 @@
 		--border-block-start: var(--border-width) solid var(--color-border);
 	}
 }
+
+[data-skin="outline"] {
+	// Outline — no elevation shadows, structural borders only.
+	--shadow-xs: none;
+	--shadow-sm: none;
+	--shadow-md: none;
+	--shadow-lg: none;
+	--shadow-xl: none;
+	--shadow-2xl: none;
+	
+	// Retain the inner shadow for recessed tracks.
+	--shadow-resting: none;
+	--shadow-floating: none;
+
+	// Make the borders stand out more since there are no shadows
+	--border-subtle: hsl(var(--color-neutral-300));
+
+	// ── Buttons — neutral chrome
+	--btn-bg: transparent;
+	--btn-bg-hover: var(--bg-hover);
+	--btn-bg-active: var(--bg-active);
+	// Give buttons a visible border instead of filling them
+	--btn-border: var(--border-strong);
+
+	// ── Accent buttons — transparent fill, colored border
+	button[type="submit"],
+	.btn {
+		--btn-bg: transparent;
+		--btn-fg: hsl(var(--color-primary));
+		--btn-border: hsl(var(--color-primary));
+		--btn-bg-hover: hsl(var(--color-primary) / 0.1);
+		--btn-fg-hover: hsl(var(--color-primary));
+		--btn-border-hover: hsl(var(--color-primary));
+	}
+}
+
+[data-skin="soft"] {
+	// Soft — playful, maximum radius, heavily shadow-based, no borders.
+	--radius-xs: 0.5rem;
+	--radius-sm: 0.75rem;
+	--radius-md: 1rem;
+	--radius-lg: 1.5rem;
+	--radius-xl: 2rem;
+	--radius-2xl: 2.5rem;
+
+	// Override shadows to be much larger and softer (volumetric look)
+	--shadow-sm: 0 8px 16px -2px rgba(0, 0, 0, 0.08);
+	--shadow-md: 0 12px 24px -4px rgba(0, 0, 0, 0.12);
+	--shadow-lg: 0 24px 48px -4px rgba(0, 0, 0, 0.16);
+
+	// Floating elements are more pronounced
+	--shadow-resting: var(--shadow-sm);
+	--shadow-floating: var(--shadow-lg);
+
+	// Remove default subtle borders (cards, panels) so they rely solely on shadows
+	--border-subtle: transparent;
+
+	// ── Buttons — pill shapes, floating, no borders
+	--btn-border: transparent;
+	--btn-border-hover: transparent;
+	--btn-bg: var(--bg-elevated);
+	--btn-bg-hover: var(--bg-hover);
+	box-shadow: var(--shadow-sm);
+}
