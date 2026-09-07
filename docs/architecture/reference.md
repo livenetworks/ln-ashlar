@@ -298,11 +298,15 @@ their respective `:root` scopes. They do NOT redeclare component structure
 ### Rule — themes and skins rebind at their respective `:root`, never via descendant selectors
 
 ```scss
-// RIGHT — vocabulary rebind at skin :root only
+// RIGHT — vocabulary rebind at skin :root; values needing var(--color-primary)
+// nest at the consuming element so it resolves on that element's cascade
 [data-skin="glass"] {
-	--btn-bg:             var(--bg-elevated);
-	--color-accent-bg:    hsl(var(--color-primary) / 0.5);
-	// ...
+	--btn-bg: var(--bg-elevated);
+
+	button[type="submit"],
+	.btn {
+		--btn-bg: hsl(var(--color-primary) / 0.2);
+	}
 }
 
 // WRONG — descendant selector at higher specificity, structural override
@@ -338,13 +342,19 @@ in the consumer mixin. Do not escalate specificity.
 
 // Default theme — no companion override; mixin falls back to --color-accent / --color-accent-fg (= solid + white)
 
-// Glass skin — rebind vocabulary + accent companions at skin :root
+// Glass skin — vocabulary rebind at skin :root; values needing var(--color-primary)
+// nest at the consuming element (not skin :root) so the nested var() resolves there
 [data-skin="glass"] {
-	--btn-bg:                var(--bg-elevated);
-	--radius:                0;
-	--color-accent-bg:       hsl(var(--color-primary) / 0.2);
-	--color-accent-bg-hover: hsl(var(--color-primary) / 0.3);
-	--color-accent-bg-fg:    hsl(var(--color-primary));
+	--btn-bg: var(--bg-elevated);
+	--radius: 0;
+
+	button[type="submit"],
+	.btn {
+		--btn-bg:       hsl(var(--color-primary) / 0.2);
+		--btn-fg:       hsl(var(--color-primary));
+		--btn-bg-hover: hsl(var(--color-primary) / 0.3);
+		--btn-fg-hover: hsl(var(--color-primary));
+	}
 	// --color-accent-fg stays at :root default (white) — solid-accent
 	// surfaces (toast-icon, pill-checked, stepper-active) keep white
 	// text on solid primary fill.
@@ -379,6 +389,15 @@ Companion tokens live in the cross-cutting `--color-accent-*` family
 in the logical token surface. They are NOT `--btn-accent-*`
 per-component-surface tokens (those would freeze at `:root` and break
 the semantic-color cascade — see `theme/config/mixins/_btn.scss` header).
+
+**Root-Resolvability Invariant.** A `var()` inside a custom-property value
+declared at a `[data-skin]` / `[data-theme]` / `[data-mode]` root may
+reference only tokens declared by `_tokens.scss :root`,
+`ln-values-light` / `ln-values-dark`, `ln-color-chain`, or the
+base-defaults block — never a token that exists only inside a
+component mixin or on a narrow element selector. If the value must
+derive from a component-local token, the rebind belongs in a nested
+consuming-element block.
 
 ### What NOT to do (themes)
 

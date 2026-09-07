@@ -82,6 +82,7 @@ code {
 	@include text-sm;
 	--color-bg: var(--bg-recessed);
 	background-color: var(--color-bg);
+	color: var(--color-fg);
 	padding: var(--size-2xs) var(--size-xs);
 	@include rounded-sm;
 }
@@ -91,6 +92,7 @@ pre {
 	@include text-sm;
 	--color-bg: var(--bg-recessed);
 	background-color: var(--color-bg);
+	color: var(--color-fg);
 	padding: var(--size-md);
 	@include rounded-md;
 	@include border;

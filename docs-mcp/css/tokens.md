@@ -44,8 +44,9 @@ Within the theme system, design values flow through four strictly defined layers
 - **Components Rebind Primitives:** Custom components rebind the primitive on their local scope to select a vocabulary role (e.g. `.card-sunken { --color-bg: var(--bg-sunken); }`).
 - **Relational Roles vs. Elevation Ladder:** `--bg-*` tokens represent **relational roles whose tonal direction is theme-defined**, not a static monotonic elevation ladder:
   - **Light mode is flat by design:** Nested surfaces are separated by **shadow** (`--shadow-resting`, `--shadow-floating`), not tone (`--bg-elevated` equals `--bg-base`).
-  - **Dark mode uses tonal elevation:** Dark grounds cannot use shadows effectively, so surfaces separate by **lightness** (`--bg-elevated` is 17% vs `--bg-base` 13%).
-  - `--bg-sunken` is darker than base in light mode (96% vs 100%), but **lighter** than base in dark mode (20% vs 13%). This prevents sunken inputs from punching through the card down to the 9% app-shell ground.
+  - **Dark mode uses tonal elevation:** Dark grounds cannot use shadows effectively, so surfaces separate by **lightness** (`--bg-elevated` is 18% vs `--bg-base` 12%).
+  - `--bg-sunken` is darker than base in light mode (96% vs 100%), but **lighter** than base in dark mode (21% vs 12%). This prevents sunken inputs from punching through the card down to the 8% app-shell ground — which is why dark binds `--input-bg` to `--bg-sunken` rather than letting it fall through to `--bg-recessed`.
+  - **Both polarities bind to the neutral ramp.** No `--bg-*` / `--fg-*` / `--border-*` token is a hand-tuned literal in either value mixin, so rebinding `--color-neutral-*` moves light and dark together.
 
 ---
 
@@ -99,17 +100,17 @@ Within the theme system, design values flow through four strictly defined layers
 | `--color-warning` | token | `32 95% 38%` | Caution status bare HSL triplet |
 | `--color-info` | token | `200 95% 38%` | Info status bare HSL triplet |
 | **Vocabulary Tokens (Light vs. Dark)** | | | |
-| `--bg-base` | token | `hsl(var(--color-white)) (light) / hsl(220 16% 13%) (dark)` | Base canvas background |
-| `--bg-elevated` | token | `var(--bg-base) (light) / hsl(220 16% 17%) (dark)` | Raised card background |
-| `--bg-sunken` | token | `hsl(var(--color-neutral-100)) (light) / hsl(220 16% 20%) (dark)` | Static sunken well and table header fill (flips lighter in dark) |
-| `--bg-recessed` | token | `hsl(var(--color-neutral-50)) (light) / hsl(220 16% 9%) (dark)` | Recessed ground and input fill |
-| `--bg-hover` | token | `hsl(var(--color-neutral-100)) (light) / hsl(220 16% 20%) (dark)` | Neutral interactive hover background |
-| `--bg-active` | token | `hsl(var(--color-neutral-150)) (light) / hsl(220 16% 24%) (dark)` | Neutral interactive active/pressed background |
-| `--fg-default` | token | `hsl(var(--color-neutral-900)) (light) / hsl(0 0% 95%) (dark)` | High-contrast primary text |
-| `--fg-muted` | token | `hsl(var(--color-neutral-500)) (light) / hsl(220 10% 68%) (dark)` | Muted secondary text and captions |
-| `--fg-subtle` | token | `hsl(var(--color-neutral-400)) (light) / hsl(218 11% 55%) (dark)` | Subtle secondary text |
-| `--border-subtle` | token | `hsl(var(--color-neutral-200)) (light) / hsl(220 14% 20%) (dark)` | Subtle separator border |
-| `--border-strong` | token | `hsl(var(--color-neutral-300)) (light) / hsl(220 13% 36%) (dark)` | Focused and high-contrast border |
+| `--bg-base` | token | `hsl(var(--color-white)) (light) / hsl(var(--color-neutral-100)) (dark)` | Base canvas background |
+| `--bg-elevated` | token | `var(--bg-base) (light) / hsl(var(--color-neutral-150)) (dark)` | Raised card background |
+| `--bg-sunken` | token | `hsl(var(--color-neutral-100)) (light) / hsl(var(--color-neutral-175)) (dark)` | Static sunken well and table header fill (flips lighter in dark) |
+| `--bg-recessed` | token | `hsl(var(--color-neutral-50)) (light) / hsl(var(--color-neutral-50)) (dark)` | Recessed ground and input fill |
+| `--bg-hover` | token | `hsl(var(--color-neutral-100)) (light) / hsl(var(--color-neutral-175)) (dark)` | Neutral interactive hover background |
+| `--bg-active` | token | `hsl(var(--color-neutral-150)) (light) / hsl(var(--color-neutral-200)) (dark)` | Neutral interactive active/pressed background |
+| `--fg-default` | token | `hsl(var(--color-neutral-900)) (light) / hsl(var(--color-neutral-900)) (dark)` | High-contrast primary text |
+| `--fg-muted` | token | `hsl(var(--color-neutral-500)) (light) / hsl(var(--color-neutral-500)) (dark)` | Muted secondary text and captions |
+| `--fg-subtle` | token | `hsl(var(--color-neutral-400)) (light) / hsl(var(--color-neutral-400)) (dark)` | Subtle secondary text |
+| `--border-subtle` | token | `hsl(var(--color-neutral-200)) (light) / hsl(var(--color-neutral-175)) (dark)` | Subtle separator border |
+| `--border-strong` | token | `hsl(var(--color-neutral-300)) (light) / hsl(var(--color-neutral-300)) (dark)` | Focused and high-contrast border |
 | **Interaction State Tokens** | | | |
 | `--tint-hover` | token | `7%` | Accent-wash ratio for interactive hover |
 | `--tint-selected` | token | `12%` | Accent-wash ratio for selected items |

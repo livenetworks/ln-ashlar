@@ -140,6 +140,7 @@ Styling values flow through four strictly defined layers. A brand token, a scale
 4. **Density Invariant:** Density modifies spatial and typographic geometry, never color or surface semantics.
 5. **Visibility Invariant:** `hidden` (attribute or `.hidden` in tabs) is the sole hiding mechanism; there is no `.ln-hidden` or ad-hoc display override class.
 6. **Freeze Rule Invariant:** Accent-derived interaction states are tokenised strictly as ratio percentages (`--tint-hover: 7%`, `--tint-selected: 12%`, `--tint-active: 14%`) rather than pre-resolved `:root` colors. `color-mix()` executes at the local declaration site so `--color-accent` and `--color-bg` resolve dynamically on the component cascade.
+7. **Root-Resolvability Invariant:** A `var()` inside a custom-property value declared at a `[data-skin]` / `[data-theme]` / `[data-mode]` root may reference only tokens declared by `_tokens.scss :root`, `ln-values-light` / `ln-values-dark`, `ln-color-chain`, or the base-defaults block — never a token that exists only inside a component mixin or on a narrow element selector. If the value must derive from a component-local token, the rebind belongs in a nested consuming-element block.
 
 ### D. Anti-Patterns & Pitfalls
 > [!CAUTION]
@@ -147,6 +148,7 @@ Styling values flow through four strictly defined layers. A brand token, a scale
 > 2. **Do Not Read Neutral Scale for Backgrounds:** Never use `--color-neutral-*` directly for backgrounds or text in mixins. The neutral scale inverts in dark mode, which will turn light surfaces pitch black or vice-versa.
 > 3. **Do Not Infer Tonal Direction from Names:** `--bg-sunken` is darker than `--bg-base` in light mode (96% vs 100%) but **lighter** than `--bg-base` in dark mode (20% vs 13%). This is intentional so sunken wells do not punch through the 9% app-shell ground.
 > 4. **Do Not Rebind Vocabulary on Components:** Never write `.card { --bg-base: ... }`. Always write `.card { --color-bg: var(--bg-elevated); }`.
+> 5. **Own-the-pair:** Any element that rebinds `--color-bg` and paints `background-color` must also paint `color: var(--color-fg)` in the same rule. A background without a foreground inherits its text colour from an arbitrary ancestor and cannot guarantee contrast against a surface it chose itself.
 
 ### E. Mixin Inclusion Grouping and Overrides
 When styling custom, project-specific components (e.g. by unique IDs like `#user-edit-modal` and `#packages-filter-drawer`), follow these grouping and overriding guidelines:
@@ -189,13 +191,15 @@ To apply themes, **rebind vocabulary tokens at the theme root scope**. Never use
 #### Correct Theme Declaration:
 ```css
 [data-mode="dark"] {
-    --bg-base:     hsl(220 16% 13%);
-    --bg-elevated: hsl(220 16% 17%);
-    --fg-default:  hsl(0 0% 95%);
-    --fg-muted:    hsl(220 9% 60%);
+    --bg-base:     hsl(var(--color-neutral-100));
+    --bg-elevated: hsl(var(--color-neutral-150));
+    --fg-default:  hsl(var(--color-neutral-900));
+    --fg-muted:    hsl(var(--color-neutral-500));
 }
 ```
 Because component mixins read primitives like `--color-bg` (which default to `--bg-base`), re-binding `--bg-base` automatically shifts styling across all components.
+
+Bind the vocabulary to the neutral ramp rather than to literals, in both polarities. The ramp is the single source of truth for greys, so a consumer who rebinds `--color-neutral-*` moves light and dark together; a hand-tuned literal silently opts that polarity out.
 
 ---
 

@@ -35,6 +35,7 @@
 	--color-neutral-50:  210 20% 98%;
 	--color-neutral-100: 220 14% 96%;
 	--color-neutral-150: 220 13% 93%;
+	--color-neutral-175: 220 13% 91%;
 	--color-neutral-200: 220 13% 90%;
 	--color-neutral-300: 216 12% 84%;
 	--color-neutral-400: 218 11% 58%;
@@ -93,9 +94,13 @@
 
 	--border-subtle:       hsl(var(--color-neutral-200));
 	--border-strong:       hsl(var(--color-neutral-300));
-	--border-strong-hover: hsl(var(--color-neutral-300));
 
 	--color-scrim:  hsl(var(--color-neutral-900) / 0.5);
+
+	// Per-polarity, not derived in the chain: the chain re-evaluates at
+	// [data-mode], where neutral-900 inverts to near-white and the scrim would
+	// lighten the page instead of dimming it.
+	--app-scrim-bg: hsl(var(--color-neutral-900) / 0.4);
 }
 
 @mixin ln-values-dark {
@@ -107,6 +112,7 @@
 	--color-neutral-50:  220 20%  8%;
 	--color-neutral-100: 220 16% 12%;
 	--color-neutral-150: 220 14% 18%;
+	--color-neutral-175: 220 13% 21%;
 	--color-neutral-200: 220 13% 24%;
 	--color-neutral-300: 220 13% 36%;
 	--color-neutral-400: 218 11% 52%;
@@ -116,25 +122,35 @@
 	--color-neutral-800: 220 20% 92%;
 	--color-neutral-900: 221 30% 97%;
 
-	// Vocabulary — bg
-	--bg-base:     hsl(220 16% 13%);
-	--bg-elevated: hsl(220 16% 17%);
-	--bg-sunken:   hsl(220 16% 20%);
-	--bg-recessed: hsl(220 16%  9%);
-	--bg-hover:    hsl(220 16% 20%);
-	--bg-active:   hsl(220 16% 24%);
+	// --color-white is deliberately not restated: :where(:root) still matches
+	// <html data-mode="dark"> and supplies it, and --color-accent-fg needs real
+	// white for text on a solid accent fill.
+
+	// Vocabulary — bg. Elevated is DARKER than sunken here; that inversion
+	// against light is intentional.
+	--bg-base:     hsl(var(--color-neutral-100));
+	--bg-elevated: hsl(var(--color-neutral-150));
+	--bg-sunken:   hsl(var(--color-neutral-175));
+	--bg-recessed: hsl(var(--color-neutral-50));
+	--bg-hover:    hsl(var(--color-neutral-175));
+	--bg-active:   hsl(var(--color-neutral-200));
+
+	// Fields ride --bg-sunken in dark; the --bg-recessed fallback would sink an
+	// 8% field into an 18% card.
+	--input-bg: var(--bg-sunken);
 
 	// Vocabulary — fg
-	--fg-default: hsl(0 0% 95%);
-	--fg-muted:   hsl(220 10% 68%);
-	--fg-subtle:  hsl(218 11% 55%);
+	--fg-default: hsl(var(--color-neutral-900));
+	--fg-muted:   hsl(var(--color-neutral-500));
+	--fg-subtle:  hsl(var(--color-neutral-400));
 
-	--border-subtle:       hsl(220 14% 20%);
-	--border-strong:       hsl(220 13% 36%);
-	--border-strong-hover: hsl(220 13% 36%);
+	--border-subtle:       hsl(var(--color-neutral-175));
+	--border-strong:       hsl(var(--color-neutral-300));
 
-	// Scrim
-	--color-scrim: hsl(0 0% 0% / 0.6);
+	// Scrims — anchored to black, not the ramp: dark --color-neutral-900 is
+	// near-white, so binding either to it would need an index flip.
+	--color-scrim:  hsl(0 0% 0% / 0.6);
+	--app-scrim-bg: hsl(0 0% 0% / 0.4);
 
 	// Status tint layers — re-tuned for dark surfaces
 	--color-success-light:   142 50% 18%;
@@ -185,9 +201,6 @@
 	--shadow-primary:  0 8px 24px -6px hsl(var(--color-primary) / 0.28);
 	--shadow-success:  0 8px 24px -6px hsl(var(--color-success) / 0.28);
 	--shadow-error:    0 8px 24px -6px hsl(var(--color-error)   / 0.28);
-
-	--app-scrim-bg:    hsl(var(--color-neutral-900) / 0.4);
-
 }
 
 // ---------------------------------------------------------------------------

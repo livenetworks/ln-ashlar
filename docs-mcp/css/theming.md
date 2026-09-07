@@ -17,7 +17,7 @@ tags: [theming, dark-mode, colors, tokens, brand, scoped-theme]
 The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand.css`), named theme presets (`ocean`, `sunset`, `midnight`, `glass`), and arbitrary **Scoped Mode/Theme Islands** by decoupling raw theme **values** (`_palette.scss`) from the unified **derivation chain** (`_theme.scss`):
 
 - **Scoped Mode/Theme Islands:** Any element at any DOM depth can declare `data-mode="dark"` (polarity) or `data-theme="glass"` (palette). Descendant elements render fully in that axis — including background, text, borders, shadows, buttons, and hover/active states — without requiring component-specific overrides.
-- **Surface Elevation Inversion:** In dark mode, elevated surfaces become *lighter* (`--bg-elevated: hsl(220 16% 17%)`) than the root canvas (`--bg-base: hsl(220 16% 13%)`), while recessed areas (`--bg-recessed: hsl(220 16% 9%)`) become darker. In light mode, surfaces are flat by design and separated by shadow.
+- **Surface Elevation Inversion:** In dark mode, elevated surfaces become *lighter* (`--bg-elevated: hsl(var(--color-neutral-150))`, 18%) than the root canvas (`--bg-base: hsl(var(--color-neutral-100))`, 12%), while recessed areas (`--bg-recessed: hsl(var(--color-neutral-50))`, 8%) become darker. In light mode, surfaces are flat by design and separated by shadow. Both polarities bind to the neutral ramp, so rebinding `--color-neutral-*` moves them together.
 - **Zero-Specificity Values (`:where()`):** Ashlar's default values are declared with `:where(:root)` and `:where([data-mode="..."])` (specificity 0,0,0). A consumer's `brand.css` at `[data-mode="dark"]` (0,1,0) always wins, regardless of stylesheet loading order.
 - **Computed Accent Tints:** `--color-accent-tint` and `--color-accent-tint-strong` are computed dynamically via `color-mix()` against the local `--bg-base`.
 - **Activation Paths:**
@@ -104,12 +104,12 @@ The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand
 | `data-skin="glass"` | attribute | — | Glass structural preset — flat radius/shadow, translucent button chrome, accent nav/menu rebinds. Polarity-agnostic |
 | `--brand-primary` | token | `221 83% 48%` | Primary brand color bare HSL triplet |
 | `--brand-secondary` | token | `160 84% 36%` | Secondary brand color bare HSL triplet |
-| `--bg-base` | token | `hsl(var(--color-white)) (light) / hsl(220 16% 13%) (dark)` | Base canvas background |
-| `--bg-elevated` | token | `var(--bg-base) (light) / hsl(220 16% 17%) (dark)` | Elevated card surface (flat in light, +4% in dark) |
-| `--bg-sunken` | token | `hsl(var(--color-neutral-100)) (light) / hsl(220 16% 20%) (dark)` | Sunken well surface (darker in light, +7% in dark) |
-| `--bg-recessed` | token | `hsl(var(--color-neutral-50)) (light) / hsl(220 16% 9%) (dark)` | Page ground and recessed fill (darker in both themes) |
-| `--fg-default` | token | `hsl(var(--color-neutral-900)) (light) / hsl(0 0% 95%) (dark)` | Primary text color |
-| `--fg-muted` | token | `hsl(var(--color-neutral-500)) (light) / hsl(220 10% 68%) (dark)` | Muted text color |
+| `--bg-base` | token | `hsl(var(--color-white)) (light) / hsl(var(--color-neutral-100)) (dark)` | Base canvas background |
+| `--bg-elevated` | token | `var(--bg-base) (light) / hsl(var(--color-neutral-150)) (dark)` | Elevated card surface (flat in light, +6% in dark) |
+| `--bg-sunken` | token | `hsl(var(--color-neutral-100)) (light) / hsl(var(--color-neutral-175)) (dark)` | Sunken well surface (darker in light, +9% in dark) |
+| `--bg-recessed` | token | `hsl(var(--color-neutral-50)) (light) / hsl(var(--color-neutral-50)) (dark)` | Page ground and recessed fill (darker in both themes) |
+| `--fg-default` | token | `hsl(var(--color-neutral-900)) (light) / hsl(var(--color-neutral-900)) (dark)` | Primary text color |
+| `--fg-muted` | token | `hsl(var(--color-neutral-500)) (light) / hsl(var(--color-neutral-500)) (dark)` | Muted text color |
 <!-- sync:css-tokens:end -->
 
 ---

@@ -53,7 +53,7 @@
 	@include ln-color-chain;
 }
 
-[data-mode] {
+:where([data-mode]) {
 	color: var(--color-fg);
 }
 
@@ -97,6 +97,9 @@
 
 [data-theme="glass"] {
 	// Electric blue accent — luminescent on dark navy glass
+	// No &[data-mode="dark"] lift block (unlike ocean/sunset/midnight): glass
+	// was authored dark-first, so 62% is already at/above the other three's
+	// lifted values (60%, 65%, 70%) — a lift here would blow out on dark.
 	--brand-primary: 218 95% 62%;
 
 	// Active-nav wash — Glass computes a stronger 24% tint mix against
@@ -138,7 +141,9 @@
 	--btn-bg-hover: var(--bg-hover);
 	--btn-bg-active: var(--bg-active);
 	--btn-border: var(--color-accent);
-	--btn-border-hover: var(--color-accent-hover);
+	// --color-accent-hover is declared only below <html> (a, mixin bodies);
+	// invalid at computed-value time here — derive locally instead.
+	--btn-border-hover: hsl(from var(--color-accent) h s calc(l - 8));
 
 	// ── Accent buttons — translucent fill via consumer-scope rebind
 	// Rebind --btn-* on the button itself (not at skin :root) so
@@ -163,6 +168,8 @@
 	// `0` fallback so default theme is unaffected.
 	--nav-link-border-color-hover: var(--color-accent);
 	--nav-link-border-color-active: var(--color-accent);
+	// Resolves against the ROOT --padding-x, not a sidebar-local one — valid
+	// today because nothing between :root and the nav rebinds it, but latent.
 	--nav-list-bleed: calc(-1 * var(--padding-x));
 
 	// ── Dropdown / menu-items dividers ─────────────────────────────
@@ -191,6 +198,8 @@
 	--shadow-floating: none;
 
 	// Make the borders stand out more since there are no shadows
+	// Resolves once at <html> against whichever polarity is active there —
+	// a nested [data-mode] island under this skin inherits root neutral-300.
 	--border-subtle: hsl(var(--color-neutral-300));
 
 	// ── Buttons — neutral chrome
@@ -238,5 +247,4 @@
 	--btn-border-hover: transparent;
 	--btn-bg: var(--bg-elevated);
 	--btn-bg-hover: var(--bg-hover);
-	box-shadow: var(--shadow-sm);
 }

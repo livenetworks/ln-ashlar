@@ -199,6 +199,9 @@
 	// --color-accent-bg
 	// --color-accent-bg-hover
 	// --color-accent-bg-fg
+	//
+	// --input-bg — same pattern, form scope. `@mixin form-input` reads it
+	// via fallback to `--bg-recessed`, so the default theme is unaffected.
 
 	// Nav surface — companions for themes that opt in to a bordered/inset
 	// nav appearance (e.g. Glass). NO defaults — `@mixin nav` reads these
