@@ -1,9 +1,8 @@
-/* shell — persistent app chrome behaviour.
- * Lives for the whole session, so it registers as a module (not a view). */
+/* shell — persistent app chrome behaviour. */
 (function () {
 	'use strict';
 
-	App.defineModule(function () {
+	function initShell() {
 		var sidebar = document.getElementById('app-sidebar');
 		var scrim = document.querySelector('.app-scrim');
 
@@ -14,5 +13,11 @@
 				sidebar.setAttribute('data-ln-toggle', 'close');
 			}
 		});
-	});
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initShell);
+	} else {
+		initShell();
+	}
 })();

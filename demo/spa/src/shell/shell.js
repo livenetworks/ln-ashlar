@@ -1,7 +1,7 @@
 (function () {
 	'use strict';
 
-	App.defineModule(function () {
+	function initShell() {
 		const sidebar = document.getElementById('app-sidebar');
 		const scrim = document.querySelector('.app-scrim');
 		const offlineBanner = document.getElementById('offline-banner');
@@ -29,7 +29,7 @@
 		document.addEventListener('click', function (e) {
 			const btn = e.target.closest('#reset-demo');
 			if (!btn) return;
-			fetch('/docuflow/api/reset').then(function (r) {
+			fetch('/demo/docuflow/api/reset').then(function (r) {
 				if (!r.ok) throw new Error('HTTP ' + r.status);
 				forceSyncBoth();
 				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
@@ -70,5 +70,11 @@
 			if (region) region.setAttribute('hidden', '');
 			forceSyncBoth();
 		});
-	});
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initShell);
+	} else {
+		initShell();
+	}
 })();

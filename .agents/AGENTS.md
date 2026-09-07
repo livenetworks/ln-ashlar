@@ -78,3 +78,7 @@
 ## 6. Global Restrictions
 - **No Browser Checking**: Do not use the browser tool or spawn browser subagents to verify layouts, pages, or functional behaviors. Rely on manual verification instructions, code inspection, and project build verification instead.
 
+## 7. MCP Review Workflow Rules
+- **Always Asynchronous (`async: true`):** When invoking `review_plan` or `review_code` via MCP, **ALWAYS** pass `async: true`. Never invoke reviews synchronously, as deep evaluations take >60–90 seconds and will cause HTTP connection timeouts. Retrieve the critique and verdict via `get_review_result` using the returned `job_id`.
+
+

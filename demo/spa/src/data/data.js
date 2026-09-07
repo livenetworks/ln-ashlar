@@ -1,7 +1,7 @@
 (function () {
 	'use strict';
 
-	App.defineModule(function () {
+	function initData() {
 		const packagesStoreEl = document.getElementById('packages');
 		const tenantsStoreEl = document.getElementById('tenants');
 
@@ -58,5 +58,11 @@
 		packagesStoreEl.addEventListener('ln-data-store:synced', function (e) {
 			if (e.detail && e.detail.changed) onPackagesChanged();
 		});
-	});
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initData);
+	} else {
+		initData();
+	}
 })();

@@ -1,6 +1,7 @@
 import {
 	registerComponent, dispatch, dispatchCancelable, guardBody, findElements, shouldInterceptLink
 } from '../../ln-core';
+import { planRegions } from './router-model.js';
 
 // Singleton router implementation
 export const router = {
@@ -11,7 +12,7 @@ export const router = {
 		_navigate(fullPath, { historyAction: 'replace' });
 	},
 	current: function () {
-		if (!currentRoute) return null;
+		if (currentPath === null) return null;
 		return {
 			path: currentPath,
 			params: currentParams,
@@ -182,20 +183,20 @@ function _matchRouteInRegion(path, sortedRoutes) {
 /**
  * Resolve target DOM element for a region.
  * Primary region (__primary__) uses the default outlet fallback chain.
- * Auxiliary regions resolve by element id (route.target).
+ * Auxiliary regions resolve by element id — the regionKey itself, since
+ * auxiliary regionKey === route.target by construction (see _registerRoute).
+ * opts.warn defaults to true; callers pass false when resolving a region with
+ * no match, so a missing auxiliary container doesn't warn on every navigation.
  */
-function _resolveRegionTarget(regionKey, route) {
+function _resolveRegionTarget(regionKey, opts = {}) {
+	const warn = opts.warn !== false;
 	if (regionKey !== '__primary__') {
-		const el = document.getElementById(route.target);
-		if (!el) {
-			console.warn(`[ln-router] Explicit target element #${route.target} not found in DOM`);
-		}
+		const el = document.getElementById(regionKey);
+		if (!el && warn) console.warn(`[ln-router] Explicit target element #${regionKey} not found in DOM`);
 		return el;
 	}
 	const defaultOutlet = document.querySelector('[data-ln-outlet]') || document.querySelector('main');
-	if (!defaultOutlet) {
-		console.warn('[ln-router] Default outlet (element with [data-ln-outlet] or <main>) not found in DOM');
-	}
+	if (!defaultOutlet && warn) console.warn('[ln-router] Default outlet (element with [data-ln-outlet] or <main>) not found in DOM');
 	return defaultOutlet;
 }
 
@@ -253,116 +254,148 @@ function _navigate(fullPath, opts = {}) {
 		regionMatches.set(regionKey, _matchRouteInRegion(path, regionData.sorted));
 	}
 
-	const hasPrimaryRegion = regionRegistry.has('__primary__');
-	const primaryMatch = regionMatches.get('__primary__'); // undefined if no primary region
+	const primaryMatch = regionMatches.get('__primary__') || null;
 
-	// 2. Not-found — ONLY when a primary region exists but did not match.
-	//    Auxiliary-only pages (no '__primary__' region) skip not-found and
-	//    proceed to paint their auxiliary regions. Use _dispatchMaybeDeferred
-	//    so the boot path defers exactly like the legacy code did.
-	if (hasPrimaryRegion && !primaryMatch) {
+	// 2. The primary outlet resolves UNCONDITIONALLY. It is a stable container,
+	//    not route state — it exists in the DOM even when the current URL has
+	//    no primary match. That's why it stays the before-navigate host: a
+	//    guard attached to <main> itself (rather than document) must still
+	//    catch the event when navigating to an aux-only path. Warn only when a
+	//    match was actually expected.
+	const primaryTarget = _resolveRegionTarget('__primary__', { warn: !!primaryMatch });
+
+	// 3. Descriptors — the only place that reads the DOM.
+	const hasPrimaryRegion = regionRegistry.has('__primary__');
+	const descriptors = [];
+	for (const [regionKey, match] of regionMatches) {
+		const targetEl = regionKey === '__primary__'
+			? primaryTarget
+			: _resolveRegionTarget(regionKey, { warn: false });
+
+		const isPending = !targetEl && !!(
+			primaryMatch &&
+			primaryMatch.route &&
+			primaryMatch.route.templateNode &&
+			primaryMatch.route.templateNode.content &&
+			primaryMatch.route.templateNode.content.querySelector('#' + CSS.escape(regionKey))
+		);
+
+		if (!targetEl && !isPending && match) {
+			console.warn(`[ln-router] Explicit target element #${regionKey} not found in DOM`);
+		}
+
+		descriptors.push({
+			regionKey,
+			match,
+			targetEl,
+			isPending,
+			hasKeep:         !!targetEl && targetEl.hasAttribute('data-ln-route-keep'),
+			hasHydrate:      !!targetEl && targetEl.hasAttribute('data-ln-router-hydrate'),
+			hasChildren:     !!targetEl && targetEl.children.length > 0,
+			mountedTemplate: targetEl ? (mountedTemplates.get(targetEl) || null) : null
+		});
+	}
+
+	// 4. Pure decision
+	const plan = planRegions(descriptors, {
+		isHydration: !!opts.isHydration,
+		hasPrimaryRegion,
+		primaryMatch
+	});
+
+	// 5. Federated not-found — only if NO region matched. Returns BEFORE
+	//    clearing, so a 404 never wipes the page.
+	if (plan.notFound) {
 		_dispatchMaybeDeferred(document.body, 'ln-router:not-found', { path });
 		return;
 	}
 
-	// 3 + 4. Resolve primary outlet and fire the single cancelable
-	//        before-navigate — both conditional on a primary MATCH.
-	let primaryTarget = null;
-	if (primaryMatch) {
-		primaryTarget = _resolveRegionTarget('__primary__', primaryMatch.route);
-		if (!primaryTarget) return; // warn already emitted in _resolveRegionTarget
+	// 6. The single cancelable gate — fired on EVERY navigation with at least
+	//    one match, regardless of whether the primary is among them.
+	const beforeEvent = dispatchCancelable(primaryTarget || document.body, 'ln-router:before-navigate', {
+		from: currentPath,
+		to: fullPath,
+		params: primaryMatch ? primaryMatch.params : {},
+		query
+	});
+	if (beforeEvent.defaultPrevented) return; // aborts ALL regions + history
 
-		const beforeEvent = dispatchCancelable(primaryTarget, 'ln-router:before-navigate', {
-			from: currentPath,
-			to: fullPath,
-			params: primaryMatch.params,
-			query
-		});
-		if (beforeEvent.defaultPrevented) return; // aborts ALL regions + history
-	}
-
-	// 5. Compute swap plans — which regions will actually change DOM
-	const swapPlans = [];
-	for (const [regionKey, match] of regionMatches) {
-		if (!match) continue;
-		const targetEl = _resolveRegionTarget(regionKey, match.route);
-		if (!targetEl) continue;
-
-		// Keep-skip applies to AUXILIARY regions only — primary is always active.
-		if (regionKey !== '__primary__' && targetEl.hasAttribute('data-ln-route-keep')) {
-			const currentTmpl = mountedTemplates.get(targetEl);
-			if (currentTmpl === match.route.templateNode) {
-				// Same template — skip (keep-region state survival)
-				continue;
-			}
-		}
-		swapPlans.push({ regionKey, match, targetEl });
-	}
-
-	// 6. History update (once per navigation)
+	// 7. History update (once per navigation)
 	if (opts.historyAction === 'push') {
 		window.history.pushState(null, '', fullPath);
 	} else if (opts.historyAction === 'replace') {
 		window.history.replaceState(null, '', fullPath);
 	}
 
-	// 7. Atomic swap — one view transition wraps all region swaps
+	// 8. Atomic swap — one view transition wraps every region clear/mount.
+	//    executeSwaps only executes the plan; it never re-judges it.
 	const executeSwaps = function () {
-		for (const { regionKey, match, targetEl } of swapPlans) {
-			// Per-region hydration check
-			const isRegionHydration = opts.isHydration
-				&& targetEl.hasAttribute('data-ln-router-hydrate')
-				&& targetEl.children.length > 0;
+		for (const d of plan.clears) {
+			_teardownOutlet(d.targetEl);
+			d.targetEl.replaceChildren();
+			mountedTemplates.delete(d.targetEl);
+		}
 
-			if (!isRegionHydration) {
-				_teardownOutlet(targetEl);
-				const clone = match.route.templateNode.content.cloneNode(true);
-				targetEl.replaceChildren(clone);
+		for (const d of plan.swaps) {
+			if (d.isPending || !d.targetEl || !document.contains(d.targetEl)) {
+				d.targetEl = d.regionKey === '__primary__' ? primaryTarget : document.getElementById(d.regionKey);
+			}
+			if (!d.targetEl) {
+				console.warn(`[ln-router] Target element #${d.regionKey} could not be resolved`);
+				continue;
 			}
 
-			// Track mounted template for keep-region logic — recorded even on
-			// hydration so the keep diff has a baseline after boot.
-			mountedTemplates.set(targetEl, match.route.templateNode);
+			if (!d.skipMount) {
+				_teardownOutlet(d.targetEl);
+				d.targetEl.replaceChildren(d.match.route.templateNode.content.cloneNode(true));
+			}
+			mountedTemplates.set(d.targetEl, d.match.route.templateNode);
 
-			// Focus, scroll, and title — primary region only
-			if (regionKey === '__primary__') {
-				if (match.route.title) {
-					document.title = match.route.title;
+			// Focus, scroll, and title — owning region only
+			if (plan.owner && d.regionKey === plan.owner.regionKey) {
+				if (d.match.route.title) {
+					let title = d.match.route.title;
+					if (d.match.params) {
+						for (const [k, v] of Object.entries(d.match.params)) {
+							title = title.replace(new RegExp('\\{\\{\\s*' + k + '\\s*\\}\\}', 'g'), v);
+						}
+					}
+					document.title = title;
 				}
 				if (!opts.isHydration) {
-					if (!targetEl.hasAttribute('tabindex')) {
-						targetEl.setAttribute('tabindex', '-1');
+					if (!d.targetEl.hasAttribute('tabindex')) {
+						d.targetEl.setAttribute('tabindex', '-1');
 					}
-					const firstHeading = targetEl.querySelector('h1, h2, h3, h4, h5, h6');
+					const firstHeading = d.targetEl.querySelector('h1, h2, h3, h4, h5, h6');
 					if (firstHeading) {
 						firstHeading.setAttribute('tabindex', '-1');
 						firstHeading.focus();
 					} else {
-						targetEl.focus();
+						d.targetEl.focus();
 					}
-					targetEl.scrollIntoView({ block: 'start', behavior: 'instant' });
+					if (d.regionKey === '__primary__') {
+						d.targetEl.scrollIntoView({ block: 'start', behavior: 'instant' });
+					}
 				}
 			}
 
-			// Dispatch navigated per swapped region
-			_dispatchMaybeDeferred(targetEl, 'ln-router:navigated', {
+			_dispatchMaybeDeferred(d.targetEl, 'ln-router:navigated', {
 				path: fullPath,
-				params: match.params,
+				params: d.match.params,
 				query,
-				route: match.route,
-				target: targetEl,
-				region: regionKey
+				route: d.match.route,
+				target: d.targetEl,
+				region: d.regionKey
 			});
 		}
 
-		// Update global primary state — only when a primary match exists.
-		// On auxiliary-only pages currentRoute stays null (current() returns null).
-		if (primaryMatch) {
-			currentPath = fullPath;
-			currentParams = primaryMatch.params;
-			currentQuery = query;
-			currentRoute = primaryMatch.route;
-		}
+		// State is read off the primary match — currentRoute is null on an
+		// aux-only navigation, which is what current() === null now hinges on.
+		currentPath  = fullPath;
+		currentQuery = query;
+		currentRoute  = primaryMatch ? primaryMatch.route  : null;
+		currentParams = primaryMatch ? primaryMatch.params : {};
+
 		// currentRegions reflects every region's match (null when unmatched).
 		// Built from regionMatches — never from the loop variable `match`.
 		currentRegions = new Map(
@@ -385,14 +418,12 @@ function _onClick(e) {
 
 	const fullPath = anchor.getAttribute('href');
 	const { path } = _normalizePath(fullPath);
-
-	// Intercept only if primary region has a match (auxiliary-only matches don't drive SPA nav)
-	const primaryData = regionRegistry.get('__primary__');
-	if (!primaryData) return;
-	const match = _matchRouteInRegion(path, primaryData.sorted);
-	if (match) {
-		e.preventDefault();
-		_navigate(fullPath, { historyAction: 'push' });
+	for (const regionData of regionRegistry.values()) {
+		if (_matchRouteInRegion(path, regionData.sorted)) {
+			e.preventDefault();
+			_navigate(fullPath, { historyAction: 'push' });
+			return;
+		}
 	}
 }
 
@@ -496,7 +527,7 @@ function _registerRoute(tmpl) {
 	};
 
 	// Warn if template is declared inside its own outlet
-	const resolvedTarget = _resolveRegionTarget(regionKey, routeMetadata);
+	const resolvedTarget = _resolveRegionTarget(regionKey);
 	if (resolvedTarget && resolvedTarget.contains(tmpl)) {
 		console.warn(`[ln-router] Route template with pattern "${pattern}" is declared inside its own outlet element:`, tmpl);
 	}

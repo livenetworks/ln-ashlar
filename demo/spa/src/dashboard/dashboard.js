@@ -58,15 +58,16 @@
 		}
 	}
 
-	App.defineView('/spa', {
-		mount: function () {
+	// Route navigation: when navigating to '/demo/spa', refresh dashboard usage
+	document.addEventListener('ln-router:navigated', function (e) {
+		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
+		if (pattern === '/demo/spa') {
 			refreshDashboardUsageIfMounted();
-		},
-		unmount: function () {}
+		}
 	});
 
 	// Register persistent store event listeners to auto-refresh the dashboard usage
-	App.defineModule(function () {
+	function initDashboard() {
 		const packagesStoreEl = document.getElementById('packages');
 		const tenantsStoreEl = document.getElementById('tenants');
 
@@ -83,5 +84,11 @@
 		});
 
 		window.addEventListener('app:packages-rebuild', refreshDashboardUsageIfMounted);
-	});
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initDashboard);
+	} else {
+		initDashboard();
+	}
 })();

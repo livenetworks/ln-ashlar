@@ -23,9 +23,9 @@ The `ln-router` component is the client-side SPA routing engine of `ln-ashlar`. 
     1. Static segments (e.g. `/posts/new`) have highest priority.
     2. Dynamic parameter segments (`:param`) have secondary priority.
     3. Wildcards (`*`) have lowest priority and act as catch-all or 404 routes.
-*   **Multi-Region Support (Auxiliary Outlets):** Supports rendering into multiple independent target containers simultaneously. Beyond the primary outlet (`__primary__` mapping to `[data-ln-outlet]` or `<main>`), auxiliary regions render via `data-ln-route-target="id"`.
+*   **Multi-Region Support (Auxiliary Outlets):** Supports rendering into multiple independent, equally-authoritative target containers simultaneously. Beyond the primary outlet (`__primary__` mapping to `[data-ln-outlet]` or `<main>`), auxiliary regions render via `data-ln-route-target="id"`. A region with no match for the current URL auto-clears unless it carries `data-ln-route-keep`.
 *   **Teardown & Garbage Collection Pipeline:** When a route target is unmounted, `ln-router` recursively invokes `.destroy()` on all active component instances within the outlet to prevent memory leaks.
-*   **Keep-Region State Survival:** Regions marked with `data-ln-route-keep` skip DOM replacement if the newly matched template node is identical, preserving internal DOM state (form values, scroll position, focus).
+*   **Keep-Region State Survival:** Regions marked with `data-ln-route-keep` skip DOM replacement if the newly matched template node is identical, preserving internal DOM state (form values, scroll position, focus); `data-ln-route-keep` also opts a region out of auto-clear when the current URL has no match for it.
 *   **View Transitions API:** Integrates with native `document.startViewTransition()` for hardware-accelerated page transitions.
 *   **Hash Popstate Guard:** Ignores `popstate` events that only change the URL fragment/hash, allowing hash-driven mechanisms to process independently without tearing down active routes.
 
@@ -100,7 +100,7 @@ The `ln-router` component is the client-side SPA routing engine of `ln-ashlar`. 
 | `data-ln-route` | `<template>` | String | — | Registers template as a route with specified pattern (e.g. `/users/:id` or `*`). |
 | `data-ln-route-target` | `<template>` | String | — | ID of target container for auxiliary regions (defaults to primary `[data-ln-outlet]`). |
 | `data-ln-route-title` | `<template>` | String | — | Document title to apply on route match (`document.title`). |
-| `data-ln-route-keep` | Outlet Container | Flag | — | Skips DOM re-rendering when the matched template node has not changed. |
+| `data-ln-route-keep` | Outlet Container | Flag | — | Skips DOM re-rendering when the matched template node has not changed, and opts the region out of auto-clear when the current URL has no match for it. |
 | `data-ln-outlet` | `<main>` / `<div>` | Flag | — | Identifies the primary outlet container for main routes. |
 | `data-ln-router-hydrate` | Outlet Container | Flag | — | Prevents cloning initial template during server-side pre-rendered hydration. |
 
@@ -116,9 +116,9 @@ The `ln-router` component is the client-side SPA routing engine of `ln-ashlar`. 
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-router:before-navigate` | Emits | Yes | Dispatched before navigation starts. Calling `preventDefault()` aborts route swap. | `{ from: String, to: String, params: Object, query: Object }` |
-| `ln-router:navigated` | Emits | No | Dispatched on each updated target container after DOM replacement and focus setup. | `{ path, params, query, route, target, region }` |
-| `ln-router:not-found` | Emits | No | Dispatched when no route matches the requested URL. | `{ path: String }` |
+| `ln-router:before-navigate` | Emits | Yes | Dispatched once per navigation in which at least one region matched, before any region swap or clear. Calling `preventDefault()` aborts the navigation. | `{ from: String, to: String, params: Object, query: Object }` |
+| `ln-router:navigated` | Emits | No | Dispatched on each region that mounted a template after DOM replacement and (for the owning region) focus setup. | `{ path, params, query, route, target, region }` |
+| `ln-router:not-found` | Emits | No | Dispatched when no region matches the requested URL. | `{ path: String }` |
 
 ---
 
@@ -151,7 +151,7 @@ Integrates natively with View Transitions API:
 
 ### ARIA & Keyboard
 
-- **Focus Management:** On route navigation, `ln-router` automatically shifts focus to prevent keyboard users from losing context. It locates the first heading (`h1-h6`) inside the new container, applies `tabindex="-1"`, and invokes `.focus()`. If no heading is found, it focuses the outlet container itself.
+- **Focus Management:** On route navigation, `ln-router` automatically shifts focus to the navigation's owning region (the primary if it swapped, otherwise the first region — in registration order — that swapped) to prevent keyboard users from losing context. It locates the first heading (`h1-h6`) inside the new container, applies `tabindex="-1"`, and invokes `.focus()`. If no heading is found, it focuses the outlet container itself.
 
 ### Common Pitfalls & Anti-patterns
 

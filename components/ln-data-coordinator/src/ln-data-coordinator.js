@@ -84,7 +84,7 @@ import { MutationReceipts } from './mutation-receipts';
 
 	function _component(dom) {
 		this.dom = dom;
-		this._name = dom.id;
+		this._name = dom.getAttribute('data-ln-data-coordinator') || dom.id;
 		if (!this._name) console.warn('[ln-data-coordinator] missing id — the coordinator cannot be addressed', dom);
 		dom[DOM_ATTRIBUTE] = this;
 		dom[DOM_ALIAS] = this;
@@ -457,7 +457,7 @@ import { MutationReceipts } from './mutation-receipts';
 
 				let isMine;
 				if (scopeAttr) {
-					isMine = (scopeAttr === self._name);
+					isMine = (scopeAttr === self._name || self._ownsStore(scopeAttr));
 				} else {
 					isMine = (form.closest('[data-ln-data-coordinator]') === self.dom);
 				}

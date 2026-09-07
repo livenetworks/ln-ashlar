@@ -65,7 +65,7 @@ Clicking a native `<a href="#modal:12">` anchor would replace the entire hash st
 Components must remain generic. A modal component handles open/close states in the hash and dispatches events, but it does **not** fetch data or populate forms. Cross-component wiring belongs inside a coordinator (such as `ln-ui-coordinator`), which catches `ln-modal:open` and fills the nested form.
 
 ### Rule 5: Router Fragment Guard
-The router ignores `popstate` history transitions where the new URL differs from the old URL **only in the fragment** (path and query remain identical). This allows the browser's Back button to dismiss open modals without reloading or tearing down the under-modal page view.
+The router ignores `popstate` history transitions where the new URL differs from the old URL **only in the fragment** (path and query remain identical). This allows the browser's Back button to dismiss open modals without reloading or tearing down the under-modal page view. This guard reads `router.current()`, which is populated on any navigation that matched at least one region — including auxiliary-only pages with no primary match — so it works there too, not only on pages where the primary region has a route.
 
 ---
 
@@ -78,13 +78,13 @@ Resolve Path ──> Match Regions ──> Intercept ──> Swap Views ──> 
 ```
 
 1. **Path Resolution:** Strips query strings and hashes. Parses query strings into a flat `query` object, and collapses trailing slashes.
-2. **Per-Region Match:** Matches the path against the sorted template patterns for each registered outlet region (e.g. `__primary__` or auxiliary regions).
-3. **Cancelable Intercept:** Dispatches `ln-router:before-navigate` on the primary outlet. Calling `e.preventDefault()` halts navigation completely.
-4. **Compute Swap Plans:** Identifies which regions must be updated. Auxiliary regions marked with `data-ln-route-keep` are skipped if the incoming template matches the currently mounted template.
+2. **Per-Region Match:** Matches the path against the sorted template patterns for each registered outlet region (e.g. `__primary__` or auxiliary regions), independently. If no region matched anywhere, `ln-router:not-found` fires and the pipeline stops before touching the DOM.
+3. **Cancelable Intercept:** Dispatches `ln-router:before-navigate` on the primary outlet as long as at least one region matched. Calling `e.preventDefault()` halts navigation completely.
+4. **Compute Region Plan:** Classifies every region into a clear (unmatched, no `data-ln-route-keep`, has content), a swap (matched, and not a keep-region already showing the matched template), or untouched (keep-region already correct, or unmatched-and-empty).
 5. **History Update:** Executes `history.pushState` or `replaceState`.
-6. **View transition & Atomic Swap:** Executes the swap. Old elements are torn down, and the new template is cloned and inserted using `replaceChildren()`.
-7. **Accessibility Focus Shift:** Programmatically shifts keyboard focus to the target outlet container or its first heading (`h1`-`h6`) with `tabindex="-1"`. This triggers screen readers to announce the new page title.
-8. **Navigation Completion:** Dispatches `ln-router:navigated` per swapped region.
+6. **View transition & Atomic Swap:** Executes the plan. Cleared regions are torn down and emptied; swapped regions are torn down, and the new template is cloned and inserted using `replaceChildren()`.
+7. **Accessibility Focus Shift:** Programmatically shifts keyboard focus to the owning region's outlet container or its first heading (`h1`-`h6`) with `tabindex="-1"` — the owner is the primary if it swapped, otherwise the first region (in registration order) that swapped. This triggers screen readers to announce the new page title.
+8. **Navigation Completion:** Dispatches `ln-router:navigated` per region that mounted a template. Cleared regions do not fire it.
 
 ---
 

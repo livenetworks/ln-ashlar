@@ -1,6 +1,6 @@
 <!-- @zone persistent -->
 <!-- Packages data layer -->
-<div data-ln-data-coordinator data-ln-data-mapper="packages" id="packages-coordinator" hidden>
+<div data-ln-data-coordinator="packages" data-ln-data-mapper="packages" id="packages-coordinator" hidden>
 	<div data-ln-data-store
 	     data-ln-data-store-stale="-1"
 	     data-ln-data-store-indexes="active"
@@ -8,12 +8,12 @@
 	     data-ln-search=""
 	     id="packages"></div>
 	<div data-ln-api-connector
-	     data-ln-api-base-url="/docuflow/api"
+	     data-ln-api-base-url="/demo/docuflow/api"
 	     data-ln-api-path="/packages"></div>
 </div>
 
 <!-- Tenants data layer -->
-<div data-ln-data-coordinator data-ln-data-mapper="tenants" id="tenants-coordinator" hidden>
+<div data-ln-data-coordinator="tenants" data-ln-data-mapper="tenants" id="tenants-coordinator" hidden>
 	<div data-ln-data-store
 	     data-ln-data-store-stale="-1"
 	     data-ln-data-store-indexes="package_id,auth_method,active"
@@ -21,6 +21,6 @@
 	     data-ln-search=""
 	     id="tenants"></div>
 	<div data-ln-api-connector
-	     data-ln-api-base-url="/docuflow/api"
+	     data-ln-api-base-url="/demo/docuflow/api"
 	     data-ln-api-path="/tenants"></div>
 </div>

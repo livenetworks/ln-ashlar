@@ -22,8 +22,6 @@ spa-starter/
   src/
     index.template.html     ← the shell skeleton with @inject markers
     app.scss                ← framework + generated module styles
-    _core/
-      runtime.js            ← window.App (defineModule / defineView) — loaded first
     shell/
       shell.html            ← header, sidebar, outlet (+ persistent toast host)
       shell.js              ← persistent chrome behaviour
@@ -61,7 +59,7 @@ What `build.mjs` does:
 
 | Output | How |
 |---|---|
-| `dist/app.js` | Concatenates every `src/<module>/*.js`, `_core` first. Files are plain scripts — no import resolution needed. |
+| `dist/app.js` | Concatenates every `src/<module>/*.js` in alphabetical order. Files are plain, self-contained scripts — no import resolution needed. |
 | `index.html` | Buckets each HTML snippet by its `<!-- @zone -->` markers and injects them into `index.template.html`. |
 | `dist/app.css` | Generates a `@use` list of all module `.scss`, then compiles `app.scss` (framework + modules) with Dart Sass. |
 
@@ -89,49 +87,61 @@ to *two* zones — its route to `routes`, its modal/store to `persistent`.
 
 ---
 
-## 4. The JS module API (`window.App`)
+## 4. Layer 2 Coordinators (Event-Driven JS)
 
-`_core/runtime.js` exposes two registrars. They are built only on the public
-globals the ln-ashlar bundle exposes (`window.lnRouter` and the
-`ln-router:navigated` event), so every module file stays a plain,
-concatenation-friendly script.
+Every JS module file is a standard **Layer 2 Coordinator** (an IIFE) that interacts strictly through public DOM and Ashlar events (`ln-router:navigated`, `ln-data-store:*`, etc.). There is no custom runtime registry or `window.App`.
 
-### Persistent module
+### Persistent chrome & session-long behaviour
 
-```js
-App.defineModule(function () {
-  // runs once when the DOM is ready — wire session-long behaviour here
-});
-```
-
-### View module
+For behaviour that lives the whole session (e.g. closing mobile sidebar drawers, offline banners, store reactions), wire event listeners on `DOMContentLoaded`:
 
 ```js
-App.defineView('/spa-starter/hello/:name', {
-  mount: function (ctx) {
-    // ctx = { target, params, query, path }
-    // `target` is the freshly-mounted view root inside the outlet
-  },
-  unmount: function () {
-    // tear down timers / global listeners you added in mount
+(function () {
+  'use strict';
+
+  function init() {
+    // runs once when the DOM is ready — wire session-long behaviour here
   }
-});
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
 ```
 
-> **Teardown is not optional.** Listeners you attach to `ctx.target` die with
-> the view (the router discards it on navigation). But anything global —
-> `setInterval`, `document`/`window` listeners, store subscriptions — leaks
-> across navigations unless you remove it in `unmount`. The monolithic
-> `app.js` hides this because it is always alive; split modules must be tidy.
-> See `home/home.js` for the canonical example.
+### Route-specific view behaviour
+
+When `ln-router` navigates to a new route, it clones the `<template data-ln-route>` into the outlet and emits `ln-router:navigated` on the document with details: `{ target, params, query, route, path }`.
+
+A route coordinator listens to `ln-router:navigated`, checks the matched pattern, and activates its logic:
+
+```js
+(function () {
+  'use strict';
+
+  document.addEventListener('ln-router:navigated', function (e) {
+    var pattern = e.detail && e.detail.route && e.detail.route.pattern;
+    if (pattern !== '/spa-starter/hello/:name') return;
+
+    // View logic: populate data, bind controls
+    window.lnCore.fillTemplate(e.detail.target, { name: e.detail.params.name });
+  });
+})();
+```
+
+> **Lifecycle & Teardown:**
+> DOM event listeners attached to elements inside `e.detail.target` are discarded automatically when `ln-router` clears the outlet.
+> For global intervals or timers (e.g. `setInterval`), stop the timer on every `ln-router:navigated` before conditionally re-starting it for the active route. See `home/home.js` for the canonical example.
 
 ### Persistent vs. view — pick by lifetime, not by file
 
 Feedback that reacts to **store events** (success/error toasts, an offline
-banner, rollback notices) must live in a **persistent module**, because those
+banner, rollback notices) must live in a **persistent coordinator**, because those
 events often arrive *after* you have navigated away from the view that
 triggered them. Put them in `shell/` (or a dedicated persistent module), never
-in a view's `mount`.
+in a view route listener.
 
 ---
 
@@ -147,12 +157,6 @@ URL/user data:
 | `lnCore.renderList(container, items, tmplName, keyFn, fillFn, tag)` | Keyed list reconciliation from a `<template data-ln-template>`. |
 
 `window.lnRouter` exposes `navigate(path)`, `replace(path)`, `current()`.
-
-> Note: `ln-core`'s `registerComponent` (true DOM-mount lifecycle via a
-> MutationObserver) is an **ESM export, not a window global**. This starter
-> deliberately avoids it so files can be plainly concatenated. If you later
-> want that lifecycle, switch the build to an ESM bundle (Vite/esbuild) and
-> `import` from `ln-core` instead of relying on `window.App`.
 
 ---
 
@@ -172,8 +176,12 @@ URL/user data:
    ```js
    (function () {
      'use strict';
-     App.defineView('/spa-starter/reports', {
-       mount: function (ctx) { /* fetch + lnCore.renderList(...) */ }
+
+     document.addEventListener('ln-router:navigated', function (e) {
+       var pattern = e.detail && e.detail.route && e.detail.route.pattern;
+       if (pattern !== '/spa-starter/reports') return;
+
+       // fetch data + lnCore.renderList(...)
      });
    })();
    ```

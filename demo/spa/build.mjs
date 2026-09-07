@@ -30,8 +30,7 @@ const GENERATED_SCSS = path.join(SRC, '_modules.generated.scss');
 
 const ZONES = ['shell', 'persistent', 'routes'];
 
-// Module folders, sorted. '_' sorts before lowercase letters, so a folder like
-// `_core` (the runtime) is always emitted first.
+// Module folders, sorted alphabetically.
 function moduleDirs() {
 	return fs.readdirSync(SRC, { withFileTypes: true })
 		.filter((d) => d.isDirectory())

@@ -8,7 +8,7 @@ The goal: ensure all agents, developers, and library users share the exact same 
 All agents consuming this corpus must understand that `ln-ashlar` supports **two distinct application architectures** on the same DOM-First foundation:
 
 1. **Server-Rendered HTML (SSR Mode):** Progressive enhancement for backend frameworks (Laravel, Go, Django, Rails) where the server delivers HTML and `ln-ashlar` auto-activates interactivity via `data-ln-*` attributes.
-2. **Client-Side Single Page Applications (SPA / JSON Mode):** Pure client-side SPAs consuming REST/JSON APIs powered by `ln-router` (path routing & region swapping), `hash.js` (compound hash state & deep-linking), `ln-http`/`ln-api-connector` (async JSON API client), `lnCore.renderList`/`lnCore.fill` (client-side template binding), and `spa-starter/` (`App.defineView()` / `App.defineModule()`).
+2. **Client-Side Single Page Applications (SPA / JSON Mode):** Pure client-side SPAs consuming REST/JSON APIs powered by `ln-router` (path routing & region swapping), `hash.js` (compound hash state & deep-linking), `ln-http`/`ln-api-connector` (async JSON API client), `lnCore.renderList`/`lnCore.fill` (client-side template binding), and `spa-starter/` (modular Layer 2 coordinators event-driven via `ln-router:navigated`).
 
 ## Audience and Layers
 

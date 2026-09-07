@@ -1356,7 +1356,7 @@
 					"read_by": "ln-router",
 					"consumed_by": "js",
 					"role": "input",
-					"description": "Preserves view state in DOM cache when unmounted."
+					"description": "Preserves view state in DOM cache when unmounted; also opts the region out of auto-clear when the current URL has no match for it."
 				},
 				"data-ln-router-hydrate": {
 					"type": "boolean",

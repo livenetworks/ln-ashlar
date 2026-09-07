@@ -1,84 +1,3 @@
-/* ── module: _core/runtime.js ─────────────────────────── */
-/* ──────────────────────────────────────────────────────────────────────────
- * _core/runtime.js — the starter's micro-runtime (loaded first; '_core' sorts
- * ahead of every lowercase module folder).
- *
- * It exposes window.App with two declarative registrars, built ONLY on the
- * public globals shipped by the ln-ashlar bundle:
- *
- *   App.defineModule(setup)            → persistent: runs once when the DOM is
- *                                        ready. For shell chrome, stores,
- *                                        modals, toasts, offline banners —
- *                                        anything that lives the whole session.
- *
- *   App.defineView(pattern, { mount, unmount })
- *                                      → transient: mount(ctx) when its route
- *                                        becomes active, unmount() when leaving.
- *                                        ctx = { target, params, query, path }.
- *
- * Why a runtime instead of ln-core's registerComponent? registerComponent is
- * an ESM export and is NOT on window.lnCore, so a plain (non-bundled) script
- * cannot call it. The route lifecycle below uses the ln-router:navigated event,
- * which IS public — keeping every module file concatenation-friendly.
- * ────────────────────────────────────────────────────────────────────────── */
-(function () {
-	'use strict';
-
-	var views = [];     // { pattern, mount, unmount }
-	var modules = [];    // persistent setup fns
-	var active = null;   // currently mounted view record
-
-	var App = {
-		defineModule: function (setup) { modules.push(setup); },
-		defineView: function (pattern, hooks) {
-			views.push({ pattern: pattern, mount: hooks.mount, unmount: hooks.unmount });
-		}
-	};
-	window.App = App;
-
-	function safe(fn, label, arg) {
-		if (!fn) return;
-		try { fn(arg); } catch (err) { console.error('[App] ' + label + ' failed:', err); }
-	}
-
-	function onNavigated(e) {
-		var pattern = e.detail.route && e.detail.route.pattern;
-
-		// Tear down the outgoing view before mounting the incoming one.
-		if (active && active.pattern !== pattern) {
-			safe(active.unmount, 'unmount (' + active.pattern + ')');
-		}
-		active = null;
-
-		for (var i = 0; i < views.length; i++) {
-			if (views[i].pattern === pattern) {
-				active = views[i];
-				safe(active.mount, 'mount (' + pattern + ')', {
-					target: e.detail.target,
-					params: e.detail.params,
-					query: e.detail.query,
-					path: e.detail.path
-				});
-				return;
-			}
-		}
-	}
-
-	// ln-router defers its boot 'navigated' one microtask, so this listener —
-	// attached from a <script defer> placed after the bundle — still receives it.
-	document.addEventListener('ln-router:navigated', onNavigated);
-
-	function bootModules() {
-		for (var i = 0; i < modules.length; i++) safe(modules[i], 'module');
-	}
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', bootModules);
-	} else {
-		bootModules();
-	}
-})();
-
 /* ── module: dashboard/dashboard.js ─────────────────────────── */
 (function () {
 	'use strict';
@@ -140,15 +59,16 @@
 		}
 	}
 
-	App.defineView('/spa', {
-		mount: function () {
+	// Route navigation: when navigating to '/demo/spa', refresh dashboard usage
+	document.addEventListener('ln-router:navigated', function (e) {
+		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
+		if (pattern === '/demo/spa') {
 			refreshDashboardUsageIfMounted();
-		},
-		unmount: function () {}
+		}
 	});
 
 	// Register persistent store event listeners to auto-refresh the dashboard usage
-	App.defineModule(function () {
+	function initDashboard() {
 		const packagesStoreEl = document.getElementById('packages');
 		const tenantsStoreEl = document.getElementById('tenants');
 
@@ -165,14 +85,20 @@
 		});
 
 		window.addEventListener('app:packages-rebuild', refreshDashboardUsageIfMounted);
-	});
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initDashboard);
+	} else {
+		initDashboard();
+	}
 })();
 
 /* ── module: data/data.js ─────────────────────────── */
 (function () {
 	'use strict';
 
-	App.defineModule(function () {
+	function initData() {
 		const packagesStoreEl = document.getElementById('packages');
 		const tenantsStoreEl = document.getElementById('tenants');
 
@@ -229,7 +155,13 @@
 		packagesStoreEl.addEventListener('ln-data-store:synced', function (e) {
 			if (e.detail && e.detail.changed) onPackagesChanged();
 		});
-	});
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initData);
+	} else {
+		initData();
+	}
 })();
 
 /* ── module: packages/packages.js ─────────────────────────── */
@@ -264,7 +196,7 @@
 (function () {
 	'use strict';
 
-	App.defineModule(function () {
+	function initShell() {
 		const sidebar = document.getElementById('app-sidebar');
 		const scrim = document.querySelector('.app-scrim');
 		const offlineBanner = document.getElementById('offline-banner');
@@ -292,7 +224,7 @@
 		document.addEventListener('click', function (e) {
 			const btn = e.target.closest('#reset-demo');
 			if (!btn) return;
-			fetch('/docuflow/api/reset').then(function (r) {
+			fetch('/demo/docuflow/api/reset').then(function (r) {
 				if (!r.ok) throw new Error('HTTP ' + r.status);
 				forceSyncBoth();
 				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
@@ -333,7 +265,13 @@
 			if (region) region.setAttribute('hidden', '');
 			forceSyncBoth();
 		});
-	});
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initShell);
+	} else {
+		initShell();
+	}
 })();
 
 /* ── module: tenant-editor/tenant-editor.js ─────────────────────────── */
@@ -344,7 +282,7 @@
 	// #tenant-form) — react to the store outcome instead of a form-level event.
 	document.addEventListener('ln-data-store:updated', function (e) {
 		if (e.detail.store !== 'tenants') return;
-		window.lnRouter.navigate('/spa/tenants');
+		window.lnRouter.navigate('/demo/spa/tenants');
 	});
 })();
 

@@ -248,8 +248,9 @@
 	</div>
 </template>
 
-<!-- Primary template for /users/:id/logs — required in multi-region model so the
-     primary outlet shows meaningful content when the logs auxiliary region also renders. -->
+<!-- Primary template for /users/:id/logs — gives the primary outlet meaningful
+     content when the logs auxiliary region also renders. Not required: without
+     it the primary would simply fall through to its own catch-all. -->
 <template data-ln-route="/users/:id/logs" data-ln-route-title="User Logs">
 	<div class="card" style="padding: var(--size-md); border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-surface);">
 		<h4>📑 User #{{id}} — Log View (Primary)</h4>

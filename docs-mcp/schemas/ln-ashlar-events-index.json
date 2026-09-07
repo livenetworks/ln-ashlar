@@ -1832,7 +1832,7 @@
 			],
 			"listened_by": [],
 			"cancelable": true,
-			"description": "Dispatched before navigation starts. Calling `preventDefault()` aborts route swap.",
+			"description": "Dispatched once per navigation in which at least one region matched, before any region swap or clear. Calling `preventDefault()` aborts the navigation.",
 			"detail": "{ from: String, to: String, params: Object, query: Object }",
 			"source": "static"
 		},
@@ -1842,7 +1842,7 @@
 			],
 			"listened_by": [],
 			"cancelable": false,
-			"description": "Dispatched on each updated target container after DOM replacement and focus setup.",
+			"description": "Dispatched on each region that mounted a template after DOM replacement and (for the owning region) focus setup.",
 			"detail": "{ path, params, query, route, target, region }",
 			"source": "static"
 		},
@@ -1852,7 +1852,7 @@
 			],
 			"listened_by": [],
 			"cancelable": false,
-			"description": "Dispatched when no route matches the requested URL.",
+			"description": "Dispatched when no region matches the requested URL.",
 			"detail": "{ path: String }",
 			"source": "static"
 		},

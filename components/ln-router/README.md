@@ -102,17 +102,20 @@ const current = router.current();
 //   path: '/users/42?tab=profile',
 //   params: { id: '42' },          // primary region params
 //   query: { tab: 'profile' },
-//   route: { 
+//   route: {                       // null on an auxiliary-only navigation
 //     pattern: '/users/:id', 
 //     target: null, // The string ID of the custom target outlet, or null if using default
 //     title: 'User Details', 
 //     templateNode: HTMLTemplateElement 
 //   },
-//   regions: Map {                  // NEW — per-region snapshot
+//   regions: Map {                  // per-region snapshot
 //     '__primary__' => { route: {...}, params: { id: '42' } },
 //     'side'        => { route: {...}, params: { id: '42' } } | null
 //   }
 // }
+// current() returns null only when the router has never navigated. Once it
+// has, route is null exactly when the primary region has no match for the
+// current URL — an auxiliary-only navigation.
 ```
 
 ### Target Outlet Resolution Fallback
@@ -129,7 +132,7 @@ If the **primary** outlet cannot be resolved, the router logs a `console.warn` a
 - `data-ln-route-title="text"`: Sets `document.title` on successful navigation (primary region only).
 - `data-ln-outlet`: Marks the default outlet element (falls back to the first `<main>` element if omitted).
 - `data-ln-router-hydrate`: Placed on the outlet element to signal that initial SSR (Server-Side Rendered) content is already present, letting the router skip the initial clone and register events cleanly.
-- `data-ln-route-keep`: Placed on a **target element** (not a template). When present, the router skips teardown and DOM swap for that region if the matched template is the same as the one currently mounted — surviving param-only URL changes while preserving DOM state (inputs, scroll, open panels). When the matched template changes, teardown and swap proceed normally. Ignored on the primary outlet (the primary always re-renders).
+- `data-ln-route-keep`: Placed on a **target element** (not a template). When present, the router skips teardown and DOM swap for that region if the matched template is the same as the one currently mounted — surviving param-only URL changes while preserving DOM state (inputs, scroll, open panels). When the matched template changes, teardown and swap proceed normally. `data-ln-route-keep` also opts an auxiliary region out of auto-clear: without it, a region left unmatched by the current URL is emptied automatically; with it, unmatched content is left in place. Ignored on the primary outlet (the primary always re-renders).
 
 ---
 
@@ -139,9 +142,9 @@ All events bubble from the target outlet element.
 
 | Event | Cancelable | Detail | Dispatched When |
 |---|---|---|---|
-| **`ln-router:before-navigate`** | **Yes** | `{ from, to, params, query }` | Fired **once per navigation** on the primary outlet before any region swap. `preventDefault()` aborts the entire navigation (no history update, no region swaps). |
-| **`ln-router:navigated`** | No | `{ path, params, query, route, target, region }` | Fired **per region that actually swapped**. `region` is `'__primary__'` for the default outlet, or the target element's id string for auxiliary regions. All existing keys (`path, params, query, route, target`) remain present for backward compatibility. |
-| **`ln-router:not-found`** | No | `{ path }` | When the primary region has no match (and no catch-all `*` exists). DOM is left untouched. Not fired on auxiliary-only pages. |
+| **`ln-router:before-navigate`** | **Yes** | `{ from, to, params, query }` | Fired **once per navigation with at least one region match** on the primary outlet, before any region swap or clear. `preventDefault()` aborts the entire navigation (no history update, no region swaps). |
+| **`ln-router:navigated`** | No | `{ path, params, query, route, target, region }` | Fired **per region that actually mounted a template**. `region` is `'__primary__'` for the default outlet, or the target element's id string for auxiliary regions. All existing keys (`path, params, query, route, target`) remain present for backward compatibility. |
+| **`ln-router:not-found`** | No | `{ path }` | When **no region matched** the current path (and no catch-all `*` exists anywhere). DOM is left untouched. |
 
 ### Timing guarantee
 
@@ -320,25 +323,23 @@ Regions are ordinary DOM elements. Each is identified by an `id`. Route template
 
 ### The primary region
 
-The primary region is the default outlet (`[data-ln-outlet]` or first `<main>`). It is authoritative for:
-- The single cancelable `ln-router:before-navigate` event (fires once per navigation)
-- `document.title` updates
-- Focus shifting and scroll management
-- `ln-router:not-found` (when the primary has no match)
-- `router.current()` return value
+The primary region is the default outlet (`[data-ln-outlet]` or first `<main>`). Every region matches the URL and swaps independently; the primary is authoritative only for:
+- `router.current()`'s `route`/`params` fields
+- The before-navigate host element (it is a stable container, always resolvable, so it stays the dispatch target even on an auxiliary-only navigation)
+
+Title updates and focus/scroll management belong to the navigation's **owner** region: the primary if it swapped, otherwise the first region (in registration order) that swapped. `ln-router:before-navigate` fires once per navigation as long as at least one region matched; `ln-router:not-found` fires only when no region matched at all.
 
 `data-ln-route-keep` is ignored on the primary region: the primary always tears down and re-renders on every matched navigation.
 
 > [!IMPORTANT]
 > **Each region matches the URL independently.** A route targeting an
-> auxiliary region (`data-ln-route-target="…"`) no longer competes with primary
+> auxiliary region (`data-ln-route-target="…"`) does not compete with primary
 > routes for a single "best match" — every region runs its own match. If you
 > have a route like `/users/:id/logs` that targets only an auxiliary region,
 > the primary region will independently try to match `/users/42/logs` against
-> its own templates and fall back to its `*` catch-all (or fire `not-found`) if
-> it has no template for that path. Author a primary template for such paths if
-> you want the main outlet to show meaningful content alongside the auxiliary
-> region. This is a deliberate consequence of the parallel-regions model.
+> its own templates. If it has none, it simply auto-clears (or is left alone
+> if it carries `data-ln-route-keep`) — the auxiliary region still renders.
+> This is a deliberate consequence of the parallel-regions model.
 
 ### `data-ln-route-keep` — persistent regions
 
@@ -351,9 +352,19 @@ Add `data-ln-route-keep` to any target element to make it a **keep region**.
 Keep-region logic:
 - **Same template matches again** (e.g. param-only change `/users/42` → `/users/43`): the region is left completely untouched. No teardown, no DOM swap, no `ln-router:navigated` event. Input values, scroll position, and open panels survive.
 - **Different template matches** (e.g. navigating to a route that has a different sidebar template): normal teardown + DOM swap + `ln-router:navigated` event.
-- **No match for this URL**: the region is left as-is (untouched content persists). To clear a keep region on certain routes, declare an explicit empty `<template>` for those patterns.
+- **No match for this URL**: the region is left as-is (untouched content persists). This is the entire purpose of `data-ln-route-keep` — without it, an unmatched region auto-clears (see below).
 
 Keep is a property of the **region target element**, not of the template.
+
+### Auto-clear — unmatched regions empty themselves
+
+A region without `data-ln-route-keep` that has no match for the current URL is
+automatically emptied: existing components inside it are torn down and its
+content is replaced with nothing. This applies to regions with content
+already present (nothing happens to an already-empty region), and it does not
+fire `ln-router:navigated` — that event means "mounted a template", and a
+clear mounts nothing. `data-ln-route-keep` is the opt-out: an unmatched keep
+region is left exactly as it was.
 
 ### `navigated` event — per swapped region
 
@@ -399,17 +410,17 @@ All region swaps for a single navigation are wrapped in a single `document.start
 
 ## 🔧 Internals
 
-Source: `components/ln-router/src/ln-router.js`.
+Source: `components/ln-router/src/ln-router.js`. The region clear/swap/owner decision is a pure function, `planRegions`, in `components/ln-router/src/router-model.js` — it does no DOM access and is covered directly by `tests/ln-router.test.js`.
 
 ### Navigation pipeline (order matters)
 
 1. Strip hash/query, collapse trailing slashes.
-2. Every region in `regionRegistry` matches independently against its own sorted route list; the primary region's match is authoritative — if it has none (and no catch-all), the router dispatches `ln-router:not-found` and stops. Auxiliary-only pages proceed without firing `not-found`.
-3. `ln-router:before-navigate` fires once on the primary outlet; `preventDefault()` aborts the whole navigation before any region swap or history update.
-4. For each matched region, a keep-region check (`data-ln-route-keep` + same template already mounted) decides whether it enters the swap plan.
+2. Every region in `regionRegistry` matches independently against its own sorted route list. DOM-reading descriptors are built for every region (matched or not), then handed to the pure `planRegions` (`router-model.js`) for the decision. If no region matched, the router dispatches `ln-router:not-found` and stops — this is checked before anything is cleared, so a 404 never wipes the page.
+3. `ln-router:before-navigate` fires once, on the primary outlet, as long as at least one region matched; `preventDefault()` aborts the whole navigation before any region swap, clear, or history update.
+4. `planRegions` classifies every region with a resolvable target into `clears` (unmatched, no `data-ln-route-keep`, has content), `swaps` (matched, and not a keep-region already showing the matched template), or neither (keep-region already correct, or unmatched-and-empty).
 5. History push/replace happens once.
-6. All planned swaps run sequentially inside a single `document.startViewTransition` call — teardown, clone, `replaceChildren`, record in `mountedTemplates`.
-7. `ln-router:navigated` fires per swapped region (`region` key = `'__primary__'` or the target id).
+6. All planned clears and swaps run sequentially inside a single `document.startViewTransition` call — clears teardown and `replaceChildren()` with nothing; swaps teardown, clone, `replaceChildren`, record in `mountedTemplates`. Title/focus/scroll apply only to the plan's owner region (the primary if it swapped, otherwise the first region — in registration order — that swapped).
+7. `ln-router:navigated` fires per region that mounted a template (`region` key = `'__primary__'` or the target id). Clears never fire it.
 
 ### Registry & specificity
 
@@ -417,7 +428,7 @@ Source: `components/ln-router/src/ln-router.js`.
 
 ### Teardown & teleport cleanup
 
-Only regions actually in the swap plan are torn down — a keep-region that skips a swap is never touched. Before `replaceChildren()` clears an outlet, the router walks its descendants for any element carrying an `ln*` property with a `destroy()` method and calls it — this is what prevents leaked window/document listeners and teleported overlay trees (e.g. an open popover in `<body>` whose trigger lived in the outlet) from surviving the swap.
+Only regions actually in `plan.clears` or `plan.swaps` are torn down — a keep-region that matches neither list is never touched. Before `replaceChildren()` empties an outlet (swap or clear), the router walks its descendants for any element carrying an `ln*` property with a `destroy()` method and calls it — this is what prevents leaked window/document listeners and teleported overlay trees (e.g. an open popover in `<body>` whose trigger lived in the outlet) from surviving.
 
 ### Per-region persistence (keep regions)
 
