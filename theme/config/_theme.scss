@@ -142,8 +142,9 @@
 	--btn-bg-active: var(--bg-active);
 	--btn-border: var(--color-accent);
 	// --color-accent-hover is declared only below <html> (a, mixin bodies);
-	// invalid at computed-value time here — derive locally instead.
-	--btn-border-hover: hsl(from var(--color-accent) h s calc(l - 8));
+	// invalid at computed-value time here — derive locally. l - 6 matches
+	// @mixin btn's own accent-hover so neutral and accent buttons agree.
+	--btn-border-hover: hsl(from var(--color-accent) h s calc(l - 6));
 
 	// ── Accent buttons — translucent fill via consumer-scope rebind
 	// Rebind --btn-* on the button itself (not at skin :root) so
