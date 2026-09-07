@@ -195,7 +195,9 @@
 // These live in :where(:root) (0,0,0) so they can be overridden by [data-skin] 
 // or [data-theme] (0,1,0) without being clobbered by nested [data-mode] islands.
 // ---------------------------------------------------------------------------
-:where(:root) {
+:where(:root),
+:where([data-mode]),
+:where([data-theme]) {
 	// shadow roles
 	--shadow-resting:  var(--shadow-sm);
 	--shadow-floating: var(--shadow-md);

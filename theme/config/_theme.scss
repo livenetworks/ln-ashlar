@@ -53,6 +53,14 @@
 	@include ln-color-chain;
 }
 
+[data-mode] {
+	color: var(--color-fg);
+}
+
+:where([data-mode]:not(html):not(body)) {
+	background-color: var(--color-bg);
+}
+
 // ---------------------------------------------------------------------------
 // Named presets — demo theme picker. Brand palette only. Activation:
 //   <html data-theme="ocean">   <html data-theme="sunset">   etc.

@@ -6,3 +6,9 @@
 .flat-stack {
 	@include flat-stack;
 }
+
+.grid       { @include grid; }
+.grid-2     { @include grid-2; }
+.grid-4     { @include grid-4; }
+.stack      { @include stack; }
+.row        { @include row; }
