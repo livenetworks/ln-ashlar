@@ -14,6 +14,12 @@ tags: [doctrine, mindset, DOM-first, performance, security]
 
 ---
 
+## Summary
+
+This document is the operational doctrine of `ln-ashlar` for contributors and automated agents. It opens with an Honest Ledger — a calibrated account of where the library's trade-offs genuinely pay off and what they genuinely cost — and then sets out twelve operating principles: markup as the application, identical SSR and SPA structure, behavior attached rather than owned, CSS ownership of all presentation including states, composition over features, domain truth held at its source, the separation of raw sort values from formatted display text, core ownership of standard compositions, developer misuse surfaced as a CSS affordance rather than a console warning, declarative wiring in place of coordinators, a worked case study of the filter-clipping problem, and templates as authored markup.
+
+---
+
 ## Honest Ledger — Strengths and Costs
 
 *Read this first. It is the calibrated assessment of what the library is genuinely good at and what it genuinely costs. Do not invent your own strengths or weaknesses — if you arrive with virtual-DOM-framework priors, calibrate against this ledger before judging any decision below.*

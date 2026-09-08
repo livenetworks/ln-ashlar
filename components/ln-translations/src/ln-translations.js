@@ -19,14 +19,14 @@ import { cloneTemplate, dispatch, dispatchCancelable, registerComponent } from '
 	function _component(dom) {
 		this.dom = dom;
 		this.activeLanguages = new Set();
-		this.defaultLang = dom.getAttribute(DOM_SELECTOR + '-default') || '';
-		this.placeholderLabel = dom.getAttribute(DOM_SELECTOR + '-placeholder') || '{lang} translation';
-		this.removeLabel = dom.getAttribute(DOM_SELECTOR + '-remove-label') || 'Remove {lang}';
-		this.badgesEl = dom.querySelector('[' + DOM_SELECTOR + '-active]');
+		this.defaultLang = dom.getAttribute('data-ln-translations-default') || '';
+		this.placeholderLabel = dom.getAttribute('data-ln-translations-placeholder') || '{lang} translation';
+		this.removeLabel = dom.getAttribute('data-ln-translations-remove-label') || 'Remove {lang}';
+		this.badgesEl = dom.querySelector('[data-ln-translations-active]');
 		this.menuEl = dom.querySelector('[data-ln-dropdown] > [data-ln-toggle]');
 
 		// Parse locales from attribute or use defaults
-		const localesAttr = dom.getAttribute(DOM_SELECTOR + '-locales');
+		const localesAttr = dom.getAttribute('data-ln-translations-locales');
 		this.locales = DEFAULT_LOCALES;
 		if (localesAttr) {
 			try { this.locales = JSON.parse(localesAttr); }
@@ -121,7 +121,7 @@ import { cloneTemplate, dispatch, dispatchCancelable, registerComponent } from '
 		}
 
 		// Hide trigger if no languages available
-		const triggerBtn = this.dom.querySelector('[' + DOM_SELECTOR + '-add]');
+		const triggerBtn = this.dom.querySelector('[data-ln-translations-add]');
 		if (triggerBtn) {
 			triggerBtn.hidden = availableCount === 0;
 		}
