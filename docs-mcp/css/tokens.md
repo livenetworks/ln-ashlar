@@ -117,6 +117,8 @@ Within the theme system, design values flow through four strictly defined layers
 | `--fg-subtle` | token | `hsl(var(--color-neutral-700)) (light) / hsl(var(--color-neutral-600)) (dark)` | Subtle secondary text |
 | `--border-subtle` | token | `hsl(var(--color-neutral-200)) (light) / hsl(var(--color-neutral-175)) (dark)` | Subtle separator border |
 | `--border-strong` | token | `hsl(var(--color-neutral-300)) (light) / hsl(var(--color-neutral-300)) (dark)` | Focused and high-contrast border |
+| `--border-ui` | token | `hsl(var(--color-neutral-400)) (light) / hsl(var(--color-neutral-400)) (dark)` | Interactive control boundary — input, select, checkbox. Solved to 3:1 against `--bg-base` per WCAG 1.4.11; decorative borders use `--border-subtle` / `--border-strong` instead |
+| `--color-ink` | token | `222 47% 11%` | Dark foreground pole for fills too light to carry white at 7:1. A polarity-independent literal — never bind it to `--color-neutral-900`, which inverts to near-white in dark mode |
 | **Interaction State Tokens** | | | |
 | `--tint-hover` | token | `7%` | Accent-wash ratio for interactive hover |
 | `--tint-selected` | token | `12%` | Accent-wash ratio for selected items |

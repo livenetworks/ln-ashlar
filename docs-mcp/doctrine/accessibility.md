@@ -3,7 +3,7 @@ name: accessibility
 classification: doctrine
 status: draft
 domain: frontend
-summary: Accessibility position statement, WCAG 2.2 Level AA design target defaults, project responsibilities, and verification workflows.
+summary: Accessibility position statement, WCAG 2.2 Level AA design target with 1.4.6 Contrast (Enhanced) met on all shipped color pairs, project responsibilities, and verification workflows.
 source: docs-mcp/doctrine/html-markup-rules.md, theme/config/mixins/_focus.scss, theme/config/mixins/_motion.scss, theme/config/mixins/_form.scss, theme/config/_density.scss, theme/config/_theme.scss, theme/base/_reset.scss, components/ln-modal/src/ln-modal.js, components/ln-nav/src/ln-nav.js
 tags: [doctrine, accessibility, wcag, aria, keyboard]
 ---
@@ -18,9 +18,27 @@ This document defines the accessibility position of `ln-ashlar` for library user
 
 ## 1. The Claim
 
-> **`ln-ashlar` adopts WCAG 2.2 Level AA as an engineering design target.**
+> **`ln-ashlar` adopts WCAG 2.2 Level AA as an engineering design target, and meets 1.4.6 Contrast (Enhanced) — the Level AAA criterion — on every color pair it ships.**
+
+The design target stays AA because Level AAA conformance turns on many criteria a component library cannot determine: reading level, sign language interpretation, and context-sensitive help all belong to authored content. Contrast is the exception — it is decided entirely by the values in the palette, so the library settles it rather than deferring it.
+
+### The Contrast Budget
+
+Three targets, one per surface class, applied as build-time constants in [`theme/config/_contrast.scss`](../../theme/config/_contrast.scss):
+
+| Constant | Ratio | Applies to |
+|---|---|---|
+| `$ln-contrast-text` | 7:1 | Text on neutral surfaces — the `--fg-*` ladder against every `--bg-*` it can land on |
+| `$ln-contrast-fill` | 7:1 | Text on solid brand fills — `--color-accent-fg` against `--color-accent` |
+| `$ln-contrast-ui` | 3:1 | Interactive boundaries — `--border-ui` on inputs, selects and checkboxes, per 1.4.11 |
+
+Lightness is solved against these targets, not authored. A fill too light to carry white at 7:1 pairs itself with `--color-ink` instead, which is why the dark brand presets ship dark text on a light fill rather than the reverse.
 
 Consuming applications may quote this position directly. Conformance is a property of a **delivered page with real content**, never of a component library in isolation. The library ships markup, styling, and behavioral defaults engineered to avoid introducing accessibility barriers; the consuming project retains sole ownership of overall page conformance.
+
+### The Boundary This Claim Stops At
+
+The budget covers the values `ln-ashlar` itself ships. A brand supplied through [`theme/brand.css`](../../theme/brand.css) arrives at runtime, after the build-time solve has already run, so **no contrast guarantee extends to a custom `--brand-primary`**. A project that rebinds the brand owns the resulting pair — see the consumer contract in [`../css/theming.md`](../css/theming.md).
 
 ### What the Library Does Not Claim
 
@@ -46,7 +64,9 @@ The library provides baseline accessibility mechanisms embedded across its HTML 
 | **Modal Focus Containment & Esc** | Native `<dialog>` element opened via `.showModal()` providing top-layer isolation, browser focus trapping, and synchronized `Escape` key cancellation via `cancel` event listener | [`components/ln-modal/src/ln-modal.js`](../../components/ln-modal/src/ln-modal.js) |
 | **High-Visibility Focus Rings** | 3-layer `box-shadow` focus ring (`var(--color-bg)` boundary, 60% accent signal, 15% outer halo) preserving visibility against light and dark surfaces | [`theme/config/mixins/_focus.scss`](../../theme/config/mixins/_focus.scss) |
 | **Vestibular Motion Safety** | `@mixin motion-safe` gates transform, scale, slide, and keyframe animations behind `@media (prefers-reduced-motion: no-preference)` | [`theme/config/mixins/_motion.scss`](../../theme/config/mixins/_motion.scss) |
-| **Contrast-Safe Theme Vocabularies** | Semantic surface and foreground ladders (`--bg-base`, `--bg-elevated`, `--fg-default`, `--fg-muted`) engineered for contrast across light and dark modes | [`theme/config/_theme.scss`](../../theme/config/_theme.scss), [`docs-mcp/css/theming.md`](../css/theming.md) |
+| **Contrast-Solved Theme Vocabularies** | Every `--fg-*` tier clears 7:1 against every `--bg-*` surface it can land on, in both polarities — verified by assertion, not by design intent | [`theme/config/_palette.scss`](../../theme/config/_palette.scss), [`tests/brand-theme-cascade.test.js`](../../tests/brand-theme-cascade.test.js) |
+| **Contrast-Solved Brand Fills** | Each `[data-theme]` preset solves its lightness to 7:1 against the nearer foreground pole and declares the matching `--color-accent-fg`, so a fill never inherits text colour it cannot support | [`theme/config/_theme.scss`](../../theme/config/_theme.scss), [`docs-mcp/css/theming.md`](../css/theming.md) |
+| **Interactive Boundary Contrast** | `--border-ui` carries input, select and checkbox boundaries at 3:1 against `--bg-base` (1.4.11); `--border-subtle` / `--border-strong` stay decorative and exempt | [`theme/config/mixins/_form.scss`](../../theme/config/mixins/_form.scss) |
 | **Target Sizing via Density Tiers** | Explicit `--density-row-h` baseline (`2.25rem` compact base, `2.75rem` comfortable, `3rem` spacious) supporting touch and pointer target requirements | [`theme/config/_density.scss`](../../theme/config/_density.scss), [`docs-mcp/css/density.md`](../css/density.md) |
 | **Defensive Hidden State** | CSS reset enforces `[hidden] { display: none !important; }` preventing author styling overrides from exposing hidden translation lists or panels | [`theme/base/_reset.scss`](../../theme/base/_reset.scss) |
 
