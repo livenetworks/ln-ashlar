@@ -66,41 +66,52 @@
 //   <html data-theme="ocean">   <html data-theme="sunset">   etc.
 // ---------------------------------------------------------------------------
 
+// Lightness is solved, not authored: each fill sits at the AAA (7:1) limit
+// for its hue against whichever foreground pole is nearer. Dark lifts cross
+// the white/ink boundary, so they pair themselves — see --color-ink.
 [data-theme="ocean"] {
-	--brand-primary: 190 80% 35%;
+	--brand-primary: 190 80% 24%;   // 7.40 on white
 
 	&[data-mode="dark"],
 	:where([data-mode="dark"]) & {
-		--brand-primary: 190 80% 60%;
+		--brand-primary: 190 80% 46%;   // 7.24 on ink
+		--color-accent-fg: hsl(var(--color-ink));
+		--check-mark: var(--check-mark-on-dark);
 	}
 }
 
 [data-theme="sunset"] {
-	--brand-primary: 10 80% 50%;
+	--brand-primary: 10 80% 36%;   // 7.10 on white
 
 	&[data-mode="dark"],
 	:where([data-mode="dark"]) & {
-		--brand-primary: 10 80% 65%;
+		--brand-primary: 10 80% 69%;   // 7.09 on ink
+		--color-accent-fg: hsl(var(--color-ink));
+		--check-mark: var(--check-mark-on-dark);
 	}
 }
 
 [data-theme="midnight"] {
-	// Pure palette — no polarity opinion. Pair with data-mode="dark" for
-	// intended contrast; without it this renders purple-on-white (accepted).
-	--brand-primary: 265 70% 60%;
+	// Pure palette — no polarity opinion, but both lightnesses are now solved,
+	// so the unpaired light case reads at AAA instead of being "accepted".
+	--brand-primary: 265 70% 50%;   // 7.05 on white
 
 	&[data-mode="dark"],
 	:where([data-mode="dark"]) & {
-		--brand-primary: 265 70% 70%;
+		--brand-primary: 265 70% 75%;   // 7.15 on ink
+		--color-accent-fg: hsl(var(--color-ink));
+		--check-mark: var(--check-mark-on-dark);
 	}
 }
 
 [data-theme="glass"] {
 	// Electric blue accent — luminescent on dark navy glass
 	// No &[data-mode="dark"] lift block (unlike ocean/sunset/midnight): glass
-	// was authored dark-first, so 62% is already at/above the other three's
-	// lifted values (60%, 65%, 70%) — a lift here would blow out on dark.
-	--brand-primary: 218 95% 62%;
+	// was authored dark-first, so it solves straight to the ink pole in both
+	// polarities — a lift here would blow out on dark.
+	--brand-primary: 218 95% 71%;   // 7.04 on ink
+	--check-mark: var(--check-mark-on-dark);
+	--color-accent-fg: hsl(var(--color-ink));
 
 	// Active-nav wash — Glass computes a stronger 24% tint mix against
 	// local --bg-base for contrast on the deep dark surface.

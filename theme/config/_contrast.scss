@@ -1,0 +1,128 @@
+@use 'sass:color';
+@use 'sass:math';
+
+// ==========================================================================
+// Contrast solver — ln-ashlar
+// ==========================================================================
+// Pure Sass WCAG 2.x contrast math. No consumer yet — this module is not
+// @use'd anywhere. See .claude/plans/contrast-step1-solver.md.
+//
+// luminance()  — WCAG relative luminance of a color
+// contrast()   — WCAG contrast ratio between two colors
+// solve-l()    — binary search: HSL lightness meeting a target ratio
+// on-color()   — pick white/ink foreground meeting a target on a fill
+// ==========================================================================
+
+$ln-contrast-text: 7;   // text on neutral surfaces — AAA
+$ln-contrast-fill:  7;  // text on solid brand fills — AAA
+$ln-contrast-ui:    3;  // interactive boundaries (WCAG 1.4.11)
+
+// Dark foreground pole for on-color(). Anchored to a polarity-independent
+// literal, NOT to var(--color-neutral-900) or any ramp token — that token
+// is 222 47% 11% in light mode but flips to 221 30% 97% (near-white) in
+// dark mode, so binding to it would silently invert this solve on a dark
+// island. Same precedent as the scrim tokens in _palette.scss:139-141
+// (--color-scrim / --app-scrim-bg anchored to black rather than the ramp,
+// for the identical reason). The value itself is light mode's
+// --color-neutral-900, taken as a fixed Sass literal — not pure black —
+// because it is a color ln-ashlar actually paints (--fg-default resolves
+// to it in light mode), and it reproduces the approved architecture
+// plan's Decision A island percentages within ~1 point; pure black drifts
+// 4-6 points off those numbers. Do not rebind this to the ramp token.
+$_ln-contrast-ink: hsl(222 47% 11%);
+
+@function _linearize($channel) {
+	$c: math.div($channel, 255);
+	@if $c <= 0.03928 {
+		@return math.div($c, 12.92);
+	}
+	@return math.pow(math.div($c + 0.055, 1.055), 2.4);
+}
+
+@function luminance($color) {
+	$r: _linearize(color.channel($color, "red", $space: rgb));
+	$g: _linearize(color.channel($color, "green", $space: rgb));
+	$b: _linearize(color.channel($color, "blue", $space: rgb));
+	@return 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
+}
+
+@function _contrast-l($lum-a, $lum-b) {
+	$lighter: math.max($lum-a, $lum-b);
+	$darker: math.min($lum-a, $lum-b);
+	@return math.div($lighter + 0.05, $darker + 0.05);
+}
+
+@function contrast($a, $b) {
+	@return _contrast-l(luminance($a), luminance($b));
+}
+
+// Binary search over integer HSL lightness (0–100) for the given hue/sat
+// that meets $target contrast against $against. luminance(L) is monotonic
+// in L for fixed hue/sat, so contrast-vs-a-fixed-pole is monotonic on
+// each side of that pole — direction depends on whether $against is the
+// light or dark pole:
+//   - light $against (>=0.5 luminance): search for the MAX L (closest to
+//     white) that still passes — i.e. how dark the color must stay.
+//   - dark $against (<0.5 luminance): search for the MIN L (closest to
+//     black) that still passes — i.e. how light the color must become.
+// Returns null when even the best-case pole (L:0 for the light branch,
+// L:100 for the dark branch) can't reach $target.
+//
+// Domain restriction: each branch assumes "meets target" stays monotonic
+// as the search crosses lightness, which only holds while the searched
+// color's luminance stays on one side of $against's luminance. Callers
+// must keep $against comfortably away from the 0.5 boundary; every
+// surface this system actually solves against sits far from it (darkest
+// planned surface ≈0.014 luminance), so this is not runtime-guarded here.
+@function solve-l($hue, $sat, $target, $against) {
+	$against-lum: luminance($against);
+	$light-surface: $against-lum >= 0.5;
+
+	@if $light-surface {
+		@if _contrast-l(luminance(hsl($hue, $sat, 0%)), $against-lum) < $target {
+			@return null;
+		}
+		$lo: 0;
+		$hi: 100;
+		@while $lo < $hi {
+			$mid: math.ceil(math.div($lo + $hi, 2));
+			@if _contrast-l(luminance(hsl($hue, $sat, $mid * 1%)), $against-lum) >= $target {
+				$lo: $mid;
+			} @else {
+				$hi: $mid - 1;
+			}
+		}
+		@return $lo;
+	} @else {
+		@if _contrast-l(luminance(hsl($hue, $sat, 100%)), $against-lum) < $target {
+			@return null;
+		}
+		$lo: 0;
+		$hi: 100;
+		@while $lo < $hi {
+			$mid: math.floor(math.div($lo + $hi, 2));
+			@if _contrast-l(luminance(hsl($hue, $sat, $mid * 1%)), $against-lum) >= $target {
+				$hi: $mid;
+			} @else {
+				$lo: $mid + 1;
+			}
+		}
+		@return $lo;
+	}
+}
+
+// Picks whichever of the two foreground poles — white, or the fixed dark
+// ink literal above — reaches $target contrast against $fill. white is
+// tried first (most fills in this system are mid-to-dark brand tones
+// needing a light foreground). Errors loudly if neither pole reaches the
+// target — that fill has no legal foreground at this target and the
+// caller must pick a different target or a different fill upstream.
+@function on-color($fill, $target) {
+	@if _contrast-l(luminance($fill), luminance(white)) >= $target {
+		@return white;
+	}
+	@if _contrast-l(luminance($fill), luminance($_ln-contrast-ink)) >= $target {
+		@return $_ln-contrast-ink;
+	}
+	@error "on-color(): no pole (white/#{$_ln-contrast-ink}) reaches contrast #{$target} against #{$fill}.";
+}

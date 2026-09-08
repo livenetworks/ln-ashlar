@@ -37,7 +37,7 @@
 /* -------------------------------------------------------------------------- */
 :root {
 	/* Primary brand color (bare HSL triplet: hue saturation% lightness%) */
-	--brand-primary:   221 83% 48%;
+	--brand-primary:   221 83% 43%;
 
 	/* Secondary brand accent color (bare HSL triplet) */
 	--brand-secondary: 160 84% 36%;

@@ -175,8 +175,14 @@ test('sync-css-tokens integrity: requireVar throws loudly on missing tokens', ()
 	);
 
 	const sources = parseTokenSources(REPO_ROOT);
-	// Real sources must contain all required primitives
-	assert.equal(requireVar(sources.colorChainVars, '--brand-primary', '_palette.scss'), '221 83% 48%');
+	// Real sources must contain all required primitives. --brand-primary is
+	// asserted by shape, not value: its lightness is solved against
+	// $ln-contrast-fill, so pinning the literal here would turn a contrast
+	// retarget into a spurious failure in a test about requireVar.
+	assert.match(
+		requireVar(sources.colorChainVars, '--brand-primary', '_palette.scss'),
+		/^\d{1,3} \d{1,3}% \d{1,3}%$/
+	);
 	assert.equal(requireVar(sources.tokensVars, '--size-md', '_tokens.scss'), '1rem');
 });
 
