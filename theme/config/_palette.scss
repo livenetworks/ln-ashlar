@@ -85,12 +85,18 @@
 	--bg-hover:  hsl(var(--color-neutral-100));
 	--bg-active: hsl(var(--color-neutral-150));
 
+	// Bound low on the ramp so every tier clears 7:1 against --bg-active,
+	// the lightest surface any of them lands on (8.02 / 11.52 / 14.11).
 	--fg-default: hsl(var(--color-neutral-900));
-	--fg-muted:   hsl(var(--color-neutral-500));
-	--fg-subtle:  hsl(var(--color-neutral-400));
+	--fg-muted:   hsl(var(--color-neutral-800));
+	--fg-subtle:  hsl(var(--color-neutral-700));
 
 	--border-subtle:       hsl(var(--color-neutral-200));
 	--border-strong:       hsl(var(--color-neutral-300));
+
+	// Interactive boundaries only (input/select/checkbox). 1.4.11 wants 3:1
+	// for these; --border-subtle/-strong stay decorative and exempt.
+	--border-ui:           hsl(var(--color-neutral-400));
 
 	--color-scrim:  hsl(var(--color-neutral-900) / 0.5);
 
@@ -102,11 +108,11 @@
 
 @mixin ln-values-dark {
 	// Neutral scale — inverted
-	--color-neutral-50:  220 20%  8%;
-	--color-neutral-100: 220 16% 12%;
-	--color-neutral-150: 220 14% 18%;
-	--color-neutral-175: 220 13% 21%;
-	--color-neutral-200: 220 13% 24%;
+	--color-neutral-50:  220 20%  5%;
+	--color-neutral-100: 220 16%  7%;
+	--color-neutral-150: 220 14% 10%;
+	--color-neutral-175: 220 13% 12%;
+	--color-neutral-200: 220 13% 14%;
 	--color-neutral-300: 220 13% 36%;
 	--color-neutral-400: 218 11% 52%;
 	--color-neutral-500: 220 10% 68%;
@@ -129,12 +135,16 @@
 	--bg-active:   hsl(var(--color-neutral-200));
 
 	// Vocabulary — fg
+	// Bound high on the ramp for the same reason as light: every tier clears
+	// 7:1 against --bg-active (8.68 / 10.74 / 14.78).
 	--fg-default: hsl(var(--color-neutral-900));
-	--fg-muted:   hsl(var(--color-neutral-500));
-	--fg-subtle:  hsl(var(--color-neutral-400));
+	--fg-muted:   hsl(var(--color-neutral-700));
+	--fg-subtle:  hsl(var(--color-neutral-600));
 
 	--border-subtle:       hsl(var(--color-neutral-175));
 	--border-strong:       hsl(var(--color-neutral-300));
+
+	--border-ui:           hsl(var(--color-neutral-400));
 
 	// Scrims — anchored to black, not the ramp: dark --color-neutral-900 is
 	// near-white, so binding either to it would need an index flip.
@@ -205,7 +215,7 @@
 // stylesheet load order, which is brand.css's whole guarantee.
 // ---------------------------------------------------------------------------
 :where(:root) {
-	--brand-primary:   221 83% 48%;
+	--brand-primary:   221 83% 43%;
 	--brand-secondary: 160 84% 36%;
 }
 
@@ -235,6 +245,20 @@
 	// undeclared by default; a client declares them to win.
 	--color-accent:    hsl(var(--color-primary));
 	--color-accent-fg: hsl(var(--color-white));
+
+	// Dark foreground pole for fills too light to carry white at AAA.
+	// A literal, never var(--color-neutral-900) — that inverts to near-white
+	// in dark mode, which is exactly where the ink islands live. Mirrors
+	// $_ln-contrast-ink in _contrast.scss; keep the two in step.
+	--color-ink: 222 47% 11%;
+
+	// Checkmark stroke is baked into the data URI, so it ships in both poles
+	// and --check-mark selects one. An ink island must repoint this or its
+	// checkmark stays white on a light fill, well under the 3:1 that 1.4.11
+	// asks of a meaningful graphic.
+	--check-mark-on-light: url("data:image/svg+xml,%3Csvg xmlns='http:%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+	--check-mark-on-dark: url("data:image/svg+xml,%3Csvg xmlns='http:%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox='0 0 24 24' fill='none' stroke='%230f1729' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+	--check-mark: var(--check-mark-on-light);
 	--color-accent-tint: var(--brand-primary-tint,
 		color-mix(in srgb, hsl(var(--color-primary)) 8%, var(--bg-base)));
 	--color-accent-tint-strong: var(--brand-primary-tint-strong,

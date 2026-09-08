@@ -98,6 +98,8 @@
 	color: var(--color-fg);
 	--color-bg: var(--bg-sunken);
 	background: var(--color-bg);
+	// Control boundary, not a divider — 1.4.11 wants 3:1 here.
+	--color-border: var(--border-ui);
 	@include border;
 	border-radius: var(--radius);
 	@include transition;
@@ -360,7 +362,7 @@
 	padding: 0;
 	@include flex-shrink-0;
 	// Non-standard 1.5px stroke — optical weight at small checkbox size.
-	border: 1.5px solid var(--color-border);
+	border: 1.5px solid var(--border-ui);
 	background: var(--color-bg);
 	@include cursor-pointer;
 	@include transition;
@@ -370,8 +372,11 @@
 		background-color: var(--color-accent);
 		border-color: var(--color-accent);
 		// Inline SVG: native <input type="checkbox"> cannot contain child elements,
-		// so a data URI is the only way to embed a checkmark here.
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+		// so a data URI is the only way to embed a checkmark here. The stroke is
+		// baked in — data URIs can't read custom properties — so the mark ships as
+		// two variants and themes point --check-mark at the one matching their
+		// --color-accent-fg pole. Same pattern as --select-arrow above.
+		background-image: var(--check-mark);
 		background-size: 0.75rem;
 		background-position: center;
 		background-repeat: no-repeat;
