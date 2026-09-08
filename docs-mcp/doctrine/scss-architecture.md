@@ -121,14 +121,20 @@ Styling values flow through four strictly defined layers. A brand token, a scale
                              --fg-default, --fg-muted, --border-subtle, --shadow-resting,
                              --text-title-md, --lh-title-md
                              (Named semantic design intent; rebound at theme :root, [data-skin], [data-mode], or [data-theme])
-            ↓ derived via ln-color-chain at :root, [data-mode], and [data-theme]
-4. Primitive Tokens      ->  --color-bg, --color-fg, --color-border, --shadow,
-                             --padding-x, --padding-y, --gap, --radius, --font-size, --line-height
+            ↓ primitives declared in the base-defaults block at
+            ↓ :root, [data-mode], [data-theme], [data-skin]
+            ↓ (ln-color-chain separately derives --color-primary/-secondary
+            ↓  and the colour-aware shadows at :root, [data-mode], [data-theme])
+4. Primitive Tokens      ->  re-derived at every axis (base-defaults block, _palette.scss):
+                               --color-bg, --color-fg, --color-border, --shadow, --radius
+                             root-only, substituted once at <html> (_tokens.scss :root):
+                               --padding-x, --padding-y, --gap, --font-size, --line-height
+                               (also rebound by [data-density] scopes and :root media queries)
                              (The ONLY tokens mixin bodies read and consume)
 ```
 
 ### B. The Rebind Contract (Read vs. Write Boundaries)
-- **Mixins:** Mixin bodies read **primitives only** (`--color-bg`, `--color-fg`, `--color-border`, `--shadow`, `--padding-x`, `--padding-y`, `--gap`, `--radius`, `--font-size`, `--line-height`). They NEVER read vocabulary tokens or raw scale tokens directly.
+- **Mixins:** Mixin bodies read **primitives only** (`--color-bg`, `--color-fg`, `--color-border`, `--shadow`, `--padding-x`, `--padding-y`, `--gap`, `--radius`, `--font-size`, `--line-height`). They NEVER read vocabulary tokens or raw scale tokens directly. Note the two groups differ in where they compute — see the layer diagram above.
 - **Components:** Component instances and custom selectors write/rebind **primitives** on their local scope to select a vocabulary role (e.g. `.sunken-card { --color-bg: var(--bg-sunken); }`). Components NEVER rebind `--bg-*` vocabulary tokens.
 - **Themes, Modes, and Skins:** These axes rebind **vocabulary tokens** at the theme root scope (`:root`, `[data-mode]`, `[data-theme]`, `[data-skin]`). They change global polarity, palette, and structure without rewriting component mixins.
 - **Density Tiers:** Density modes (`[data-density="compact"]`) rebind geometric primitives and vocabulary (`--padding-y`, `--gap`, `--text-{role}`, `--lh-{role}`), never color semantics.
@@ -141,6 +147,21 @@ Styling values flow through four strictly defined layers. A brand token, a scale
 5. **Visibility Invariant:** `hidden` (attribute or `.hidden` in tabs) is the sole hiding mechanism; there is no `.ln-hidden` or ad-hoc display override class.
 6. **Freeze Rule Invariant:** Accent-derived interaction states are tokenised strictly as ratio percentages (`--tint-hover: 7%`, `--tint-selected: 12%`, `--tint-active: 14%`) rather than pre-resolved `:root` colors. `color-mix()` executes at the local declaration site so `--color-accent` and `--color-bg` resolve dynamically on the component cascade.
 7. **Root-Resolvability Invariant:** A `var()` inside a custom-property value declared at a `[data-skin]` / `[data-theme]` / `[data-mode]` root may reference only tokens declared by `_tokens.scss :root`, `ln-values-light` / `ln-values-dark`, `ln-color-chain`, or the base-defaults block — never a token that exists only inside a component mixin or on a narrow element selector. If the value must derive from a component-local token, the rebind belongs in a nested consuming-element block.
+8. **Declaration-Site Invariant:** A token whose value is a **literal** and identical
+   across both polarities carries no polarity opinion — declare it in a
+   `:where(:root)`-only block, never inside `ln-values-light` / `ln-values-dark`.
+   Declaring it in the mixins re-declares it on every nested `[data-mode]` island,
+   and a declaration beats inheritance at any specificity, so it clobbers whatever an
+   ancestor `[data-theme]` or `[data-skin]` set. Example: `--brand-primary: 221 83%
+   48%` sits in the `:where(:root)` brand block in `_palette.scss`, so
+   `<section data-theme="sunset">` can rebind it and a nested `[data-mode="light"]`
+   card keeps the sunset hue. Conversely, a token whose value is an **indirection**
+   (`var(--other)`) must be declared in the four-axis base-defaults block, never at
+   `:root` alone — at `:root` it substitutes once at `<html>` and inherits as a
+   frozen literal, so no island rebind of its target can reach it. Example:
+   `--radius: var(--radius-md)` sits in the base-defaults block, so
+   `[data-skin="glass"]`'s `--radius-md: 0` reaches a scoped skin island; at `:root`
+   alone it did not.
 
 ### D. Anti-Patterns & Pitfalls
 > [!CAUTION]

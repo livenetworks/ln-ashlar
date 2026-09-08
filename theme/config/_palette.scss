@@ -1,15 +1,12 @@
 // ==========================================================================
 // Palette & Color Derivation Mixins — ln-ashlar
 // ==========================================================================
-// Pure mixin partial — no CSS output.
+// Value mixins + the derivation chain, plus two zero-specificity CSS blocks
+// at the bottom (brand, base defaults).
 // Defines theme values (light and dark) and the unified color derivation chain.
 // ==========================================================================
 
 @mixin ln-values-light {
-	// Brand colors — bare HSL triplets
-	--brand-primary:   221 83% 48%;
-	--brand-secondary: 160 84% 36%;
-
 	// Secondary tint layers
 	--color-secondary-light:   160 84% 94%;
 	--color-secondary-lighter: 160 84% 97%;
@@ -104,10 +101,6 @@
 }
 
 @mixin ln-values-dark {
-	// Brand colors — bare HSL triplets (default dark matches light per R8)
-	--brand-primary:   221 83% 48%;
-	--brand-secondary: 160 84% 36%;
-
 	// Neutral scale — inverted
 	--color-neutral-50:  220 20%  8%;
 	--color-neutral-100: 220 16% 12%;
@@ -134,10 +127,6 @@
 	--bg-recessed: hsl(var(--color-neutral-50));
 	--bg-hover:    hsl(var(--color-neutral-175));
 	--bg-active:   hsl(var(--color-neutral-200));
-
-	// Fields ride --bg-sunken in dark; the --bg-recessed fallback would sink an
-	// 8% field into an 18% card.
-	--input-bg: var(--bg-sunken);
 
 	// Vocabulary — fg
 	--fg-default: hsl(var(--color-neutral-900));
@@ -204,13 +193,31 @@
 }
 
 // ---------------------------------------------------------------------------
+// Brand — :where(:root) ONLY. Deliberately not in ln-values-light /
+// ln-values-dark and deliberately not joined to the four-axis block below.
+//
+// Brand is a literal with no polarity opinion. Declared inside the value
+// mixins it would be re-declared on every nested [data-mode] island, and a
+// declaration beats inheritance at any specificity — so a light card inside
+// <section data-theme="sunset" data-mode="dark"> would snap back to default
+// blue. :root-only means no island re-declares it; [data-theme] at (0,1,0)
+// rebinds it normally; a consumer's brand.css at (0,1,0) still wins at any
+// stylesheet load order, which is brand.css's whole guarantee.
+// ---------------------------------------------------------------------------
+:where(:root) {
+	--brand-primary:   221 83% 48%;
+	--brand-secondary: 160 84% 36%;
+}
+
+// ---------------------------------------------------------------------------
 // Base Defaults — Lazy-evaluated primitives and surfaces.
 // These live in :where(:root) (0,0,0) so they can be overridden by [data-skin] 
 // or [data-theme] (0,1,0) without being clobbered by nested [data-mode] islands.
 // ---------------------------------------------------------------------------
 :where(:root),
 :where([data-mode]),
-:where([data-theme]) {
+:where([data-theme]),
+:where([data-skin]) {
 	// shadow roles
 	--shadow-resting:  var(--shadow-sm);
 	--shadow-floating: var(--shadow-md);
@@ -221,6 +228,7 @@
 	--color-fg:     var(--fg-default);
 	--color-border: var(--border-subtle);
 	--shadow:       var(--shadow-resting);
+	--radius:       var(--radius-md);
 
 	// accent — tints computed against the LOCAL --bg-base, so one
 	// formula serves both themes. The two override slots are
@@ -237,7 +245,6 @@
 	--btn-fg:           var(--color-fg);
 	--btn-border:       var(--border-strong);
 	--btn-bg-hover:     var(--bg-hover);
-	--btn-bg-active:    var(--bg-active);
 	--btn-fg-hover:     var(--color-fg);
 	--btn-border-hover: var(--border-strong);
 }

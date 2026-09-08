@@ -147,8 +147,8 @@ export function generateTokensTable(sources) {
 		'| Name | Kind | Parameters / Values | Description |',
 		'|---|---|---|---|',
 		'| **Brand & Status Triplets (Bare HSL)** | | | |',
-		row('--brand-primary', 'token', requireVar(lightVars, '--brand-primary', '_palette.scss (ln-values-light)'), 'Primary brand bare HSL triplet'),
-		row('--brand-secondary', 'token', requireVar(lightVars, '--brand-secondary', '_palette.scss (ln-values-light)'), 'Brand secondary accent bare HSL triplet'),
+		row('--brand-primary', 'token', requireVar(colorChainVars, '--brand-primary', '_palette.scss (:where(:root) brand block)'), 'Primary brand bare HSL triplet'),
+		row('--brand-secondary', 'token', requireVar(colorChainVars, '--brand-secondary', '_palette.scss (:where(:root) brand block)'), 'Brand secondary accent bare HSL triplet'),
 		row('--color-success', 'token', requireVar(lightVars, '--color-success', '_palette.scss (ln-values-light)'), 'Success status bare HSL triplet'),
 		row('--color-error', 'token', requireVar(lightVars, '--color-error', '_palette.scss (ln-values-light)'), 'Error status bare HSL triplet'),
 		row('--color-warning', 'token', requireVar(lightVars, '--color-warning', '_palette.scss (ln-values-light)'), 'Caution status bare HSL triplet'),
@@ -215,7 +215,7 @@ export function generateTokensTable(sources) {
 		row('--padding-x', 'token', requireVar(tokensVars, '--padding-x', '_tokens.scss'), 'Horizontal padding primitive'),
 		row('--padding-y', 'token', requireVar(tokensVars, '--padding-y', '_tokens.scss'), 'Vertical padding primitive'),
 		row('--gap', 'token', requireVar(tokensVars, '--gap', '_tokens.scss'), 'Layout gap primitive'),
-		row('--radius', 'token', requireVar(tokensVars, '--radius', '_tokens.scss'), 'Component corner radius primitive')
+		row('--radius', 'token', requireVar(colorChainVars, '--radius', '_palette.scss'), 'Component corner radius primitive')
 	];
 
 	return rows.join('\n');
@@ -227,7 +227,7 @@ export function generateTokensTable(sources) {
  * @returns {string}
  */
 export function generateThemingTable(sources) {
-	const { lightVars, darkVars } = sources;
+	const { lightVars, darkVars, colorChainVars } = sources;
 
 	const rows = [
 		'| Name | Kind | Parameters / Values | Description |',
@@ -242,8 +242,8 @@ export function generateThemingTable(sources) {
 		'| `data-theme="midnight"` | attribute | — | Midnight deep purple brand palette preset (`--brand-primary: 265 70% 60%`); pair with `data-mode="dark"` |',
 		'| `data-theme="glass"` | attribute | — | Glass luminous blue brand palette preset (`--brand-primary: 218 95% 62%`) |',
 		'| `data-skin="glass"` | attribute | — | Glass structural preset — flat radius/shadow, translucent button chrome, accent nav/menu rebinds. Polarity-agnostic |',
-		row('--brand-primary', 'token', requireVar(lightVars, '--brand-primary', '_palette.scss (ln-values-light)'), 'Primary brand color bare HSL triplet'),
-		row('--brand-secondary', 'token', requireVar(lightVars, '--brand-secondary', '_palette.scss (ln-values-light)'), 'Secondary brand color bare HSL triplet'),
+		row('--brand-primary', 'token', requireVar(colorChainVars, '--brand-primary', '_palette.scss (:where(:root) brand block)'), 'Primary brand color bare HSL triplet'),
+		row('--brand-secondary', 'token', requireVar(colorChainVars, '--brand-secondary', '_palette.scss (:where(:root) brand block)'), 'Secondary brand color bare HSL triplet'),
 		row('--bg-base', 'token', `${requireVar(lightVars, '--bg-base', '_palette.scss (ln-values-light)')} (light) / ${requireVar(darkVars, '--bg-base', '_palette.scss (ln-values-dark)')} (dark)`, 'Base canvas background'),
 		row('--bg-elevated', 'token', `${requireVar(lightVars, '--bg-elevated', '_palette.scss (ln-values-light)')} (light) / ${requireVar(darkVars, '--bg-elevated', '_palette.scss (ln-values-dark)')} (dark)`, 'Elevated card surface (flat in light, +6% in dark)'),
 		row('--bg-sunken', 'token', `${requireVar(lightVars, '--bg-sunken', '_palette.scss (ln-values-light)')} (light) / ${requireVar(darkVars, '--bg-sunken', '_palette.scss (ln-values-dark)')} (dark)`, 'Sunken well surface (darker in light, +9% in dark)'),

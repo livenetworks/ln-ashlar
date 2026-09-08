@@ -18,14 +18,14 @@ The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand
 
 - **Scoped Mode/Theme Islands:** Any element at any DOM depth can declare `data-mode="dark"` (polarity) or `data-theme="glass"` (palette). Descendant elements render fully in that axis — including background, text, borders, shadows, buttons, and hover/active states — without requiring component-specific overrides.
 - **Surface Elevation Inversion:** In dark mode, elevated surfaces become *lighter* (`--bg-elevated: hsl(var(--color-neutral-150))`, 18%) than the root canvas (`--bg-base: hsl(var(--color-neutral-100))`, 12%), while recessed areas (`--bg-recessed: hsl(var(--color-neutral-50))`, 8%) become darker. In light mode, surfaces are flat by design and separated by shadow. Both polarities bind to the neutral ramp, so rebinding `--color-neutral-*` moves them together.
-- **Zero-Specificity Values (`:where()`):** Ashlar's default values are declared with `:where(:root)` and `:where([data-mode="..."])` (specificity 0,0,0). A consumer's `brand.css` at `[data-mode="dark"]` (0,1,0) always wins, regardless of stylesheet loading order.
+- **Zero-Specificity Values (`:where()`):** Ashlar's default values are declared with `:where(:root)` and `:where([data-mode="..."])` (specificity 0,0,0). A consumer's `brand.css` at `:root` (0,1,0) always wins, regardless of stylesheet loading order.
 - **Computed Accent Tints:** `--color-accent-tint` and `--color-accent-tint-strong` are computed dynamically via `color-mix()` against the local `--bg-base`.
 - **Activation Paths:**
   1. Root level override: `<html data-mode="dark">`, `<html data-theme="glass">`, or `<html data-skin="glass">`.
   2. Scoped island: `<header data-mode="dark">` or `<section data-theme="sunset">`.
   3. Automatic system preference: `@media (prefers-color-scheme: dark)` when no explicit root polarity attribute is set.
-  4. Structural activation: `<html data-skin="glass">` globally applies structural overrides like flatter radii and shadows. (Note: Unlike mode and theme, skin cannot be scoped to deep DOM islands without breaking geometry coherence, and must be applied at `<html>`).
-- **Brand.css Integration:** Custom brand tokens are injected by declaring bare HSL triplets on `:root` and `[data-mode="dark"]` in a client stylesheet, without editing library sources.
+  4. Structural activation: `<html data-skin="glass">` globally applies structural overrides like flatter radii and shadows. A skin can also be scoped to an island (`<section data-skin="glass">`): `[data-skin]` is one of the four axes in the base-defaults block, so `--radius` and the colour primitives re-derive there. Root-level scales the skin rebinds directly (`--radius-*`, `--shadow-*`) still resolve on the skin element itself — see R6 for what does and does not follow an island.
+- **Brand.css Integration:** Custom brand tokens are injected by declaring bare HSL triplets on `:root` in a client stylesheet, without editing library sources. Brand is polarity-free — one declaration serves both modes.
 
 ---
 
@@ -73,15 +73,9 @@ The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand
 
 ```css
 /* brand.css - overrides brand tokens with zero specificity conflict */
-:root,
-[data-mode="light"] {
+:root {
     --brand-primary:   215 85% 45%;
     --brand-secondary: 195 35% 35%;
-}
-
-[data-mode="dark"] {
-    --brand-primary:   215 90% 65%;
-    --brand-secondary: 195 30% 70%;
 }
 ```
 
@@ -118,8 +112,25 @@ The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand
 
 > [!CAUTION]
 > 1. **Do Not Invert Neutral Tokens Manually:** Never rely on raw `--color-neutral-100` for backgrounds, as it inverts to dark grey in dark mode. Always use `--bg-base` or `--bg-elevated`.
-> 2. **R6 — Scoped Themes Carry Colors and Shadows Only:** Structural dimensions, typography scale, and `--radius-*` remain root-level invariants and do not follow scoped theme islands.
-> 3. **R7 — Presets Include Value Mixin:** Any custom or named preset must `@include ln-values-light` or `@include ln-values-dark` to declare its surface family, preventing accidental inheritance of ancestor surface tokens.
+> 2. **R6 — What Follows a Scoped Island, and What Does Not:** The colour primitives
+>    (`--color-bg`, `--color-fg`, `--color-border`, `--shadow`) and `--radius` are
+>    declared in the four-axis base-defaults block in `_palette.scss`, so they
+>    re-derive at `:root`, `[data-mode]`, `[data-theme]`, and `[data-skin]` — a
+>    scoped `<section data-skin="glass">` genuinely flattens its descendants.
+>    `--padding-x`, `--padding-y`, `--gap`, `--font-size` and `--line-height` are
+>    declared at `_tokens.scss :root` (rebound only by `:root` media queries and by
+>    `[data-density]` scopes), so they substitute once and inherit frozen: a
+>    `[data-mode]` / `[data-theme]` / `[data-skin]` island does **not** move them.
+>    The `--size-*`, `--text-*` and `--lh-*` scales are likewise root-level.
+> 3. **R7 — Presets Are Palette-Only; Never Include a Value Mixin:** A
+>    `[data-theme]` preset declares brand tokens and nothing else. It must NOT
+>    `@include ln-values-light` / `ln-values-dark`: that would force a polarity onto
+>    a palette-only axis (a `<section data-theme="ocean">` inside a dark page would
+>    snap to light surfaces), and it would re-declare every literal in the mixin on
+>    that element, clobbering whatever an ancestor axis had set. A nested island
+>    inheriting its ancestor's surfaces is the intended behaviour, not a leak — see
+>    the Declaration-Site Invariant in `scss-architecture`. (Supersedes the earlier
+>    R7, which was authored but never implemented.)
 > 4. **Bare Triplets Requirement in Brand.css:** When customizing brand colors in `brand.css`, always provide bare HSL triplets (e.g. `215 85% 45%`), never `hsl(...)`, so that alpha transparency composition continues to work.
 
 ---

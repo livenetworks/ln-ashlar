@@ -399,6 +399,24 @@ component mixin or on a narrow element selector. If the value must
 derive from a component-local token, the rebind belongs in a nested
 consuming-element block.
 
+**Declaration-Site Invariant.** A token whose value is a literal and
+identical across both polarities carries no polarity opinion — declare
+it in a `:where(:root)`-only block, never inside `ln-values-light` /
+`ln-values-dark`. Declaring it in the mixins re-declares it on every
+nested `[data-mode]` island, and a declaration beats inheritance at
+any specificity, so it clobbers whatever an ancestor `[data-theme]` or
+`[data-skin]` set. Example: `--brand-primary: 221 83% 48%` sits in the
+`:where(:root)` brand block in `_palette.scss`, so
+`<section data-theme="sunset">` can rebind it and a nested
+`[data-mode="light"]` card keeps the sunset hue. Conversely, a token
+whose value is an indirection (`var(--other)`) must be declared in the
+four-axis base-defaults block, never at `:root` alone — at `:root` it
+substitutes once at `<html>` and inherits as a frozen literal, so no
+island rebind of its target can reach it. Example:
+`--radius: var(--radius-md)` sits in the base-defaults block, so
+`[data-skin="glass"]`'s `--radius-md: 0` reaches a scoped skin island;
+at `:root` alone it did not.
+
 ### What NOT to do (themes)
 
 - Do not write `[data-theme="..."] .selector { ... }` or `[data-skin="..."] .selector { ... }`. Rebind tokens at skin/theme `:root` instead.

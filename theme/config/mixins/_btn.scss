@@ -46,14 +46,10 @@
 	color: var(--btn-fg);
 	@include transition-colors;
 
-	&:hover:not(:disabled) {
+	&:hover:not(:disabled),
+	&:active:not(:disabled) {
 		background: var(--btn-bg-hover);
 		color: var(--btn-fg-hover);
-		border-color: var(--btn-border-hover);
-	}
-
-	&:active:not(:disabled) {
-		background: var(--btn-bg-active);
 		border-color: var(--btn-border-hover);
 	}
 

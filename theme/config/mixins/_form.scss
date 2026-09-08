@@ -96,7 +96,7 @@
 	font-size: var(--font-size);
 	line-height: var(--line-height);
 	color: var(--color-fg);
-	--color-bg: var(--input-bg, var(--bg-recessed));
+	--color-bg: var(--bg-sunken);
 	background: var(--color-bg);
 	@include border;
 	border-radius: var(--radius);

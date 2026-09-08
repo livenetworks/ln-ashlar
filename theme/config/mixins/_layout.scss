@@ -92,7 +92,11 @@
 //
 // Cascade note: the --radius / --shadow re-binds cascade
 // into grandchildren. If a consumer nests a rounded card inside a
-// flat-stack panel, re-bind --radius on that nested element.
+// flat-stack panel, re-bind --radius on that nested element. Exception: a
+// grandchild carrying [data-mode] / [data-theme] / [data-skin] matches the
+// four-axis base-defaults block in _palette.scss, which re-derives --radius
+// and --shadow on it directly — no flat-stack rule reaches a grandchild to
+// contest that, so it silently gets root radius/shadow back.
 //
 // Block-axis only. For horizontal joined controls use btn-group or
 // pill-group — they use border-radius tricks on first/last children

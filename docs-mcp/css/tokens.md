@@ -32,20 +32,26 @@ Within the theme system, design values flow through four strictly defined layers
                              --fg-default, --fg-muted, --border-subtle, --shadow-resting,
                              --text-title-md, --lh-title-md
                              (Named semantic design intent; rebound at theme :root, [data-skin], [data-mode], or [data-theme])
-            ↓ derived via ln-color-chain at :root, [data-mode], and [data-theme]
-4. Primitive Tokens      ->  --color-bg, --color-fg, --color-border, --shadow,
-                             --padding-x, --padding-y, --gap, --radius, --font-size, --line-height
+            ↓ primitives declared in the base-defaults block at
+            ↓ :root, [data-mode], [data-theme], [data-skin]
+            ↓ (ln-color-chain separately derives --color-primary/-secondary
+            ↓  and the colour-aware shadows at :root, [data-mode], [data-theme])
+4. Primitive Tokens      ->  re-derived at every axis (base-defaults block, _palette.scss):
+                               --color-bg, --color-fg, --color-border, --shadow, --radius
+                             root-only, substituted once at <html> (_tokens.scss :root):
+                               --padding-x, --padding-y, --gap, --font-size, --line-height
+                               (also rebound by [data-density] scopes and :root media queries)
                              (The ONLY tokens mixin bodies read and consume)
 ```
 
 ### Architectural Contract:
-- **Values vs. Derivation Split:** Theme-specific values (`ln-values-light`, `ln-values-dark`) are shipped at zero specificity via `:where()`. The derivation chain (`ln-color-chain`) re-evaluates all dependent primitives at `:root`, `[data-mode]`, and `[data-theme]` scopes.
+- **Values vs. Derivation Split:** Theme-specific values (`ln-values-light`, `ln-values-dark`) are shipped at zero specificity via `:where()`. `ln-color-chain` re-evaluates the semantic colours and colour-aware shadows at `:root`, `[data-mode]`, and `[data-theme]`; the primitives are re-derived by the base-defaults block, which adds `[data-skin]` as a fourth axis.
 - **Mixins Read Primitives Only:** Mixin bodies reference `--color-bg`, `--color-fg`, `--color-border`, `--shadow`, `--padding-x`, `--padding-y`, and `--gap`. They never reference `--bg-*` or `--size-*` directly.
 - **Components Rebind Primitives:** Custom components rebind the primitive on their local scope to select a vocabulary role (e.g. `.card-sunken { --color-bg: var(--bg-sunken); }`).
 - **Relational Roles vs. Elevation Ladder:** `--bg-*` tokens represent **relational roles whose tonal direction is theme-defined**, not a static monotonic elevation ladder:
   - **Light mode is flat by design:** Nested surfaces are separated by **shadow** (`--shadow-resting`, `--shadow-floating`), not tone (`--bg-elevated` equals `--bg-base`).
   - **Dark mode uses tonal elevation:** Dark grounds cannot use shadows effectively, so surfaces separate by **lightness** (`--bg-elevated` is 18% vs `--bg-base` 12%).
-  - `--bg-sunken` is darker than base in light mode (96% vs 100%), but **lighter** than base in dark mode (21% vs 12%). This prevents sunken inputs from punching through the card down to the 8% app-shell ground — which is why dark binds `--input-bg` to `--bg-sunken` rather than letting it fall through to `--bg-recessed`.
+  - `--bg-sunken` is darker than base in light mode (96% vs 100%), but **lighter** than base in dark mode (21% vs 12%). This prevents sunken inputs from punching through the card down to the 8% app-shell ground — which is why both polarities bind form fields directly to `--bg-sunken` rather than letting them fall through to `--bg-recessed`.
   - **Both polarities bind to the neutral ramp.** No `--bg-*` / `--fg-*` / `--border-*` token is a hand-tuned literal in either value mixin, so rebinding `--color-neutral-*` moves light and dark together.
 
 ---

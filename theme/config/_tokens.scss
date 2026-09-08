@@ -173,7 +173,8 @@
 	--padding-x:       var(--size-sm-up);
 	--padding-y:       var(--size-xs-up);   // 6px — dense base (DocuFlow 7px rounds to 6px)
 	--gap:             var(--size-xs-up);   // 6px — dense base
-	--radius:          var(--radius-md);
+	// --radius sits with the other primitives in _palette.scss. Declared here it
+	// would resolve once at <html> and inherit frozen through every theme island.
 
 	// Accent-wash strengths. Ratios, not colors — color-mix() stays at the
 	// declaration site so --color-accent / --color-bg resolve locally and the
@@ -199,9 +200,6 @@
 	// --color-accent-bg
 	// --color-accent-bg-hover
 	// --color-accent-bg-fg
-	//
-	// --input-bg — same pattern, form scope. `@mixin form-input` reads it
-	// via fallback to `--bg-recessed`, so the default theme is unaffected.
 
 	// Nav surface — companions for themes that opt in to a bordered/inset
 	// nav appearance (e.g. Glass). NO defaults — `@mixin nav` reads these

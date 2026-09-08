@@ -139,7 +139,6 @@
 	// at :root only; library owns structure. (See docs/architecture/reference.md ## Theme Architecture for exact mechanics)
 	--btn-bg: var(--bg-elevated);
 	--btn-bg-hover: var(--bg-hover);
-	--btn-bg-active: var(--bg-active);
 	--btn-border: var(--color-accent);
 	// --color-accent-hover is declared only below <html> (a, mixin bodies);
 	// invalid at computed-value time here — derive locally. l - 6 matches
@@ -206,7 +205,6 @@
 	// ── Buttons — neutral chrome
 	--btn-bg: transparent;
 	--btn-bg-hover: var(--bg-hover);
-	--btn-bg-active: var(--bg-active);
 	// Give buttons a visible border instead of filling them
 	--btn-border: var(--border-strong);
 

@@ -4,8 +4,9 @@
  * ============================================================================
  *
  * This file allows client applications to override corporate brand colors
- * and typography for both light and dark themes in a single place without
- * modifying or recompiling core library files.
+ * and typography in a single place, without modifying or recompiling core
+ * library files. Brand is polarity-free by default: one :root declaration
+ * serves light and dark alike.
  *
  * HOW TO USE:
  * 1. Copy this file into your project (e.g., as `assets/css/brand.css`).
@@ -34,8 +35,7 @@
 /* -------------------------------------------------------------------------- */
 /* Light Mode Brand Values                                                    */
 /* -------------------------------------------------------------------------- */
-:root,
-[data-mode="light"] {
+:root {
 	/* Primary brand color (bare HSL triplet: hue saturation% lightness%) */
 	--brand-primary:   221 83% 48%;
 
@@ -52,18 +52,22 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* Dark Mode Brand Values                                                     */
+/* Dark Mode Brand Values — OPT-IN, commented out by default                  */
 /* -------------------------------------------------------------------------- */
-[data-mode="dark"] {
-	/* Primary brand color for dark surfaces (defaults to matching light mode per R8; */
-	/* adjust if your brand requires custom dark mode contrast or hue tuning) */
-	--brand-primary:   221 83% 48%;
-
-	/* Secondary brand accent color for dark surfaces (defaults to matching light mode; */
-	/* adjust if your brand requires custom dark mode contrast or hue tuning) */
-	--brand-secondary: 160 84% 36%;
-
-	/* Optional manual dark accent tint overrides */
-	/* --brand-primary-tint:        hsl(232 50% 15%); */
-	/* --brand-primary-tint-strong: hsl(232 60% 22%); */
-}
+/*
+ * Uncomment ONLY if your brand genuinely needs a different primary on dark
+ * surfaces. Be aware of the cost: a per-polarity brand override re-declares
+ * the token on EVERY nested [data-mode="dark"] island, and a declaration beats
+ * inheritance at any specificity. So a dark island nested inside a scoped
+ * [data-theme] region will clobber that region's brand and snap back to the
+ * value below. Declaring brand at :root only — the default above — lets
+ * [data-theme] islands rebind it cleanly.
+ *
+ * [data-mode="dark"] {
+ *     --brand-primary:   221 83% 48%;
+ *     --brand-secondary: 160 84% 36%;
+ *
+ *     --brand-primary-tint:        hsl(232 50% 15%);
+ *     --brand-primary-tint-strong: hsl(232 60% 22%);
+ * }
+ */
