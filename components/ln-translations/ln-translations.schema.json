@@ -35,16 +35,29 @@
 			]
 		},
 		"data-ln-translations": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"ln-translations-dev.scss",
 				"src/ln-translations.js"
 			]
 		},
 		"data-ln-translations-active": {
-			"direction": null,
+			"direction": "author",
 			"sources": [
-				"ln-translations-dev.scss"
+				"ln-translations-dev.scss",
+				"src/ln-translations.js"
+			]
+		},
+		"data-ln-translations-add": {
+			"direction": "author",
+			"sources": [
+				"src/ln-translations.js"
+			]
+		},
+		"data-ln-translations-default": {
+			"direction": "author",
+			"sources": [
+				"src/ln-translations.js"
 			]
 		},
 		"data-ln-translations-lang": {
@@ -54,12 +67,24 @@
 			]
 		},
 		"data-ln-translations-locales": {
-			"direction": null,
+			"direction": "author",
+			"sources": [
+				"src/ln-translations.js"
+			]
+		},
+		"data-ln-translations-placeholder": {
+			"direction": "author",
 			"sources": [
 				"src/ln-translations.js"
 			]
 		},
 		"data-ln-translations-prefix": {
+			"direction": "author",
+			"sources": [
+				"src/ln-translations.js"
+			]
+		},
+		"data-ln-translations-remove-label": {
 			"direction": "author",
 			"sources": [
 				"src/ln-translations.js"

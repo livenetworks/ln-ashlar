@@ -166,10 +166,10 @@ function Q(t, e, a, n, d = {}) {
           for (let h = 0; h < u.removedNodes.length; h++) {
             const p = u.removedNodes[h];
             if (p.nodeType === 1) {
-              const I = t.indexOf("[") !== -1 || t.indexOf(".") !== -1 || t.indexOf("#") !== -1 ? t : "[" + t + "]", x = Array.from(p.querySelectorAll(I));
-              p.matches && p.matches(I) && x.push(p);
-              for (let v = 0; v < x.length; v++) {
-                const O = x[v];
+              const I = t.indexOf("[") !== -1 || t.indexOf(".") !== -1 || t.indexOf("#") !== -1 ? t : "[" + t + "]", v = Array.from(p.querySelectorAll(I));
+              p.matches && p.matches(I) && v.push(p);
+              for (let x = 0; x < v.length; x++) {
+                const O = v[x];
                 if (!document.contains(O)) {
                   const A = O[e];
                   A && typeof A.destroy == "function" && A.destroy();
@@ -578,9 +578,12 @@ const q = /* @__PURE__ */ new Set([
   "data-ln-translations",
   "data-ln-translations-active",
   "data-ln-translations-add",
+  "data-ln-translations-default",
   "data-ln-translations-lang",
   "data-ln-translations-locales",
+  "data-ln-translations-placeholder",
   "data-ln-translations-prefix",
+  "data-ln-translations-remove-label",
   "data-ln-ui-coordinator",
   "data-ln-ui-coordinator-dict",
   "data-ln-upload",

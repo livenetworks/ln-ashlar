@@ -1,19 +1,19 @@
 function ue(t) {
   let n = !1;
-  for (let u = 0; u < t.length; u++) {
-    const p = t[u];
-    if (!(p === "" || p == null) && (n = !0, !Number.isFinite(Number(p))))
+  for (let d = 0; d < t.length; d++) {
+    const h = t[d];
+    if (!(h === "" || h == null) && (n = !0, !Number.isFinite(Number(h))))
       return "string";
   }
   return n ? "number" : "string";
 }
-function he(t, n, u, p) {
-  if (u === "number") {
+function he(t, n, d, h) {
+  if (d === "number") {
     const c = parseFloat(t), i = parseFloat(n);
     return (isNaN(c) ? 0 : c) - (isNaN(i) ? 0 : i);
   }
-  const l = t != null ? String(t) : "", d = n != null ? String(n) : "";
-  return p ? p.compare(l, d) : l < d ? -1 : l > d ? 1 : 0;
+  const l = t != null ? String(t) : "", u = n != null ? String(n) : "";
+  return h ? h.compare(l, u) : l < u ? -1 : l > u ? 1 : 0;
 }
 if (typeof window < "u") {
   const t = console.warn;
@@ -24,44 +24,44 @@ if (typeof window < "u") {
 const Jt = {};
 function Ht(t, n) {
   Jt[t] || (Jt[t] = document.querySelector('[data-ln-template="' + t + '"]'));
-  const u = Jt[t];
-  return u ? u.content.cloneNode(!0) : (console.warn("[" + (n || "ln-core") + '] Template "' + t + '" not found'), null);
+  const d = Jt[t];
+  return d ? d.content.cloneNode(!0) : (console.warn("[" + (n || "ln-core") + '] Template "' + t + '" not found'), null);
 }
-function S(t, n, u) {
+function S(t, n, d) {
   t.dispatchEvent(new CustomEvent(n, {
     bubbles: !0,
-    detail: u || {}
+    detail: d || {}
   }));
 }
-function W(t, n, u) {
-  const p = new CustomEvent(n, {
+function W(t, n, d) {
+  const h = new CustomEvent(n, {
     bubbles: !0,
     cancelable: !0,
-    detail: u || {}
+    detail: d || {}
   });
-  return t.dispatchEvent(p), p;
+  return t.dispatchEvent(h), h;
 }
-function Pe(t, n, u) {
+function Pe(t, n, d) {
   t._applyFilterAndSort(), t._vStart = -1, t._vEnd = -1, t._render(), t._updateFooter();
-  const p = {
+  const h = {
     sort: t.currentSort,
     filters: t.currentFilters,
     search: t.currentSearch
   };
-  p[u] = t.name, S(t.dom, n, p);
+  h[d] = t.name, S(t.dom, n, h);
 }
 function ot(t, n) {
   if (!t || !n) return t;
-  const u = t.querySelectorAll("[data-ln-field]");
-  for (let c = 0; c < u.length; c++) {
-    const i = u[c], f = i.getAttribute("data-ln-field");
-    n[f] != null && (i.textContent = n[f]);
+  const d = t.querySelectorAll("[data-ln-field]");
+  for (let c = 0; c < d.length; c++) {
+    const i = d[c], p = i.getAttribute("data-ln-field");
+    n[p] != null && (i.textContent = n[p]);
   }
-  const p = t.querySelectorAll("[data-ln-attr]");
-  for (let c = 0; c < p.length; c++) {
-    const i = p[c], f = i.getAttribute("data-ln-attr").split(",");
-    for (let h = 0; h < f.length; h++) {
-      const b = f[h].trim().split(":");
+  const h = t.querySelectorAll("[data-ln-attr]");
+  for (let c = 0; c < h.length; c++) {
+    const i = h[c], p = i.getAttribute("data-ln-attr").split(",");
+    for (let f = 0; f < p.length; f++) {
+      const b = p[f].trim().split(":");
       if (b.length !== 2) continue;
       const g = b[0].trim(), _ = b[1].trim();
       n[_] != null && i.setAttribute(g, n[_]);
@@ -69,14 +69,14 @@ function ot(t, n) {
   }
   const l = t.querySelectorAll("[data-ln-show]");
   for (let c = 0; c < l.length; c++) {
-    const i = l[c], f = i.getAttribute("data-ln-show");
-    f in n && i.classList.toggle("hidden", !n[f]);
+    const i = l[c], p = i.getAttribute("data-ln-show");
+    p in n && i.classList.toggle("hidden", !n[p]);
   }
-  const d = t.querySelectorAll("[data-ln-class]");
-  for (let c = 0; c < d.length; c++) {
-    const i = d[c], f = i.getAttribute("data-ln-class").split(",");
-    for (let h = 0; h < f.length; h++) {
-      const b = f[h].trim().split(":");
+  const u = t.querySelectorAll("[data-ln-class]");
+  for (let c = 0; c < u.length; c++) {
+    const i = u[c], p = i.getAttribute("data-ln-class").split(",");
+    for (let f = 0; f < p.length; f++) {
+      const b = p[f].trim().split(":");
       if (b.length !== 2) continue;
       const g = b[0].trim(), _ = b[1].trim();
       _ in n && i.classList.toggle(g, !!n[_]);
@@ -84,11 +84,11 @@ function ot(t, n) {
   }
   return t;
 }
-function Rn(t, n) {
+function In(t, n) {
   t.matches && t.matches("[data-ln-form], [data-ln-fillable]") && t.dispatchEvent(new CustomEvent("ln-fill", { detail: n ?? null, bubbles: !0 }));
-  const u = t.querySelectorAll("[data-ln-form], [data-ln-fillable]");
-  for (let p = 0; p < u.length; p++)
-    u[p].dispatchEvent(new CustomEvent("ln-fill", { detail: n ?? null, bubbles: !0 }));
+  const d = t.querySelectorAll("[data-ln-form], [data-ln-fillable]");
+  for (let h = 0; h < d.length; h++)
+    d[h].dispatchEvent(new CustomEvent("ln-fill", { detail: n ?? null, bubbles: !0 }));
   return t;
 }
 typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore._fillBound || (window.lnCore._fillBound = !0, document.addEventListener("ln-fill", function(t) {
@@ -97,51 +97,51 @@ typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore._fill
       ot(t.target, t.detail);
     else {
       const n = t.target.querySelectorAll("[data-ln-field]");
-      for (let u = 0; u < n.length; u++)
-        n[u].textContent = "";
+      for (let d = 0; d < n.length; d++)
+        n[d].textContent = "";
     }
 })));
 function Dt(t, n) {
   if (!t || !n) return t;
-  const u = document.createTreeWalker(t, NodeFilter.SHOW_TEXT);
-  for (; u.nextNode(); ) {
-    const d = u.currentNode;
-    d.textContent.indexOf("{{") !== -1 && (d.textContent = d.textContent.replace(
+  const d = document.createTreeWalker(t, NodeFilter.SHOW_TEXT);
+  for (; d.nextNode(); ) {
+    const u = d.currentNode;
+    u.textContent.indexOf("{{") !== -1 && (u.textContent = u.textContent.replace(
       /\{\{\s*(\w+)\s*\}\}/g,
       function(c, i) {
         return n[i] !== void 0 ? n[i] : "";
       }
     ));
   }
-  const p = function(d, c) {
+  const h = function(u, c) {
     return n[c] !== void 0 ? n[c] : "";
   }, l = Array.from(t.querySelectorAll("*"));
   t.nodeType === 1 && l.push(t);
-  for (let d = 0; d < l.length; d++) {
-    const c = l[d], i = c.attributes;
-    for (let f = 0; f < i.length; f++) {
-      const h = i[f];
-      h.value.indexOf("{{") !== -1 && c.setAttribute(h.name, h.value.replace(/\{\{\s*(\w+)\s*\}\}/g, p));
+  for (let u = 0; u < l.length; u++) {
+    const c = l[u], i = c.attributes;
+    for (let p = 0; p < i.length; p++) {
+      const f = i[p];
+      f.value.indexOf("{{") !== -1 && c.setAttribute(f.name, f.value.replace(/\{\{\s*(\w+)\s*\}\}/g, h));
     }
   }
   return t;
 }
-function On(t, n, u, p, l, d) {
+function Dn(t, n, d, h, l, u) {
   const c = {};
-  for (let f = 0; f < t.children.length; f++) {
-    const h = t.children[f], b = h.getAttribute("data-ln-render-key");
-    b && (c[b] = h);
+  for (let p = 0; p < t.children.length; p++) {
+    const f = t.children[p], b = f.getAttribute("data-ln-render-key");
+    b && (c[b] = f);
   }
   const i = document.createDocumentFragment();
-  for (let f = 0; f < n.length; f++) {
-    const h = n[f], b = String(p(h));
+  for (let p = 0; p < n.length; p++) {
+    const f = n[p], b = String(h(f));
     let g = c[b];
     if (g)
-      l(g, h, f);
+      l(g, f, p);
     else {
-      const _ = Ht(u, d);
-      if (!_ || (Dt(_, h), g = _.firstElementChild, !g)) continue;
-      g.setAttribute("data-ln-render-key", b), l(g, h, f);
+      const _ = Ht(d, u);
+      if (!_ || (Dt(_, f), g = _.firstElementChild, !g)) continue;
+      g.setAttribute("data-ln-render-key", b), l(g, f, p);
     }
     i.appendChild(g);
   }
@@ -156,25 +156,25 @@ function ct(t, n) {
   }
   t();
 }
-function pt(t, n, u) {
+function pt(t, n, d) {
   if (t) {
-    const p = t.querySelector('[data-ln-template="' + n + '"]');
-    if (p) return p.content.cloneNode(!0);
+    const h = t.querySelector('[data-ln-template="' + n + '"]');
+    if (h) return h.content.cloneNode(!0);
   }
-  return Ht(n, u);
+  return Ht(n, d);
 }
 function Vt(t, n) {
-  const u = {}, p = t.querySelectorAll("[" + n + "]");
-  for (let l = 0; l < p.length; l++)
-    u[p[l].getAttribute(n)] = p[l].textContent, p[l].remove();
-  return u;
+  const d = {}, h = t.querySelectorAll("[" + n + "]");
+  for (let l = 0; l < h.length; l++)
+    d[h[l].getAttribute(n)] = h[l].textContent, h[l].remove();
+  return d;
 }
-function Zt(t, n, u, p) {
+function Zt(t, n, d, h) {
   if (t.nodeType !== 1) return;
-  const d = n.indexOf("[") !== -1 || n.indexOf(".") !== -1 || n.indexOf("#") !== -1 ? n : "[" + n + "]", c = Array.from(t.querySelectorAll(d));
-  t.matches && t.matches(d) && c.push(t);
+  const u = n.indexOf("[") !== -1 || n.indexOf(".") !== -1 || n.indexOf("#") !== -1 ? n : "[" + n + "]", c = Array.from(t.querySelectorAll(u));
+  t.matches && t.matches(u) && c.push(t);
   for (const i of c)
-    i[u] || (i[u] = new p(i));
+    i[d] || (i[d] = new h(i));
 }
 function kt(t) {
   return !!(t.offsetWidth || t.offsetHeight || t.getClientRects().length);
@@ -182,7 +182,7 @@ function kt(t) {
 function Be(t) {
   return !!(!t || t.ctrlKey || t.metaKey || t.shiftKey || t.altKey || typeof t.button == "number" && t.button !== 0);
 }
-function Mn(t) {
+function Rn(t) {
   if (!t) return !1;
   if (typeof t.closest == "function")
     return !!t.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])');
@@ -192,80 +192,80 @@ function Mn(t) {
 function He(t) {
   return !!(!t || t.disabled || typeof t.getAttribute == "function" && t.getAttribute("aria-disabled") === "true" || typeof t.closest == "function" && t.closest("[inert]"));
 }
-function Fn(t, n) {
+function On(t, n) {
   return !t || !document.contains(t) || He(t) || n && typeof t[n] != "function" ? !1 : kt(t);
 }
-function Nn(t) {
+function Mn(t) {
   const n = t.querySelector('input[name="_method"]');
   return ((n && n.value !== "" ? n.value : t.method) || "").toUpperCase();
 }
 function Ue(t, n) {
-  const u = !!(n && n.typed), p = n && n.exclude, l = {}, d = t.elements, c = {};
-  if (u)
-    for (let i = 0; i < d.length; i++) {
-      const f = d[i];
-      f.name && f.type === "checkbox" && !f.disabled && (c[f.name] = (c[f.name] || 0) + 1);
+  const d = !!(n && n.typed), h = n && n.exclude, l = {}, u = t.elements, c = {};
+  if (d)
+    for (let i = 0; i < u.length; i++) {
+      const p = u[i];
+      p.name && p.type === "checkbox" && !p.disabled && (c[p.name] = (c[p.name] || 0) + 1);
     }
-  for (let i = 0; i < d.length; i++) {
-    const f = d[i];
-    if (!(!f.name || f.disabled || f.type === "file" || f.type === "submit" || f.type === "button") && !(p && f.matches && f.matches(p)))
-      if (f.type === "checkbox")
-        u && c[f.name] === 1 ? l[f.name] = f.checked : (l[f.name] || (l[f.name] = []), f.checked && l[f.name].push(f.value));
-      else if (f.type === "radio")
-        f.checked && (l[f.name] = f.value);
-      else if (f.type === "select-multiple") {
-        l[f.name] = [];
-        for (let h = 0; h < f.options.length; h++)
-          f.options[h].selected && l[f.name].push(f.options[h].value);
-      } else if (u && f.type === "hidden")
-        l[f.name] = f.value;
-      else if (u && (f.type === "number" || f.type === "range")) {
-        const h = Number(f.value);
-        l[f.name] = f.value === "" || isNaN(h) ? null : h;
+  for (let i = 0; i < u.length; i++) {
+    const p = u[i];
+    if (!(!p.name || p.disabled || p.type === "file" || p.type === "submit" || p.type === "button") && !(h && p.matches && p.matches(h)))
+      if (p.type === "checkbox")
+        d && c[p.name] === 1 ? l[p.name] = p.checked : (l[p.name] || (l[p.name] = []), p.checked && l[p.name].push(p.value));
+      else if (p.type === "radio")
+        p.checked && (l[p.name] = p.value);
+      else if (p.type === "select-multiple") {
+        l[p.name] = [];
+        for (let f = 0; f < p.options.length; f++)
+          p.options[f].selected && l[p.name].push(p.options[f].value);
+      } else if (d && p.type === "hidden")
+        l[p.name] = p.value;
+      else if (d && (p.type === "number" || p.type === "range")) {
+        const f = Number(p.value);
+        l[p.name] = p.value === "" || isNaN(f) ? null : f;
       } else
-        l[f.name] = f.value;
+        l[p.name] = p.value;
   }
   return l;
 }
-function Pn(t) {
+function Fn(t) {
   if (typeof t != "string") return !!t;
   const n = t.trim().toLowerCase();
   return n !== "false" && n !== "0" && n !== "" && n !== "off" && n !== "no";
 }
 function ze(t, n) {
-  const u = t.elements, p = [], l = {};
-  for (let d = 0; d < u.length; d++) {
-    const c = u[d];
+  const d = t.elements, h = [], l = {};
+  for (let u = 0; u < d.length; u++) {
+    const c = d[u];
     c.name && c.type === "checkbox" && (l[c.name] = (l[c.name] || 0) + 1);
   }
-  for (let d = 0; d < u.length; d++) {
-    const c = u[d];
+  for (let u = 0; u < d.length; u++) {
+    const c = d[u];
     if (c.type === "file" || c.type === "submit" || c.type === "button") continue;
     const i = c.getAttribute("data-ln-fill-as") || c.name;
     if (!i || !(i in n)) continue;
-    const f = n[i];
+    const p = n[i];
     if (c.type === "checkbox") {
-      if (Array.isArray(f))
-        c.checked = f.indexOf(c.value) !== -1;
+      if (Array.isArray(p))
+        c.checked = p.indexOf(c.value) !== -1;
       else if (l[c.name] > 1) {
-        const h = String(f).split(",").map(function(b) {
+        const f = String(p).split(",").map(function(b) {
           return b.trim();
         });
-        c.checked = h.indexOf(c.value) !== -1;
+        c.checked = f.indexOf(c.value) !== -1;
       } else
-        c.checked = Pn(f);
-      p.push(c);
+        c.checked = Fn(p);
+      h.push(c);
     } else if (c.type === "radio")
-      c.checked = c.value === String(f), p.push(c);
+      c.checked = c.value === String(p), h.push(c);
     else if (c.type === "select-multiple") {
-      if (Array.isArray(f))
-        for (let h = 0; h < c.options.length; h++)
-          c.options[h].selected = f.indexOf(c.options[h].value) !== -1;
-      p.push(c);
+      if (Array.isArray(p))
+        for (let f = 0; f < c.options.length; f++)
+          c.options[f].selected = p.indexOf(c.options[f].value) !== -1;
+      h.push(c);
     } else
-      c.value = f, p.push(c);
+      c.value = p, h.push(c);
   }
-  return p;
+  return h;
 }
 const Ae = {
   mk: "mk-MK",
@@ -284,10 +284,10 @@ const Ae = {
   en: "en-US"
 };
 function V(t) {
-  const n = t ? t.closest("[lang]") : null, u = (n ? n.getAttribute("lang") || n.lang : null) || (document.documentElement ? document.documentElement.getAttribute("lang") || document.documentElement.lang : null) || navigator.language;
-  if (!u) return "en-US";
-  const p = u.trim().toLowerCase();
-  return p.indexOf("-") === -1 && Ae[p] ? Ae[p] : u;
+  const n = t ? t.closest("[lang]") : null, d = (n ? n.getAttribute("lang") || n.lang : null) || (document.documentElement ? document.documentElement.getAttribute("lang") || document.documentElement.lang : null) || navigator.language;
+  if (!d) return "en-US";
+  const h = d.trim().toLowerCase();
+  return h.indexOf("-") === -1 && Ae[h] ? Ae[h] : d;
 }
 function Wt() {
   typeof window > "u" || (window.lnCore = window.lnCore || {}, !window.lnCore._localeObserverBound && (window.lnCore._localeObserverBound = !0, ct(function() {
@@ -306,19 +306,19 @@ function Wt() {
 function At(t) {
   return t.hasAttribute("data-ln-value") ? t.getAttribute("data-ln-value") : t.textContent.trim();
 }
-function Ke(t, n, { get: u, set: p }) {
+function Ke(t, n, { get: d, set: h }) {
   Object.defineProperty(t, "value", {
     get: function() {
-      return u ? u.call(this) : n.get.call(this);
+      return d ? d.call(this) : n.get.call(this);
     },
     set: function(l) {
-      p ? p.call(this, l, (d) => n.set.call(this, d)) : n.set.call(this, l);
+      h ? h.call(this, l, (u) => n.set.call(this, u)) : n.set.call(this, l);
     },
     configurable: !0
   });
 }
 typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore._bootHolds = window.lnCore._bootHolds || 0, window.lnCore._bootQueue = window.lnCore._bootQueue || []);
-function Bn() {
+function Nn() {
   typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore._bootHolds = (window.lnCore._bootHolds || 0) + 1);
 }
 function te() {
@@ -335,11 +335,11 @@ function je() {
 function it(t) {
   typeof window < "u" ? (window.lnCore = window.lnCore || {}, window.lnCore._bootHolds = window.lnCore._bootHolds || 0, window.lnCore._bootQueue = window.lnCore._bootQueue || [], window.lnCore._bootHolds > 0 ? window.lnCore._bootQueue.push(t) : setTimeout(t, 0)) : t();
 }
-function M(t, n, u, p, l = {}) {
-  const d = l.extraAttributes || [], c = l.onAttributeChange || null, i = l.onSubtreeChange || null, f = l.onInit || null;
-  function h(g) {
+function M(t, n, d, h, l = {}) {
+  const u = l.extraAttributes || [], c = l.onAttributeChange || null, i = l.onSubtreeChange || null, p = l.onInit || null;
+  function f(g) {
     const _ = g || document.body;
-    Zt(_, t, n, u), f && f(_);
+    Zt(_, t, n, d), p && p(_);
   }
   ct(function() {
     const g = new MutationObserver(function(m) {
@@ -352,7 +352,7 @@ function M(t, n, u, p, l = {}) {
           }
           for (let e = 0; e < s.addedNodes.length; e++) {
             const o = s.addedNodes[e];
-            o.nodeType === 1 && (Zt(o, t, n, u), f && f(o));
+            o.nodeType === 1 && (Zt(o, t, n, d), p && p(o));
           }
           for (let e = 0; e < s.removedNodes.length; e++) {
             const o = s.removedNodes[e];
@@ -368,7 +368,7 @@ function M(t, n, u, p, l = {}) {
               }
             }
           }
-        } else s.type === "attributes" && (c && s.target[n] ? c(s.target, s.attributeName) : (Zt(s.target, t, n, u), f && f(s.target)));
+        } else s.type === "attributes" && (c && s.target[n] ? c(s.target, s.attributeName) : (Zt(s.target, t, n, d), p && p(s.target)));
       }
     });
     let _ = [];
@@ -383,23 +383,23 @@ function M(t, n, u, p, l = {}) {
       childList: !0,
       subtree: !0,
       attributes: !0,
-      attributeFilter: _.concat(d)
+      attributeFilter: _.concat(u)
     });
-  }, p || (t.indexOf("[") === -1 ? t.replace("data-", "") : "component")), window[n] = h;
+  }, h || (t.indexOf("[") === -1 ? t.replace("data-", "") : "component")), window[n] = f;
   function b() {
     je() > 0 ? it(function() {
-      h(document.body);
-    }) : h(document.body);
+      f(document.body);
+    }) : f(document.body);
   }
-  return document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", b) : b(), h;
+  return document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", b) : b(), f;
 }
 function Ve(t, n) {
   if (t.ctrlKey || t.metaKey || t.shiftKey || t.altKey || t.button !== 0 || !n) return !1;
-  const u = n.getAttribute("href");
-  return !(!u || n.getAttribute("target") === "_blank" || n.hasAttribute("download") || u.startsWith("mailto:") || u.startsWith("tel:") || u === "#" || u.startsWith("#") || n.hostname && n.hostname !== window.location.hostname);
+  const d = n.getAttribute("href");
+  return !(!d || n.getAttribute("target") === "_blank" || n.hasAttribute("download") || d.startsWith("mailto:") || d.startsWith("tel:") || d === "#" || d.startsWith("#") || n.hostname && n.hostname !== window.location.hostname);
 }
 function dt(...t) {
-  return t.filter((n) => n != null && n !== "").map((n, u) => u === 0 ? n.replace(/\/+$/, "") : n.replace(/^\/+/, "").replace(/\/+$/, "")).filter(Boolean).join("/");
+  return t.filter((n) => n != null && n !== "").map((n, d) => d === 0 ? n.replace(/\/+$/, "") : n.replace(/^\/+/, "").replace(/\/+$/, "")).filter(Boolean).join("/");
 }
 function Lt(t, n) {
   return Object.assign({
@@ -410,22 +410,22 @@ function Lt(t, n) {
 function We(t, n = "ln-core") {
   try {
     return t ? JSON.parse(t) : {};
-  } catch (u) {
-    return console.error(`[${n}] Invalid headers JSON:`, u), {};
+  } catch (d) {
+    return console.error(`[${n}] Invalid headers JSON:`, d), {};
   }
 }
 const Ge = {};
-function Hn(t, n) {
+function Pn(t, n) {
   Ge[t] = n;
 }
-function Un(t) {
+function Bn(t) {
   return Ge[t] || { ingress: (n) => n, egress: (n) => n };
 }
 const $e = {};
 function fe(t, n) {
   if (!t || typeof n != "object") return;
-  const u = t.toLowerCase().split("-")[0];
-  $e[u] = n;
+  const d = t.toLowerCase().split("-")[0];
+  $e[d] = n;
 }
 function _t(t) {
   if (!t) return null;
@@ -480,24 +480,24 @@ fe("mk", {
     "саб"
   ]
 });
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerDataMapper = Hn, window.lnCore.getDataMapper = Un, window.lnCore.registerLocaleFallback = fe, window.lnCore.getLocaleFallback = _t, window.lnCore.fillTemplate = Dt, window.lnCore.fill = ot, window.lnCore.lnFill = Rn, window.lnCore.renderList = On, window.lnCore.ensureLocaleObserver = Wt);
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerDataMapper = Pn, window.lnCore.getDataMapper = Bn, window.lnCore.registerLocaleFallback = fe, window.lnCore.getLocaleFallback = _t, window.lnCore.fillTemplate = Dt, window.lnCore.fill = ot, window.lnCore.lnFill = In, window.lnCore.renderList = Dn, window.lnCore.ensureLocaleObserver = Wt);
 function pe(t, n) {
-  let u = !1;
+  let d = !1;
   return function() {
-    u || (u = !0, queueMicrotask(function() {
-      u = !1, t();
+    d || (d = !0, queueMicrotask(function() {
+      d = !1, t();
     }));
   };
 }
 function Qe(t) {
   t = t || {};
-  let n = t.windowSize > 0 ? t.windowSize : 1e3, u = t.pageSize > 0 ? t.pageSize : 200, p = t.threshold != null ? t.threshold : 25, l = t.fetchDebounce != null ? t.fetchDebounce : 120;
-  const d = typeof t.requestPage == "function" ? t.requestPage : function() {
+  let n = t.windowSize > 0 ? t.windowSize : 1e3, d = t.pageSize > 0 ? t.pageSize : 200, h = t.threshold != null ? t.threshold : 25, l = t.fetchDebounce != null ? t.fetchDebounce : 120;
+  const u = typeof t.requestPage == "function" ? t.requestPage : function() {
   }, c = typeof t.onChange == "function" ? t.onChange : function() {
-  }, i = /* @__PURE__ */ new Map(), f = /* @__PURE__ */ new Map(), h = /* @__PURE__ */ new Set();
+  }, i = /* @__PURE__ */ new Map(), p = /* @__PURE__ */ new Map(), f = /* @__PURE__ */ new Set();
   let b = 0, g = 0, _ = 0, m = { sort: null, filters: {}, search: "" }, r = null, s = 0, e = 0, o = !1;
   function a(A) {
-    f.set(A, ++s);
+    p.set(A, ++s);
   }
   function y() {
     return !!(m && (m.search || m.filters && Object.keys(m.filters).length));
@@ -505,14 +505,14 @@ function Qe(t) {
   function v() {
     if (i.size <= n) return;
     const A = Array.from(i.keys()).sort(function(L, q) {
-      return (f.get(L) || 0) - (f.get(q) || 0);
+      return (p.get(L) || 0) - (p.get(q) || 0);
     });
     let C = 0;
     for (; i.size > n && C < A.length; )
-      i.delete(A[C]), f.delete(A[C]), C++;
+      i.delete(A[C]), p.delete(A[C]), C++;
   }
   function w(A, C) {
-    h.add(A), d(m, A, C);
+    f.add(A), u(m, A, C);
   }
   return {
     get: function(A) {
@@ -544,10 +544,10 @@ function Qe(t) {
       for (let N = A; N < C; N++)
         i.has(N) && a(N);
       if (b <= 0) return;
-      const L = Math.max(0, A - p), q = Math.min(b, C + p), x = Math.floor(L / u), D = Math.floor(Math.max(0, q - 1) / u);
+      const L = Math.max(0, A - h), q = Math.min(b, C + h), x = Math.floor(L / d), D = Math.floor(Math.max(0, q - 1) / d);
       let F = -1;
       for (let N = x; N <= D; N++) {
-        const B = N * u, $ = Math.min(u, b - B);
+        const B = N * d, $ = Math.min(d, b - B);
         let H = !1;
         const U = Math.max(B, L), z = Math.min(B + $, q);
         for (let st = U; st < z; st++)
@@ -555,13 +555,13 @@ function Qe(t) {
             H = !0;
             break;
           }
-        if (H && !h.has(B)) {
+        if (H && !f.has(B)) {
           F = B;
           break;
         }
       }
       F !== -1 && (r = setTimeout(function() {
-        w(F, u);
+        w(F, d);
       }, l));
     },
     // Splice a fetched page. Stale (superseded-query) responses are dropped.
@@ -575,37 +575,37 @@ function Qe(t) {
       for (let x = 0; x < L.length; x++)
         L[x] != null && q++;
       if (q === 0 && (A.provisional || A.filtered > 0))
-        return h.delete(C), !1;
-      o && (i.clear(), f.clear(), o = !1), A.provisional || (g = A.total != null ? A.total : g, b = A.filtered != null ? A.filtered : A.data ? A.data.length : b);
+        return f.delete(C), !1;
+      o && (i.clear(), p.clear(), o = !1), A.provisional || (g = A.total != null ? A.total : g, b = A.filtered != null ? A.filtered : A.data ? A.data.length : b);
       for (let x = 0; x < L.length; x++)
         L[x] != null && (i.set(C + x, L[x]), a(C + x));
-      return h.delete(C), v(), c(), !0;
+      return f.delete(C), v(), c(), !0;
     },
     // First load: fetch page 0 at the current generation (no bump).
     requestInitial: function(A) {
-      A && (m = A), w(0, u);
+      A && (m = A), w(0, d);
     },
     // Query change: new generation, stale rows stay visible until the first
     // response of the new generation lands in ingest() — no blanking, no
     // placeholder flash (ln-table--loading is the refresh affordance).
     invalidate: function(A) {
-      _++, h.clear(), clearTimeout(r), A && (m = A), o = !0, w(0, u);
+      _++, f.clear(), clearTimeout(r), A && (m = A), o = !0, w(0, d);
     },
     // Post-mutation refresh of a windowed view: same stale-while-revalidate
     // swap as invalidate(), but re-requests the page at the CURRENT scroll
     // position instead of jumping back to page 0.
     revalidate: function() {
-      _++, h.clear(), clearTimeout(r), o = !0;
-      const A = Math.max(0, Math.floor(e / u) * u);
-      w(A, u);
+      _++, f.clear(), clearTimeout(r), o = !0;
+      const A = Math.max(0, Math.floor(e / d) * d);
+      w(A, d);
     },
     // Failed page fetch: release the offset so the next ensure() (scroll,
     // filter, resize) can re-request it. No onChange(), no auto-retry.
     release: function(A) {
-      h.delete(A);
+      f.delete(A);
     },
     destroy: function() {
-      clearTimeout(r), i.clear(), f.clear(), h.clear();
+      clearTimeout(r), i.clear(), p.clear(), f.clear();
     },
     configure: function(A) {
       A = A || {};
@@ -614,14 +614,14 @@ function Qe(t) {
         const L = A.windowSize < n;
         n = A.windowSize, L && v(), C = !0;
       }
-      A.pageSize != null && A.pageSize > 0 && (u = A.pageSize), A.threshold != null && A.threshold >= 0 && (p = A.threshold), A.fetchDebounce != null && A.fetchDebounce >= 0 && (l = A.fetchDebounce), C && c();
+      A.pageSize != null && A.pageSize > 0 && (d = A.pageSize), A.threshold != null && A.threshold >= 0 && (h = A.threshold), A.fetchDebounce != null && A.fetchDebounce >= 0 && (l = A.fetchDebounce), C && c();
     },
     setGrandTotal: function(A) {
       A == null || isNaN(A) || A < 0 || (g = A, y() || (b = A), c());
     }
   };
 }
-const zn = "ln:";
+const Hn = "ln:";
 let vt = null;
 function Xe() {
   if (vt !== null) return vt;
@@ -635,30 +635,30 @@ function Xe() {
   }
   return vt;
 }
-function Kn() {
+function Un() {
   return location.pathname.replace(/\/+$/, "").toLowerCase() || "/";
 }
 function Ye(t, n) {
-  const u = n.getAttribute("data-ln-persist"), p = u !== null && u !== "" ? u : n.id;
-  return p ? zn + t + ":" + Kn() + ":" + p : (console.warn('[ln-persist] Element requires id or data-ln-persist="key"', n), null);
+  const d = n.getAttribute("data-ln-persist"), h = d !== null && d !== "" ? d : n.id;
+  return h ? Hn + t + ":" + Un() + ":" + h : (console.warn('[ln-persist] Element requires id or data-ln-persist="key"', n), null);
 }
 function Gt(t, n) {
   if (!Xe()) return null;
-  const u = Ye(t, n);
-  if (!u) return null;
+  const d = Ye(t, n);
+  if (!d) return null;
   try {
-    const p = localStorage.getItem(u);
-    return p !== null ? JSON.parse(p) : null;
+    const h = localStorage.getItem(d);
+    return h !== null ? JSON.parse(h) : null;
   } catch {
     return null;
   }
 }
-function bt(t, n, u) {
+function bt(t, n, d) {
   if (!Xe()) return;
-  const p = Ye(t, n);
-  if (p)
+  const h = Ye(t, n);
+  if (h)
     try {
-      u == null ? localStorage.removeItem(p) : localStorage.setItem(p, JSON.stringify(u));
+      d == null ? localStorage.removeItem(h) : localStorage.setItem(h, JSON.stringify(d));
     } catch {
     }
 }
@@ -666,21 +666,21 @@ function Je(t) {
   return (t || "").replace(/^#/, "");
 }
 function $t(t) {
-  const n = t === void 0 ? location.hash : t, u = {}, p = Je(n);
-  if (!p) return u;
-  const l = p.split("&");
-  for (let d = 0; d < l.length; d++) {
-    const c = l[d];
+  const n = t === void 0 ? location.hash : t, d = {}, h = Je(n);
+  if (!h) return d;
+  const l = h.split("&");
+  for (let u = 0; u < l.length; u++) {
+    const c = l[u];
     if (!c) continue;
-    const i = c.indexOf(":"), f = i > -1 ? c.slice(0, i) : c, h = i > -1 ? c.slice(i + 1) : "";
-    if (f)
+    const i = c.indexOf(":"), p = i > -1 ? c.slice(0, i) : c, f = i > -1 ? c.slice(i + 1) : "";
+    if (p)
       try {
-        u[f] = decodeURIComponent(h);
+        d[p] = decodeURIComponent(f);
       } catch {
-        u[f] = h;
+        d[p] = f;
       }
   }
-  return u;
+  return d;
 }
 function X(t) {
   if (!t) return null;
@@ -689,11 +689,11 @@ function X(t) {
 }
 function et(t, n) {
   if (!t) return;
-  const u = $t();
-  n == null ? delete u[t] : u[t] = String(n);
-  const l = Object.keys(u).map(function(d) {
-    const c = u[d];
-    return c === "" ? d : d + ":" + encodeURIComponent(c);
+  const d = $t();
+  n == null ? delete d[t] : d[t] = String(n);
+  const l = Object.keys(d).map(function(u) {
+    const c = d[u];
+    return c === "" ? u : u + ":" + encodeURIComponent(c);
   }).join("&");
   Je(location.hash) !== l && (location.hash = l);
 }
@@ -702,10 +702,10 @@ function me(t) {
 }
 function yt(t, n) {
   if (!t || !t.hasAttribute("data-ln-hash")) return null;
-  const u = t.getAttribute("data-ln-hash");
-  if (u && u.trim() !== "") return u.trim();
-  const p = t.getAttribute("data-ln-sort") || t.getAttribute("data-ln-search-for") || t.getAttribute("data-ln-search") || t.getAttribute("data-ln-filter") || t.id;
-  return p ? n ? p + "-" + n : p : n || null;
+  const d = t.getAttribute("data-ln-hash");
+  if (d && d.trim() !== "") return d.trim();
+  const h = t.getAttribute("data-ln-sort") || t.getAttribute("data-ln-search-for") || t.getAttribute("data-ln-search") || t.getAttribute("data-ln-filter") || t.id;
+  return h ? n ? h + "-" + n : h : n || null;
 }
 function Ze(t, n) {
   return !n || n === "none" || t === null || t === void 0 ? null : String(t) + "." + n;
@@ -720,29 +720,29 @@ function re(t) {
   if (!t || typeof t != "string") return null;
   const n = t.indexOf(":");
   if (n === -1) return null;
-  const u = t.slice(0, n), p = t.slice(n + 1), l = p ? p.split(",").map(function(d) {
+  const d = t.slice(0, n), h = t.slice(n + 1), l = h ? h.split(",").map(function(u) {
     try {
-      return decodeURIComponent(d);
+      return decodeURIComponent(u);
     } catch {
-      return d;
+      return u;
     }
   }).filter(Boolean) : [];
-  return { key: u, values: l };
+  return { key: d, values: l };
 }
 typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.hashParse = $t, window.lnCore.hashGet = X, window.lnCore.hashSet = et, window.lnCore.hashLinkClick = me, window.lnCore.resolveHashNamespace = yt, window.lnCore.hashSortEncode = Ze, window.lnCore.hashSortDecode = ie, window.lnCore.hashFilterEncode = tn, window.lnCore.hashFilterDecode = re);
-function Ut(t, n, u, p) {
-  const l = typeof p == "number" ? p : 4, d = window.innerWidth, c = window.innerHeight, i = n.width, f = n.height, h = (u || "bottom").split("-"), b = h[0], g = h[1] === "start" || h[1] === "end" ? h[1] : "center", _ = {
+function Ut(t, n, d, h) {
+  const l = typeof h == "number" ? h : 4, u = window.innerWidth, c = window.innerHeight, i = n.width, p = n.height, f = (d || "bottom").split("-"), b = f[0], g = f[1] === "start" || f[1] === "end" ? f[1] : "center", _ = {
     top: ["top", "bottom", "right", "left"],
     bottom: ["bottom", "top", "right", "left"],
     left: ["left", "right", "top", "bottom"],
     right: ["right", "left", "top", "bottom"]
   }, m = _[b] || _.bottom;
   function r(y) {
-    return y === "top" || y === "bottom" ? g === "start" ? t.left : g === "end" ? t.right - i : t.left + (t.width - i) / 2 : g === "start" ? t.top : g === "end" ? t.bottom - f : t.top + (t.height - f) / 2;
+    return y === "top" || y === "bottom" ? g === "start" ? t.left : g === "end" ? t.right - i : t.left + (t.width - i) / 2 : g === "start" ? t.top : g === "end" ? t.bottom - p : t.top + (t.height - p) / 2;
   }
   function s(y) {
     let v, w, A = !0;
-    return y === "top" ? (v = t.top - l - f, w = r(y), v < 0 && (A = !1)) : y === "bottom" ? (v = t.bottom + l, w = r(y), v + f > c && (A = !1)) : y === "left" ? (v = r(y), w = t.left - l - i, w < 0 && (A = !1)) : (v = r(y), w = t.right + l, w + i > d && (A = !1)), { top: v, left: w, side: y, fits: A };
+    return y === "top" ? (v = t.top - l - p, w = r(y), v < 0 && (A = !1)) : y === "bottom" ? (v = t.bottom + l, w = r(y), v + p > c && (A = !1)) : y === "left" ? (v = r(y), w = t.left - l - i, w < 0 && (A = !1)) : (v = r(y), w = t.right + l, w + i > u && (A = !1)), { top: v, left: w, side: y, fits: A };
   }
   let e = null;
   for (let y = 0; y < m.length; y++) {
@@ -754,14 +754,14 @@ function Ut(t, n, u, p) {
   }
   e || (e = s(m[0]));
   let o = e.top, a = e.left;
-  return i >= d ? a = 0 : (a < 0 && (a = 0), a + i > d && (a = d - i)), f >= c ? o = 0 : (o < 0 && (o = 0), o + f > c && (o = c - f)), { top: o, left: a, placement: e.side };
+  return i >= u ? a = 0 : (a < 0 && (a = 0), a + i > u && (a = u - i)), p >= c ? o = 0 : (o < 0 && (o = 0), o + p > c && (o = c - p)), { top: o, left: a, placement: e.side };
 }
 function oe(t) {
   if (!t) return { width: 0, height: 0 };
-  const n = t.style, u = n.visibility, p = n.display, l = n.position;
+  const n = t.style, d = n.visibility, h = n.display, l = n.position;
   n.visibility = "hidden", n.display = "block", n.position = "fixed";
-  const d = t.offsetWidth, c = t.offsetHeight;
-  return n.visibility = u, n.display = p, n.position = l, { width: d, height: c };
+  const u = t.offsetWidth, c = t.offsetHeight;
+  return n.visibility = d, n.display = h, n.position = l, { width: u, height: c };
 }
 let ft = null;
 async function Se(t) {
@@ -770,10 +770,10 @@ async function Se(t) {
     return;
   }
   try {
-    const n = new TextEncoder(), u = await crypto.subtle.digest("SHA-256", n.encode(t));
+    const n = new TextEncoder(), d = await crypto.subtle.digest("SHA-256", n.encode(t));
     ft = await crypto.subtle.importKey(
       "raw",
-      u,
+      d,
       { name: "AES-GCM" },
       !1,
       ["encrypt", "decrypt"]
@@ -785,51 +785,51 @@ async function Se(t) {
 function ut() {
   return ft;
 }
-async function jn(t, n = ft) {
-  const u = n || ft;
-  if (!u || t === void 0 || t === null) return t;
+async function zn(t, n = ft) {
+  const d = n || ft;
+  if (!d || t === void 0 || t === null) return t;
   try {
-    const p = new TextEncoder(), l = crypto.getRandomValues(new Uint8Array(12)), d = typeof t == "string" ? t : JSON.stringify(t), c = await crypto.subtle.encrypt(
+    const h = new TextEncoder(), l = crypto.getRandomValues(new Uint8Array(12)), u = typeof t == "string" ? t : JSON.stringify(t), c = await crypto.subtle.encrypt(
       { name: "AES-GCM", iv: l },
-      u,
-      p.encode(d)
-    ), i = btoa(String.fromCharCode(...l)), f = btoa(String.fromCharCode(...new Uint8Array(c)));
+      d,
+      h.encode(u)
+    ), i = btoa(String.fromCharCode(...l)), p = btoa(String.fromCharCode(...new Uint8Array(c)));
     return {
       encrypted: !0,
       iv: i,
-      data: f
+      data: p
     };
-  } catch (p) {
-    return console.error("[ln-core/crypto] Encryption failed:", p), t;
+  } catch (h) {
+    return console.error("[ln-core/crypto] Encryption failed:", h), t;
   }
 }
-async function Vn(t, n = ft) {
-  const u = n || ft;
-  if (!t || !t.encrypted || !u) return t;
+async function Kn(t, n = ft) {
+  const d = n || ft;
+  if (!t || !t.encrypted || !d) return t;
   try {
-    const p = new TextDecoder(), l = Uint8Array.from(atob(t.iv), (f) => f.charCodeAt(0)), d = Uint8Array.from(atob(t.data), (f) => f.charCodeAt(0)), c = await crypto.subtle.decrypt(
+    const h = new TextDecoder(), l = Uint8Array.from(atob(t.iv), (p) => p.charCodeAt(0)), u = Uint8Array.from(atob(t.data), (p) => p.charCodeAt(0)), c = await crypto.subtle.decrypt(
       { name: "AES-GCM", iv: l },
-      u,
-      d
-    ), i = p.decode(c);
+      d,
+      u
+    ), i = h.decode(c);
     try {
       return JSON.parse(i);
     } catch {
       return i;
     }
-  } catch (p) {
-    return console.error("[ln-core/crypto] Decryption failed. Key may be incorrect:", p), { ...t, decryptionError: !0 };
+  } catch (h) {
+    return console.error("[ln-core/crypto] Decryption failed. Key may be incorrect:", h), { ...t, decryptionError: !0 };
   }
 }
-function en(t, n = 100, u = 0) {
-  const p = parseFloat(String(t)) || 0, l = parseFloat(String(n)) || 100, d = parseFloat(String(u)) || 0, c = Math.max(d, Math.min(p, l)), i = l - d;
-  let f = 0;
-  return i > 0 && (f = (c - d) / i * 100), f = Math.max(0, Math.min(100, f)), {
-    value: p,
-    min: d,
+function en(t, n = 100, d = 0) {
+  const h = parseFloat(String(t)) || 0, l = parseFloat(String(n)) || 100, u = parseFloat(String(d)) || 0, c = Math.max(u, Math.min(h, l)), i = l - u;
+  let p = 0;
+  return i > 0 && (p = (c - u) / i * 100), p = Math.max(0, Math.min(100, p)), {
+    value: h,
+    min: u,
     max: l,
     clampedValue: c,
-    percentage: f
+    percentage: p
   };
 }
 function Y(t) {
@@ -838,103 +838,95 @@ function Y(t) {
     return isNaN(t.getTime()) ? null : t;
   const n = Number(t);
   if (!isNaN(n) && n > 0) {
-    const u = n < 1e11 ? n * 1e3 : n, p = new Date(u);
-    return isNaN(p.getTime()) ? null : p;
+    const d = n < 1e11 ? n * 1e3 : n, h = new Date(d);
+    return isNaN(h.getTime()) ? null : h;
   }
   if (typeof t == "string") {
-    const u = t.trim();
-    if (!u) return null;
-    const p = new Date(u);
-    return isNaN(p.getTime()) ? null : p;
+    const d = t.trim();
+    if (!d) return null;
+    const h = new Date(d);
+    return isNaN(h.getTime()) ? null : h;
   }
   return null;
 }
 function Tt(t) {
   if (!t || !(t instanceof Date) || isNaN(t.getTime())) return "";
-  const n = t.getFullYear(), u = String(t.getMonth() + 1).padStart(2, "0"), p = String(t.getDate()).padStart(2, "0");
-  return n + "-" + u + "-" + p;
+  const n = t.getFullYear(), d = String(t.getMonth() + 1).padStart(2, "0"), h = String(t.getDate()).padStart(2, "0");
+  return n + "-" + d + "-" + h;
 }
 const at = {};
 function zt(t) {
   const n = t || "default";
   if (!at[n]) {
-    const u = new Intl.NumberFormat(t, { useGrouping: !0 }), p = u.formatToParts(1234.5);
-    let l = "", d = ".";
-    for (let c = 0; c < p.length; c++)
-      p[c].type === "group" && (l = p[c].value), p[c].type === "decimal" && (d = p[c].value);
-    at[n] = { groupSep: l, decimalSep: d, fmt: u };
+    const d = new Intl.NumberFormat(t, { useGrouping: !0 }), h = d.formatToParts(1234.5);
+    let l = "", u = ".";
+    for (let c = 0; c < h.length; c++)
+      h[c].type === "group" && (l = h[c].value), h[c].type === "decimal" && (u = h[c].value);
+    at[n] = { groupSep: l, decimalSep: u, fmt: d };
   }
   return at[n];
 }
-function nn(t, n, u) {
+function nn(t, n, d) {
   if (t == null || typeof t != "string") return "";
-  let p = t.trim();
-  return p === "" ? "" : (p = p.replace(/[$€£¥]/g, ""), n && (p = p.split(n).join("")), p = p.replace(/\s/g, ""), u && u !== "." && (p = p.replace(u, ".")), p = p.replace(/[^\d.-]/g, ""), p);
+  let h = t.trim();
+  return h === "" ? "" : (h = h.replace(/[$€£¥]/g, ""), n && (h = h.split(n).join("")), h = h.replace(/\s/g, ""), d && d !== "." && (h = h.replace(d, ".")), h = h.replace(/[^\d.-]/g, ""), h);
 }
 function Rt(t, n) {
   if (typeof t == "number") return isNaN(t) ? NaN : t;
   if (t == null || typeof t != "string") return NaN;
-  const u = t.trim();
-  if (u === "" || u === "-") return NaN;
-  const p = zt(n), l = nn(u, p.groupSep, p.decimalSep);
+  const d = t.trim();
+  if (d === "" || d === "-") return NaN;
+  const h = zt(n), l = nn(d, h.groupSep, h.decimalSep);
   if (l === "" || l === "-") return NaN;
-  const d = parseFloat(l);
-  return isNaN(d) ? NaN : d;
+  const u = parseFloat(l);
+  return isNaN(u) ? NaN : u;
 }
-function tt(t, n, u = {}) {
+function tt(t, n, d = {}) {
   if (typeof t != "number" || isNaN(t) || !Number.isFinite(t)) return "";
-  const p = n || "default", l = u.maxDecimals != null ? parseInt(u.maxDecimals, 10) : null, d = u.userDecimals != null ? u.userDecimals : null;
+  const h = n || "default", l = d.maxDecimals != null ? parseInt(d.maxDecimals, 10) : null, u = d.userDecimals != null ? d.userDecimals : null;
   if (l !== null) {
-    const c = p + "|max:" + l;
+    const c = h + "|max:" + l;
     return at[c] || (at[c] = new Intl.NumberFormat(n, {
       useGrouping: !0,
       minimumFractionDigits: 0,
       maximumFractionDigits: l
     })), at[c].format(t);
   }
-  if (d !== null && d > 0) {
-    const c = p + "|exact:" + d;
+  if (u !== null && u > 0) {
+    const c = h + "|exact:" + u;
     return at[c] || (at[c] = new Intl.NumberFormat(n, {
       useGrouping: !0,
-      minimumFractionDigits: d,
-      maximumFractionDigits: d
+      minimumFractionDigits: u,
+      maximumFractionDigits: u
     })), at[c].format(t);
   }
   return zt(n).fmt.format(t);
 }
-function se(t) {
+function jn(t) {
   return String(t || "").trim().toLowerCase();
 }
-function rn(t) {
-  const n = se(t);
+function Vn(t) {
+  const n = jn(t);
   return n ? n.split(/\s+/).filter(Boolean) : [];
 }
-function Wn(t) {
-  if (t == null) return null;
-  const n = String(t).split(",").map((u) => u.trim()).filter(Boolean);
-  return n.length ? n : null;
-}
-function on(t, n) {
+function Wn(t, n) {
   if (!n || n.length === 0) return !0;
   if (!t) return !1;
-  const u = String(t).toLowerCase();
-  for (let p = 0; p < n.length; p++)
-    if (u.indexOf(n[p]) === -1) return !1;
+  const d = String(t).toLowerCase();
+  for (let h = 0; h < n.length; h++)
+    if (d.indexOf(n[h]) === -1) return !1;
   return !0;
-}
-function Gn(t) {
-  return !t || t.length === 0 ? "" : t.join(" ").replace(/\s+/g, " ").trim().toLowerCase();
 }
 function ge(t, n) {
   if (!n || n.length === 0) return !0;
   if (t == null) return !1;
-  const u = String(t).trim().toLowerCase();
-  for (let p = 0; p < n.length; p++)
-    if (String(n[p]).trim().toLowerCase() === u)
+  const d = String(t).trim().toLowerCase();
+  for (let h = 0; h < n.length; h++)
+    if (String(n[h]).trim().toLowerCase() === d)
       return !0;
   return !1;
 }
-function $n(t) {
+function Gn(t) {
   if (typeof t == "string") return t;
   if (t && typeof t == "object") {
     if (typeof t.href == "string") return t.href;
@@ -942,23 +934,23 @@ function $n(t) {
   }
   return String(t || "");
 }
-function Qn(t, n) {
+function $n(t, n) {
   return n && n.method ? String(n.method).toUpperCase() : t && typeof t == "object" && t.method ? String(t.method).toUpperCase() : "GET";
 }
-function Xn(t, n) {
+function Qn(t, n) {
   return (n || "GET") + " " + (t || "");
 }
-function Yn(t) {
+function Xn(t) {
   const n = (t || "").toUpperCase();
   return n === "GET" || n === "HEAD";
 }
 (function() {
   if (window.lnHttp) return;
-  const t = window.fetch.bind(window), n = /* @__PURE__ */ new Map(), u = /* @__PURE__ */ new Map();
-  function p(c, i) {
+  const t = window.fetch.bind(window), n = /* @__PURE__ */ new Map(), d = /* @__PURE__ */ new Map();
+  function h(c, i) {
     i = i || {};
-    const f = $n(c), h = Qn(c, i), b = Xn(f, h);
-    Yn(h) && n.has(b) && (n.get(b).abort(), n.delete(b));
+    const p = Gn(c), f = $n(c, i), b = Qn(p, f);
+    Xn(f) && n.has(b) && (n.get(b).abort(), n.delete(b));
     const g = new AbortController(), _ = i.signal;
     let m = null;
     _ && (_.aborted ? g.abort(_.reason) : (m = function() {
@@ -969,123 +961,123 @@ function Yn(t) {
       _ && m && _.removeEventListener("abort", m), n.get(b) === g && n.delete(b);
     });
   }
-  p.toString = function() {
+  h.toString = function() {
     return "function fetch() { [ln-http wrapped] }";
-  }, window.fetch = p;
+  }, window.fetch = h;
   function l(c) {
     if (!c.detail || !c.detail.url) return;
-    const i = c.target, f = (c.detail.method || (c.detail.body ? "POST" : "GET")).toUpperCase(), h = c.detail.key;
-    h && u.has(h) && (u.get(h).abort(), u.delete(h));
+    const i = c.target, p = (c.detail.method || (c.detail.body ? "POST" : "GET")).toUpperCase(), f = c.detail.key;
+    f && d.has(f) && (d.get(f).abort(), d.delete(f));
     const b = new AbortController(), g = c.detail.signal;
     let _ = null;
     g && (g.aborted ? b.abort(g.reason) : (_ = function() {
       b.abort(g.reason);
-    }, g.addEventListener("abort", _, { once: !0 }))), h && u.set(h, b);
-    const m = { method: f, signal: b.signal };
+    }, g.addEventListener("abort", _, { once: !0 }))), f && d.set(f, b);
+    const m = { method: p, signal: b.signal };
     c.detail.body !== void 0 && (m.body = c.detail.body), window.fetch(c.detail.url, m).then(function(r) {
-      g && _ && g.removeEventListener("abort", _), h && u.get(h) === b && u.delete(h), S(i, "ln-http:response", {
+      g && _ && g.removeEventListener("abort", _), f && d.get(f) === b && d.delete(f), S(i, "ln-http:response", {
         ok: r.ok,
         status: r.status,
         response: r
       });
     }).catch(function(r) {
-      g && _ && g.removeEventListener("abort", _), h && u.get(h) === b && u.delete(h), !(r && r.name === "AbortError") && S(i, "ln-http:error", {
+      g && _ && g.removeEventListener("abort", _), f && d.get(f) === b && d.delete(f), !(r && r.name === "AbortError") && S(i, "ln-http:error", {
         ok: !1,
         status: 0,
         error: r
       });
     });
   }
-  function d(c) {
+  function u(c) {
     const i = c.detail || {};
     i.all ? window.lnHttp.cancelAll() : i.key ? window.lnHttp.cancelByKey(i.key) : i.url && window.lnHttp.cancel(i.url);
   }
-  document.addEventListener("ln-http:request", l), document.addEventListener("ln-http:cancel", d), window.lnHttp = {
+  document.addEventListener("ln-http:request", l), document.addEventListener("ln-http:cancel", u), window.lnHttp = {
     cancel: function(c) {
       let i = !1;
-      return n.forEach(function(f, h) {
-        h.endsWith(" " + c) && (f.abort(), n.delete(h), i = !0);
+      return n.forEach(function(p, f) {
+        f.endsWith(" " + c) && (p.abort(), n.delete(f), i = !0);
       }), i;
     },
     cancelByKey: function(c) {
-      return u.has(c) ? (u.get(c).abort(), u.delete(c), !0) : !1;
+      return d.has(c) ? (d.get(c).abort(), d.delete(c), !0) : !1;
     },
     cancelAll: function() {
       n.forEach(function(c) {
         c.abort();
-      }), n.clear(), u.forEach(function(c) {
+      }), n.clear(), d.forEach(function(c) {
         c.abort();
-      }), u.clear();
+      }), d.clear();
     },
     get inflight() {
       const c = [];
-      return n.forEach(function(i, f) {
-        const h = f.indexOf(" ");
-        c.push({ method: f.slice(0, h), url: f.slice(h + 1) });
-      }), u.forEach(function(i, f) {
-        c.push({ key: f });
+      return n.forEach(function(i, p) {
+        const f = p.indexOf(" ");
+        c.push({ method: p.slice(0, f), url: p.slice(f + 1) });
+      }), d.forEach(function(i, p) {
+        c.push({ key: p });
       }), c;
     },
     destroy: function() {
-      window.lnHttp.cancelAll(), document.removeEventListener("ln-http:request", l), document.removeEventListener("ln-http:cancel", d), window.fetch = t, delete window.lnHttp;
+      window.lnHttp.cancelAll(), document.removeEventListener("ln-http:request", l), document.removeEventListener("ln-http:cancel", u), window.fetch = t, delete window.lnHttp;
     }
   };
 })();
 (function() {
   const t = "template[data-ln-include]", n = "lnInclude";
   if (window[n] !== void 0) return;
-  const u = /* @__PURE__ */ new Map();
-  function p(l) {
+  const d = /* @__PURE__ */ new Map();
+  function h(l) {
     if (this.dom = l, this.url = l.getAttribute("data-ln-include"), this._held = !1, this._destroyed = !1, !this.url)
       return this;
-    Bn(), this._held = !0;
-    const d = this, c = this.url;
-    let i = u.get(c);
-    return i || (i = fetch(c).then(function(f) {
-      if (!f.ok)
-        throw new Error("HTTP error! status: " + f.status);
-      return f.text();
-    }).catch(function(f) {
-      throw u.delete(c), f;
-    }), u.set(c, i)), i.then(function(f) {
-      if (d._destroyed) return;
-      const h = document.createElement("template");
-      h.innerHTML = f, d.dom.content.appendChild(h.content), S(d.dom, "ln-include:loaded", { target: d.dom, url: d.url }), d._held && (d._held = !1, te());
-    }).catch(function(f) {
-      d._destroyed || (console.error("[ln-include] Failed to fetch template from " + d.url + ":", f), S(d.dom, "ln-include:error", { target: d.dom, url: d.url, error: f }), d._held && (d._held = !1, te()));
+    Nn(), this._held = !0;
+    const u = this, c = this.url;
+    let i = d.get(c);
+    return i || (i = fetch(c).then(function(p) {
+      if (!p.ok)
+        throw new Error("HTTP error! status: " + p.status);
+      return p.text();
+    }).catch(function(p) {
+      throw d.delete(c), p;
+    }), d.set(c, i)), i.then(function(p) {
+      if (u._destroyed) return;
+      const f = document.createElement("template");
+      f.innerHTML = p, u.dom.content.appendChild(f.content), S(u.dom, "ln-include:loaded", { target: u.dom, url: u.url }), u._held && (u._held = !1, te());
+    }).catch(function(p) {
+      u._destroyed || (console.error("[ln-include] Failed to fetch template from " + u.url + ":", p), S(u.dom, "ln-include:error", { target: u.dom, url: u.url, error: p }), u._held && (u._held = !1, te()));
     }), this;
   }
-  p.prototype.destroy = function() {
+  h.prototype.destroy = function() {
     this.dom[n] && (this._destroyed = !0, this._held && (this._held = !1, te()), delete this.dom[n]);
-  }, M(t, n, p, "ln-include");
+  }, M(t, n, h, "ln-include");
 })();
 (function() {
-  const t = "data-ln-form", n = "lnForm", u = "data-ln-form-action-edit", p = "data-ln-form-action-method";
+  const t = "data-ln-form", n = "lnForm", d = "data-ln-form-action-edit", h = "data-ln-form-action-method";
   if (window[n] !== void 0) return;
-  function l(d) {
-    this.dom = d, this._baseAction = d.getAttribute("action") || "";
+  function l(u) {
+    this.dom = u, this._baseAction = u.getAttribute("action") || "";
     const c = this;
     return this._onLnFill = function(i) {
       i.target === c.dom && (i.detail ? (c.fill(i.detail), c._applyActionMode(i.detail)) : c.dom.reset());
     }, this._onReset = function() {
       c._applyActionMode(null);
-    }, d.addEventListener("ln-fill", this._onLnFill), d.addEventListener("reset", this._onReset), this;
+    }, u.addEventListener("ln-fill", this._onLnFill), u.addEventListener("reset", this._onReset), this;
   }
-  l.prototype.fill = function(d) {
-    const c = ze(this.dom, d);
+  l.prototype.fill = function(u) {
+    const c = ze(this.dom, u);
     for (let i = 0; i < c.length; i++) {
-      const f = c[i], h = f.tagName === "SELECT" || f.type === "checkbox" || f.type === "radio";
-      f.dispatchEvent(new Event(h ? "change" : "input", { bubbles: !0 }));
+      const p = c[i], f = p.tagName === "SELECT" || p.type === "checkbox" || p.type === "radio";
+      p.dispatchEvent(new Event(f ? "change" : "input", { bubbles: !0 }));
     }
   }, l.prototype._ensureMethodInput = function() {
-    let d = this.dom.querySelector('input[name="_method"]');
-    return d || (d = document.createElement("input"), d.type = "hidden", d.name = "_method", d.value = "", this.dom.appendChild(d)), d;
-  }, l.prototype._applyActionMode = function(d) {
-    if (!this.dom.hasAttribute(u)) return;
-    const c = d && d.id != null && d.id !== "" ? d.id : null, i = this._ensureMethodInput();
+    let u = this.dom.querySelector('input[name="_method"]');
+    return u || (u = document.createElement("input"), u.type = "hidden", u.name = "_method", u.value = "", this.dom.appendChild(u)), u;
+  }, l.prototype._applyActionMode = function(u) {
+    if (!this.dom.hasAttribute(d)) return;
+    const c = u && u.id != null && u.id !== "" ? u.id : null, i = this._ensureMethodInput();
     if (c !== null) {
-      const f = this.dom.getAttribute(u);
-      f ? this.dom.setAttribute("action", f.replace(":id", encodeURIComponent(c))) : this.dom.setAttribute("action", this._baseAction.replace(/\/$/, "") + "/" + encodeURIComponent(c)), i.value = this.dom.getAttribute(p) || "PUT";
+      const p = this.dom.getAttribute(d);
+      p ? this.dom.setAttribute("action", p.replace(":id", encodeURIComponent(c))) : this.dom.setAttribute("action", this._baseAction.replace(/\/$/, "") + "/" + encodeURIComponent(c)), i.value = this.dom.getAttribute(h) || "PUT";
     } else
       this.dom.setAttribute("action", this._baseAction), i.value = "";
   }, l.prototype.destroy = function() {
@@ -1104,88 +1096,88 @@ const Ce = {
 function Le(t, n = 0) {
   return t ? !!(t.valid && n === 0) : n === 0;
 }
-function Jn(t, n) {
-  const u = [];
+function Yn(t, n) {
+  const d = [];
   if (t) {
-    const p = Object.keys(Ce);
-    for (let l = 0; l < p.length; l++) {
-      const d = p[l], c = Ce[d];
-      t[c] && u.push(d);
+    const h = Object.keys(Ce);
+    for (let l = 0; l < h.length; l++) {
+      const u = h[l], c = Ce[u];
+      t[c] && d.push(u);
     }
   }
   if (n) {
-    const p = Array.from(n);
-    for (let l = 0; l < p.length; l++)
-      p[l] && u.indexOf(p[l]) === -1 && u.push(p[l]);
+    const h = Array.from(n);
+    for (let l = 0; l < h.length; l++)
+      h[l] && d.indexOf(h[l]) === -1 && d.push(h[l]);
   }
-  return u;
+  return d;
 }
 (function() {
-  const t = "data-ln-validate", n = "lnValidate", u = "data-ln-validate-errors", p = "data-ln-validate-error", l = "ln-validate-valid", d = "ln-validate-invalid";
+  const t = "data-ln-validate", n = "lnValidate", d = "data-ln-validate-errors", h = "data-ln-validate-error", l = "ln-validate-valid", u = "ln-validate-invalid";
   if (window[n] !== void 0) return;
   function c(i) {
     this.dom = i, this._touched = !1, this._customErrors = /* @__PURE__ */ new Set();
-    const f = this, h = i.tagName, b = i.type, g = h === "SELECT" || b === "checkbox" || b === "radio";
+    const p = this, f = i.tagName, b = i.type, g = f === "SELECT" || b === "checkbox" || b === "radio";
     this._onInput = function() {
-      f._touched = !0, f.validate();
+      p._touched = !0, p.validate();
     }, this._onChange = function() {
-      f._touched = !0, f.validate();
+      p._touched = !0, p.validate();
     }, this._onSetCustom = function(r) {
       const s = r.detail && r.detail.error;
       if (!s) return;
-      f._customErrors.add(s), f._touched = !0;
+      p._customErrors.add(s), p._touched = !0;
       const e = i.closest(".form-element");
       if (e) {
-        const o = e.querySelector("[" + p + '="' + s + '"]');
+        const o = e.querySelector("[" + h + '="' + s + '"]');
         o && o.classList.remove("hidden");
       }
-      i.classList.remove(l), i.classList.add(d), i.setAttribute("aria-invalid", "true");
+      i.classList.remove(l), i.classList.add(u), i.setAttribute("aria-invalid", "true");
     }, this._onClearCustom = function(r) {
       const s = r.detail && r.detail.error, e = i.closest(".form-element");
       if (s) {
-        if (f._customErrors.delete(s), e) {
-          const o = e.querySelector("[" + p + '="' + s + '"]');
+        if (p._customErrors.delete(s), e) {
+          const o = e.querySelector("[" + h + '="' + s + '"]');
           o && o.classList.add("hidden");
         }
       } else
-        f._customErrors.forEach(function(o) {
+        p._customErrors.forEach(function(o) {
           if (e) {
-            const a = e.querySelector("[" + p + '="' + o + '"]');
+            const a = e.querySelector("[" + h + '="' + o + '"]');
             a && a.classList.add("hidden");
           }
-        }), f._customErrors.clear();
-      f._touched && f.validate();
+        }), p._customErrors.clear();
+      p._touched && p.validate();
     }, g || i.addEventListener("input", this._onInput), i.addEventListener("change", this._onChange), i.addEventListener("ln-validate:set-custom", this._onSetCustom), i.addEventListener("ln-validate:clear-custom", this._onClearCustom);
     const _ = i.form;
     return _ && (_.hasAttribute("novalidate") || _.setAttribute("novalidate", ""), this._onFormReset = function() {
-      f.reset();
+      p.reset();
     }, this._onValidateRequest = function(r) {
-      f._touched = !0, !f.validate() && r.detail && r.detail.invalidFields && r.detail.invalidFields.push(f.dom);
+      p._touched = !0, !p.validate() && r.detail && r.detail.invalidFields && r.detail.invalidFields.push(p.dom);
     }, _.addEventListener("reset", this._onFormReset), _.addEventListener("ln-validate:request-validate", this._onValidateRequest), _._lnValidateGateBound || (_._lnValidateGateBound = !0, _.addEventListener("submit", function(r) {
       const s = { invalidFields: [] };
       S(_, "ln-validate:request-validate", s), s.invalidFields.length > 0 && (r.preventDefault(), s.invalidFields.sort((e, o) => e.compareDocumentPosition(o) & Node.DOCUMENT_POSITION_PRECEDING ? -1 : 1), s.invalidFields[0].focus());
     }))), (i.value && i.value.trim() !== "" || i.checked) && (this._touched = !0, this.validate()), this;
   }
   c.prototype.validate = function() {
-    const i = this.dom, f = i.validity, h = Le(f, this._customErrors.size), b = Jn(f, this._customErrors), g = i.closest(".form-element");
+    const i = this.dom, p = i.validity, f = Le(p, this._customErrors.size), b = Yn(p, this._customErrors), g = i.closest(".form-element");
     if (g) {
-      const m = g.querySelector("[" + u + "]");
+      const m = g.querySelector("[" + d + "]");
       if (m) {
-        const r = m.querySelectorAll("[" + p + "]");
+        const r = m.querySelectorAll("[" + h + "]");
         for (let s = 0; s < r.length; s++) {
-          const e = r[s].getAttribute(p);
+          const e = r[s].getAttribute(h);
           r[s].classList.toggle("hidden", !b.includes(e));
         }
       }
     }
-    return i.classList.toggle(l, h), i.classList.toggle(d, !h), i.setAttribute("aria-invalid", h ? "false" : "true"), S(i, h ? "ln-validate:valid" : "ln-validate:invalid", { target: i, field: i.name, errors: b }), h;
+    return i.classList.toggle(l, f), i.classList.toggle(u, !f), i.setAttribute("aria-invalid", f ? "false" : "true"), S(i, f ? "ln-validate:valid" : "ln-validate:invalid", { target: i, field: i.name, errors: b }), f;
   }, c.prototype.reset = function() {
-    this._touched = !1, this._customErrors.clear(), this.dom.classList.remove(l, d), this.dom.removeAttribute("aria-invalid");
+    this._touched = !1, this._customErrors.clear(), this.dom.classList.remove(l, u), this.dom.removeAttribute("aria-invalid");
     const i = this.dom.closest(".form-element");
     if (i) {
-      const f = i.querySelectorAll("[" + p + "]");
-      for (let h = 0; h < f.length; h++)
-        f[h].classList.add("hidden");
+      const p = i.querySelectorAll("[" + h + "]");
+      for (let f = 0; f < p.length; f++)
+        p[f].classList.add("hidden");
     }
   }, Object.defineProperty(c.prototype, "isValid", {
     get: function() {
@@ -1195,17 +1187,17 @@ function Jn(t, n) {
     if (!this.dom[n]) return;
     this.dom.removeEventListener("input", this._onInput), this.dom.removeEventListener("change", this._onChange), this.dom.removeEventListener("ln-validate:set-custom", this._onSetCustom), this.dom.removeEventListener("ln-validate:clear-custom", this._onClearCustom);
     const i = this.dom.form;
-    i && (this._onFormReset && i.removeEventListener("reset", this._onFormReset), this._onValidateRequest && i.removeEventListener("ln-validate:request-validate", this._onValidateRequest)), this.dom.classList.remove(l, d), this.dom.removeAttribute("aria-invalid"), S(this.dom, "ln-validate:destroyed", { target: this.dom }), delete this.dom[n];
+    i && (this._onFormReset && i.removeEventListener("reset", this._onFormReset), this._onValidateRequest && i.removeEventListener("ln-validate:request-validate", this._onValidateRequest)), this.dom.classList.remove(l, u), this.dom.removeAttribute("aria-invalid"), S(this.dom, "ln-validate:destroyed", { target: this.dom }), delete this.dom[n];
   }, M(t, n, c, "ln-validate");
 })();
 (function() {
-  const t = "data-ln-ajax", n = "lnAjax", u = "data-ln-form-scope";
+  const t = "data-ln-ajax", n = "lnAjax", d = "data-ln-form-scope";
   if (window[n] !== void 0) return;
-  function p(g) {
+  function h(g) {
     if (!g.hasAttribute(t) || g[n]) return;
     g[n] = !0;
-    const _ = f(g);
-    l(_.links), d(_.forms);
+    const _ = p(g);
+    l(_.links), u(_.forms);
   }
   function l(g) {
     for (const _ of g) {
@@ -1221,10 +1213,10 @@ function Jn(t, n) {
       _.addEventListener("click", r), _[n + "Trigger"] = r;
     }
   }
-  function d(g) {
+  function u(g) {
     for (const _ of g) {
       if (_[n + "Trigger"]) continue;
-      if (_.hasAttribute(u)) {
+      if (_.hasAttribute(d)) {
         _[n + "ScopeWarned"] || (_[n + "ScopeWarned"] = !0, console.warn("[ln-ajax] Form has data-ln-form-scope — the ln-data-coordinator write pipeline takes precedence; skipping ajax interception for this form."));
         continue;
       }
@@ -1244,7 +1236,7 @@ function Jn(t, n) {
   }
   function c(g) {
     if (!g[n]) return;
-    const _ = f(g);
+    const _ = p(g);
     for (const m of _.links)
       m[n + "Trigger"] && (m.removeEventListener("click", m[n + "Trigger"]), delete m[n + "Trigger"]);
     for (const m of _.forms)
@@ -1313,26 +1305,26 @@ function Jn(t, n) {
       S(r, "ln-ajax:error", { method: g, url: y, status: 0, data: null, error: C }), S(r, "ln-ajax:complete", { method: g, url: y }), a();
     });
   }
-  function f(g) {
+  function p(g) {
     const _ = { links: [], forms: [] };
     return g.tagName === "A" && g.getAttribute(t) !== "false" ? _.links.push(g) : g.tagName === "FORM" && g.getAttribute(t) !== "false" ? _.forms.push(g) : (_.links = Array.from(g.querySelectorAll('a:not([data-ln-ajax="false"])')), _.forms = Array.from(g.querySelectorAll('form:not([data-ln-ajax="false"])'))), _;
   }
-  function h() {
+  function f() {
     ct(function() {
       new MutationObserver(function(_) {
         for (const m of _)
           if (m.type === "childList") {
             for (const r of m.addedNodes)
-              if (r.nodeType === 1 && (p(r), !r.hasAttribute(t))) {
+              if (r.nodeType === 1 && (h(r), !r.hasAttribute(t))) {
                 for (const e of r.querySelectorAll("[" + t + "]"))
-                  p(e);
+                  h(e);
                 const s = r.closest && r.closest("[" + t + "]");
                 if (s && s.getAttribute(t) !== "false") {
-                  const e = f(r);
-                  l(e.links), d(e.forms);
+                  const e = p(r);
+                  l(e.links), u(e.forms);
                 }
               }
-          } else m.type === "attributes" && p(m.target);
+          } else m.type === "attributes" && h(m.target);
       }).observe(document.body, {
         childList: !0,
         subtree: !0,
@@ -1343,28 +1335,28 @@ function Jn(t, n) {
   }
   function b() {
     for (const g of document.querySelectorAll("[" + t + "]"))
-      p(g);
+      h(g);
   }
-  window[n] = p, window[n].destroy = c, h(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", b) : b();
+  window[n] = h, window[n].destroy = c, f(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", b) : b();
 })();
-function Zn(t, { isHydration: n = !1, hasPrimaryRegion: u = !1, primaryMatch: p = null } = {}) {
-  const l = u ? !p : !t.some((h) => h.match), d = [], c = [];
-  for (const h of t)
-    if (!(!h.targetEl && !h.isPending)) {
-      if (!h.match) {
-        const b = n && h.hasHydrate && h.hasChildren;
-        !h.hasKeep && h.hasChildren && !b && h.targetEl && d.push(h);
+function Jn(t, { isHydration: n = !1, hasPrimaryRegion: d = !1, primaryMatch: h = null } = {}) {
+  const l = d ? !h : !t.some((f) => f.match), u = [], c = [];
+  for (const f of t)
+    if (!(!f.targetEl && !f.isPending)) {
+      if (!f.match) {
+        const b = n && f.hasHydrate && f.hasChildren;
+        !f.hasKeep && f.hasChildren && !b && f.targetEl && u.push(f);
         continue;
       }
-      h.hasKeep && h.mountedTemplate === h.match.route.templateNode || c.push(Object.assign({}, h, {
-        skipMount: n && h.hasHydrate && h.hasChildren
+      f.hasKeep && f.mountedTemplate === f.match.route.templateNode || c.push(Object.assign({}, f, {
+        skipMount: n && f.hasHydrate && f.hasChildren
       }));
     }
-  c.sort((h, b) => h.regionKey === "__primary__" ? -1 : b.regionKey === "__primary__" ? 1 : 0);
-  const f = c.find((h) => h.regionKey === "__primary__") || c[0] || null;
-  return { notFound: l, clears: d, swaps: c, owner: f };
+  c.sort((f, b) => f.regionKey === "__primary__" ? -1 : b.regionKey === "__primary__" ? 1 : 0);
+  const p = c.find((f) => f.regionKey === "__primary__") || c[0] || null;
+  return { notFound: l, clears: u, swaps: c, owner: p };
 }
-const sn = {
+const rn = {
   navigate: function(t) {
     It(t, { historyAction: "push" });
   },
@@ -1374,125 +1366,125 @@ const sn = {
   current: function() {
     return Kt === null ? null : {
       path: Kt,
-      params: cn,
-      query: dn,
-      route: un,
-      regions: ln
+      params: an,
+      query: ln,
+      route: cn,
+      regions: sn
     };
   }
-}, _e = "data-ln-route", an = "lnRoute";
-typeof window < "u" && (window.lnRouter = sn);
+}, _e = "data-ln-route", on = "lnRoute";
+typeof window < "u" && (window.lnRouter = rn);
 const lt = /* @__PURE__ */ new Map(), ee = /* @__PURE__ */ new WeakMap();
-let ln = /* @__PURE__ */ new Map(), Te = !1, Kt = null, cn = {}, dn = {}, un = null, ae = !1;
-function qe(t, n, u) {
-  ae ? queueMicrotask(function() {
-    S(t, n, u);
-  }) : S(t, n, u);
+let sn = /* @__PURE__ */ new Map(), Te = !1, Kt = null, an = {}, ln = {}, cn = null, se = !1;
+function qe(t, n, d) {
+  se ? queueMicrotask(function() {
+    S(t, n, d);
+  }) : S(t, n, d);
 }
 function jt(t) {
   try {
-    const d = new URL(t, window.location.origin);
-    t = d.pathname + d.search + d.hash;
+    const u = new URL(t, window.location.origin);
+    t = u.pathname + u.search + u.hash;
   } catch {
   }
-  let [n] = t.split("#"), [u, p] = n.split("?");
+  let [n] = t.split("#"), [d, h] = n.split("?");
   const l = {};
-  if (p) {
-    const d = new URLSearchParams(p);
-    for (const [c, i] of d.entries())
+  if (h) {
+    const u = new URLSearchParams(h);
+    for (const [c, i] of u.entries())
       l[c] = i;
   }
-  return u = u.replace(/\/+$/, ""), u === "" && (u = "/"), { path: u, query: l };
+  return d = d.replace(/\/+$/, ""), d === "" && (d = "/"), { path: d, query: l };
 }
-function hn(t, n) {
+function dn(t, n) {
   if (t.pattern === "*") return 1;
   if (n.pattern === "*") return -1;
-  const u = t.segments, p = n.segments, l = Math.max(u.length, p.length);
-  for (let d = 0; d < l; d++) {
-    const c = u[d], i = p[d];
+  const d = t.segments, h = n.segments, l = Math.max(d.length, h.length);
+  for (let u = 0; u < l; u++) {
+    const c = d[u], i = h[u];
     if (c === void 0) return 1;
     if (i === void 0) return -1;
     if (c === "*") return 1;
     if (i === "*") return -1;
-    const f = c.startsWith(":"), h = i.startsWith(":");
-    if (f && !h) return 1;
-    if (!f && h) return -1;
+    const p = c.startsWith(":"), f = i.startsWith(":");
+    if (p && !f) return 1;
+    if (!p && f) return -1;
   }
   return 0;
 }
-function fn(t, n) {
-  const u = t.split("/").filter(Boolean);
-  for (const p of n) {
-    if (p.pattern === "*")
+function un(t, n) {
+  const d = t.split("/").filter(Boolean);
+  for (const h of n) {
+    if (h.pattern === "*")
       return {
-        route: p,
+        route: h,
         params: { wildcard: t }
       };
-    const l = p.segments, d = {};
+    const l = h.segments, u = {};
     let c = !0;
-    if (!(u.length > l.length && l[l.length - 1] !== "*")) {
+    if (!(d.length > l.length && l[l.length - 1] !== "*")) {
       for (let i = 0; i < l.length; i++) {
-        const f = l[i], h = u[i];
-        if (f === "*") {
-          d.wildcard = u.slice(i).join("/");
+        const p = l[i], f = d[i];
+        if (p === "*") {
+          u.wildcard = d.slice(i).join("/");
           break;
         }
-        if (h === void 0) {
+        if (f === void 0) {
           c = !1;
           break;
         }
-        if (f.startsWith(":"))
-          d[f.slice(1)] = decodeURIComponent(h);
-        else if (f !== h) {
+        if (p.startsWith(":"))
+          u[p.slice(1)] = decodeURIComponent(f);
+        else if (p !== f) {
           c = !1;
           break;
         }
       }
-      if (c && (l.indexOf("*") !== -1 || u.length <= l.length))
-        return { route: p, params: d };
+      if (c && (l.indexOf("*") !== -1 || d.length <= l.length))
+        return { route: h, params: u };
     }
   }
   return null;
 }
-function le(t, n = {}) {
-  const u = n.warn !== !1;
+function ae(t, n = {}) {
+  const d = n.warn !== !1;
   if (t !== "__primary__") {
     const l = document.getElementById(t);
-    return !l && u && console.warn(`[ln-router] Explicit target element #${t} not found in DOM`), l;
+    return !l && d && console.warn(`[ln-router] Explicit target element #${t} not found in DOM`), l;
   }
-  const p = document.querySelector("[data-ln-outlet]") || document.querySelector("main");
-  return !p && u && console.warn("[ln-router] Default outlet (element with [data-ln-outlet] or <main>) not found in DOM"), p;
+  const h = document.querySelector("[data-ln-outlet]") || document.querySelector("main");
+  return !h && d && console.warn("[ln-router] Default outlet (element with [data-ln-outlet] or <main>) not found in DOM"), h;
 }
 function xe(t) {
   if (!t) return;
-  const n = Array.from(t.querySelectorAll("*")), u = [t].concat(n);
-  for (const l of u)
-    for (const d of Object.keys(l))
-      if (d.startsWith("ln") && l[d] && typeof l[d].destroy == "function")
+  const n = Array.from(t.querySelectorAll("*")), d = [t].concat(n);
+  for (const l of d)
+    for (const u of Object.keys(l))
+      if (u.startsWith("ln") && l[u] && typeof l[u].destroy == "function")
         try {
-          l[d].destroy();
+          l[u].destroy();
         } catch (c) {
-          console.error(`[ln-router] Error destroying component ${d} on element:`, l, c);
+          console.error(`[ln-router] Error destroying component ${u} on element:`, l, c);
         }
-  const p = document.querySelectorAll('[data-ln-popover="open"]');
-  for (const l of p) {
-    const d = l.lnPopover;
-    if (d && d.trigger && t.contains(d.trigger))
+  const h = document.querySelectorAll('[data-ln-popover="open"]');
+  for (const l of h) {
+    const u = l.lnPopover;
+    if (u && u.trigger && t.contains(u.trigger))
       try {
-        d.destroy();
+        u.destroy();
       } catch (c) {
         console.error("[ln-router] Error destroying open popover:", c);
       }
   }
 }
 function It(t, n = {}) {
-  const { path: u, query: p } = jt(t), l = /* @__PURE__ */ new Map();
+  const { path: d, query: h } = jt(t), l = /* @__PURE__ */ new Map();
   for (const [_, m] of lt)
-    l.set(_, fn(u, m.sorted));
-  const d = l.get("__primary__") || null, c = le("__primary__", { warn: !!d }), i = lt.has("__primary__"), f = [];
+    l.set(_, un(d, m.sorted));
+  const u = l.get("__primary__") || null, c = ae("__primary__", { warn: !!u }), i = lt.has("__primary__"), p = [];
   for (const [_, m] of l) {
-    const r = _ === "__primary__" ? c : le(_, { warn: !1 }), s = !r && !!(d && d.route && d.route.templateNode && d.route.templateNode.content && d.route.templateNode.content.querySelector("#" + CSS.escape(_)));
-    !r && !s && m && console.warn(`[ln-router] Explicit target element #${_} not found in DOM`), f.push({
+    const r = _ === "__primary__" ? c : ae(_, { warn: !1 }), s = !r && !!(u && u.route && u.route.templateNode && u.route.templateNode.content && u.route.templateNode.content.querySelector("#" + CSS.escape(_)));
+    !r && !s && m && console.warn(`[ln-router] Explicit target element #${_} not found in DOM`), p.push({
       regionKey: _,
       match: m,
       targetEl: r,
@@ -1503,31 +1495,31 @@ function It(t, n = {}) {
       mountedTemplate: r && ee.get(r) || null
     });
   }
-  const h = Zn(f, {
+  const f = Jn(p, {
     isHydration: !!n.isHydration,
     hasPrimaryRegion: i,
-    primaryMatch: d
+    primaryMatch: u
   });
-  if (h.notFound) {
-    qe(document.body, "ln-router:not-found", { path: u });
+  if (f.notFound) {
+    qe(document.body, "ln-router:not-found", { path: d });
     return;
   }
   if (W(c || document.body, "ln-router:before-navigate", {
     from: Kt,
     to: t,
-    params: d ? d.params : {},
-    query: p
+    params: u ? u.params : {},
+    query: h
   }).defaultPrevented) return;
   n.historyAction === "push" ? window.history.pushState(null, "", t) : n.historyAction === "replace" && window.history.replaceState(null, "", t);
   const g = function() {
-    for (const _ of h.clears)
+    for (const _ of f.clears)
       xe(_.targetEl), _.targetEl.replaceChildren(), ee.delete(_.targetEl);
-    for (const _ of h.swaps) {
+    for (const _ of f.swaps) {
       if ((_.isPending || !_.targetEl || !document.contains(_.targetEl)) && (_.targetEl = _.regionKey === "__primary__" ? c : document.getElementById(_.regionKey)), !_.targetEl) {
         console.warn(`[ln-router] Target element #${_.regionKey} could not be resolved`);
         continue;
       }
-      if (_.skipMount || (xe(_.targetEl), _.targetEl.replaceChildren(_.match.route.templateNode.content.cloneNode(!0))), ee.set(_.targetEl, _.match.route.templateNode), h.owner && _.regionKey === h.owner.regionKey) {
+      if (_.skipMount || (xe(_.targetEl), _.targetEl.replaceChildren(_.match.route.templateNode.content.cloneNode(!0))), ee.set(_.targetEl, _.match.route.templateNode), f.owner && _.regionKey === f.owner.regionKey) {
         if (_.match.route.title) {
           let m = _.match.route.title;
           if (_.match.params)
@@ -1544,120 +1536,120 @@ function It(t, n = {}) {
       qe(_.targetEl, "ln-router:navigated", {
         path: t,
         params: _.match.params,
-        query: p,
+        query: h,
         route: _.match.route,
         target: _.targetEl,
         region: _.regionKey
       });
     }
-    Kt = t, dn = p, un = d ? d.route : null, cn = d ? d.params : {}, ln = new Map(
+    Kt = t, ln = h, cn = u ? u.route : null, an = u ? u.params : {}, sn = new Map(
       Array.from(l.entries()).map(([_, m]) => [_, m ? { route: m.route, params: m.params } : null])
     );
   };
   document.startViewTransition && !n.isHydration ? document.startViewTransition(g) : g();
 }
-function ti(t) {
+function Zn(t) {
   const n = t.target.closest("a");
   if (!n || !Ve(t, n)) return;
-  const u = n.getAttribute("href"), { path: p } = jt(u);
+  const d = n.getAttribute("href"), { path: h } = jt(d);
   for (const l of lt.values())
-    if (fn(p, l.sorted)) {
-      t.preventDefault(), It(u, { historyAction: "push" });
+    if (un(h, l.sorted)) {
+      t.preventDefault(), It(d, { historyAction: "push" });
       return;
     }
 }
-function ei(t, n) {
-  const u = Object.keys(t), p = Object.keys(n);
-  if (u.length !== p.length) return !1;
-  for (let l = 0; l < u.length; l++) {
-    const d = u[l];
-    if (t[d] !== n[d]) return !1;
+function ti(t, n) {
+  const d = Object.keys(t), h = Object.keys(n);
+  if (d.length !== h.length) return !1;
+  for (let l = 0; l < d.length; l++) {
+    const u = d[l];
+    if (t[u] !== n[u]) return !1;
   }
   return !0;
 }
-function ni() {
-  const t = window.location.pathname + window.location.search, n = sn.current();
+function ei() {
+  const t = window.location.pathname + window.location.search, n = rn.current();
   if (n && n.path != null) {
-    const u = jt(t);
-    if (jt(n.path).path === u.path && ei(n.query, u.query))
+    const d = jt(t);
+    if (jt(n.path).path === d.path && ti(n.query, d.query))
       return;
   }
   It(t, { historyAction: "skip" });
 }
-function ii() {
+function ni() {
   Te || (Te = !0, ct(function() {
-    document.addEventListener("click", ti), window.addEventListener("popstate", ni), ae = !0;
+    document.addEventListener("click", Zn), window.addEventListener("popstate", ei), se = !0;
     const t = window.location.pathname + window.location.search + window.location.hash;
-    It(t, { historyAction: "replace", isHydration: !0 }), ae = !1;
+    It(t, { historyAction: "replace", isHydration: !0 }), se = !1;
   }, "ln-router"));
+}
+function ii(t) {
+  const n = t.getAttribute(_e);
+  if (!n) return;
+  const d = t.getAttribute("data-ln-route-target") || null;
+  if (d === "__primary__") {
+    console.warn(`[ln-router] "__primary__" is a reserved region key and cannot be used as data-ln-route-target. Route "${n}" rejected.`);
+    return;
+  }
+  const h = d || "__primary__";
+  lt.has(h) || lt.set(h, { routes: /* @__PURE__ */ new Map(), sorted: [] });
+  const l = lt.get(h);
+  if (l.routes.has(n)) {
+    console.warn(`[ln-router] Duplicate route pattern registered: "${n}" in region "${h}"`);
+    return;
+  }
+  const u = t.getAttribute("data-ln-route-title"), c = n.split("/").filter(Boolean), i = {
+    pattern: n,
+    segments: c,
+    target: d,
+    title: u,
+    templateNode: t
+  }, p = ae(h);
+  p && p.contains(t) && console.warn(`[ln-router] Route template with pattern "${n}" is declared inside its own outlet element:`, t), l.routes.set(n, i), l.sorted = Array.from(l.routes.values()).sort(dn);
 }
 function ri(t) {
   const n = t.getAttribute(_e);
   if (!n) return;
-  const u = t.getAttribute("data-ln-route-target") || null;
-  if (u === "__primary__") {
-    console.warn(`[ln-router] "__primary__" is a reserved region key and cannot be used as data-ln-route-target. Route "${n}" rejected.`);
-    return;
-  }
-  const p = u || "__primary__";
-  lt.has(p) || lt.set(p, { routes: /* @__PURE__ */ new Map(), sorted: [] });
-  const l = lt.get(p);
-  if (l.routes.has(n)) {
-    console.warn(`[ln-router] Duplicate route pattern registered: "${n}" in region "${p}"`);
-    return;
-  }
-  const d = t.getAttribute("data-ln-route-title"), c = n.split("/").filter(Boolean), i = {
-    pattern: n,
-    segments: c,
-    target: u,
-    title: d,
-    templateNode: t
-  }, f = le(p);
-  f && f.contains(t) && console.warn(`[ln-router] Route template with pattern "${n}" is declared inside its own outlet element:`, t), l.routes.set(n, i), l.sorted = Array.from(l.routes.values()).sort(hn);
+  const h = t.getAttribute("data-ln-route-target") || null || "__primary__", l = lt.get(h);
+  l && (l.routes.delete(n), l.sorted = Array.from(l.routes.values()).sort(dn), l.routes.size === 0 && lt.delete(h));
 }
-function oi(t) {
-  const n = t.getAttribute(_e);
-  if (!n) return;
-  const p = t.getAttribute("data-ln-route-target") || null || "__primary__", l = lt.get(p);
-  l && (l.routes.delete(n), l.sorted = Array.from(l.routes.values()).sort(hn), l.routes.size === 0 && lt.delete(p));
+function hn(t) {
+  return this.dom = t, ii(t), this;
 }
-function pn(t) {
-  return this.dom = t, ri(t), this;
-}
-pn.prototype.destroy = function() {
-  oi(this.dom), delete this.dom[an];
+hn.prototype.destroy = function() {
+  ri(this.dom), delete this.dom[on];
 };
-M(_e, an, pn, "ln-router", {
+M(_e, on, hn, "ln-router", {
   extraAttributes: ["data-ln-route-target", "data-ln-route-title"],
   onInit: function() {
-    lt.size > 0 && ii();
+    lt.size > 0 && ni();
   }
 });
 (function() {
   const t = "data-ln-modal", n = "lnModal";
   if (window[n] !== void 0) return;
-  function u(l) {
+  function d(l) {
     this.dom = l, this.isOpen = l.getAttribute(t) === "open";
-    const d = this;
+    const u = this;
     return this._onRequestOpen = function() {
-      d.dom.setAttribute(t, "open");
+      u.dom.setAttribute(t, "open");
     }, this._onRequestClose = function() {
-      d.dom.setAttribute(t, "close");
+      u.dom.setAttribute(t, "close");
     }, this._onCancel = function(c) {
-      c.preventDefault(), d.dom.setAttribute(t, "close");
+      c.preventDefault(), u.dom.setAttribute(t, "close");
     }, this._onClickClose = function(c) {
       const i = c.target.closest("[data-ln-modal-close]");
-      i && d.dom.contains(i) && (c.preventDefault(), d.dom.setAttribute(t, "close"));
+      i && u.dom.contains(i) && (c.preventDefault(), u.dom.setAttribute(t, "close"));
     }, this.dom.addEventListener("ln-modal:request-open", this._onRequestOpen), this.dom.addEventListener("ln-modal:request-close", this._onRequestClose), this.dom.addEventListener("cancel", this._onCancel), this.dom.addEventListener("click", this._onClickClose), this.isOpen && (typeof this.dom.showModal == "function" && this.dom.showModal(), document.body.classList.add("ln-modal-open")), this;
   }
-  u.prototype.open = function() {
+  d.prototype.open = function() {
     this.dom.setAttribute(t, "open");
-  }, u.prototype.close = function() {
+  }, d.prototype.close = function() {
     this.dom.setAttribute(t, "close");
-  }, u.prototype.toggle = function() {
+  }, d.prototype.toggle = function() {
     const l = this.dom.getAttribute(t);
     this.dom.setAttribute(t, l === "open" ? "close" : "open");
-  }, u.prototype.destroy = function() {
+  }, d.prototype.destroy = function() {
     if (this.dom[n]) {
       if (this.dom.removeEventListener("ln-modal:request-open", this._onRequestOpen), this.dom.removeEventListener("ln-modal:request-close", this._onRequestClose), this.dom.removeEventListener("cancel", this._onCancel), this.dom.removeEventListener("click", this._onClickClose), this.isOpen) {
         const l = this.dom;
@@ -1671,20 +1663,20 @@ M(_e, an, pn, "ln-router", {
       S(this.dom, "ln-modal:destroyed", { modalId: this.dom.id, target: this.dom }), delete this.dom[n];
     }
   };
-  function p(l) {
-    const d = l[n];
-    if (!d) return;
+  function h(l) {
+    const u = l[n];
+    if (!u) return;
     const i = l.getAttribute(t) === "open";
-    if (i !== d.isOpen)
+    if (i !== u.isOpen)
       if (i) {
         if (W(l, "ln-modal:before-open", { modalId: l.id, target: l }).defaultPrevented) {
           l.setAttribute(t, "close");
           return;
         }
-        d.isOpen = !0, document.body.classList.add("ln-modal-open"), typeof l.showModal == "function" && l.showModal();
-        const h = l.querySelector("[autofocus]");
-        if (h && kt(h))
-          h.focus();
+        u.isOpen = !0, document.body.classList.add("ln-modal-open"), typeof l.showModal == "function" && l.showModal();
+        const f = l.querySelector("[autofocus]");
+        if (f && kt(f))
+          f.focus();
         else {
           const b = l.querySelectorAll('input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), select:not([disabled])'), g = Array.prototype.find.call(b, kt);
           if (g) g.focus();
@@ -1699,17 +1691,17 @@ M(_e, an, pn, "ln-router", {
           l.setAttribute(t, "open");
           return;
         }
-        d.isOpen = !1, S(l, "ln-modal:close", { modalId: l.id, target: l }), typeof l.close == "function" && l.close(), document.querySelector("[" + t + '="open"]') || document.body.classList.remove("ln-modal-open");
+        u.isOpen = !1, S(l, "ln-modal:close", { modalId: l.id, target: l }), typeof l.close == "function" && l.close(), document.querySelector("[" + t + '="open"]') || document.body.classList.remove("ln-modal-open");
       }
   }
-  M(t, n, u, "ln-modal", {
-    onAttributeChange: p
+  M(t, n, d, "ln-modal", {
+    onAttributeChange: h
   });
 })();
 (function() {
-  const t = "data-ln-ui-coordinator", n = "lnUiCoordinator", u = "data-ln-ui-coordinator-dict";
+  const t = "data-ln-ui-coordinator", n = "lnUiCoordinator", d = "data-ln-ui-coordinator-dict";
   if (window[n] !== void 0) return;
-  function p(e) {
+  function h(e) {
     const o = {};
     let a = e;
     const y = [];
@@ -1747,7 +1739,7 @@ M(_e, an, pn, "ln-router", {
     }
     return document.querySelector("[data-ln-modal]");
   }
-  function d(e, o) {
+  function u(e, o) {
     if (e !== "edit") return "";
     if (o) {
       const a = o.getAttribute("data-ln-fill-id");
@@ -1778,7 +1770,7 @@ M(_e, an, pn, "ln-router", {
           D && (A[D.charAt(0).toLowerCase() + D.slice(1)] = C[x]);
         }
         const L = Object.keys(A).length > 0;
-        o.hasAttribute("data-ln-modal-mode") ? v.dataset.lnModalMode = o.getAttribute("data-ln-modal-mode") : v.dataset.lnModalMode = L ? "edit" : "new", L && window.lnCore && typeof window.lnCore.lnFill == "function" ? window.lnCore.lnFill(v, A) : v.dataset.lnModalMode === "new" && c(v), v.getAttribute("data-ln-modal") === "open" ? S(v, "ln-modal:request-close", {}) : (v.id && et(v.id, d(v.dataset.lnModalMode, o)), S(v, "ln-modal:request-open", {}));
+        o.hasAttribute("data-ln-modal-mode") ? v.dataset.lnModalMode = o.getAttribute("data-ln-modal-mode") : v.dataset.lnModalMode = L ? "edit" : "new", L && window.lnCore && typeof window.lnCore.lnFill == "function" ? window.lnCore.lnFill(v, A) : v.dataset.lnModalMode === "new" && c(v), v.getAttribute("data-ln-modal") === "open" ? S(v, "ln-modal:request-close", {}) : (v.id && et(v.id, u(v.dataset.lnModalMode, o)), S(v, "ln-modal:request-open", {}));
       }
       return;
     }
@@ -1802,13 +1794,13 @@ M(_e, an, pn, "ln-router", {
     const o = e.target;
     if (!o || !o.lnModal || !o.id) return;
     let a = X(o.id);
-    a === null && (a = d(o.dataset.lnModalMode, null), et(o.id, a)), a ? (o.dataset.lnModalMode = "edit", o.dispatchEvent(new CustomEvent("ln-fill:request", {
+    a === null && (a = u(o.dataset.lnModalMode, null), et(o.id, a)), a ? (o.dataset.lnModalMode = "edit", o.dispatchEvent(new CustomEvent("ln-fill:request", {
       bubbles: !0,
       detail: { id: a }
     }))) : (o.dataset.lnModalMode = "new", c(o));
   });
   let i = !1;
-  function f() {
+  function p() {
     if (!i) {
       i = !0;
       try {
@@ -1830,16 +1822,16 @@ M(_e, an, pn, "ln-router", {
       }
     }
   }
-  function h() {
+  function f() {
     const e = document.querySelectorAll('[data-ln-modal="open"][id]');
     for (let o = 0; o < e.length; o++) {
       const a = e[o];
-      a.lnModal && X(a.id) === null && et(a.id, d(a.dataset.lnModalMode, null));
+      a.lnModal && X(a.id) === null && et(a.id, u(a.dataset.lnModalMode, null));
     }
   }
-  window.addEventListener("hashchange", f);
+  window.addEventListener("hashchange", p);
   function b() {
-    h(), f();
+    f(), p();
   }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function() {
     it(b);
@@ -1860,7 +1852,7 @@ M(_e, an, pn, "ln-router", {
     y && y.lnModal && (y.id && et(y.id, null), S(y, "ln-modal:request-close", {}), c(y));
   }
   function _(e) {
-    const o = e.detail || {}, a = o.data, y = o.status || 0, v = p(e.target);
+    const o = e.detail || {}, a = o.data, y = o.status || 0, v = h(e.target);
     if (a && a.message) {
       const w = a.message;
       window.dispatchEvent(new CustomEvent("ln-toast:enqueue", {
@@ -1886,7 +1878,7 @@ M(_e, an, pn, "ln-router", {
   }
   document.addEventListener("ln-ajax:success", g), document.addEventListener("ln-ajax:error", _);
   function m(e) {
-    const o = e.detail || {}, a = p(e.target), y = o.message || (o.reason === "max-size" ? a["upload-max-size"] || "File is too large" : o.reason === "max-files" ? a["upload-max-files"] || "Maximum file count exceeded" : a["upload-invalid-type"] || "This file type is not allowed"), v = a["upload-invalid-title"] || "Invalid File";
+    const o = e.detail || {}, a = h(e.target), y = o.message || (o.reason === "max-size" ? a["upload-max-size"] || "File is too large" : o.reason === "max-files" ? a["upload-max-files"] || "Maximum file count exceeded" : a["upload-invalid-type"] || "This file type is not allowed"), v = a["upload-invalid-title"] || "Invalid File";
     window.dispatchEvent(new CustomEvent("ln-toast:enqueue", {
       detail: {
         type: "error",
@@ -1896,7 +1888,7 @@ M(_e, an, pn, "ln-router", {
     }));
   }
   function r(e) {
-    const o = e.detail || {}, a = p(e.target), y = o.message || a["upload-failed"] || "Failed to upload file", v = a["upload-error-title"] || "Upload Error";
+    const o = e.detail || {}, a = h(e.target), y = o.message || a["upload-failed"] || "Failed to upload file", v = a["upload-error-title"] || "Upload Error";
     window.dispatchEvent(new CustomEvent("ln-toast:enqueue", {
       detail: {
         type: "error",
@@ -1910,141 +1902,141 @@ M(_e, an, pn, "ln-router", {
     !o || !o.lnModal || (o.id && X(o.id) !== null && et(o.id, null), o.dataset.lnModalMode === "new" && c(o));
   });
   function s(e) {
-    return this.dom = e, this.dict = Vt(e, u), this;
+    return this.dom = e, this.dict = Vt(e, d), this;
   }
   s.prototype.destroy = function() {
     this.dom[n] && (this.dict = {}, delete this.dom[n]);
   }, M(t, n, s, "ln-ui-coordinator");
 })();
-function si(t, n) {
+function oi(t, n) {
   if (!t) return 0;
   if (n <= 0)
     return t.startsWith("-") ? 1 : 0;
-  let u = n, p = 0;
-  for (let l = 0; l < t.length && u > 0; l++)
-    p = l + 1, /[0-9]/.test(t[l]) && u--;
-  return u > 0 && (p = t.length), p;
+  let d = n, h = 0;
+  for (let l = 0; l < t.length && d > 0; l++)
+    h = l + 1, /[0-9]/.test(t[l]) && d--;
+  return d > 0 && (h = t.length), h;
 }
 (function() {
   const t = "data-ln-number", n = "lnNumber";
   if (window[n] !== void 0) return;
-  const u = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value");
-  function p(l) {
+  const d = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value");
+  function h(l) {
     if (l[n]) return l[n];
     l[n] = this, this.dom = l;
-    const d = this;
+    const u = this;
     if (this._onLocaleChange = function() {
-      d.isTextElement ? d._formatTextContent() : isNaN(d.value) || d._displayFormatted(d.value);
+      u.isTextElement ? u._formatTextContent() : isNaN(u.value) || u._displayFormatted(u.value);
     }, Wt(), document.addEventListener("ln-core:locale-change", this._onLocaleChange), l.tagName !== "INPUT")
       return this.isTextElement = !0, this._initTextElement(), this;
     const c = document.createElement("input");
     c.type = "hidden", c.name = l.name, l.removeAttribute("name"), l.hasAttribute("data-ln-fill-as") && c.setAttribute("data-ln-fill-as", l.getAttribute("data-ln-fill-as")), l.type = "text", l.setAttribute("inputmode", "decimal"), l.insertAdjacentElement("afterend", c), this._hidden = c, Object.defineProperty(c, "value", {
       get: function() {
-        return u.get.call(c);
+        return d.get.call(c);
       },
-      set: function(f) {
-        if (u.set.call(c, f), f !== "" && !isNaN(parseFloat(f))) {
-          const h = d.dom.getAttribute("data-ln-number-decimals");
-          d._setDisplayRaw(tt(parseFloat(f), V(d.dom), { maxDecimals: h }));
+      set: function(p) {
+        if (d.set.call(c, p), p !== "" && !isNaN(parseFloat(p))) {
+          const f = u.dom.getAttribute("data-ln-number-decimals");
+          u._setDisplayRaw(tt(parseFloat(p), V(u.dom), { maxDecimals: f }));
         } else
-          d._setDisplayRaw("");
-        d.dom.dispatchEvent(new Event("input", { bubbles: !0 }));
+          u._setDisplayRaw("");
+        u.dom.dispatchEvent(new Event("input", { bubbles: !0 }));
       }
-    }), Ke(l, u, {
+    }), Ke(l, d, {
       get: function() {
-        return u.get.call(l);
+        return d.get.call(l);
       },
-      set: function(f) {
-        if (f === "") {
-          d._setDisplayRaw(""), d._setHiddenRaw(""), l.dispatchEvent(new Event("input", { bubbles: !0 }));
+      set: function(p) {
+        if (p === "") {
+          u._setDisplayRaw(""), u._setHiddenRaw(""), l.dispatchEvent(new Event("input", { bubbles: !0 }));
           return;
         }
-        const h = typeof f == "number" ? f : Rt(String(f), V(l));
-        if (isNaN(h))
-          d._setDisplayRaw(String(f)), d._setHiddenRaw("");
+        const f = typeof p == "number" ? p : Rt(String(p), V(l));
+        if (isNaN(f))
+          u._setDisplayRaw(String(p)), u._setHiddenRaw("");
         else {
-          d._setHiddenRaw(h);
+          u._setHiddenRaw(f);
           const b = l.getAttribute("data-ln-number-decimals");
-          d._setDisplayRaw(tt(h, V(l), { maxDecimals: b }));
+          u._setDisplayRaw(tt(f, V(l), { maxDecimals: b }));
         }
         l.dispatchEvent(new Event("input", { bubbles: !0 }));
       }
     }), this._onInput = function() {
-      d._handleInput();
-    }, l.addEventListener("input", this._onInput), this._onKeyDown = function(f) {
-      if (f.key !== "Backspace") return;
-      const h = l.selectionStart, b = l.selectionEnd;
-      if (h !== b || h === 0) return;
-      const g = zt(V(l)), _ = u.get.call(l), m = _[h - 1];
+      u._handleInput();
+    }, l.addEventListener("input", this._onInput), this._onKeyDown = function(p) {
+      if (p.key !== "Backspace") return;
+      const f = l.selectionStart, b = l.selectionEnd;
+      if (f !== b || f === 0) return;
+      const g = zt(V(l)), _ = d.get.call(l), m = _[f - 1];
       if (m === g.groupSep || /\s/.test(m)) {
-        f.preventDefault();
-        const r = h - 2 >= 0 ? h - 2 : 0, s = _.slice(0, r) + _.slice(h);
-        u.set.call(l, s), l.setSelectionRange(r, r), l.dispatchEvent(new Event("input", { bubbles: !0 }));
+        p.preventDefault();
+        const r = f - 2 >= 0 ? f - 2 : 0, s = _.slice(0, r) + _.slice(f);
+        d.set.call(l, s), l.setSelectionRange(r, r), l.dispatchEvent(new Event("input", { bubbles: !0 }));
       }
-    }, l.addEventListener("keydown", this._onKeyDown), this._onPaste = function(f) {
-      f.preventDefault();
-      const h = (f.clipboardData || window.clipboardData).getData("text"), b = Rt(h, V(l));
-      d.value = isNaN(b) ? NaN : b;
+    }, l.addEventListener("keydown", this._onKeyDown), this._onPaste = function(p) {
+      p.preventDefault();
+      const f = (p.clipboardData || window.clipboardData).getData("text"), b = Rt(f, V(l));
+      u.value = isNaN(b) ? NaN : b;
     }, l.addEventListener("paste", this._onPaste);
     const i = l.value;
     if (i !== "") {
-      const f = Rt(i, V(l));
-      if (!isNaN(f)) {
-        const h = l.getAttribute("data-ln-number-decimals");
-        this._setHiddenRaw(f), this._setDisplayRaw(tt(f, V(l), { maxDecimals: h })), l.dispatchEvent(new Event("input", { bubbles: !0 }));
+      const p = Rt(i, V(l));
+      if (!isNaN(p)) {
+        const f = l.getAttribute("data-ln-number-decimals");
+        this._setHiddenRaw(p), this._setDisplayRaw(tt(p, V(l), { maxDecimals: f })), l.dispatchEvent(new Event("input", { bubbles: !0 }));
       }
     }
     return this;
   }
-  p.prototype._initTextElement = function() {
+  h.prototype._initTextElement = function() {
     const l = this.dom;
-    let d = l.getAttribute("data-ln-value"), c = l.getAttribute("data-ln-number"), i = null;
-    d !== null && d !== "" ? i = d : c !== null && c !== "" && c !== "true" ? i = c : i = l.textContent.trim();
-    const f = Rt(i, V(l));
-    isNaN(f) ? this._rawValue = null : (this._rawValue = f, l.hasAttribute("data-ln-value") || l.setAttribute("data-ln-value", String(f)), this._formatTextContent());
-  }, p.prototype._formatTextContent = function() {
+    let u = l.getAttribute("data-ln-value"), c = l.getAttribute("data-ln-number"), i = null;
+    u !== null && u !== "" ? i = u : c !== null && c !== "" && c !== "true" ? i = c : i = l.textContent.trim();
+    const p = Rt(i, V(l));
+    isNaN(p) ? this._rawValue = null : (this._rawValue = p, l.hasAttribute("data-ln-value") || l.setAttribute("data-ln-value", String(p)), this._formatTextContent());
+  }, h.prototype._formatTextContent = function() {
     if (this._rawValue !== null && !isNaN(this._rawValue)) {
       const l = this.dom.getAttribute("data-ln-number-decimals");
       this.dom.textContent = tt(this._rawValue, V(this.dom), { maxDecimals: l });
     }
-  }, p.prototype._handleInput = function() {
-    const l = this.dom, d = u.get.call(l);
-    if (d === "") {
+  }, h.prototype._handleInput = function() {
+    const l = this.dom, u = d.get.call(l);
+    if (u === "") {
       this._setHiddenRaw(""), S(l, "ln-number:input", { value: NaN, formatted: "" });
       return;
     }
-    if (d === "-") {
+    if (u === "-") {
       this._setHiddenRaw(""), S(l, "ln-number:input", { value: NaN, formatted: "-" });
       return;
     }
     const c = l.selectionStart;
     let i = 0;
     for (let y = 0; y < c; y++)
-      /[0-9]/.test(d[y]) && i++;
-    const f = V(l), h = zt(f);
-    let b = d, g = nn(d, h.groupSep, h.decimalSep), _ = parseFloat(g);
+      /[0-9]/.test(u[y]) && i++;
+    const p = V(l), f = zt(p);
+    let b = u, g = nn(u, f.groupSep, f.decimalSep), _ = parseFloat(g);
     if (isNaN(_)) {
-      this._setHiddenRaw(""), S(l, "ln-number:input", { value: NaN, formatted: d });
+      this._setHiddenRaw(""), S(l, "ln-number:input", { value: NaN, formatted: u });
       return;
     }
     const m = l.getAttribute("data-ln-number-decimals"), r = g.indexOf(".");
     if (m !== null && r !== -1) {
       const y = parseInt(m, 10), v = g.slice(r + 1);
       if (y === 0)
-        g = g.slice(0, r), b = b.split(h.decimalSep)[0], _ = parseFloat(g), this._setDisplayRaw(b);
+        g = g.slice(0, r), b = b.split(f.decimalSep)[0], _ = parseFloat(g), this._setDisplayRaw(b);
       else if (v.length > y) {
         g = g.slice(0, r + 1 + y);
-        const w = b.split(h.decimalSep);
-        b = w[0] + h.decimalSep + w[1].slice(0, y), _ = parseFloat(g), this._setDisplayRaw(b);
+        const w = b.split(f.decimalSep);
+        b = w[0] + f.decimalSep + w[1].slice(0, y), _ = parseFloat(g), this._setDisplayRaw(b);
       }
     }
     const s = l.getAttribute("data-ln-number-max");
     if (s !== null && _ > parseFloat(s)) {
-      const y = parseFloat(s), v = tt(y, f, { maxDecimals: m });
+      const y = parseFloat(s), v = tt(y, p, { maxDecimals: m });
       this._setDisplayRaw(v), this._setHiddenRaw(y), l.setSelectionRange(v.length, v.length), S(l, "ln-number:input", { value: y, formatted: v });
       return;
     }
-    if (b.endsWith(h.decimalSep) || h.decimalSep !== "." && b.endsWith(".")) {
+    if (b.endsWith(f.decimalSep) || f.decimalSep !== "." && b.endsWith(".")) {
       this._setHiddenRaw(_), S(l, "ln-number:input", { value: _, formatted: b });
       return;
     }
@@ -2055,30 +2047,30 @@ function si(t, n) {
     }
     let o;
     if (m !== null)
-      o = tt(_, f, { maxDecimals: m });
+      o = tt(_, p, { maxDecimals: m });
     else {
       const y = e !== -1 ? g.slice(e + 1).length : 0;
-      o = tt(_, f, { userDecimals: y });
+      o = tt(_, p, { userDecimals: y });
     }
     this._setDisplayRaw(o);
-    const a = si(o, i);
+    const a = oi(o, i);
     l.setSelectionRange(a, a), this._setHiddenRaw(_), S(l, "ln-number:input", { value: _, formatted: o });
-  }, p.prototype._setHiddenRaw = function(l) {
-    this._hidden && u.set.call(this._hidden, String(l));
-  }, p.prototype._setDisplayRaw = function(l) {
-    this.isTextElement ? this.dom.textContent = String(l) : u.set.call(this.dom, String(l));
-  }, p.prototype._displayFormatted = function(l) {
+  }, h.prototype._setHiddenRaw = function(l) {
+    this._hidden && d.set.call(this._hidden, String(l));
+  }, h.prototype._setDisplayRaw = function(l) {
+    this.isTextElement ? this.dom.textContent = String(l) : d.set.call(this.dom, String(l));
+  }, h.prototype._displayFormatted = function(l) {
     if (this.isTextElement)
       this._formatTextContent();
     else {
-      const d = this.dom.getAttribute("data-ln-number-decimals");
-      this._setDisplayRaw(tt(l, V(this.dom), { maxDecimals: d }));
+      const u = this.dom.getAttribute("data-ln-number-decimals");
+      this._setDisplayRaw(tt(l, V(this.dom), { maxDecimals: u }));
     }
-  }, Object.defineProperty(p.prototype, "value", {
+  }, Object.defineProperty(h.prototype, "value", {
     get: function() {
       if (this.isTextElement)
         return this._rawValue;
-      const l = u.get.call(this._hidden);
+      const l = d.get.call(this._hidden);
       return l === "" ? NaN : parseFloat(l);
     },
     set: function(l) {
@@ -2091,16 +2083,16 @@ function si(t, n) {
         return;
       }
       this._setHiddenRaw(l);
-      const d = this.dom.getAttribute("data-ln-number-decimals");
-      this._setDisplayRaw(tt(l, V(this.dom), { maxDecimals: d })), this.dom.dispatchEvent(new Event("input", { bubbles: !0 }));
+      const u = this.dom.getAttribute("data-ln-number-decimals");
+      this._setDisplayRaw(tt(l, V(this.dom), { maxDecimals: u })), this.dom.dispatchEvent(new Event("input", { bubbles: !0 }));
     }
-  }), Object.defineProperty(p.prototype, "formatted", {
+  }), Object.defineProperty(h.prototype, "formatted", {
     get: function() {
-      return this.isTextElement ? this.dom.textContent : u.get.call(this.dom);
+      return this.isTextElement ? this.dom.textContent : d.get.call(this.dom);
     }
-  }), p.prototype.destroy = function() {
+  }), h.prototype.destroy = function() {
     this.dom[n] && (this._onLocaleChange && document.removeEventListener("ln-core:locale-change", this._onLocaleChange), this.isTextElement || (this.dom.removeEventListener("input", this._onInput), this.dom.removeEventListener("keydown", this._onKeyDown), this.dom.removeEventListener("paste", this._onPaste), this._hidden && (this.dom.name = this._hidden.name, this._hidden.remove()), this.dom.type = "number", this.dom.removeAttribute("inputmode")), S(this.dom, "ln-number:destroyed", { target: this.dom }), delete this.dom[n]);
-  }, M(t, n, p, "ln-number", {
+  }, M(t, n, h, "ln-number", {
     extraAttributes: [
       "data-ln-value",
       "data-ln-number-decimals",
@@ -2109,12 +2101,12 @@ function si(t, n) {
       "lang"
     ],
     onAttributeChange: function(l) {
-      const d = l[n];
-      d && (d.isTextElement ? d._initTextElement() : isNaN(d.value) || d._displayFormatted(d.value));
+      const u = l[n];
+      u && (u.isTextElement ? u._initTextElement() : isNaN(u.value) || u._displayFormatted(u.value));
     }
   });
 })();
-const ce = /^(short|medium|long)(\s+datetime)?$/, ai = {
+const le = /^(short|medium|long)(\s+datetime)?$/, si = {
   short: { dateStyle: "short" },
   medium: { dateStyle: "medium" },
   long: { dateStyle: "long" },
@@ -2122,122 +2114,122 @@ const ce = /^(short|medium|long)(\s+datetime)?$/, ai = {
   "medium datetime": { dateStyle: "medium", timeStyle: "short" },
   "long datetime": { dateStyle: "long", timeStyle: "short" }
 };
-function li(t) {
-  return !t || t === "" ? { dateStyle: "medium" } : String(t).trim().match(ce) ? ai[t.trim()] : null;
+function ai(t) {
+  return !t || t === "" ? { dateStyle: "medium" } : String(t).trim().match(le) ? si[t.trim()] : null;
 }
 function Ot(t) {
   if (!t || typeof t != "string") return null;
   const n = t.trim();
   if (n.length < 6) return null;
-  let u, p;
+  let d, h;
   if (n.indexOf(".") !== -1)
-    u = ".", p = n.split(".");
+    d = ".", h = n.split(".");
   else if (n.indexOf("/") !== -1)
-    u = "/", p = n.split("/");
+    d = "/", h = n.split("/");
   else if (n.indexOf("-") !== -1)
-    u = "-", p = n.split("-");
+    d = "-", h = n.split("-");
   else
     return null;
-  if (p.length !== 3) return null;
+  if (h.length !== 3) return null;
   const l = [];
-  for (let h = 0; h < 3; h++) {
-    const b = parseInt(p[h], 10);
+  for (let f = 0; f < 3; f++) {
+    const b = parseInt(h[f], 10);
     if (isNaN(b)) return null;
     l.push(b);
   }
-  let d, c, i;
-  u === "." ? (d = l[0], c = l[1], i = l[2]) : u === "/" ? (c = l[0], d = l[1], i = l[2]) : p[0].length === 4 ? (i = l[0], c = l[1], d = l[2]) : (d = l[0], c = l[1], i = l[2]), i < 100 && (i += i < 50 ? 2e3 : 1900);
-  const f = new Date(i, c - 1, d);
-  return f.getFullYear() !== i || f.getMonth() !== c - 1 || f.getDate() !== d ? null : f;
+  let u, c, i;
+  d === "." ? (u = l[0], c = l[1], i = l[2]) : d === "/" ? (c = l[0], u = l[1], i = l[2]) : h[0].length === 4 ? (i = l[0], c = l[1], u = l[2]) : (u = l[0], c = l[1], i = l[2]), i < 100 && (i += i < 50 ? 2e3 : 1900);
+  const p = new Date(i, c - 1, u);
+  return p.getFullYear() !== i || p.getMonth() !== c - 1 || p.getDate() !== u ? null : p;
 }
-function ne(t, n, u, p) {
+function ne(t, n, d, h) {
   if (!t || !(t instanceof Date) || isNaN(t.getTime()) || !n || typeof n != "string") return "";
-  const l = t.getDate(), d = t.getMonth(), c = t.getFullYear(), i = t.getHours(), f = t.getMinutes();
-  let h, b;
-  const g = (u || "").toLowerCase().split("-")[0];
+  const l = t.getDate(), u = t.getMonth(), c = t.getFullYear(), i = t.getHours(), p = t.getMinutes();
+  let f, b;
+  const g = (d || "").toLowerCase().split("-")[0];
   let _ = !1;
   try {
-    const s = new Intl.DateTimeFormat(u, { month: "long" }).resolvedOptions().locale.toLowerCase().split("-")[0];
-    _ = !!(p && s !== g);
+    const s = new Intl.DateTimeFormat(d, { month: "long" }).resolvedOptions().locale.toLowerCase().split("-")[0];
+    _ = !!(h && s !== g);
   } catch {
-    _ = !!p;
+    _ = !!h;
   }
-  if (_ && p && p.monthsLong)
-    h = p.monthsLong[d];
+  if (_ && h && h.monthsLong)
+    f = h.monthsLong[u];
   else
     try {
-      h = new Intl.DateTimeFormat(u, { month: "long" }).format(t);
+      f = new Intl.DateTimeFormat(d, { month: "long" }).format(t);
     } catch {
-      h = String(d + 1);
+      f = String(u + 1);
     }
-  if (_ && p && p.monthsShort)
-    b = p.monthsShort[d];
+  if (_ && h && h.monthsShort)
+    b = h.monthsShort[u];
   else
     try {
-      b = new Intl.DateTimeFormat(u, { month: "short" }).format(t);
+      b = new Intl.DateTimeFormat(d, { month: "short" }).format(t);
     } catch {
-      b = String(d + 1);
+      b = String(u + 1);
     }
   const m = {
     yyyy: String(c),
     yy: String(c).slice(-2),
-    MMMM: h,
+    MMMM: f,
     MMM: b,
-    MM: String(d + 1).padStart(2, "0"),
-    M: String(d + 1),
+    MM: String(u + 1).padStart(2, "0"),
+    M: String(u + 1),
     dd: String(l).padStart(2, "0"),
     d: String(l),
     HH: String(i).padStart(2, "0"),
-    mm: String(f).padStart(2, "0")
+    mm: String(p).padStart(2, "0")
   };
   return n.replace(/yyyy|yy|MMMM|MMM|MM|M|dd|d|HH|mm/g, function(r) {
     return m[r] !== void 0 ? m[r] : r;
   });
 }
-function Mt(t, n, u, p) {
+function Mt(t, n, d, h) {
   if (!t || !(t instanceof Date) || isNaN(t.getTime())) return "";
-  const l = li(n);
+  const l = ai(n);
   if (l)
     try {
-      const d = new Intl.DateTimeFormat(u, l), c = (u || "").toLowerCase().split("-")[0], i = d.resolvedOptions().locale.toLowerCase().split("-")[0];
-      return p && i !== c ? ne(t, "dd.MM.yyyy", u, p) : d.format(t);
+      const u = new Intl.DateTimeFormat(d, l), c = (d || "").toLowerCase().split("-")[0], i = u.resolvedOptions().locale.toLowerCase().split("-")[0];
+      return h && i !== c ? ne(t, "dd.MM.yyyy", d, h) : u.format(t);
     } catch {
-      return ne(t, "dd.MM.yyyy", u, p);
+      return ne(t, "dd.MM.yyyy", d, h);
     }
-  return ne(t, n || "dd.MM.yyyy", u, p);
+  return ne(t, n || "dd.MM.yyyy", d, h);
 }
 (function() {
   const t = "data-ln-date", n = "lnDate";
   if (window[n] !== void 0) return;
-  const u = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value");
-  function p(i, f, h) {
+  const d = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value");
+  function h(i, p, f) {
     S(i.dom, "ln-date:change", {
-      value: f,
+      value: p,
       formatted: i.dom.value,
-      date: h
+      date: f
     }), i.dom.dispatchEvent(new Event("change", { bubbles: !0 }));
   }
-  function l(i, f, h, b) {
-    i._setHiddenRaw(f), u.set.call(i._picker, f), i._lastISO = f, b !== void 0 ? (i._isFormatting = !0, i.dom.value = b, i._isFormatting = !1) : h && i._displayFormatted(h), p(i, f, h);
+  function l(i, p, f, b) {
+    i._setHiddenRaw(p), d.set.call(i._picker, p), i._lastISO = p, b !== void 0 ? (i._isFormatting = !0, i.dom.value = b, i._isFormatting = !1) : f && i._displayFormatted(f), h(i, p, f);
   }
-  function d(i) {
-    i._setHiddenRaw(""), u.set.call(i._picker, ""), i._isFormatting = !0, i.dom.value = "", i._isFormatting = !1, i._lastISO = "", p(i, "", null);
+  function u(i) {
+    i._setHiddenRaw(""), d.set.call(i._picker, ""), i._isFormatting = !0, i.dom.value = "", i._isFormatting = !1, i._lastISO = "", h(i, "", null);
   }
   function c(i) {
     if (i[n]) return i[n];
     i[n] = this, this.dom = i;
-    const f = this;
+    const p = this;
     if (this._onLocaleChange = function() {
-      if (f.isTextElement)
-        f._formatTextContent();
-      else if (f.value) {
-        const e = Y(f.value);
-        e && f._displayFormatted(e);
+      if (p.isTextElement)
+        p._formatTextContent();
+      else if (p.value) {
+        const e = Y(p.value);
+        e && p._displayFormatted(e);
       }
     }, Wt(), document.addEventListener("ln-core:locale-change", this._onLocaleChange), i.tagName !== "INPUT")
       return this.isTextElement = !0, this._initTextElement(), this;
     this.isTextElement = !1;
-    const h = i.value, b = i.name, g = i.closest(".form-element, form") || i.parentNode;
+    const f = i.value, b = i.name, g = i.closest(".form-element, form") || i.parentNode;
     if (g) {
       const e = g.querySelectorAll("[data-ln-date-dict]");
       for (let o = 0; o < e.length; o++) {
@@ -2257,75 +2249,75 @@ function Mt(t, n, u, p) {
     const s = document.createElement("button");
     if (s.type = "button", s.setAttribute("aria-label", i.getAttribute("data-ln-date-label") || "Open date picker"), s.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-calendar"></use></svg>', r.insertAdjacentElement("afterend", s), this._btn = s, this._lastISO = "", Object.defineProperty(m, "value", {
       get: function() {
-        return u.get.call(m);
+        return d.get.call(m);
       },
       set: function(e) {
-        if (u.set.call(m, e), e && e !== "") {
+        if (d.set.call(m, e), e && e !== "") {
           const o = Y(e);
-          o && l(f, e, o);
-        } else e === "" && d(f);
+          o && l(p, e, o);
+        } else e === "" && u(p);
       }
-    }), Ke(i, u, {
+    }), Ke(i, d, {
       get: function() {
-        return u.get.call(i);
+        return d.get.call(i);
       },
       set: function(e, o) {
-        if (f._isFormatting) {
+        if (p._isFormatting) {
           o(e);
           return;
         }
         if (!e || e === "") {
-          o(""), d(f);
+          o(""), u(p);
           return;
         }
         const a = Y(e) || Ot(e);
         if (a) {
           const y = Tt(a), v = i.getAttribute(t) || "", w = V(i), A = _t(w), C = Mt(a, v, w, A);
-          o(C), l(f, y, a, C);
+          o(C), l(p, y, a, C);
         } else
-          o(String(e)), d(f);
+          o(String(e)), u(p);
       }
     }), this._onPickerChange = function() {
       const e = r.value;
       if (e) {
         const o = Y(e);
-        o && l(f, e, o);
+        o && l(p, e, o);
       } else
-        d(f);
+        u(p);
     }, r.addEventListener("change", this._onPickerChange), this._onBlur = function() {
-      const e = f.dom.value.trim();
+      const e = p.dom.value.trim();
       if (e === "") {
-        f._lastISO !== "" && d(f);
+        p._lastISO !== "" && u(p);
         return;
       }
-      if (f._lastISO) {
-        const a = Y(f._lastISO);
+      if (p._lastISO) {
+        const a = Y(p._lastISO);
         if (a) {
-          const y = f.dom.getAttribute(t) || "", v = V(f.dom), w = _t(v);
+          const y = p.dom.getAttribute(t) || "", v = V(p.dom), w = _t(v);
           if (e === Mt(a, y, v, w)) return;
         }
       }
       const o = Ot(e);
       if (o) {
         const a = Tt(o);
-        l(f, a, o);
-      } else if (f._lastISO) {
-        const a = Y(f._lastISO);
-        a && f._displayFormatted(a);
+        l(p, a, o);
+      } else if (p._lastISO) {
+        const a = Y(p._lastISO);
+        a && p._displayFormatted(a);
       } else
-        f.dom.value = "";
+        p.dom.value = "";
     }, i.addEventListener("blur", this._onBlur), this._onBtnClick = function() {
-      f._openPicker();
-    }, s.addEventListener("click", this._onBtnClick), h && h !== "") {
-      const e = Y(h);
-      e && l(f, h, e);
+      p._openPicker();
+    }, s.addEventListener("click", this._onBtnClick), f && f !== "") {
+      const e = Y(f);
+      e && l(p, f, e);
     }
     return this;
   }
   c.prototype._initTextElement = function() {
-    const i = this.dom, f = i.getAttribute("data-ln-value"), h = i.getAttribute("data-ln-date"), b = i.getAttribute("datetime");
+    const i = this.dom, p = i.getAttribute("data-ln-value"), f = i.getAttribute("data-ln-date"), b = i.getAttribute("datetime");
     let g = null;
-    f !== null && f !== "" ? g = f : b !== null && b !== "" ? g = b : h !== null && h !== "" && h !== "true" && !ce.test(h) ? g = h : g = i.textContent.trim();
+    p !== null && p !== "" ? g = p : b !== null && b !== "" ? g = b : f !== null && f !== "" && f !== "true" && !le.test(f) ? g = f : g = i.textContent.trim();
     const _ = Y(g) || Ot(g);
     if (_ && !isNaN(_.getTime())) {
       const m = Tt(_);
@@ -2336,13 +2328,13 @@ function Mt(t, n, u, p) {
     if (this._rawValue) {
       const i = Y(this._rawValue);
       if (i) {
-        let h = this.dom.getAttribute("data-ln-date-format");
-        if (!h) {
+        let f = this.dom.getAttribute("data-ln-date-format");
+        if (!f) {
           const _ = this.dom.getAttribute("data-ln-date");
-          _ && ce.test(_) && (h = _);
+          _ && le.test(_) && (f = _);
         }
         const b = V(this.dom), g = _t(b);
-        this.dom.textContent = Mt(i, h || "medium", b, g);
+        this.dom.textContent = Mt(i, f || "medium", b, g);
       }
     }
   }, c.prototype._openPicker = function() {
@@ -2355,13 +2347,13 @@ function Mt(t, n, u, p) {
     else
       this._picker.click();
   }, c.prototype._setHiddenRaw = function(i) {
-    u.set.call(this._hidden, i);
+    d.set.call(this._hidden, i);
   }, c.prototype._displayFormatted = function(i) {
-    const f = this.dom.getAttribute(t) || "", h = V(this.dom), b = _t(h);
-    this._isFormatting = !0, this.dom.value = Mt(i, f, h, b), this._isFormatting = !1;
+    const p = this.dom.getAttribute(t) || "", f = V(this.dom), b = _t(f);
+    this._isFormatting = !0, this.dom.value = Mt(i, p, f, b), this._isFormatting = !1;
   }, Object.defineProperty(c.prototype, "value", {
     get: function() {
-      return this.isTextElement ? this._rawValue || "" : u.get.call(this._hidden);
+      return this.isTextElement ? this._rawValue || "" : d.get.call(this._hidden);
     },
     set: function(i) {
       if (this.isTextElement) {
@@ -2369,18 +2361,18 @@ function Mt(t, n, u, p) {
           this._rawValue = null, this.dom.removeAttribute("data-ln-value"), this.dom.textContent = "";
           return;
         }
-        const h = Y(i) || Ot(i);
-        if (!h) return;
-        const b = Tt(h);
+        const f = Y(i) || Ot(i);
+        if (!f) return;
+        const b = Tt(f);
         this._rawValue = b, this.dom.setAttribute("data-ln-value", b), this._formatTextContent();
         return;
       }
       if (!i || i === "") {
-        d(this);
+        u(this);
         return;
       }
-      const f = Y(i);
-      f && l(this, i, f);
+      const p = Y(i);
+      p && l(this, i, p);
     }
   }), Object.defineProperty(c.prototype, "date", {
     get: function() {
@@ -2410,13 +2402,13 @@ function Mt(t, n, u, p) {
   }, M(t, n, c, "ln-date", {
     extraAttributes: ["data-ln-date-format", "data-ln-date-locale", "data-ln-value", "datetime", "lang"],
     onAttributeChange: function(i) {
-      const f = i[n];
-      if (f) {
-        if (f.isTextElement)
-          f._initTextElement();
-        else if (f.value) {
-          const h = Y(f.value);
-          h && f._displayFormatted(h);
+      const p = i[n];
+      if (p) {
+        if (p.isTextElement)
+          p._initTextElement();
+        else if (p.value) {
+          const f = Y(p.value);
+          f && p._displayFormatted(f);
         }
       }
     }
@@ -2426,9 +2418,9 @@ function Mt(t, n, u, p) {
   const t = "data-ln-nav", n = "lnNav";
   if (window[n] !== void 0) return;
   if (history._lnNavCallbacks = history._lnNavCallbacks || [], !history._lnNavPatched) {
-    const d = history.pushState;
+    const u = history.pushState;
     history.pushState = function() {
-      d.apply(history, arguments);
+      u.apply(history, arguments);
       for (const i of history._lnNavCallbacks)
         i();
     };
@@ -2439,12 +2431,12 @@ function Mt(t, n, u, p) {
         i();
     }, history._lnNavPatched = !0;
   }
-  function u(d) {
-    return this.dom = d, this.activeClass = d.getAttribute(t) || "active", this.exact = d.hasAttribute("data-ln-nav-exact"), this.updateHandler = () => this.update(), window.addEventListener("popstate", this.updateHandler), history._lnNavCallbacks.push(this.updateHandler), this.observer = new MutationObserver(() => this.update()), this.observer.observe(d, { childList: !0, subtree: !0 }), this.update(), this;
+  function d(u) {
+    return this.dom = u, this.activeClass = u.getAttribute(t) || "active", this.exact = u.hasAttribute("data-ln-nav-exact"), this.updateHandler = () => this.update(), window.addEventListener("popstate", this.updateHandler), history._lnNavCallbacks.push(this.updateHandler), this.observer = new MutationObserver(() => this.update()), this.observer.observe(u, { childList: !0, subtree: !0 }), this.update(), this;
   }
-  u.prototype.update = function() {
+  d.prototype.update = function() {
     if (!this.activeClass || W(this.dom, "ln-nav:before-update", { target: this.dom }).defaultPrevented) return;
-    const c = Array.from(this.dom.querySelectorAll("a")), i = window.location.pathname, f = p(i), h = [];
+    const c = Array.from(this.dom.querySelectorAll("a")), i = window.location.pathname, p = h(i), f = [];
     for (const b of c) {
       const g = b.getAttribute("href");
       if (!g || g === "#" || g.startsWith("#") || g.startsWith("javascript:") || g.startsWith("mailto:") || g.startsWith("tel:")) {
@@ -2455,119 +2447,119 @@ function Mt(t, n, u, p) {
         b.classList.remove(this.activeClass), b.removeAttribute("aria-current");
         continue;
       }
-      const _ = p(g), m = _ === f, r = !this.exact && _ !== "/" && f.startsWith(_ + "/");
-      m || r ? (b.classList.add(this.activeClass), b.setAttribute("aria-current", "page"), h.push(b)) : (b.classList.remove(this.activeClass), b.removeAttribute("aria-current"));
+      const _ = h(g), m = _ === p, r = !this.exact && _ !== "/" && p.startsWith(_ + "/");
+      m || r ? (b.classList.add(this.activeClass), b.setAttribute("aria-current", "page"), f.push(b)) : (b.classList.remove(this.activeClass), b.removeAttribute("aria-current"));
     }
-    S(this.dom, "ln-nav:update", { target: this.dom, activeLinks: h });
-  }, u.prototype.destroy = function() {
+    S(this.dom, "ln-nav:update", { target: this.dom, activeLinks: f });
+  }, d.prototype.destroy = function() {
     if (!this.dom[n]) return;
     this.observer && this.observer.disconnect(), window.removeEventListener("popstate", this.updateHandler);
-    const d = history._lnNavCallbacks.indexOf(this.updateHandler);
-    d !== -1 && history._lnNavCallbacks.splice(d, 1), S(this.dom, "ln-nav:destroyed", { target: this.dom }), delete this.dom[n];
+    const u = history._lnNavCallbacks.indexOf(this.updateHandler);
+    u !== -1 && history._lnNavCallbacks.splice(u, 1), S(this.dom, "ln-nav:destroyed", { target: this.dom }), delete this.dom[n];
   };
-  function p(d) {
+  function h(u) {
     try {
-      return new URL(d, window.location.href).pathname.replace(/\/$/, "") || "/";
+      return new URL(u, window.location.href).pathname.replace(/\/$/, "") || "/";
     } catch {
-      return d.replace(/\/$/, "") || "/";
+      return u.replace(/\/$/, "") || "/";
     }
   }
-  function l(d, c) {
-    const i = d[n];
+  function l(u, c) {
+    const i = u[n];
     if (i) {
       if (c === t) {
-        if (!d.hasAttribute(t)) {
+        if (!u.hasAttribute(t)) {
           i.destroy();
           return;
         }
-        const f = i.activeClass, h = d.getAttribute(t) || "active";
-        if (f !== h) {
-          const b = d.querySelectorAll("a");
+        const p = i.activeClass, f = u.getAttribute(t) || "active";
+        if (p !== f) {
+          const b = u.querySelectorAll("a");
           for (const g of b)
-            f && g.classList.remove(f);
-          i.activeClass = h;
+            p && g.classList.remove(p);
+          i.activeClass = f;
         }
-      } else c === "data-ln-nav-exact" && (i.exact = d.hasAttribute("data-ln-nav-exact"));
+      } else c === "data-ln-nav-exact" && (i.exact = u.hasAttribute("data-ln-nav-exact"));
       i.update();
     }
   }
-  M(t, n, u, "ln-nav", {
+  M(t, n, d, "ln-nav", {
     extraAttributes: ["data-ln-nav-exact"],
     onAttributeChange: l
   });
 })();
-function ke(t, n, u, p) {
+function ke(t, n, d, h) {
   const l = (t || "").toLowerCase().trim();
   if (l) return l;
   if ((n || "").toUpperCase() !== "A") return "";
-  const d = u || "";
-  if (!d.startsWith("#")) return "";
-  const c = d.slice(1);
+  const u = d || "";
+  if (!u.startsWith("#")) return "";
+  const c = u.slice(1);
   if (!c) return "";
-  const i = c.split("&"), f = (p || "").toLowerCase().trim();
-  if (f)
+  const i = c.split("&"), p = (h || "").toLowerCase().trim();
+  if (p)
     for (const g of i) {
       const _ = g.indexOf(":");
-      if (_ > 0 && g.slice(0, _).toLowerCase().trim() === f)
+      if (_ > 0 && g.slice(0, _).toLowerCase().trim() === p)
         return g.slice(_ + 1).toLowerCase().trim();
     }
-  const h = i[i.length - 1] || "", b = h.indexOf(":");
-  return (b > 0 ? h.slice(b + 1) : h).toLowerCase().trim();
+  const f = i[i.length - 1] || "", b = f.indexOf(":");
+  return (b > 0 ? f.slice(b + 1) : f).toLowerCase().trim();
 }
-function ci(t, n) {
+function li(t, n) {
   if (!Array.isArray(t) || t.length === 0)
     return { hashEnabled: !1, warning: null };
-  const u = t.filter(
-    (d) => (d.tagName || "").toUpperCase() === "A" && (d.href || "").startsWith("#")
-  ), p = u.length > 0 && u.length === t.length, l = (n || "").toLowerCase().trim();
-  return u.length > 0 && u.length !== t.length ? { hashEnabled: !1, warning: "mixed" } : p && !l ? { hashEnabled: !1, warning: "missing-namespace" } : {
-    hashEnabled: p && !!l,
+  const d = t.filter(
+    (u) => (u.tagName || "").toUpperCase() === "A" && (u.href || "").startsWith("#")
+  ), h = d.length > 0 && d.length === t.length, l = (n || "").toLowerCase().trim();
+  return d.length > 0 && d.length !== t.length ? { hashEnabled: !1, warning: "mixed" } : h && !l ? { hashEnabled: !1, warning: "missing-namespace" } : {
+    hashEnabled: h && !!l,
     warning: null
   };
 }
-function di(t, n, u) {
-  const p = (t || "").toLowerCase().trim();
-  return p && Array.isArray(n) && n.includes(p) ? p : (u || "").toLowerCase().trim();
+function ci(t, n, d) {
+  const h = (t || "").toLowerCase().trim();
+  return h && Array.isArray(n) && n.includes(h) ? h : (d || "").toLowerCase().trim();
 }
 (function() {
   const t = "data-ln-tabs", n = "lnTabs";
   if (window[n] !== void 0 && window[n] !== null) return;
-  function u(l) {
-    return this.dom = l, this.activeKey = null, p.call(this), this;
+  function d(l) {
+    return this.dom = l, this.activeKey = null, h.call(this), this;
   }
-  function p() {
+  function h() {
     this.tabs = Array.from(this.dom.querySelectorAll("[data-ln-tab]")), this.panels = Array.from(this.dom.querySelectorAll("[data-ln-panel]"));
     const l = this.tabs.map((i) => ({
       tagName: i.tagName,
       href: i.getAttribute("href")
     }));
     this.nsKey = (this.dom.getAttribute("data-ln-tabs-key") || this.dom.id || "").toLowerCase().trim();
-    const d = ci(l, this.nsKey);
-    this.hashEnabled = d.hashEnabled, d.warning === "mixed" ? console.warn('[ln-tabs] Mixed <a href="#…"> and <button> triggers in one group — using persist mode. Pick one: anchors for URL hash, buttons for localStorage persist.', this.dom) : d.warning === "missing-namespace" && console.warn("[ln-tabs] Anchor triggers need a hash namespace — add id or data-ln-tabs-key to the wrapper. Falling back to non-hash mode.", this.dom), this.mapTabs = {}, this.mapPanels = {};
+    const u = li(l, this.nsKey);
+    this.hashEnabled = u.hashEnabled, u.warning === "mixed" ? console.warn('[ln-tabs] Mixed <a href="#…"> and <button> triggers in one group — using persist mode. Pick one: anchors for URL hash, buttons for localStorage persist.', this.dom) : u.warning === "missing-namespace" && console.warn("[ln-tabs] Anchor triggers need a hash namespace — add id or data-ln-tabs-key to the wrapper. Falling back to non-hash mode.", this.dom), this.mapTabs = {}, this.mapPanels = {};
     for (const i of this.tabs) {
-      const f = ke(i.getAttribute("data-ln-tab"), i.tagName, i.getAttribute("href"), this.nsKey);
-      f ? this.mapTabs[f] = i : console.warn('[ln-tabs] Trigger has no resolvable key — needs `data-ln-tab="key"` or `<a href="#…">`.', i);
+      const p = ke(i.getAttribute("data-ln-tab"), i.tagName, i.getAttribute("href"), this.nsKey);
+      p ? this.mapTabs[p] = i : console.warn('[ln-tabs] Trigger has no resolvable key — needs `data-ln-tab="key"` or `<a href="#…">`.', i);
     }
     for (const i of this.panels) {
-      const f = (i.getAttribute("data-ln-panel") || "").toLowerCase().trim();
-      f && (this.mapPanels[f] = i);
+      const p = (i.getAttribute("data-ln-panel") || "").toLowerCase().trim();
+      p && (this.mapPanels[p] = i);
     }
     this.defaultKey = (this.dom.getAttribute("data-ln-tabs-default") || "").toLowerCase().trim() || Object.keys(this.mapTabs)[0] || "", this.autoFocus = (this.dom.getAttribute("data-ln-tabs-focus") || "true").toLowerCase() !== "false";
     const c = this;
     this._clickHandlers = [];
     for (const i of this.tabs) {
       if (i[n + "Trigger"]) continue;
-      const f = function(h) {
+      const p = function(f) {
         const b = i.tagName === "A";
-        if (!b && (h.ctrlKey || h.metaKey || h.button === 1)) return;
+        if (!b && (f.ctrlKey || f.metaKey || f.button === 1)) return;
         const g = ke(i.getAttribute("data-ln-tab"), i.tagName, i.getAttribute("href"), c.nsKey);
-        g && (b && !me(h) || (c.hashEnabled ? X(c.nsKey) === g ? c.dom.setAttribute("data-ln-tabs-active", g) : et(c.nsKey, g) : c.dom.setAttribute("data-ln-tabs-active", g)));
+        g && (b && !me(f) || (c.hashEnabled ? X(c.nsKey) === g ? c.dom.setAttribute("data-ln-tabs-active", g) : et(c.nsKey, g) : c.dom.setAttribute("data-ln-tabs-active", g)));
       };
-      i.addEventListener("click", f), i[n + "Trigger"] = f, c._clickHandlers.push({ el: i, handler: f });
+      i.addEventListener("click", p), i[n + "Trigger"] = p, c._clickHandlers.push({ el: i, handler: p });
     }
     if (this._onRequestSelect = function(i) {
-      const f = i.detail && (i.detail.key || i.detail.tab);
-      f && c.select(f);
+      const p = i.detail && (i.detail.key || i.detail.tab);
+      p && c.select(p);
     }, this.dom.addEventListener("ln-tabs:request-select", this._onRequestSelect), this._hashHandler = function() {
       if (!c.hashEnabled) return;
       const i = X(c.nsKey);
@@ -2577,37 +2569,37 @@ function di(t, n, u) {
     else {
       let i = this.defaultKey;
       if (this.dom.hasAttribute("data-ln-persist") && !this.hashEnabled) {
-        const f = Gt("tabs", this.dom);
-        f !== null && f in this.mapPanels && (i = f);
+        const p = Gt("tabs", this.dom);
+        p !== null && p in this.mapPanels && (i = p);
       }
       this.dom.setAttribute("data-ln-tabs-active", i);
     }
   }
-  u.prototype.select = function(l) {
-    const d = (l + "").toLowerCase().trim();
-    d && (this.hashEnabled ? X(this.nsKey) === d ? this.dom.setAttribute("data-ln-tabs-active", d) : et(this.nsKey, d) : this.dom.setAttribute("data-ln-tabs-active", d));
-  }, u.prototype._applyActive = function(l) {
+  d.prototype.select = function(l) {
+    const u = (l + "").toLowerCase().trim();
+    u && (this.hashEnabled ? X(this.nsKey) === u ? this.dom.setAttribute("data-ln-tabs-active", u) : et(this.nsKey, u) : this.dom.setAttribute("data-ln-tabs-active", u));
+  }, d.prototype._applyActive = function(l) {
     var c;
-    if (l = di(l, Object.keys(this.mapPanels), this.defaultKey), l === this.activeKey) return;
-    const d = this.activeKey;
-    if (d !== null && W(this.dom, "ln-tabs:before-change", {
+    if (l = ci(l, Object.keys(this.mapPanels), this.defaultKey), l === this.activeKey) return;
+    const u = this.activeKey;
+    if (u !== null && W(this.dom, "ln-tabs:before-change", {
       key: l,
-      previousKey: d,
+      previousKey: u,
       tab: this.mapTabs[l],
       panel: this.mapPanels[l],
       target: this.dom
     }).defaultPrevented) {
-      d in this.mapPanels && (this.dom.setAttribute("data-ln-tabs-active", d), this.hashEnabled && X(this.nsKey) !== d && et(this.nsKey, d));
+      u in this.mapPanels && (this.dom.setAttribute("data-ln-tabs-active", u), this.hashEnabled && X(this.nsKey) !== u && et(this.nsKey, u));
       return;
     }
     this.activeKey = l;
     for (const i in this.mapTabs) {
-      const f = this.mapTabs[i];
-      i === l ? (f.setAttribute("data-active", ""), f.setAttribute("aria-selected", "true")) : (f.removeAttribute("data-active"), f.setAttribute("aria-selected", "false"));
+      const p = this.mapTabs[i];
+      i === l ? (p.setAttribute("data-active", ""), p.setAttribute("aria-selected", "true")) : (p.removeAttribute("data-active"), p.setAttribute("aria-selected", "false"));
     }
     for (const i in this.mapPanels) {
-      const f = this.mapPanels[i], h = i === l;
-      f.classList.toggle("hidden", !h), f.setAttribute("aria-hidden", h ? "false" : "true");
+      const p = this.mapPanels[i], f = i === l;
+      p.classList.toggle("hidden", !f), p.setAttribute("aria-hidden", f ? "false" : "true");
     }
     if (this.autoFocus) {
       const i = (c = this.mapPanels[l]) == null ? void 0 : c.querySelector('input,button,select,textarea,[tabindex]:not([tabindex="-1"])');
@@ -2615,55 +2607,55 @@ function di(t, n, u) {
     }
     S(this.dom, "ln-tabs:change", {
       key: l,
-      previousKey: d,
+      previousKey: u,
       tab: this.mapTabs[l],
       panel: this.mapPanels[l],
       target: this.dom
     }), this.dom.hasAttribute("data-ln-persist") && !this.hashEnabled && bt("tabs", this.dom, l);
-  }, u.prototype.destroy = function() {
+  }, d.prototype.destroy = function() {
     if (this.dom[n]) {
       this.dom.removeEventListener("ln-tabs:request-select", this._onRequestSelect);
-      for (const { el: l, handler: d } of this._clickHandlers)
-        l.removeEventListener("click", d), delete l[n + "Trigger"];
+      for (const { el: l, handler: u } of this._clickHandlers)
+        l.removeEventListener("click", u), delete l[n + "Trigger"];
       this.hashEnabled && window.removeEventListener("hashchange", this._hashHandler), S(this.dom, "ln-tabs:destroyed", { target: this.dom }), delete this.dom[n];
     }
-  }, M(t, n, u, "ln-tabs", {
+  }, M(t, n, d, "ln-tabs", {
     extraAttributes: ["data-ln-tabs-active"],
     onAttributeChange: function(l) {
-      const d = l.getAttribute("data-ln-tabs-active");
-      l[n]._applyActive(d);
+      const u = l.getAttribute("data-ln-tabs-active");
+      l[n]._applyActive(u);
     }
   });
 })();
 (function() {
-  const t = "data-ln-toggle", n = "lnToggle", u = "data-ln-toggle-for", p = "data-ln-toggle-action", l = "data-ln-persist";
+  const t = "data-ln-toggle", n = "lnToggle", d = "data-ln-toggle-for", h = "data-ln-toggle-action", l = "data-ln-persist";
   if (window[n] !== void 0) return;
-  const d = /* @__PURE__ */ new Set();
+  const u = /* @__PURE__ */ new Set();
   let c = null;
   function i(m, r) {
     return r === "open" ? "open" : r === "close" || m === "open" ? "close" : "open";
   }
-  function f() {
+  function p() {
     c || (c = function(m) {
       if (Be(m)) return;
-      const r = m.target.closest("[" + u + "]");
+      const r = m.target.closest("[" + d + "]");
       if (!r || He(r)) return;
-      const s = r.getAttribute(u);
+      const s = r.getAttribute(d);
       if (!s) return;
       const e = document.getElementById(s);
       if (!e || !e[n]) return;
       m.preventDefault();
-      const o = r.getAttribute(p) || "toggle", a = e.getAttribute(t);
+      const o = r.getAttribute(h) || "toggle", a = e.getAttribute(t);
       e.setAttribute(t, i(a, o));
     }, document.addEventListener("click", c));
   }
-  function h() {
-    d.size > 0 || !c || (document.removeEventListener("click", c), c = null);
+  function f() {
+    u.size > 0 || !c || (document.removeEventListener("click", c), c = null);
   }
   function b(m, r) {
     if (!m || !m.id) return;
     const s = document.querySelectorAll(
-      "[" + u + '="' + m.id + '"]'
+      "[" + d + '="' + m.id + '"]'
     );
     for (let e = 0; e < s.length; e++)
       s[e].setAttribute("aria-expanded", r ? "true" : "false");
@@ -2681,7 +2673,7 @@ function di(t, n, u) {
       const s = Gt("toggle", m);
       s !== null && m.setAttribute(t, s === "open" ? "open" : "close");
     }
-    return this.isOpen = m.getAttribute(t) === "open", this.isOpen && m.classList.add("open"), b(m, this.isOpen), d.add(this), f(), this;
+    return this.isOpen = m.getAttribute(t) === "open", this.isOpen && m.classList.add("open"), b(m, this.isOpen), u.add(this), p(), this;
   }
   g.prototype.open = function() {
     this.dom.setAttribute(t, "open");
@@ -2691,7 +2683,7 @@ function di(t, n, u) {
     const m = this.dom.getAttribute(t);
     this.dom.setAttribute(t, i(m, "toggle"));
   }, g.prototype.destroy = function() {
-    this.dom[n] && (this.dom.removeEventListener("ln-toggle:request-open", this._onRequestOpen), this.dom.removeEventListener("ln-toggle:request-close", this._onRequestClose), this.dom.removeEventListener("ln-toggle:request-toggle", this._onRequestToggle), d.delete(this), delete this.dom[n], h(), S(this.dom, "ln-toggle:destroyed", { target: this.dom }));
+    this.dom[n] && (this.dom.removeEventListener("ln-toggle:request-open", this._onRequestOpen), this.dom.removeEventListener("ln-toggle:request-close", this._onRequestClose), this.dom.removeEventListener("ln-toggle:request-toggle", this._onRequestToggle), u.delete(this), delete this.dom[n], f(), S(this.dom, "ln-toggle:destroyed", { target: this.dom }));
   };
   function _(m) {
     const r = m[n];
@@ -2719,23 +2711,23 @@ function di(t, n, u) {
 (function() {
   const t = "data-ln-accordion", n = "lnAccordion";
   if (window[n] !== void 0) return;
-  function u(p) {
-    return this.dom = p, this._onToggleOpen = function(l) {
-      if (l.detail.target.closest("[data-ln-accordion]") !== p) return;
-      const d = p.querySelectorAll("[data-ln-toggle]");
-      for (const c of d)
-        c !== l.detail.target && c.closest("[data-ln-accordion]") === p && c.getAttribute("data-ln-toggle") === "open" && c.setAttribute("data-ln-toggle", "close");
-      S(p, "ln-accordion:change", { target: l.detail.target });
-    }, p.addEventListener("ln-toggle:open", this._onToggleOpen), this;
+  function d(h) {
+    return this.dom = h, this._onToggleOpen = function(l) {
+      if (l.detail.target.closest("[data-ln-accordion]") !== h) return;
+      const u = h.querySelectorAll("[data-ln-toggle]");
+      for (const c of u)
+        c !== l.detail.target && c.closest("[data-ln-accordion]") === h && c.getAttribute("data-ln-toggle") === "open" && c.setAttribute("data-ln-toggle", "close");
+      S(h, "ln-accordion:change", { target: l.detail.target });
+    }, h.addEventListener("ln-toggle:open", this._onToggleOpen), this;
   }
-  u.prototype.destroy = function() {
+  d.prototype.destroy = function() {
     this.dom[n] && (this.dom.removeEventListener("ln-toggle:open", this._onToggleOpen), S(this.dom, "ln-accordion:destroyed", { target: this.dom }), delete this.dom[n]);
-  }, M(t, n, u, "ln-accordion");
+  }, M(t, n, d, "ln-accordion");
 })();
 (function() {
-  const t = "data-ln-dropdown", n = "lnDropdown", u = "data-ln-dropdown-position", p = "data-ln-dropdown-placement", l = "bottom-end";
+  const t = "data-ln-dropdown", n = "lnDropdown", d = "data-ln-dropdown-position", h = "data-ln-dropdown-placement", l = "bottom-end";
   if (window[n] !== void 0) return;
-  function d(c) {
+  function u(c) {
     this.dom = c, this.toggleEl = c.querySelector("[data-ln-toggle]"), this._boundDocClick = null, this._docClickTimeout = null, this._boundScrollReposition = null, this._boundResizeClose = null, this.toggleEl && (this.toggleEl.setAttribute("data-ln-dropdown-menu", ""), this.toggleEl.setAttribute("role", "menu"), this.toggleEl.setAttribute("popover", "manual"), this._initMenuAria()), this.triggerBtn = c.querySelector("[data-ln-toggle-for]"), this.triggerBtn && (this.triggerBtn.setAttribute("aria-haspopup", "menu"), this.triggerBtn.setAttribute("aria-expanded", "false"));
     const i = this;
     return this._onRequestOpen = function() {
@@ -2744,64 +2736,64 @@ function di(t, n, u) {
       i.toggleEl && i.toggleEl.setAttribute("data-ln-toggle", "close");
     }, this._onRequestToggle = function() {
       if (i.toggleEl) {
-        const f = i.toggleEl.getAttribute("data-ln-toggle");
-        i.toggleEl.setAttribute("data-ln-toggle", f === "open" ? "close" : "open");
+        const p = i.toggleEl.getAttribute("data-ln-toggle");
+        i.toggleEl.setAttribute("data-ln-toggle", p === "open" ? "close" : "open");
       }
-    }, this._onKeydown = function(f) {
-      const h = i.toggleEl && i.toggleEl.getAttribute("data-ln-toggle") === "open";
-      if (f.key === "Escape") {
-        h && (f.preventDefault(), f.stopPropagation(), i.toggleEl.setAttribute("data-ln-toggle", "close"), i.triggerBtn && i.triggerBtn.focus());
+    }, this._onKeydown = function(p) {
+      const f = i.toggleEl && i.toggleEl.getAttribute("data-ln-toggle") === "open";
+      if (p.key === "Escape") {
+        f && (p.preventDefault(), p.stopPropagation(), i.toggleEl.setAttribute("data-ln-toggle", "close"), i.triggerBtn && i.triggerBtn.focus());
         return;
       }
-      if (f.key === "Tab") {
-        h && (i.triggerBtn && i.triggerBtn.focus(), i.toggleEl.setAttribute("data-ln-toggle", "close"));
+      if (p.key === "Tab") {
+        f && (i.triggerBtn && i.triggerBtn.focus(), i.toggleEl.setAttribute("data-ln-toggle", "close"));
         return;
       }
       const b = i._getMenuItems();
       if (b.length === 0) return;
-      if (!h && (f.key === "ArrowDown" || f.key === "ArrowUp")) {
-        f.preventDefault(), i.toggleEl.setAttribute("data-ln-toggle", "open"), setTimeout(function() {
+      if (!f && (p.key === "ArrowDown" || p.key === "ArrowUp")) {
+        p.preventDefault(), i.toggleEl.setAttribute("data-ln-toggle", "open"), setTimeout(function() {
           const _ = i._getMenuItems();
-          _.length > 0 && i._focusItem(_, f.key === "ArrowDown" ? 0 : _.length - 1);
+          _.length > 0 && i._focusItem(_, p.key === "ArrowDown" ? 0 : _.length - 1);
         }, 0);
         return;
       }
-      if (!h) return;
+      if (!f) return;
       const g = b.indexOf(document.activeElement);
-      if (f.key === "ArrowDown") {
-        f.preventDefault();
+      if (p.key === "ArrowDown") {
+        p.preventDefault();
         const _ = g < b.length - 1 ? g + 1 : 0;
         i._focusItem(b, _);
-      } else if (f.key === "ArrowUp") {
-        f.preventDefault();
+      } else if (p.key === "ArrowUp") {
+        p.preventDefault();
         const _ = g > 0 ? g - 1 : b.length - 1;
         i._focusItem(b, _);
-      } else f.key === "Home" ? (f.preventDefault(), i._focusItem(b, 0)) : f.key === "End" && (f.preventDefault(), i._focusItem(b, b.length - 1));
-    }, this.dom.addEventListener("ln-dropdown:request-open", this._onRequestOpen), this.dom.addEventListener("ln-dropdown:request-close", this._onRequestClose), this.dom.addEventListener("ln-dropdown:request-toggle", this._onRequestToggle), this.dom.addEventListener("keydown", this._onKeydown), this._onToggleOpen = function(f) {
-      !f.detail || f.detail.target !== i.toggleEl || (i.triggerBtn && i.triggerBtn.setAttribute("aria-expanded", "true"), typeof i.toggleEl.showPopover == "function" && i.toggleEl.showPopover(), i._initMenuAria(), i._reposition(), i._addOutsideClickListener(), i._addScrollRepositionListener(), i._addResizeCloseListener(), S(c, "ln-dropdown:open", { target: f.detail.target }));
-    }, this._onToggleClose = function(f) {
-      !f.detail || f.detail.target !== i.toggleEl || (i.triggerBtn && i.triggerBtn.setAttribute("aria-expanded", "false"), i._removeOutsideClickListener(), i._removeScrollRepositionListener(), i._removeResizeCloseListener(), i.toggleEl.style.top = "", i.toggleEl.style.left = "", i.toggleEl.removeAttribute(p), typeof i.toggleEl.hidePopover == "function" && i.toggleEl.matches(":popover-open") && i.toggleEl.hidePopover(), S(c, "ln-dropdown:close", { target: f.detail.target }));
+      } else p.key === "Home" ? (p.preventDefault(), i._focusItem(b, 0)) : p.key === "End" && (p.preventDefault(), i._focusItem(b, b.length - 1));
+    }, this.dom.addEventListener("ln-dropdown:request-open", this._onRequestOpen), this.dom.addEventListener("ln-dropdown:request-close", this._onRequestClose), this.dom.addEventListener("ln-dropdown:request-toggle", this._onRequestToggle), this.dom.addEventListener("keydown", this._onKeydown), this._onToggleOpen = function(p) {
+      !p.detail || p.detail.target !== i.toggleEl || (i.triggerBtn && i.triggerBtn.setAttribute("aria-expanded", "true"), typeof i.toggleEl.showPopover == "function" && i.toggleEl.showPopover(), i._initMenuAria(), i._reposition(), i._addOutsideClickListener(), i._addScrollRepositionListener(), i._addResizeCloseListener(), S(c, "ln-dropdown:open", { target: p.detail.target }));
+    }, this._onToggleClose = function(p) {
+      !p.detail || p.detail.target !== i.toggleEl || (i.triggerBtn && i.triggerBtn.setAttribute("aria-expanded", "false"), i._removeOutsideClickListener(), i._removeScrollRepositionListener(), i._removeResizeCloseListener(), i.toggleEl.style.top = "", i.toggleEl.style.left = "", i.toggleEl.removeAttribute(h), typeof i.toggleEl.hidePopover == "function" && i.toggleEl.matches(":popover-open") && i.toggleEl.hidePopover(), S(c, "ln-dropdown:close", { target: p.detail.target }));
     }, this.toggleEl && (this.toggleEl.addEventListener("ln-toggle:open", this._onToggleOpen), this.toggleEl.addEventListener("ln-toggle:close", this._onToggleClose)), this;
   }
-  d.prototype._initMenuAria = function() {
+  u.prototype._initMenuAria = function() {
     if (!this.toggleEl) return;
     const c = this.toggleEl.querySelectorAll("li");
-    for (const f of c)
-      f.setAttribute("role", "none");
+    for (const p of c)
+      p.setAttribute("role", "none");
     const i = this._getMenuItems();
-    for (let f = 0; f < i.length; f++)
-      i[f].setAttribute("role", "menuitem"), i[f].setAttribute("tabindex", f === 0 ? "0" : "-1");
-  }, d.prototype._getMenuItems = function() {
+    for (let p = 0; p < i.length; p++)
+      i[p].setAttribute("role", "menuitem"), i[p].setAttribute("tabindex", p === 0 ? "0" : "-1");
+  }, u.prototype._getMenuItems = function() {
     return this.toggleEl ? Array.from(this.toggleEl.querySelectorAll('a[href], button:not([disabled]), [role="menuitem"]:not([disabled])')) : [];
-  }, d.prototype._focusItem = function(c, i) {
-    for (let f = 0; f < c.length; f++)
-      c[f].setAttribute("tabindex", f === i ? "0" : "-1");
+  }, u.prototype._focusItem = function(c, i) {
+    for (let p = 0; p < c.length; p++)
+      c[p].setAttribute("tabindex", p === i ? "0" : "-1");
     c[i] && c[i].focus();
-  }, d.prototype._reposition = function() {
+  }, u.prototype._reposition = function() {
     if (!this.triggerBtn || !this.toggleEl) return;
-    const c = this.triggerBtn.getBoundingClientRect(), i = oe(this.toggleEl), f = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--size-xs")) * 16 || 4, h = this.dom.getAttribute(u) || l, b = Ut(c, i, h, f);
-    this.toggleEl.style.top = b.top + "px", this.toggleEl.style.left = b.left + "px", this.toggleEl.setAttribute(p, b.placement);
-  }, d.prototype._addOutsideClickListener = function() {
+    const c = this.triggerBtn.getBoundingClientRect(), i = oe(this.toggleEl), p = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--size-xs")) * 16 || 4, f = this.dom.getAttribute(d) || l, b = Ut(c, i, f, p);
+    this.toggleEl.style.top = b.top + "px", this.toggleEl.style.left = b.left + "px", this.toggleEl.setAttribute(h, b.placement);
+  }, u.prototype._addOutsideClickListener = function() {
     if (this._boundDocClick) return;
     const c = this;
     this._boundDocClick = function(i) {
@@ -2809,41 +2801,41 @@ function di(t, n, u) {
     }, c._docClickTimeout = setTimeout(function() {
       c._docClickTimeout = null, document.addEventListener("click", c._boundDocClick);
     }, 0);
-  }, d.prototype._removeOutsideClickListener = function() {
+  }, u.prototype._removeOutsideClickListener = function() {
     this._docClickTimeout && (clearTimeout(this._docClickTimeout), this._docClickTimeout = null), this._boundDocClick && (document.removeEventListener("click", this._boundDocClick), this._boundDocClick = null);
-  }, d.prototype._addScrollRepositionListener = function() {
+  }, u.prototype._addScrollRepositionListener = function() {
     const c = this;
     this._boundScrollReposition = function() {
       c._reposition();
     }, window.addEventListener("scroll", this._boundScrollReposition, { passive: !0, capture: !0 });
-  }, d.prototype._removeScrollRepositionListener = function() {
+  }, u.prototype._removeScrollRepositionListener = function() {
     this._boundScrollReposition && (window.removeEventListener("scroll", this._boundScrollReposition, { capture: !0 }), this._boundScrollReposition = null);
-  }, d.prototype._addResizeCloseListener = function() {
+  }, u.prototype._addResizeCloseListener = function() {
     const c = this;
     this._boundResizeClose = function() {
       c.toggleEl && c.toggleEl.getAttribute("data-ln-toggle") === "open" && c.toggleEl.setAttribute("data-ln-toggle", "close");
     }, window.addEventListener("resize", this._boundResizeClose);
-  }, d.prototype._removeResizeCloseListener = function() {
+  }, u.prototype._removeResizeCloseListener = function() {
     this._boundResizeClose && (window.removeEventListener("resize", this._boundResizeClose), this._boundResizeClose = null);
-  }, d.prototype.destroy = function() {
-    this.dom[n] && (this.dom.removeEventListener("ln-dropdown:request-open", this._onRequestOpen), this.dom.removeEventListener("ln-dropdown:request-close", this._onRequestClose), this.dom.removeEventListener("ln-dropdown:request-toggle", this._onRequestToggle), this.dom.removeEventListener("keydown", this._onKeydown), this._removeOutsideClickListener(), this._removeScrollRepositionListener(), this._removeResizeCloseListener(), this.toggleEl && typeof this.toggleEl.hidePopover == "function" && this.toggleEl.matches(":popover-open") && this.toggleEl.hidePopover(), this.toggleEl && (this.toggleEl.removeAttribute(p), this.toggleEl.removeEventListener("ln-toggle:open", this._onToggleOpen), this.toggleEl.removeEventListener("ln-toggle:close", this._onToggleClose)), S(this.dom, "ln-dropdown:destroyed", { target: this.dom }), delete this.dom[n]);
-  }, M(t, n, d, "ln-dropdown");
+  }, u.prototype.destroy = function() {
+    this.dom[n] && (this.dom.removeEventListener("ln-dropdown:request-open", this._onRequestOpen), this.dom.removeEventListener("ln-dropdown:request-close", this._onRequestClose), this.dom.removeEventListener("ln-dropdown:request-toggle", this._onRequestToggle), this.dom.removeEventListener("keydown", this._onKeydown), this._removeOutsideClickListener(), this._removeScrollRepositionListener(), this._removeResizeCloseListener(), this.toggleEl && typeof this.toggleEl.hidePopover == "function" && this.toggleEl.matches(":popover-open") && this.toggleEl.hidePopover(), this.toggleEl && (this.toggleEl.removeAttribute(h), this.toggleEl.removeEventListener("ln-toggle:open", this._onToggleOpen), this.toggleEl.removeEventListener("ln-toggle:close", this._onToggleClose)), S(this.dom, "ln-dropdown:destroyed", { target: this.dom }), delete this.dom[n]);
+  }, M(t, n, u, "ln-dropdown");
 })();
 (function() {
-  const t = "data-ln-popover", n = "lnPopover", u = "data-ln-popover-for", p = "data-ln-popover-position";
+  const t = "data-ln-popover", n = "lnPopover", d = "data-ln-popover-for", h = "data-ln-popover-position";
   if (window[n] !== void 0) return;
   const l = [];
-  let d = null;
+  let u = null;
   function c() {
-    d || (d = function(b) {
+    u || (u = function(b) {
       if (b.key !== "Escape" || l.length === 0) return;
       l[l.length - 1].close();
-    }, document.addEventListener("keydown", d));
+    }, document.addEventListener("keydown", u));
   }
   function i() {
-    l.length > 0 || d && (document.removeEventListener("keydown", d), d = null);
+    l.length > 0 || u && (document.removeEventListener("keydown", u), u = null);
   }
-  function f(b) {
+  function p(b) {
     this.dom = b, this.isOpen = b.getAttribute(t) === "open", this.trigger = null, this._previousFocus = null, this._boundDocClick = null, this._docClickTimeout = null, this._boundReposition = null;
     const g = this;
     return this._onRequestOpen = function(_) {
@@ -2856,17 +2848,17 @@ function di(t, n, u) {
       g.toggle(m);
     }, b.addEventListener("ln-popover:request-open", this._onRequestOpen), b.addEventListener("ln-popover:request-close", this._onRequestClose), b.addEventListener("ln-popover:request-toggle", this._onRequestToggle), b.hasAttribute("tabindex") || b.setAttribute("tabindex", "-1"), b.hasAttribute("role") || b.setAttribute("role", "dialog"), b.hasAttribute("popover") || b.setAttribute("popover", "manual"), this.isOpen && this._applyOpen(null), this;
   }
-  f.prototype.open = function(b) {
+  p.prototype.open = function(b) {
     this.isOpen || (this.trigger = b || null, this.dom.setAttribute(t, "open"));
-  }, f.prototype.close = function() {
+  }, p.prototype.close = function() {
     this.isOpen && this.dom.setAttribute(t, "closed");
-  }, f.prototype.toggle = function(b) {
+  }, p.prototype.toggle = function(b) {
     this.isOpen ? this.close() : this.open(b);
-  }, f.prototype._applyOpen = function(b) {
+  }, p.prototype._applyOpen = function(b) {
     this.isOpen = !0, b && (this.trigger = b), this._previousFocus = document.activeElement, typeof this.dom.showPopover == "function" && this.dom.showPopover();
     const g = oe(this.dom);
     if (this.trigger) {
-      const s = this.trigger.getBoundingClientRect(), e = this.dom.getAttribute(p) || "bottom", o = Ut(s, g, e, 8);
+      const s = this.trigger.getBoundingClientRect(), e = this.dom.getAttribute(h) || "bottom", o = Ut(s, g, e, 8);
       this.dom.style.top = o.top + "px", this.dom.style.left = o.left + "px", this.dom.setAttribute("data-ln-popover-placement", o.placement), this.trigger.setAttribute("aria-expanded", "true");
     }
     const _ = this.dom.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'), m = Array.prototype.find.call(_, kt);
@@ -2878,14 +2870,14 @@ function di(t, n, u) {
       r._docClickTimeout = null, document.addEventListener("click", r._boundDocClick);
     }, 0), this._boundReposition = function() {
       if (!r.trigger) return;
-      const s = r.trigger.getBoundingClientRect(), e = oe(r.dom), o = r.dom.getAttribute(p) || "bottom", a = Ut(s, e, o, 8);
+      const s = r.trigger.getBoundingClientRect(), e = oe(r.dom), o = r.dom.getAttribute(h) || "bottom", a = Ut(s, e, o, 8);
       r.dom.style.top = a.top + "px", r.dom.style.left = a.left + "px", r.dom.setAttribute("data-ln-popover-placement", a.placement);
     }, window.addEventListener("scroll", this._boundReposition, { passive: !0, capture: !0 }), window.addEventListener("resize", this._boundReposition), l.push(this), c(), S(this.dom, "ln-popover:open", {
       popoverId: this.dom.id,
       target: this.dom,
       trigger: this.trigger
     });
-  }, f.prototype._applyClose = function() {
+  }, p.prototype._applyClose = function() {
     this.isOpen = !1, this._docClickTimeout && (clearTimeout(this._docClickTimeout), this._docClickTimeout = null), this._boundDocClick && (document.removeEventListener("click", this._boundDocClick), this._boundDocClick = null), this._boundReposition && (window.removeEventListener("scroll", this._boundReposition, { capture: !0 }), window.removeEventListener("resize", this._boundReposition), this._boundReposition = null), this.dom.style.top = "", this.dom.style.left = "", this.dom.removeAttribute("data-ln-popover-placement"), this.trigger && this.trigger.setAttribute("aria-expanded", "false"), typeof this.dom.hidePopover == "function" && this.dom.matches(":popover-open") && this.dom.hidePopover();
     const b = l.indexOf(this);
     b !== -1 && l.splice(b, 1), i(), this._previousFocus && this.trigger && this._previousFocus === this.trigger ? this.trigger.focus() : this.trigger && document.activeElement === document.body && this.trigger.focus(), this._previousFocus = null, S(this.dom, "ln-popover:close", {
@@ -2893,15 +2885,15 @@ function di(t, n, u) {
       target: this.dom,
       trigger: this.trigger
     }), this.trigger = null;
-  }, f.prototype.destroy = function() {
+  }, p.prototype.destroy = function() {
     this.dom[n] && (this.dom.removeEventListener("ln-popover:request-open", this._onRequestOpen), this.dom.removeEventListener("ln-popover:request-close", this._onRequestClose), this.dom.removeEventListener("ln-popover:request-toggle", this._onRequestToggle), this.isOpen && this._applyClose(), delete this.dom[n], S(this.dom, "ln-popover:destroyed", {
       popoverId: this.dom.id,
       target: this.dom
     }));
   };
-  function h(b) {
+  function f(b) {
     this.dom = b;
-    const g = b.getAttribute(u);
+    const g = b.getAttribute(d);
     return b.setAttribute("aria-haspopup", "dialog"), b.setAttribute("aria-expanded", "false"), b.setAttribute("aria-controls", g), this._onClick = function(_) {
       if (_.ctrlKey || _.metaKey || _.button === 1) return;
       _.preventDefault();
@@ -2912,9 +2904,9 @@ function di(t, n, u) {
       m.setAttribute(t, r === "open" ? "closed" : "open");
     }, b.addEventListener("click", this._onClick), this;
   }
-  h.prototype.destroy = function() {
+  f.prototype.destroy = function() {
     this.dom.removeEventListener("click", this._onClick), delete this.dom[n + "Trigger"];
-  }, M(t, n, f, "ln-popover", {
+  }, M(t, n, p, "ln-popover", {
     onAttributeChange: function(b) {
       const g = b[n];
       if (!g) return;
@@ -2942,12 +2934,12 @@ function di(t, n, u) {
           g._applyClose();
         }
     }
-  }), M(u, n + "Trigger", h, "ln-popover-trigger");
+  }), M(d, n + "Trigger", f, "ln-popover-trigger");
 })();
 (function() {
-  const t = "data-ln-tooltip-enhance", n = "data-ln-tooltip", u = "data-ln-tooltip-position", p = "lnTooltipEnhance", l = "ln-tooltip-portal";
-  if (window[p] !== void 0) return;
-  let d = 0, c = null, i = null, f = null, h = null, b = null, g = null;
+  const t = "data-ln-tooltip-enhance", n = "data-ln-tooltip", d = "data-ln-tooltip-position", h = "lnTooltipEnhance", l = "ln-tooltip-portal";
+  if (window[h] !== void 0) return;
+  let u = 0, c = null, i = null, p = null, f = null, b = null, g = null;
   function _() {
     return c && c.parentNode || (c = document.getElementById(l), c || (c = document.createElement("div"), c.id = l, document.body.appendChild(c)), c.hasAttribute("popover") || c.setAttribute("popover", "manual")), c;
   }
@@ -2960,50 +2952,50 @@ function di(t, n, u) {
     g && (document.removeEventListener("keydown", g), g = null);
   }
   function s(a) {
-    if (f === a) return;
+    if (p === a) return;
     e();
     const y = a.getAttribute(n) || a.getAttribute("title");
     if (!y) return;
-    _(), typeof c.showPopover == "function" && c.showPopover(), a.hasAttribute("title") && (h = a.getAttribute("title"), a.removeAttribute("title"));
+    _(), typeof c.showPopover == "function" && c.showPopover(), a.hasAttribute("title") && (f = a.getAttribute("title"), a.removeAttribute("title"));
     const v = a.getAttribute("aria-describedby");
     v ? b = v : b = null;
     const w = document.createElement("div");
-    w.className = "ln-tooltip", w.textContent = y, a[p + "Uid"] || (d += 1, a[p + "Uid"] = "ln-tooltip-" + d), w.id = a[p + "Uid"], c.appendChild(w);
-    const A = w.offsetWidth, C = w.offsetHeight, L = a.getBoundingClientRect(), q = a.getAttribute(u) || "top", x = Ut(L, { width: A, height: C }, q, 6);
-    w.style.top = x.top + "px", w.style.left = x.left + "px", w.setAttribute("data-ln-tooltip-placement", x.placement), b ? a.setAttribute("aria-describedby", b + " " + w.id) : a.setAttribute("aria-describedby", w.id), i = w, f = a, m();
+    w.className = "ln-tooltip", w.textContent = y, a[h + "Uid"] || (u += 1, a[h + "Uid"] = "ln-tooltip-" + u), w.id = a[h + "Uid"], c.appendChild(w);
+    const A = w.offsetWidth, C = w.offsetHeight, L = a.getBoundingClientRect(), q = a.getAttribute(d) || "top", x = Ut(L, { width: A, height: C }, q, 6);
+    w.style.top = x.top + "px", w.style.left = x.left + "px", w.setAttribute("data-ln-tooltip-placement", x.placement), b ? a.setAttribute("aria-describedby", b + " " + w.id) : a.setAttribute("aria-describedby", w.id), i = w, p = a, m();
   }
   function e() {
     if (!i) {
       r();
       return;
     }
-    f && (b !== null ? f.setAttribute("aria-describedby", b) : f.removeAttribute("aria-describedby"), b = null, h !== null && f.setAttribute("title", h)), h = null, i.parentNode && i.parentNode.removeChild(i), i = null, f = null, c && typeof c.hidePopover == "function" && c.matches(":popover-open") && c.hidePopover(), r();
+    p && (b !== null ? p.setAttribute("aria-describedby", b) : p.removeAttribute("aria-describedby"), b = null, f !== null && p.setAttribute("title", f)), f = null, i.parentNode && i.parentNode.removeChild(i), i = null, p = null, c && typeof c.hidePopover == "function" && c.matches(":popover-open") && c.hidePopover(), r();
   }
   function o(a) {
     return this.dom = a, a.hasAttribute("data-ln-tooltip-enhanced") || (a.setAttribute("data-ln-tooltip-enhanced", ""), this._addedEnhancedAttr = !0), this._onEnter = function() {
       s(a);
     }, this._onLeave = function() {
-      f === a && !a.contains(document.activeElement) && e();
+      p === a && !a.contains(document.activeElement) && e();
     }, this._onFocus = function() {
       s(a);
     }, this._onBlur = function() {
-      f === a && !a.matches(":hover") && e();
+      p === a && !a.matches(":hover") && e();
     }, a.addEventListener("mouseenter", this._onEnter), a.addEventListener("mouseleave", this._onLeave), a.addEventListener("focus", this._onFocus, !0), a.addEventListener("blur", this._onBlur, !0), this;
   }
   o.prototype.destroy = function() {
     const a = this.dom;
-    a.removeEventListener("mouseenter", this._onEnter), a.removeEventListener("mouseleave", this._onLeave), a.removeEventListener("focus", this._onFocus, !0), a.removeEventListener("blur", this._onBlur, !0), f === a && e(), this._addedEnhancedAttr && a.removeAttribute("data-ln-tooltip-enhanced"), delete a[p], delete a[p + "Uid"], S(a, "ln-tooltip:destroyed", { trigger: a });
+    a.removeEventListener("mouseenter", this._onEnter), a.removeEventListener("mouseleave", this._onLeave), a.removeEventListener("focus", this._onFocus, !0), a.removeEventListener("blur", this._onBlur, !0), p === a && e(), this._addedEnhancedAttr && a.removeAttribute("data-ln-tooltip-enhanced"), delete a[h], delete a[h + "Uid"], S(a, "ln-tooltip:destroyed", { trigger: a });
   }, M(
     "[" + t + "], [data-ln-tooltip-enhanced], [" + n + "][title]",
-    p,
+    h,
     o,
     "ln-tooltip"
   );
 })();
 (function() {
-  const t = "data-ln-toast", n = "lnToast", u = "ln-toast-item";
+  const t = "data-ln-toast", n = "lnToast", d = "ln-toast-item";
   if (window[n] !== void 0) return;
-  function p(r) {
+  function h(r) {
     if (!(!r || !(r instanceof HTMLElement)) && (r.hasAttribute("popover") || r.setAttribute("popover", "manual"), typeof r.showPopover == "function")) {
       if (r.matches(":popover-open"))
         try {
@@ -3024,33 +3016,33 @@ function di(t, n, u) {
       } catch {
       }
   }
-  function d(r) {
+  function u(r) {
     this.dom = r, this.timeoutDefault = +(r.getAttribute("data-ln-toast-timeout") ?? 6e3), this.max = +(r.getAttribute("data-ln-toast-max") ?? 5);
     const s = Array.from(r.querySelectorAll("[data-ln-toast-item]"));
     for (; s.length > this.max; ) r.removeChild(s.shift());
     for (const e of s) g(e, this);
-    return s.length > 0 && p(r), this;
+    return s.length > 0 && h(r), this;
   }
-  d.prototype.enqueue = function(r) {
+  u.prototype.enqueue = function(r) {
     if (!r) return;
     const s = c(r, this.dom);
     if (!s) return;
     const e = Number.isFinite(r.timeout) ? r.timeout : this.timeoutDefault;
-    f(this, s), e > 0 && (s._timer = setTimeout(() => h(s), e));
-  }, d.prototype.clear = function() {
+    p(this, s), e > 0 && (s._timer = setTimeout(() => f(s), e));
+  }, u.prototype.clear = function() {
     for (const r of Array.from(this.dom.querySelectorAll("[data-ln-toast-item]")))
-      h(r);
-  }, d.prototype.destroy = function() {
+      f(r);
+  }, u.prototype.destroy = function() {
     if (this.dom[n]) {
       for (const r of Array.from(this.dom.querySelectorAll("[data-ln-toast-item]")))
-        h(r);
+        f(r);
       l(this.dom), S(this.dom, "ln-toast:destroyed", { target: this.dom }), delete this.dom[n];
     }
   };
   function c(r, s) {
-    const e = ((r.type || "") + "").trim().toLowerCase(), o = pt(s, u, "ln-toast");
+    const e = ((r.type || "") + "").trim().toLowerCase(), o = pt(s, d, "ln-toast");
     if (!o)
-      return console.warn('[ln-toast] Template "' + u + '" not found'), null;
+      return console.warn('[ln-toast] Template "' + d + '" not found'), null;
     ot(o, {
       type: e,
       title: r.title,
@@ -3063,7 +3055,7 @@ function di(t, n, u) {
     y && i(y, r);
     const v = a.querySelector("[data-ln-toast-close]");
     return v && v.addEventListener("click", function() {
-      h(a);
+      f(a);
     }), a;
   }
   function i(r, s) {
@@ -3084,12 +3076,12 @@ function di(t, n, u) {
       r.appendChild(e);
     }
   }
-  function f(r, s) {
+  function p(r, s) {
     const e = Array.from(r.dom.querySelectorAll("[data-ln-toast-item]"));
     for (; e.length >= r.max && e.length > 0; ) r.dom.removeChild(e.shift());
-    r.dom.appendChild(s), p(r.dom), requestAnimationFrame(() => s.classList.remove("ln-enter"));
+    r.dom.appendChild(s), h(r.dom), requestAnimationFrame(() => s.classList.remove("ln-enter"));
   }
-  function h(r) {
+  function f(r) {
     if (!r || !r.parentNode) return;
     const s = r.parentNode;
     clearTimeout(r._timer), r.classList.remove("ln-enter"), r.classList.add("ln-out"), setTimeout(() => {
@@ -3105,11 +3097,11 @@ function di(t, n, u) {
     r._lnToastHydrated = !0;
     const e = r.querySelector("[data-ln-toast-close]");
     e && e.addEventListener("click", function() {
-      h(r);
+      f(r);
     });
     const o = +(r.getAttribute("data-ln-toast-timeout") ?? s.timeoutDefault);
     o > 0 && (r._timer = setTimeout(function() {
-      h(r);
+      f(r);
     }, o));
   }
   function _(r) {
@@ -3118,78 +3110,78 @@ function di(t, n, u) {
       console.warn("[ln-toast] No toast container found");
       return;
     }
-    (e[n] || (e[n] = new d(e))).enqueue(s);
+    (e[n] || (e[n] = new u(e))).enqueue(s);
   }
   function m(r) {
     const s = r && r.detail || {};
     if (s.container) {
       const e = b(s);
-      e && (e[n] || (e[n] = new d(e))).clear();
+      e && (e[n] || (e[n] = new u(e))).clear();
     } else {
       const e = document.querySelectorAll("[" + t + "]");
       for (const o of Array.from(e))
-        (o[n] || (o[n] = new d(o))).clear();
+        (o[n] || (o[n] = new u(o))).clear();
     }
   }
   ct(function() {
     window.addEventListener("ln-toast:enqueue", _), window.addEventListener("ln-toast:clear", m), window.addEventListener("ln-modal:open", function() {
       const r = document.querySelectorAll("[" + t + "]");
       for (const s of Array.from(r))
-        s.querySelectorAll("[data-ln-toast-item]").length > 0 && p(s);
+        s.querySelectorAll("[data-ln-toast-item]").length > 0 && h(s);
     });
-  }, "ln-toast"), M(t, n, d, "ln-toast");
+  }, "ln-toast"), M(t, n, u, "ln-toast");
 })();
-function ui(t) {
+function di(t) {
   if (!t) return null;
-  const n = String(t).split(",").map((u) => u.trim().toLowerCase()).filter(Boolean).map((u) => u.startsWith(".") ? u.slice(1) : u);
+  const n = String(t).split(",").map((d) => d.trim().toLowerCase()).filter(Boolean).map((d) => d.startsWith(".") ? d.slice(1) : d);
   return n.length ? n : null;
 }
-function mn(t) {
+function fn(t) {
   return !t || typeof t != "string" || !t.includes(".") ? "" : t.split(".").pop().toLowerCase();
 }
-function hi(t, n) {
+function ui(t, n) {
   if (!n || n.length === 0) return !0;
   if (!t) return !1;
-  const u = mn(t.name), p = String(t.type || "").toLowerCase();
+  const d = fn(t.name), h = String(t.type || "").toLowerCase();
   return n.some((l) => {
     if (l.includes("/")) {
       if (l.endsWith("/*")) {
-        const d = l.slice(0, -1);
-        return p.startsWith(d);
+        const u = l.slice(0, -1);
+        return h.startsWith(u);
       }
-      return p === l;
+      return h === l;
     }
-    return u === l;
+    return d === l;
   });
 }
-function fi(t, n = "en", u = {}) {
+function hi(t, n = "en", d = {}) {
   if (typeof t != "number" || isNaN(t) || t === 0)
-    return "0 " + (u["unit-b"] || "B");
-  const p = 1024, l = [
-    u["unit-b"] || "B",
-    u["unit-kb"] || "KB",
-    u["unit-mb"] || "MB",
-    u["unit-gb"] || "GB"
-  ], d = Math.floor(Math.log(t) / Math.log(p)), c = Math.min(d, l.length - 1), i = t / Math.pow(p, c);
+    return "0 " + (d["unit-b"] || "B");
+  const h = 1024, l = [
+    d["unit-b"] || "B",
+    d["unit-kb"] || "KB",
+    d["unit-mb"] || "MB",
+    d["unit-gb"] || "GB"
+  ], u = Math.floor(Math.log(t) / Math.log(h)), c = Math.min(u, l.length - 1), i = t / Math.pow(h, c);
   return new Intl.NumberFormat(n, {
     maximumFractionDigits: 1,
     minimumFractionDigits: 0
   }).format(i) + " " + l[c];
 }
 (function() {
-  const t = "data-ln-upload", n = "lnUpload", u = "data-ln-upload-dict", p = "data-ln-upload-accept", l = "data-ln-upload-delete", d = "data-ln-upload-max-size", c = "data-ln-upload-max-files", i = "data-ln-upload-file-field", f = "data-ln-upload-ids-field", h = "file", b = "file_ids[]";
+  const t = "data-ln-upload", n = "lnUpload", d = "data-ln-upload-dict", h = "data-ln-upload-accept", l = "data-ln-upload-delete", u = "data-ln-upload-max-size", c = "data-ln-upload-max-files", i = "data-ln-upload-file-field", p = "data-ln-upload-ids-field", f = "file", b = "file_ids[]";
   if (window[n] !== void 0) return;
   function g(r, s, e) {
-    return fi(r, s, e);
+    return hi(r, s, e);
   }
   function _() {
     const r = document.querySelector('meta[name="csrf-token"]');
     return r ? r.getAttribute("content") : "";
   }
   function m(r) {
-    this.dom = r, this.dict = Vt(r, u), this.locale = V(r), this.zone = r.querySelector("[data-ln-upload-zone]") || r, this.list = r.querySelector("[data-ln-upload-list]"), this.input = r.querySelector('input[type="file"]'), this.input || console.warn('[ln-upload] Missing <input type="file"> in container:', r), this.uploadUrl = r.getAttribute(t) || "", this.deleteUrlPattern = r.getAttribute(l) || "", this.fileFieldName = r.getAttribute(i) || h, this.idsFieldName = r.getAttribute(f) || b, this.maxSize = +r.getAttribute(d) || 0, this.maxFiles = +r.getAttribute(c) || 0;
-    const s = r.getAttribute(p) || (this.input ? this.input.getAttribute("accept") : "");
-    return this.allowedExts = ui(s), this.uploadedFiles = /* @__PURE__ */ new Map(), this.fileIdCounter = 0, this._dragDepth = 0, this._hydrate(), this._bindEvents(), this;
+    this.dom = r, this.dict = Vt(r, d), this.locale = V(r), this.zone = r.querySelector("[data-ln-upload-zone]") || r, this.list = r.querySelector("[data-ln-upload-list]"), this.input = r.querySelector('input[type="file"]'), this.input || console.warn('[ln-upload] Missing <input type="file"> in container:', r), this.uploadUrl = r.getAttribute(t) || "", this.deleteUrlPattern = r.getAttribute(l) || "", this.fileFieldName = r.getAttribute(i) || f, this.idsFieldName = r.getAttribute(p) || b, this.maxSize = +r.getAttribute(u) || 0, this.maxFiles = +r.getAttribute(c) || 0;
+    const s = r.getAttribute(h) || (this.input ? this.input.getAttribute("accept") : "");
+    return this.allowedExts = di(s), this.uploadedFiles = /* @__PURE__ */ new Map(), this.fileIdCounter = 0, this._dragDepth = 0, this._hydrate(), this._bindEvents(), this;
   }
   m.prototype._hydrate = function() {
     const r = this;
@@ -3272,7 +3264,7 @@ function fi(t, n = "en", u = {}) {
         });
         continue;
       }
-      if (!hi(a, s.allowedExts)) {
+      if (!ui(a, s.allowedExts)) {
         S(s.dom, "ln-upload:invalid", {
           file: a,
           reason: "accept"
@@ -3289,7 +3281,7 @@ function fi(t, n = "en", u = {}) {
       W(s.dom, "ln-upload:before-upload", { file: a }).defaultPrevented || s._uploadSingleFile(a);
     }
   }, m.prototype._uploadSingleFile = function(r) {
-    const s = this, e = "file-" + ++s.fileIdCounter, o = mn(r.name);
+    const s = this, e = "file-" + ++s.fileIdCounter, o = fn(r.name);
     let a = null;
     if (this.list) {
       const C = pt(this.dom, "ln-upload-item", "ln-upload");
@@ -3485,47 +3477,47 @@ function fi(t, n = "en", u = {}) {
   function n(i) {
     return i.hostname && i.hostname !== window.location.hostname;
   }
-  function u(i) {
+  function d(i) {
     if (i.getAttribute("data-ln-external-link") === "processed" || !n(i)) return;
     i.target = "_blank";
-    const f = (i.rel || "").split(/\s+/).filter(Boolean);
-    f.includes("noopener") || f.push("noopener"), f.includes("noreferrer") || f.push("noreferrer"), i.rel = f.join(" ");
-    const h = document.createElement("span");
-    h.className = "sr-only", h.textContent = "(opens in new tab)", i.appendChild(h), i.setAttribute("data-ln-external-link", "processed"), S(i, "ln-external-links:processed", {
+    const p = (i.rel || "").split(/\s+/).filter(Boolean);
+    p.includes("noopener") || p.push("noopener"), p.includes("noreferrer") || p.push("noreferrer"), i.rel = p.join(" ");
+    const f = document.createElement("span");
+    f.className = "sr-only", f.textContent = "(opens in new tab)", i.appendChild(f), i.setAttribute("data-ln-external-link", "processed"), S(i, "ln-external-links:processed", {
       link: i,
       href: i.href
     });
   }
-  function p(i) {
+  function h(i) {
     i = i || document.body;
-    for (const f of i.querySelectorAll("a, area"))
-      u(f);
+    for (const p of i.querySelectorAll("a, area"))
+      d(p);
   }
   function l() {
     ct(function() {
       document.body.addEventListener("click", function(i) {
-        const f = i.target.closest("a, area");
-        f && f.getAttribute("data-ln-external-link") === "processed" && S(f, "ln-external-links:clicked", {
-          link: f,
-          href: f.href,
-          text: f.textContent || f.title || ""
+        const p = i.target.closest("a, area");
+        p && p.getAttribute("data-ln-external-link") === "processed" && S(p, "ln-external-links:clicked", {
+          link: p,
+          href: p.href,
+          text: p.textContent || p.title || ""
         });
       });
     }, "ln-external-links");
   }
-  function d() {
+  function u() {
     ct(function() {
-      new MutationObserver(function(f) {
-        for (const h of f) {
-          if (h.type === "childList") {
-            for (const b of h.addedNodes)
-              if (b.nodeType === 1 && (b.matches && (b.matches("a") || b.matches("area")) && u(b), b.querySelectorAll))
+      new MutationObserver(function(p) {
+        for (const f of p) {
+          if (f.type === "childList") {
+            for (const b of f.addedNodes)
+              if (b.nodeType === 1 && (b.matches && (b.matches("a") || b.matches("area")) && d(b), b.querySelectorAll))
                 for (const g of b.querySelectorAll("a, area"))
-                  u(g);
+                  d(g);
           }
-          if (h.type === "attributes" && h.attributeName === "href") {
-            const b = h.target;
-            b.matches && (b.matches("a") || b.matches("area")) && u(b);
+          if (f.type === "attributes" && f.attributeName === "href") {
+            const b = f.target;
+            b.matches && (b.matches("a") || b.matches("area")) && d(b);
           }
         }
       }).observe(document.body, {
@@ -3537,26 +3529,26 @@ function fi(t, n = "en", u = {}) {
     }, "ln-external-links");
   }
   function c() {
-    l(), d(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function() {
-      p();
-    }) : p();
+    l(), u(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function() {
+      h();
+    }) : h();
   }
   window[t] = {
-    process: p
+    process: h
   }, c();
 })();
 (function() {
   const t = "data-ln-link", n = "lnLink";
   if (window[n] !== void 0) return;
-  let u = null;
-  function p() {
-    u = document.createElement("div"), u.className = "ln-link-status", document.body.appendChild(u);
+  let d = null;
+  function h() {
+    d = document.createElement("div"), d.className = "ln-link-status", document.body.appendChild(d);
   }
   function l(o) {
-    u && (u.textContent = o, u.classList.add("ln-link-status--visible"));
+    d && (d.textContent = o, d.classList.add("ln-link-status--visible"));
   }
-  function d() {
-    u && u.classList.remove("ln-link-status--visible");
+  function u() {
+    d && d.classList.remove("ln-link-status--visible");
   }
   function c(o, a) {
     if (a.target.closest("a, button, input, select, textarea")) return;
@@ -3576,18 +3568,18 @@ function fi(t, n = "en", u = {}) {
     const y = a.getAttribute("href");
     y && l(y);
   }
-  function f() {
-    d();
+  function p() {
+    u();
   }
-  function h(o) {
+  function f(o) {
     o[n + "Row"] || !o.querySelector("a") || (o[n + "Row"] = !0, o._lnLinkClick = function(y) {
       c(o, y);
     }, o._lnLinkEnter = function() {
       i(o);
-    }, o.addEventListener("click", o._lnLinkClick), o.addEventListener("mouseenter", o._lnLinkEnter), o.addEventListener("mouseleave", f));
+    }, o.addEventListener("click", o._lnLinkClick), o.addEventListener("mouseenter", o._lnLinkEnter), o.addEventListener("mouseleave", p));
   }
   function b(o) {
-    o[n + "Row"] && (o._lnLinkClick && o.removeEventListener("click", o._lnLinkClick), o._lnLinkEnter && o.removeEventListener("mouseenter", o._lnLinkEnter), o.removeEventListener("mouseleave", f), delete o._lnLinkClick, delete o._lnLinkEnter, delete o[n + "Row"]);
+    o[n + "Row"] && (o._lnLinkClick && o.removeEventListener("click", o._lnLinkClick), o._lnLinkEnter && o.removeEventListener("mouseenter", o._lnLinkEnter), o.removeEventListener("mouseleave", p), delete o._lnLinkClick, delete o._lnLinkEnter, delete o[n + "Row"]);
   }
   function g(o) {
     if (!o[n + "Init"]) return;
@@ -3607,9 +3599,9 @@ function fi(t, n = "en", u = {}) {
     if (a === "TABLE" || a === "TBODY") {
       const y = a === "TABLE" && o.querySelector("tbody") || o;
       for (const v of y.querySelectorAll("tr"))
-        h(v);
+        f(v);
     } else
-      h(o);
+      f(o);
   }
   function m(o) {
     o.hasAttribute && o.hasAttribute(t) && _(o);
@@ -3628,13 +3620,13 @@ function fi(t, n = "en", u = {}) {
                 const w = v.closest("[" + t + "]");
                 if (w)
                   if (v.tagName === "TR")
-                    h(v);
+                    f(v);
                   else {
                     const A = w.tagName;
                     if (A === "TABLE" || A === "TBODY") {
                       const C = v.querySelectorAll ? v.querySelectorAll("tr") : [];
                       for (const L of C)
-                        h(L);
+                        f(L);
                     }
                   }
               }
@@ -3652,11 +3644,11 @@ function fi(t, n = "en", u = {}) {
   }
   window[n] = { init: s, destroy: g };
   function e() {
-    p(), r(), s(document.body);
+    h(), r(), s(document.body);
   }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", e) : e();
 })();
-const xt = ["Ctrl", "Alt", "Shift", "Meta"], pi = {
+const xt = ["Ctrl", "Alt", "Shift", "Meta"], fi = {
   alt: "Alt",
   control: "Ctrl",
   ctrl: "Ctrl",
@@ -3689,91 +3681,91 @@ const xt = ["Ctrl", "Alt", "Shift", "Meta"], pi = {
   arrowright: "ArrowRight",
   right: "ArrowRight"
 };
-function gn(t) {
+function pn(t) {
   if (t === " ") return "Space";
   const n = String(t || "").trim();
   if (!n) return "";
-  const u = pi[n.toLowerCase()];
-  return u || (n.length === 1 || /^f\d{1,2}$/i.test(n) ? n.toUpperCase() : n.charAt(0).toUpperCase() + n.slice(1));
+  const d = fi[n.toLowerCase()];
+  return d || (n.length === 1 || /^f\d{1,2}$/i.test(n) ? n.toUpperCase() : n.charAt(0).toUpperCase() + n.slice(1));
 }
-function _n(t) {
+function mn(t) {
   const n = String(t || "").replace(/\s*\+\s*/g, "+").trim();
   if (!n) return "";
-  const u = n.split("+"), p = /* @__PURE__ */ new Set();
+  const d = n.split("+"), h = /* @__PURE__ */ new Set();
   let l = "";
-  for (let c = 0; c < u.length; c++) {
-    const i = gn(u[c]);
+  for (let c = 0; c < d.length; c++) {
+    const i = pn(d[c]);
     if (!i) return "";
     if (xt.indexOf(i) !== -1) {
-      p.add(i);
+      h.add(i);
       continue;
     }
     if (l) return "";
     l = i;
   }
   if (!l) return "";
-  const d = [];
+  const u = [];
   for (let c = 0; c < xt.length; c++)
-    p.has(xt[c]) && d.push(xt[c]);
-  return d.push(l), d.join("+");
+    h.has(xt[c]) && u.push(xt[c]);
+  return u.push(l), u.join("+");
 }
-function mi(t) {
+function pi(t) {
   const n = String(t || "").replace(/\s*\+\s*/g, "+").trim();
   if (!n) return [];
-  const u = n.split(/[\s,]+/), p = [];
-  for (let l = 0; l < u.length; l++) {
-    const d = _n(u[l]);
-    d && p.indexOf(d) === -1 && p.push(d);
+  const d = n.split(/[\s,]+/), h = [];
+  for (let l = 0; l < d.length; l++) {
+    const u = mn(d[l]);
+    u && h.indexOf(u) === -1 && h.push(u);
   }
-  return p;
+  return h;
 }
-function gi(t, n) {
-  const u = String(n || "").trim();
-  if (!u || /[\s,]/.test(u)) return "";
-  const p = String(t || "").replace(/\s*\+\s*/g, "+").trim();
-  return /[\s,]/.test(p) ? "" : _n(p ? p + "+" + u : u);
+function mi(t, n) {
+  const d = String(n || "").trim();
+  if (!d || /[\s,]/.test(d)) return "";
+  const h = String(t || "").replace(/\s*\+\s*/g, "+").trim();
+  return /[\s,]/.test(h) ? "" : mn(h ? h + "+" + d : d);
+}
+function gi(t) {
+  if (!t) return "";
+  const n = pn(t.key);
+  if (!n || xt.indexOf(n) !== -1) return "";
+  const d = [];
+  return t.ctrlKey && d.push("Ctrl"), t.altKey && d.push("Alt"), t.shiftKey && d.push("Shift"), t.metaKey && d.push("Meta"), d.push(n), d.join("+");
 }
 function _i(t) {
-  if (!t) return "";
-  const n = gn(t.key);
-  if (!n || xt.indexOf(n) !== -1) return "";
-  const u = [];
-  return t.ctrlKey && u.push("Ctrl"), t.altKey && u.push("Alt"), t.shiftKey && u.push("Shift"), t.metaKey && u.push("Meta"), u.push(n), u.join("+");
-}
-function bi(t) {
   if (!t || !t.tagName) return null;
   const n = String(t.tagName).toLowerCase();
   if (n === "button" || n === "a" && t.hasAttribute && t.hasAttribute("href")) return "click";
   if (n === "input" || n === "textarea" || n === "select" || t.isContentEditable) return "focus";
   if (t.hasAttribute && t.hasAttribute("contenteditable")) {
-    const u = t.getAttribute("contenteditable");
-    if (u === "" || String(u).toLowerCase() !== "false") return "focus";
+    const d = t.getAttribute("contenteditable");
+    if (d === "" || String(d).toLowerCase() !== "false") return "focus";
   }
   return null;
 }
-function yi(t, n, u, p) {
-  if (!t || !n || u !== "click" || t.target !== n || t.ctrlKey || t.altKey || t.shiftKey || t.metaKey) return !1;
+function bi(t, n, d, h) {
+  if (!t || !n || d !== "click" || t.target !== n || t.ctrlKey || t.altKey || t.shiftKey || t.metaKey) return !1;
   const l = String(n.tagName || "").toLowerCase();
-  return l === "button" ? p === "Enter" || p === "Space" : l === "a" && n.hasAttribute && n.hasAttribute("href") && p === "Enter";
+  return l === "button" ? h === "Enter" || h === "Space" : l === "a" && n.hasAttribute && n.hasAttribute("href") && h === "Enter";
 }
 (function() {
-  const t = "data-ln-key", n = "lnKey", u = "data-ln-key-target", p = "data-ln-key-allow-input", l = "data-ln-key-modifier", d = "data-ln-key-for", c = "lnKeyFor";
+  const t = "data-ln-key", n = "lnKey", d = "data-ln-key-target", h = "data-ln-key-allow-input", l = "data-ln-key-modifier", u = "data-ln-key-for", c = "lnKeyFor";
   if (window[n] !== void 0) return;
   const i = /* @__PURE__ */ new Set();
-  let f = null;
-  function h() {
-    f || (f = function(r) {
+  let p = null;
+  function f() {
+    p || (p = function(r) {
       if (r.defaultPrevented || r.isComposing || r.repeat) return;
-      const s = _i(r);
+      const s = gi(r);
       if (!s) return;
-      const e = Mn(r.target), o = document.querySelectorAll("[" + t + "], [" + d + "]");
+      const e = Rn(r.target), o = document.querySelectorAll("[" + t + "], [" + u + "]");
       let a = null, y = !1, v = !1;
       for (let C = 0; C < o.length; C++) {
         const L = o[C], q = L[n] || L[c];
         if (!q || !q.matches(s) || e && !q.allowsInput()) continue;
-        const x = q.resolveTarget(), D = bi(x);
-        if (!(!D || !Fn(x, D))) {
-          if (yi(r, x, D, s)) {
+        const x = q.resolveTarget(), D = _i(x);
+        if (!(!D || !On(x, D))) {
+          if (bi(r, x, D, s)) {
             v = !0;
             continue;
           }
@@ -3790,42 +3782,42 @@ function yi(t, n, u, p) {
         event: r
       };
       W(a.host, "ln-key:before-trigger", w).defaultPrevented || (r.preventDefault(), a.target[a.action](), S(a.host, "ln-key:trigger", w));
-    }, document.addEventListener("keydown", f));
+    }, document.addEventListener("keydown", p));
   }
   function b() {
-    i.size > 0 || !f || (document.removeEventListener("keydown", f), f = null);
+    i.size > 0 || !p || (document.removeEventListener("keydown", p), p = null);
   }
   function g(r) {
-    return this.dom = r, this.shortcuts = [], i.add(this), this.sync(), h(), this;
+    return this.dom = r, this.shortcuts = [], i.add(this), this.sync(), f(), this;
   }
   g.prototype.sync = function() {
-    this.shortcuts = mi(this.dom.getAttribute(t));
+    this.shortcuts = pi(this.dom.getAttribute(t));
   }, g.prototype.matches = function(r) {
     return this.shortcuts.indexOf(r) !== -1;
   }, g.prototype.allowsInput = function() {
-    return this.dom.hasAttribute(p);
+    return this.dom.hasAttribute(h);
   }, g.prototype.resolveTarget = function() {
-    const r = this.dom.getAttribute(u);
-    return r ? m(r, u) : this.dom;
+    const r = this.dom.getAttribute(d);
+    return r ? m(r, d) : this.dom;
   }, g.prototype.destroy = function() {
     this.dom[n] && (i.delete(this), delete this.dom[n], b(), S(this.dom, "ln-key:destroyed", { target: this.dom }));
   };
   function _(r) {
-    return this.dom = r, i.add(this), h(), this;
+    return this.dom = r, i.add(this), f(), this;
   }
   _.prototype._modifierContext = function() {
     return this.dom.closest("[" + l + "]");
   }, _.prototype.shortcut = function() {
     const r = this._modifierContext(), s = r ? r.getAttribute(l) : "";
-    return gi(s, this.dom.textContent);
+    return mi(s, this.dom.textContent);
   }, _.prototype.matches = function(r) {
     return this.shortcut() === r;
   }, _.prototype.allowsInput = function() {
-    if (this.dom.hasAttribute(p)) return !0;
+    if (this.dom.hasAttribute(h)) return !0;
     const r = this._modifierContext();
-    return !!(r && r.hasAttribute(p));
+    return !!(r && r.hasAttribute(h));
   }, _.prototype.resolveTarget = function() {
-    return m(this.dom.getAttribute(d), d);
+    return m(this.dom.getAttribute(u), u);
   }, _.prototype.destroy = function() {
     this.dom[c] && (i.delete(this), delete this.dom[c], b(), S(this.dom, "ln-key:destroyed", { target: this.dom }));
   };
@@ -3839,7 +3831,7 @@ function yi(t, n, u, p) {
     }
   }
   M(t, n, g, "ln-key", {
-    extraAttributes: [u, p],
+    extraAttributes: [d, h],
     onAttributeChange: function(r) {
       const s = r[n];
       if (s) {
@@ -3850,39 +3842,39 @@ function yi(t, n, u, p) {
         s.sync();
       }
     }
-  }), M(d, c, _, "ln-key-for", {
+  }), M(u, c, _, "ln-key-for", {
     onAttributeChange: function(r) {
       const s = r[c];
-      s && !r.hasAttribute(d) && s.destroy();
+      s && !r.hasAttribute(u) && s.destroy();
     }
   });
 })();
-function vi(t, n, u = 100) {
+function yi(t, n, d = 100) {
   if (n != null && n !== "") {
-    const p = parseFloat(String(n));
-    if (!isNaN(p) && p > 0) return p;
+    const h = parseFloat(String(n));
+    if (!isNaN(h) && h > 0) return h;
   }
   if (t != null && t !== "") {
-    const p = parseFloat(String(t));
-    if (!isNaN(p) && p > 0) return p;
+    const h = parseFloat(String(t));
+    if (!isNaN(h) && h > 0) return h;
   }
-  return u;
+  return d;
 }
 (function() {
   const t = "[data-ln-progress]", n = "lnProgress";
   if (window[n] !== void 0) return;
-  function u(d) {
-    return this.dom = d, this._parentObserver = null, l.call(this), p.call(this), this;
+  function d(u) {
+    return this.dom = u, this._parentObserver = null, l.call(this), h.call(this), this;
   }
-  u.prototype.destroy = function() {
+  d.prototype.destroy = function() {
     this.dom[n] && (this._parentObserver && this._parentObserver.disconnect(), delete this.dom[n]);
   };
-  function p() {
-    const d = this, c = this.dom.parentElement;
+  function h() {
+    const u = this, c = this.dom.parentElement;
     if (!c) return;
-    const i = new MutationObserver(function(f) {
-      for (const h of f)
-        h.attributeName === "data-ln-progress-max" && l.call(d);
+    const i = new MutationObserver(function(p) {
+      for (const f of p)
+        f.attributeName === "data-ln-progress-max" && l.call(u);
     });
     i.observe(c, {
       attributes: !0,
@@ -3890,7 +3882,7 @@ function vi(t, n, u = 100) {
     }), this._parentObserver = i;
   }
   function l() {
-    const d = this.dom.getAttribute("data-ln-progress"), c = this.dom.parentElement, i = c ? c.getAttribute("data-ln-progress-max") : null, f = this.dom.getAttribute("data-ln-progress-max"), h = vi(f, i, 100), b = en(d, h);
+    const u = this.dom.getAttribute("data-ln-progress"), c = this.dom.parentElement, i = c ? c.getAttribute("data-ln-progress-max") : null, p = this.dom.getAttribute("data-ln-progress-max"), f = yi(p, i, 100), b = en(u, f);
     this.dom.style.width = b.percentage + "%", this.dom.setAttribute("role", "progressbar"), this.dom.setAttribute("aria-valuemin", String(b.min)), this.dom.setAttribute("aria-valuemax", String(b.max)), this.dom.setAttribute("aria-valuenow", String(b.clampedValue)), S(this.dom, "ln-progress:change", {
       target: this.dom,
       value: b.value,
@@ -3901,70 +3893,70 @@ function vi(t, n, u = 100) {
   M(
     t,
     n,
-    u,
+    d,
     "ln-progress",
     {
       extraAttributes: ["data-ln-progress-max"],
-      onAttributeChange: function(d) {
-        const c = d[n];
+      onAttributeChange: function(u) {
+        const c = u[n];
         c && l.call(c);
       }
     }
   );
 })();
-function wi(t, n) {
+function vi(t, n) {
   if (!Array.isArray(t) || !Array.isArray(n)) return t !== n;
   if (t.length !== n.length) return !0;
-  for (let u = 0; u < t.length; u++)
-    if (t[u] !== n[u]) return !0;
+  for (let d = 0; d < t.length; d++)
+    if (t[d] !== n[d]) return !0;
   return !1;
 }
-function Ei(t, n) {
+function wi(t, n) {
   if (!n || typeof n != "object") return !0;
-  const u = Object.keys(n);
-  if (u.length === 0) return !0;
-  for (let p = 0; p < u.length; p++) {
-    const l = n[u[p]], d = t[l.col] || "";
-    if (!ge(d, l.values))
+  const d = Object.keys(n);
+  if (d.length === 0) return !0;
+  for (let h = 0; h < d.length; h++) {
+    const l = n[d[h]], u = t[l.col] || "";
+    if (!ge(u, l.values))
       return !1;
   }
   return !0;
 }
-function Ai(t) {
+function Ei(t) {
   if (!Array.isArray(t)) return { key: null, values: [] };
   let n = null;
-  const u = [];
-  for (let p = 0; p < t.length; p++) {
-    const l = t[p];
-    !n && l.key && (n = l.key), l.checked && !l.isReset && l.value && u.push(l.value);
+  const d = [];
+  for (let h = 0; h < t.length; h++) {
+    const l = t[h];
+    !n && l.key && (n = l.key), l.checked && !l.isReset && l.value && d.push(l.value);
   }
-  return { key: n, values: u };
+  return { key: n, values: d };
 }
 (function() {
-  const t = "data-ln-filter", n = "lnFilter", u = "data-ln-filter-key", p = "data-ln-filter-value", l = "data-ln-filter-hide", d = "data-ln-filter-reset", c = "data-ln-filter-col", i = "data-ln-hash", f = /* @__PURE__ */ new WeakMap();
+  const t = "data-ln-filter", n = "lnFilter", d = "data-ln-filter-key", h = "data-ln-filter-value", l = "data-ln-filter-hide", u = "data-ln-filter-reset", c = "data-ln-filter-col", i = "data-ln-hash", p = /* @__PURE__ */ new WeakMap();
   if (window[n] !== void 0) return;
-  function h(r) {
-    return r.hasAttribute(d) || !r.getAttribute(p);
+  function f(r) {
+    return r.hasAttribute(u) || !r.getAttribute(h);
   }
   function b(r) {
-    const s = r.dom.querySelectorAll("[" + u + "]"), e = [];
+    const s = r.dom.querySelectorAll("[" + d + "]"), e = [];
     for (let a = 0; a < s.length; a++) {
       const y = s[a];
       e.push({
-        key: y.getAttribute(u),
-        value: y.getAttribute(p) || "",
+        key: y.getAttribute(d),
+        value: y.getAttribute(h) || "",
         checked: y.checked,
-        isReset: h(y)
+        isReset: f(y)
       });
     }
-    const o = Ai(e);
+    const o = Ei(e);
     return { key: o.key, values: o.values, targetId: r.targetId };
   }
   function g(r, s, e) {
-    const o = r.querySelectorAll("[" + u + "]"), a = Array.isArray(e) && e.length > 0;
+    const o = r.querySelectorAll("[" + d + "]"), a = Array.isArray(e) && e.length > 0;
     for (let y = 0; y < o.length; y++) {
       const v = o[y];
-      h(v) ? v.checked = !a : a && v.getAttribute(u) === s && e.indexOf(v.getAttribute(p)) !== -1 ? v.checked = !0 : v.checked = !1;
+      f(v) ? v.checked = !a : a && v.getAttribute(d) === s && e.indexOf(v.getAttribute(h)) !== -1 ? v.checked = !0 : v.checked = !1;
     }
   }
   function _(r) {
@@ -3993,9 +3985,9 @@ function Ai(t) {
       }), a = !0);
     }
     if (!a) {
-      const y = r.querySelectorAll("[" + u + "]");
+      const y = r.querySelectorAll("[" + d + "]");
       for (let v = 0; v < y.length; v++)
-        if (y[v].checked && !h(y[v])) {
+        if (y[v].checked && !f(y[v])) {
           it(function() {
             e._destroyed || e._render();
           });
@@ -4008,50 +4000,50 @@ function Ai(t) {
     const r = this;
     this._onDomChange = function(s) {
       const e = s.target;
-      if (!e || !e.hasAttribute || !e.hasAttribute(u)) return;
-      const o = Array.from(r.dom.querySelectorAll("[" + u + "]"));
-      if (h(e)) {
+      if (!e || !e.hasAttribute || !e.hasAttribute(d)) return;
+      const o = Array.from(r.dom.querySelectorAll("[" + d + "]"));
+      if (f(e)) {
         for (let a = 0; a < o.length; a++)
-          h(o[a]) || (o[a].checked = !1);
+          f(o[a]) || (o[a].checked = !1);
         e.checked = !0, r._queueRender();
         return;
       }
       if (e.checked) {
         for (let y = 0; y < o.length; y++)
-          h(o[y]) && (o[y].checked = !1);
+          f(o[y]) && (o[y].checked = !1);
         let a = !1;
         for (let y = 0; y < o.length; y++)
-          if (h(o[y])) {
+          if (f(o[y])) {
             a = !0;
             break;
           }
         if (a) {
           let y = !0;
           for (let v = 0; v < o.length; v++)
-            if (!h(o[v]) && !o[v].checked) {
+            if (!f(o[v]) && !o[v].checked) {
               y = !1;
               break;
             }
           if (y)
             for (let v = 0; v < o.length; v++)
-              h(o[v]) ? o[v].checked = !0 : o[v].checked = !1;
+              f(o[v]) ? o[v].checked = !0 : o[v].checked = !1;
         }
       } else {
         let a = !1;
         for (let y = 0; y < o.length; y++)
-          if (!h(o[y]) && o[y].checked) {
+          if (!f(o[y]) && o[y].checked) {
             a = !0;
             break;
           }
         if (!a)
           for (let y = 0; y < o.length; y++)
-            h(o[y]) && (o[y].checked = !0);
+            f(o[y]) && (o[y].checked = !0);
       }
       r._queueRender();
     }, this.dom.addEventListener("change", this._onDomChange);
   }, _.prototype._render = function() {
     const r = this, s = b(this), e = this._lastSnapshot;
-    if (!(!e || e.key !== s.key || wi(e.values, s.values))) return;
+    if (!(!e || e.key !== s.key || vi(e.values, s.values))) return;
     const a = s.key === null || s.values.length === 0, y = document.getElementById(r.targetId), v = {
       key: s.key,
       values: s.values.slice(),
@@ -4088,8 +4080,8 @@ function Ai(t) {
     const e = s.tagName === "TABLE" ? s : s.querySelector("table");
     if (!e) return;
     const o = r.key || this.dom.getAttribute("data-ln-filter-key") || "col" + this.colIndex, a = r.values;
-    f.has(e) || f.set(e, {});
-    const y = f.get(e);
+    p.has(e) || p.set(e, {});
+    const y = p.get(e);
     o && a.length > 0 ? y[o] = { col: this.colIndex, values: a.slice() } : o && delete y[o];
     const v = e.tBodies;
     for (let w = 0; w < v.length; w++) {
@@ -4098,7 +4090,7 @@ function Ai(t) {
         const L = A[C], q = {};
         for (let x = 0; x < L.cells.length; x++)
           q[x] = L.cells[x].textContent.trim();
-        Ei(q, y) ? L.removeAttribute(l) : L.setAttribute(l, "true");
+        wi(q, y) ? L.removeAttribute(l) : L.setAttribute(l, "true");
       }
     }
   }, _.prototype.destroy = function() {
@@ -4107,9 +4099,9 @@ function Ai(t) {
         const r = document.getElementById(this.targetId);
         if (r) {
           const s = r.tagName === "TABLE" ? r : r.querySelector("table");
-          if (s && f.has(s)) {
-            const e = f.get(s), o = this.dom.getAttribute("data-ln-filter-key") || "col" + this.colIndex;
-            o && e[o] && delete e[o], Object.keys(e).length === 0 && f.delete(s);
+          if (s && p.has(s)) {
+            const e = p.get(s), o = this.dom.getAttribute("data-ln-filter-key") || "col" + this.colIndex;
+            o && e[o] && delete e[o], Object.keys(e).length === 0 && p.delete(s);
           }
         }
       }
@@ -4125,14 +4117,37 @@ function Ai(t) {
     onAttributeChange: m
   });
 })();
+function ce(t) {
+  return String(t || "").trim().toLowerCase();
+}
+function Ai(t) {
+  const n = ce(t);
+  return n ? n.split(/\s+/).filter(Boolean) : [];
+}
+function Si(t) {
+  if (t == null) return null;
+  const n = String(t).split(",").map((d) => d.trim()).filter(Boolean);
+  return n.length ? n : null;
+}
+function Ci(t, n) {
+  if (!n || n.length === 0) return !0;
+  if (!t) return !1;
+  const d = String(t).toLowerCase();
+  for (let h = 0; h < n.length; h++)
+    if (d.indexOf(n[h]) === -1) return !1;
+  return !0;
+}
+function Li(t) {
+  return !t || t.length === 0 ? "" : t.join(" ").replace(/\s+/g, " ").trim().toLowerCase();
+}
 (function() {
-  const t = "data-ln-search", n = "lnSearch", u = "data-ln-search-for", p = "lnSearchControl", l = "data-ln-search-items", d = "data-ln-search-fields", c = "data-ln-search-exclude", i = "data-ln-search-hide", f = "data-ln-hash";
+  const t = "data-ln-search", n = "lnSearch", d = "data-ln-search-for", h = "lnSearchControl", l = "data-ln-search-items", u = "data-ln-search-fields", c = "data-ln-search-exclude", i = "data-ln-search-hide", p = "data-ln-hash";
   if (window[n] !== void 0) return;
-  function h(a) {
+  function f(a) {
     const y = yt(a, "search");
     if (y) return y;
     if (a.id) {
-      const v = document.querySelector("[" + u + '="' + a.id + '"]');
+      const v = document.querySelector("[" + d + '="' + a.id + '"]');
       if (v) {
         const w = yt(v, "search");
         if (w) return w;
@@ -4158,12 +4173,12 @@ function Ai(t) {
     if (a._lnSearchText !== void 0) return a._lnSearchText;
     const y = [];
     g(a, y);
-    const v = Gn(y);
+    const v = Li(y);
     return a._lnSearchText = v, v;
   }
   function m(a, y) {
     if (!a.id) return;
-    const v = document.querySelectorAll("[" + u + '="' + a.id + '"]');
+    const v = document.querySelectorAll("[" + d + '="' + a.id + '"]');
     for (const w of v) {
       const A = b(w);
       A && A.value !== y && (A.value = y);
@@ -4172,7 +4187,7 @@ function Ai(t) {
   function r(a) {
     this.dom = a, this.term = a.getAttribute(t) || "", this._destroyed = !1;
     const y = this;
-    return this.nsKey = h(a), this.hashEnabled = !!this.nsKey, this._onHashChange = function() {
+    return this.nsKey = f(a), this.hashEnabled = !!this.nsKey, this._onHashChange = function() {
       if (y._destroyed || !y.hashEnabled) return;
       const v = X(y.nsKey), w = y.dom.getAttribute(t) || "";
       v !== null && v !== w ? y.dom.setAttribute(t, v) : v === null && w !== "" && y.dom.setAttribute(t, "");
@@ -4185,14 +4200,14 @@ function Ai(t) {
             return;
           }
         }
-        se(y.term) && (m(y.dom, y.term), y._apply());
+        ce(y.term) && (m(y.dom, y.term), y._apply());
       }
     }), this;
   }
   r.prototype._apply = function() {
-    const a = this.dom, y = se(this.term), v = rn(y);
+    const a = this.dom, y = ce(this.term), v = Ai(y);
     this.hashEnabled && et(this.nsKey, this.term ? this.term : null);
-    const w = Wn(a.getAttribute(d));
+    const w = Si(a.getAttribute(u));
     if (W(a, "ln-search:change", {
       term: y,
       tokens: v,
@@ -4204,13 +4219,13 @@ function Ai(t) {
       const x = L[q];
       if (x.removeAttribute(i), x.hasAttribute(c) || v.length === 0) continue;
       const D = _(x);
-      on(D, v) || x.setAttribute(i, "true");
+      Ci(D, v) || x.setAttribute(i, "true");
     }
   }, r.prototype.destroy = function() {
     this.dom[n] && (this._destroyed = !0, this.hashEnabled && this._onHashChange && window.removeEventListener("hashchange", this._onHashChange), delete this.dom[n]);
   };
   function s(a) {
-    if (this.dom = a, this.targetId = a.getAttribute(u), this.input = b(a), this._attachHandler(), this.input && this.input.value.trim()) {
+    if (this.dom = a, this.targetId = a.getAttribute(d), this.input = b(a), this._attachHandler(), this.input && this.input.value.trim()) {
       const y = this;
       it(function() {
         const v = document.getElementById(y.targetId);
@@ -4229,37 +4244,37 @@ function Ai(t) {
       a._write(a.input.value);
     }, this.input.addEventListener("input", this._onInput);
   }, s.prototype.destroy = function() {
-    this.dom[p] && (this.input && this._onInput && this.input.removeEventListener("input", this._onInput), delete this.dom[p]);
+    this.dom[h] && (this.input && this._onInput && this.input.removeEventListener("input", this._onInput), delete this.dom[h]);
   };
   function e(a) {
     const y = a.getAttribute("data-ln-search-clear-for");
     if (y) {
-      const L = document.getElementById(y), q = document.querySelector("[" + u + '="' + y + '"]'), x = q ? b(q) : null;
+      const L = document.getElementById(y), q = document.querySelector("[" + d + '="' + y + '"]'), x = q ? b(q) : null;
       return { target: L, input: x };
     }
     const v = a.closest("[" + t + "]");
     if (v) {
-      const L = v.id ? document.querySelector("[" + u + '="' + v.id + '"]') : null, q = L ? b(L) : null;
+      const L = v.id ? document.querySelector("[" + d + '="' + v.id + '"]') : null, q = L ? b(L) : null;
       return { target: v, input: q };
     }
     const w = a.closest("[data-ln-table-source], [data-ln-list-source]");
     if (w) {
       const L = w.getAttribute("data-ln-table-source") || w.getAttribute("data-ln-list-source"), q = L ? document.getElementById(L) : null;
       if (q && q.hasAttribute(t)) {
-        const x = document.querySelector("[" + u + '="' + L + '"]'), D = x ? b(x) : null;
+        const x = document.querySelector("[" + d + '="' + L + '"]'), D = x ? b(x) : null;
         return { target: q, input: D };
       }
     }
-    const A = a.closest("[" + u + "]");
+    const A = a.closest("[" + d + "]");
     if (A) {
-      const L = A.getAttribute(u), q = L ? document.getElementById(L) : null, x = b(A);
+      const L = A.getAttribute(d), q = L ? document.getElementById(L) : null, x = b(A);
       return { target: q, input: x };
     }
     const C = a.parentElement;
     if (C) {
-      const L = C.querySelector("[" + u + "]");
+      const L = C.querySelector("[" + d + "]");
       if (L) {
-        const q = L.getAttribute(u), x = q ? document.getElementById(q) : null, D = b(L);
+        const q = L.getAttribute(d), x = q ? document.getElementById(q) : null, D = b(L);
         return { target: x, input: D };
       }
     }
@@ -4274,57 +4289,57 @@ function Ai(t) {
   function o(a, y) {
     const v = a[n];
     if (!v || v._destroyed) return;
-    if (y === f) {
-      v._onHashChange && window.removeEventListener("hashchange", v._onHashChange), v.nsKey = h(a), v.hashEnabled = !!v.nsKey, v.hashEnabled && window.addEventListener("hashchange", v._onHashChange);
+    if (y === p) {
+      v._onHashChange && window.removeEventListener("hashchange", v._onHashChange), v.nsKey = f(a), v.hashEnabled = !!v.nsKey, v.hashEnabled && window.addEventListener("hashchange", v._onHashChange);
       return;
     }
     const w = a.getAttribute(t) || "";
     w !== v.term && (v.term = w, m(a, w), v._apply());
   }
   M(t, n, r, "ln-search", {
-    extraAttributes: [f],
+    extraAttributes: [p],
     onAttributeChange: o,
     onSubtreeChange: function(a, y) {
       const v = y.target;
       v && v._lnSearchText !== void 0 && delete v._lnSearchText, v && v.parentElement && v.parentElement._lnSearchText !== void 0 && delete v.parentElement._lnSearchText;
     }
-  }), M(u, p, s, "ln-search-control");
+  }), M(d, h, s, "ln-search-control");
 })();
 function ht(t) {
   const n = String(t || "").trim().toLowerCase();
   return n === "asc" || n === "ascending" ? "asc" : n === "desc" || n === "descending" ? "desc" : "none";
 }
-function Si(t) {
+function Ti(t) {
   const n = ht(t);
   return n === "asc" ? "ascending" : n === "desc" ? "descending" : "none";
 }
-function Ci(t, n) {
+function qi(t, n) {
   return !t || !n ? !1 : t.field !== null && t.field !== void 0 && n.field !== null && n.field !== void 0 ? t.field === n.field : t.column !== null && t.column !== void 0 && n.column !== null && n.column !== void 0 ? String(t.column) === String(n.column) : !1;
 }
-function Li(t, n, u, p) {
+function xi(t, n, d, h) {
   const l = ht(t);
   if (l === "none") return () => 0;
-  const d = l === "desc" ? -1 : 1, c = typeof p == "function" ? p : (i) => i;
-  return function(i, f) {
-    const h = c(i), b = c(f);
-    return he(h, b, n, u) * d;
+  const u = l === "desc" ? -1 : 1, c = typeof h == "function" ? h : (i) => i;
+  return function(i, p) {
+    const f = c(i), b = c(p);
+    return he(f, b, n, d) * u;
   };
 }
 (function() {
-  const t = "data-ln-sort", n = "lnSort", u = "data-ln-sort-field", p = "data-ln-sort-state", l = "data-ln-sort-dir", d = "data-ln-sort-items", c = "data-ln-hash";
+  const t = "data-ln-sort", n = "lnSort", d = "data-ln-sort-field", h = "data-ln-sort-state", l = "data-ln-sort-dir", u = "data-ln-sort-items", c = "data-ln-hash";
   if (window[n] !== void 0) return;
   const i = /* @__PURE__ */ new WeakMap();
-  function f(g, _) {
+  function p(g, _) {
     if (_) {
       const m = g.querySelector('[data-ln-field="' + _ + '"]');
       if (m) return At(m);
     }
     return At(g);
   }
-  function h(g) {
-    this.dom = g, this.targetId = g.getAttribute(t), this.field = g.getAttribute(u) || null;
+  function f(g) {
+    this.dom = g, this.targetId = g.getAttribute(t), this.field = g.getAttribute(d) || null;
     const _ = g.closest("th");
-    this.column = !this.field && _ ? _.cellIndex : null, this.itemsSelector = g.getAttribute(d) || null, this._state = ht(g.getAttribute(p)), this._destroyed = !1, this.nsKey = yt(g, "sort"), this.hashEnabled = !!this.nsKey;
+    this.column = !this.field && _ ? _.cellIndex : null, this.itemsSelector = g.getAttribute(u) || null, this._state = ht(g.getAttribute(h)), this._destroyed = !1, this.nsKey = yt(g, "sort"), this.hashEnabled = !!this.nsKey;
     const m = this;
     this._onClick = function(s) {
       const e = s.target.closest("[" + l + "]");
@@ -4335,22 +4350,22 @@ function Li(t, n, u, p) {
       if (m._destroyed || !s.detail) return;
       const e = m._resolveTarget();
       if (!(e && (s.target === e || e.contains(s.target)) || s.detail.targetId && s.detail.targetId === m.targetId)) return;
-      if (Ci(
+      if (qi(
         { field: m.field, column: m.column },
         { field: s.detail.field, column: s.detail.column }
       )) {
         const y = ht(s.detail.direction);
-        y && g.getAttribute(p) !== y && (m._state = y, g.setAttribute(p, y), m._updateAriaSort(y));
+        y && g.getAttribute(h) !== y && (m._state = y, g.setAttribute(h, y), m._updateAriaSort(y));
         return;
       }
-      g.getAttribute(p) !== "none" && (m._state = "none", g.setAttribute(p, "none"), m._updateAriaSort("none")), g.hasAttribute("data-ln-persist") && bt("sort", g, null);
+      g.getAttribute(h) !== "none" && (m._state = "none", g.setAttribute(h, "none"), m._updateAriaSort("none")), g.hasAttribute("data-ln-persist") && bt("sort", g, null);
     }, document.addEventListener("ln-sort:change", this._onSortChange), this._onHashChange = function() {
       if (m._destroyed || !m.hashEnabled) return;
       const s = X(m.nsKey), e = ie(s);
       if (e)
-        m.field !== null && e.fieldOrColumn === m.field || m.column !== null && String(m.column) === e.fieldOrColumn ? m._state !== e.direction && m._apply(e.direction, !0) : m._state !== "none" && (m._state = "none", g.setAttribute(p, "none"), m._updateAriaSort("none"));
+        m.field !== null && e.fieldOrColumn === m.field || m.column !== null && String(m.column) === e.fieldOrColumn ? m._state !== e.direction && m._apply(e.direction, !0) : m._state !== "none" && (m._state = "none", g.setAttribute(h, "none"), m._updateAriaSort("none"));
       else if (m._state !== "none") {
-        m._state = "none", g.setAttribute(p, "none"), m._updateAriaSort("none");
+        m._state = "none", g.setAttribute(h, "none"), m._updateAriaSort("none");
         const o = m._resolveTarget();
         o && (W(o, "ln-sort:change", {
           field: m.field,
@@ -4374,22 +4389,22 @@ function Li(t, n, u, p) {
       }), r = !0;
     }
     if (!r) {
-      const s = ht(g.getAttribute(p));
+      const s = ht(g.getAttribute(h));
       s && s !== "none" && it(function() {
         m._destroyed || m._apply(s, !0);
       });
     }
     return this;
   }
-  h.prototype._resolveTarget = function() {
+  f.prototype._resolveTarget = function() {
     return document.getElementById(this.targetId);
-  }, h.prototype._updateAriaSort = function(g) {
+  }, f.prototype._updateAriaSort = function(g) {
     const _ = this.dom.closest("th");
-    _ && _.setAttribute("aria-sort", Si(g));
-  }, h.prototype._apply = function(g, _) {
+    _ && _.setAttribute("aria-sort", Ti(g));
+  }, f.prototype._apply = function(g, _) {
     if (this._destroyed) return;
     const m = ht(g);
-    this._state = m, this.dom.getAttribute(p) !== m && this.dom.setAttribute(p, m), this._updateAriaSort(m);
+    this._state = m, this.dom.getAttribute(h) !== m && this.dom.setAttribute(h, m), this._updateAriaSort(m);
     const r = this._resolveTarget();
     if (!r) return;
     const s = {
@@ -4403,7 +4418,7 @@ function Li(t, n, u, p) {
       et(this.nsKey, o);
     }
     W(r, "ln-sort:change", s).defaultPrevented || this._defaultSort(r, m);
-  }, h.prototype._defaultSort = function(g, _) {
+  }, f.prototype._defaultSort = function(g, _) {
     const m = this.itemsSelector ? Array.from(g.querySelectorAll(this.itemsSelector)) : Array.from(g.children);
     if (!m.length) return;
     const r = m[0].parentNode;
@@ -4415,74 +4430,74 @@ function Li(t, n, u, p) {
       });
     else {
       const o = this.field, a = m.map(function(A) {
-        return f(A, o);
-      }), y = ue(a), v = typeof Intl < "u" ? new Intl.Collator(V(this.dom), { sensitivity: "base" }) : null, w = Li(_, y, v, function(A) {
-        return f(A, o);
+        return p(A, o);
+      }), y = ue(a), v = typeof Intl < "u" ? new Intl.Collator(V(this.dom), { sensitivity: "base" }) : null, w = xi(_, y, v, function(A) {
+        return p(A, o);
       });
       s = m.slice().sort(w);
     }
     const e = document.createDocumentFragment();
     for (let o = 0; o < s.length; o++) e.appendChild(s[o]);
     r.appendChild(e);
-  }, h.prototype.destroy = function() {
+  }, f.prototype.destroy = function() {
     this._destroyed || (this._destroyed = !0, this.dom.removeEventListener("click", this._onClick), document.removeEventListener("ln-sort:change", this._onSortChange), this.hashEnabled && this._onHashChange && window.removeEventListener("hashchange", this._onHashChange), delete this.dom[n]);
   };
   function b(g, _) {
     const m = g[n];
     if (!(!m || m._destroyed))
-      if (_ === u) {
-        m.field = g.getAttribute(u) || null;
+      if (_ === d) {
+        m.field = g.getAttribute(d) || null;
         const r = g.closest("th");
         m.column = !m.field && r ? r.cellIndex : null;
-      } else if (_ === d)
-        m.itemsSelector = g.getAttribute(d) || null;
-      else if (_ === p) {
-        const r = ht(g.getAttribute(p));
+      } else if (_ === u)
+        m.itemsSelector = g.getAttribute(u) || null;
+      else if (_ === h) {
+        const r = ht(g.getAttribute(h));
         r !== m._state && m._apply(r);
       } else _ === t ? m.targetId = g.getAttribute(t) : _ === c && (m.hashEnabled && m._onHashChange && window.removeEventListener("hashchange", m._onHashChange), m.nsKey = yt(g, "sort"), m.hashEnabled = !!m.nsKey, m.hashEnabled && window.addEventListener("hashchange", m._onHashChange));
   }
-  M(t, n, h, "ln-sort", {
-    extraAttributes: [u, d, p, c],
+  M(t, n, f, "ln-sort", {
+    extraAttributes: [d, u, h, c],
     onAttributeChange: b
   });
 })();
-function Ie(t, n, u, p, l = 15) {
-  if (p <= 0 || u <= 0)
+function Ie(t, n, d, h, l = 15) {
+  if (h <= 0 || d <= 0)
     return { start: 0, end: 0, topPadding: 0, bottomPadding: 0 };
-  const d = Math.max(0, t || 0), c = Math.max(0, n || 0), i = Math.floor(d / u), f = Math.ceil(c / u), h = Math.max(0, i - l), b = Math.min(p, i + f + l), g = h * u, _ = Math.max(0, (p - b) * u);
-  return { start: h, end: b, topPadding: g, bottomPadding: _ };
+  const u = Math.max(0, t || 0), c = Math.max(0, n || 0), i = Math.floor(u / d), p = Math.ceil(c / d), f = Math.max(0, i - l), b = Math.min(h, i + p + l), g = f * d, _ = Math.max(0, (h - b) * d);
+  return { start: f, end: b, topPadding: g, bottomPadding: _ };
 }
-function Ti(t, n) {
-  const u = Array.isArray(t) ? t.length : 0, p = n instanceof Set ? n : new Set(n || []);
+function ki(t, n) {
+  const d = Array.isArray(t) ? t.length : 0, h = n instanceof Set ? n : new Set(n || []);
   let l = 0;
   if (Array.isArray(t))
     for (let i = 0; i < t.length; i++)
-      p.has(t[i]) && l++;
+      h.has(t[i]) && l++;
   else
-    l = p.size;
-  const d = u > 0 && l === u, c = l > 0 && l < u;
-  return { totalCount: u, selectedCount: l, isAllSelected: d, isIndeterminate: c };
+    l = h.size;
+  const u = d > 0 && l === d, c = l > 0 && l < d;
+  return { totalCount: d, selectedCount: l, isAllSelected: u, isIndeterminate: c };
 }
-function De(t, n, u) {
-  const p = new Set(t);
-  return n == null || ((u !== void 0 ? u : !p.has(n)) ? p.add(n) : p.delete(n)), p;
+function De(t, n, d) {
+  const h = new Set(t);
+  return n == null || ((d !== void 0 ? d : !h.has(n)) ? h.add(n) : h.delete(n)), h;
 }
-function Re(t, n, u) {
-  const p = new Set(t);
-  if (!Array.isArray(n)) return p;
-  if (u)
+function Re(t, n, d) {
+  const h = new Set(t);
+  if (!Array.isArray(n)) return h;
+  if (d)
     for (let l = 0; l < n.length; l++)
-      n[l] != null && p.add(n[l]);
+      n[l] != null && h.add(n[l]);
   else
     for (let l = 0; l < n.length; l++)
-      p.delete(n[l]);
-  return p;
+      h.delete(n[l]);
+  return h;
 }
 (function() {
-  const t = "data-ln-table", n = "lnTable", u = "data-ln-table-empty";
+  const t = "data-ln-table", n = "lnTable", d = "data-ln-table-empty";
   if (window[n] !== void 0) return;
   typeof Intl < "u" && new Intl.Collator(document.documentElement.lang || void 0, { sensitivity: "base" });
-  function f(g, _) {
+  function p(g, _) {
     if (g == null || isNaN(g)) return "";
     try {
       return new Intl.NumberFormat(V(_)).format(g);
@@ -4490,7 +4505,7 @@ function Re(t, n, u) {
       return String(g);
     }
   }
-  function h(g) {
+  function f(g) {
     let _ = g.parentElement;
     for (; _ && _ !== document.body && _ !== document.documentElement; ) {
       const r = getComputedStyle(_).overflowY;
@@ -4700,7 +4715,7 @@ function Re(t, n, u) {
         } else this.isDataDriven && this._data.length > 0 && (m = this._buildRow(this._data[0]));
         m && this.tbody && (this.tbody.appendChild(m), this._rowHeight = m.offsetHeight || 40, m.remove());
       }
-    this.isDataDriven ? this._scrollContainer = h(this.dom) : this._scrollContainer = null;
+    this.isDataDriven ? this._scrollContainer = f(this.dom) : this._scrollContainer = null;
     const _ = this._scrollContainer || window;
     this._scrollHandler = function() {
       g._rafId || (g._rafId = requestAnimationFrame(function() {
@@ -4814,7 +4829,7 @@ function Re(t, n, u) {
           y.className = "ln-table__empty", y.appendChild(a), _ = y;
         }
     } else {
-      const r = this.dom.querySelector("template[" + u + "]"), s = document.createElement("td");
+      const r = this.dom.querySelector("template[" + d + "]"), s = document.createElement("td");
       s.setAttribute("colspan", String(g)), r && s.appendChild(document.importNode(r.content, !0));
       const e = document.createElement("tr");
       e.className = "ln-table__empty", e.appendChild(s), _ = e;
@@ -4933,7 +4948,7 @@ function Re(t, n, u) {
       const s = g[r].getAttribute("data-ln-table-row-id");
       s != null && _.push(s);
     }
-    const m = Ti(_, this.selectedIds);
+    const m = ki(_, this.selectedIds);
     this._selectAllCheckbox.checked = m.isAllSelected, this._selectAllCheckbox.indeterminate = m.isIndeterminate;
   }, b.prototype._restoreSelection = function() {
     if (!this.tbody) return;
@@ -5015,9 +5030,9 @@ function Re(t, n, u) {
     let g = 0, _ = 0;
     this.isDataDriven ? (g = this._lastTotal != null ? this._lastTotal : this._data.length, _ = this.visibleCount) : (g = this._data.length, _ = this._filteredData.length);
     const m = _ < g;
-    if (this._totalSpan && (this._totalSpan.textContent = f(g, this.dom)), this._filteredSpan && (this._filteredSpan.textContent = m ? f(_, this.dom) : ""), this._filteredWrap && this._filteredWrap.classList.toggle("hidden", !m), this._selectedSpan) {
+    if (this._totalSpan && (this._totalSpan.textContent = p(g, this.dom)), this._filteredSpan && (this._filteredSpan.textContent = m ? p(_, this.dom) : ""), this._filteredWrap && this._filteredWrap.classList.toggle("hidden", !m), this._selectedSpan) {
       const r = this.selectedIds ? this.selectedIds.size : 0;
-      this._selectedSpan.textContent = r > 0 ? f(r, this.dom) : "", this._selectedWrap && this._selectedWrap.classList.toggle("hidden", r === 0);
+      this._selectedSpan.textContent = r > 0 ? p(r, this.dom) : "", this._selectedWrap && this._selectedWrap.classList.toggle("hidden", r === 0);
     }
   }, b.prototype.destroy = function() {
     this.dom[n] && (this._disableVirtualScroll(), this.dom.removeEventListener("ln-table:set-search", this._onSetSearch), this.dom.removeEventListener("ln-table:request-clear-filters", this._onRequestClearFilters), this.isDataDriven ? (this.dom.removeEventListener("ln-table:set-data", this._onSetData), this.dom.removeEventListener("ln-table:set-loading", this._onSetLoading), this.dom.removeEventListener("ln-table:page-failed", this._onPageFailed), this.dom.removeEventListener("ln-table:request-revalidate", this._onRequestRevalidate), this.dom.removeEventListener("ln-table:request-invalidate", this._onRequestInvalidate), this.dom.removeEventListener("ln-sort:change", this._onSort), this.tbody && (this.tbody.removeEventListener("click", this._onRowClick), this.tbody.removeEventListener("click", this._onRowAction)), this._cache && this._cache.destroy()) : (this._emptyTbodyObserver && (this._emptyTbodyObserver.disconnect(), this._emptyTbodyObserver = null), this.dom.removeEventListener("ln-sort:change", this._onSort), this.dom.removeEventListener("ln-search:change", this._onSearchChange), this.dom.removeEventListener("ln-filter:change", this._onFilterChange)), this._onSelectionChange && this.tbody && this.tbody.removeEventListener("change", this._onSelectionChange), this._selectAllCheckbox && this._onSelectAll && this._selectAllCheckbox.removeEventListener("change", this._onSelectAll), this._colgroup && (this._colgroup.remove(), this._colgroup = null), this.table && (this.table.style.tableLayout = ""), this._data = [], this._filteredData = [], delete this.dom[n]);
@@ -5066,32 +5081,32 @@ function Re(t, n, u) {
     if (c.key !== "/" || c.defaultPrevented || document.activeElement && (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA" || document.activeElement.isContentEditable)) return;
     const i = document.querySelector("[" + t + "] [data-ln-search-for]") || document.querySelector("[data-ln-search-for]");
     if (!i) return;
-    const f = i.tagName === "INPUT" || i.tagName === "TEXTAREA" ? i : i.querySelector('input[type="search"], input[type="text"], input');
-    f && (c.preventDefault(), f.focus());
+    const p = i.tagName === "INPUT" || i.tagName === "TEXTAREA" ? i : i.querySelector('input[type="search"], input[type="text"], input');
+    p && (c.preventDefault(), p.focus());
   });
-  function u(c) {
-    return this.dom = c, d(this), this;
+  function d(c) {
+    return this.dom = c, u(this), this;
   }
-  function p(c, i) {
-    const f = i ? '[data-ln-search-for="' + i + '"]' : "[data-ln-search-for]", h = c.querySelector(f) || document.querySelector(f);
-    return h ? h.tagName === "INPUT" || h.tagName === "TEXTAREA" ? h : h.querySelector("input, textarea") : null;
+  function h(c, i) {
+    const p = i ? '[data-ln-search-for="' + i + '"]' : "[data-ln-search-for]", f = c.querySelector(p) || document.querySelector(p);
+    return f ? f.tagName === "INPUT" || f.tagName === "TEXTAREA" ? f : f.querySelector("input, textarea") : null;
   }
   function l(c, i) {
     if (i) {
-      const h = c.querySelectorAll('[data-ln-filter="' + i + '"]');
-      if (h.length > 0) return h;
+      const f = c.querySelectorAll('[data-ln-filter="' + i + '"]');
+      if (f.length > 0) return f;
       const b = document.querySelectorAll('[data-ln-filter="' + i + '"]');
       if (b.length > 0) return b;
     }
-    const f = c.querySelectorAll("[data-ln-filter]");
-    return f.length > 0 ? f : document.querySelectorAll("[data-ln-filter]");
+    const p = c.querySelectorAll("[data-ln-filter]");
+    return p.length > 0 ? p : document.querySelectorAll("[data-ln-filter]");
   }
-  function d(c) {
+  function u(c) {
     const i = c.dom;
-    function f(h) {
-      const b = h.target;
+    function p(f) {
+      const b = f.target;
       if (b && b.hasAttribute && b.hasAttribute("data-ln-table")) return b;
-      const g = h.detail && h.detail.targetId || b && b.id;
+      const g = f.detail && f.detail.targetId || b && b.id;
       return g ? i.querySelector('[data-ln-table-source="' + g + '"]') || i.querySelector('[data-ln-table="' + g + '"]') : null;
     }
     c._handlers = {
@@ -5100,11 +5115,11 @@ function Re(t, n, u) {
       // every view bound to it — a second forwarder would fetch twice for one
       // user change. What is left is the header indicator, which is Layer 2
       // policy: ln-table never sets this class itself.
-      filter: function(h) {
-        if (!h.detail) return;
-        const b = f(h);
+      filter: function(f) {
+        if (!f.detail) return;
+        const b = p(f);
         if (!b || !b.hasAttribute || !b.hasAttribute("data-ln-table")) return;
-        const g = h.detail.key, _ = h.detail.values || [], m = b.querySelectorAll("th");
+        const g = f.detail.key, _ = f.detail.values || [], m = b.querySelectorAll("th");
         for (let r = 0; r < m.length; r++)
           if (m[r].getAttribute("data-ln-table-filter-col") === g) {
             const s = m[r].querySelector("[data-ln-table-col-filter]");
@@ -5114,8 +5129,8 @@ function Re(t, n, u) {
       },
       // Clear-all has no ID binding of its own — resolve structurally,
       // scoped to this host only (never document-wide).
-      clear: function(h) {
-        const b = h.target.closest("[data-ln-table-clear], [data-ln-table-clear-all]");
+      clear: function(f) {
+        const b = f.target.closest("[data-ln-table-clear], [data-ln-table-clear-all]");
         if (!b) return;
         const g = b.closest("[data-ln-table]") || i.querySelector("[data-ln-table]");
         if (!g || !g.lnTable) return;
@@ -5128,7 +5143,7 @@ function Re(t, n, u) {
         if (s && s.hasAttribute("data-ln-search"))
           s.setAttribute("data-ln-search", "");
         else {
-          const o = p(i, r);
+          const o = h(i, r);
           o && o.value !== "" && (o.value = "", o.dispatchEvent(new Event("input", { bubbles: !0 })));
         }
         const e = l(i, r);
@@ -5142,14 +5157,14 @@ function Re(t, n, u) {
       }
     }, i.addEventListener("ln-filter:change", c._handlers.filter), i.addEventListener("click", c._handlers.clear);
   }
-  u.prototype.destroy = function() {
+  d.prototype.destroy = function() {
     this.dom[n] && (this._handlers && (this.dom.removeEventListener("ln-filter:change", this._handlers.filter), this.dom.removeEventListener("click", this._handlers.clear), this._handlers = null), delete this.dom[n]);
-  }, M(t, n, u, "ln-table-coordinator");
+  }, M(t, n, d, "ln-table-coordinator");
 })();
 (function() {
-  const t = "data-ln-list", n = "lnList", u = "data-ln-list-empty";
+  const t = "data-ln-list", n = "lnList", d = "data-ln-list-empty";
   if (window[n] !== void 0) return;
-  function f(r, s) {
+  function p(r, s) {
     if (r == null || isNaN(r)) return "";
     try {
       return new Intl.NumberFormat(V(s)).format(r);
@@ -5157,7 +5172,7 @@ function Re(t, n, u) {
       return String(r);
     }
   }
-  function h(r) {
+  function f(r) {
     let s = r;
     for (; s && s !== document.body && s !== document.documentElement; ) {
       const o = getComputedStyle(s).overflowY;
@@ -5167,7 +5182,7 @@ function Re(t, n, u) {
     return null;
   }
   function b(r) {
-    const s = r._scrollContainer || h(r.dom);
+    const s = r._scrollContainer || f(r.dom);
     return {
       container: s,
       top: s ? s.scrollTop : window.scrollY
@@ -5409,7 +5424,7 @@ function Re(t, n, u) {
     if (this._virtual) return;
     this._virtual = !0, this._vStart = -1, this._vEnd = -1;
     const r = this;
-    this._itemHeight || this._measureItemHeight(), this._scrollContainer = h(this.dom);
+    this._itemHeight || this._measureItemHeight(), this._scrollContainer = f(this.dom);
     const s = this._scrollContainer || window;
     this._scrollHandler = function() {
       r._rafId || (r._rafId = requestAnimationFrame(function() {
@@ -5516,7 +5531,7 @@ function Re(t, n, u) {
         }
       }
     } else {
-      const s = this.dom.querySelector(`template[${u}]`);
+      const s = this.dom.querySelector(`template[${d}]`);
       if (s) {
         const e = s.content.firstElementChild;
         e && (r = document.importNode(e, !0));
@@ -5666,9 +5681,9 @@ function Re(t, n, u) {
     let r = 0, s = 0;
     this.isDataDriven ? (r = this._lastTotal != null ? this._lastTotal : this._data.length, s = this.visibleCount) : (r = this._data.length, s = this._filteredData.length);
     const e = s < r;
-    if (this._totalSpan && (this._totalSpan.textContent = f(r, this.dom)), this._filteredSpan && (this._filteredSpan.textContent = e ? f(s, this.dom) : ""), this._filteredWrap && this._filteredWrap.classList.toggle("hidden", !e), this._selectedSpan) {
+    if (this._totalSpan && (this._totalSpan.textContent = p(r, this.dom)), this._filteredSpan && (this._filteredSpan.textContent = e ? p(s, this.dom) : ""), this._filteredWrap && this._filteredWrap.classList.toggle("hidden", !e), this._selectedSpan) {
       const o = this.selectedIds ? this.selectedIds.size : 0;
-      this._selectedSpan.textContent = o > 0 ? f(o, this.dom) : "", this._selectedWrap && this._selectedWrap.classList.toggle("hidden", o === 0);
+      this._selectedSpan.textContent = o > 0 ? p(o, this.dom) : "", this._selectedWrap && this._selectedWrap.classList.toggle("hidden", o === 0);
     }
   }, m.prototype.destroy = function() {
     this.dom[n] && (this._disableVirtualScroll(), this.dom.removeEventListener("ln-list:set-search", this._onSetSearch), this.dom.removeEventListener("ln-search:change", this._onSearchChange), this.dom.removeEventListener("ln-list:request-clear-filters", this._onRequestClearFilters), this.isDataDriven ? (this._cache && this._cache.destroy(), this.dom.removeEventListener("ln-list:set-data", this._onSetData), this.dom.removeEventListener("ln-list:set-loading", this._onSetLoading), this.dom.removeEventListener("ln-list:page-failed", this._onPageFailed), this.dom.removeEventListener("ln-list:request-revalidate", this._onRequestRevalidate), this.dom.removeEventListener("ln-list:request-invalidate", this._onRequestInvalidate), this.dom.removeEventListener("ln-sort:change", this._onSort), this.tbody && (this.tbody.removeEventListener("click", this._onItemClick), this.tbody.removeEventListener("click", this._onItemAction))) : (this._emptyObserver && (this._emptyObserver.disconnect(), this._emptyObserver = null), this._onFilterChange && this.dom.removeEventListener("ln-filter:change", this._onFilterChange), this._onSort && this.dom.removeEventListener("ln-sort:change", this._onSort)), this._onSelectionChange && this.tbody && this.tbody.removeEventListener("change", this._onSelectionChange), this._selectAllCheckbox && this._onSelectAll && this._selectAllCheckbox.removeEventListener("change", this._onSelectAll), this._data = [], this._filteredData = [], delete this.dom[n]);
@@ -5713,44 +5728,44 @@ function Re(t, n, u) {
 (function() {
   const t = "data-ln-circular-progress", n = "lnCircularProgress";
   if (window[n] !== void 0) return;
-  const u = "http://www.w3.org/2000/svg", p = 36, l = 16, d = 2 * Math.PI * l;
+  const d = "http://www.w3.org/2000/svg", h = 36, l = 16, u = 2 * Math.PI * l;
   function c(b) {
-    return this.dom = b, this.svg = null, this.trackCircle = null, this.progressCircle = null, this.labelEl = null, f.call(this), h.call(this), this;
+    return this.dom = b, this.svg = null, this.trackCircle = null, this.progressCircle = null, this.labelEl = null, p.call(this), f.call(this), this;
   }
   c.prototype.destroy = function() {
     this.dom[n] && (this.svg && this.svg.remove(), this.labelEl && this.labelEl.remove(), delete this.dom[n]);
   };
   function i(b, g) {
-    const _ = document.createElementNS(u, b);
+    const _ = document.createElementNS(d, b);
     for (const [m, r] of Object.entries(g))
       _.setAttribute(m, r);
     return _;
   }
-  function f() {
+  function p() {
     this.svg = i("svg", {
-      viewBox: "0 0 " + p + " " + p,
-      width: p,
-      height: p
+      viewBox: "0 0 " + h + " " + h,
+      width: h,
+      height: h
     }), this.svg.classList.add("ln-circular-progress__svg"), this.trackCircle = i("circle", {
-      cx: p / 2,
-      cy: p / 2,
+      cx: h / 2,
+      cy: h / 2,
       r: l,
       fill: "none",
       "stroke-width": "3"
     }), this.trackCircle.classList.add("ln-circular-progress__track"), this.progressCircle = i("circle", {
-      cx: p / 2,
-      cy: p / 2,
+      cx: h / 2,
+      cy: h / 2,
       r: l,
       fill: "none",
       "stroke-width": "3",
       "stroke-linecap": "round",
-      "stroke-dasharray": d,
-      "stroke-dashoffset": d,
-      transform: "rotate(-90 " + p / 2 + " " + p / 2 + ")"
+      "stroke-dasharray": u,
+      "stroke-dashoffset": u,
+      transform: "rotate(-90 " + h / 2 + " " + h / 2 + ")"
     }), this.progressCircle.classList.add("ln-circular-progress__fill"), this.svg.appendChild(this.trackCircle), this.svg.appendChild(this.progressCircle), this.labelEl = document.createElement("strong"), this.labelEl.classList.add("ln-circular-progress__label"), this.dom.appendChild(this.svg), this.dom.appendChild(this.labelEl);
   }
-  function h() {
-    const b = this.dom.getAttribute("data-ln-circular-progress"), g = this.dom.getAttribute("data-ln-circular-progress-max"), _ = en(b, g || 100), m = d - _.percentage / 100 * d;
+  function f() {
+    const b = this.dom.getAttribute("data-ln-circular-progress"), g = this.dom.getAttribute("data-ln-circular-progress-max"), _ = en(b, g || 100), m = u - _.percentage / 100 * u;
     this.progressCircle.setAttribute("stroke-dashoffset", m);
     const r = this.dom.getAttribute("data-ln-circular-progress-label"), s = r !== null ? r : Math.round(_.percentage) + "%";
     this.labelEl.textContent = s, this.dom.setAttribute("role", "progressbar"), this.dom.setAttribute("aria-valuemin", String(_.min)), this.dom.setAttribute("aria-valuemax", String(_.max)), this.dom.setAttribute("aria-valuenow", String(_.clampedValue)), this.dom.setAttribute("aria-valuetext", s), S(this.dom, "ln-circular-progress:change", {
@@ -5764,47 +5779,47 @@ function Re(t, n, u) {
     extraAttributes: ["data-ln-circular-progress-max", "data-ln-circular-progress-label"],
     onAttributeChange: function(b) {
       const g = b[n];
-      g && h.call(g);
+      g && f.call(g);
     }
   });
 })();
 (function() {
-  const t = "data-ln-sortable", n = "lnSortable", u = "data-ln-sortable-handle";
+  const t = "data-ln-sortable", n = "lnSortable", d = "data-ln-sortable-handle";
   if (window[n] !== void 0) return;
-  function p(d) {
-    this.dom = d, this.isEnabled = d.getAttribute(t) !== "disabled", this._dragging = null, d.setAttribute("aria-roledescription", "sortable list");
+  function h(u) {
+    this.dom = u, this.isEnabled = u.getAttribute(t) !== "disabled", this._dragging = null, u.setAttribute("aria-roledescription", "sortable list");
     const c = this;
     return this._onPointerDown = function(i) {
       c.isEnabled && c._handlePointerDown(i);
-    }, d.addEventListener("pointerdown", this._onPointerDown), this;
+    }, u.addEventListener("pointerdown", this._onPointerDown), this;
   }
-  p.prototype.enable = function() {
+  h.prototype.enable = function() {
     this.isEnabled || this.dom.setAttribute(t, "");
-  }, p.prototype.disable = function() {
+  }, h.prototype.disable = function() {
     this.isEnabled && this.dom.setAttribute(t, "disabled");
-  }, p.prototype.destroy = function() {
+  }, h.prototype.destroy = function() {
     this.dom[n] && (this.dom.removeEventListener("pointerdown", this._onPointerDown), S(this.dom, "ln-sortable:destroyed", { target: this.dom }), delete this.dom[n]);
-  }, p.prototype._handlePointerDown = function(d) {
-    let c = d.target.closest("[" + u + "]"), i;
+  }, h.prototype._handlePointerDown = function(u) {
+    let c = u.target.closest("[" + d + "]"), i;
     if (c) {
       for (i = c; i && i.parentElement !== this.dom; )
         i = i.parentElement;
       if (!i || i.parentElement !== this.dom) return;
     } else {
-      if (this.dom.querySelector("[" + u + "]")) return;
-      for (i = d.target; i && i.parentElement !== this.dom; )
+      if (this.dom.querySelector("[" + d + "]")) return;
+      for (i = u.target; i && i.parentElement !== this.dom; )
         i = i.parentElement;
       if (!i || i.parentElement !== this.dom) return;
       c = i;
     }
-    const h = Array.from(this.dom.children).indexOf(i);
+    const f = Array.from(this.dom.children).indexOf(i);
     if (W(this.dom, "ln-sortable:before-drag", {
       item: i,
-      index: h
+      index: f
     }).defaultPrevented) return;
-    d.preventDefault(), c.setPointerCapture(d.pointerId), this._dragging = i, i.classList.add("ln-sortable--dragging"), i.setAttribute("aria-grabbed", "true"), this.dom.classList.add("ln-sortable--active"), S(this.dom, "ln-sortable:drag-start", {
+    u.preventDefault(), c.setPointerCapture(u.pointerId), this._dragging = i, i.classList.add("ln-sortable--dragging"), i.setAttribute("aria-grabbed", "true"), this.dom.classList.add("ln-sortable--active"), S(this.dom, "ln-sortable:drag-start", {
       item: i,
-      index: h
+      index: f
     });
     const g = this, _ = function(r) {
       g._handlePointerMove(r);
@@ -5812,80 +5827,80 @@ function Re(t, n, u) {
       g._handlePointerEnd(r), c.removeEventListener("pointermove", _), c.removeEventListener("pointerup", m), c.removeEventListener("pointercancel", m);
     };
     c.addEventListener("pointermove", _), c.addEventListener("pointerup", m), c.addEventListener("pointercancel", m);
-  }, p.prototype._handlePointerMove = function(d) {
+  }, h.prototype._handlePointerMove = function(u) {
     if (!this._dragging) return;
     const c = Array.from(this.dom.children), i = this._dragging;
-    for (const f of c)
-      f.classList.remove("ln-sortable--drop-before", "ln-sortable--drop-after");
-    for (const f of c) {
-      if (f === i) continue;
-      const h = f.getBoundingClientRect(), b = h.top + h.height / 2;
-      if (d.clientY >= h.top && d.clientY < b) {
-        f.classList.add("ln-sortable--drop-before");
+    for (const p of c)
+      p.classList.remove("ln-sortable--drop-before", "ln-sortable--drop-after");
+    for (const p of c) {
+      if (p === i) continue;
+      const f = p.getBoundingClientRect(), b = f.top + f.height / 2;
+      if (u.clientY >= f.top && u.clientY < b) {
+        p.classList.add("ln-sortable--drop-before");
         break;
-      } else if (d.clientY >= b && d.clientY <= h.bottom) {
-        f.classList.add("ln-sortable--drop-after");
+      } else if (u.clientY >= b && u.clientY <= f.bottom) {
+        p.classList.add("ln-sortable--drop-after");
         break;
       }
     }
-  }, p.prototype._handlePointerEnd = function(d) {
+  }, h.prototype._handlePointerEnd = function(u) {
     if (!this._dragging) return;
-    const c = this._dragging, i = Array.from(this.dom.children), f = i.indexOf(c);
-    let h = null, b = null;
+    const c = this._dragging, i = Array.from(this.dom.children), p = i.indexOf(c);
+    let f = null, b = null;
     for (const g of i) {
       if (g.classList.contains("ln-sortable--drop-before")) {
-        h = g, b = "before";
+        f = g, b = "before";
         break;
       }
       if (g.classList.contains("ln-sortable--drop-after")) {
-        h = g, b = "after";
+        f = g, b = "after";
         break;
       }
     }
     for (const g of i)
       g.classList.remove("ln-sortable--drop-before", "ln-sortable--drop-after");
-    if (c.classList.remove("ln-sortable--dragging"), c.removeAttribute("aria-grabbed"), this.dom.classList.remove("ln-sortable--active"), h && h !== c) {
-      b === "before" ? this.dom.insertBefore(c, h) : this.dom.insertBefore(c, h.nextElementSibling);
+    if (c.classList.remove("ln-sortable--dragging"), c.removeAttribute("aria-grabbed"), this.dom.classList.remove("ln-sortable--active"), f && f !== c) {
+      b === "before" ? this.dom.insertBefore(c, f) : this.dom.insertBefore(c, f.nextElementSibling);
       const _ = Array.from(this.dom.children).indexOf(c);
       S(this.dom, "ln-sortable:reordered", {
         item: c,
-        oldIndex: f,
+        oldIndex: p,
         newIndex: _
       });
     }
     this._dragging = null;
   };
-  function l(d) {
-    const c = d[n];
+  function l(u) {
+    const c = u[n];
     if (!c) return;
-    const i = d.getAttribute(t) !== "disabled";
-    i !== c.isEnabled && (c.isEnabled = i, S(d, i ? "ln-sortable:enabled" : "ln-sortable:disabled", { target: d }));
+    const i = u.getAttribute(t) !== "disabled";
+    i !== c.isEnabled && (c.isEnabled = i, S(u, i ? "ln-sortable:enabled" : "ln-sortable:disabled", { target: u }));
   }
-  M(t, n, p, "ln-sortable", {
+  M(t, n, h, "ln-sortable", {
     onAttributeChange: l
   });
 })();
 (function() {
-  const t = "data-ln-confirm", n = "lnConfirm", u = "data-ln-confirm-timeout";
+  const t = "data-ln-confirm", n = "lnConfirm", d = "data-ln-confirm-timeout";
   if (window[n] !== void 0) return;
   function l(c) {
-    const i = parseFloat(c.getAttribute(u));
+    const i = parseFloat(c.getAttribute(d));
     return isNaN(i) || i <= 0 ? 3 : i;
   }
-  function d(c) {
+  function u(c) {
     this.dom = c, this.confirming = !1, this.revertTimer = null, this._submitted = !1, this.idleEl = c.querySelector("[data-ln-confirm-idle]"), this.activeEl = c.querySelector("[data-ln-confirm-active]"), this.isTwoElementMode = !!(this.idleEl || this.activeEl), this.isTwoElementMode ? (this.originalText = "", this.confirmText = "") : (this.originalText = c.textContent.trim(), this.confirmText = c.getAttribute(t) || "Confirm?");
     const i = this;
-    return this._onClick = function(f) {
-      if (!Be(f))
+    return this._onClick = function(p) {
+      if (!Be(p))
         if (!i.confirming)
-          f.preventDefault(), f.stopImmediatePropagation(), i._enterConfirm();
+          p.preventDefault(), p.stopImmediatePropagation(), i._enterConfirm();
         else {
           if (i._submitted) return;
-          i._submitted = !0, f.stopPropagation(), i._reset();
+          i._submitted = !0, p.stopPropagation(), i._reset();
         }
     }, c.addEventListener("click", this._onClick), this;
   }
-  d.prototype._enterConfirm = function() {
+  u.prototype._enterConfirm = function() {
     if (this.confirming = !0, this.dom.setAttribute("data-confirming", "true"), this.originalAriaLabel = this.dom.getAttribute("aria-label"), this.originalAriaLive = this.dom.getAttribute("aria-live"), this.isTwoElementMode) {
       this.idleEl && this.idleEl.setAttribute("hidden", "true"), this.activeEl && this.activeEl.removeAttribute("hidden");
       const c = this.activeEl ? this.activeEl.textContent.trim() : "";
@@ -5895,13 +5910,13 @@ function Re(t, n, u) {
       c && this.originalText === "" ? (this.isIconButton = !0, this.originalIconHref = c.getAttribute("href"), c.setAttribute("href", "#ln-icon-check"), this.dom.classList.add("ln-confirm-tooltip"), this.dom.setAttribute("data-tooltip-text", this.confirmText), this.dom.setAttribute("aria-label", this.confirmText), this.dom.setAttribute("aria-live", "polite")) : this.dom.textContent = this.confirmText;
     }
     this._startTimer(), S(this.dom, "ln-confirm:waiting", { target: this.dom });
-  }, d.prototype._startTimer = function() {
+  }, u.prototype._startTimer = function() {
     this.revertTimer && clearTimeout(this.revertTimer);
     const c = this, i = l(this.dom) * 1e3;
     this.revertTimer = setTimeout(function() {
       c._reset();
     }, i);
-  }, d.prototype._reset = function() {
+  }, u.prototype._reset = function() {
     if (this._submitted = !1, this.confirming = !1, this.dom.removeAttribute("data-confirming"), this.isTwoElementMode)
       this.idleEl && this.idleEl.removeAttribute("hidden"), this.activeEl && this.activeEl.setAttribute("hidden", "true");
     else if (this.isIconButton) {
@@ -5910,24 +5925,24 @@ function Re(t, n, u) {
     } else
       this.dom.textContent = this.originalText;
     this.originalAriaLabel !== null && this.originalAriaLabel !== void 0 ? this.dom.setAttribute("aria-label", this.originalAriaLabel) : this.dom.removeAttribute("aria-label"), this.originalAriaLabel = null, this.originalAriaLive !== null && this.originalAriaLive !== void 0 ? this.dom.setAttribute("aria-live", this.originalAriaLive) : this.dom.removeAttribute("aria-live"), this.originalAriaLive = null, this.revertTimer && (clearTimeout(this.revertTimer), this.revertTimer = null);
-  }, d.prototype.destroy = function() {
+  }, u.prototype.destroy = function() {
     this.dom[n] && (this.confirming && this._reset(), this.dom.removeEventListener("click", this._onClick), delete this.dom[n], S(this.dom, "ln-confirm:destroyed", { target: this.dom }));
-  }, M(t, n, d, "ln-confirm");
+  }, M(t, n, u, "ln-confirm");
 })();
 (function() {
   const t = "data-ln-translations", n = "lnTranslations";
   if (window[n] !== void 0) return;
-  const u = {
+  const d = {
     en: "English",
     sq: "Shqip",
     sr: "Srpski"
   };
-  function p(l) {
-    this.dom = l, this.activeLanguages = /* @__PURE__ */ new Set(), this.defaultLang = l.getAttribute(t + "-default") || "", this.placeholderLabel = l.getAttribute(t + "-placeholder") || "{lang} translation", this.removeLabel = l.getAttribute(t + "-remove-label") || "Remove {lang}", this.badgesEl = l.querySelector("[" + t + "-active]"), this.menuEl = l.querySelector("[data-ln-dropdown] > [data-ln-toggle]");
-    const d = l.getAttribute(t + "-locales");
-    if (this.locales = u, d)
+  function h(l) {
+    this.dom = l, this.activeLanguages = /* @__PURE__ */ new Set(), this.defaultLang = l.getAttribute("data-ln-translations-default") || "", this.placeholderLabel = l.getAttribute("data-ln-translations-placeholder") || "{lang} translation", this.removeLabel = l.getAttribute("data-ln-translations-remove-label") || "Remove {lang}", this.badgesEl = l.querySelector("[data-ln-translations-active]"), this.menuEl = l.querySelector("[data-ln-dropdown] > [data-ln-toggle]");
+    const u = l.getAttribute("data-ln-translations-locales");
+    if (this.locales = d, u)
       try {
-        this.locales = JSON.parse(d);
+        this.locales = JSON.parse(u);
       } catch {
         console.warn("[ln-translations] Invalid JSON in data-ln-translations-locales");
       }
@@ -5939,55 +5954,55 @@ function Re(t, n, u) {
       i.detail && i.detail.lang && c.removeLanguage(i.detail.lang);
     }, l.addEventListener("ln-translations:request-add", this._onRequestAdd), l.addEventListener("ln-translations:request-remove", this._onRequestRemove), this._detectExisting(), this;
   }
-  p.prototype._applyDefaultLang = function() {
+  h.prototype._applyDefaultLang = function() {
     if (!this.defaultLang) return;
     const l = this.dom.querySelectorAll("[data-ln-translatable]");
-    for (const d of l) {
-      const c = d.querySelectorAll("input:not([data-ln-translatable-lang]), textarea:not([data-ln-translatable-lang]), select:not([data-ln-translatable-lang])");
+    for (const u of l) {
+      const c = u.querySelectorAll("input:not([data-ln-translatable-lang]), textarea:not([data-ln-translatable-lang]), select:not([data-ln-translatable-lang])");
       for (const i of c)
         i.setAttribute("data-ln-translatable-lang", this.defaultLang);
     }
-  }, p.prototype._detectExisting = function() {
+  }, h.prototype._detectExisting = function() {
     const l = this.dom.querySelectorAll("[data-ln-translatable-lang]");
-    for (const d of l) {
-      const c = d.getAttribute("data-ln-translatable-lang");
+    for (const u of l) {
+      const c = u.getAttribute("data-ln-translatable-lang");
       c && c !== this.defaultLang && this.activeLanguages.add(c);
     }
     this.activeLanguages.size > 0 && (this._updateBadges(), this._updateDropdown());
-  }, p.prototype._updateDropdown = function() {
+  }, h.prototype._updateDropdown = function() {
     if (!this.menuEl) return;
     this.menuEl.textContent = "";
     const l = this;
-    let d = 0;
+    let u = 0;
     for (const i in this.locales) {
       if (!this.locales.hasOwnProperty(i) || this.activeLanguages.has(i)) continue;
-      d++;
-      const f = Ht("ln-translations-menu-item", "ln-translations");
-      if (!f) return;
-      const h = f.querySelector("[data-ln-translations-lang]");
-      h.setAttribute("data-ln-translations-lang", i), h.textContent = this.locales[i], h.addEventListener("click", function(b) {
+      u++;
+      const p = Ht("ln-translations-menu-item", "ln-translations");
+      if (!p) return;
+      const f = p.querySelector("[data-ln-translations-lang]");
+      f.setAttribute("data-ln-translations-lang", i), f.textContent = this.locales[i], f.addEventListener("click", function(b) {
         b.ctrlKey || b.metaKey || b.button === 1 || (b.preventDefault(), b.stopPropagation(), l.menuEl.getAttribute("data-ln-toggle") === "open" && l.menuEl.setAttribute("data-ln-toggle", "close"), l.addLanguage(i));
-      }), this.menuEl.appendChild(f);
+      }), this.menuEl.appendChild(p);
     }
-    const c = this.dom.querySelector("[" + t + "-add]");
-    c && (c.hidden = d === 0);
-  }, p.prototype._updateBadges = function() {
+    const c = this.dom.querySelector("[data-ln-translations-add]");
+    c && (c.hidden = u === 0);
+  }, h.prototype._updateBadges = function() {
     if (!this.badgesEl) return;
     this.badgesEl.textContent = "";
     const l = this;
-    this.activeLanguages.forEach(function(d) {
+    this.activeLanguages.forEach(function(u) {
       const c = Ht("ln-translations-badge", "ln-translations");
       if (!c) return;
       const i = c.querySelector("[data-ln-translations-lang]");
-      i.setAttribute("data-ln-translations-lang", d);
-      const f = i.querySelector("span");
-      f.textContent = l.locales[d] || d.toUpperCase();
-      const h = i.querySelector("button"), b = l.locales[d] || d.toUpperCase();
-      h.setAttribute("aria-label", l.removeLabel.replace("{lang}", b)), h.addEventListener("click", function(g) {
-        g.ctrlKey || g.metaKey || g.button === 1 || (g.preventDefault(), g.stopPropagation(), l.removeLanguage(d));
+      i.setAttribute("data-ln-translations-lang", u);
+      const p = i.querySelector("span");
+      p.textContent = l.locales[u] || u.toUpperCase();
+      const f = i.querySelector("button"), b = l.locales[u] || u.toUpperCase();
+      f.setAttribute("aria-label", l.removeLabel.replace("{lang}", b)), f.addEventListener("click", function(g) {
+        g.ctrlKey || g.metaKey || g.button === 1 || (g.preventDefault(), g.stopPropagation(), l.removeLanguage(u));
       }), l.badgesEl.appendChild(c);
     });
-  }, p.prototype.addLanguage = function(l, d) {
+  }, h.prototype.addLanguage = function(l, u) {
     if (this.activeLanguages.has(l)) return;
     const c = this.locales[l] || l;
     if (W(this.dom, "ln-translations:before-add", {
@@ -5995,16 +6010,16 @@ function Re(t, n, u) {
       lang: l,
       langName: c
     }).defaultPrevented) return;
-    this.activeLanguages.add(l), d = d || {};
-    const f = this.dom.querySelectorAll("[data-ln-translatable]");
-    for (const h of f) {
-      const b = h.getAttribute("data-ln-translatable"), g = h.getAttribute("data-ln-translations-prefix") || "", _ = h.querySelector(
+    this.activeLanguages.add(l), u = u || {};
+    const p = this.dom.querySelectorAll("[data-ln-translatable]");
+    for (const f of p) {
+      const b = f.getAttribute("data-ln-translatable"), g = f.getAttribute("data-ln-translations-prefix") || "", _ = f.querySelector(
         this.defaultLang ? '[data-ln-translatable-lang="' + this.defaultLang + '"]' : "input:not([data-ln-translatable-lang]), textarea:not([data-ln-translatable-lang]), select:not([data-ln-translatable-lang])"
       );
       if (!_) continue;
       const m = _.cloneNode(_.tagName === "SELECT");
-      g ? m.name = g + "[trans][" + l + "][" + b + "]" : m.name = "trans[" + l + "][" + b + "]", m.value = d[b] !== void 0 ? d[b] : "", m.removeAttribute("id"), "placeholder" in m && (m.placeholder = this.placeholderLabel.replace("{lang}", c)), m.setAttribute("data-ln-translatable-lang", l);
-      const r = h.querySelectorAll('[data-ln-translatable-lang]:not([data-ln-translatable-lang="' + this.defaultLang + '"])'), s = r.length > 0 ? r[r.length - 1] : _;
+      g ? m.name = g + "[trans][" + l + "][" + b + "]" : m.name = "trans[" + l + "][" + b + "]", m.value = u[b] !== void 0 ? u[b] : "", m.removeAttribute("id"), "placeholder" in m && (m.placeholder = this.placeholderLabel.replace("{lang}", c)), m.setAttribute("data-ln-translatable-lang", l);
+      const r = f.querySelectorAll('[data-ln-translatable-lang]:not([data-ln-translatable-lang="' + this.defaultLang + '"])'), s = r.length > 0 ? r[r.length - 1] : _;
       s.parentNode.insertBefore(m, s.nextSibling);
     }
     this._updateDropdown(), this._updateBadges(), S(this.dom, "ln-translations:added", {
@@ -6012,7 +6027,7 @@ function Re(t, n, u) {
       lang: l,
       langName: c
     });
-  }, p.prototype.removeLanguage = function(l) {
+  }, h.prototype.removeLanguage = function(l) {
     if (!this.activeLanguages.has(l) || W(this.dom, "ln-translations:before-remove", {
       target: this.dom,
       lang: l
@@ -6024,37 +6039,37 @@ function Re(t, n, u) {
       target: this.dom,
       lang: l
     });
-  }, p.prototype.getActiveLanguages = function() {
+  }, h.prototype.getActiveLanguages = function() {
     return new Set(this.activeLanguages);
-  }, p.prototype.hasLanguage = function(l) {
+  }, h.prototype.hasLanguage = function(l) {
     return this.activeLanguages.has(l);
-  }, p.prototype.destroy = function() {
+  }, h.prototype.destroy = function() {
     if (!this.dom[n]) return;
-    const l = this.defaultLang, d = this.dom.querySelectorAll("[data-ln-translatable-lang]");
-    for (const c of d)
+    const l = this.defaultLang, u = this.dom.querySelectorAll("[data-ln-translatable-lang]");
+    for (const c of u)
       c.getAttribute("data-ln-translatable-lang") !== l && c.parentNode.removeChild(c);
     this.dom.removeEventListener("ln-translations:request-add", this._onRequestAdd), this.dom.removeEventListener("ln-translations:request-remove", this._onRequestRemove), delete this.dom[n];
-  }, M(t, n, p, "ln-translations");
+  }, M(t, n, h, "ln-translations");
 })();
-const qi = "ln-autosave:", xi = 1e3;
-function ki(t, n) {
-  return n ? qi + (t || "") + ":" + n : null;
+const Ii = "ln-autosave:", Di = 1e3;
+function Ri(t, n) {
+  return n ? Ii + (t || "") + ":" + n : null;
 }
-function Ii(t, n = xi) {
+function Oi(t, n = Di) {
   if (t == null) return 0;
   if (t === "") return n;
-  const u = parseInt(String(t), 10);
-  return isNaN(u) || u < 0 ? n : u;
+  const d = parseInt(String(t), 10);
+  return isNaN(d) || d < 0 ? n : d;
 }
 (function() {
-  const t = "data-ln-autosave", n = "lnAutosave", u = "data-ln-autosave-clear", p = "data-ln-autosave-debounce-input", l = '[data-ln-autosave-exclude], input[type="password"]';
+  const t = "data-ln-autosave", n = "lnAutosave", d = "data-ln-autosave-clear", h = "data-ln-autosave-debounce-input", l = '[data-ln-autosave-exclude], input[type="password"]';
   if (window[n] !== void 0) return;
-  function d(i) {
-    const f = i.tagName;
-    return f === "INPUT" || f === "TEXTAREA" || f === "SELECT";
+  function u(i) {
+    const p = i.tagName;
+    return p === "INPUT" || p === "TEXTAREA" || p === "SELECT";
   }
   function c(i) {
-    const h = i.getAttribute(t) || i.id, b = ki(window.location.pathname, h);
+    const f = i.getAttribute(t) || i.id, b = Ri(window.location.pathname, f);
     if (!b) {
       console.warn("ln-autosave: form needs an id or data-ln-autosave value", i);
       return;
@@ -6100,21 +6115,21 @@ function Ii(t, n = xi) {
     }
     this._onFocusout = function(e) {
       const o = e.target;
-      d(o) && o.name && !o.matches(l) && _();
+      u(o) && o.name && !o.matches(l) && _();
     }, this._onChange = function(e) {
       const o = e.target;
-      d(o) && o.name && !o.matches(l) && _();
+      u(o) && o.name && !o.matches(l) && _();
     }, this._onSubmit = function() {
       r();
     }, this._onReset = function() {
       r();
     }, this._onClearClick = function(e) {
-      e.target.closest("[" + u + "]") && r();
+      e.target.closest("[" + d + "]") && r();
     }, i.addEventListener("focusout", this._onFocusout), i.addEventListener("change", this._onChange), i.addEventListener("submit", this._onSubmit), i.addEventListener("reset", this._onReset), i.addEventListener("click", this._onClearClick);
-    const s = Ii(i.getAttribute(p));
+    const s = Oi(i.getAttribute(h));
     return s > 0 && (this._onInput = function(e) {
       const o = e.target;
-      !d(o) || !o.name || o.matches(l) || (g !== null && clearTimeout(g), g = setTimeout(_, s));
+      !u(o) || !o.name || o.matches(l) || (g !== null && clearTimeout(g), g = setTimeout(_, s));
     }, i.addEventListener("input", this._onInput)), this._getInputTimer = function() {
       return g;
     }, m(), this;
@@ -6133,25 +6148,25 @@ function Ii(t, n = xi) {
 (function() {
   const t = "data-ln-autoresize", n = "lnAutoresize";
   if (window[n] !== void 0) return;
-  function u(p) {
-    if (p.tagName !== "TEXTAREA")
-      return console.warn("[ln-autoresize] Can only be applied to <textarea>, got:", p.tagName), this;
-    this.dom = p;
+  function d(h) {
+    if (h.tagName !== "TEXTAREA")
+      return console.warn("[ln-autoresize] Can only be applied to <textarea>, got:", h.tagName), this;
+    this.dom = h;
     const l = this;
     return this._onInput = function() {
       l._resize();
-    }, p.addEventListener("input", this._onInput), this._resize(), this;
+    }, h.addEventListener("input", this._onInput), this._resize(), this;
   }
-  u.prototype._resize = function() {
+  d.prototype._resize = function() {
     this.dom.style.height = "auto", this.dom.style.height = this.dom.scrollHeight + "px";
-  }, u.prototype.destroy = function() {
+  }, d.prototype.destroy = function() {
     this.dom[n] && (this.dom.removeEventListener("input", this._onInput), this.dom.style.height = "", delete this.dom[n]);
-  }, M(t, n, u, "ln-autoresize");
+  }, M(t, n, d, "ln-autoresize");
 })();
 (function() {
   const t = "data-ln-editor", n = "lnEditor";
   if (window[n] !== void 0) return;
-  const u = {
+  const d = {
     P: !0,
     BR: !0,
     STRONG: !0,
@@ -6171,7 +6186,7 @@ function Ii(t, n = xi) {
     PRE: !0,
     CODE: !0,
     DIV: !0
-  }, p = {
+  }, h = {
     bold: "bold",
     italic: "italic",
     underline: "underline",
@@ -6183,15 +6198,15 @@ function Ii(t, n = xi) {
     blockquote: "blockquote",
     code: "pre",
     paragraph: "p"
-  }, d = {
+  }, u = {
     "ordered-list": "insertOrderedList",
     "unordered-list": "insertUnorderedList"
   };
   let c = 0;
   function i(e) {
-    return !!(p[e] || l[e] || d[e] || e === "link");
+    return !!(h[e] || l[e] || u[e] || e === "link");
   }
-  function f(e) {
+  function p(e) {
     this.dom = e;
     const o = this;
     if (this._textarea = e.querySelector("textarea"), !this._textarea)
@@ -6259,22 +6274,22 @@ function Ii(t, n = xi) {
       }, 0);
     }, A.addEventListener("reset", this._onFormReset)), this;
   }
-  f.prototype._syncToTextarea = function() {
+  p.prototype._syncToTextarea = function() {
     this._textarea && (this._textarea.value = this._surface.innerHTML);
-  }, f.prototype._execAction = function(e) {
+  }, p.prototype._execAction = function(e) {
     if (!(!e || W(this.dom, "ln-editor:before-change", {
       action: e,
       target: this.dom
     }).defaultPrevented)) {
-      if (this._surface.focus(), p[e])
-        document.execCommand(p[e], !1, null);
+      if (this._surface.focus(), h[e])
+        document.execCommand(h[e], !1, null);
       else if (l[e]) {
-        const a = l[e], y = h(this._surface);
+        const a = l[e], y = f(this._surface);
         y && y.toLowerCase() === a ? document.execCommand("formatBlock", !1, "<p>") : document.execCommand("formatBlock", !1, "<" + a + ">");
-      } else d[e] ? document.execCommand(d[e], !1, null) : e === "link" ? s(this) : e === "unlink" ? document.execCommand("unlink", !1, null) : e === "clear" && (document.execCommand("removeFormat", !1, null), document.execCommand("formatBlock", !1, "<p>"));
+      } else u[e] ? document.execCommand(u[e], !1, null) : e === "link" ? s(this) : e === "unlink" ? document.execCommand("unlink", !1, null) : e === "clear" && (document.execCommand("removeFormat", !1, null), document.execCommand("formatBlock", !1, "<p>"));
       this._syncToTextarea(), this._updateActiveStates();
     }
-  }, f.prototype._updateActiveStates = function() {
+  }, p.prototype._updateActiveStates = function() {
     const e = this.dom.querySelector('[role="toolbar"]');
     if (!e) return;
     const o = window.getSelection();
@@ -6285,30 +6300,30 @@ function Ii(t, n = xi) {
     for (let v = 0; v < y.length; v++) {
       const w = y[v], A = w.getAttribute("data-ln-editor-action");
       let C = !1;
-      if (p[A])
+      if (h[A])
         try {
-          C = document.queryCommandState(p[A]);
+          C = document.queryCommandState(h[A]);
         } catch {
         }
       else if (l[A]) {
-        const L = h(this._surface);
+        const L = f(this._surface);
         C = L && L.toLowerCase() === l[A];
-      } else if (d[A])
+      } else if (u[A])
         try {
-          C = document.queryCommandState(d[A]);
+          C = document.queryCommandState(u[A]);
         } catch {
         }
       else A === "link" && (C = !!b(o.anchorNode, "A", this._surface));
       i(A) && w.setAttribute("aria-pressed", String(C)), C ? w.classList.add("ln-editor-active") : w.classList.remove("ln-editor-active");
     }
-  }, f.prototype.getHTML = function() {
+  }, p.prototype.getHTML = function() {
     return this._surface ? this._surface.innerHTML : "";
-  }, f.prototype.setHTML = function(e) {
+  }, p.prototype.setHTML = function(e) {
     this._surface && (this._surface.innerHTML = e, this._syncToTextarea(), S(this.dom, "ln-editor:changed", {
       html: this._textarea.value,
       target: this.dom
     }));
-  }, f.prototype.destroy = function() {
+  }, p.prototype.destroy = function() {
     if (!this.dom[n]) return;
     this._surface && (this._surface.removeEventListener("input", this._onInput), this._surface.removeEventListener("paste", this._onPaste), this._surface.removeEventListener("keydown", this._onKeydown), this._surface.removeEventListener("focus", this._onFocus), this._surface.removeEventListener("blur", this._onBlur), this._surface.remove());
     const e = this.dom.querySelector('[role="toolbar"]');
@@ -6322,7 +6337,7 @@ function Ii(t, n = xi) {
     }
     S(this.dom, "ln-editor:destroyed", { target: this.dom }), delete this.dom[n];
   };
-  function h(e) {
+  function f(e) {
     const o = window.getSelection();
     if (!o || o.rangeCount === 0) return null;
     let a = o.anchorNode;
@@ -6369,7 +6384,7 @@ function Ii(t, n = xi) {
           e.removeChild(y);
           continue;
         }
-        if (u[y.tagName]) {
+        if (d[y.tagName]) {
           const v = Array.from(y.attributes);
           for (let w = 0; w < v.length; w++) {
             const A = v[w].name;
@@ -6459,97 +6474,97 @@ function Ii(t, n = xi) {
       H.key === "Enter" ? (H.preventDefault(), F()) : H.key === "Escape" && (H.preventDefault(), N());
     }), document.addEventListener("mousedown", $);
   }
-  M(t, n, f, "ln-editor");
+  M(t, n, p, "ln-editor");
 })();
 (function() {
   const t = "lnFill";
   if (window[t] !== void 0) return;
   const n = { lnFillForm: !0, lnFillStore: !0 };
-  function u(l) {
-    const d = {}, c = l.dataset;
+  function d(l) {
+    const u = {}, c = l.dataset;
     for (const i in c) {
       if (!i.startsWith("lnFill") || n[i]) continue;
-      const f = i.slice(6);
-      f && (d[f.charAt(0).toLowerCase() + f.slice(1)] = c[i]);
+      const p = i.slice(6);
+      p && (u[p.charAt(0).toLowerCase() + p.slice(1)] = c[i]);
     }
-    return d;
+    return u;
   }
-  function p(l, d) {
-    const c = window.CSS && CSS.escape ? CSS.escape(d) : d, i = document.querySelectorAll('[data-ln-fill-id="' + c + '"]');
+  function h(l, u) {
+    const c = window.CSS && CSS.escape ? CSS.escape(u) : u, i = document.querySelectorAll('[data-ln-fill-id="' + c + '"]');
     if (i.length === 0) return null;
-    for (let f = 0; f < i.length; f++) {
-      const h = i[f].getAttribute("data-ln-fill-form");
-      if (h) {
-        const b = document.getElementById(h);
-        if (b && l.contains(b)) return i[f];
+    for (let p = 0; p < i.length; p++) {
+      const f = i[p].getAttribute("data-ln-fill-form");
+      if (f) {
+        const b = document.getElementById(f);
+        if (b && l.contains(b)) return i[p];
       }
     }
     return i[0];
   }
   document.addEventListener("click", function(l) {
     if (l.ctrlKey || l.metaKey || l.button === 1) return;
-    const d = l.target.closest("[data-ln-fill-form]");
-    if (!d) return;
-    const c = d.getAttribute("href");
+    const u = l.target.closest("[data-ln-fill-form]");
+    if (!u) return;
+    const c = u.getAttribute("href");
     if (c && c.indexOf("#") !== -1) return;
-    const i = d.getAttribute("data-ln-fill-form"), f = document.getElementById(i);
-    if (!f) return;
-    const h = u(d), b = Object.keys(h).length > 0;
-    window.lnCore.lnFill(f, b ? h : null);
+    const i = u.getAttribute("data-ln-fill-form"), p = document.getElementById(i);
+    if (!p) return;
+    const f = d(u), b = Object.keys(f).length > 0;
+    window.lnCore.lnFill(p, b ? f : null);
   }), document.addEventListener("ln-fill:request", function(l) {
-    const d = l.detail;
-    if (!d) return;
-    const c = l.target, i = d.id;
+    const u = l.detail;
+    if (!u) return;
+    const c = l.target, i = u.id;
     if (i == null) {
       window.lnCore.lnFill(c, null);
       return;
     }
-    const f = p(c, i);
-    if (!f) return;
-    const h = u(f);
-    window.lnCore.lnFill(c, h);
+    const p = h(c, i);
+    if (!p) return;
+    const f = d(p);
+    window.lnCore.lnFill(c, f);
   }), window[t] = !0;
 })();
-function Di(t, n = "-") {
+function Mi(t, n = "-") {
   if (t == null) return "";
-  const u = n || "-", p = u.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return String(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, u).replace(new RegExp(`${p}+`, "g"), u).replace(new RegExp(`^${p}+|${p}+$`, "g"), "");
+  const d = n || "-", h = d.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return String(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, d).replace(new RegExp(`${h}+`, "g"), d).replace(new RegExp(`^${h}+|${h}+$`, "g"), "");
 }
 (function() {
   const t = "data-ln-slug-from", n = "lnSlug";
   if (window[n] !== void 0) return;
-  function u(p) {
-    if (p.tagName !== "INPUT")
-      return console.warn("[ln-slug] Can only be applied to <input>, got:", p.tagName), this;
-    const l = p.form;
+  function d(h) {
+    if (h.tagName !== "INPUT")
+      return console.warn("[ln-slug] Can only be applied to <input>, got:", h.tagName), this;
+    const l = h.form;
     if (!l)
-      return console.warn("[ln-slug] Slug input is not inside a <form>:", p), this;
-    const d = p.getAttribute(t), c = l.elements[d];
+      return console.warn("[ln-slug] Slug input is not inside a <form>:", h), this;
+    const u = h.getAttribute(t), c = l.elements[u];
     if (!c)
-      return console.warn('[ln-slug] Source field "' + d + '" not found in form:', p), this;
+      return console.warn('[ln-slug] Source field "' + u + '" not found in form:', h), this;
     if (typeof c.addEventListener != "function")
-      return console.warn('[ln-slug] Source field "' + d + '" is a RadioNodeList (same-name group) — single source field required:', p), this;
-    this.dom = p, this.source = c, this._pristine = p.value === "", this._mirroring = !1;
+      return console.warn('[ln-slug] Source field "' + u + '" is a RadioNodeList (same-name group) — single source field required:', h), this;
+    this.dom = h, this.source = c, this._pristine = h.value === "", this._mirroring = !1;
     const i = this;
     return this._onSource = function() {
       i._pristine && i._mirror();
     }, this._onSlug = function() {
       i._mirroring || (i._pristine = i.dom.value === "");
-    }, c.addEventListener("input", this._onSource), p.addEventListener("input", this._onSlug), this._pristine && c.value && c.value.trim() !== "" && this._mirror(), this;
+    }, c.addEventListener("input", this._onSource), h.addEventListener("input", this._onSlug), this._pristine && c.value && c.value.trim() !== "" && this._mirror(), this;
   }
-  u.prototype._mirror = function() {
-    this._mirroring = !0, this.dom.value = Di(this.source.value), this.dom.dispatchEvent(new Event("input", { bubbles: !0 })), this._mirroring = !1;
-  }, u.prototype.destroy = function() {
+  d.prototype._mirror = function() {
+    this._mirroring = !0, this.dom.value = Mi(this.source.value), this.dom.dispatchEvent(new Event("input", { bubbles: !0 })), this._mirroring = !1;
+  }, d.prototype.destroy = function() {
     this.dom[n] && (this.source.removeEventListener("input", this._onSource), this.dom.removeEventListener("input", this._onSlug), delete this.dom[n]);
-  }, M(t, n, u, "ln-slug");
+  }, M(t, n, d, "ln-slug");
 })();
-function Ri(t, n = Date.now()) {
+function Fi(t, n = Date.now()) {
   if (!t)
     return { value: 0, unit: "second", isOlderThanMonth: !1 };
-  const u = typeof n == "number" ? n : n.getTime(), p = t.getTime(), l = Math.floor((p - u) / 1e3), d = Math.abs(l);
-  return d < 10 ? { value: 0, unit: "second", isOlderThanMonth: !1 } : d < 60 ? { value: l, unit: "second", isOlderThanMonth: !1 } : d < 3600 ? { value: Math.round(l / 60), unit: "minute", isOlderThanMonth: !1 } : d < 86400 ? { value: Math.round(l / 3600), unit: "hour", isOlderThanMonth: !1 } : d < 604800 ? { value: Math.round(l / 86400), unit: "day", isOlderThanMonth: !1 } : d < 2592e3 ? { value: Math.round(l / 604800), unit: "week", isOlderThanMonth: !1 } : { value: Math.round(l / 2592e3), unit: "month", isOlderThanMonth: !0 };
+  const d = typeof n == "number" ? n : n.getTime(), h = t.getTime(), l = Math.floor((h - d) / 1e3), u = Math.abs(l);
+  return u < 10 ? { value: 0, unit: "second", isOlderThanMonth: !1 } : u < 60 ? { value: l, unit: "second", isOlderThanMonth: !1 } : u < 3600 ? { value: Math.round(l / 60), unit: "minute", isOlderThanMonth: !1 } : u < 86400 ? { value: Math.round(l / 3600), unit: "hour", isOlderThanMonth: !1 } : u < 604800 ? { value: Math.round(l / 86400), unit: "day", isOlderThanMonth: !1 } : u < 2592e3 ? { value: Math.round(l / 604800), unit: "week", isOlderThanMonth: !1 } : { value: Math.round(l / 2592e3), unit: "month", isOlderThanMonth: !0 };
 }
-function Ft(t, n, u = /* @__PURE__ */ new Date()) {
+function Ft(t, n, d = /* @__PURE__ */ new Date()) {
   switch (t) {
     case "full":
       return { dateStyle: "long", timeStyle: "short" };
@@ -6559,33 +6574,33 @@ function Ft(t, n, u = /* @__PURE__ */ new Date()) {
       return { timeStyle: "short" };
     case "short":
     default: {
-      const p = { month: "short", day: "numeric" };
-      return n && n.getFullYear() !== u.getFullYear() && (p.year = "numeric"), p;
+      const h = { month: "short", day: "numeric" };
+      return n && n.getFullYear() !== d.getFullYear() && (h.year = "numeric"), h;
     }
   }
 }
 (function() {
   const t = "data-ln-time", n = "lnTime";
   if (window[n] !== void 0) return;
-  const u = {}, p = {};
+  const d = {}, h = {};
   function l(w) {
     return w.getAttribute("data-ln-time-locale") || V(w);
   }
-  function d(w, A) {
+  function u(w, A) {
     const C = (w || "") + "|" + JSON.stringify(A);
-    return u[C] || (u[C] = new Intl.DateTimeFormat(w, A)), u[C];
+    return d[C] || (d[C] = new Intl.DateTimeFormat(w, A)), d[C];
   }
   function c(w) {
     const A = w || "";
-    return p[A] || (p[A] = new Intl.RelativeTimeFormat(w, { numeric: "auto", style: "narrow" })), p[A];
+    return h[A] || (h[A] = new Intl.RelativeTimeFormat(w, { numeric: "auto", style: "narrow" })), h[A];
   }
   const i = /* @__PURE__ */ new Set();
-  let f = null;
-  function h() {
-    f || (f = setInterval(g, 6e4));
+  let p = null;
+  function f() {
+    p || (p = setInterval(g, 6e4));
   }
   function b() {
-    f && (clearInterval(f), f = null);
+    p && (clearInterval(p), p = null);
   }
   function g() {
     for (const w of i) {
@@ -6598,7 +6613,7 @@ function Ft(t, n, u = /* @__PURE__ */ new Date()) {
     i.size === 0 && b();
   }
   function _(w, A) {
-    const C = _t(A), L = (A || "").toLowerCase().split("-")[0], q = d(A, Ft("full", w)), x = q.resolvedOptions().locale.toLowerCase().split("-")[0];
+    const C = _t(A), L = (A || "").toLowerCase().split("-")[0], q = u(A, Ft("full", w)), x = q.resolvedOptions().locale.toLowerCase().split("-")[0];
     if (C && x !== L && C.monthsLong) {
       const D = C.monthsLong[w.getMonth()], F = w.getDate(), N = w.getFullYear(), B = String(w.getHours()).padStart(2, "0"), $ = String(w.getMinutes()).padStart(2, "0");
       return `${F} ${D} ${N} во ${B}:${$}`;
@@ -6606,7 +6621,7 @@ function Ft(t, n, u = /* @__PURE__ */ new Date()) {
     return q.format(w);
   }
   function m(w, A) {
-    const C = Ft("short", w), L = _t(A), q = (A || "").toLowerCase().split("-")[0], x = d(A, C), D = x.resolvedOptions().locale.toLowerCase().split("-")[0];
+    const C = Ft("short", w), L = _t(A), q = (A || "").toLowerCase().split("-")[0], x = u(A, C), D = x.resolvedOptions().locale.toLowerCase().split("-")[0];
     if (L && D !== q && L.monthsShort) {
       const F = L.monthsShort[w.getMonth()], N = w.getDate(), B = C.year ? " " + w.getFullYear() : "";
       return `${N} ${F}${B}`;
@@ -6614,13 +6629,13 @@ function Ft(t, n, u = /* @__PURE__ */ new Date()) {
     return x.format(w);
   }
   function r(w, A) {
-    return d(A, Ft("date", w)).format(w);
+    return u(A, Ft("date", w)).format(w);
   }
   function s(w, A) {
-    return d(A, Ft("time", w)).format(w);
+    return u(A, Ft("time", w)).format(w);
   }
   function e(w, A) {
-    const C = Ri(w);
+    const C = Fi(w);
     return C.isOlderThanMonth ? m(w, A) : c(A).format(C.value, C.unit);
   }
   function o(w) {
@@ -6654,7 +6669,7 @@ function Ft(t, n, u = /* @__PURE__ */ new Date()) {
     const A = this;
     return this._onLocaleChange = function() {
       o(A);
-    }, Wt(), document.addEventListener("ln-core:locale-change", this._onLocaleChange), o(this), w.getAttribute(t) === "relative" && (i.add(this), h()), this;
+    }, Wt(), document.addEventListener("ln-core:locale-change", this._onLocaleChange), o(this), w.getAttribute(t) === "relative" && (i.add(this), f()), this;
   }
   a.prototype.render = function() {
     o(this);
@@ -6664,7 +6679,7 @@ function Ft(t, n, u = /* @__PURE__ */ new Date()) {
   function y(w) {
     const A = w[n];
     if (!A) return;
-    w.getAttribute(t) === "relative" ? (i.add(A), h()) : (i.delete(A), i.size === 0 && b()), o(A);
+    w.getAttribute(t) === "relative" ? (i.add(A), f()) : (i.delete(A), i.size === 0 && b()), o(A);
   }
   function v(w) {
     w.nodeType === 1 && w.hasAttribute && w.hasAttribute(t) && w[n] && o(w[n]);
@@ -6675,26 +6690,26 @@ function Ft(t, n, u = /* @__PURE__ */ new Date()) {
     onInit: v
   });
 })();
-function Oi(t = {}) {
-  let n = t.windowSize > 0 ? t.windowSize : 1e3, u = t.pageSize > 0 ? t.pageSize : 200, p = t.fetchDebounce != null ? t.fetchDebounce : 120;
+function Ni(t = {}) {
+  let n = t.windowSize > 0 ? t.windowSize : 1e3, d = t.pageSize > 0 ? t.pageSize : 200, h = t.fetchDebounce != null ? t.fetchDebounce : 120;
   const l = typeof t.requestPage == "function" ? t.requestPage : () => {
-  }, d = /* @__PURE__ */ new Map(), c = /* @__PURE__ */ new Set();
-  let i = 0, f = 0, h = 0, b = !1, g = null;
+  }, u = /* @__PURE__ */ new Map(), c = /* @__PURE__ */ new Set();
+  let i = 0, p = 0, f = 0, b = !1, g = null;
   function _(s, e) {
-    d.delete(s), d.set(s, e);
+    u.delete(s), u.set(s, e);
   }
   function m() {
-    if (d.size <= n) return [];
+    if (u.size <= n) return [];
     const s = [];
-    for (; d.size > n; ) {
-      const o = d.keys().next().value;
-      s.push(d.get(o)), d.delete(o);
+    for (; u.size > n; ) {
+      const o = u.keys().next().value;
+      s.push(u.get(o)), u.delete(o);
     }
-    const e = new Set(d.values());
+    const e = new Set(u.values());
     return s.filter((o) => !e.has(o));
   }
   function r(s, e) {
-    c.add(s), clearTimeout(g), g = setTimeout(() => l(s, u, e), p);
+    c.add(s), clearTimeout(g), g = setTimeout(() => l(s, d, e), h);
   }
   return {
     get logicalTotal() {
@@ -6704,19 +6719,19 @@ function Oi(t = {}) {
       i = s;
     },
     get grandTotal() {
-      return f;
+      return p;
     },
     set grandTotal(s) {
-      f = s;
+      p = s;
     },
     get queryGen() {
-      return h;
+      return f;
     },
     set queryGen(s) {
-      h = s;
+      f = s;
     },
     get size() {
-      return d.size;
+      return u.size;
     },
     // Whether a server ordering exists for the current query at all — false
     // from reset() until the first ingest(). Distinct from a missing page.
@@ -6724,8 +6739,8 @@ function Oi(t = {}) {
       return b;
     },
     getId: (s) => {
-      if (!d.has(s)) return;
-      const e = d.get(s);
+      if (!u.has(s)) return;
+      const e = u.get(s);
       return _(s, e), e;
     },
     ensure: (s, e, o) => {
@@ -6733,92 +6748,92 @@ function Oi(t = {}) {
       if (i <= 0) return;
       const a = Math.max(0, s), y = Math.min(i, e);
       for (let v = a; v < y; v++)
-        if (!d.has(v)) {
-          const w = Math.floor(v / u) * u;
+        if (!u.has(v)) {
+          const w = Math.floor(v / d) * d;
           if (!c.has(w)) return r(w, o);
         }
     },
     ingest: (s, e, o, a, y) => {
-      if (y != null && y !== h) return [];
-      b = !0, o != null && (f = o), a != null && (i = a);
+      if (y != null && y !== f) return [];
+      b = !0, o != null && (p = o), a != null && (i = a);
       for (let v = 0; v < e.length; v++)
         _(s + v, e[v]);
       return c.delete(s), m();
     },
     reset: function() {
-      h++, this.clear();
+      f++, this.clear();
     },
     clear: () => {
-      b = !1, d.clear(), c.clear(), clearTimeout(g);
+      b = !1, u.clear(), c.clear(), clearTimeout(g);
     },
     configure: (s = {}) => {
-      s.windowSize > 0 && s.windowSize !== n && (n = s.windowSize, m()), s.pageSize > 0 && (u = s.pageSize), s.fetchDebounce >= 0 && (p = s.fetchDebounce);
+      s.windowSize > 0 && s.windowSize !== n && (n = s.windowSize, m()), s.pageSize > 0 && (d = s.pageSize), s.fetchDebounce >= 0 && (h = s.fetchDebounce);
     }
   };
 }
-function Mi(t, n, u) {
+function Pi(t, n, d) {
   if (!Array.isArray(t) || !n || !n.field) return t;
-  const { field: p, direction: l } = n, d = l === "desc", c = t.map((f) => f ? f[p] : void 0), i = ue(c);
-  return [...t].sort((f, h) => {
-    const b = f ? f[p] : void 0, g = h ? h[p] : void 0, _ = he(b, g, i, u);
-    return d ? -_ : _;
+  const { field: h, direction: l } = n, u = l === "desc", c = t.map((p) => p ? p[h] : void 0), i = ue(c);
+  return [...t].sort((p, f) => {
+    const b = p ? p[h] : void 0, g = f ? f[h] : void 0, _ = he(b, g, i, d);
+    return u ? -_ : _;
   });
 }
-function bn(t, n) {
+function gn(t, n) {
   if (!Array.isArray(t) || !n || typeof n != "object") return t;
-  const u = Object.keys(n).filter((p) => Array.isArray(n[p]) && n[p].length > 0);
-  return u.length ? t.filter((p) => p ? u.every((l) => ge(p[l], n[l])) : !1) : t;
+  const d = Object.keys(n).filter((h) => Array.isArray(n[h]) && n[h].length > 0);
+  return d.length ? t.filter((h) => h ? d.every((l) => ge(h[l], n[l])) : !1) : t;
 }
-function Fi(t, n, u) {
-  if (!Array.isArray(t) || !n || !u || !u.length) return t;
-  const p = rn(n);
-  return p.length ? t.filter((l) => l ? p.every(
-    (d) => u.some((c) => {
+function Bi(t, n, d) {
+  if (!Array.isArray(t) || !n || !d || !d.length) return t;
+  const h = Vn(n);
+  return h.length ? t.filter((l) => l ? h.every(
+    (u) => d.some((c) => {
       const i = l[c];
-      return i != null && on(String(i), [d]);
+      return i != null && Wn(String(i), [u]);
     })
   ) : !1) : t;
 }
-function Ni(t, n, u) {
+function Hi(t, n, d) {
   if (!Array.isArray(t) || !t.length) return 0;
-  if (u === "count") return t.length;
-  const p = t.map((d) => d && d[n] != null ? parseFloat(d[n]) : NaN).filter((d) => Number.isFinite(d)), l = p.reduce((d, c) => d + c, 0);
-  return u === "sum" ? l : u === "avg" && p.length ? l / p.length : 0;
+  if (d === "count") return t.length;
+  const h = t.map((u) => u && u[n] != null ? parseFloat(u[n]) : NaN).filter((u) => Number.isFinite(u)), l = h.reduce((u, c) => u + c, 0);
+  return d === "sum" ? l : d === "avg" && h.length ? l / h.length : 0;
 }
-function Pi(t, n = {}, u = [], p) {
+function Ui(t, n = {}, d = [], h) {
   if (!Array.isArray(t))
     return { records: [], total: 0, filtered: 0 };
   const l = t.length;
-  let d = t;
-  n.filters && (d = bn(d, n.filters)), n.search && (d = Fi(d, n.search, u));
-  const c = d.length;
-  if (n.sort && (d = Mi(d, n.sort, p)), n.offset || n.limit) {
-    const i = n.offset || 0, f = n.limit || d.length;
-    d = d.slice(i, i + f);
+  let u = t;
+  n.filters && (u = gn(u, n.filters)), n.search && (u = Bi(u, n.search, d));
+  const c = u.length;
+  if (n.sort && (u = Pi(u, n.sort, h)), n.offset || n.limit) {
+    const i = n.offset || 0, p = n.limit || u.length;
+    u = u.slice(i, i + p);
   }
-  return { records: d, total: l, filtered: c };
+  return { records: u, total: l, filtered: c };
 }
-function Bi(t, n) {
-  return !Array.isArray(t) || !n || typeof n != "object" ? t : t.map((u) => {
-    if (!u) return null;
-    const p = { ...u };
-    for (const [l, d] of Object.entries(n))
-      if (typeof d == "function")
+function zi(t, n) {
+  return !Array.isArray(t) || !n || typeof n != "object" ? t : t.map((d) => {
+    if (!d) return null;
+    const h = { ...d };
+    for (const [l, u] of Object.entries(n))
+      if (typeof u == "function")
         try {
-          p[l] = d(u);
+          h[l] = u(d);
         } catch {
-          p[l] = void 0;
+          h[l] = void 0;
         }
-    return p;
+    return h;
   });
 }
 (function() {
-  const t = "data-ln-data-store", n = "lnDataStore", u = "data-ln-data-store-no-local-query";
+  const t = "data-ln-data-store", n = "lnDataStore", d = "data-ln-data-store-no-local-query";
   if (window[n] !== void 0) return;
-  const p = "ln_app_cache", l = "_meta", d = "1.0";
+  const h = "ln_app_cache", l = "_meta", u = "1.0";
   let c = null, i = null;
-  const f = {};
-  function h(E) {
+  const p = {};
+  function f(E) {
     E && E.name === "QuotaExceededError" && S(document, "ln-data-store:quota-exceeded", { error: E });
   }
   function b() {
@@ -6838,7 +6853,7 @@ function Bi(t, n) {
     return i || (i = new Promise((E) => {
       if (typeof indexedDB > "u")
         return console.warn("[ln-data-store] IndexedDB not available — falling back to in-memory store"), E(null);
-      const T = b(), k = Object.keys(T), I = indexedDB.open(p);
+      const T = b(), k = Object.keys(T), I = indexedDB.open(h);
       I.onerror = () => {
         console.warn("[ln-data-store] IndexedDB open failed — falling back to in-memory store"), E(null);
       }, I.onsuccess = (R) => {
@@ -6847,7 +6862,7 @@ function Bi(t, n) {
           return _(O), c = O, E(O);
         const j = O.version;
         O.close();
-        const G = indexedDB.open(p, j + 1);
+        const G = indexedDB.open(h, j + 1);
         G.onblocked = () => {
           console.warn("[ln-data-store] Database upgrade blocked — waiting for other tabs to close connection");
         }, G.onerror = () => {
@@ -6878,7 +6893,7 @@ function Bi(t, n) {
   }
   async function r(E) {
     if (!ut() || !E) return E;
-    const T = { ...E }, k = T.id, I = await jn(T);
+    const T = { ...E }, k = T.id, I = await zn(T);
     return !I || !I.encrypted ? E : {
       id: k,
       encrypted: !0,
@@ -6887,13 +6902,13 @@ function Bi(t, n) {
     };
   }
   async function s(E) {
-    return !E || !E.encrypted || !ut() ? E : Vn(E);
+    return !E || !E.encrypted || !ut() ? E : Kn(E);
   }
   const e = (E, T) => m().then((k) => k ? k.transaction(E, T).objectStore(E) : null);
   function o(E) {
     return new Promise((T, k) => {
       E.onsuccess = () => T(E.result), E.onerror = () => {
-        h(E.error), k(E.error);
+        f(E.error), k(E.error);
       };
     });
   }
@@ -6914,7 +6929,7 @@ function Bi(t, n) {
     const R = E.getAttribute("data-ln-data-store-window");
     if (R !== null) {
       const O = parseInt(R, 10) || 1e3, P = parseInt(E.getAttribute("data-ln-data-store-window-page"), 10) || 200;
-      this._windowIndex = Oi({
+      this._windowIndex = Ni({
         windowSize: O,
         pageSize: P,
         requestPage: (K, j, G) => {
@@ -6929,7 +6944,7 @@ function Bi(t, n) {
       });
     } else
       this._windowIndex = null;
-    return this.windowed = this._windowIndex !== null, this.noLocalQuery = E.hasAttribute(u), this.totalCount = 0, this.presenters = null, this._mutationChain = Promise.resolve(), f[this._name] = this, F(this), this.ready = wn(this), this;
+    return this.windowed = this._windowIndex !== null, this.noLocalQuery = E.hasAttribute(d), this.totalCount = 0, this.presenters = null, this._mutationChain = Promise.resolve(), p[this._name] = this, F(this), this.ready = yn(this), this;
   }
   function F(E) {
     E._handlers = {
@@ -6984,7 +6999,7 @@ function Bi(t, n) {
       } else
         E.totalCount = k;
       return E.hasCache = !0, E.isLoaded = !0, E.canServe = !0, x(E._name, {
-        schema_version: d,
+        schema_version: u,
         last_synced_at: E.lastSyncedAt,
         has_cache: !0,
         record_count: E.totalCount
@@ -7001,7 +7016,7 @@ function Bi(t, n) {
     return y(E._name, T).then((R) => {
       if (!R) throw new Error(`Record not found: ${T}`);
       const O = { ...R, ...k }, P = k.id;
-      return (P !== void 0 && P !== T ? En(E._name, T, O) : w(E._name, O)).then(() => B(E, 0)).then(() => {
+      return (P !== void 0 && P !== T ? vn(E._name, T, O) : w(E._name, O)).then(() => B(E, 0)).then(() => {
         S(E.dom, "ln-data-store:updated", { store: E._name, record: O, previous: R, requestId: I });
       });
     });
@@ -7033,16 +7048,16 @@ function Bi(t, n) {
       error: I
     });
   }
-  function wn(E) {
+  function yn(E) {
     return g().then((T) => {
       if (!T) throw new Error("IndexedDB is unavailable");
       return q(E._name);
     }).then((T) => {
-      if (E.initializationError = null, T && T.schema_version === d)
+      if (E.initializationError = null, T && T.schema_version === u)
         E.lastSyncedAt = T.last_synced_at || null, E.totalCount = T.record_count || 0, E.hasCache = T.has_cache === !0 || E.totalCount > 0, E.hasCache && (E.isLoaded = !0, E.canServe = !0, S(E.dom, "ln-data-store:ready", { store: E._name, count: E.totalCount, source: "cache" })), E.isInitialized = !0, S(E.dom, "ln-data-store:initialized", { store: E._name, hasCache: E.hasCache, lastSyncedAt: E.lastSyncedAt, count: E.totalCount });
       else {
-        if (T && T.schema_version !== d)
-          return C(E._name).then(() => x(E._name, { schema_version: d, last_synced_at: null, has_cache: !1, record_count: 0 })).then(() => {
+        if (T && T.schema_version !== u)
+          return C(E._name).then(() => x(E._name, { schema_version: u, last_synced_at: null, has_cache: !1, record_count: 0 })).then(() => {
             E.isInitialized = !0, E.hasCache = !1, S(E.dom, "ln-data-store:initialized", { store: E._name, hasCache: !1, lastSyncedAt: null, count: 0 });
           });
         E.isInitialized = !0, E.hasCache = !1, S(E.dom, "ln-data-store:initialized", { store: E._name, hasCache: !1, lastSyncedAt: null, count: 0 });
@@ -7056,7 +7071,7 @@ function Bi(t, n) {
     return m().then((k) => k ? (ut() ? Promise.all(T.map((R) => r(R))) : Promise.resolve(T)).then((R) => new Promise((O, P) => {
       const K = k.transaction(E, "readwrite"), j = K.objectStore(E);
       R.forEach((G) => j.put(G)), K.oncomplete = () => O(), K.onerror = () => {
-        h(K.error), P(K.error);
+        f(K.error), P(K.error);
       };
     })) : void 0);
   }
@@ -7069,28 +7084,28 @@ function Bi(t, n) {
         });
     });
   }
-  function En(E, T, k) {
+  function vn(E, T, k) {
     return (ut() ? r(k) : Promise.resolve(k)).then((R) => m().then((O) => {
       if (O)
         return new Promise((P, K) => {
           const j = O.transaction(E, "readwrite"), G = j.objectStore(E);
           G.put(R), G.delete(T), j.oncomplete = () => P(), j.onerror = () => {
-            h(j.error), K(j.error);
+            f(j.error), K(j.error);
           };
         });
     }));
   }
-  const An = new Intl.Collator(void 0, { numeric: !0, sensitivity: "base" });
-  function Sn(E) {
+  const wn = new Intl.Collator(void 0, { numeric: !0, sensitivity: "base" });
+  function En(E) {
     return E ? Object.keys(E).filter((T) => Array.isArray(E[T]) && E[T].length > 0) : [];
   }
-  function Cn(E, T, k) {
+  function An(E, T, k) {
     return T.every((I) => k[I].map(String).includes(String(E[I])));
   }
-  function Ln(E) {
+  function Sn(E) {
     return String(E || "").toLowerCase().split(/\s+/).filter(Boolean);
   }
-  function Tn(E, T, k) {
+  function Cn(E, T, k) {
     return T.every(
       (I) => k.some((R) => {
         const O = E[R];
@@ -7098,17 +7113,17 @@ function Bi(t, n) {
       })
     );
   }
-  function qn(E, T, k) {
-    return Ni(E, T, k);
+  function Ln(E, T, k) {
+    return Hi(E, T, k);
   }
   function St(E, T) {
-    return Bi(T, E.presenters && E.presenters.computed);
+    return zi(T, E.presenters && E.presenters.computed);
   }
-  function xn(E) {
+  function Tn(E) {
     return !E.sort && !ut();
   }
-  function kn(E, T, k) {
-    const I = Sn(T.filters), R = T.search ? Ln(T.search) : [], O = E._searchFields, P = R.length > 0 && O && O.length > 0;
+  function qn(E, T, k) {
+    const I = En(T.filters), R = T.search ? Sn(T.search) : [], O = E._searchFields, P = R.length > 0 && O && O.length > 0;
     return e(E._name, "readonly").then((K) => K ? new Promise((j, G) => {
       const rt = [], J = K.openCursor();
       J.onsuccess = () => {
@@ -7118,12 +7133,12 @@ function Bi(t, n) {
           return;
         }
         const Ct = mt.value;
-        (!I.length || Cn(Ct, I, T.filters)) && (!P || Tn(Ct, R, O)) && rt.push(Ct), mt.continue();
+        (!I.length || An(Ct, I, T.filters)) && (!P || Cn(Ct, R, O)) && rt.push(Ct), mt.continue();
       }, J.onerror = () => G(J.error);
     }) : []);
   }
   function we(E, T, k) {
-    return Pi(T, k, E._searchFields, An);
+    return Ui(T, k, E._searchFields, wn);
   }
   function Ee(E, T, k) {
     const I = [];
@@ -7168,7 +7183,7 @@ function Bi(t, n) {
           queryGen: T._windowIndex.queryGen,
           provisional: !0
         } : Ee(T, k, I);
-        return xn(E) ? kn(T, E, R).then((P) => O(P.slice(k, R))) : a(T._name).then((P) => O(we(T, P, E).records));
+        return Tn(E) ? qn(T, E, R).then((P) => O(P.slice(k, R))) : a(T._name).then((P) => O(we(T, P, E).records));
       }
       return Ee(T, k, I);
     }
@@ -7183,9 +7198,9 @@ function Bi(t, n) {
   }, D.prototype.getById = function(E) {
     return y(this._name, E).then((T) => T ? St(this, [T])[0] : null);
   }, D.prototype.count = function(E) {
-    return E && Object.keys(E).length > 0 ? a(this._name).then((k) => bn(k, E).length) : this.totalCount != null ? Promise.resolve(this.totalCount) : L(this._name);
+    return E && Object.keys(E).length > 0 ? a(this._name).then((k) => gn(k, E).length) : this.totalCount != null ? Promise.resolve(this.totalCount) : L(this._name);
   }, D.prototype.aggregate = function(E, T) {
-    return a(this._name).then((k) => qn(k, E, T));
+    return a(this._name).then((k) => Ln(k, E, T));
   }, D.prototype.setPresenters = function(E) {
     this.presenters = E;
   }, D.prototype.applySync = function(E, T, k, I) {
@@ -7201,7 +7216,7 @@ function Bi(t, n) {
         if (j && j.length) return Qt(R._name, j);
       }
     }).then(() => L(R._name)).then((P) => (R.totalCount = I.total !== void 0 ? I.total : P, R.hasCache = !0, x(R._name, {
-      schema_version: d,
+      schema_version: u,
       last_synced_at: k,
       has_cache: !0,
       record_count: R.totalCount
@@ -7227,7 +7242,7 @@ function Bi(t, n) {
   }, D.prototype.fullReload = function() {
     const E = this;
     return C(E._name).then(() => x(E._name, {
-      schema_version: d,
+      schema_version: u,
       last_synced_at: null,
       has_cache: !1,
       record_count: 0
@@ -7245,9 +7260,9 @@ function Bi(t, n) {
         this.dom.removeEventListener(E, T);
       this._queryHandlers = null;
     }
-    delete f[this._name], delete this.dom[n], S(this.dom, "ln-data-store:destroyed", { store: this._name });
+    delete p[this._name], delete this.dom[n], S(this.dom, "ln-data-store:destroyed", { store: this._name });
   };
-  function In() {
+  function xn() {
     return m().then((E) => {
       if (!E) return;
       const T = Array.from(E.objectStoreNames);
@@ -7256,7 +7271,7 @@ function Bi(t, n) {
         T.forEach((O) => R.objectStore(O).clear()), R.oncomplete = () => k(), R.onerror = () => I(R.error);
       });
     }).then(() => {
-      Object.values(f).forEach((E) => {
+      Object.values(p).forEach((E) => {
         E.isLoaded = !1, E.canServe = !1, E.isInitialized = !1, E.initializationError = null, E.hasCache = !1, E.isSyncing = !1, E.lastSyncedAt = null, E.totalCount = 0;
       });
     });
@@ -7271,16 +7286,16 @@ function Bi(t, n) {
       }
     });
   }
-  function Dn(E, T) {
+  function kn(E, T) {
     const k = E[n];
-    !k || T !== u || (k.noLocalQuery = E.hasAttribute(u));
+    !k || T !== d || (k.noLocalQuery = E.hasAttribute(d));
   }
   M(t, n, D, "ln-data-store", {
-    extraAttributes: [u],
-    onAttributeChange: Dn
-  }), window[n].clearAll = In, window[n].init = window[n], window[n].setStorageKey = Se, typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.setStorageKey = Se);
+    extraAttributes: [d],
+    onAttributeChange: kn
+  }), window[n].clearAll = xn, window[n].init = window[n], window[n].setStorageKey = Se, typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.setStorageKey = Se);
 })();
-const Hi = {
+const Ki = {
   offset: "offset",
   limit: "limit",
   search: "search",
@@ -7288,56 +7303,56 @@ const Hi = {
   sortDir: "sort_dir"
 };
 function gt(...t) {
-  return t.filter((n) => n != null && n !== "").map((n, u) => {
-    const p = String(n);
-    return u === 0 ? p.replace(/\/+$/, "") : p.replace(/^\/+/, "").replace(/\/+$/, "");
+  return t.filter((n) => n != null && n !== "").map((n, d) => {
+    const h = String(n);
+    return d === 0 ? h.replace(/\/+$/, "") : h.replace(/^\/+/, "").replace(/\/+$/, "");
   }).filter(Boolean).join("/");
 }
-function Ui(t, n) {
+function ji(t, n) {
   if (!t || typeof t != "object") return "";
-  const u = Object.assign({}, Hi);
+  const d = Object.assign({}, Ki);
   if (n && typeof n == "object")
     for (const l in n)
-      n[l] !== void 0 && n[l] !== null && n[l] !== "" && (u[l] = n[l]);
-  const p = new URLSearchParams();
-  return t.search && p.append(u.search, t.search), t.offset != null && p.append(u.offset, t.offset), t.limit != null && p.append(u.limit, t.limit), t.sort && t.sort.field && t.sort.direction && (p.append(u.sortField, t.sort.field), p.append(u.sortDir, t.sort.direction)), t.filters && typeof t.filters == "object" && Object.keys(t.filters).forEach((l) => {
-    const d = t.filters[l];
-    Array.isArray(d) && d.length > 0 && p.append(l, d.join(","));
-  }), p.toString();
+      n[l] !== void 0 && n[l] !== null && n[l] !== "" && (d[l] = n[l]);
+  const h = new URLSearchParams();
+  return t.search && h.append(d.search, t.search), t.offset != null && h.append(d.offset, t.offset), t.limit != null && h.append(d.limit, t.limit), t.sort && t.sort.field && t.sort.direction && (h.append(d.sortField, t.sort.field), h.append(d.sortDir, t.sort.direction)), t.filters && typeof t.filters == "object" && Object.keys(t.filters).forEach((l) => {
+    const u = t.filters[l];
+    Array.isArray(u) && u.length > 0 && h.append(l, u.join(","));
+  }), h.toString();
 }
-function zi(t, n, u) {
-  let p = gt(t, n);
-  return u && (p += (p.indexOf("?") !== -1 ? "&" : "?") + u), p;
+function Vi(t, n, d) {
+  let h = gt(t, n);
+  return d && (h += (h.indexOf("?") !== -1 ? "&" : "?") + d), h;
 }
 function Oe(t) {
-  const n = t && t.content !== void 0 ? t.content : t, u = t && t.message ? t.message : null;
-  return { record: n, message: u };
+  const n = t && t.content !== void 0 ? t.content : t, d = t && t.message ? t.message : null;
+  return { record: n, message: d };
 }
 (function() {
-  const t = "data-ln-api-connector", n = "lnApiConnector", u = "lnConnector";
+  const t = "data-ln-api-connector", n = "lnApiConnector", d = "lnConnector";
   if (window[n] !== void 0) return;
-  function p(i) {
-    return i.ok ? i.status === 204 ? null : i.json() : i.json().catch(() => null).then((f) => {
-      const h = new Error("HTTP " + i.status + ": " + i.statusText);
-      throw h.status = i.status, h.data = f, h;
+  function h(i) {
+    return i.ok ? i.status === 204 ? null : i.json() : i.json().catch(() => null).then((p) => {
+      const f = new Error("HTTP " + i.status + ": " + i.statusText);
+      throw f.status = i.status, f.data = p, f;
     });
   }
   function l(i) {
-    return this.dom = i, i[n] = this, i[u] = this, this._inflight = /* @__PURE__ */ new Map(), this._queryTimers = /* @__PURE__ */ new Map(), this.refreshConfig(), this._handlers = null, d(this), this;
+    return this.dom = i, i[n] = this, i[d] = this, this._inflight = /* @__PURE__ */ new Map(), this._queryTimers = /* @__PURE__ */ new Map(), this.refreshConfig(), this._handlers = null, u(this), this;
   }
   l.prototype.refreshConfig = function() {
     const i = this.dom;
     this.baseUrl = i.getAttribute("data-ln-api-base-url") || "", this.path = i.getAttribute("data-ln-api-path") || "", this.credentials = "same-origin", this.rawHeaders = i.getAttribute("data-ln-api-headers"), this.headers = We(this.rawHeaders);
-    const f = {}, h = i.getAttribute("data-ln-api-param-offset");
-    h && (f.offset = h);
+    const p = {}, f = i.getAttribute("data-ln-api-param-offset");
+    f && (p.offset = f);
     const b = i.getAttribute("data-ln-api-param-limit");
-    b && (f.limit = b);
+    b && (p.limit = b);
     const g = i.getAttribute("data-ln-api-param-search");
-    g && (f.search = g);
+    g && (p.search = g);
     const _ = i.getAttribute("data-ln-api-param-sort-field");
-    _ && (f.sortField = _);
+    _ && (p.sortField = _);
     const m = i.getAttribute("data-ln-api-param-sort-dir");
-    m && (f.sortDir = m), this.paramKeys = f;
+    m && (p.sortDir = m), this.paramKeys = p;
     const r = i.getAttribute("data-ln-api-connector-query-debounce");
     this.queryDebounce = r !== null ? +r : 300, S(this.dom, "ln-api-connector:config-changed", {
       baseUrl: this.baseUrl,
@@ -7346,90 +7361,90 @@ function Oe(t) {
       paramKeys: this.paramKeys
     });
   }, l.prototype._reqHeaders = function(i) {
-    const f = Object.assign({}, this.headers);
-    return !f.Accept && !f.accept && (f.Accept = "application/json"), !f["Content-Type"] && !f["content-type"] && (f["Content-Type"] = "application/json"), i && (f["X-Idempotency-Key"] = i), f;
+    const p = Object.assign({}, this.headers);
+    return !p.Accept && !p.accept && (p.Accept = "application/json"), !p["Content-Type"] && !p["content-type"] && (p["Content-Type"] = "application/json"), i && (p["X-Idempotency-Key"] = i), p;
   }, l.prototype.cancel = function(i) {
     return i && this._inflight.has(i) ? (this._inflight.get(i).abort(), this._inflight.delete(i), !0) : !1;
-  }, l.prototype.fetchDelta = function(i, f) {
-    const h = this;
-    let b = gt(h.baseUrl, h.path);
+  }, l.prototype.fetchDelta = function(i, p) {
+    const f = this;
+    let b = gt(f.baseUrl, f.path);
     i != null && i !== "" && (b += (b.indexOf("?") !== -1 ? "&" : "?") + "since=" + encodeURIComponent(i));
-    const g = f || "sync";
-    h._inflight.has(g) && h._inflight.get(g).abort();
+    const g = p || "sync";
+    f._inflight.has(g) && f._inflight.get(g).abort();
     const _ = new AbortController();
-    return h._inflight.set(g, _), window.fetch(b, {
+    return f._inflight.set(g, _), window.fetch(b, {
       method: "GET",
-      headers: h._reqHeaders(),
-      credentials: h.credentials,
+      headers: f._reqHeaders(),
+      credentials: f.credentials,
       signal: _.signal
-    }).then(p).finally(function() {
-      h._inflight.get(g) === _ && h._inflight.delete(g);
+    }).then(h).finally(function() {
+      f._inflight.get(g) === _ && f._inflight.delete(g);
     });
-  }, l.prototype.query = function(i, f) {
-    const h = this, b = Ui(i, h.paramKeys), g = zi(h.baseUrl, h.path, b), _ = f || "query";
-    h._inflight.has(_) && h._inflight.get(_).abort();
+  }, l.prototype.query = function(i, p) {
+    const f = this, b = ji(i, f.paramKeys), g = Vi(f.baseUrl, f.path, b), _ = p || "query";
+    f._inflight.has(_) && f._inflight.get(_).abort();
     const m = new AbortController();
-    return h._inflight.set(_, m), window.fetch(g, {
+    return f._inflight.set(_, m), window.fetch(g, {
       method: "GET",
-      headers: h._reqHeaders(),
-      credentials: h.credentials,
+      headers: f._reqHeaders(),
+      credentials: f.credentials,
       signal: m.signal
-    }).then(p).finally(function() {
-      h._inflight.get(_) === m && h._inflight.delete(_);
+    }).then(h).finally(function() {
+      f._inflight.get(_) === m && f._inflight.delete(_);
     });
-  }, l.prototype.create = function(i, f, h) {
+  }, l.prototype.create = function(i, p, f) {
     const b = this;
-    return window.fetch(gt(b.baseUrl, f || b.path), {
+    return window.fetch(gt(b.baseUrl, p || b.path), {
       method: "POST",
-      headers: b._reqHeaders(h),
+      headers: b._reqHeaders(f),
       credentials: b.credentials,
       body: JSON.stringify(i)
-    }).then(p);
-  }, l.prototype.update = function(i, f, h, b, g) {
+    }).then(h);
+  }, l.prototype.update = function(i, p, f, b, g) {
     const _ = this;
-    h != null && (f = Object.assign({}, f, { expected_version: h }));
+    f != null && (p = Object.assign({}, p, { expected_version: f }));
     const m = b ? gt(_.baseUrl, b) : gt(_.baseUrl, _.path, i);
     return window.fetch(m, {
       method: "PUT",
       headers: _._reqHeaders(g),
       credentials: _.credentials,
-      body: JSON.stringify(f)
-    }).then(p);
-  }, l.prototype.delete = function(i, f, h) {
+      body: JSON.stringify(p)
+    }).then(h);
+  }, l.prototype.delete = function(i, p, f) {
     const b = this;
-    return window.fetch(gt(b.baseUrl, f || b.path, i), {
+    return window.fetch(gt(b.baseUrl, p || b.path, i), {
       method: "DELETE",
-      headers: b._reqHeaders(h),
+      headers: b._reqHeaders(f),
       credentials: b.credentials
-    }).then(p);
-  }, l.prototype.bulkDelete = function(i, f, h) {
+    }).then(h);
+  }, l.prototype.bulkDelete = function(i, p, f) {
     const b = this;
-    return window.fetch(gt(b.baseUrl, f || b.path, "bulk-delete"), {
+    return window.fetch(gt(b.baseUrl, p || b.path, "bulk-delete"), {
       method: "DELETE",
-      headers: b._reqHeaders(h),
+      headers: b._reqHeaders(f),
       credentials: b.credentials,
       body: JSON.stringify({ ids: i })
-    }).then(p);
+    }).then(h);
   };
-  function d(i) {
+  function u(i) {
     i._handlers = {
-      sync: function(f) {
-        const h = f.detail || {}, b = h.meta && h.meta.targetEl ? h.meta.targetEl : null;
-        i.fetchDelta(h.since, b).then(function(g) {
-          S(i.dom, "ln-api-connector:fetched", { data: g, since: h.since, meta: h.meta || null });
+      sync: function(p) {
+        const f = p.detail || {}, b = f.meta && f.meta.targetEl ? f.meta.targetEl : null;
+        i.fetchDelta(f.since, b).then(function(g) {
+          S(i.dom, "ln-api-connector:fetched", { data: g, since: f.since, meta: f.meta || null });
         }).catch(function(g) {
           g && g.name === "AbortError" || S(i.dom, "ln-api-connector:error", {
             action: "sync",
             error: g.message,
             status: g.status || 0,
             data: g.data || null,
-            since: h.since,
-            meta: h.meta || null
+            since: f.since,
+            meta: f.meta || null
           });
         });
       },
-      query: function(f) {
-        const h = f.detail || {}, b = h.query || h, g = h.meta && h.meta.targetEl ? h.meta.targetEl : null, _ = g || "query", m = i.queryDebounce;
+      query: function(p) {
+        const f = p.detail || {}, b = f.query || f, g = f.meta && f.meta.targetEl ? f.meta.targetEl : null, _ = g || "query", m = i.queryDebounce;
         function r(e, o, a) {
           i.query(o, a).then(function(y) {
             const v = y || {};
@@ -7452,28 +7467,28 @@ function Oe(t) {
           });
         }
         if (m === 0) {
-          r(h, b, g);
+          r(f, b, g);
           return;
         }
         i._queryTimers.has(_) && clearTimeout(i._queryTimers.get(_));
         const s = setTimeout(function() {
-          i._queryTimers.delete(_), r(h, b, g);
+          i._queryTimers.delete(_), r(f, b, g);
         }, m);
         i._queryTimers.set(_, s);
       },
-      cancel: function(f) {
-        const h = f.detail || {}, b = h.meta && h.meta.targetEl ? h.meta.targetEl : h.targetEl || h.key;
+      cancel: function(p) {
+        const f = p.detail || {}, b = f.meta && f.meta.targetEl ? f.meta.targetEl : f.targetEl || f.key;
         b && i.cancel(b);
       },
-      create: function(f) {
-        const h = f.detail || {};
-        i.create(h.data, h.url, h.idempotencyKey).then(function(b) {
+      create: function(p) {
+        const f = p.detail || {};
+        i.create(f.data, f.url, f.idempotencyKey).then(function(b) {
           const g = Oe(b);
           S(i.dom, "ln-api-connector:created", {
             record: g.record,
-            tempId: h.tempId,
+            tempId: f.tempId,
             message: g.message,
-            meta: h.meta || null
+            meta: f.meta || null
           });
         }).catch(function(b) {
           b && b.name === "AbortError" || S(i.dom, "ln-api-connector:error", {
@@ -7481,20 +7496,20 @@ function Oe(t) {
             error: b.message,
             status: b.status || 0,
             data: b.data || null,
-            tempId: h.tempId,
-            meta: h.meta || null
+            tempId: f.tempId,
+            meta: f.meta || null
           });
         });
       },
-      update: function(f) {
-        const h = f.detail || {};
-        i.update(h.id, h.data, h.expected_version, h.url, h.idempotencyKey).then(function(b) {
+      update: function(p) {
+        const f = p.detail || {};
+        i.update(f.id, f.data, f.expected_version, f.url, f.idempotencyKey).then(function(b) {
           const g = Oe(b);
           S(i.dom, "ln-api-connector:updated", {
             record: g.record,
-            id: h.id,
+            id: f.id,
             message: g.message,
-            meta: h.meta || null
+            meta: f.meta || null
           });
         }).catch(function(b) {
           b && b.name === "AbortError" || S(i.dom, "ln-api-connector:error", {
@@ -7502,21 +7517,21 @@ function Oe(t) {
             error: b.message,
             status: b.status || 0,
             data: b.data || null,
-            id: h.id,
+            id: f.id,
             conflictData: b.status === 409 ? b.data : null,
-            meta: h.meta || null
+            meta: f.meta || null
           });
         });
       },
-      delete: function(f) {
-        const h = f.detail || {};
-        i.delete(h.id, h.url, h.idempotencyKey).then(function(b) {
+      delete: function(p) {
+        const f = p.detail || {};
+        i.delete(f.id, f.url, f.idempotencyKey).then(function(b) {
           const g = b && b.message ? b.message : null;
           S(i.dom, "ln-api-connector:deleted", {
             response: b,
-            id: h.id,
+            id: f.id,
             message: g,
-            meta: h.meta || null
+            meta: f.meta || null
           });
         }).catch(function(b) {
           b && b.name === "AbortError" || S(i.dom, "ln-api-connector:error", {
@@ -7524,20 +7539,20 @@ function Oe(t) {
             error: b.message,
             status: b.status || 0,
             data: b.data || null,
-            id: h.id,
-            meta: h.meta || null
+            id: f.id,
+            meta: f.meta || null
           });
         });
       },
-      bulkDelete: function(f) {
-        const h = f.detail || {};
-        i.bulkDelete(h.ids, h.url, h.idempotencyKey).then(function(b) {
+      bulkDelete: function(p) {
+        const f = p.detail || {};
+        i.bulkDelete(f.ids, f.url, f.idempotencyKey).then(function(b) {
           const g = b && b.message ? b.message : null;
           S(i.dom, "ln-api-connector:bulk-deleted", {
             response: b,
-            ids: h.ids,
+            ids: f.ids,
             message: g,
-            meta: h.meta || null
+            meta: f.meta || null
           });
         }).catch(function(b) {
           b && b.name === "AbortError" || S(i.dom, "ln-api-connector:error", {
@@ -7545,8 +7560,8 @@ function Oe(t) {
             error: b.message,
             status: b.status || 0,
             data: b.data || null,
-            ids: h.ids,
-            meta: h.meta || null
+            ids: f.ids,
+            meta: f.meta || null
           });
         });
       }
@@ -7555,15 +7570,15 @@ function Oe(t) {
   l.prototype.destroy = function() {
     if (!this.dom[n]) return;
     const i = this;
-    i._inflight && (i._inflight.forEach(function(f) {
-      f.abort();
-    }), i._inflight.clear()), this._queryTimers && (this._queryTimers.forEach(function(f) {
-      f && clearTimeout(f);
-    }), this._queryTimers.clear()), this._handlers && (i.dom.removeEventListener("ln-api-connector:request-sync", i._handlers.sync), i.dom.removeEventListener("ln-api-connector:request-query", i._handlers.query), i.dom.removeEventListener("ln-api-connector:request-fetch", i._handlers.query), i.dom.removeEventListener("ln-api-connector:request-cancel", i._handlers.cancel), i.dom.removeEventListener("ln-api-connector:request-create", i._handlers.create), i.dom.removeEventListener("ln-api-connector:request-update", i._handlers.update), i.dom.removeEventListener("ln-api-connector:request-delete", i._handlers.delete), i.dom.removeEventListener("ln-api-connector:request-bulk-delete", i._handlers.bulkDelete), i._handlers = null), S(this.dom, "ln-api-connector:destroyed", { target: this.dom }), delete this.dom[n], delete this.dom[u];
+    i._inflight && (i._inflight.forEach(function(p) {
+      p.abort();
+    }), i._inflight.clear()), this._queryTimers && (this._queryTimers.forEach(function(p) {
+      p && clearTimeout(p);
+    }), this._queryTimers.clear()), this._handlers && (i.dom.removeEventListener("ln-api-connector:request-sync", i._handlers.sync), i.dom.removeEventListener("ln-api-connector:request-query", i._handlers.query), i.dom.removeEventListener("ln-api-connector:request-fetch", i._handlers.query), i.dom.removeEventListener("ln-api-connector:request-cancel", i._handlers.cancel), i.dom.removeEventListener("ln-api-connector:request-create", i._handlers.create), i.dom.removeEventListener("ln-api-connector:request-update", i._handlers.update), i.dom.removeEventListener("ln-api-connector:request-delete", i._handlers.delete), i.dom.removeEventListener("ln-api-connector:request-bulk-delete", i._handlers.bulkDelete), i._handlers = null), S(this.dom, "ln-api-connector:destroyed", { target: this.dom }), delete this.dom[n], delete this.dom[d];
   };
   function c(i) {
-    const f = i[n];
-    f && f.refreshConfig();
+    const p = i[n];
+    p && p.refreshConfig();
   }
   M(t, n, l, "ln-api-connector", {
     extraAttributes: [
@@ -7581,14 +7596,14 @@ function Oe(t) {
   });
 })();
 (function() {
-  const t = "data-ln-couchdb-connector", n = "lnCouchDbConnector", u = "lnConnector";
+  const t = "data-ln-couchdb-connector", n = "lnCouchDbConnector", d = "lnConnector";
   if (window[n] !== void 0) return;
-  function p(_) {
+  function h(_) {
     const m = _ && _.content !== void 0 ? _.content : _, r = _ && _.message ? _.message : null;
     return { content: m, message: r };
   }
   function l(_) {
-    return this.dom = _, _[n] = this, _[u] = this, this.refreshConfig(), this._handlers = null, b(this), this;
+    return this.dom = _, _[n] = this, _[d] = this, this.refreshConfig(), this._handlers = null, b(this), this;
   }
   l.prototype.refreshConfig = function() {
     const _ = this.dom;
@@ -7601,7 +7616,7 @@ function Oe(t) {
       headers: this.headers
     });
   };
-  function d(_, m, r) {
+  function u(_, m, r) {
     const s = Object.assign({}, Lt(_.headers, _.auth), r || {});
     return m && (s["Idempotency-Key"] = m), s;
   }
@@ -7625,14 +7640,14 @@ function Oe(t) {
     const s = Object.assign({ _id: m.id }, m);
     return s._id || delete s._id, window.fetch(dt(_.url, _.db), {
       method: "POST",
-      headers: d(_, r),
+      headers: u(_, r),
       credentials: _.credentials,
       body: JSON.stringify(s)
     }).then((e) => {
       if (!e.ok) throw new Error("HTTP " + e.status + ": " + e.statusText);
       return e.json();
     }).then((e) => {
-      const o = p(e), a = o.content;
+      const o = h(e), a = o.content;
       return { record: Object.assign({}, s, { id: a.id, _id: a.id, _rev: a.rev }), message: o.message };
     });
   }
@@ -7647,7 +7662,7 @@ function Oe(t) {
     })).then((y) => {
       const v = Object.assign({}, e, { _rev: y });
       delete v.rev;
-      const w = d(_, s, { "If-Match": y });
+      const w = u(_, s, { "If-Match": y });
       return window.fetch(dt(_.url, _.db, null, m), {
         method: "PUT",
         headers: w,
@@ -7655,7 +7670,7 @@ function Oe(t) {
         body: JSON.stringify(v)
       }).then((A) => {
         if (A.ok) return A.json().then((C) => {
-          const L = p(C);
+          const L = h(C);
           return { record: Object.assign({}, v, { _rev: L.content.rev }), message: L.message };
         });
         if (A.status === 409) return A.json().then((C) => {
@@ -7669,25 +7684,25 @@ function Oe(t) {
   l.prototype.update = function(_, m, r) {
     return i(this, _, m, r).then((s) => s.record);
   };
-  function f(_, m, r, s) {
+  function p(_, m, r, s) {
     return (r ? Promise.resolve(r) : window.fetch(dt(_.url, _.db, null, m), { method: "GET", headers: Lt(_.headers, _.auth), credentials: _.credentials }).then((o) => {
       if (!o.ok) throw new Error("Could not retrieve document for revision delete");
       return o.json().then((a) => a._rev);
     })).then((o) => {
       const a = dt(_.url, _.db, null, m) + "?rev=" + encodeURIComponent(o);
-      return window.fetch(a, { method: "DELETE", headers: d(_, s), credentials: _.credentials }).then((y) => {
+      return window.fetch(a, { method: "DELETE", headers: u(_, s), credentials: _.credentials }).then((y) => {
         if (!y.ok) throw new Error("HTTP " + y.status + ": " + y.statusText);
         return y.json();
       }).then((y) => {
-        const v = p(y);
+        const v = h(y);
         return { response: v.content, message: v.message };
       });
     });
   }
   l.prototype.delete = function(_, m, r) {
-    return f(this, _, m, r).then((s) => s.response);
+    return p(this, _, m, r).then((s) => s.response);
   };
-  function h(_, m, r) {
+  function f(_, m, r) {
     return !m || m.length === 0 ? Promise.resolve({ response: { ok: !0, deletedCount: 0 }, message: null }) : window.fetch(dt(_.url, _.db, "_all_docs"), {
       method: "POST",
       headers: Lt(_.headers, _.auth),
@@ -7700,20 +7715,20 @@ function Oe(t) {
       const o = (s.rows || []).filter((a) => !a.error && a.value && a.value.rev).map((a) => ({ _id: a.id, _rev: a.value.rev, _deleted: !0 }));
       return o.length === 0 ? { response: { ok: !0, deletedCount: 0 }, message: null } : window.fetch(dt(_.url, _.db, "_bulk_docs"), {
         method: "POST",
-        headers: d(_, r),
+        headers: u(_, r),
         credentials: _.credentials,
         body: JSON.stringify({ docs: o })
       }).then((a) => {
         if (!a.ok) throw new Error("HTTP " + a.status + ": " + a.statusText);
         return a.json();
       }).then((a) => {
-        const y = p(a);
+        const y = h(a);
         return { response: { ok: !0, results: y.content, deletedCount: o.length }, message: y.message };
       });
     });
   }
   l.prototype.bulkDelete = function(_, m) {
-    return h(this, _, m).then((r) => r.response);
+    return f(this, _, m).then((r) => r.response);
   };
   function b(_) {
     _._handlers = {
@@ -7763,7 +7778,7 @@ function Oe(t) {
       },
       delete: function(r) {
         const s = r.detail || {};
-        f(_, s.id, s.rev, s.idempotencyKey).then(function(e) {
+        p(_, s.id, s.rev, s.idempotencyKey).then(function(e) {
           S(_.dom, "ln-couchdb-connector:deleted", { response: e.response, id: s.id, message: e.message, meta: s.meta || null });
         }).catch(function(e) {
           S(_.dom, "ln-couchdb-connector:error", {
@@ -7777,7 +7792,7 @@ function Oe(t) {
       },
       bulkDelete: function(r) {
         const s = r.detail || {};
-        h(_, s.ids, s.idempotencyKey).then(function(e) {
+        f(_, s.ids, s.idempotencyKey).then(function(e) {
           S(_.dom, "ln-couchdb-connector:bulk-deleted", { response: e.response, ids: s.ids, message: e.message, meta: s.meta || null });
         }).catch(function(e) {
           S(_.dom, "ln-couchdb-connector:error", {
@@ -7798,7 +7813,7 @@ function Oe(t) {
     const _ = this;
     _._handlers && (["ln-couchdb-connector", "ln-api-connector"].forEach(function(r) {
       _.dom.removeEventListener(r + ":request-sync", _._handlers.sync), _.dom.removeEventListener(r + ":request-fetch", _._handlers.sync), _.dom.removeEventListener(r + ":request-create", _._handlers.create), _.dom.removeEventListener(r + ":request-update", _._handlers.update), _.dom.removeEventListener(r + ":request-delete", _._handlers.delete), _.dom.removeEventListener(r + ":request-bulk-delete", _._handlers.bulkDelete);
-    }), _._handlers = null), S(this.dom, "ln-couchdb-connector:destroyed", { target: this.dom }), delete this.dom[n], delete this.dom[u];
+    }), _._handlers = null), S(this.dom, "ln-couchdb-connector:destroyed", { target: this.dom }), delete this.dom[n], delete this.dom[d];
   };
   function g(_) {
     const m = _[n];
@@ -7814,7 +7829,7 @@ function Oe(t) {
     onAttributeChange: g
   });
 })();
-function Ki(t) {
+function Wi(t) {
   return t = t || {}, {
     sort: t.sort,
     filters: t.filters,
@@ -7825,20 +7840,20 @@ function Ki(t) {
   };
 }
 function Nt(t, n) {
-  const u = !t || !!t.initializationError, p = !!(t && t.noLocalQuery && !t.windowed);
-  return n && (u || !t.canServe || p) ? "remote" : t && !t.initializationError ? "store" : "none";
+  const d = !t || !!t.initializationError, h = !!(t && t.noLocalQuery && !t.windowed);
+  return n && (d || !t.canServe || h) ? "remote" : t && !t.initializationError ? "store" : "none";
 }
 function Me(t, n) {
-  const u = Object.assign({}, t);
-  return n && (u.filters = n.filters, u.search = n.search, u.sort = n.sort), u;
+  const d = Object.assign({}, t);
+  return n && (d.filters = n.filters, d.search = n.search, d.sort = n.sort), d;
 }
-class ji {
+class Gi {
   constructor() {
     this._pending = /* @__PURE__ */ new Map();
   }
   wait(n) {
-    return new Promise((u, p) => {
-      this._pending.set(n, { resolve: u, reject: p });
+    return new Promise((d, h) => {
+      this._pending.set(n, { resolve: d, reject: h });
     });
   }
   resolve(n) {
@@ -7848,38 +7863,38 @@ class ji {
     return this._settle(n, !0);
   }
   close(n) {
-    const u = n || new Error("Mutation receipt registry closed");
-    for (const p of this._pending.values()) p.reject(u);
+    const d = n || new Error("Mutation receipt registry closed");
+    for (const h of this._pending.values()) h.reject(d);
     this._pending.clear();
   }
-  _settle(n, u) {
-    const p = n && n.requestId;
-    if (!p) return !1;
-    const l = this._pending.get(p);
-    return l ? (this._pending.delete(p), u ? l.reject(n.error || new Error("Store mutation failed")) : l.resolve(n), !0) : !1;
+  _settle(n, d) {
+    const h = n && n.requestId;
+    if (!h) return !1;
+    const l = this._pending.get(h);
+    return l ? (this._pending.delete(h), d ? l.reject(n.error || new Error("Store mutation failed")) : l.resolve(n), !0) : !1;
   }
 }
 (function() {
-  const t = "data-ln-data-coordinator", n = "lnDataCoordinator", u = "lnCoordinator", p = "data-ln-form-scope";
+  const t = "data-ln-data-coordinator", n = "lnDataCoordinator", d = "lnCoordinator", h = "data-ln-form-scope";
   if (window[n] !== void 0) return;
   const l = /* @__PURE__ */ new Set();
-  let d = !1, c = null, i = null, f = null;
-  function h() {
-    d || (d = !0, c = function() {
+  let u = !1, c = null, i = null, p = null;
+  function f() {
+    u || (u = !0, c = function() {
       S(document, "ln-data-store:online", {}), l.forEach(function(e) {
         e._maybeSync();
       });
     }, i = function() {
       S(document, "ln-data-store:offline", {});
-    }, f = function() {
+    }, p = function() {
       document.visibilityState === "visible" && l.forEach(function(e) {
         const o = e.findChildren(), a = o.store;
         a && o.connector && a.isInitialized && !a.initializationError && !a.isSyncing && !e._noAutosync && (!a.hasCache || e._isStale()) && a.forceSync();
       });
-    }, window.addEventListener("online", c), window.addEventListener("offline", i), document.addEventListener("visibilitychange", f));
+    }, window.addEventListener("online", c), window.addEventListener("offline", i), document.addEventListener("visibilitychange", p));
   }
   function b() {
-    d && (l.size > 0 || (window.removeEventListener("online", c), window.removeEventListener("offline", i), document.removeEventListener("visibilitychange", f), c = null, i = null, f = null, d = !1));
+    u && (l.size > 0 || (window.removeEventListener("online", c), window.removeEventListener("offline", i), document.removeEventListener("visibilitychange", p), c = null, i = null, p = null, u = !1));
   }
   function g() {
     try {
@@ -7893,7 +7908,7 @@ class ji {
   }
   const _ = ["ln-api-connector", "ln-couchdb-connector"];
   function m(e) {
-    return this.dom = e, this._name = e.getAttribute("data-ln-data-coordinator") || e.id, this._name || console.warn("[ln-data-coordinator] missing id — the coordinator cannot be addressed", e), e[n] = this, e[u] = this, this.mapper = null, this._handlers = null, this._boundQueries = /* @__PURE__ */ new WeakMap(), this._boundDelivered = /* @__PURE__ */ new WeakMap(), this._mutationReceipts = new ji(), this._dict = Vt(e, "data-ln-data-coordinator-dict"), this._parseStaleAttributes(), this.refreshMapper(), r(this), l.add(this), h(), this._checkInitialSync(), this;
+    return this.dom = e, this._name = e.getAttribute("data-ln-data-coordinator") || e.id, this._name || console.warn("[ln-data-coordinator] missing id — the coordinator cannot be addressed", e), e[n] = this, e[d] = this, this.mapper = null, this._handlers = null, this._boundQueries = /* @__PURE__ */ new WeakMap(), this._boundDelivered = /* @__PURE__ */ new WeakMap(), this._mutationReceipts = new Gi(), this._dict = Vt(e, "data-ln-data-coordinator-dict"), this._parseStaleAttributes(), this.refreshMapper(), r(this), l.add(this), f(), this._checkInitialSync(), this;
   }
   m.prototype._parseStaleAttributes = function() {
     const o = this.findChildren().storeEl, a = this.dom.getAttribute("data-ln-data-coordinator-stale") || (o ? o.getAttribute("data-ln-data-store-stale") : null), y = parseInt(a, 10);
@@ -8102,11 +8117,11 @@ class ji {
       formSubmit: function(o) {
         const a = o.target;
         if (o.defaultPrevented) return;
-        const y = a.hasAttribute(p) ? a.getAttribute(p) : null;
+        const y = a.hasAttribute(h) ? a.getAttribute(h) : null;
         if (y === null) return;
         let v;
         if (y ? v = y === e._name || e._ownsStore(y) : v = a.closest("[data-ln-data-coordinator]") === e.dom, !v) return;
-        const w = Nn(a);
+        const w = Mn(a);
         if (w !== "POST" && w !== "PUT" && w !== "PATCH") return;
         o.preventDefault();
         const A = Ue(a);
@@ -8276,7 +8291,7 @@ class ji {
   }, m.prototype._serveData = function(e, o) {
     const a = e.target, y = o === "table" ? "data-ln-table-source" : o === "list" ? "data-ln-list-source" : "data-ln-chart-source", v = a.getAttribute(y);
     if (!v || !this._ownsStore(v)) return;
-    const w = e.detail || {}, A = Ki(w);
+    const w = e.detail || {}, A = Wi(w);
     this._boundQueries.set(a, A);
     const C = this.findChildren(), L = this, q = C.store;
     return (q && q.ready ? q.ready : Promise.resolve()).then(function() {
@@ -8417,7 +8432,7 @@ class ji {
     const e = this;
     e._handlers && (e.dom.removeEventListener("ln-data-store:request-remote-sync", e._handlers.sync), e.dom.removeEventListener("ln-data-store:request-page", e._handlers.requestPage), e.dom.removeEventListener("ln-data-coordinator:request-create", e._handlers.reqCreate), e.dom.removeEventListener("ln-data-coordinator:request-update", e._handlers.reqUpdate), e.dom.removeEventListener("ln-data-coordinator:request-delete", e._handlers.reqDelete), e.dom.removeEventListener("ln-data-coordinator:request-bulk-delete", e._handlers.reqBulkDelete), e.dom.removeEventListener("ln-api-queue:send", e._handlers.queueSend), e.dom.removeEventListener("ln-api-queue:failed", e._handlers.queueFailed), e.dom.removeEventListener("ln-data-store:initialized", e._handlers.storeInitialized), document.removeEventListener("submit", e._handlers.formSubmit), _.forEach(function(o) {
       e.dom.removeEventListener(o + ":fetched", e._handlers.connFetched), e.dom.removeEventListener(o + ":created", e._handlers.connCreated), e.dom.removeEventListener(o + ":updated", e._handlers.connUpdated), e.dom.removeEventListener(o + ":deleted", e._handlers.connDeleted), e.dom.removeEventListener(o + ":bulk-deleted", e._handlers.connBulkDeleted), e.dom.removeEventListener(o + ":error", e._handlers.connError);
-    }), document.removeEventListener("ln-table:request-data", e._handlers.reqTableData), document.removeEventListener("ln-list:request-data", e._handlers.reqListData), document.removeEventListener("ln-chart:request-data", e._handlers.reqChartData), document.removeEventListener("ln-options:request-data", e._handlers.reqOptions), document.removeEventListener("ln-stat:request-count", e._handlers.reqStat), e.dom.removeEventListener("ln-data-store:ready", e._handlers.refresh), e.dom.removeEventListener("ln-data-store:created", e._handlers.refresh), e.dom.removeEventListener("ln-data-store:updated", e._handlers.refresh), e.dom.removeEventListener("ln-data-store:deleted", e._handlers.refresh), e.dom.removeEventListener("ln-data-store:mutation-error", e._handlers.mutationError), e.dom.removeEventListener("ln-data-store:synced", e._handlers.refreshSynced), e.dom.removeEventListener("ln-data-store:query-changed", e._handlers.refreshQuery), e._handlers = null), e._boundQueries = null, e._boundDelivered = null, e._mutationReceipts.close(new Error("Data coordinator destroyed")), e._mutationReceipts = null, l.delete(this), b(), delete this.dom[n], delete this.dom[u];
+    }), document.removeEventListener("ln-table:request-data", e._handlers.reqTableData), document.removeEventListener("ln-list:request-data", e._handlers.reqListData), document.removeEventListener("ln-chart:request-data", e._handlers.reqChartData), document.removeEventListener("ln-options:request-data", e._handlers.reqOptions), document.removeEventListener("ln-stat:request-count", e._handlers.reqStat), e.dom.removeEventListener("ln-data-store:ready", e._handlers.refresh), e.dom.removeEventListener("ln-data-store:created", e._handlers.refresh), e.dom.removeEventListener("ln-data-store:updated", e._handlers.refresh), e.dom.removeEventListener("ln-data-store:deleted", e._handlers.refresh), e.dom.removeEventListener("ln-data-store:mutation-error", e._handlers.mutationError), e.dom.removeEventListener("ln-data-store:synced", e._handlers.refreshSynced), e.dom.removeEventListener("ln-data-store:query-changed", e._handlers.refreshQuery), e._handlers = null), e._boundQueries = null, e._boundDelivered = null, e._mutationReceipts.close(new Error("Data coordinator destroyed")), e._mutationReceipts = null, l.delete(this), b(), delete this.dom[n], delete this.dom[d];
   };
   function s(e, o) {
     const a = e[n];
@@ -8430,7 +8445,7 @@ class ji {
     onAttributeChange: s
   });
 })();
-const Vi = "ln_api_queue", Wi = 2, Q = "outbox", Z = "_queue_meta";
+const $i = "ln_api_queue", Qi = 2, Q = "outbox", Z = "_queue_meta";
 function nt(t, n) {
   return t.error || new Error(n);
 }
@@ -8446,52 +8461,52 @@ function Pt(t) {
 function Ne(t) {
   t.leaseOwner = null, t.leaseUntil = 0;
 }
-function Gi(t, n, u) {
-  return typeof t != "string" || t.indexOf(n) === -1 ? t : t.split(n).join(u);
+function Xi(t, n, d) {
+  return typeof t != "string" || t.indexOf(n) === -1 ? t : t.split(n).join(d);
 }
-function $i(t, n, u, p) {
-  const l = /* @__PURE__ */ new Map(), d = [], c = [];
+function Yi(t, n, d, h) {
+  const l = /* @__PURE__ */ new Map(), u = [], c = [];
   for (const i of t || [])
     l.has(i.chainKey) || l.set(i.chainKey, []), l.get(i.chainKey).push(i);
-  return l.forEach((i, f) => {
+  return l.forEach((i, p) => {
     i.sort((b, g) => b.seq - g.seq);
-    const h = i[0];
-    if (!(!h || h.status === "failed")) {
-      if (h.status === "inflight" && (h.leaseUntil || 0) > p) {
-        c.push({ chainKey: f, at: h.leaseUntil });
+    const f = i[0];
+    if (!(!f || f.status === "failed")) {
+      if (f.status === "inflight" && (f.leaseUntil || 0) > h) {
+        c.push({ chainKey: p, at: f.leaseUntil });
         return;
       }
-      if ((h.nextAttemptAt || 0) > p) {
-        c.push({ chainKey: f, at: h.nextAttemptAt });
+      if ((f.nextAttemptAt || 0) > h) {
+        c.push({ chainKey: p, at: f.nextAttemptAt });
         return;
       }
-      h.status = "inflight", h.leaseOwner = n, h.leaseUntil = p + u, h.updatedAt = p, d.push(h);
+      f.status = "inflight", f.leaseOwner = n, f.leaseUntil = h + d, f.updatedAt = h, u.push(f);
     }
-  }), { entries: d, wakeups: c };
+  }), { entries: u, wakeups: c };
 }
-function Qi(t, n, u, p, l) {
-  const d = [], c = [];
+function Ji(t, n, d, h, l) {
+  const u = [], c = [];
   for (const i of t || []) {
     if (i.entryId === n) {
       c.push(i.entryId);
       continue;
     }
-    i.chainKey === u && (i.chainKey = p, i.targetId === u && (i.targetId = p), i.meta && i.meta.id === u && (i.meta.id = p), i.meta && typeof i.meta.action == "string" && (i.meta.action = Gi(i.meta.action, u, p)), i.updatedAt = l, d.push(i));
+    i.chainKey === d && (i.chainKey = h, i.targetId === d && (i.targetId = h), i.meta && i.meta.id === d && (i.meta.id = h), i.meta && typeof i.meta.action == "string" && (i.meta.action = Xi(i.meta.action, d, h)), i.updatedAt = l, u.push(i));
   }
-  return { changed: d, deleted: c };
+  return { changed: u, deleted: c };
 }
-class Xi {
+class Zi {
   constructor(n) {
-    n = n || {}, this.indexedDB = n.indexedDB || globalThis.indexedDB, this.keyRange = n.IDBKeyRange || globalThis.IDBKeyRange, this.dbName = n.dbName || Vi, this.now = n.now || (() => Date.now()), this.uuid = n.uuid || (() => crypto.randomUUID()), this._db = null, this._ready = null;
+    n = n || {}, this.indexedDB = n.indexedDB || globalThis.indexedDB, this.keyRange = n.IDBKeyRange || globalThis.IDBKeyRange, this.dbName = n.dbName || $i, this.now = n.now || (() => Date.now()), this.uuid = n.uuid || (() => crypto.randomUUID()), this._db = null, this._ready = null;
   }
   open() {
-    return this._ready ? this._ready : !this.indexedDB || !this.keyRange ? Promise.resolve(null) : (this._ready = new Promise((n, u) => {
-      const p = this.indexedDB.open(this.dbName, Wi);
-      p.onupgradeneeded = (l) => {
-        const d = l.target.result;
+    return this._ready ? this._ready : !this.indexedDB || !this.keyRange ? Promise.resolve(null) : (this._ready = new Promise((n, d) => {
+      const h = this.indexedDB.open(this.dbName, Qi);
+      h.onupgradeneeded = (l) => {
+        const u = l.target.result;
         let c;
-        d.objectStoreNames.contains(Q) ? c = l.target.transaction.objectStore(Q) : c = d.createObjectStore(Q, { keyPath: "entryId" }), c.indexNames.contains("by_scope_chain") || c.createIndex("by_scope_chain", ["scope", "chainKey"], { unique: !1 }), c.indexNames.contains("by_scope_seq") || c.createIndex("by_scope_seq", ["scope", "seq"], { unique: !1 }), d.objectStoreNames.contains(Z) || d.createObjectStore(Z, { keyPath: "key" });
-      }, p.onerror = () => u(nt(p, "Queue database open failed")), p.onsuccess = (l) => {
+        u.objectStoreNames.contains(Q) ? c = l.target.transaction.objectStore(Q) : c = u.createObjectStore(Q, { keyPath: "entryId" }), c.indexNames.contains("by_scope_chain") || c.createIndex("by_scope_chain", ["scope", "chainKey"], { unique: !1 }), c.indexNames.contains("by_scope_seq") || c.createIndex("by_scope_seq", ["scope", "seq"], { unique: !1 }), u.objectStoreNames.contains(Z) || u.createObjectStore(Z, { keyPath: "key" });
+      }, h.onerror = () => d(nt(h, "Queue database open failed")), h.onsuccess = (l) => {
         this._db = l.target.result, this._db.onversionchange = () => this.close(), n(this._db);
       };
     }), this._ready);
@@ -8500,33 +8515,33 @@ class Xi {
     this._db && this._db.close(), this._db = null, this._ready = null;
   }
   deleteDatabase() {
-    return this.close(), this.indexedDB ? new Promise((n, u) => {
-      const p = this.indexedDB.deleteDatabase(this.dbName);
-      p.onsuccess = () => n(), p.onerror = () => u(nt(p, "Queue database delete failed")), p.onblocked = () => u(new Error("Queue database delete blocked"));
+    return this.close(), this.indexedDB ? new Promise((n, d) => {
+      const h = this.indexedDB.deleteDatabase(this.dbName);
+      h.onsuccess = () => n(), h.onerror = () => d(nt(h, "Queue database delete failed")), h.onblocked = () => d(new Error("Queue database delete blocked"));
     }) : Promise.resolve();
   }
   allForScope(n) {
-    return this.open().then((u) => u ? new Promise((p, l) => {
-      const c = u.transaction(Q, "readonly").objectStore(Q).index("by_scope_seq").getAll(wt(this.keyRange, n));
-      c.onsuccess = () => p(c.result || []), c.onerror = () => l(nt(c, "Queue scope read failed"));
+    return this.open().then((d) => d ? new Promise((h, l) => {
+      const c = d.transaction(Q, "readonly").objectStore(Q).index("by_scope_seq").getAll(wt(this.keyRange, n));
+      c.onsuccess = () => h(c.result || []), c.onerror = () => l(nt(c, "Queue scope read failed"));
     }) : []);
   }
-  enqueue(n, u) {
-    return u = u || {}, this.open().then((p) => p ? new Promise((l, d) => {
-      const c = p.transaction([Z, Q], "readwrite"), i = c.objectStore(Z), f = c.objectStore(Q), h = Fe(n);
+  enqueue(n, d) {
+    return d = d || {}, this.open().then((h) => h ? new Promise((l, u) => {
+      const c = h.transaction([Z, Q], "readwrite"), i = c.objectStore(Z), p = c.objectStore(Q), f = Fe(n);
       let b = null;
       const g = (m) => {
         const r = m + 1;
         b = {
           entryId: this.uuid(),
           scope: n,
-          chainKey: u.chainKey,
+          chainKey: d.chainKey,
           seq: r,
-          op: u.op,
-          targetId: u.targetId !== void 0 ? u.targetId : null,
-          payload: u.payload,
-          expectedVersion: u.expectedVersion !== void 0 ? u.expectedVersion : null,
-          meta: u.meta || {},
+          op: d.op,
+          targetId: d.targetId !== void 0 ? d.targetId : null,
+          payload: d.payload,
+          expectedVersion: d.expectedVersion !== void 0 ? d.expectedVersion : null,
+          meta: d.meta || {},
           attempts: 0,
           nextAttemptAt: 0,
           status: "pending",
@@ -8534,54 +8549,54 @@ class Xi {
           leaseUntil: 0,
           createdAt: this.now(),
           updatedAt: this.now()
-        }, i.put({ key: h, value: r }), f.put(b);
-      }, _ = i.get(h);
-      _.onerror = () => d(nt(_, "Queue sequence read failed")), _.onsuccess = () => {
+        }, i.put({ key: f, value: r }), p.put(b);
+      }, _ = i.get(f);
+      _.onerror = () => u(nt(_, "Queue sequence read failed")), _.onsuccess = () => {
         const m = _.result;
         if (m && typeof m.value == "number") {
           g(m.value);
           return;
         }
-        const r = f.index("by_scope_seq").getAll(wt(this.keyRange, n));
-        r.onerror = () => d(nt(r, "Queue sequence migration failed")), r.onsuccess = () => {
+        const r = p.index("by_scope_seq").getAll(wt(this.keyRange, n));
+        r.onerror = () => u(nt(r, "Queue sequence migration failed")), r.onsuccess = () => {
           const s = (r.result || []).reduce((e, o) => Math.max(e, o.seq || 0), 0);
           g(s);
         };
-      }, c.oncomplete = () => l(b), c.onerror = () => d(c.error || new Error("Queue enqueue transaction failed")), c.onabort = () => d(c.error || new Error("Queue enqueue transaction aborted"));
+      }, c.oncomplete = () => l(b), c.onerror = () => u(c.error || new Error("Queue enqueue transaction failed")), c.onabort = () => u(c.error || new Error("Queue enqueue transaction aborted"));
     }) : null);
   }
-  claimReady(n, u, p) {
-    return this.open().then((l) => l ? new Promise((d, c) => {
-      const i = l.transaction(Q, "readwrite"), f = i.objectStore(Q), h = f.index("by_scope_seq").getAll(wt(this.keyRange, n)), b = this.now();
+  claimReady(n, d, h) {
+    return this.open().then((l) => l ? new Promise((u, c) => {
+      const i = l.transaction(Q, "readwrite"), p = i.objectStore(Q), f = p.index("by_scope_seq").getAll(wt(this.keyRange, n)), b = this.now();
       let g = { entries: [], wakeups: [] };
-      h.onerror = () => c(nt(h, "Queue claim read failed")), h.onsuccess = () => {
-        g = $i(h.result || [], u, p, b);
-        for (const _ of g.entries) f.put(_);
-      }, i.oncomplete = () => d(g), i.onerror = () => c(i.error || new Error("Queue claim transaction failed")), i.onabort = () => c(i.error || new Error("Queue claim transaction aborted"));
+      f.onerror = () => c(nt(f, "Queue claim read failed")), f.onsuccess = () => {
+        g = Yi(f.result || [], d, h, b);
+        for (const _ of g.entries) p.put(_);
+      }, i.oncomplete = () => u(g), i.onerror = () => c(i.error || new Error("Queue claim transaction failed")), i.onabort = () => c(i.error || new Error("Queue claim transaction aborted"));
     }) : { entries: [], wakeups: [] });
   }
-  ack(n, u) {
-    return this._updateEntry(n, u, (p, l) => (l.delete(p.entryId), { status: "acked", entry: p }));
+  ack(n, d) {
+    return this._updateEntry(n, d, (h, l) => (l.delete(h.entryId), { status: "acked", entry: h }));
   }
-  nack(n, u, p, l) {
+  nack(n, d, h, l) {
     l = l || {};
-    const d = l.maxAttempts || 8, c = l.backoff || [2e3, 5e3, 15e3, 6e4, 3e5];
-    return this.open().then((i) => i ? new Promise((f, h) => {
-      const b = i.transaction([Q, Z], "readwrite"), g = b.objectStore(Q), _ = b.objectStore(Z), m = g.get(u);
+    const u = l.maxAttempts || 8, c = l.backoff || [2e3, 5e3, 15e3, 6e4, 3e5];
+    return this.open().then((i) => i ? new Promise((p, f) => {
+      const b = i.transaction([Q, Z], "readwrite"), g = b.objectStore(Q), _ = b.objectStore(Z), m = g.get(d);
       let r = null;
-      m.onerror = () => h(nt(m, "Queue nack read failed")), m.onsuccess = () => {
+      m.onerror = () => f(nt(m, "Queue nack read failed")), m.onsuccess = () => {
         const s = m.result;
         if (!(!s || s.scope !== n)) {
-          if (p === "drop") {
+          if (h === "drop") {
             g.delete(s.entryId), r = { status: "dropped", entry: s };
             return;
           }
-          if (Ne(s), s.updatedAt = this.now(), p === "auth") {
+          if (Ne(s), s.updatedAt = this.now(), h === "auth") {
             s.status = "pending", g.put(s), _.put({ key: Pt(n), value: "auth" }), r = { status: "auth", entry: s };
             return;
           }
-          if (p === "retry") {
-            if (s.attempts = (s.attempts || 0) + 1, s.attempts >= d) {
+          if (h === "retry") {
+            if (s.attempts = (s.attempts || 0) + 1, s.attempts >= u) {
               s.status = "failed", s.nextAttemptAt = 0, g.put(s), r = { status: "failed", entry: s };
               return;
             }
@@ -8589,81 +8604,81 @@ class Xi {
             s.status = "pending", s.nextAttemptAt = this.now() + e, g.put(s), r = { status: "retry", entry: s, delay: e };
           }
         }
-      }, b.oncomplete = () => f(r), b.onerror = () => h(b.error || new Error("Queue nack transaction failed")), b.onabort = () => h(b.error || new Error("Queue nack transaction aborted"));
+      }, b.oncomplete = () => p(r), b.onerror = () => f(b.error || new Error("Queue nack transaction failed")), b.onabort = () => f(b.error || new Error("Queue nack transaction aborted"));
     }) : null);
   }
-  remap(n, u, p) {
-    return this._remapTransaction(n, null, u, p);
+  remap(n, d, h) {
+    return this._remapTransaction(n, null, d, h);
   }
-  resolveCreate(n, u, p, l) {
-    return this._remapTransaction(n, u, p, l);
+  resolveCreate(n, d, h, l) {
+    return this._remapTransaction(n, d, h, l);
   }
-  _remapTransaction(n, u, p, l) {
-    return this.open().then((d) => d ? new Promise((c, i) => {
-      const f = d.transaction(Q, "readwrite"), h = f.objectStore(Q), b = h.index("by_scope_seq").getAll(wt(this.keyRange, n));
+  _remapTransaction(n, d, h, l) {
+    return this.open().then((u) => u ? new Promise((c, i) => {
+      const p = u.transaction(Q, "readwrite"), f = p.objectStore(Q), b = f.index("by_scope_seq").getAll(wt(this.keyRange, n));
       let g = { changed: [], deleted: [] };
       b.onerror = () => i(nt(b, "Queue remap read failed")), b.onsuccess = () => {
-        g = Qi(b.result || [], u, p, l, this.now());
-        for (const _ of g.deleted) h.delete(_);
-        for (const _ of g.changed) h.put(_);
-      }, f.oncomplete = () => c(g.changed), f.onerror = () => i(f.error || new Error("Queue remap transaction failed")), f.onabort = () => i(f.error || new Error("Queue remap transaction aborted"));
+        g = Ji(b.result || [], d, h, l, this.now());
+        for (const _ of g.deleted) f.delete(_);
+        for (const _ of g.changed) f.put(_);
+      }, p.oncomplete = () => c(g.changed), p.onerror = () => i(p.error || new Error("Queue remap transaction failed")), p.onabort = () => i(p.error || new Error("Queue remap transaction aborted"));
     }) : []);
   }
   resetFailed(n) {
-    return this.open().then((u) => u ? new Promise((p, l) => {
-      const d = u.transaction(Q, "readwrite"), c = d.objectStore(Q), i = c.index("by_scope_seq").getAll(wt(this.keyRange, n));
-      let f = 0;
+    return this.open().then((d) => d ? new Promise((h, l) => {
+      const u = d.transaction(Q, "readwrite"), c = u.objectStore(Q), i = c.index("by_scope_seq").getAll(wt(this.keyRange, n));
+      let p = 0;
       i.onerror = () => l(nt(i, "Queue failed-entry read failed")), i.onsuccess = () => {
-        for (const h of i.result || [])
-          h.status === "failed" && (h.status = "pending", h.attempts = 0, h.nextAttemptAt = 0, h.updatedAt = this.now(), Ne(h), c.put(h), f++);
-      }, d.oncomplete = () => p(f), d.onerror = () => l(d.error || new Error("Queue failed-entry reset failed")), d.onabort = () => l(d.error || new Error("Queue failed-entry reset aborted"));
+        for (const f of i.result || [])
+          f.status === "failed" && (f.status = "pending", f.attempts = 0, f.nextAttemptAt = 0, f.updatedAt = this.now(), Ne(f), c.put(f), p++);
+      }, u.oncomplete = () => h(p), u.onerror = () => l(u.error || new Error("Queue failed-entry reset failed")), u.onabort = () => l(u.error || new Error("Queue failed-entry reset aborted"));
     }) : 0);
   }
   getPaused(n) {
-    return this.open().then((u) => u ? new Promise((p, l) => {
-      const c = u.transaction(Z, "readonly").objectStore(Z).get(Pt(n));
+    return this.open().then((d) => d ? new Promise((h, l) => {
+      const c = d.transaction(Z, "readonly").objectStore(Z).get(Pt(n));
       c.onsuccess = () => {
         const i = c.result ? c.result.value : !1;
-        p(i || !1);
+        h(i || !1);
       }, c.onerror = () => l(nt(c, "Queue pause-state read failed"));
     }) : !1);
   }
-  setPaused(n, u) {
-    return this.open().then((p) => {
-      if (p)
-        return new Promise((l, d) => {
-          const c = p.transaction(Z, "readwrite"), i = typeof u == "string" ? u : u ? "manual" : !1;
-          c.objectStore(Z).put({ key: Pt(n), value: i }), c.oncomplete = () => l(), c.onerror = () => d(c.error || new Error("Queue pause-state write failed")), c.onabort = () => d(c.error || new Error("Queue pause-state write aborted"));
+  setPaused(n, d) {
+    return this.open().then((h) => {
+      if (h)
+        return new Promise((l, u) => {
+          const c = h.transaction(Z, "readwrite"), i = typeof d == "string" ? d : d ? "manual" : !1;
+          c.objectStore(Z).put({ key: Pt(n), value: i }), c.oncomplete = () => l(), c.onerror = () => u(c.error || new Error("Queue pause-state write failed")), c.onabort = () => u(c.error || new Error("Queue pause-state write aborted"));
         });
     });
   }
   clear(n) {
-    return this.open().then((u) => {
-      if (u)
-        return new Promise((p, l) => {
-          const d = u.transaction([Q, Z], "readwrite"), i = d.objectStore(Q).index("by_scope_seq").openCursor(wt(this.keyRange, n));
-          i.onsuccess = (f) => {
-            const h = f.target.result;
-            h && (h.delete(), h.continue());
-          }, i.onerror = () => l(nt(i, "Queue clear failed")), d.objectStore(Z).delete(Fe(n)), d.objectStore(Z).delete(Pt(n)), d.oncomplete = () => p(), d.onerror = () => l(d.error || new Error("Queue clear transaction failed")), d.onabort = () => l(d.error || new Error("Queue clear transaction aborted"));
+    return this.open().then((d) => {
+      if (d)
+        return new Promise((h, l) => {
+          const u = d.transaction([Q, Z], "readwrite"), i = u.objectStore(Q).index("by_scope_seq").openCursor(wt(this.keyRange, n));
+          i.onsuccess = (p) => {
+            const f = p.target.result;
+            f && (f.delete(), f.continue());
+          }, i.onerror = () => l(nt(i, "Queue clear failed")), u.objectStore(Z).delete(Fe(n)), u.objectStore(Z).delete(Pt(n)), u.oncomplete = () => h(), u.onerror = () => l(u.error || new Error("Queue clear transaction failed")), u.onabort = () => l(u.error || new Error("Queue clear transaction aborted"));
         });
     });
   }
-  _updateEntry(n, u, p) {
-    return this.open().then((l) => l ? new Promise((d, c) => {
-      const i = l.transaction(Q, "readwrite"), f = i.objectStore(Q), h = f.get(u);
+  _updateEntry(n, d, h) {
+    return this.open().then((l) => l ? new Promise((u, c) => {
+      const i = l.transaction(Q, "readwrite"), p = i.objectStore(Q), f = p.get(d);
       let b = null;
-      h.onerror = () => c(nt(h, "Queue entry read failed")), h.onsuccess = () => {
-        const g = h.result;
-        !g || g.scope !== n || (b = p(g, f));
-      }, i.oncomplete = () => d(b), i.onerror = () => c(i.error || new Error("Queue entry transaction failed")), i.onabort = () => c(i.error || new Error("Queue entry transaction aborted"));
+      f.onerror = () => c(nt(f, "Queue entry read failed")), f.onsuccess = () => {
+        const g = f.result;
+        !g || g.scope !== n || (b = h(g, p));
+      }, i.oncomplete = () => u(b), i.onerror = () => c(i.error || new Error("Queue entry transaction failed")), i.onabort = () => c(i.error || new Error("Queue entry transaction aborted"));
     }) : null);
   }
 }
 (function() {
-  const t = "data-ln-api-queue", n = "lnApiQueue", u = [2e3, 5e3, 15e3, 6e4, 3e5], p = 8, l = 6e4;
+  const t = "data-ln-api-queue", n = "lnApiQueue", d = [2e3, 5e3, 15e3, 6e4, 3e5], h = 8, l = 6e4;
   if (window[n] !== void 0) return;
-  function d() {
+  function u() {
     try {
       return crypto.randomUUID();
     } catch {
@@ -8673,15 +8688,15 @@ class Xi {
       });
     }
   }
-  const c = new Xi({
+  const c = new Zi({
     indexedDB: window.indexedDB,
     IDBKeyRange: window.IDBKeyRange,
-    uuid: d
+    uuid: u
   });
-  function i(h) {
-    this.dom = h, h[n] = this;
-    const b = h.closest("[data-ln-data-coordinator]");
-    this.scope = h.id || (b ? b.id : null) || "default", this._paused = !1, this._timers = /* @__PURE__ */ new Map(), this._workerId = d(), this._drainPromise = null, this._onlineHandler = () => this._drain(), this._bindEvents(), window.addEventListener("online", this._onlineHandler);
+  function i(f) {
+    this.dom = f, f[n] = this;
+    const b = f.closest("[data-ln-data-coordinator]");
+    this.scope = f.id || (b ? b.id : null) || "default", this._paused = !1, this._timers = /* @__PURE__ */ new Map(), this._workerId = u(), this._drainPromise = null, this._onlineHandler = () => this._drain(), this._bindEvents(), window.addEventListener("online", this._onlineHandler);
     const g = this;
     return c.open().then((_) => _ ? c.getPaused(g.scope) : (console.warn("[ln-api-queue] IndexedDB not available — queue disabled"), !1)).then((_) => {
       if (g._paused = !!_, g._paused) {
@@ -8694,28 +8709,28 @@ class Xi {
     }), this;
   }
   i.prototype._isOnline = function() {
-    const h = this.dom.getAttribute("data-ln-api-queue-online");
-    return h === "true" ? !0 : h === "false" ? !1 : navigator.onLine;
+    const f = this.dom.getAttribute("data-ln-api-queue-online");
+    return f === "true" ? !0 : f === "false" ? !1 : navigator.onLine;
   }, i.prototype._emitPendingCount = function() {
-    const h = this;
-    return c.allForScope(h.scope).then((b) => (S(h.dom, "ln-api-queue:pending-count", { count: b.length, scope: h.scope }), b.length === 0 && S(h.dom, "ln-api-queue:drained", { scope: h.scope }), b));
-  }, i.prototype._clearTimer = function(h) {
-    const b = this._timers.get(h);
-    b && (clearTimeout(b), this._timers.delete(h));
-  }, i.prototype._scheduleTimer = function(h, b) {
-    const g = Math.max(0, b), _ = this._timers.get(h);
+    const f = this;
+    return c.allForScope(f.scope).then((b) => (S(f.dom, "ln-api-queue:pending-count", { count: b.length, scope: f.scope }), b.length === 0 && S(f.dom, "ln-api-queue:drained", { scope: f.scope }), b));
+  }, i.prototype._clearTimer = function(f) {
+    const b = this._timers.get(f);
+    b && (clearTimeout(b), this._timers.delete(f));
+  }, i.prototype._scheduleTimer = function(f, b) {
+    const g = Math.max(0, b), _ = this._timers.get(f);
     _ && clearTimeout(_);
     const m = this, r = setTimeout(() => {
-      m._timers.delete(h), m._drain();
+      m._timers.delete(f), m._drain();
     }, g);
-    this._timers.set(h, r);
+    this._timers.set(f, r);
   }, i.prototype._drain = function() {
-    const h = this;
-    return h._paused || !h._isOnline() ? Promise.resolve() : (h._drainPromise || (h._drainPromise = c.claimReady(h.scope, h._workerId, l).then((b) => {
+    const f = this;
+    return f._paused || !f._isOnline() ? Promise.resolve() : (f._drainPromise || (f._drainPromise = c.claimReady(f.scope, f._workerId, l).then((b) => {
       for (const g of b.wakeups)
-        h._scheduleTimer(g.chainKey, g.at - Date.now());
+        f._scheduleTimer(g.chainKey, g.at - Date.now());
       for (const g of b.entries)
-        h._clearTimer(g.chainKey), S(h.dom, "ln-api-queue:send", {
+        f._clearTimer(g.chainKey), S(f.dom, "ln-api-queue:send", {
           entryId: g.entryId,
           chainKey: g.chainKey,
           op: g.op,
@@ -8726,13 +8741,13 @@ class Xi {
           meta: g.meta
         });
     }).catch((b) => {
-      console.error("[ln-api-queue] Drain failed:", b), S(h.dom, "ln-api-queue:error", { operation: "drain", error: b });
+      console.error("[ln-api-queue] Drain failed:", b), S(f.dom, "ln-api-queue:error", { operation: "drain", error: b });
     }).finally(() => {
-      h._drainPromise = null;
-    })), h._drainPromise);
-  }, i.prototype._onEnqueue = function(h) {
+      f._drainPromise = null;
+    })), f._drainPromise);
+  }, i.prototype._onEnqueue = function(f) {
     const b = this;
-    return c.enqueue(b.scope, h.detail || {}).then((g) => {
+    return c.enqueue(b.scope, f.detail || {}).then((g) => {
       if (g)
         return b._emitPendingCount().then((_) => (S(b.dom, "ln-api-queue:enqueued", {
           entryId: g.entryId,
@@ -8742,16 +8757,16 @@ class Xi {
     }).catch((g) => {
       S(b.dom, "ln-api-queue:error", { operation: "enqueue", error: g });
     });
-  }, i.prototype._onAck = function(h) {
-    const b = this, g = h.detail || {};
+  }, i.prototype._onAck = function(f) {
+    const b = this, g = f.detail || {};
     return c.ack(b.scope, g.entryId).then(() => b._emitPendingCount()).then(() => b._drain()).catch((_) => {
       S(b.dom, "ln-api-queue:error", { operation: "ack", entryId: g.entryId, error: _ });
     });
-  }, i.prototype._onNack = function(h) {
-    const b = this, g = h.detail || {};
+  }, i.prototype._onNack = function(f) {
+    const b = this, g = f.detail || {};
     return c.nack(b.scope, g.entryId, g.reason, {
-      maxAttempts: p,
-      backoff: u
+      maxAttempts: h,
+      backoff: d
     }).then((_) => {
       if (_)
         return _.status === "failed" ? S(b.dom, "ln-api-queue:failed", {
@@ -8767,13 +8782,13 @@ class Xi {
     }).catch((_) => {
       S(b.dom, "ln-api-queue:error", { operation: "nack", entryId: g.entryId, error: _ });
     });
-  }, i.prototype._onRemap = function(h) {
-    const b = this, g = h.detail || {};
+  }, i.prototype._onRemap = function(f) {
+    const b = this, g = f.detail || {};
     return c.remap(b.scope, g.oldKey, g.newId).catch((_) => {
       S(b.dom, "ln-api-queue:error", { operation: "remap", error: _ });
     });
-  }, i.prototype._onResolveCreate = function(h) {
-    const b = this, g = h.detail || {};
+  }, i.prototype._onResolveCreate = function(f) {
+    const b = this, g = f.detail || {};
     return c.resolveCreate(b.scope, g.entryId, g.oldKey, g.newId).then(() => b._emitPendingCount()).then(() => b._drain()).catch((_) => {
       S(b.dom, "ln-api-queue:error", {
         operation: "resolve-create",
@@ -8782,60 +8797,60 @@ class Xi {
       });
     });
   }, i.prototype._onResume = function() {
-    const h = this;
-    return c.setPaused(h.scope, !1).then(() => (h._paused = !1, S(h.dom, "ln-api-queue:resumed", {}), h._drain())).catch((b) => {
-      S(h.dom, "ln-api-queue:error", { operation: "resume", error: b });
+    const f = this;
+    return c.setPaused(f.scope, !1).then(() => (f._paused = !1, S(f.dom, "ln-api-queue:resumed", {}), f._drain())).catch((b) => {
+      S(f.dom, "ln-api-queue:error", { operation: "resume", error: b });
     });
   }, i.prototype._onPause = function() {
-    const h = this;
-    return c.setPaused(h.scope, "manual").then(() => {
-      h._paused = !0, S(h.dom, "ln-api-queue:paused", { reason: "manual" });
+    const f = this;
+    return c.setPaused(f.scope, "manual").then(() => {
+      f._paused = !0, S(f.dom, "ln-api-queue:paused", { reason: "manual" });
     }).catch((b) => {
-      S(h.dom, "ln-api-queue:error", { operation: "pause", error: b });
+      S(f.dom, "ln-api-queue:error", { operation: "pause", error: b });
     });
   }, i.prototype._onDrain = function() {
-    const h = this;
-    return c.resetFailed(h.scope).then(() => {
-      const b = h._drainPromise;
-      return b ? b.then(() => h._drain()) : h._drain();
+    const f = this;
+    return c.resetFailed(f.scope).then(() => {
+      const b = f._drainPromise;
+      return b ? b.then(() => f._drain()) : f._drain();
     }).catch((b) => {
-      S(h.dom, "ln-api-queue:error", { operation: "manual-drain", error: b });
+      S(f.dom, "ln-api-queue:error", { operation: "manual-drain", error: b });
     });
   }, i.prototype._onClear = function() {
-    const h = this;
-    return h._timers.forEach((b) => clearTimeout(b)), h._timers.clear(), c.clear(h.scope).then(() => {
-      h._paused = !1, S(h.dom, "ln-api-queue:pending-count", { count: 0, scope: h.scope }), S(h.dom, "ln-api-queue:drained", { scope: h.scope });
+    const f = this;
+    return f._timers.forEach((b) => clearTimeout(b)), f._timers.clear(), c.clear(f.scope).then(() => {
+      f._paused = !1, S(f.dom, "ln-api-queue:pending-count", { count: 0, scope: f.scope }), S(f.dom, "ln-api-queue:drained", { scope: f.scope });
     }).catch((b) => {
-      S(h.dom, "ln-api-queue:error", { operation: "clear", error: b });
+      S(f.dom, "ln-api-queue:error", { operation: "clear", error: b });
     });
   }, i.prototype._bindEvents = function() {
-    const h = this;
-    h._handlers = {
-      enqueue: (b) => h._onEnqueue(b),
-      ack: (b) => h._onAck(b),
-      nack: (b) => h._onNack(b),
-      remap: (b) => h._onRemap(b),
-      resolveCreate: (b) => h._onResolveCreate(b),
-      resume: () => h._onResume(),
-      pause: () => h._onPause(),
-      drain: () => h._onDrain(),
-      clear: () => h._onClear()
-    }, h.dom.addEventListener("ln-api-queue:request-enqueue", h._handlers.enqueue), h.dom.addEventListener("ln-api-queue:ack", h._handlers.ack), h.dom.addEventListener("ln-api-queue:nack", h._handlers.nack), h.dom.addEventListener("ln-api-queue:request-remap", h._handlers.remap), h.dom.addEventListener("ln-api-queue:resolve-create", h._handlers.resolveCreate), h.dom.addEventListener("ln-api-queue:request-resume", h._handlers.resume), h.dom.addEventListener("ln-api-queue:request-pause", h._handlers.pause), h.dom.addEventListener("ln-api-queue:request-drain", h._handlers.drain), h.dom.addEventListener("ln-api-queue:request-clear", h._handlers.clear);
+    const f = this;
+    f._handlers = {
+      enqueue: (b) => f._onEnqueue(b),
+      ack: (b) => f._onAck(b),
+      nack: (b) => f._onNack(b),
+      remap: (b) => f._onRemap(b),
+      resolveCreate: (b) => f._onResolveCreate(b),
+      resume: () => f._onResume(),
+      pause: () => f._onPause(),
+      drain: () => f._onDrain(),
+      clear: () => f._onClear()
+    }, f.dom.addEventListener("ln-api-queue:request-enqueue", f._handlers.enqueue), f.dom.addEventListener("ln-api-queue:ack", f._handlers.ack), f.dom.addEventListener("ln-api-queue:nack", f._handlers.nack), f.dom.addEventListener("ln-api-queue:request-remap", f._handlers.remap), f.dom.addEventListener("ln-api-queue:resolve-create", f._handlers.resolveCreate), f.dom.addEventListener("ln-api-queue:request-resume", f._handlers.resume), f.dom.addEventListener("ln-api-queue:request-pause", f._handlers.pause), f.dom.addEventListener("ln-api-queue:request-drain", f._handlers.drain), f.dom.addEventListener("ln-api-queue:request-clear", f._handlers.clear);
   }, i.prototype.destroy = function() {
     if (!this.dom[n]) return;
-    const h = this;
-    h.dom.removeEventListener("ln-api-queue:request-enqueue", h._handlers.enqueue), h.dom.removeEventListener("ln-api-queue:ack", h._handlers.ack), h.dom.removeEventListener("ln-api-queue:nack", h._handlers.nack), h.dom.removeEventListener("ln-api-queue:request-remap", h._handlers.remap), h.dom.removeEventListener("ln-api-queue:resolve-create", h._handlers.resolveCreate), h.dom.removeEventListener("ln-api-queue:request-resume", h._handlers.resume), h.dom.removeEventListener("ln-api-queue:request-pause", h._handlers.pause), h.dom.removeEventListener("ln-api-queue:request-drain", h._handlers.drain), h.dom.removeEventListener("ln-api-queue:request-clear", h._handlers.clear), window.removeEventListener("online", h._onlineHandler), h._timers.forEach((b) => clearTimeout(b)), h._timers.clear(), S(h.dom, "ln-api-queue:destroyed", { scope: h.scope }), delete h.dom[n];
+    const f = this;
+    f.dom.removeEventListener("ln-api-queue:request-enqueue", f._handlers.enqueue), f.dom.removeEventListener("ln-api-queue:ack", f._handlers.ack), f.dom.removeEventListener("ln-api-queue:nack", f._handlers.nack), f.dom.removeEventListener("ln-api-queue:request-remap", f._handlers.remap), f.dom.removeEventListener("ln-api-queue:resolve-create", f._handlers.resolveCreate), f.dom.removeEventListener("ln-api-queue:request-resume", f._handlers.resume), f.dom.removeEventListener("ln-api-queue:request-pause", f._handlers.pause), f.dom.removeEventListener("ln-api-queue:request-drain", f._handlers.drain), f.dom.removeEventListener("ln-api-queue:request-clear", f._handlers.clear), window.removeEventListener("online", f._onlineHandler), f._timers.forEach((b) => clearTimeout(b)), f._timers.clear(), S(f.dom, "ln-api-queue:destroyed", { scope: f.scope }), delete f.dom[n];
   };
-  function f(h) {
-    const b = h[n];
+  function p(f) {
+    const b = f[n];
     b && b._drain();
   }
   M(t, n, i, "ln-api-queue", {
     extraAttributes: ["data-ln-api-queue-online"],
-    onAttributeChange: f
+    onAttributeChange: p
   });
 })();
-function yn(t) {
+function _n(t) {
   if (t == null || t === "") return null;
   const n = Number(t);
   return Number.isFinite(n) ? n : null;
@@ -8843,36 +8858,36 @@ function yn(t) {
 function Et(t) {
   return String(Math.round(t * 1e3) / 1e3);
 }
-function Yi(t, n, u) {
-  const p = yn(t);
-  return p === null || p < 0 ? 0 : Math.min(p, Math.min(n, u) / 2);
+function tr(t, n, d) {
+  const h = _n(t);
+  return h === null || h < 0 ? 0 : Math.min(h, Math.min(n, d) / 2);
 }
-function Ji(t) {
+function er(t) {
   if (typeof t != "string") return null;
   const n = t.trim().split(/[\s,]+/).map(Number);
-  return n.length !== 4 || n.some((u) => !Number.isFinite(u)) || n[2] <= 0 || n[3] <= 0 ? null : { x: n[0], y: n[1], width: n[2], height: n[3] };
+  return n.length !== 4 || n.some((d) => !Number.isFinite(d)) || n[2] <= 0 || n[3] <= 0 ? null : { x: n[0], y: n[1], width: n[2], height: n[3] };
 }
-function Zi(t) {
+function nr(t) {
   if (!t || typeof t != "string") return null;
-  const n = t.split(":"), u = n[0].trim();
-  return u ? {
-    field: u,
+  const n = t.split(":"), d = n[0].trim();
+  return d ? {
+    field: d,
     direction: n[1] && n[1].trim().toLowerCase() === "desc" ? "desc" : "asc"
   } : null;
 }
-function tr(t, n) {
+function ir(t, n) {
   n = n || {};
-  const u = n.viewBox || { x: 0, y: 0, width: 1e3, height: 320 }, p = n.xField || "label", l = n.yField || "value", d = n.includeZero !== !1, c = Yi(n.padding, u.width, u.height), i = Array.isArray(t) ? t : [], f = [];
+  const d = n.viewBox || { x: 0, y: 0, width: 1e3, height: 320 }, h = n.xField || "label", l = n.yField || "value", u = n.includeZero !== !1, c = tr(n.padding, d.width, d.height), i = Array.isArray(t) ? t : [], p = [];
   for (let v = 0; v < i.length; v++) {
-    const w = i[v] || {}, A = yn(w[l]);
-    A !== null && f.push({
+    const w = i[v] || {}, A = _n(w[l]);
+    A !== null && p.push({
       record: w,
       sourceIndex: v,
-      label: w[p] == null ? String(v + 1) : String(w[p]),
+      label: w[h] == null ? String(v + 1) : String(w[h]),
       value: A
     });
   }
-  if (f.length === 0)
+  if (p.length === 0)
     return {
       points: [],
       linePoints: "",
@@ -8882,16 +8897,16 @@ function tr(t, n) {
       max: null,
       domainMin: 0,
       domainMax: 1,
-      baselineY: u.y + u.height - c
+      baselineY: d.y + d.height - c
     };
-  let h = f[0].value, b = f[0].value;
-  for (let v = 1; v < f.length; v++)
-    f[v].value < h && (h = f[v].value), f[v].value > b && (b = f[v].value);
-  let g = h, _ = b;
-  d && (g = Math.min(0, g), _ = Math.max(0, _)), g === _ && (_ === 0 ? _ = 1 : _ > 0 ? g = 0 : _ = 0);
-  const m = Math.max(1, u.width - c * 2), r = Math.max(1, u.height - c * 2), s = _ - g, e = u.y + u.height - c - (0 - g) / s * r, o = [];
-  for (let v = 0; v < f.length; v++) {
-    const w = f[v], A = f.length === 1 ? 0.5 : v / (f.length - 1), C = u.x + c + A * m, L = u.y + u.height - c - (w.value - g) / s * r;
+  let f = p[0].value, b = p[0].value;
+  for (let v = 1; v < p.length; v++)
+    p[v].value < f && (f = p[v].value), p[v].value > b && (b = p[v].value);
+  let g = f, _ = b;
+  u && (g = Math.min(0, g), _ = Math.max(0, _)), g === _ && (_ === 0 ? _ = 1 : _ > 0 ? g = 0 : _ = 0);
+  const m = Math.max(1, d.width - c * 2), r = Math.max(1, d.height - c * 2), s = _ - g, e = d.y + d.height - c - (0 - g) / s * r, o = [];
+  for (let v = 0; v < p.length; v++) {
+    const w = p[v], A = p.length === 1 ? 0.5 : v / (p.length - 1), C = d.x + c + A * m, L = d.y + d.height - c - (w.value - g) / s * r;
     o.push({
       record: w.record,
       sourceIndex: w.sourceIndex,
@@ -8913,7 +8928,7 @@ function tr(t, n) {
     linePoints: a,
     areaPoints: y,
     count: o.length,
-    min: h,
+    min: f,
     max: b,
     domainMin: g,
     domainMax: _,
@@ -8921,56 +8936,56 @@ function tr(t, n) {
   };
 }
 (function() {
-  const t = "data-ln-chart", n = "lnChart", u = { x: 0, y: 0, width: 1e3, height: 320 };
+  const t = "data-ln-chart", n = "lnChart", d = { x: 0, y: 0, width: 1e3, height: 320 };
   if (window[n] !== void 0) return;
-  function p(d, c) {
-    d && (d.textContent = c);
+  function h(u, c) {
+    u && (u.textContent = c);
   }
-  function l(d) {
-    this.dom = d, this.name = d.getAttribute(t) || "", this.source = d.getAttribute("data-ln-chart-source") || this.name, this.plot = d.querySelector("[data-ln-chart-plot]"), this.line = d.querySelector("[data-ln-chart-line]"), this.area = d.querySelector("[data-ln-chart-area]"), this.labels = d.querySelector("[data-ln-chart-labels]"), this.empty = d.querySelector("[data-ln-chart-empty]"), this.minimum = d.querySelector("[data-ln-chart-min]"), this.maximum = d.querySelector("[data-ln-chart-max]"), this.count = d.querySelector("[data-ln-chart-count]"), this._data = [], this.model = null, this.isLoaded = !1;
+  function l(u) {
+    this.dom = u, this.name = u.getAttribute(t) || "", this.source = u.getAttribute("data-ln-chart-source") || this.name, this.plot = u.querySelector("[data-ln-chart-plot]"), this.line = u.querySelector("[data-ln-chart-line]"), this.area = u.querySelector("[data-ln-chart-area]"), this.labels = u.querySelector("[data-ln-chart-labels]"), this.empty = u.querySelector("[data-ln-chart-empty]"), this.minimum = u.querySelector("[data-ln-chart-min]"), this.maximum = u.querySelector("[data-ln-chart-max]"), this.count = u.querySelector("[data-ln-chart-count]"), this._data = [], this.model = null, this.isLoaded = !1;
     const c = this;
     return this._onSetData = function(i) {
-      const f = i.detail || {};
-      c._data = Array.isArray(f.data) ? f.data : [], c.isLoaded = !0, c._setLoading(!1), c._render();
+      const p = i.detail || {};
+      c._data = Array.isArray(p.data) ? p.data : [], c.isLoaded = !0, c._setLoading(!1), c._render();
     }, this._onSetLoading = function(i) {
       c._setLoading(!!(i.detail && i.detail.loading));
     }, this._onRefresh = function() {
       c.requestData();
-    }, d.addEventListener("ln-chart:set-data", this._onSetData), d.addEventListener("ln-chart:set-loading", this._onSetLoading), d.addEventListener("ln-chart:request-refresh", this._onRefresh), this.requestData(), this;
+    }, u.addEventListener("ln-chart:set-data", this._onSetData), u.addEventListener("ln-chart:set-loading", this._onSetLoading), u.addEventListener("ln-chart:request-refresh", this._onRefresh), this.requestData(), this;
   }
   l.prototype._readOptions = function() {
-    const d = this.dom.getAttribute("data-ln-chart-padding"), c = d === null ? NaN : Number(d), i = (this.dom.getAttribute("data-ln-chart-type") || "line").toLowerCase();
+    const u = this.dom.getAttribute("data-ln-chart-padding"), c = u === null ? NaN : Number(u), i = (this.dom.getAttribute("data-ln-chart-type") || "line").toLowerCase();
     return {
       xField: this.dom.getAttribute("data-ln-chart-x") || "label",
       yField: this.dom.getAttribute("data-ln-chart-y") || "value",
       includeZero: this.dom.getAttribute("data-ln-chart-zero") !== "false",
       padding: Number.isFinite(c) && c >= 0 ? c : 16,
       type: i === "area" || i === "polygon" ? "area" : "line",
-      viewBox: this.plot && Ji(this.plot.getAttribute("viewBox")) || u
+      viewBox: this.plot && er(this.plot.getAttribute("viewBox")) || d
     };
-  }, l.prototype._setLoading = function(d) {
-    this.dom.classList.toggle("ln-chart--loading", d), this.dom.setAttribute("aria-busy", d ? "true" : "false");
-  }, l.prototype._renderLabels = function(d) {
-    if (!this.labels || (this.labels.replaceChildren(), d.count === 0)) return;
+  }, l.prototype._setLoading = function(u) {
+    this.dom.classList.toggle("ln-chart--loading", u), this.dom.setAttribute("aria-busy", u ? "true" : "false");
+  }, l.prototype._renderLabels = function(u) {
+    if (!this.labels || (this.labels.replaceChildren(), u.count === 0)) return;
     const c = this.name + "-label", i = '[data-ln-template="' + c + '"]';
     if (!this.dom.querySelector(i) && !document.querySelector(i)) return;
-    const f = pt(this.dom, c, "ln-chart");
-    if (!f) return;
-    const h = V(this.dom);
-    for (const b of d.points) {
-      const g = f.cloneNode(!0);
+    const p = pt(this.dom, c, "ln-chart");
+    if (!p) return;
+    const f = V(this.dom);
+    for (const b of u.points) {
+      const g = p.cloneNode(!0);
       Dt(g, {
         label: b.label,
-        value: tt(b.value, h)
+        value: tt(b.value, f)
       }), this.labels.appendChild(g);
     }
   }, l.prototype._render = function() {
-    const d = this._readOptions(), c = tr(this._data, d);
-    this.model = c, this.line && (this.line.setAttribute("points", c.linePoints), this.line.toggleAttribute("hidden", c.count === 0)), this.area && (this.area.setAttribute("points", c.areaPoints), this.area.toggleAttribute("hidden", c.count === 0 || d.type !== "area"));
+    const u = this._readOptions(), c = ir(this._data, u);
+    this.model = c, this.line && (this.line.setAttribute("points", c.linePoints), this.line.toggleAttribute("hidden", c.count === 0)), this.area && (this.area.setAttribute("points", c.areaPoints), this.area.toggleAttribute("hidden", c.count === 0 || u.type !== "area"));
     const i = c.count === 0;
     this.dom.classList.toggle("ln-chart--empty", i), this.empty && this.empty.toggleAttribute("hidden", !i);
-    const f = V(this.dom);
-    p(this.minimum, tt(c.min, f)), p(this.maximum, tt(c.max, f)), p(this.count, tt(c.count, f)), this._renderLabels(c), S(this.dom, "ln-chart:rendered", {
+    const p = V(this.dom);
+    h(this.minimum, tt(c.min, p)), h(this.maximum, tt(c.max, p)), h(this.count, tt(c.count, p)), this._renderLabels(c), S(this.dom, "ln-chart:rendered", {
       chart: this.name,
       count: c.count,
       min: c.min,
@@ -8980,7 +8995,7 @@ function tr(t, n) {
     this.source = this.dom.getAttribute("data-ln-chart-source") || this.name, S(this.dom, "ln-chart:request-data", {
       chart: this.name,
       source: this.source,
-      sort: Zi(this.dom.getAttribute("data-ln-chart-sort")),
+      sort: nr(this.dom.getAttribute("data-ln-chart-sort")),
       filters: {},
       search: ""
     });
@@ -8996,8 +9011,8 @@ function tr(t, n) {
       "data-ln-chart-zero",
       "data-ln-chart-sort"
     ],
-    onAttributeChange: function(d, c) {
-      const i = d[n];
+    onAttributeChange: function(u, c) {
+      const i = u[n];
       if (i) {
         if (c === "data-ln-chart-source" || c === "data-ln-chart-sort") {
           i.requestData();
@@ -9011,80 +9026,80 @@ function tr(t, n) {
 (function() {
   const t = "data-ln-options", n = "lnOptions";
   if (window[n] !== void 0) return;
-  function u(p) {
-    this.dom = p, this._storeName = p.getAttribute(t), this._valueField = p.getAttribute("data-ln-options-value") || "id", this._labelField = p.getAttribute("data-ln-options-label") || "name";
+  function d(h) {
+    this.dom = h, this._storeName = h.getAttribute(t), this._valueField = h.getAttribute("data-ln-options-value") || "id", this._labelField = h.getAttribute("data-ln-options-label") || "name";
     const l = this;
-    return this._onSetData = function(d) {
-      l._rebuild(d.detail.data || []);
-    }, p.addEventListener("ln-options:set-data", this._onSetData), S(p, "ln-options:request-data", { options: this._storeName }), this;
+    return this._onSetData = function(u) {
+      l._rebuild(u.detail.data || []);
+    }, h.addEventListener("ln-options:set-data", this._onSetData), S(h, "ln-options:request-data", { options: this._storeName }), this;
   }
-  u.prototype._rebuild = function(p) {
-    const l = this.dom, d = this._valueField, c = this._labelField, i = l.value, f = l.querySelectorAll("option");
-    for (let b = f.length - 1; b >= 0; b--)
-      f[b].value !== "" && l.removeChild(f[b]);
-    for (let b = 0; b < p.length; b++) {
-      const g = p[b], _ = document.createElement("option");
-      _.value = String(g[d]), _.textContent = g[c] != null ? g[c] : "", l.appendChild(_);
+  d.prototype._rebuild = function(h) {
+    const l = this.dom, u = this._valueField, c = this._labelField, i = l.value, p = l.querySelectorAll("option");
+    for (let b = p.length - 1; b >= 0; b--)
+      p[b].value !== "" && l.removeChild(p[b]);
+    for (let b = 0; b < h.length; b++) {
+      const g = h[b], _ = document.createElement("option");
+      _.value = String(g[u]), _.textContent = g[c] != null ? g[c] : "", l.appendChild(_);
     }
-    const h = l.options;
-    for (let b = 0; b < h.length; b++)
-      if (h[b].value === i) {
+    const f = l.options;
+    for (let b = 0; b < f.length; b++)
+      if (f[b].value === i) {
         l.value = i;
         break;
       }
-  }, u.prototype.destroy = function() {
+  }, d.prototype.destroy = function() {
     this.dom[n] && (this.dom.removeEventListener("ln-options:set-data", this._onSetData), delete this.dom[n]);
-  }, M(t, n, u, "ln-options");
+  }, M(t, n, d, "ln-options");
 })();
-function er(t) {
+function rr(t) {
   if (!t || typeof t != "string") return null;
   const n = t.indexOf(":");
   if (n === -1) return null;
-  const u = t.slice(0, n).trim(), p = t.slice(n + 1).trim();
-  if (!u) return null;
+  const d = t.slice(0, n).trim(), h = t.slice(n + 1).trim();
+  if (!d) return null;
   const l = {};
-  return l[u] = [p], l;
+  return l[d] = [h], l;
 }
-function nr(t) {
+function or(t) {
   return t == null ? "" : String(t);
 }
 (function() {
   const t = "data-ln-stat", n = "lnStat";
   if (window[n] !== void 0) return;
-  function u(p) {
-    return this.dom = p, this._storeName = p.getAttribute(t), this._filters = er(p.getAttribute("data-ln-stat-filter")), this._onSetCount = function(l) {
-      p.textContent = nr(l.detail && l.detail.count), p.classList.remove("is-loading");
-    }, p.addEventListener("ln-stat:set-count", this._onSetCount), S(p, "ln-stat:request-count", {
+  function d(h) {
+    return this.dom = h, this._storeName = h.getAttribute(t), this._filters = rr(h.getAttribute("data-ln-stat-filter")), this._onSetCount = function(l) {
+      h.textContent = or(l.detail && l.detail.count), h.classList.remove("is-loading");
+    }, h.addEventListener("ln-stat:set-count", this._onSetCount), S(h, "ln-stat:request-count", {
       stat: this._storeName,
       filters: this._filters
     }), this;
   }
-  u.prototype.destroy = function() {
+  d.prototype.destroy = function() {
     this.dom[n] && (this.dom.removeEventListener("ln-stat:set-count", this._onSetCount), delete this.dom[n]);
-  }, M(t, n, u, "ln-stat");
+  }, M(t, n, d, "ln-stat");
 })();
 (function() {
-  const t = "ln-icon-sprite", n = "#ln-icon-", u = "#ln-icon-custom-", p = /* @__PURE__ */ new Set(), l = /* @__PURE__ */ new Set();
-  let d = null;
-  const c = (window.LN_ICON_CDN || "https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline").replace(/\/$/, ""), i = (window.LN_ICON_CUSTOM_CDN || "").replace(/\/$/, ""), f = "lni:", h = "lni:v", b = "1";
+  const t = "ln-icon-sprite", n = "#ln-icon-", d = "#ln-icon-custom-", h = /* @__PURE__ */ new Set(), l = /* @__PURE__ */ new Set();
+  let u = null;
+  const c = (window.LN_ICON_CDN || "https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline").replace(/\/$/, ""), i = (window.LN_ICON_CUSTOM_CDN || "").replace(/\/$/, ""), p = "lni:", f = "lni:v", b = "1";
   function g() {
     try {
-      if (localStorage.getItem(h) !== b) {
+      if (localStorage.getItem(f) !== b) {
         for (let a = localStorage.length - 1; a >= 0; a--) {
           const y = localStorage.key(a);
-          y && y.indexOf(f) === 0 && localStorage.removeItem(y);
+          y && y.indexOf(p) === 0 && localStorage.removeItem(y);
         }
-        localStorage.setItem(h, b);
+        localStorage.setItem(f, b);
       }
     } catch {
     }
   }
   g();
   function _() {
-    return d || (d = document.getElementById(t), d || (d = document.createElementNS("http://www.w3.org/2000/svg", "svg"), d.id = t, d.setAttribute("hidden", ""), d.setAttribute("aria-hidden", "true"), d.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "defs")), document.body.insertBefore(d, document.body.firstChild))), d;
+    return u || (u = document.getElementById(t), u || (u = document.createElementNS("http://www.w3.org/2000/svg", "svg"), u.id = t, u.setAttribute("hidden", ""), u.setAttribute("aria-hidden", "true"), u.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "defs")), document.body.insertBefore(u, document.body.firstChild))), u;
   }
   function m(a) {
-    return a.indexOf(u) === 0 ? i + "/" + a.slice(u.length) + ".svg" : c + "/" + a.slice(n.length) + ".svg";
+    return a.indexOf(d) === 0 ? i + "/" + a.slice(d.length) + ".svg" : c + "/" + a.slice(n.length) + ".svg";
   }
   function r(a, y) {
     const v = y.match(/viewBox="([^"]+)"/), w = v ? v[1] : "0 0 24 24", A = y.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i), C = A ? A[1].trim() : "", L = y.match(/<svg([^>]*)>/i), q = L ? L[1] : "", x = document.createElementNS("http://www.w3.org/2000/svg", "symbol");
@@ -9094,16 +9109,16 @@ function nr(t) {
     }), x.innerHTML = C, _().querySelector("defs").appendChild(x);
   }
   function s(a) {
-    if (p.has(a) || l.has(a)) return;
-    if (a.indexOf(u) === 0 && !i) {
+    if (h.has(a) || l.has(a)) return;
+    if (a.indexOf(d) === 0 && !i) {
       console.warn("[ln-icon] Custom icon requested but no CUSTOM_CDN configured:", a);
       return;
     }
     const y = a.slice(1);
     try {
-      const w = localStorage.getItem(f + y);
+      const w = localStorage.getItem(p + y);
       if (w) {
-        r(y, w), p.add(a);
+        r(y, w), h.add(a);
         return;
       }
     } catch {
@@ -9114,9 +9129,9 @@ function nr(t) {
       if (!w.ok) throw new Error(w.status);
       return w.text();
     }).then(function(w) {
-      r(y, w), p.add(a), l.delete(a);
+      r(y, w), h.add(a), l.delete(a);
       try {
-        localStorage.setItem(f + y, w);
+        localStorage.setItem(p + y, w);
       } catch {
       }
     }).catch(function(w) {
@@ -9124,7 +9139,7 @@ function nr(t) {
     });
   }
   function e(a) {
-    const y = 'use[href^="' + n + '"], use[href^="' + u + '"]', v = a.querySelectorAll ? a.querySelectorAll(y) : [];
+    const y = 'use[href^="' + n + '"], use[href^="' + d + '"]', v = a.querySelectorAll ? a.querySelectorAll(y) : [];
     if (a.matches && a.matches(y)) {
       const w = a.getAttribute("href");
       w && s(w);
@@ -9143,7 +9158,7 @@ function nr(t) {
           });
         else if (y.type === "attributes" && y.attributeName === "href") {
           const v = y.target.getAttribute("href");
-          v && (v.indexOf(n) === 0 || v.indexOf(u) === 0) && s(v);
+          v && (v.indexOf(n) === 0 || v.indexOf(d) === 0) && s(v);
         }
       });
     }).observe(document.body, {
@@ -9396,9 +9411,12 @@ const be = /* @__PURE__ */ new Set([
   "data-ln-translations",
   "data-ln-translations-active",
   "data-ln-translations-add",
+  "data-ln-translations-default",
   "data-ln-translations-lang",
   "data-ln-translations-locales",
+  "data-ln-translations-placeholder",
   "data-ln-translations-prefix",
+  "data-ln-translations-remove-label",
   "data-ln-ui-coordinator",
   "data-ln-ui-coordinator-dict",
   "data-ln-upload",
@@ -9425,201 +9443,201 @@ const be = /* @__PURE__ */ new Set([
   "data-ln-value",
   "data-ln-websocket-connector"
 ]);
-function ir(t, n) {
+function sr(t, n) {
   if (t === n) return 0;
   if (!t.length) return n.length;
   if (!n.length) return t.length;
-  const u = [];
-  for (let p = 0; p <= n.length; p++) u[p] = [p];
-  for (let p = 0; p <= t.length; p++) u[0][p] = p;
-  for (let p = 1; p <= n.length; p++)
+  const d = [];
+  for (let h = 0; h <= n.length; h++) d[h] = [h];
+  for (let h = 0; h <= t.length; h++) d[0][h] = h;
+  for (let h = 1; h <= n.length; h++)
     for (let l = 1; l <= t.length; l++)
-      n.charAt(p - 1) === t.charAt(l - 1) ? u[p][l] = u[p - 1][l - 1] : u[p][l] = Math.min(
-        u[p - 1][l - 1] + 1,
-        u[p][l - 1] + 1,
-        u[p - 1][l] + 1
+      n.charAt(h - 1) === t.charAt(l - 1) ? d[h][l] = d[h - 1][l - 1] : d[h][l] = Math.min(
+        d[h - 1][l - 1] + 1,
+        d[h][l - 1] + 1,
+        d[h - 1][l] + 1
       );
-  return u[n.length][t.length];
+  return d[n.length][t.length];
 }
-function rr(t, n = be) {
+function ar(t, n = be) {
   if (n.has(t)) return null;
-  let u = null, p = 1 / 0;
-  for (const d of n) {
-    const c = ir(t, d);
-    c < p && (p = c, u = d);
+  let d = null, h = 1 / 0;
+  for (const u of n) {
+    const c = sr(t, u);
+    c < h && (h = c, d = u);
   }
   const l = Math.max(3, Math.floor(t.length * 0.4));
-  return p <= l ? u : null;
+  return h <= l ? d : null;
 }
-function vn(t) {
+function bn(t) {
   return typeof CSS < "u" && CSS.escape ? CSS.escape(t) : t.replace(/([!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~])/g, "\\$1");
 }
-function or(t = document) {
-  const n = t.ownerDocument || t, u = t.nodeType === 9 ? t.body || t.documentElement : t;
-  if (!u) return [];
-  const p = [], l = [u, ...u.querySelectorAll("*")];
-  for (let d = 0; d < l.length; d++) {
-    const c = l[d];
+function lr(t = document) {
+  const n = t.ownerDocument || t, d = t.nodeType === 9 ? t.body || t.documentElement : t;
+  if (!d) return [];
+  const h = [], l = [d, ...d.querySelectorAll("*")];
+  for (let u = 0; u < l.length; u++) {
+    const c = l[u];
     if (c.attributes)
       for (let i = 0; i < c.attributes.length; i++) {
-        const f = c.attributes[i];
-        if (f.name.startsWith("data-ln-") && f.name.endsWith("-for")) {
-          const h = (f.value || "").trim();
-          if (!h) {
-            p.push({
+        const p = c.attributes[i];
+        if (p.name.startsWith("data-ln-") && p.name.endsWith("-for")) {
+          const f = (p.value || "").trim();
+          if (!f) {
+            h.push({
               type: "id-empty",
               element: c,
-              attribute: f.name,
+              attribute: p.name,
               targetId: "",
-              message: `[ln-debug] Empty ID reference in <${c.tagName.toLowerCase()} ${f.name}="">.`
+              message: `[ln-debug] Empty ID reference in <${c.tagName.toLowerCase()} ${p.name}="">.`
             });
             continue;
           }
-          n.getElementById(h) || n.querySelector("#" + vn(h)) || p.push({
+          n.getElementById(f) || n.querySelector("#" + bn(f)) || h.push({
             type: "id-unresolved",
             element: c,
-            attribute: f.name,
-            targetId: h,
-            message: `[ln-debug] Unresolved ID reference: <${c.tagName.toLowerCase()} ${f.name}="${h}"> targets "#${h}", but no element with id="${h}" exists in the document.`
+            attribute: p.name,
+            targetId: f,
+            message: `[ln-debug] Unresolved ID reference: <${c.tagName.toLowerCase()} ${p.name}="${f}"> targets "#${f}", but no element with id="${f}" exists in the document.`
           });
         }
       }
   }
-  return p;
+  return h;
 }
-function sr(t = document) {
-  const n = t.ownerDocument || t, u = t.nodeType === 9 ? t.body || t.documentElement : t;
-  if (!u) return [];
-  const p = [], l = [u, ...u.querySelectorAll("*")];
-  for (let d = 0; d < l.length; d++) {
-    const c = l[d];
+function cr(t = document) {
+  const n = t.ownerDocument || t, d = t.nodeType === 9 ? t.body || t.documentElement : t;
+  if (!d) return [];
+  const h = [], l = [d, ...d.querySelectorAll("*")];
+  for (let u = 0; u < l.length; u++) {
+    const c = l[u];
     if (c.attributes)
       for (let i = 0; i < c.attributes.length; i++) {
-        const f = c.attributes[i];
-        if (f.name.startsWith("data-ln-") && (f.name.endsWith("-source") || f.name.endsWith("-store")) && f.name !== "data-ln-data-store") {
-          const b = (f.value || "").trim();
+        const p = c.attributes[i];
+        if (p.name.startsWith("data-ln-") && (p.name.endsWith("-source") || p.name.endsWith("-store")) && p.name !== "data-ln-data-store") {
+          const b = (p.value || "").trim();
           if (!b) {
-            p.push({
+            h.push({
               type: "store-empty",
               element: c,
-              attribute: f.name,
+              attribute: p.name,
               storeName: "",
-              message: `[ln-debug] Empty store reference in <${c.tagName.toLowerCase()} ${f.name}="">.`
+              message: `[ln-debug] Empty store reference in <${c.tagName.toLowerCase()} ${p.name}="">.`
             });
             continue;
           }
-          const g = vn(b), _ = n.querySelector(`[data-ln-data-store="${g}"], [data-ln-store="${g}"]`), m = typeof window < "u" && window.lnDataStore && typeof window.lnDataStore.getStore == "function" && window.lnDataStore.getStore(b);
-          !_ && !m && p.push({
+          const g = bn(b), _ = n.querySelector(`[data-ln-data-store="${g}"], [data-ln-store="${g}"]`), m = typeof window < "u" && window.lnDataStore && typeof window.lnDataStore.getStore == "function" && window.lnDataStore.getStore(b);
+          !_ && !m && h.push({
             type: "store-unresolved",
             element: c,
-            attribute: f.name,
+            attribute: p.name,
             storeName: b,
-            message: `[ln-debug] Unresolved store reference: <${c.tagName.toLowerCase()} ${f.name}="${b}"> targets store "${b}", but no [data-ln-data-store="${b}"] exists in the document.`
+            message: `[ln-debug] Unresolved store reference: <${c.tagName.toLowerCase()} ${p.name}="${b}"> targets store "${b}", but no [data-ln-data-store="${b}"] exists in the document.`
           });
         }
       }
   }
-  return p;
+  return h;
 }
-function ar(t = document) {
+function dr(t = document) {
   t.ownerDocument;
   const n = t.nodeType === 9 ? t.body || t.documentElement : t;
   if (!n) return [];
-  const u = [], p = Array.from(n.querySelectorAll("[data-ln-data-store]"));
-  n.hasAttribute && n.hasAttribute("data-ln-data-store") && p.unshift(n);
+  const d = [], h = Array.from(n.querySelectorAll("[data-ln-data-store]"));
+  n.hasAttribute && n.hasAttribute("data-ln-data-store") && h.unshift(n);
   const l = /* @__PURE__ */ new Map();
-  for (let d = 0; d < p.length; d++) {
-    const c = p[d], i = (c.getAttribute("data-ln-data-store") || "").trim();
+  for (let u = 0; u < h.length; u++) {
+    const c = h[u], i = (c.getAttribute("data-ln-data-store") || "").trim();
     i && (l.has(i) || l.set(i, []), l.get(i).push(c));
   }
-  for (const [d, c] of l.entries())
-    c.length > 1 && u.push({
+  for (const [u, c] of l.entries())
+    c.length > 1 && d.push({
       type: "store-duplicate",
-      storeName: d,
+      storeName: u,
       elements: c,
-      message: `[ln-debug] Duplicate store name: Multiple elements declare data-ln-data-store="${d}". Store names must be unique across the document.`
+      message: `[ln-debug] Duplicate store name: Multiple elements declare data-ln-data-store="${u}". Store names must be unique across the document.`
     });
-  return u;
+  return d;
 }
-function lr(t = document, n = be) {
-  const u = t.nodeType === 9 ? t.body || t.documentElement : t;
-  if (!u) return [];
-  const p = [], l = [u, ...u.querySelectorAll("*")];
-  for (let d = 0; d < l.length; d++) {
-    const c = l[d];
+function ur(t = document, n = be) {
+  const d = t.nodeType === 9 ? t.body || t.documentElement : t;
+  if (!d) return [];
+  const h = [], l = [d, ...d.querySelectorAll("*")];
+  for (let u = 0; u < l.length; u++) {
+    const c = l[u];
     if (c.attributes)
       for (let i = 0; i < c.attributes.length; i++) {
-        const f = c.attributes[i];
-        if (f.name.startsWith("data-ln-") && !n.has(f.name)) {
-          const h = rr(f.name, n), b = h ? ` Did you mean "${h}"?` : "";
-          p.push({
+        const p = c.attributes[i];
+        if (p.name.startsWith("data-ln-") && !n.has(p.name)) {
+          const f = ar(p.name, n), b = f ? ` Did you mean "${f}"?` : "";
+          h.push({
             type: "attribute-unknown",
             element: c,
-            attribute: f.name,
-            suggestion: h,
-            message: `[ln-debug] Unknown attribute "${f.name}" on <${c.tagName.toLowerCase()}>.${b}`
+            attribute: p.name,
+            suggestion: f,
+            message: `[ln-debug] Unknown attribute "${p.name}" on <${c.tagName.toLowerCase()}>.${b}`
           });
         }
       }
   }
-  return p;
+  return h;
 }
 function de(t = typeof document < "u" ? document : null, n = {}) {
   if (!t)
     return { idIssues: [], storeIssues: [], uniquenessIssues: [], spellingIssues: [], total: 0 };
-  const u = n.validAttributes || be, p = or(t), l = sr(t), d = ar(t), c = lr(t, u), i = [
-    ...p,
+  const d = n.validAttributes || be, h = lr(t), l = cr(t), u = dr(t), c = ur(t, d), i = [
+    ...h,
     ...l,
-    ...d,
+    ...u,
     ...c
   ];
   if (!n.silent)
-    for (let f = 0; f < i.length; f++)
-      console.warn(i[f].message);
+    for (let p = 0; p < i.length; p++)
+      console.warn(i[p].message);
   return {
-    idIssues: p,
+    idIssues: h,
     storeIssues: l,
-    uniquenessIssues: d,
+    uniquenessIssues: u,
     spellingIssues: c,
     total: i.length
   };
 }
 let qt = null;
-function Bt(t = typeof document < "u" ? document : null, n = 50, u = null) {
+function Bt(t = typeof document < "u" ? document : null, n = 50, d = null) {
   if (!t) return;
   qt && (clearTimeout(qt), qt = null);
-  function p() {
+  function h() {
     qt = setTimeout(() => {
       qt = null;
       const l = de(t);
-      u && u(l);
+      d && d(l);
     }, n);
   }
-  je() > 0 ? it(p) : p();
+  je() > 0 ? it(h) : h();
 }
 (function() {
   const t = "data-ln-debug", n = "lnDebug";
   if (typeof window < "u" && window[n] !== void 0) return;
-  function u(p) {
-    return this.dom = p, Bt(p.ownerDocument || document), this;
+  function d(h) {
+    return this.dom = h, Bt(h.ownerDocument || document), this;
   }
-  u.prototype.verify = function(p, l) {
-    return de(p || (this.dom ? this.dom.ownerDocument || this.dom : document), l);
-  }, u.prototype.destroy = function() {
+  d.prototype.verify = function(h, l) {
+    return de(h || (this.dom ? this.dom.ownerDocument || this.dom : document), l);
+  }, d.prototype.destroy = function() {
     delete this.dom[n];
   }, typeof window < "u" && (window.lnDebug = {
-    verify: function(p, l) {
-      return de(p || document, l);
+    verify: function(h, l) {
+      return de(h || document, l);
     },
-    schedule: function(p, l, d) {
-      return Bt(p || document, l, d);
+    schedule: function(h, l, u) {
+      return Bt(h || document, l, u);
     }
-  }), M(t, n, u, "ln-debug", {
-    onInit: function(p) {
-      typeof document < "u" && Bt(p && p.ownerDocument ? p.ownerDocument : document);
+  }), M(t, n, d, "ln-debug", {
+    onInit: function(h) {
+      typeof document < "u" && Bt(h && h.ownerDocument ? h.ownerDocument : document);
     },
-    onSubtreeChange: function(p) {
-      typeof document < "u" && Bt(p && p.ownerDocument ? p.ownerDocument : document);
+    onSubtreeChange: function(h) {
+      typeof document < "u" && Bt(h && h.ownerDocument ? h.ownerDocument : document);
     }
   });
 })();
