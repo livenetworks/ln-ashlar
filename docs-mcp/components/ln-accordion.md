@@ -255,7 +255,7 @@ The styling is split into a reusable mixin and a declarative selector binding:
 - **Delegated ARIA Responsibility:** `ln-accordion` does not modify accessibility attributes directly. ARIA behavior is managed by the underlying [`ln-toggle`](./ln-toggle.md) panels:
   - Triggers are synced with `aria-expanded="true"` or `"false"`.
   - Trigger and panel relationship is linked via `aria-controls="panel-id"`.
-- **Keyboard Navigation:** Users can navigate through headers using `Tab` and `Shift+Tab`, and activate/toggle them using `Enter` or `Space`.
+- **Keyboard Navigation:** The `<header>` trigger is activated by pointer only. A `<header>` element is not focusable and `ln-toggle` adds no `role`, `tabindex`, or key handling — use a `<button>` trigger to support keyboard operation.
 
 ### Common Pitfalls & Anti-patterns
 

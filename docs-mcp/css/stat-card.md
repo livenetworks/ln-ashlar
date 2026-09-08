@@ -27,10 +27,10 @@ The `stat-card` module (`theme/config/mixins/_stat-card.scss` and `theme/compone
 ### Base HTML Markup (KPI Tile with Trend)
 
 ```html
-<article class="stat-card">
-    <p class="stat-label">Monthly Active Users</p>
-    <p class="stat-value">24,580</p>
-    <p class="stat-trend up">
+<article data-ln-stat-card>
+    <p data-ln-stat-label>Monthly Active Users</p>
+    <p data-ln-stat-value>24,580</p>
+    <p data-ln-stat-trend="up">
         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up-right"></use></svg>
         <span>+14.2% vs last month</span>
     </p>
@@ -40,10 +40,10 @@ The `stat-card` module (`theme/config/mixins/_stat-card.scss` and `theme/compone
 ### Variant 1: Negative Trend
 
 ```html
-<article class="stat-card">
-    <p class="stat-label">Error Rate</p>
-    <p class="stat-value">0.04%</p>
-    <p class="stat-trend down">
+<article data-ln-stat-card>
+    <p data-ln-stat-label>Error Rate</p>
+    <p data-ln-stat-value>0.04%</p>
+    <p data-ln-stat-trend="down">
         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down-right"></use></svg>
         <span>-0.02% improvement</span>
     </p>
@@ -57,8 +57,10 @@ The `stat-card` module (`theme/config/mixins/_stat-card.scss` and `theme/compone
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
 | `stat-card` | mixin | — | KPI card container layout with tabular numeral styling |
-| `.stat-card` | class | — | Prototyping class for `stat-card` |
-| `.stat-label`, `.stat-value`, `.stat-trend` | class | — | Child element structural styling classes |
+| `data-ln-stat-card` | attribute | — | Binds the `stat-card` mixin to the container |
+| `data-ln-stat-label` | attribute | — | Uppercase muted caption; direct child |
+| `data-ln-stat-value` | attribute | — | Tabular-numeral metric value; direct child |
+| `data-ln-stat-trend` | attribute | `up` \| `down` \| `neutral` | Directional trend row; direct child |
 
 ---
 

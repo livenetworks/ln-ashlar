@@ -54,7 +54,7 @@ The `forms` styling system (`theme/config/mixins/_form.scss` and `theme/componen
 ```html
 <label class="search">
     <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-    <input type="search" placeholder="Filter records…" data-ln-search-debounce="0">
+    <input type="search" placeholder="Filter records…">
     <button type="button" data-ln-search-clear aria-label="Clear search">
         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
     </button>
@@ -89,7 +89,6 @@ The `forms` styling system (`theme/config/mixins/_form.scss` and `theme/componen
 > [!CAUTION]
 > 1. **Explicit Label-Input Association:** Always associate labels with inputs using matching `for` and `id` attributes or by nesting the input inside the `<label>`.
 > 2. **Never Author Asterisks for Required Fields:** Do not write `<label>Email *</label>` in HTML. CSS handles the required marker automatically from `[required]` using `:has()`.
-> 3. **Search Debounce Distinction:** For local DOM filtering, set `data-ln-search-debounce="0"`. For API / remote searches, use `500` ms debounce to protect backend performance.
 
 ---
 

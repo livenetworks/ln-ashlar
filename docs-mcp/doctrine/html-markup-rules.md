@@ -160,7 +160,7 @@ For full HTML-first declarative purity and localization, micro-components use:
 
 To prevent styling side-effects and maintain clean component configurations, visual styling selectors must be kept separate from behavioral selectors:
 
-- **Functional Triggers (`data-ln-*`):** Used strictly for JavaScript binding and behavior configurations (e.g., `data-ln-modal`, `data-ln-search-debounce`). Never style elements using these attributes as bare selectors (e.g., `[data-ln-modal] { padding: 12px; }` is forbidden).
+- **Functional Triggers (`data-ln-*`):** Used strictly for JavaScript binding and behavior configurations (e.g., `data-ln-modal`, `data-ln-search-for`). Never style elements using these attributes as bare selectors (e.g., `[data-ln-modal] { padding: 12px; }` is forbidden).
 - **Visual Styles (CSS Classes):** CSS/SCSS selectors and classes define visual presentation (e.g., `.search`, `.collapsible`, `.btn`).
 - **State Selection:** State attributes with explicit values (`data-ln-modal="open"`) are allowed in CSS to handle display states (e.g., toggling `display: flex` or animations).
 

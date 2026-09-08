@@ -68,7 +68,7 @@ flowchart TB
 
 <label class="search">
 	<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-	<input type="search" placeholder="Search..." data-ln-search-for="documents" data-ln-search-debounce="0">
+	<input type="search" placeholder="Search..." data-ln-search-for="documents">
 	<button type="button" data-ln-search-clear aria-label="Clear search">
 		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 	</button>

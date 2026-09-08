@@ -1405,13 +1405,6 @@
 					"role": "input",
 					"description": "CSS selector for target child items inside container (e.g. 'tbody tr')."
 				},
-				"data-ln-search-debounce": {
-					"type": "number",
-					"read_by": "ln-search",
-					"consumed_by": "js",
-					"role": "input",
-					"description": "Debounce delay in ms (use 0 for instant local DOM filter, >=150 for API search)."
-				},
 				"data-ln-search-clear": {
 					"type": "boolean",
 					"read_by": "ln-search",

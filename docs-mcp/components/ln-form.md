@@ -38,8 +38,8 @@ tags: [forms, populate, REST]
         <input id="username" name="username" type="text" required />
     </div>
     <ul class="form-actions">
-        <li><button type="button" class="btn btn-ghost">Cancel</button></li>
-        <li><button type="submit" class="btn btn-primary">Save</button></li>
+        <li><button type="button" class="btn-ghost">Cancel</button></li>
+        <li><button type="submit">Save</button></li>
     </ul>
 </form>
 ```

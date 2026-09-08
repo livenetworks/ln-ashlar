@@ -3,9 +3,9 @@ name: ln-search
 classification: simple
 status: stable
 domain: frontend
-summary: Two-host debounced search primitive that drives target state attributes and coordinates list filtering and remote queries.
+summary: Two-host search primitive that drives target state attributes and coordinates list filtering and remote queries.
 source: components/ln-search/src/ln-search.js
-tags: [search, filter, debounce, dom-filtering, attribute-bridge]
+tags: [search, filter, dom-filtering, attribute-bridge]
 ---
 
 # 🔍 ln-search
@@ -17,12 +17,12 @@ tags: [search, filter, debounce, dom-filtering, attribute-bridge]
 ## 1. Core Behavior & Responsibility
 
 The `ln-search` component is a decoupled search primitive implemented using the **Two-Host / Attribute Bridge Architecture**. It splits search functionality into two distinct roles:
-1. **Control Role (`data-ln-search-for="targetId"`)**: Sits on the input or wrapper, capturing user keystrokes, managing the debounce timer and clear button, and writing the search term into the target's `data-ln-search` attribute.
+1. **Control Role (`data-ln-search-for="targetId"`)**: Sits on the input or wrapper, capturing user keystrokes, managing the clear button, and writing the search term into the target's `data-ln-search` attribute.
 2. **State Host Role (`data-ln-search="term"`)**: Sits on the target element (table, list, container). It observes its own attribute changes via `MutationObserver`, syncs matching controls, dispatches `ln-search:change`, and runs tokenized DOM filtering if not prevented.
 
 *   **Dual Search Operations (Local vs Remote):**
-    *   **Local DOM Filtering (Markup Search):** Configured with `` on the control for instant per-keyup text matching. Matches stay visible, non-matching elements receive `data-ln-search-hide="true"`.
-    *   **Remote API Search:** Uses default `500ms` debounce (or custom `data-ln-search-debounce="150"`) to throttle queries.
+    *   **Local DOM Filtering (Markup Search):** Instant per-keyup text matching. Matches stay visible, non-matching elements receive `data-ln-search-hide="true"`.
+    *   **Remote API Search:** Dispatches `ln-search:change` on the target; a coordinator (e.g. `ln-table-coordinator`) intercepts it and issues the remote fetch.
 *   **Tokenized AND Matching & Text Caching:** Matches whitespace-separated tokens order-independently using substring tests (`indexOf`). Searchable text per item is cached dynamically (`_lnSearchText`) to guarantee $O(1)$ per-item lookups on keystrokes, and automatically invalidated via `MutationObserver` on DOM/text mutations.
 *   **Exempt & Subtree Exclusion (`data-ln-search-exclude`):**
     *   On an **item root**: The item is completely exempt from filtering (always visible, never hidden).
@@ -184,7 +184,7 @@ Clear triggers work universally without external coordinators:
 
 | Instance | Property / Method | Description |
 |---|---|---|
-| `element.lnSearchControl` (Control) | `targetId`, `input`, `debounceTime`, `destroy()` | Manages input, debounce timer, and clear button. |
+| `element.lnSearchControl` (Control) | `targetId`, `input`, `destroy()` | Manages input and clear button. |
 | `element.lnSearch` (State Host) | `term`, `nsKey`, `hashEnabled`, `_apply()`, `destroy()` | Owns true search state, URL hash sync, dispatches events, and performs DOM filtering. |
 
 
@@ -226,7 +226,6 @@ label.search {
 
 > [!CAUTION]
 > 1. **Using `data-ln-search="targetId"` on inputs:** `data-ln-search` is the state attribute on the target. Controls must use `data-ln-search-for="targetId"`.
-> 2. **Omitting `` for Local Search:** Omitting `debounce="0"` for local DOM filtering introduces a default 500ms delay.
 
 ---
 
@@ -241,7 +240,6 @@ sequenceDiagram
     participant Consumer as Consumer (ln-table)
 
     User->>Control: Type search string
-    Control->>Control: Debounce timer
     Control->>Target: setAttribute('data-ln-search', rawTerm)
     Target->>Target: MutationObserver catches change (_syncAttribute)
     Target->>Target: _syncControls(rawTerm)

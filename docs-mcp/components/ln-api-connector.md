@@ -5,7 +5,7 @@ status: stable
 domain: frontend
 summary: A stateless RESTful API network connection driver.
 source: components/ln-api-connector/src/ln-api-connector.js
-tags: [network, REST, sync, fetch]
+tags: [network, REST, sync, fetch, debounce]
 ---
 
 # 🔗 ln-api-connector

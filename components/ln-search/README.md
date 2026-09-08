@@ -1,8 +1,8 @@
 # ln-search
 
-A zero-dependency, decoupled **Two-Host Debounced Search Primitive** built on the Attribute Bridge pattern.
+A zero-dependency, decoupled **Two-Host Search Primitive** built on the Attribute Bridge pattern.
 
-It splits search into a **Control** (`data-ln-search-for="targetId"`) that manages user inputs, debounce timers, and clear triggers, and a **State Host** (`data-ln-search="term"`) on the target element (table, list, container) that observes its own attribute, coordinates two-way control sync, and dispatches cancelable change events.
+It splits search into a **Control** (`data-ln-search-for="targetId"`) that manages user inputs and clear triggers, and a **State Host** (`data-ln-search="term"`) on the target element (table, list, container) that observes its own attribute, coordinates two-way control sync, and dispatches cancelable change events.
 
 ---
 

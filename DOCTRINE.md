@@ -130,9 +130,7 @@
 ## 🎨 8. Visual Layer vs. Functional Layer Separation & Search Rules
 
 * **Separation of Concerns:** Clearly separate visual styling (HTML chrome/wrappers and CSS classes, e.g. `.search`, `.collapsible`) from functional JS triggers (`data-ln-*` attributes). Visual markup classes are recommended globally as design standards even if JS logic is absent.
-* **Search Debounce Guidelines:**
-  * **Local DOM Search (Markup Search):** When searching locally within the DOM, always explicitly set `data-ln-search-debounce="0"` on the input to ensure instant filtering on keyup/input.
-  * **Remote Search (API Search):** When searching via backend APIs (e.g., using `ln-data-store`, `ln-table` remote mode, or custom fetches), always use a debounce of `500` milliseconds (the standard default in `ln-search`) to throttle requests and protect the server.
+* **Search Debounce:** Debounce is owned by `ln-api-connector` via `data-ln-api-connector-query-debounce` — see `components/ln-api-connector/README.md` for the full contract.
 
 ---
 
