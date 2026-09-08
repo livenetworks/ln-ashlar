@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as sass from 'sass-embedded';
-import { requireVar, parseTokenSources } from '../scripts/sync-css-tokens.mjs';
+import { requireVar, parseTokenSources, stripComments, extractCssVariables } from '../scripts/sync-css-tokens.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -184,6 +184,33 @@ test('sync-css-tokens integrity: requireVar throws loudly on missing tokens', ()
 		/^\d{1,3} \d{1,3}% \d{1,3}%$/
 	);
 	assert.equal(requireVar(sources.tokensVars, '--size-md', '_tokens.scss'), '1rem');
+});
+
+test('sync-css-tokens integrity: stripComments does not treat // inside a string as a comment', () => {
+	// The defect this guards: a data URI carrying protocol slashes lost everything
+	// from `http://` to end of line, so the declaration holding it vanished from
+	// the token map — and --check still reported fresh, because the generator and
+	// the doc drifted together.
+	const uri = "--check-mark: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3C/svg%3E\");";
+	assert.equal(stripComments(uri), uri, 'a quoted URL must survive intact');
+	assert.ok(extractCssVariables(uri).has('--check-mark'));
+
+	// Real comments must still go. Whitespace sitting before a stripped comment
+	// stays put, matching the regex behaviour this replaced.
+	assert.equal(stripComments('--a: 1; // trailing\n--b: 2;'), '--a: 1; \n--b: 2;');
+	assert.equal(stripComments('--a: /* mid */ 1;'), '--a:  1;');
+
+	// A comment opener inside a string is not an opener; one outside still is.
+	assert.equal(stripComments('--a: "keep /* this */"; /* drop this */').trimEnd(), '--a: "keep /* this */";');
+
+	// An escaped delimiter must not end the string early.
+	assert.equal(stripComments('--a: "esc \\" // still inside";'), '--a: "esc \\" // still inside";');
+
+	// Every quoted url() in the real sources must survive, since the scanner
+	// assumes that shape.
+	const palette = fs.readFileSync(path.join(REPO_ROOT, 'theme/config/_palette.scss'), 'utf8');
+	const urls = (palette.match(/url\(/g) || []).length;
+	assert.equal((stripComments(palette).match(/url\(/g) || []).length, urls);
 });
 
 test('Values symmetry: a vocabulary token declared in one polarity must be declared in both', () => {

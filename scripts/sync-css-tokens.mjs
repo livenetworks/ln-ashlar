@@ -30,13 +30,58 @@ const FENCE_END = '<!-- sync:css-tokens:end -->';
 
 /**
  * Strips comments from SCSS code.
+ *
+ * Scans rather than regex-replaces, because `//` and `/*` are only comment
+ * openers outside a string. A data URI carrying `xmlns='http://www.w3.org/...'`
+ * would otherwise lose everything from the protocol slashes to end of line,
+ * silently truncating the declaration that contains it.
+ *
+ * Assumes every `url()` is quoted — true across `theme/`. An unquoted
+ * `url(http://…)` would still trip on its slashes.
+ *
  * @param {string} code
  * @returns {string}
  */
 export function stripComments(code) {
-	return code
-		.replace(/\/\*[\s\S]*?\*\//g, '')
-		.replace(/\/\/.*/g, '');
+	let out = '';
+	let quote = null;
+	let i = 0;
+
+	while (i < code.length) {
+		const c = code[i];
+
+		if (quote) {
+			out += c;
+			// A backslash escapes the next character, including the delimiter.
+			if (c === '\\' && i + 1 < code.length) out += code[++i];
+			else if (c === quote) quote = null;
+			i++;
+			continue;
+		}
+
+		if (c === '"' || c === "'") {
+			quote = c;
+			out += c;
+			i++;
+			continue;
+		}
+
+		if (c === '/' && code[i + 1] === '*') {
+			const end = code.indexOf('*/', i + 2);
+			i = end === -1 ? code.length : end + 2;
+			continue;
+		}
+
+		if (c === '/' && code[i + 1] === '/') {
+			while (i < code.length && code[i] !== '\n') i++;
+			continue;
+		}
+
+		out += c;
+		i++;
+	}
+
+	return out;
 }
 
 /**
