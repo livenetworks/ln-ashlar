@@ -96,14 +96,14 @@ The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand
 | `data-theme="midnight"` | attribute | — | Midnight deep purple brand palette preset (`--brand-primary: 265 70% 60%`); pair with `data-mode="dark"` |
 | `data-theme="glass"` | attribute | — | Glass luminous blue brand palette preset (`--brand-primary: 218 95% 62%`) |
 | `data-skin="glass"` | attribute | — | Glass structural preset — flat radius/shadow, translucent button chrome, accent nav/menu rebinds. Polarity-agnostic |
-| `--brand-primary` | token | `221 83% 48%` | Primary brand color bare HSL triplet |
+| `--brand-primary` | token | `221 83% 43%` | Primary brand color bare HSL triplet |
 | `--brand-secondary` | token | `160 84% 36%` | Secondary brand color bare HSL triplet |
 | `--bg-base` | token | `hsl(var(--color-white)) (light) / hsl(var(--color-neutral-100)) (dark)` | Base canvas background |
 | `--bg-elevated` | token | `var(--bg-base) (light) / hsl(var(--color-neutral-150)) (dark)` | Elevated card surface (flat in light, +6% in dark) |
 | `--bg-sunken` | token | `hsl(var(--color-neutral-100)) (light) / hsl(var(--color-neutral-175)) (dark)` | Sunken well surface (darker in light, +9% in dark) |
 | `--bg-recessed` | token | `hsl(var(--color-neutral-50)) (light) / hsl(var(--color-neutral-50)) (dark)` | Page ground and recessed fill (darker in both themes) |
 | `--fg-default` | token | `hsl(var(--color-neutral-900)) (light) / hsl(var(--color-neutral-900)) (dark)` | Primary text color |
-| `--fg-muted` | token | `hsl(var(--color-neutral-500)) (light) / hsl(var(--color-neutral-500)) (dark)` | Muted text color |
+| `--fg-muted` | token | `hsl(var(--color-neutral-800)) (light) / hsl(var(--color-neutral-700)) (dark)` | Muted text color |
 <!-- sync:css-tokens:end -->
 
 ---
