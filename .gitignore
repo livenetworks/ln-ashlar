@@ -11,3 +11,7 @@ js/ln-icon/tabler/
 # Source material the docs-mcp corpus was written from (drafts, mirrored
 # pre-corpus docs). Not served — the MCP indexer skips `_`-prefixed paths.
 docs-mcp/_incoming/
+
+# Continue.dev scaffolding. Per-developer IDE state, not project content, and
+# its mcpServers entry carries a bearer token — never commit it.
+.continue/
