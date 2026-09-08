@@ -99,7 +99,7 @@ Within the theme system, design values flow through four strictly defined layers
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
 | **Brand & Status Triplets (Bare HSL)** | | | |
-| `--brand-primary` | token | `221 83% 48%` | Primary brand bare HSL triplet |
+| `--brand-primary` | token | `221 83% 43%` | Primary brand bare HSL triplet |
 | `--brand-secondary` | token | `160 84% 36%` | Brand secondary accent bare HSL triplet |
 | `--color-success` | token | `142 76% 36%` | Success status bare HSL triplet |
 | `--color-error` | token | `0 84% 48%` | Error status bare HSL triplet |
@@ -113,8 +113,8 @@ Within the theme system, design values flow through four strictly defined layers
 | `--bg-hover` | token | `hsl(var(--color-neutral-100)) (light) / hsl(var(--color-neutral-175)) (dark)` | Neutral interactive hover background |
 | `--bg-active` | token | `hsl(var(--color-neutral-150)) (light) / hsl(var(--color-neutral-200)) (dark)` | Neutral interactive active/pressed background |
 | `--fg-default` | token | `hsl(var(--color-neutral-900)) (light) / hsl(var(--color-neutral-900)) (dark)` | High-contrast primary text |
-| `--fg-muted` | token | `hsl(var(--color-neutral-500)) (light) / hsl(var(--color-neutral-500)) (dark)` | Muted secondary text and captions |
-| `--fg-subtle` | token | `hsl(var(--color-neutral-400)) (light) / hsl(var(--color-neutral-400)) (dark)` | Subtle secondary text |
+| `--fg-muted` | token | `hsl(var(--color-neutral-800)) (light) / hsl(var(--color-neutral-700)) (dark)` | Muted secondary text and captions |
+| `--fg-subtle` | token | `hsl(var(--color-neutral-700)) (light) / hsl(var(--color-neutral-600)) (dark)` | Subtle secondary text |
 | `--border-subtle` | token | `hsl(var(--color-neutral-200)) (light) / hsl(var(--color-neutral-175)) (dark)` | Subtle separator border |
 | `--border-strong` | token | `hsl(var(--color-neutral-300)) (light) / hsl(var(--color-neutral-300)) (dark)` | Focused and high-contrast border |
 | **Interaction State Tokens** | | | |
