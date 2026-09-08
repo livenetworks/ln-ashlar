@@ -261,8 +261,7 @@ Text comparisons utilize `Intl.Collator` read from the document `<html lang>` ta
 > 3. **Unformatted SSR Sort:** Column sorting on dates or formatted currencies will fail if done via raw text. Always define `data-ln-value` attributes with raw values on `<td>` cells for proper sorting.
 
 > [!CAUTION]
-> 4. **Search Debounce Throttling:** Remote searches targeting APIs must configure `data-ln-search-debounce` on search inputs with a throttle value (at least `150`ms, recommended `250`ms) to prevent server overload. Instant filtering (`0`ms) is restricted to local SSR markup.
-> 5. **Windowed Select-All:** When `data-ln-table-window` is active, the header "select all" checkbox (`data-ln-table-col-select`) is automatically hidden — a windowed table cannot select rows it has never fetched. Per-row selection (`data-ln-table-row-select`) still works and survives LRU eviction.
+> 4. **Windowed Select-All:** When `data-ln-table-window` is active, the header "select all" checkbox (`data-ln-table-col-select`) is automatically hidden — a windowed table cannot select rows it has never fetched. Per-row selection (`data-ln-table-row-select`) still works and survives LRU eviction.
 
 ---
 

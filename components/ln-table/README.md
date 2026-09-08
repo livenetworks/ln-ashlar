@@ -169,7 +169,7 @@ Column filters use static authored markup — a `[data-ln-popover]` block contai
 <!-- Popover: sibling to [data-ln-table], not inside it -->
 <div data-ln-popover id="filter-dept">
 	<label class="search">
-		<input type="search" data-ln-search-for="filter-dept-list" data-ln-search-debounce="0" placeholder="Search...">
+		<input type="search" data-ln-search-for="filter-dept-list" placeholder="Search...">
 		<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon"><use href="#ln-icon-x"></use></svg></button>
 	</label>
 	<ul id="filter-dept-list" data-ln-search="" data-ln-filter="my-table" data-ln-search-items="label">

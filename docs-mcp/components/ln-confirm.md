@@ -78,7 +78,6 @@ For compact layouts and table rows. Replaces the SVG icon path with `#ln-icon-ch
 #### HTML Markup
 ```html
 <button type="button" 
-        class="btn btn-icon" 
         aria-label="Delete Item" 
         data-ln-confirm="Confirm deletion?">
     <svg class="ln-icon" aria-hidden="true">

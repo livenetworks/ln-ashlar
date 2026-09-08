@@ -89,7 +89,7 @@ is push.
 </section>
 
 <label class="search">
-    <input type="search" placeholder="Search..." data-ln-search-for="orders" data-ln-search-debounce="0">
+    <input type="search" placeholder="Search..." data-ln-search-for="orders">
     <button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon"><use href="#ln-icon-x"></use></svg></button>
 </label>
 <ul data-ln-filter="orders">…</ul>

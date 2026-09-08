@@ -29,15 +29,15 @@ The `stepper` module (`theme/config/mixins/_stepper.scss` and `theme/components/
 ### Base HTML Markup
 
 ```html
-<ol class="stepper" data-ln-stepper>
+<ol data-ln-stepper>
     <li data-ln-step="complete">
-        <span>Account Info</span>
+        <span data-ln-step-label>Account Info</span>
     </li>
     <li data-ln-step="current" aria-current="step">
-        <span>Verification</span>
+        <span data-ln-step-label>Verification</span>
     </li>
     <li data-ln-step="upcoming">
-        <span>Confirmation</span>
+        <span data-ln-step-label>Confirmation</span>
     </li>
 </ol>
 ```
@@ -49,7 +49,8 @@ The `stepper` module (`theme/config/mixins/_stepper.scss` and `theme/components/
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
 | `stepper` | mixin | — | Linear horizontal stepper with CSS counter numbers and connectors |
-| `.stepper` | class | — | Prototyping class for `stepper` |
+| `data-ln-stepper` | attribute | — | Binds the `stepper` mixin to the list |
+| `data-ln-step-label` | attribute | — | Step caption element; direct child of `<li>` |
 | `data-ln-step` | attribute | `complete` \| `current` \| `upcoming` | Step completion state |
 
 ---

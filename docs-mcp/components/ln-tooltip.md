@@ -41,7 +41,6 @@ Best for icon buttons or static elements located in open layout areas where pare
 
 ```html
 <button type="button" 
-        class="btn btn-icon" 
         data-ln-tooltip="Save Changes" 
         aria-label="Save Changes">
     <svg class="ln-icon" aria-hidden="true">
@@ -56,7 +55,7 @@ Recommended for elements close to the screen edges or nested inside containers w
 
 ```html
 <button type="button" 
-        class="btn btn-icon btn-ghost-danger" 
+        class="btn-ghost" 
         data-ln-tooltip="Delete Row" 
         data-ln-tooltip-enhance 
         data-ln-tooltip-position="right"

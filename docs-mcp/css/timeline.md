@@ -27,7 +27,7 @@ The `timeline` module (`theme/config/mixins/_timeline.scss` and `theme/component
 ### Base HTML Markup (Audit Trail Feed)
 
 ```html
-<ol class="timeline" data-ln-timeline>
+<ol class="timeline">
     <li>
         <time datetime="2026-09-01T10:00:00Z">Sep 1, 10:00</time>
         <h4>Document Published</h4>

@@ -48,7 +48,7 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
     <header class="page-header">
         <label class="search">
             <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-            <input type="search" placeholder="Search employees... (Press '/')" data-ln-search-for="employee-table" data-ln-search-debounce="0">
+            <input type="search" placeholder="Search employees... (Press '/')" data-ln-search-for="employee-table">
             <button type="button" data-ln-search-clear aria-label="Clear search">
                 <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
             </button>
@@ -146,7 +146,7 @@ Multiple `data-ln-table-coordinator` wrappers can safely exist on the same page.
     <header class="page-header">
         <h2>Active Employees</h2>
         <label class="search">
-            <input type="search" placeholder="Search active..." data-ln-search-for="active-employees-table" data-ln-search-debounce="0">
+            <input type="search" placeholder="Search active..." data-ln-search-for="active-employees-table">
         </label>
     </header>
     <div data-ln-table id="active-employees-table">
