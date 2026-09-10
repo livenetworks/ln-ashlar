@@ -371,6 +371,86 @@ registerComponent('data-ln-example', 'lnExample', _component, 'ln-example', {
   (initial DOM, added childList nodes, attribute-mutated subtrees).
 - Returns the constructor function (also stored at `window[attribute]`).
 
+### observeAttributes(names, handler)
+
+For components that own their own lifecycle (bespoke `childList` logic that
+doesn't fit `registerComponent`'s shape) and need only the attribute half of
+the shared attribute-observer invariant.
+
+```js
+import { observeAttributes } from '../ln-core';
+
+observeAttributes(['href'], function (el, name, oldValue) {
+    _processLink(el);
+});
+```
+
+- `names` — attribute names to watch. No `data-ln-` prefix gate, no instance
+  gate — every mutation of a watched name calls `handler`, on any element.
+- `handler(el, attributeName, oldValue)`.
+- Installs onto the same shared `MutationObserver` used by `registerComponent`
+  (one observer on `document.body`, no `attributeFilter`).
+- A component using `observeAttributes` must **not** run its own attribute
+  `MutationObserver` alongside it — that duplicates delivery.
+- Two standing exceptions keep their own private observer instead of using
+  this: `ln-progress` (observes an attribute on its **parent**, outside the
+  host-only boundary the shared observer covers) and `ln-icon` (the only
+  component in the library that imports nothing — pulling in `helpers.js`'s
+  module-level side effects would roughly quadruple its standalone bundle
+  size). Neither is an oversight; do not migrate them.
+
+### defineAttrs(instance, dom, spec)
+
+Define live, getter-only properties on a component instance that read the DOM
+on every access. Pairs with the typed readers `attrStr` / `attrInt` /
+`attrBool` / `attrList`, all sharing the `(el, name, fallback)` shape.
+
+```js
+import { defineAttrs, attrInt, attrBool, attrList } from '../ln-core';
+
+defineAttrs(this, dom, {
+    _windowSize: [attrInt, 'data-ln-example-window', 1000],
+    _tags:       [attrList, 'data-ln-example-tags'],
+    noSync:      [attrBool, 'data-ln-example-no-sync']
+});
+```
+
+- `spec` — `{ propName: [reader, attributeName, fallback] }`.
+- `attrStr` — returns `fallback` when the attribute is absent, else the raw
+  string.
+- `attrInt` — `parseInt(..., 10)`; returns `fallback` on `NaN`. `"0"` stays
+  `0` — unlike the common `parseInt(attr, 10) || fallback` idiom, which maps
+  `"0"` to `fallback`. Check call sites relying on that idiom before swapping
+  them to `attrInt`.
+- `attrBool` — `el.hasAttribute(name)`.
+- `attrList` — `(el.getAttribute(name) || '').split(',').map(trim).filter(Boolean)`.
+  Allocates a new array per read — do not call inside a per-row loop.
+- `reader` can be any function of that `(el, name, fallback)` shape, so a
+  component can pass its own for special-cased parsing.
+- **Getter-only — assignment throws** (`TypeError`, strict mode). Nothing is
+  copied into instance state, so there is no state to invalidate and no sync
+  step; a drifting copy is structurally impossible. Before migrating an
+  existing `this.prop = ...` assignment to a `defineAttrs` getter, grep for
+  every place the codebase assigns to that property after construction — a
+  hit means the property is not a pure attribute mirror and does not belong
+  in the spec. (`ln-data-store`'s `windowed` is excluded for exactly this
+  reason: `destroy()` assigns `this.windowed = false`.)
+- **Attribute names must be inline string literals or a `const` bound to a
+  literal — never concatenated or templated.**
+  `scripts/sync-ln-schemas.mjs:22-23` is a raw regex over file text; a
+  constructed name is invisible to it and the CI docs gate breaks silently.
+
+### Frozen-attribute convention
+
+A **frozen attribute** is a constructor-only attribute — one that physically
+cannot be re-read at runtime (e.g. an IndexedDB schema fixed at open time).
+When a frozen attribute is edited after init, the component writes
+`data-ln-{component}-frozen` on its own host, with the attempted attribute
+name as the value, and a co-located `*-dev.scss` rule surfaces it through the
+`dev-dom-error` mixin under `[data-ln-debug]`. Never `console.warn` for this
+case — it is a CSS-only dev affordance. See `ln-data-store` for the reference
+implementation (`_markFrozen`, `ln-data-store-dev.scss`).
+
 ### holdInit() / releaseInit() / pendingCount() / queueBoot(fn)
 
 Boot gating primitives for asynchronous loading (such as external partial templates). Prevents components from initializing (sweeping the DOM) before all external resources have finished loading.

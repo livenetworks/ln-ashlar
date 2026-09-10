@@ -4,68 +4,68 @@ if (typeof window < "u") {
     typeof e[0] == "string" && (e[0].startsWith("[ln-") || e[0].startsWith("[lnCore")) && !(document.documentElement.hasAttribute("data-ln-debug") || document.body && document.body.hasAttribute("data-ln-debug")) || t.apply(console, e);
   };
 }
-const S = {};
-function R(t, e) {
-  S[t] || (S[t] = document.querySelector('[data-ln-template="' + t + '"]'));
-  const a = S[t];
-  return a ? a.content.cloneNode(!0) : (console.warn("[" + (e || "ln-core") + '] Template "' + t + '" not found'), null);
+const E = {};
+function V(t, e) {
+  E[t] || (E[t] = document.querySelector('[data-ln-template="' + t + '"]'));
+  const n = E[t];
+  return n ? n.content.cloneNode(!0) : (console.warn("[" + (e || "ln-core") + '] Template "' + t + '" not found'), null);
 }
-function _(t, e) {
+function M(t, e) {
   if (!t || !e) return t;
-  const a = t.querySelectorAll("[data-ln-field]");
-  for (let l = 0; l < a.length; l++) {
-    const i = a[l], o = i.getAttribute("data-ln-field");
-    e[o] != null && (i.textContent = e[o]);
-  }
-  const n = t.querySelectorAll("[data-ln-attr]");
+  const n = t.querySelectorAll("[data-ln-field]");
   for (let l = 0; l < n.length; l++) {
-    const i = n[l], o = i.getAttribute("data-ln-attr").split(",");
-    for (let s = 0; s < o.length; s++) {
-      const c = o[s].trim().split(":");
+    const i = n[l], d = i.getAttribute("data-ln-field");
+    e[d] != null && (i.textContent = e[d]);
+  }
+  const a = t.querySelectorAll("[data-ln-attr]");
+  for (let l = 0; l < a.length; l++) {
+    const i = a[l], d = i.getAttribute("data-ln-attr").split(",");
+    for (let s = 0; s < d.length; s++) {
+      const c = d[s].trim().split(":");
       if (c.length !== 2) continue;
-      const f = c[0].trim(), m = c[1].trim();
-      e[m] != null && i.setAttribute(f, e[m]);
+      const u = c[0].trim(), f = c[1].trim();
+      e[f] != null && i.setAttribute(u, e[f]);
     }
   }
-  const d = t.querySelectorAll("[data-ln-show]");
-  for (let l = 0; l < d.length; l++) {
-    const i = d[l], o = i.getAttribute("data-ln-show");
-    o in e && i.classList.toggle("hidden", !e[o]);
+  const o = t.querySelectorAll("[data-ln-show]");
+  for (let l = 0; l < o.length; l++) {
+    const i = o[l], d = i.getAttribute("data-ln-show");
+    d in e && i.classList.toggle("hidden", !e[d]);
   }
   const r = t.querySelectorAll("[data-ln-class]");
   for (let l = 0; l < r.length; l++) {
-    const i = r[l], o = i.getAttribute("data-ln-class").split(",");
-    for (let s = 0; s < o.length; s++) {
-      const c = o[s].trim().split(":");
+    const i = r[l], d = i.getAttribute("data-ln-class").split(",");
+    for (let s = 0; s < d.length; s++) {
+      const c = d[s].trim().split(":");
       if (c.length !== 2) continue;
-      const f = c[0].trim(), m = c[1].trim();
-      m in e && i.classList.toggle(f, !!e[m]);
+      const u = c[0].trim(), f = c[1].trim();
+      f in e && i.classList.toggle(u, !!e[f]);
     }
   }
   return t;
 }
-function U(t, e) {
+function z(t, e) {
   t.matches && t.matches("[data-ln-form], [data-ln-fillable]") && t.dispatchEvent(new CustomEvent("ln-fill", { detail: e ?? null, bubbles: !0 }));
-  const a = t.querySelectorAll("[data-ln-form], [data-ln-fillable]");
-  for (let n = 0; n < a.length; n++)
-    a[n].dispatchEvent(new CustomEvent("ln-fill", { detail: e ?? null, bubbles: !0 }));
+  const n = t.querySelectorAll("[data-ln-form], [data-ln-fillable]");
+  for (let a = 0; a < n.length; a++)
+    n[a].dispatchEvent(new CustomEvent("ln-fill", { detail: e ?? null, bubbles: !0 }));
   return t;
 }
 typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore._fillBound || (window.lnCore._fillBound = !0, document.addEventListener("ln-fill", function(t) {
   if (!(!t.target.matches || !t.target.matches("[data-ln-fillable]")))
     if (t.detail)
-      _(t.target, t.detail);
+      M(t.target, t.detail);
     else {
       const e = t.target.querySelectorAll("[data-ln-field]");
-      for (let a = 0; a < e.length; a++)
-        e[a].textContent = "";
+      for (let n = 0; n < e.length; n++)
+        e[n].textContent = "";
     }
 })));
-function T(t, e) {
+function $(t, e) {
   if (!t || !e) return t;
-  const a = document.createTreeWalker(t, NodeFilter.SHOW_TEXT);
-  for (; a.nextNode(); ) {
-    const r = a.currentNode;
+  const n = document.createTreeWalker(t, NodeFilter.SHOW_TEXT);
+  for (; n.nextNode(); ) {
+    const r = n.currentNode;
     r.textContent.indexOf("{{") !== -1 && (r.textContent = r.textContent.replace(
       /\{\{\s*(\w+)\s*\}\}/g,
       function(l, i) {
@@ -73,58 +73,58 @@ function T(t, e) {
       }
     ));
   }
-  const n = function(r, l) {
+  const a = function(r, l) {
     return e[l] !== void 0 ? e[l] : "";
-  }, d = Array.from(t.querySelectorAll("*"));
-  t.nodeType === 1 && d.push(t);
-  for (let r = 0; r < d.length; r++) {
-    const l = d[r], i = l.attributes;
-    for (let o = 0; o < i.length; o++) {
-      const s = i[o];
-      s.value.indexOf("{{") !== -1 && l.setAttribute(s.name, s.value.replace(/\{\{\s*(\w+)\s*\}\}/g, n));
+  }, o = Array.from(t.querySelectorAll("*"));
+  t.nodeType === 1 && o.push(t);
+  for (let r = 0; r < o.length; r++) {
+    const l = o[r], i = l.attributes;
+    for (let d = 0; d < i.length; d++) {
+      const s = i[d];
+      s.value.indexOf("{{") !== -1 && l.setAttribute(s.name, s.value.replace(/\{\{\s*(\w+)\s*\}\}/g, a));
     }
   }
   return t;
 }
-function H(t, e, a, n, d, r) {
+function Q(t, e, n, a, o, r) {
   const l = {};
-  for (let o = 0; o < t.children.length; o++) {
-    const s = t.children[o], c = s.getAttribute("data-ln-render-key");
+  for (let d = 0; d < t.children.length; d++) {
+    const s = t.children[d], c = s.getAttribute("data-ln-render-key");
     c && (l[c] = s);
   }
   const i = document.createDocumentFragment();
-  for (let o = 0; o < e.length; o++) {
-    const s = e[o], c = String(n(s));
-    let f = l[c];
-    if (f)
-      d(f, s, o);
+  for (let d = 0; d < e.length; d++) {
+    const s = e[d], c = String(a(s));
+    let u = l[c];
+    if (u)
+      o(u, s, d);
     else {
-      const m = R(a, r);
-      if (!m || (T(m, s), f = m.firstElementChild, !f)) continue;
-      f.setAttribute("data-ln-render-key", c), d(f, s, o);
+      const f = V(n, r);
+      if (!f || ($(f, s), u = f.firstElementChild, !u)) continue;
+      u.setAttribute("data-ln-render-key", c), o(u, s, d);
     }
-    i.appendChild(f);
+    i.appendChild(u);
   }
   t.textContent = "", t.appendChild(i);
 }
-function k(t, e) {
+function A(t, e) {
   if (!document.body) {
     document.addEventListener("DOMContentLoaded", function() {
-      k(t, e);
+      A(t, e);
     }), console.warn("[" + e + '] Script loaded before <body> — add "defer" to your <script> tag');
     return;
   }
   t();
 }
-function D(t, e, a, n) {
+function O(t, e, n, a) {
   if (t.nodeType !== 1) return;
   const r = e.indexOf("[") !== -1 || e.indexOf(".") !== -1 || e.indexOf("#") !== -1 ? e : "[" + e + "]", l = Array.from(t.querySelectorAll(r));
   t.matches && t.matches(r) && l.push(t);
   for (const i of l)
-    i[a] || (i[a] = new n(i));
+    i[n] || (i[n] = new a(i));
 }
-function z() {
-  typeof window > "u" || (window.lnCore = window.lnCore || {}, !window.lnCore._localeObserverBound && (window.lnCore._localeObserverBound = !0, k(function() {
+function K() {
+  typeof window > "u" || (window.lnCore = window.lnCore || {}, !window.lnCore._localeObserverBound && (window.lnCore._localeObserverBound = !0, A(function() {
     new MutationObserver(function() {
       document.dispatchEvent(new CustomEvent("ln-core:locale-change", {
         bubbles: !0,
@@ -138,89 +138,139 @@ function z() {
   }, "ln-core")));
 }
 typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore._bootHolds = window.lnCore._bootHolds || 0, window.lnCore._bootQueue = window.lnCore._bootQueue || []);
-function $() {
+function N() {
   return typeof window < "u" && window.lnCore && window.lnCore._bootHolds || 0;
 }
-function M(t) {
+function j(t) {
   typeof window < "u" ? (window.lnCore = window.lnCore || {}, window.lnCore._bootHolds = window.lnCore._bootHolds || 0, window.lnCore._bootQueue = window.lnCore._bootQueue || [], window.lnCore._bootHolds > 0 ? window.lnCore._bootQueue.push(t) : setTimeout(t, 0)) : t();
 }
-function Q(t, e, a, n, d = {}) {
-  const r = d.extraAttributes || [], l = d.onAttributeChange || null, i = d.onSubtreeChange || null, o = d.onInit || null;
-  function s(f) {
-    const m = f || document.body;
-    D(m, t, e, a), o && o(m);
+function W() {
+  return window.lnCore = window.lnCore || {}, window.lnCore._attrRegistry = window.lnCore._attrRegistry || { byAttr: /* @__PURE__ */ new Map(), reactive: [] }, window.lnCore._attrRegistry;
+}
+function G(t) {
+  const e = W(), n = t.observed || [];
+  for (let a = 0; a < n.length; a++) {
+    const o = n[a];
+    e.byAttr.has(o) || e.byAttr.set(o, []), e.byAttr.get(o).push(t);
   }
-  k(function() {
-    const f = new MutationObserver(function(w) {
-      for (let b = 0; b < w.length; b++) {
-        const u = w[b];
-        if (u.type === "childList") {
-          if (i && u.target) {
-            const p = t.indexOf("[") !== -1 || t.indexOf(".") !== -1 || t.indexOf("#") !== -1 ? t : "[" + t + "]", C = u.target.nodeType === 1 ? u.target.matches(p) ? u.target : u.target.closest(p) : u.target.parentElement ? u.target.parentElement.closest(p) : null;
-            C && i(C, u);
+  (t.onAttrChange || t.effects) && e.reactive.push(t);
+}
+function P(t) {
+  const e = t.target, n = t.attributeName;
+  if (t.oldValue === e.getAttribute(n)) return;
+  const a = W(), o = a.byAttr.get(n);
+  if (n.indexOf("data-ln-") === 0)
+    for (let r = 0; r < a.reactive.length; r++) {
+      const l = a.reactive[r];
+      if (!e[l.attribute]) continue;
+      const i = l.effects && l.effects[n];
+      i ? i(e, n, t.oldValue) : l.onAttrChange && l.onAttrChange(e, n, t.oldValue);
+    }
+  if (o)
+    for (let r = 0; r < o.length; r++) {
+      const l = o[r];
+      if (l.handler) {
+        l.handler(e, n, t.oldValue);
+        continue;
+      }
+      l.onAttributeChange && e[l.attribute] ? l.onAttributeChange(e, n) : (O(e, l.selector, l.attribute, l.ComponentFn), l.onInit && l.onInit(e));
+    }
+}
+function X() {
+  window.lnCore = window.lnCore || {}, !window.lnCore._attrObserverBound && (window.lnCore._attrObserverBound = !0, A(function() {
+    new MutationObserver(function(e) {
+      for (let n = 0; n < e.length; n++)
+        P(e[n]);
+    }).observe(document.body, {
+      attributes: !0,
+      subtree: !0,
+      attributeOldValue: !0
+    });
+  }, "ln-core"));
+}
+function J(t, e, n, a, o = {}) {
+  const r = o.extraAttributes || [], l = o.onAttributeChange || null, i = o.onSubtreeChange || null, d = o.onInit || null, s = o.onAttrChange || null, c = o.effects || null;
+  function u(y) {
+    const h = y || document.body;
+    O(h, t, e, n), d && d(h);
+  }
+  const f = [];
+  if (t.indexOf("[") !== -1) {
+    const y = /\[([\w-]+)/g;
+    let h;
+    for (; (h = y.exec(t)) !== null; )
+      f.push(h[1]);
+  } else
+    f.push(t);
+  G({
+    selector: t,
+    attribute: e,
+    ComponentFn: n,
+    onInit: d,
+    observed: f.concat(r),
+    onAttributeChange: l,
+    onAttrChange: s,
+    effects: c
+  }), X(), A(function() {
+    new MutationObserver(function(h) {
+      for (let v = 0; v < h.length; v++) {
+        const m = h[v];
+        if (m.type === "childList") {
+          if (i && m.target) {
+            const p = t.indexOf("[") !== -1 || t.indexOf(".") !== -1 || t.indexOf("#") !== -1 ? t : "[" + t + "]", x = m.target.nodeType === 1 ? m.target.matches(p) ? m.target : m.target.closest(p) : m.target.parentElement ? m.target.parentElement.closest(p) : null;
+            x && i(x, m);
           }
-          for (let h = 0; h < u.addedNodes.length; h++) {
-            const p = u.addedNodes[h];
-            p.nodeType === 1 && (D(p, t, e, a), o && o(p));
+          for (let w = 0; w < m.addedNodes.length; w++) {
+            const p = m.addedNodes[w];
+            p.nodeType === 1 && (O(p, t, e, n), d && d(p));
           }
-          for (let h = 0; h < u.removedNodes.length; h++) {
-            const p = u.removedNodes[h];
+          for (let w = 0; w < m.removedNodes.length; w++) {
+            const p = m.removedNodes[w];
             if (p.nodeType === 1) {
-              const I = t.indexOf("[") !== -1 || t.indexOf(".") !== -1 || t.indexOf("#") !== -1 ? t : "[" + t + "]", v = Array.from(p.querySelectorAll(I));
-              p.matches && p.matches(I) && v.push(p);
-              for (let x = 0; x < v.length; x++) {
-                const O = v[x];
-                if (!document.contains(O)) {
-                  const A = O[e];
-                  A && typeof A.destroy == "function" && A.destroy();
+              const q = t.indexOf("[") !== -1 || t.indexOf(".") !== -1 || t.indexOf("#") !== -1 ? t : "[" + t + "]", S = Array.from(p.querySelectorAll(q));
+              p.matches && p.matches(q) && S.push(p);
+              for (let D = 0; D < S.length; D++) {
+                const T = S[D];
+                if (!document.contains(T)) {
+                  const _ = T[e];
+                  _ && typeof _.destroy == "function" && _.destroy();
                 }
               }
             }
           }
-        } else u.type === "attributes" && (l && u.target[e] ? l(u.target, u.attributeName) : (D(u.target, t, e, a), o && o(u.target)));
+        }
       }
-    });
-    let m = [];
-    if (t.indexOf("[") !== -1) {
-      const w = /\[([\w-]+)/g;
-      let b;
-      for (; (b = w.exec(t)) !== null; )
-        m.push(b[1]);
-    } else
-      m.push(t);
-    f.observe(document.body, {
+    }).observe(document.body, {
       childList: !0,
-      subtree: !0,
-      attributes: !0,
-      attributeFilter: m.concat(r)
+      subtree: !0
     });
-  }, n), window[e] = s;
-  function c() {
-    $() > 0 ? M(function() {
-      s(document.body);
-    }) : s(document.body);
+  }, a), window[e] = u;
+  function g() {
+    N() > 0 ? j(function() {
+      u(document.body);
+    }) : u(document.body);
   }
-  return document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", c) : c(), s;
+  return document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", g) : g(), u;
 }
-const N = {};
-function K(t, e) {
-  N[t] = e;
+const R = {};
+function Y(t, e) {
+  R[t] = e;
 }
-function G(t) {
-  return N[t] || { ingress: (e) => e, egress: (e) => e };
+function Z(t) {
+  return R[t] || { ingress: (e) => e, egress: (e) => e };
 }
-const j = {};
-function W(t, e) {
+const B = {};
+function F(t, e) {
   if (!t || typeof e != "object") return;
-  const a = t.toLowerCase().split("-")[0];
-  j[a] = e;
+  const n = t.toLowerCase().split("-")[0];
+  B[n] = e;
 }
-function V(t) {
+function tt(t) {
   if (!t) return null;
   const e = t.toLowerCase().split("-")[0];
-  return j[e] || null;
+  return B[e] || null;
 }
-W("mk", {
+F("mk", {
   monthsLong: [
     "јануари",
     "февруари",
@@ -268,76 +318,76 @@ W("mk", {
     "саб"
   ]
 });
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerDataMapper = K, window.lnCore.getDataMapper = G, window.lnCore.registerLocaleFallback = W, window.lnCore.getLocaleFallback = V, window.lnCore.fillTemplate = T, window.lnCore.fill = _, window.lnCore.lnFill = U, window.lnCore.renderList = H, window.lnCore.ensureLocaleObserver = z);
-function B(t) {
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerDataMapper = Y, window.lnCore.getDataMapper = Z, window.lnCore.registerLocaleFallback = F, window.lnCore.getLocaleFallback = tt, window.lnCore.fillTemplate = $, window.lnCore.fill = M, window.lnCore.lnFill = z, window.lnCore.renderList = Q, window.lnCore.ensureLocaleObserver = K);
+function U(t) {
   return (t || "").replace(/^#/, "");
 }
 function L(t) {
-  const e = t === void 0 ? location.hash : t, a = {}, n = B(e);
-  if (!n) return a;
-  const d = n.split("&");
-  for (let r = 0; r < d.length; r++) {
-    const l = d[r];
+  const e = t === void 0 ? location.hash : t, n = {}, a = U(e);
+  if (!a) return n;
+  const o = a.split("&");
+  for (let r = 0; r < o.length; r++) {
+    const l = o[r];
     if (!l) continue;
-    const i = l.indexOf(":"), o = i > -1 ? l.slice(0, i) : l, s = i > -1 ? l.slice(i + 1) : "";
-    if (o)
+    const i = l.indexOf(":"), d = i > -1 ? l.slice(0, i) : l, s = i > -1 ? l.slice(i + 1) : "";
+    if (d)
       try {
-        a[o] = decodeURIComponent(s);
+        n[d] = decodeURIComponent(s);
       } catch {
-        a[o] = s;
+        n[d] = s;
       }
   }
-  return a;
+  return n;
 }
-function P(t) {
+function et(t) {
   if (!t) return null;
   const e = L();
   return t in e ? e[t] : null;
 }
-function X(t, e) {
+function nt(t, e) {
   if (!t) return;
-  const a = L();
-  e == null ? delete a[t] : a[t] = String(e);
-  const d = Object.keys(a).map(function(r) {
-    const l = a[r];
+  const n = L();
+  e == null ? delete n[t] : n[t] = String(e);
+  const o = Object.keys(n).map(function(r) {
+    const l = n[r];
     return l === "" ? r : r + ":" + encodeURIComponent(l);
   }).join("&");
-  B(location.hash) !== d && (location.hash = d);
+  U(location.hash) !== o && (location.hash = o);
 }
-function J(t) {
+function at(t) {
   return t.button === 1 || t.ctrlKey || t.metaKey || t.shiftKey ? !1 : (t.preventDefault(), !0);
 }
-function Y(t, e) {
+function lt(t, e) {
   if (!t || !t.hasAttribute("data-ln-hash")) return null;
-  const a = t.getAttribute("data-ln-hash");
-  if (a && a.trim() !== "") return a.trim();
-  const n = t.getAttribute("data-ln-sort") || t.getAttribute("data-ln-search-for") || t.getAttribute("data-ln-search") || t.getAttribute("data-ln-filter") || t.id;
-  return n ? e ? n + "-" + e : n : e || null;
+  const n = t.getAttribute("data-ln-hash");
+  if (n && n.trim() !== "") return n.trim();
+  const a = t.getAttribute("data-ln-sort") || t.getAttribute("data-ln-search-for") || t.getAttribute("data-ln-search") || t.getAttribute("data-ln-filter") || t.id;
+  return a ? e ? a + "-" + e : a : e || null;
 }
-function Z(t, e) {
+function ot(t, e) {
   return !e || e === "none" || t === null || t === void 0 ? null : String(t) + "." + e;
 }
-function tt(t) {
+function rt(t) {
   return !t || typeof t != "string" ? null : t.endsWith(".asc") ? { fieldOrColumn: t.slice(0, -4), direction: "asc" } : t.endsWith(".desc") ? { fieldOrColumn: t.slice(0, -5), direction: "desc" } : null;
 }
-function et(t, e) {
+function dt(t, e) {
   return !t || !Array.isArray(e) || e.length === 0 ? null : t + ":" + e.map(encodeURIComponent).join(",");
 }
-function nt(t) {
+function it(t) {
   if (!t || typeof t != "string") return null;
   const e = t.indexOf(":");
   if (e === -1) return null;
-  const a = t.slice(0, e), n = t.slice(e + 1), d = n ? n.split(",").map(function(r) {
+  const n = t.slice(0, e), a = t.slice(e + 1), o = a ? a.split(",").map(function(r) {
     try {
       return decodeURIComponent(r);
     } catch {
       return r;
     }
   }).filter(Boolean) : [];
-  return { key: a, values: d };
+  return { key: n, values: o };
 }
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.hashParse = L, window.lnCore.hashGet = P, window.lnCore.hashSet = X, window.lnCore.hashLinkClick = J, window.lnCore.resolveHashNamespace = Y, window.lnCore.hashSortEncode = Z, window.lnCore.hashSortDecode = tt, window.lnCore.hashFilterEncode = et, window.lnCore.hashFilterDecode = nt);
-const q = /* @__PURE__ */ new Set([
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.hashParse = L, window.lnCore.hashGet = et, window.lnCore.hashSet = nt, window.lnCore.hashLinkClick = at, window.lnCore.resolveHashNamespace = lt, window.lnCore.hashSortEncode = ot, window.lnCore.hashSortDecode = rt, window.lnCore.hashFilterEncode = dt, window.lnCore.hashFilterDecode = it);
+const I = /* @__PURE__ */ new Set([
   "data-ln-accordion",
   "data-ln-ajax",
   "data-ln-api-base-url",
@@ -393,6 +443,7 @@ const q = /* @__PURE__ */ new Set([
   "data-ln-data-coordinator-stale",
   "data-ln-data-mapper",
   "data-ln-data-store",
+  "data-ln-data-store-frozen",
   "data-ln-data-store-indexes",
   "data-ln-data-store-no-autosync",
   "data-ln-data-store-no-local-query",
@@ -610,205 +661,205 @@ const q = /* @__PURE__ */ new Set([
   "data-ln-value",
   "data-ln-websocket-connector"
 ]);
-function at(t, e) {
+function st(t, e) {
   if (t === e) return 0;
   if (!t.length) return e.length;
   if (!e.length) return t.length;
-  const a = [];
-  for (let n = 0; n <= e.length; n++) a[n] = [n];
-  for (let n = 0; n <= t.length; n++) a[0][n] = n;
-  for (let n = 1; n <= e.length; n++)
-    for (let d = 1; d <= t.length; d++)
-      e.charAt(n - 1) === t.charAt(d - 1) ? a[n][d] = a[n - 1][d - 1] : a[n][d] = Math.min(
-        a[n - 1][d - 1] + 1,
-        a[n][d - 1] + 1,
-        a[n - 1][d] + 1
+  const n = [];
+  for (let a = 0; a <= e.length; a++) n[a] = [a];
+  for (let a = 0; a <= t.length; a++) n[0][a] = a;
+  for (let a = 1; a <= e.length; a++)
+    for (let o = 1; o <= t.length; o++)
+      e.charAt(a - 1) === t.charAt(o - 1) ? n[a][o] = n[a - 1][o - 1] : n[a][o] = Math.min(
+        n[a - 1][o - 1] + 1,
+        n[a][o - 1] + 1,
+        n[a - 1][o] + 1
       );
-  return a[e.length][t.length];
+  return n[e.length][t.length];
 }
-function lt(t, e = q) {
+function ct(t, e = I) {
   if (e.has(t)) return null;
-  let a = null, n = 1 / 0;
+  let n = null, a = 1 / 0;
   for (const r of e) {
-    const l = at(t, r);
-    l < n && (n = l, a = r);
+    const l = st(t, r);
+    l < a && (a = l, n = r);
   }
-  const d = Math.max(3, Math.floor(t.length * 0.4));
-  return n <= d ? a : null;
+  const o = Math.max(3, Math.floor(t.length * 0.4));
+  return a <= o ? n : null;
 }
-function F(t) {
+function H(t) {
   return typeof CSS < "u" && CSS.escape ? CSS.escape(t) : t.replace(/([!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~])/g, "\\$1");
 }
-function ot(t = document) {
-  const e = t.ownerDocument || t, a = t.nodeType === 9 ? t.body || t.documentElement : t;
-  if (!a) return [];
-  const n = [], d = [a, ...a.querySelectorAll("*")];
-  for (let r = 0; r < d.length; r++) {
-    const l = d[r];
+function ut(t = document) {
+  const e = t.ownerDocument || t, n = t.nodeType === 9 ? t.body || t.documentElement : t;
+  if (!n) return [];
+  const a = [], o = [n, ...n.querySelectorAll("*")];
+  for (let r = 0; r < o.length; r++) {
+    const l = o[r];
     if (l.attributes)
       for (let i = 0; i < l.attributes.length; i++) {
-        const o = l.attributes[i];
-        if (o.name.startsWith("data-ln-") && o.name.endsWith("-for")) {
-          const s = (o.value || "").trim();
+        const d = l.attributes[i];
+        if (d.name.startsWith("data-ln-") && d.name.endsWith("-for")) {
+          const s = (d.value || "").trim();
           if (!s) {
-            n.push({
+            a.push({
               type: "id-empty",
               element: l,
-              attribute: o.name,
+              attribute: d.name,
               targetId: "",
-              message: `[ln-debug] Empty ID reference in <${l.tagName.toLowerCase()} ${o.name}="">.`
+              message: `[ln-debug] Empty ID reference in <${l.tagName.toLowerCase()} ${d.name}="">.`
             });
             continue;
           }
-          e.getElementById(s) || e.querySelector("#" + F(s)) || n.push({
+          e.getElementById(s) || e.querySelector("#" + H(s)) || a.push({
             type: "id-unresolved",
             element: l,
-            attribute: o.name,
+            attribute: d.name,
             targetId: s,
-            message: `[ln-debug] Unresolved ID reference: <${l.tagName.toLowerCase()} ${o.name}="${s}"> targets "#${s}", but no element with id="${s}" exists in the document.`
+            message: `[ln-debug] Unresolved ID reference: <${l.tagName.toLowerCase()} ${d.name}="${s}"> targets "#${s}", but no element with id="${s}" exists in the document.`
           });
         }
       }
   }
-  return n;
+  return a;
 }
-function dt(t = document) {
-  const e = t.ownerDocument || t, a = t.nodeType === 9 ? t.body || t.documentElement : t;
-  if (!a) return [];
-  const n = [], d = [a, ...a.querySelectorAll("*")];
-  for (let r = 0; r < d.length; r++) {
-    const l = d[r];
+function ft(t = document) {
+  const e = t.ownerDocument || t, n = t.nodeType === 9 ? t.body || t.documentElement : t;
+  if (!n) return [];
+  const a = [], o = [n, ...n.querySelectorAll("*")];
+  for (let r = 0; r < o.length; r++) {
+    const l = o[r];
     if (l.attributes)
       for (let i = 0; i < l.attributes.length; i++) {
-        const o = l.attributes[i];
-        if (o.name.startsWith("data-ln-") && (o.name.endsWith("-source") || o.name.endsWith("-store")) && o.name !== "data-ln-data-store") {
-          const c = (o.value || "").trim();
+        const d = l.attributes[i];
+        if (d.name.startsWith("data-ln-") && (d.name.endsWith("-source") || d.name.endsWith("-store")) && d.name !== "data-ln-data-store") {
+          const c = (d.value || "").trim();
           if (!c) {
-            n.push({
+            a.push({
               type: "store-empty",
               element: l,
-              attribute: o.name,
+              attribute: d.name,
               storeName: "",
-              message: `[ln-debug] Empty store reference in <${l.tagName.toLowerCase()} ${o.name}="">.`
+              message: `[ln-debug] Empty store reference in <${l.tagName.toLowerCase()} ${d.name}="">.`
             });
             continue;
           }
-          const f = F(c), m = e.querySelector(`[data-ln-data-store="${f}"], [data-ln-store="${f}"]`), w = typeof window < "u" && window.lnDataStore && typeof window.lnDataStore.getStore == "function" && window.lnDataStore.getStore(c);
-          !m && !w && n.push({
+          const u = H(c), f = e.querySelector(`[data-ln-data-store="${u}"], [data-ln-store="${u}"]`), g = typeof window < "u" && window.lnDataStore && typeof window.lnDataStore.getStore == "function" && window.lnDataStore.getStore(c);
+          !f && !g && a.push({
             type: "store-unresolved",
             element: l,
-            attribute: o.name,
+            attribute: d.name,
             storeName: c,
-            message: `[ln-debug] Unresolved store reference: <${l.tagName.toLowerCase()} ${o.name}="${c}"> targets store "${c}", but no [data-ln-data-store="${c}"] exists in the document.`
+            message: `[ln-debug] Unresolved store reference: <${l.tagName.toLowerCase()} ${d.name}="${c}"> targets store "${c}", but no [data-ln-data-store="${c}"] exists in the document.`
           });
         }
       }
   }
-  return n;
+  return a;
 }
-function rt(t = document) {
+function mt(t = document) {
   t.ownerDocument;
   const e = t.nodeType === 9 ? t.body || t.documentElement : t;
   if (!e) return [];
-  const a = [], n = Array.from(e.querySelectorAll("[data-ln-data-store]"));
-  e.hasAttribute && e.hasAttribute("data-ln-data-store") && n.unshift(e);
-  const d = /* @__PURE__ */ new Map();
-  for (let r = 0; r < n.length; r++) {
-    const l = n[r], i = (l.getAttribute("data-ln-data-store") || "").trim();
-    i && (d.has(i) || d.set(i, []), d.get(i).push(l));
+  const n = [], a = Array.from(e.querySelectorAll("[data-ln-data-store]"));
+  e.hasAttribute && e.hasAttribute("data-ln-data-store") && a.unshift(e);
+  const o = /* @__PURE__ */ new Map();
+  for (let r = 0; r < a.length; r++) {
+    const l = a[r], i = (l.getAttribute("data-ln-data-store") || "").trim();
+    i && (o.has(i) || o.set(i, []), o.get(i).push(l));
   }
-  for (const [r, l] of d.entries())
-    l.length > 1 && a.push({
+  for (const [r, l] of o.entries())
+    l.length > 1 && n.push({
       type: "store-duplicate",
       storeName: r,
       elements: l,
       message: `[ln-debug] Duplicate store name: Multiple elements declare data-ln-data-store="${r}". Store names must be unique across the document.`
     });
-  return a;
+  return n;
 }
-function it(t = document, e = q) {
-  const a = t.nodeType === 9 ? t.body || t.documentElement : t;
-  if (!a) return [];
-  const n = [], d = [a, ...a.querySelectorAll("*")];
-  for (let r = 0; r < d.length; r++) {
-    const l = d[r];
+function pt(t = document, e = I) {
+  const n = t.nodeType === 9 ? t.body || t.documentElement : t;
+  if (!n) return [];
+  const a = [], o = [n, ...n.querySelectorAll("*")];
+  for (let r = 0; r < o.length; r++) {
+    const l = o[r];
     if (l.attributes)
       for (let i = 0; i < l.attributes.length; i++) {
-        const o = l.attributes[i];
-        if (o.name.startsWith("data-ln-") && !e.has(o.name)) {
-          const s = lt(o.name, e), c = s ? ` Did you mean "${s}"?` : "";
-          n.push({
+        const d = l.attributes[i];
+        if (d.name.startsWith("data-ln-") && !e.has(d.name)) {
+          const s = ct(d.name, e), c = s ? ` Did you mean "${s}"?` : "";
+          a.push({
             type: "attribute-unknown",
             element: l,
-            attribute: o.name,
+            attribute: d.name,
             suggestion: s,
-            message: `[ln-debug] Unknown attribute "${o.name}" on <${l.tagName.toLowerCase()}>.${c}`
+            message: `[ln-debug] Unknown attribute "${d.name}" on <${l.tagName.toLowerCase()}>.${c}`
           });
         }
       }
   }
-  return n;
+  return a;
 }
-function E(t = typeof document < "u" ? document : null, e = {}) {
+function k(t = typeof document < "u" ? document : null, e = {}) {
   if (!t)
     return { idIssues: [], storeIssues: [], uniquenessIssues: [], spellingIssues: [], total: 0 };
-  const a = e.validAttributes || q, n = ot(t), d = dt(t), r = rt(t), l = it(t, a), i = [
-    ...n,
-    ...d,
+  const n = e.validAttributes || I, a = ut(t), o = ft(t), r = mt(t), l = pt(t, n), i = [
+    ...a,
+    ...o,
     ...r,
     ...l
   ];
   if (!e.silent)
-    for (let o = 0; o < i.length; o++)
-      console.warn(i[o].message);
+    for (let d = 0; d < i.length; d++)
+      console.warn(i[d].message);
   return {
-    idIssues: n,
-    storeIssues: d,
+    idIssues: a,
+    storeIssues: o,
     uniquenessIssues: r,
     spellingIssues: l,
     total: i.length
   };
 }
-let g = null;
-function y(t = typeof document < "u" ? document : null, e = 50, a = null) {
+let b = null;
+function C(t = typeof document < "u" ? document : null, e = 50, n = null) {
   if (!t) return;
-  g && (clearTimeout(g), g = null);
-  function n() {
-    g = setTimeout(() => {
-      g = null;
-      const d = E(t);
-      a && a(d);
+  b && (clearTimeout(b), b = null);
+  function a() {
+    b = setTimeout(() => {
+      b = null;
+      const o = k(t);
+      n && n(o);
     }, e);
   }
-  $() > 0 ? M(n) : n();
+  N() > 0 ? j(a) : a();
 }
 (function() {
   const t = "data-ln-debug", e = "lnDebug";
   if (typeof window < "u" && window[e] !== void 0) return;
-  function a(n) {
-    return this.dom = n, y(n.ownerDocument || document), this;
+  function n(a) {
+    return this.dom = a, C(a.ownerDocument || document), this;
   }
-  a.prototype.verify = function(n, d) {
-    return E(n || (this.dom ? this.dom.ownerDocument || this.dom : document), d);
-  }, a.prototype.destroy = function() {
+  n.prototype.verify = function(a, o) {
+    return k(a || (this.dom ? this.dom.ownerDocument || this.dom : document), o);
+  }, n.prototype.destroy = function() {
     delete this.dom[e];
   }, typeof window < "u" && (window.lnDebug = {
-    verify: function(n, d) {
-      return E(n || document, d);
+    verify: function(a, o) {
+      return k(a || document, o);
     },
-    schedule: function(n, d, r) {
-      return y(n || document, d, r);
+    schedule: function(a, o, r) {
+      return C(a || document, o, r);
     }
-  }), Q(t, e, a, "ln-debug", {
-    onInit: function(n) {
-      typeof document < "u" && y(n && n.ownerDocument ? n.ownerDocument : document);
+  }), J(t, e, n, "ln-debug", {
+    onInit: function(a) {
+      typeof document < "u" && C(a && a.ownerDocument ? a.ownerDocument : document);
     },
-    onSubtreeChange: function(n) {
-      typeof document < "u" && y(n && n.ownerDocument ? n.ownerDocument : document);
+    onSubtreeChange: function(a) {
+      typeof document < "u" && C(a && a.ownerDocument ? a.ownerDocument : document);
     }
   });
 })();
 export {
-  y as scheduleVerification,
-  E as verifyDOM
+  C as scheduleVerification,
+  k as verifyDOM
 };

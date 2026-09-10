@@ -1,4 +1,4 @@
-import { dispatchCancelable, guardBody } from '../../ln-core';
+import { dispatchCancelable, guardBody, observeAttributes } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-link';
@@ -169,21 +169,21 @@ import { dispatchCancelable, guardBody } from '../../ln-core';
 								}
 							}
 						}
-					} else if (mutation.type === 'attributes') {
-						if (mutation.target.hasAttribute && mutation.target.hasAttribute(DOM_SELECTOR)) {
-							findElements(mutation.target);
-						} else {
-							_destroyContainer(mutation.target);
-						}
 					}
 				}
 			});
 
 			observer.observe(document.body, {
 				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: [DOM_SELECTOR]
+				subtree: true
+			});
+
+			observeAttributes([DOM_SELECTOR], function (el) {
+				if (el.hasAttribute && el.hasAttribute(DOM_SELECTOR)) {
+					findElements(el);
+				} else {
+					_destroyContainer(el);
+				}
 			});
 		}, 'ln-link');
 	}

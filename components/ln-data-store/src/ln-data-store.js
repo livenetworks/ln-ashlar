@@ -1,4 +1,4 @@
-import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, decryptData } from '../../ln-core';
+import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, decryptData, defineAttrs, attrInt, attrBool, attrList } from '../../ln-core';
 import { createWindowIndex } from './window-index.js';
 import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from './data-store-model.js';
 
@@ -204,17 +204,26 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 
 	// ─── Component Constructor ─────────────────────────────
 
+	// 'never' / '-1' mean "no staleness", everything unparsable means the default.
+	function _readStale(el, name, fallback) {
+		const raw = el.getAttribute(name);
+		if (raw === 'never' || raw === '-1') return -1;
+		const parsed = parseInt(raw, 10);
+		return isNaN(parsed) ? fallback : parsed;
+	}
+
 	function _component(dom) {
 		this.dom = dom;
 		this._name = dom.id;
 		if (!this._name) console.warn('[ln-data-store] missing id — the store cannot be addressed', dom);
 
-		const staleAttr = dom.getAttribute('data-ln-data-store-stale');
-		const _parsed = parseInt(staleAttr, 10);
-		this._staleThreshold = (staleAttr === 'never' || staleAttr === '-1') ? -1 : (isNaN(_parsed) ? 300 : _parsed);
-
-		const searchAttr = dom.getAttribute('data-ln-data-store-search-fields') || '';
-		this._searchFields = searchAttr.split(',').map(s => s.trim()).filter(Boolean);
+		defineAttrs(this, dom, {
+			_staleThreshold: [_readStale, 'data-ln-data-store-stale', 300],
+			_searchFields:   [attrList,   'data-ln-data-store-search-fields'],
+			noLocalQuery:    [attrBool,   NO_LOCAL_QUERY_ATTR],
+			_windowSize:     [attrInt,    'data-ln-data-store-window', 1000],
+			_windowPageSize: [attrInt,    'data-ln-data-store-window-page', 200]
+		});
 
 		this._handlers = null;
 
@@ -230,13 +239,10 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 		this.isSyncing = false;
 		this.lastSyncedAt = null;
 		this.query = { filters: {}, search: '', sort: null };
-		const winAttr = dom.getAttribute('data-ln-data-store-window');
-		if (winAttr !== null) {
-			const winSize = parseInt(winAttr, 10) || 1000;
-			const pageSize = parseInt(dom.getAttribute('data-ln-data-store-window-page'), 10) || 200;
+		if (dom.hasAttribute('data-ln-data-store-window')) {
 			this._windowIndex = createWindowIndex({
-				windowSize: winSize,
-				pageSize: pageSize,
+				windowSize: this._windowSize,
+				pageSize: this._windowPageSize,
 				requestPage: (offset, limit, query) => {
 					dispatch(this.dom, 'ln-data-store:request-page', {
 						store: this._name,
@@ -252,8 +258,7 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 		}
 		this.windowed = this._windowIndex !== null;
 		// Opt out of answering reads from the cache: queries wait for the server.
-		// Read live so it can be flipped per situation — see onAttributeChange.
-		this.noLocalQuery = dom.hasAttribute(NO_LOCAL_QUERY_ATTR);
+		// Read live off the host — see the effects map at registration.
 		this.totalCount = 0;
 		this.presenters = null;
 		this._mutationChain = Promise.resolve();
@@ -903,18 +908,39 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 
 	// ─── Registration ──────────────────────────────────────
 
-	// The opt-out is policy for the next read, so a flip needs no invalidation —
-	// nothing already delivered becomes wrong, the following query just resolves
-	// under the new rule.
-	function _syncAttribute(el, attrName) {
-		const instance = el[DOM_ATTRIBUTE];
-		if (!instance || attrName !== NO_LOCAL_QUERY_ATTR) return;
-		instance.noLocalQuery = el.hasAttribute(NO_LOCAL_QUERY_ATTR);
+	const FROZEN_ATTR = 'data-ln-data-store-frozen';
+
+	// The IndexedDB schema and the store's registered name are fixed at open
+	// time: createIndex is only legal inside a versionchange transaction
+	// (see onupgradeneeded, :85-94). A post-init edit is recorded on the host
+	// for the dev stylesheet to surface; nothing is applied.
+	function _markFrozen(el, attrName) {
+		el.setAttribute(FROZEN_ATTR, attrName);
+	}
+
+	// Shrinking the window drops positions; the records behind them stop being
+	// held, exactly as on ingest (:757-758), so they leave IndexedDB too.
+	function _applyWindowSize(el) {
+		const inst = el[DOM_ATTRIBUTE];
+		if (!inst._windowIndex) return;
+		const evicted = inst._windowIndex.configure({ windowSize: inst._windowSize });
+		if (evicted.length) {
+			_deleteBulk(inst._name, evicted).catch(err => {
+				console.error('[ln-data-store] window shrink eviction failed:', err);
+			});
+		}
 	}
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-data-store', {
-		extraAttributes: [NO_LOCAL_QUERY_ATTR],
-		onAttributeChange: _syncAttribute
+		effects: {
+			'data-ln-data-store-window': _applyWindowSize,
+			'data-ln-data-store-window-page': el => {
+				const inst = el[DOM_ATTRIBUTE];
+				if (inst._windowIndex) inst._windowIndex.configure({ pageSize: inst._windowPageSize });
+			},
+			'data-ln-data-store-indexes': _markFrozen,
+			'data-ln-data-store': _markFrozen
+		}
 	});
 
 	window[DOM_ATTRIBUTE].clearAll = _clearAll;

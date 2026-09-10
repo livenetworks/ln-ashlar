@@ -67,6 +67,26 @@ test('createWindowIndex reset() bumps queryGen and drops in-flight responses', (
 	assert.equal(index.getId(0), undefined); // dropped
 });
 
+test('createWindowIndex configure() returns ids evicted by a window shrink', () => {
+	const index = createWindowIndex({
+		windowSize: 5,
+		pageSize: 2,
+		threshold: 0,
+		fetchDebounce: 0,
+		requestPage: () => {}
+	});
+
+	index.ingest(0, ['a', 'b', 'c', 'd', 'e'], 5, 5, index.queryGen);
+	assert.equal(index.size, 5);
+
+	const evicted = index.configure({ windowSize: 3 });
+	assert.deepEqual(evicted, ['a', 'b']);
+	assert.equal(index.size, 3);
+
+	const noEviction = index.configure({ pageSize: 4 });
+	assert.deepEqual(noEviction, []);
+});
+
 test('createWindowIndex ingest() records at offset without compaction/shifting', () => {
 	const index = createWindowIndex({
 		windowSize: 1000,
