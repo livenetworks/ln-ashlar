@@ -10,8 +10,9 @@
 			]
 		},
 		"data-ln-debug": {
-			"direction": null,
+			"direction": "author",
 			"sources": [
+				"src/gate.js",
 				"src/ln-debug.js"
 			]
 		},

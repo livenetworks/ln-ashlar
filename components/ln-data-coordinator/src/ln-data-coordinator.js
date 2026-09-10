@@ -315,21 +315,17 @@ import { MutationReceipts } from './mutation-receipts';
 
 	_component.prototype._toastFromMessage = function (message) {
 		if (!message) return;
-		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-			detail: {
-				type: message.type || 'success',
-				title: message.title || '',
-				message: message.body || ''
-			}
-		}));
+		dispatch(window, 'ln-toast:enqueue', {
+			type: message.type || 'success',
+			title: message.title || '',
+			message: message.body || ''
+		});
 	};
 
 	_component.prototype._toastFromDict = function (key) {
 		const text = this._dict[key];
 		if (!text) return;
-		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-			detail: { type: 'error', title: '', message: text }
-		}));
+		dispatch(window, 'ln-toast:enqueue', { type: 'error', title: '', message: text });
 	};
 
 	_component.prototype._requestStoreMutation = function (children, action, detail) {

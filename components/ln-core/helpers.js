@@ -39,18 +39,32 @@ export function cloneTemplate(name, componentTag) {
 
 // ─── Event Dispatch ────────────────────────────────────────
 
+// Nullable console-observation sink. Installed/removed only by ln-debug's
+// gate (components/ln-debug/src/gate.js) — this is the one place in
+// ln-core that ever touches it. window.lnCore is guaranteed already
+// initialized by the module-load-time block below (Loader Gate State),
+// so the hot-path read needs no defensive "window.lnCore &&" guard.
+export function setDebugSink(sink) {
+	window.lnCore = window.lnCore || {};
+	window.lnCore._debugSink = sink;
+}
+
 export function dispatch(element, eventName, detail) {
+	const payload = detail || {};
+	if (window.lnCore._debugSink) window.lnCore._debugSink('event', eventName, element, payload);
 	element.dispatchEvent(new CustomEvent(eventName, {
 		bubbles: true,
-		detail: detail || {}
+		detail: payload
 	}));
 }
 
 export function dispatchCancelable(element, eventName, detail) {
+	const payload = detail || {};
+	if (window.lnCore._debugSink) window.lnCore._debugSink('event', eventName, element, payload);
 	const event = new CustomEvent(eventName, {
 		bubbles: true,
 		cancelable: true,
-		detail: detail || {}
+		detail: payload
 	});
 	element.dispatchEvent(event);
 	return event;
@@ -163,10 +177,12 @@ export function lnFill(container, record) {
 	// guards e.target === self.dom. Modal callers (lnFill(modalEl, …)
 	// where modalEl is [data-ln-modal]) do not match, so they are unaffected.
 	if (container.matches && container.matches('[data-ln-form], [data-ln-fillable]')) {
+		if (window.lnCore._debugSink) window.lnCore._debugSink('event', 'ln-fill', container, record ?? null);
 		container.dispatchEvent(new CustomEvent('ln-fill', { detail: record ?? null, bubbles: true }));
 	}
 	const targets = container.querySelectorAll('[data-ln-form], [data-ln-fillable]');
 	for (let i = 0; i < targets.length; i++) {
+		if (window.lnCore._debugSink) window.lnCore._debugSink('event', 'ln-fill', targets[i], record ?? null);
 		targets[i].dispatchEvent(new CustomEvent('ln-fill', { detail: record ?? null, bubbles: true }));
 	}
 	return container;
@@ -581,10 +597,7 @@ export function ensureLocaleObserver() {
 
 	guardBody(function () {
 		const observer = new MutationObserver(function () {
-			document.dispatchEvent(new CustomEvent('ln-core:locale-change', {
-				bubbles: true,
-				detail: {}
-			}));
+			dispatch(document, 'ln-core:locale-change', {});
 		});
 		observer.observe(document.documentElement, {
 			attributes: true,
@@ -731,6 +744,13 @@ function _handleAttrMutation(mut) {
 
 	const registry = _attrRegistry();
 	const entries = registry.byAttr.get(name);
+
+	// debug sink — library attribute mutations only: data-ln-* or a name
+	// this registry already reacts to (lang, href, datetime, …). Never
+	// page attributes (class, style, aria-*) — that would flood the console.
+	if (window.lnCore._debugSink && (name.indexOf('data-ln-') === 0 || entries)) {
+		window.lnCore._debugSink('attr', name, el, { oldValue: mut.oldValue, newValue: el.getAttribute(name) });
+	}
 
 	// (A) reactive path — only data-ln-* (ln-date/ln-time/ln-number legitimately
 	// observe lang/datetime, ln-external-links observes href, none of which are
