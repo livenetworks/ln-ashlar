@@ -1,6 +1,6 @@
 import { registerComponent } from '../../ln-core/index.js';
 import { verifyDOM, scheduleVerification } from './debug-verifier.js';
-import { ensureDebugGate } from './gate.js';
+import { ensureDebugGate, refreshDebugHosts } from './gate.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-debug';
@@ -13,6 +13,7 @@ import { ensureDebugGate } from './gate.js';
 	function _component(dom) {
 		this.dom = dom;
 		scheduleVerification(dom.ownerDocument || document);
+		refreshDebugHosts();
 		return this;
 	}
 
@@ -22,20 +23,10 @@ import { ensureDebugGate } from './gate.js';
 
 	_component.prototype.destroy = function () {
 		delete this.dom[DOM_ATTRIBUTE];
+		refreshDebugHosts();
 	};
 
-	if (typeof window !== 'undefined') {
-		window.lnDebug = {
-			verify: function (rootDom, options) {
-				return verifyDOM(rootDom || document, options);
-			},
-			schedule: function (rootDom, delay, callback) {
-				return scheduleVerification(rootDom || document, delay, callback);
-			}
-		};
-	}
-
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-debug', {
+	const _ctor = registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-debug', {
 		onInit: function (node) {
 			if (typeof document !== 'undefined') {
 				scheduleVerification(node && node.ownerDocument ? node.ownerDocument : document);
@@ -47,6 +38,17 @@ import { ensureDebugGate } from './gate.js';
 			}
 		}
 	});
+
+	// registerComponent assigns window[DOM_ATTRIBUTE] = constructor, so the
+	// static API has to hang off that constructor. Assigning a separate
+	// object to window.lnDebug beforehand is silently overwritten.
+	_ctor.verify = function (rootDom, options) {
+		return verifyDOM(rootDom || document, options);
+	};
+
+	_ctor.schedule = function (rootDom, delay, callback) {
+		return scheduleVerification(rootDom || document, delay, callback);
+	};
 })();
 
 export { verifyDOM, scheduleVerification };
