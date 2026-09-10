@@ -189,10 +189,7 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 
 		if (param) {
 			modal.dataset.lnModalMode = 'edit';
-			modal.dispatchEvent(new CustomEvent('ln-fill:request', {
-				bubbles: true,
-				detail: { id: param }
-			}));
+			dispatch(modal, 'ln-fill:request', { id: param });
 		} else {
 			modal.dataset.lnModalMode = 'new';
 			_resetModalForm(modal);
@@ -224,10 +221,7 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 					} else {
 						// Modal is already open, but hash param changed dynamically (e.g. #modal:42 -> #modal:5)
 						if (param) {
-							modal.dispatchEvent(new CustomEvent('ln-fill:request', {
-								bubbles: true,
-								detail: { id: param }
-							}));
+							dispatch(modal, 'ln-fill:request', { id: param });
 						} else {
 							_resetModalForm(modal);
 						}
@@ -280,13 +274,11 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 		// 1. Dispatch UI toast notification if response envelope contains a message
 		if (data && data.message) {
 			const msg = data.message;
-			window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-				detail: {
-					type: msg.type || 'success',
-					title: msg.title || '',
-					message: msg.body || ''
-				}
-			}));
+			dispatch(window, 'ln-toast:enqueue', {
+				type: msg.type || 'success',
+				title: msg.title || '',
+				message: msg.body || ''
+			});
 		}
 
 		// 2. Auto-close modal and clean up if the submitting element was inside a modal
@@ -310,31 +302,25 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 		// 1. If server returned structured error message, toast it
 		if (data && data.message) {
 			const msg = data.message;
-			window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-				detail: {
-					type: msg.type || 'error',
-					title: msg.title || '',
-					message: msg.body || ''
-				}
-			}));
+			dispatch(window, 'ln-toast:enqueue', {
+				type: msg.type || 'error',
+				title: msg.title || '',
+				message: msg.body || ''
+			});
 		} else if (status === 0) {
 			// 2. Genuine network failure (DNS / offline / abort / connection dropped)
-			window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-				detail: {
-					type: 'error',
-					title: dict['network-error-title'] || '',
-					message: dict['network-error'] || 'Network error'
-				}
-			}));
+			dispatch(window, 'ln-toast:enqueue', {
+				type: 'error',
+				title: dict['network-error-title'] || '',
+				message: dict['network-error'] || 'Network error'
+			});
 		} else {
 			// 3. Server HTTP error (status >= 400 or HTML error page) without structured JSON message
-			window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-				detail: {
-					type: 'error',
-					title: dict['server-error-title'] || '',
-					message: dict['server-error'] || 'Server error'
-				}
-			}));
+			dispatch(window, 'ln-toast:enqueue', {
+				type: 'error',
+				title: dict['server-error-title'] || '',
+				message: dict['server-error'] || 'Server error'
+			});
 		}
 
 		// Note: We deliberately do NOT close the modal on error so form validation feedback remains visible
@@ -351,13 +337,11 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 		const message = detail.message || (detail.reason === 'max-size' ? dict['upload-max-size'] || 'File is too large' : (detail.reason === 'max-files' ? dict['upload-max-files'] || 'Maximum file count exceeded' : dict['upload-invalid-type'] || 'This file type is not allowed'));
 		const title = dict['upload-invalid-title'] || 'Invalid File';
 
-		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-			detail: {
-				type: 'error',
-				title: title,
-				message: message
-			}
-		}));
+		dispatch(window, 'ln-toast:enqueue', {
+			type: 'error',
+			title: title,
+			message: message
+		});
 	}
 
 	function _handleUploadError(e) {
@@ -366,13 +350,11 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 		const message = detail.message || dict['upload-failed'] || 'Failed to upload file';
 		const title = dict['upload-error-title'] || 'Upload Error';
 
-		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-			detail: {
-				type: 'error',
-				title: title,
-				message: message
-			}
-		}));
+		dispatch(window, 'ln-toast:enqueue', {
+			type: 'error',
+			title: title,
+			message: message
+		});
 	}
 
 	document.addEventListener('ln-upload:invalid', _handleUploadInvalid);

@@ -1,11 +1,14 @@
 import { registerComponent } from '../../ln-core/index.js';
 import { verifyDOM, scheduleVerification } from './debug-verifier.js';
+import { ensureDebugGate } from './gate.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-debug';
 	const DOM_ATTRIBUTE = 'lnDebug';
 
 	if (typeof window !== 'undefined' && window[DOM_ATTRIBUTE] !== undefined) return;
+
+	ensureDebugGate();
 
 	function _component(dom) {
 		this.dom = dom;

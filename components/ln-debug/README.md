@@ -15,7 +15,8 @@ The `ln-debug` component solves this by providing:
    - Validates that `data-ln-*-source` and `data-ln-*-store` consumers resolve to declared `[data-ln-data-store]` providers.
    - Flags duplicate `[data-ln-data-store]` instances across the document.
    - Detects misspelled `data-ln-*` attributes against the schema-generated attribute manifest.
-3. **Zero Production Overhead**: Runs strictly in dev mode (`data-ln-debug` attribute or `dist/ln-ashlar-dev.js`).
+3. **Console Observation Layer**: Logs every `ln-*` CustomEvent dispatched through `ln-core`, and every library attribute mutation, to the console — the library's whole runtime life, visible on demand.
+4. **Zero Production Overhead**: Runs strictly in dev mode (`data-ln-debug` attribute or `dist/ln-ashlar-dev.js`).
 
 ---
 
@@ -78,3 +79,28 @@ window.lnDebug.schedule(document.body, 50, (report) => {
 The verifier hooks into `lnCore`'s `queueBoot` and `pendingCount()`:
 - If asynchronous initialization is in progress (`holdInit` > 0 from `ln-include` or router), verification is queued and executes only after boot holds are released.
 - Rapid DOM mutations are debounced to ensure sibling elements (e.g. stores and consumers) have fully settled before invariants are asserted.
+
+---
+
+## 6. Console Observation Layer
+
+While `data-ln-debug` is active, `ln-core`'s `dispatch()`, `dispatchCancelable()`,
+and `lnFill()` log every `ln-*` CustomEvent they emit — event name, target
+element, and detail payload — to the console via `console.groupCollapsed`.
+The shared attribute observer likewise logs every mutation of a
+`data-ln-*` attribute, and of any attribute the library's reactive
+registry already observes (`lang`, `href`, `datetime`), as an `old →
+new` pair. Page attributes the library has no opinion on (`class`,
+`style`, `aria-*`) are never logged — this is the library's runtime life,
+not the page's.
+
+The gate is read once, live, from `data-ln-debug` on `<html>` or
+`<body>` — exactly like the console warning filter above — and re-evaluated
+on every mutation of that attribute, so toggling it in the DOM inspector
+takes effect immediately without a reload. No other `data-ln-*` attribute
+controls this layer, and no other component ever checks `data-ln-debug`
+directly: the check happens exactly once, in this component.
+
+Nothing is logged via `console.warn` or `console.debug` — `console.warn`
+is reserved for markup-error diagnostics (see above), and Chrome hides
+`console.debug` below its Verbose log level by default.
