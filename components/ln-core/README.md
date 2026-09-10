@@ -349,8 +349,9 @@ import { registerComponent } from '../ln-core';
 function _component(dom) { this.dom = dom; /* ... */ }
 
 registerComponent('data-ln-example', 'lnExample', _component, 'ln-example', {
-    extraAttributes: ['data-ln-example-state'],
-    onAttributeChange: function (target, name) { /* attribute → state bridge */ },
+    effects: {
+        'data-ln-example-state': function (target, name, oldValue) { /* attribute → state bridge */ }
+    },
     onInit: function (root) { /* post-init hook, per added subtree */ }
 });
 ```
@@ -359,16 +360,28 @@ registerComponent('data-ln-example', 'lnExample', _component, 'ln-example', {
   if it contains `[`, `.`, or `#` (e.g. `'[data-ln-foo]:not([disabled])'`).
 - `attribute` — JS-side key used both as `window[attribute]` (the
   constructor function) and `el[attribute]` (the per-element instance).
-- `options.extraAttributes` — additional attribute names to include in
-  the MutationObserver's `attributeFilter` (e.g. state attributes set
-  by coordinator).
-
-  > **Coverage rule:** `extraAttributes` must include every attribute your `onAttributeChange` handler — and any helper it calls synchronously — reads from the element as an input to what it renders or derives. The observed set is *primary attribute + `extraAttributes`*; an attribute read but not observed will not trigger a re-sync when it changes. Behaviour flags checked only at a transition (e.g. `data-ln-persist`, read at open/close to decide a side-effect) are exempt — a mid-life change to them is not meant to re-render.
-- `options.onAttributeChange(target, attrName)` — called when a
-  filtered attribute changes on an already-initialized element. The
+- `options.effects` — `{ attributeName: handler(target, name, oldValue) }`.
+  A per-attribute reaction dispatched by the shared attribute observer's
+  registry. Fires when the mutated element already owns an instance
+  (`el[attribute]` is truthy) and the attribute name starts with `data-ln-`.
+- `options.onAttrChange(target, name, oldValue)` — catch-all reaction for
+  any `data-ln-*` attribute on the host not covered by an `effects` key.
+  Same instance and prefix gate as `effects`.
+- `options.onAttributeChange(target, attrName)` — called when an attribute
+  in this registration's observed set (the selector's own attribute name,
+  plus `extraAttributes`) changes on an already-initialized element. The
   attribute → state bridge hook.
+- `options.extraAttributes` — additional attribute names, beyond the
+  selector's own, added to this registration's observed set in the shared
+  attribute registry (e.g. state attributes set by a coordinator). Read by
+  the `onAttributeChange` path.
 - `options.onInit(root)` — called after `findElements` per subtree
   (initial DOM, added childList nodes, attribute-mutated subtrees).
+- `options.onSubtreeChange(host, mutation)` — called on every `childList`
+  mutation inside this registration's observed subtree, where `host` is the
+  nearest ancestor (or the mutated node itself) matching `selector`. Runs
+  alongside, not instead of, the added/removed-node instantiation and
+  teardown `registerComponent` already performs.
 - Returns the constructor function (also stored at `window[attribute]`).
 
 ### observeAttributes(names, handler)

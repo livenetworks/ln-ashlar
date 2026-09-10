@@ -110,7 +110,7 @@ export function eventToShortcut(event) {
    * Do not invent cancelable pre-events for actions where the browser must unconditionally proceed with a native default (e.g. final button clicks).
 
 2. **Attribute as Single Source of Truth:**
-   * Component state is written to DOM attributes (`setAttribute`), and `_syncAttribute` reacts to update visual/ARIA state and emit post-fact events.
+   * Component state is written to DOM attributes (`setAttribute`); the shared core attribute observer dispatches the change to the component's declared reaction (`effects` / `onAttrChange` in `registerComponent`, or an `observeAttributes` handler), which updates visual/ARIA state and emits post-fact events.
 
 3. **Zero Hardcoded Display Text in JS:**
    * User-facing text must come from `<template>` clones, `data-ln-*-dict` dictionaries via `buildDict()`, or browser `Intl` APIs. Never hardcode English labels into JS models or components.

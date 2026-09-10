@@ -67,7 +67,7 @@ import { registerComponent, dispatch, dispatchCancelable } from '../ln-core';
         this.dom.setAttribute(DOM_SELECTOR, nextState);
     };
 
-    // 6. State Sync (Called by the MutationObserver registration)
+    // 6. State Sync (called by the shared attribute observer's dispatch)
     _component.prototype.sync = function () {
         const val = this.dom.getAttribute(DOM_SELECTOR);
         this.isOpen = (val === 'open');
@@ -85,11 +85,13 @@ import { registerComponent, dispatch, dispatchCancelable } from '../ln-core';
         delete this.dom[DOM_ATTRIBUTE];
     };
 
-    // 8. Register component with ln-core
+    // 8. Register component with ln-core.
+    // effects maps one attribute name to its own reaction. The shared
+    // attribute observer already watches every data-*/data-ln-* mutation,
+    // so there is no attribute list to maintain here.
     registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'acme-awesome', {
-        extraAttributes: [],
-        onAttributeChange: function (target) {
-            if (target[DOM_ATTRIBUTE]) {
+        effects: {
+            [DOM_SELECTOR]: function (target) {
                 target[DOM_ATTRIBUTE].sync();
             }
         }
@@ -105,9 +107,37 @@ In `ln-ashlar`, the DOM is the single source of truth. Direct, in-memory state m
 
 ### The Rule:
 - **Write to the DOM:** Prototype methods that mutate state must **only** modify HTML attributes (e.g. calling `setAttribute`).
-- **Read from the DOM:** The `registerComponent` MutationObserver intercepts the attribute modification, invokes the `onAttributeChange` hook, which in turn calls the component's prototype `sync()` method to update internal properties (`this.isOpen`) and classes.
+- **Read from the DOM:** The shared core attribute observer intercepts the modification and dispatches it to the component's declared reaction — an `effects[attributeName]` handler or a catch-all `onAttrChange` passed to `registerComponent` — which in turn calls the component's own `sync()` method to update internal properties (`this.isOpen`) and classes.
 
 This ensures that mutating state programmatically via JS behaves identically to modifying elements directly in the browser's developer console.
+
+### Configuration Attributes vs. Control-State Attributes
+
+The toggle example above reacts to a single control-state flag
+(`open`/`close`). Typed configuration attributes — a window size, a search
+field list, a boolean feature flag — should not be parsed once in the
+constructor and cached on the instance; that copy can drift from the DOM.
+Read them live instead with `defineAttrs`:
+
+```javascript
+import { defineAttrs, attrInt, attrBool, attrList } from '../ln-core';
+
+defineAttrs(this, dom, {
+    _windowSize: [attrInt,  'data-acme-awesome-window', 1000],
+    _tags:       [attrList, 'data-acme-awesome-tags'],
+    noSync:      [attrBool, 'data-acme-awesome-no-sync']
+});
+```
+
+`attrStr` / `attrInt` / `attrBool` / `attrList` all share the
+`(el, name, fallback)` shape. The properties `defineAttrs` installs are
+getter-only — assignment throws in strict mode — because nothing is copied
+into instance state; there is no cached value to invalidate.
+
+Components with a bespoke `childList` lifecycle that doesn't fit
+`registerComponent`'s shape at all (rare — three components in the library
+do this) use `observeAttributes(names, handler)` for the attribute half
+instead. See `components/ln-core/README.md` for the full contract of both.
 
 ---
 

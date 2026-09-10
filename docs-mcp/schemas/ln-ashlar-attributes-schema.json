@@ -603,6 +603,34 @@
 					"consumed_by": "js",
 					"role": "input",
 					"description": "Fields to index for local client-side store search queries."
+				},
+				"data-ln-data-store-window": {
+					"type": "number",
+					"read_by": "ln-data-store",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Enables server-side windowing and sets how many record positions stay resident. Presence activates windowed mode."
+				},
+				"data-ln-data-store-window-page": {
+					"type": "number",
+					"read_by": "ln-data-store",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Page size the windowed store requests from the backend. Becomes the limit on each ln-data-store:request-page event."
+				},
+				"data-ln-data-store-no-local-query": {
+					"type": "boolean",
+					"read_by": "ln-data-store",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Opts out of answering reads from the local cache; queries wait for the server."
+				},
+				"data-ln-data-store-frozen": {
+					"type": "string",
+					"read_by": "ln-data-store (SCSS)",
+					"consumed_by": "css",
+					"role": "state",
+					"description": "Runtime-written, dev-only. Names a constructor-only attribute that was edited after init; surfaced as a diagnostic under [data-ln-debug]."
 				}
 			}
 		},

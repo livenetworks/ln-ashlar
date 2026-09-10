@@ -84,4 +84,4 @@ When authoring or refactoring components:
 - [x] **Step 2:** Write isolated Node test suite `tests/ln-{component}.test.js` targeting pure logic.
 - [x] **Step 3:** Update `src/ln-{component}.js` to delegate domain logic to pure imports.
 - [x] **Step 4:** For global keyboard/click interceptors, implement lazy listener registration/teardown.
-- [x] **Step 5:** Ensure full compatibility with `ln-core` `registerComponent` and `onAttributeChange`.
+- [x] **Step 5:** Ensure full compatibility with `ln-core` `registerComponent`'s attribute reactions (`effects` / `onAttrChange`).

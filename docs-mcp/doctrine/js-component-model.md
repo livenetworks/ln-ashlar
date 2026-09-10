@@ -93,10 +93,10 @@ Components with separate triggers/inputs and targets use a decoupled two-host ar
 2. **State Host (`data-ln-{name}="state"`)**:
    - Resides on the target container/element (e.g. `<table id="my-table" data-ln-search="">`, `<div id="user-modal" data-ln-modal="closed">`).
    - Owns the true state property (`this.term`, `this.isOpen`).
-   - Monitored by a `MutationObserver` (`onAttributeChange: _syncAttribute`).
+   - Reacts to its own attribute changes through the shared core attribute observer — declared as `effects` (per-attribute handlers) or a catch-all `onAttrChange` passed to `registerComponent`, or through `observeAttributes` for a component that manages its own lifecycle.
 
 ### Attribute-Driven Commands vs. Event-Driven Notifications
-- **Commands & Requests (Mutations):** Come strictly through **Attributes** via `setAttribute` (or request events from coordinators). Modifying the HTML attribute is how anything in the system asks a component to change. The component's `MutationObserver` catches this change, validates it against the current instance state (idempotency guard `if (next === instance.state) return`), updates internal state, and syncs controls.
+- **Commands & Requests (Mutations):** Come strictly through **Attributes** via `setAttribute` (or request events from coordinators). Modifying the HTML attribute is how anything in the system asks a component to change. The core's shared attribute observer catches this change, filters out no-op writes centrally (a same-value `setAttribute` produces no reaction — components do not need a private "did it really change" guard), fires the component's declared reaction, updates internal state, and syncs controls.
 - **Events (Lifecycle & Intent Announcements):**
   - **Before / Intent Events (`ln-{name}:before-{action}` / cancelable hooks like `ln-search:change`):** Announces *"I am preparing to act / search / close — does an external consumer want to take over or cancel?"*. Calling `event.preventDefault()` allows coordinators or parent components (like `ln-table` or `ln-data-store`) to handle the action.
   - **After / Notification Events (`ln-{name}:{action}`):** Announces *"Action completed / state has transitioned"*. Bubbles up for coordinators, analytics, or UI feedback.
@@ -116,10 +116,15 @@ function _syncControls(target, value) {
 
 #### Correct State Transition (Attribute Bridge):
 ```js
+// `isOpen` is a live getter, never a stored copy. The constructor installs it:
+//   defineAttrs(this, dom, {
+//       isOpen: [(el, name) => el.getAttribute(name) === 'open', 'data-ln-toggle']
+//   });
+
 _component.prototype.open = function () {
-    if (this.isOpen) return;
     this.dom.setAttribute('data-ln-toggle', 'open');
-    // Observer triggers _syncAttribute() -> updates DOM, dispatches events
+    // The shared core observer dispatches to this component's declared
+    // effects / onAttrChange -> updates DOM, dispatches events
 };
 ```
 
@@ -132,6 +137,9 @@ Using hidden checkboxes (`<input type="checkbox">`) to toggle styling state is s
 ### No Inline Styling from JS
 Consistent with the Attribute Bridge, JS never sets styles directly (`el.style.*`) — it toggles classes/attributes and lets SCSS style the resulting state. (Accepted exception on record: `ln-date`'s hidden native picker.) Dev-misuse warnings surface via a CSS `::after` affordance, not `console.warn`. Recoverable runtime issues use a `[component-name]`-prefixed `console.warn` + bail — never throw across handlers, never `alert`/`confirm`/`prompt`.
 
+### Frozen Attributes
+A **frozen attribute** is a constructor-only attribute — one that physically cannot be re-read at runtime (e.g. an IndexedDB schema fixed at open time). When a frozen attribute is edited after init, the component writes `data-ln-{component}-frozen` on its own host, with the attempted attribute name as the value, and a co-located `*-dev.scss` rule surfaces it through the `dev-dom-error` mixin under `[data-ln-debug]`. Never `console.warn` for this case — it is a CSS-only dev affordance. This convention is binding on every component that acquires a frozen attribute; see `ln-data-store` for the reference implementation (`_markFrozen`, `ln-data-store-dev.scss`).
+
 ---
 
 ## 4. MutationObserver and Auto-Initialization
@@ -139,7 +147,7 @@ Consistent with the Attribute Bridge, JS never sets styles directly (`el.style.*
 Dynamic HTML injected into the page (via AJAX, router transitions, or raw `innerHTML` replacements) is automatically initialized by a document-level `MutationObserver`.
 
 ### Rules:
-- The observer filters on target attributes via `attributeFilter` to ensure performance is not degraded by unrelated class or style mutations.
+- One shared attribute observer, installed once on `document.body` with no per-name filter, delivers every `data-ln-*` mutation under it. Cost is kept low by two guards that run before any component code: an echo guard (a same-value `setAttribute` produces no reaction) and, on the reactive dispatch path, a `data-ln-` prefix check. A component never installs its own filtered `MutationObserver` for attributes on its own host element — it declares `effects` / `onAttrChange` in `registerComponent`, or uses `observeAttributes` for a bespoke lifecycle.
 - Double-initialization is prevented by checking the presence of the instance property (e.g., `if (el.lnName) return`).
 - **Instant Inspector Activation:** Because the observer tracks target attribute additions globally across the document tree, a developer can dynamically add a component selector (e.g. `data-ln-toggle="close"`) to any element directly inside the browser's developer tools inspector, and the framework will instantly bootstrap the component instance without requiring a page refresh.
 
@@ -149,7 +157,7 @@ Dynamic HTML injected into the page (via AJAX, router transitions, or raw `inner
 2. **Declarative, Testable & Reproducible:**
    Any control state — a search term, an open modal, an expanded accordion, a deep-linked view — can be authored, inspected, automated, restored, or server-rendered from HTML attributes alone, with no orchestration script. Application data is restored by the store from its own cache, not from markup.
 3. **DevTools Inspector as the Control Plane:**
-   Editing any attribute in the browser's DevTools Inspector immediately activates the component's functionality in real-time. The underlying `MutationObserver` instantly synchronizes the internal engine, updates the DOM, syncs matching controls (`[data-ln-*-for]`), and dispatches lifecycle events.
+   Editing any `data-ln-*` attribute on a component's own host element in the browser's DevTools Inspector immediately activates the component's reaction in real time — no page refresh, no rebuilt instance. The shared attribute observer dispatches to the component's declared `effects` / `onAttrChange` (or `observeAttributes` handler), which synchronizes the internal engine, updates the DOM, syncs matching controls (`[data-ln-*-for]`), and dispatches lifecycle events. This is host-scoped: attributes on a component's *descendants* (e.g. `data-ln-table-col` on a `<th>`) are read live at render time rather than pushed reactively — editing one takes effect on the next render, not instantly.
 
 ### Hydration Polarity (SSR)
 Server-rendered content is authored as full markup; JS hydration adds behavior only. `<template>` + fill is reserved for runtime data — not for content that already exists in the server-rendered page. Content is visible without JS; transient enter-states (`.ln-enter`) are the exception, not the default.

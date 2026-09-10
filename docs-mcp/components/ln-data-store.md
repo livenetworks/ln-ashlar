@@ -85,6 +85,10 @@ Use when synchronizing with a REST backend API.
 | `data-ln-data-store-stale` | Root | `Integer` \| `"never"` \| `-1` | `300` | Seconds before data is considered stale. |
 | `data-ln-data-store-indexes` | Root | `String` | `""` | Comma-separated IndexedDB index fields. |
 | `data-ln-data-store-search-fields` | Root | `String` | `""` | Comma-separated list of text fields for search. |
+| `data-ln-data-store-window` | Root | `Integer` | `1000` | Enables server-side windowing. Presence activates windowed mode; the value bounds how many record positions stay resident. |
+| `data-ln-data-store-window-page` | Root | `Integer` | `200` | Page size the windowed store requests from the backend. Becomes the `limit` on each `ln-data-store:request-page` event. |
+| `data-ln-data-store-no-local-query` | Root | Flag / Valueless | *Absent* | Opts out of answering reads from the local cache; queries wait for the server. |
+| `data-ln-data-store-frozen` | Root | `String` | *Absent* | **Runtime-written, dev-only.** Set by the component when `data-ln-data-store` or `-indexes` is edited after init, naming the attribute that was touched. Surfaced as a diagnostic under `[data-ln-debug]`. Never authored. |
 
 ### Programmatic JS API
 
