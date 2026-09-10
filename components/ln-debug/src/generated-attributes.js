@@ -55,6 +55,7 @@ export const VALID_ATTRIBUTES = new Set([
 	'data-ln-data-coordinator-stale',
 	'data-ln-data-mapper',
 	'data-ln-data-store',
+	'data-ln-data-store-frozen',
 	'data-ln-data-store-indexes',
 	'data-ln-data-store-no-autosync',
 	'data-ln-data-store-no-local-query',
