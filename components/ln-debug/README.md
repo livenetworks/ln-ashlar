@@ -22,22 +22,28 @@ The `ln-debug` component solves this by providing:
 
 ## 2. Minimal Blueprint
 
-Add the `data-ln-debug` attribute to either the `<html>` or `<body>` element:
+Add the `data-ln-debug` attribute to `<body>`, or to any element whose
+subtree should be observed:
 
 ```html
 <!DOCTYPE html>
-<html lang="en" data-ln-debug>
+<html lang="en">
 <head>
     <!-- Core library and Dev Verifier -->
     <script src="dist/ln-ashlar.iife.js" defer></script>
 </head>
-<body>
+<body data-ln-debug>
     <!-- Broken references or typos will be reported clearly in the console -->
     <button data-ln-toggle-for="sidebar-menu">Toggle</button>
     <div id="sidebar-menu">Sidebar Content</div>
 </body>
 </html>
 ```
+
+The console warning filter (§1) reads `data-ln-debug` from `<html>` or
+`<body>`. The cross-reference verifier (§3) and the console observation
+layer (§6) activate only on elements inside `<body>`'s subtree — see §6 for
+the observation layer's host-containment rule.
 
 ---
 
@@ -84,8 +90,8 @@ The verifier hooks into `lnCore`'s `queueBoot` and `pendingCount()`:
 
 ## 6. Console Observation Layer
 
-While `data-ln-debug` is active, `ln-core`'s `dispatch()`, `dispatchCancelable()`,
-and `lnFill()` log every `ln-*` CustomEvent they emit — event name, target
+While a host is active, `ln-core`'s `dispatch()`, `dispatchCancelable()`, and
+`lnFill()` log every `ln-*` CustomEvent they emit — event name, target
 element, and detail payload — to the console via `console.groupCollapsed`.
 The shared attribute observer likewise logs every mutation of a
 `data-ln-*` attribute, and of any attribute the library's reactive
@@ -94,12 +100,32 @@ new` pair. Page attributes the library has no opinion on (`class`,
 `style`, `aria-*`) are never logged — this is the library's runtime life,
 not the page's.
 
-The gate is read once, live, from `data-ln-debug` on `<html>` or
-`<body>` — exactly like the console warning filter above — and re-evaluated
-on every mutation of that attribute, so toggling it in the DOM inspector
-takes effect immediately without a reload. No other `data-ln-*` attribute
-controls this layer, and no other component ever checks `data-ln-debug`
-directly: the check happens exactly once, in this component.
+**Host containment.** A host is any element carrying `data-ln-debug`.
+Multiple hosts may be active at once. An event or attribute mutation is
+logged only when some active host `.contains()` the target element — this
+layer observes its own subtree, exactly like every other component in the
+library. Placing `data-ln-debug` on `<body>` observes the whole page;
+placing it on a smaller container scopes logging to that container's
+descendants only.
+
+**Page-wide exception.** A handful of `dispatch()` calls target `window` or
+`document` directly — `ln-toast:enqueue`, `ln-data-store:online` /
+`offline` / `quota-exceeded`, `ln-core:locale-change` — because no element
+subtree can contain a target that isn't an element. These log only when
+`document.body` itself is a host.
+
+**Scope.** `data-ln-debug` is read from elements inside `document.body`'s
+subtree via the shared attribute observer, and is re-evaluated on every
+mutation of that attribute — adding or removing it on any descendant of
+`<body>` (including `<body>` itself) takes effect immediately, without a
+reload, whether added, removed, or toggled in the DOM inspector. An element
+that already carries `data-ln-debug` at the moment it is inserted into the
+document — via `innerHTML`, `appendChild`, `ln-include`, or a router view
+swap — becomes an active host immediately on insertion, and stops being one
+the moment it is removed. `<html>` is not a supported host for this layer —
+unlike the console warning filter in §1, which still reads `data-ln-debug`
+from `<html>` or `<body>`. The two checks are independent and are not
+required to agree.
 
 Nothing is logged via `console.warn` or `console.debug` — `console.warn`
 is reserved for markup-error diagnostics (see above), and Chrome hides
