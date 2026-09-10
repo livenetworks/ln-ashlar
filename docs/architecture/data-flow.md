@@ -697,9 +697,10 @@ modalEl.addEventListener('ln-modal:before-open', function () {
 
 ## 6. The MutationObserver discipline
 
-Every cross-component wiring in ln-ashlar is mediated by **one**
-MutationObserver-maintained registry. This is the foundation: it is
-how components find each other without runtime DOM scans.
+Cross-component **wiring** attributes that a project coordinator owns
+(control pointers like `data-ln-modal-for`, `data-ln-popover-for`) are
+commonly mediated by **one** MutationObserver-maintained registry, so
+components find each other without repeated runtime DOM scans.
 
 The pattern:
 
@@ -714,9 +715,13 @@ The pattern:
 3. **Runtime work iterates the registry.** No `querySelectorAll`
    after the init scan.
 
-Uniform across the library — `data-ln-modal-for`, `data-ln-popover-for`,
-`data-ln-search`, `registerComponent`. The observer is the only piece that
-ever queries the DOM by attribute.
+This is a project/coordinator-level pattern for wiring `ln-core` doesn't
+already cover. `registerComponent` itself does not use it: every
+`data-ln-*` mutation under `<body>` goes through one always-on shared
+attribute observer with no per-name filter, dispatched by a registry keyed
+on attribute name (see the JS Component Model doctrine, §4). A component
+reacting to its own host's attributes declares `effects` / `onAttrChange`
+in `registerComponent` rather than building a registry like the one above.
 
 ```js
 // Skeleton — actual implementations live per component

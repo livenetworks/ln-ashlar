@@ -21,7 +21,7 @@ tags: [core, helpers, dom-binding, templates, service]
 The JavaScript source is entry-pointed at [index.js](../../components/ln-core/index.js) and implemented across modular sub-files in [components/ln-core/](../../components/ln-core/).
 
 Key responsibilities include:
-- **Component Lifecycle Registration (`registerComponent`):** Registers component classes with MutationObserver-based lifecycle management (childList, attribute observation, auto-instantiation, and automatic `destroy()` teardown on DOM removal).
+- **Component Lifecycle Registration (`registerComponent`):** Registers component classes with MutationObserver-based lifecycle management — a per-registration `childList` observer for auto-instantiation and teardown, plus a single library-wide shared attribute observer (installed once on `document.body`, no per-name filter) that dispatches attribute mutations to each component's declared reaction (`effects` / `onAttrChange`, or the earlier `onAttributeChange` / `extraAttributes`, both still supported).
 - **Template System (`cloneTemplate`, `cloneTemplateScoped`, `fillTemplate`):** Clones HTML `<template>` tags safely and interpolates text nodes and attribute placeholders (`{{ prop }}`).
 - **Declarative DOM Binding (`fill`, `lnFill`):** Maps Javascript objects directly onto DOM elements via `data-ln-field`, `data-ln-attr`, `data-ln-show`, and `data-ln-class`, and broadcasts `ln-fill` events across form and display containers.
 - **Event Dispatch & Request Primitives (`dispatch`, `dispatchCancelable`, `requestData`):** Emits custom events with standard `bubbles: true` settings and handles cancelable lifecycle hooks and table/list pagination data requests.
@@ -44,10 +44,14 @@ Key responsibilities include:
 ```javascript
 import { registerComponent, cloneTemplate, fill, dispatch } from '../../ln-core';
 
-// 1. Register a custom component with automatic MutationObserver lifecycle
+// 1. Register a custom component with automatic MutationObserver lifecycle.
+// effects fires per attribute name; onAttrChange is a catch-all for every
+// other data-ln-* on the host. No attribute list to maintain — the shared
+// observer already watches everything and dispatches by registration.
 registerComponent('[data-ln-card]', 'lnCard', MyCardComponent, 'ln-card', {
-    extraAttributes: ['data-ln-status'],
-    onAttributeChange: (dom, attrName) => dom.lnCard?._syncAttribute(attrName)
+    effects: {
+        'data-ln-card-status': (dom, attrName, oldValue) => dom.lnCard.render()
+    }
 });
 
 // 2. Clone a template by name and fill fields
@@ -71,7 +75,13 @@ This service module exposes no declarative HTML attributes directly on itself.
 
 | Helper | Signature | Returns | Description |
 |---|---|---|---|
-| `registerComponent` | `(selector: String, attribute: String, ComponentFn: Class\|Function, componentTag?: String, options?: Object)` | `Function` | Registers a component constructor with MutationObserver subtree tracking, auto-instantiation, attribute change callbacks (`onAttributeChange`), and automatic `destroy()` teardown on node removal. |
+| `registerComponent` | `(selector: String, attribute: String, ComponentFn: Class\|Function, componentTag?: String, options?: Object)` | `Function` | Registers a component constructor with MutationObserver subtree tracking, auto-instantiation, and automatic `destroy()` teardown on node removal. Attribute reactions are declared via `options.effects` (per-name handlers) and/or `options.onAttrChange` (catch-all), dispatched by the one shared body-level attribute observer; `options.onAttributeChange` / `options.extraAttributes` remain supported for components still on the earlier per-list registration. |
+| `attrStr` | `(el: HTMLElement, name: String, fallback?: String)` | `String` | Live-reads a string attribute; returns `fallback` when absent. |
+| `attrInt` | `(el: HTMLElement, name: String, fallback?: Number)` | `Number` | Live-reads an integer attribute (`parseInt(..., 10)`); returns `fallback` on `NaN`. `"0"` stays `0`. |
+| `attrBool` | `(el: HTMLElement, name: String, fallback?: Boolean)` | `Boolean` | Live-reads a boolean attribute via `el.hasAttribute(name)`; ignores `fallback`. |
+| `attrList` | `(el: HTMLElement, name: String, fallback?: Array)` | `Array<String>` | Live-reads a comma-separated attribute into a trimmed, non-empty string array; ignores `fallback`. |
+| `defineAttrs` | `(instance: Object, dom: HTMLElement, spec: Object)` | `Object` | Installs getter-only properties on `instance` that re-read `dom`'s attributes on every access via the typed readers above (or a custom reader of the same `(el, name, fallback)` shape). Assignment throws in strict mode — nothing is copied into instance state. |
+| `observeAttributes` | `(names: Array<String>, handler: Function)` | `void` | Registers a raw handler on the shared attribute observer for components that own their own lifecycle and need only the attribute half of the invariant — no instance gate, no `data-ln-` prefix gate. `handler(el, attributeName, oldValue)`. |
 | `cloneTemplate` | `(name: String, componentTag?: String)` | `DocumentFragment\|null` | Clones a `<template data-ln-template="name">` element. Caches template lookups after first retrieval. |
 | `cloneTemplateScoped` | `(root: HTMLElement, name: String, componentTag?: String)` | `DocumentFragment\|null` | Searches for a scoped `<template data-ln-template="name">` within `root` before falling back to document-global lookup. |
 | `fillTemplate` | `(clone: DocumentFragment\|HTMLElement, data: Object)` | `DocumentFragment\|HTMLElement` | Replaces `{{ prop }}` placeholders inside text nodes and element attribute values. |
@@ -139,6 +149,7 @@ This service module exposes no declarative HTML attributes directly on itself.
 - [`ln-hash`](./ln-hash.md) — `hashParse`, `hashGet`, `hashSet`, `hashLinkClick`, `hashSortEncode`, `hashSortDecode`, `hashFilterEncode`, `hashFilterDecode`, `resolveHashNamespace`
 - [`positioning`](./positioning.md) — `computePlacement`, `measureHidden`
 - [`ln-crypto`](./ln-crypto.md) — `setCryptoKey`, `getCryptoKey`, `encryptData`, `decryptData`
+- **`attrs.js`** — `attrStr`, `attrInt`, `attrBool`, `attrList`, `defineAttrs`
 - **`date.js`** — `parseDateInput`, `formatDateToISO`
 - **`number.js`** — `getSeparators`, `cleanNumericString`, `parseNumber`, `formatNumber`
 - **`progress.js`** — `calculateProgress`
@@ -162,8 +173,9 @@ sequenceDiagram
     participant Core as ln-core (helpers)
     participant DOM as Component DOM / Template
 
-    App->>Core: registerComponent('[data-ln-widget]', 'lnWidget', WidgetClass)
-    Core->>DOM: MutationObserver tracks added/removed nodes
+    App->>Core: registerComponent('[data-ln-widget]', 'lnWidget', WidgetClass, 'ln-widget', { effects })
+    Core->>DOM: childList observer tracks added/removed nodes
+    Core->>DOM: shared body-level attribute observer dispatches data-ln-* mutations to effects/onAttrChange
     
     App->>Core: cloneTemplate('row-template')
     Core->>DOM: Clone <template> node

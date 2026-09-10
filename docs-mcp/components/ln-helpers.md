@@ -21,7 +21,7 @@ tags: [helpers, dom, forms, templates, serialization, registration, service]
 The JavaScript source is located at [helpers.js](../../components/ln-core/helpers.js).
 
 Key responsibilities include:
-- **Component Lifecycle Registration (`registerComponent`):** Registers component classes with MutationObserver-based lifecycle management (childList, attribute observation, auto-instantiation, and automatic `destroy()` teardown on DOM removal).
+- **Component Lifecycle Registration (`registerComponent`):** Registers component classes with MutationObserver-based lifecycle management — a per-registration `childList` observer for auto-instantiation and teardown, plus a single shared attribute observer (installed once on `document.body`, no per-name filter, exported standalone as `observeAttributes` for components with their own lifecycle) that dispatches attribute mutations to each component's declared reaction (`effects` / `onAttrChange`, or the earlier `onAttributeChange` / `extraAttributes`, both still supported).
 - **Declarative Attribute & Field Binding (`fill`, `lnFill`):** Maps data properties onto elements declaring `data-ln-field`, `data-ln-attr`, `data-ln-show`, or `data-ln-class`, and broadcasts `ln-fill` events.
 - **Form Data Pipeline (`serializeForm`, `populateForm`, `resolveFormMethod`, `interceptValueProperty`, `readValue`):** Extracts typed JavaScript objects from HTML forms, populates forms back from records, intercepts input value getters/setters, and reads raw machine values.
 - **Template Operations (`cloneTemplate`, `cloneTemplateScoped`, `fillTemplate`, `renderList`):** Clones `<template>` elements and interpolates text nodes and attribute placeholders (`{{ prop }}`).
@@ -42,10 +42,13 @@ Key responsibilities include:
 ```javascript
 import { registerComponent } from '../../ln-core';
 
-// Automatically instantiates MyWidget on page load & dynamic MutationObserver insertion
+// Automatically instantiates MyWidget on page load & dynamic MutationObserver insertion.
+// effects fires per attribute name; the shared observer watches everything,
+// so there is no attribute list to maintain.
 registerComponent('[data-ln-widget]', 'lnWidget', MyWidget, 'ln-widget', {
-    extraAttributes: ['data-ln-status'],
-    onAttributeChange: (dom, attrName) => dom.lnWidget?._syncAttribute(attrName)
+    effects: {
+        'data-ln-widget-status': (dom, attrName, oldValue) => dom.lnWidget.render()
+    }
 });
 ```
 
@@ -100,11 +103,12 @@ populateForm(form, { name: "Jane", age: 31, isAdmin: false });
 | `data-ln-class` | `data-ln-class="className:property"` | Toggles CSS class `className` based on truthiness of `data[property]`. |
 | `data-ln-fill-as` | `data-ln-fill-as="key"` | Overrides input `name` attribute matching during `populateForm`. |
 
-### Programmatic JS API (Complete Inventory of 28 Exports)
+### Programmatic JS API (Complete Inventory of 29 Exports)
 
 | Helper | Signature | Returns | Description |
 |---|---|---|---|
-| `registerComponent` | `(selector: String, attribute: String, ComponentFn: Class\|Function, componentTag?: String, options?: Object)` | `Function` | Registers a component constructor with MutationObserver subtree tracking, auto-instantiation, attribute change callbacks (`onAttributeChange`), and automatic `destroy()` teardown on node removal. |
+| `registerComponent` | `(selector: String, attribute: String, ComponentFn: Class\|Function, componentTag?: String, options?: Object)` | `Function` | Registers a component constructor with MutationObserver subtree tracking, auto-instantiation, and automatic `destroy()` teardown on node removal. Attribute reactions are declared via `options.effects` (per-name handlers) and/or `options.onAttrChange` (catch-all), dispatched by the one shared body-level attribute observer; `options.onAttributeChange` / `options.extraAttributes` remain supported. |
+| `observeAttributes` | `(names: Array<String>, handler: Function)` | `void` | Registers a raw handler on the shared attribute observer for components that own their own lifecycle and need only the attribute half of the invariant — no instance gate, no `data-ln-` prefix gate. `handler(el, attributeName, oldValue)`. |
 | `cloneTemplate` | `(name: String, componentTag?: String)` | `DocumentFragment\|null` | Clones a `<template data-ln-template="name">` element. Caches template lookups after first retrieval. |
 | `cloneTemplateScoped` | `(root: HTMLElement, name: String, componentTag?: String)` | `DocumentFragment\|null` | Searches for a scoped `<template data-ln-template="name">` within `root` before falling back to document-global lookup. |
 | `fillTemplate` | `(clone: DocumentFragment\|HTMLElement, data: Object)` | `DocumentFragment\|HTMLElement` | Replaces `{{ prop }}` placeholders inside text nodes and element attribute values. |

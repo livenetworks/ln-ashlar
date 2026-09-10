@@ -42,8 +42,8 @@ import { registerComponent } from '../ln-core';
 	// --- Boot via Core Registration ---
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-{name}', {
 		// Optional hooks:
-		// extraAttributes: ['data-ln-{name}-state'],
-		// onAttributeChange: function (target, name) { ... },
+		// effects: { 'data-ln-{name}-state': function (target, name, oldValue) { ... } },
+		// onAttrChange: function (target, name, oldValue) { ... },  // catch-all
 		// onInit: function (root) { ... }
 	});
 })();
@@ -56,7 +56,7 @@ import { registerComponent } from '../ln-core';
 1. Walks the document (and subsequent AJAX injections via MutationObserver) to find matching elements.
 2. Guards against double-initialization by checking `element[DOM_ATTRIBUTE]`.
 3. Instantiates the component: `element[DOM_ATTRIBUTE] = new ComponentFn(element)`.
-4. Binds dynamic attribute updates to `onAttributeChange` hooks and subtree insertions to `onInit` hooks.
+4. Binds dynamic attribute updates on the host to `effects` / `onAttrChange` reactions (dispatched by the single shared body-level attribute observer) and subtree insertions to `onInit` hooks.
 5. Exposes the constructor at `window[DOM_ATTRIBUTE]`.
 
 ### Four Conventions Every Skeleton Encodes
@@ -136,36 +136,47 @@ dom.textContent = new Intl.DateTimeFormat(locale).format(date)
 
 ---
 
-## MutationObserver — Attribute Watching
+## Attribute Reactions — `effects` / `onAttrChange`
 
-`findElements` watches for NEW elements (childList). If your component also needs to react to ATTRIBUTE CHANGES on existing elements, add your own observer:
+`findElements` watches for NEW elements (childList) via `registerComponent`'s
+own observer. Reactions to ATTRIBUTE CHANGES on an already-initialized host
+go through the single shared attribute observer `ln-core` installs once on
+`document.body` — **never** a private, per-component `MutationObserver` on
+your own element.
+
+Declare the reaction in the same `registerComponent` call:
 
 ```javascript
-function _constructor(dom) {
-    this.dom = dom
-    this._attrObserver = new MutationObserver(function (mutations) {
-        for (const m of mutations) {
-            if (m.type === 'attributes') {
-                _render(dom[DOM_ATTRIBUTE])
-            }
-        }
-    })
-    this._attrObserver.observe(dom, {
-        attributes: true,
-        attributeFilter: ['datetime', 'data-ln-time']  // only watch relevant attrs
-    })
-    _render(this)
-}
-
-_constructor.prototype.destroy = function () {
-    this._attrObserver.disconnect()
-    delete this.dom[DOM_ATTRIBUTE]
-}
+registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-time', {
+    effects: {
+        'datetime': function (dom) { _render(dom[DOM_ATTRIBUTE]) },
+        'data-ln-time': function (dom) { _render(dom[DOM_ATTRIBUTE]) }
+    }
+})
 ```
 
-**Use `attributeFilter`** — never observe ALL attributes. List only the ones your component cares about.
-
-And list **all** of them: every self-attribute your `onAttributeChange` handler (or a helper it calls synchronously) reads as a render/derive input must be in the observed set (primary attribute + `extraAttributes`), or a runtime change to it silently no-ops. Behaviour flags read only at a transition (e.g. `data-ln-persist`) are exempt. Cross-check siblings that read the same attribute — `ln-time` observes `datetime`, so `ln-date`'s text mode must too.
+- `effects` maps one attribute name to its own handler; `onAttrChange` is the
+  catch-all for every other `data-ln-*` on the host not covered by `effects`.
+- No attribute list to maintain for performance — the shared observer already
+  watches every mutation under `<body>`. Cost is one Map lookup per mutation,
+  guarded by an echo check (`oldValue === current value` → skip) and, on the
+  reactive path, a `data-ln-` prefix check.
+- **Do not add your own attribute `MutationObserver`** for attributes on your
+  own host element — that duplicates delivery and drifts from the shared
+  invariant.
+- Cross-check siblings that read the same attribute — `ln-time` reacts to
+  `datetime`, so `ln-date`'s text mode must too.
+- Two narrow, permanent exceptions elsewhere in the library keep a private
+  observer instead, and neither is a pattern to copy from scratch: a
+  component that must read an attribute on its **parent** (`ln-progress`,
+  outside the host-only boundary the shared observer covers), and a
+  component that cannot afford to import anything at all (`ln-icon`,
+  bundle-size floor). If your case looks like either, read
+  `components/ln-core/README.md`'s `observeAttributes` section first.
+- For a component with a bespoke `childList` lifecycle that doesn't fit
+  `registerComponent`'s shape at all (rare — three components in the library
+  do this), use `observeAttributes(names, handler)` from `ln-core` for the
+  attribute half only.
 
 ---
 
@@ -465,8 +476,8 @@ try {
 - [ ] Guard: `if (window[DOM_ATTRIBUTE] !== undefined) return`
 - [ ] Uses `findElements` from `ln-core` (not custom MutationObserver for init)
 - [ ] **Zero display text in JS** — all user-facing text from templates, dict, or Intl
-- [ ] `attributeFilter` if watching attribute changes (never observe ALL)
-- [ ] every attribute your `onAttributeChange` handler (or its helpers) reads is in the observed set (primary + `extraAttributes`)
+- [ ] Attribute reactions declared via `effects` / `onAttrChange` in `registerComponent` (or `observeAttributes` for a bespoke lifecycle) — no private attribute `MutationObserver` on your own host
+- [ ] every attribute your reaction (or a helper it calls synchronously) reads as a render/derive input is covered by an `effects` key, `onAttrChange`, or read live via `defineAttrs` at render time — nothing parsed once into instance state and left to drift
 - [ ] Shared resources (intervals, connections) at module level, not per-instance
 - [ ] Shared interval checks `document.body.contains()` on tick (orphan cleanup)
 - [ ] Formatter/template caches at module level
