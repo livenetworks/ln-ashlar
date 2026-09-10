@@ -32,6 +32,7 @@ It possesses no visual interface and is **completely blind to the network** (no 
 | `data-ln-data-store-window="N"` | Enables windowed residency mode. Caps how many records stay resident — both the LRU position index and the records held in IndexedDB. | *Disabled* |
 | `data-ln-data-store-window-page="N"` | Page size of slices requested from the server. | `200` |
 | `data-ln-data-store-no-local-query` | Leave queries to the server: the store stops answering reads from its own records. Read live, so it can be flipped per situation. | *Absent* |
+| `data-ln-data-store-frozen` | **Runtime-written, dev-only.** Set by the component itself when `data-ln-data-store` or `-indexes` is edited after init; surfaced as a dev-only diagnostic banner (`[data-ln-debug]`). Not authored. | *Absent* |
 
 ---
 

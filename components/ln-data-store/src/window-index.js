@@ -103,13 +103,17 @@ export function createWindowIndex(config = {}) {
 			clearTimeout(debounceId);
 		},
 
+		// Returns the ids evicted by a window shrink, same contract as ingest() —
+		// the caller must purge them from storage.
 		configure: (partial = {}) => {
+			let evicted = [];
 			if (partial.windowSize > 0 && partial.windowSize !== windowSize) {
 				windowSize = partial.windowSize;
-				evict();
+				evicted = evict();
 			}
 			if (partial.pageSize > 0) pageSize = partial.pageSize;
 			if (partial.fetchDebounce >= 0) fetchDebounce = partial.fetchDebounce;
+			return evicted;
 		}
 	};
 }

@@ -1,4 +1,4 @@
-import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink } from '../../ln-core';
+import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink, observeAttributes } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-ajax';
@@ -249,17 +249,17 @@ import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink } from '..
 								}
 							}
 						}
-					} else if (mutation.type === 'attributes') {
-						_constructor(mutation.target);
 					}
 				}
 			});
 
 			observer.observe(document.body, {
 				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: [DOM_SELECTOR]
+				subtree: true
+			});
+
+			observeAttributes([DOM_SELECTOR], function (el) {
+				_constructor(el);
 			});
 		}, 'ln-ajax');
 	}

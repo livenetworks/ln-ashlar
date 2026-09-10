@@ -690,6 +690,109 @@ export function queueBoot(fn) {
 	}
 }
 
+// ─── Shared Attribute Observer ─────────────────────────────
+//
+// One MutationObserver on document.body watches every attribute mutation,
+// with no filtering by name. Registry lives on window.lnCore (not module scope)
+// because every standalone bundle inlines its own copy of this file — same
+// reason and same shape as the _fillBound / _localeObserverBound flags above.
+
+function _attrRegistry() {
+	window.lnCore = window.lnCore || {};
+	window.lnCore._attrRegistry = window.lnCore._attrRegistry || { byAttr: new Map(), reactive: [] };
+	return window.lnCore._attrRegistry;
+}
+
+function _registerAttrEntry(entry) {
+	const registry = _attrRegistry();
+	const observed = entry.observed || [];
+	for (let i = 0; i < observed.length; i++) {
+		const name = observed[i];
+		if (!registry.byAttr.has(name)) registry.byAttr.set(name, []);
+		registry.byAttr.get(name).push(entry);
+	}
+	if (entry.onAttrChange || entry.effects) {
+		registry.reactive.push(entry);
+	}
+}
+
+// Processes one MutationRecord. Order is load-bearing: the reactive path
+// runs FIRST so that adding a marker attribute to a fresh element is not
+// reported as a change to an existing instance. If the legacy path ran
+// first it would construct the instance, and the reactive path would then
+// see el[attribute] truthy and fire an effect for what was actually the
+// element's initialisation.
+function _handleAttrMutation(mut) {
+	const el = mut.target;
+	const name = mut.attributeName;
+
+	// echo guard — a same-value setAttribute still produces a record
+	if (mut.oldValue === el.getAttribute(name)) return;
+
+	const registry = _attrRegistry();
+	const entries = registry.byAttr.get(name);
+
+	// (A) reactive path — only data-ln-* (ln-date/ln-time/ln-number legitimately
+	// observe lang/datetime, ln-external-links observes href, none of which are
+	// data-ln-*; prefix-guarding the whole callback would break those)
+	if (name.indexOf('data-ln-') === 0) {
+		for (let i = 0; i < registry.reactive.length; i++) {
+			const entry = registry.reactive[i];
+			if (!el[entry.attribute]) continue;
+			const effect = entry.effects && entry.effects[name];
+			if (effect) effect(el, name, mut.oldValue);
+			else if (entry.onAttrChange) entry.onAttrChange(el, name, mut.oldValue);
+		}
+	}
+
+	if (!entries) return;
+	for (let i = 0; i < entries.length; i++) {
+		const entry = entries[i];
+		// (B) raw handler — components that own their own lifecycle
+		if (entry.handler) {
+			entry.handler(el, name, mut.oldValue);
+			continue;
+		}
+		// (C) legacy path — byte-for-byte the old per-registration branch
+		if (entry.onAttributeChange && el[entry.attribute]) {
+			entry.onAttributeChange(el, name);
+		} else {
+			findElements(el, entry.selector, entry.attribute, entry.ComponentFn);
+			if (entry.onInit) entry.onInit(el);
+		}
+	}
+}
+
+function _ensureAttrObserver() {
+	window.lnCore = window.lnCore || {};
+	if (window.lnCore._attrObserverBound) return;
+	window.lnCore._attrObserverBound = true;
+
+	guardBody(function () {
+		const observer = new MutationObserver(function (mutations) {
+			for (let i = 0; i < mutations.length; i++) {
+				_handleAttrMutation(mutations[i]);
+			}
+		});
+		observer.observe(document.body, {
+			attributes: true,
+			subtree: true,
+			attributeOldValue: true
+		});
+	}, 'ln-core');
+}
+
+/**
+ * For components that own their own lifecycle and only need the attribute
+ * half of the shared invariant — no instance gate, no `data-ln-` prefix gate.
+ * @param {string[]} names - attribute names to watch
+ * @param {function(Element, string, string):void} handler - (el, attributeName, oldValue)
+ */
+export function observeAttributes(names, handler) {
+	_registerAttrEntry({ observed: names, handler: handler });
+	_ensureAttrObserver();
+}
+
 // ─── Component Registration ───────────────────────────────
 
 export function registerComponent(selector, attribute, ComponentFn, componentTag, options = {}) {
@@ -697,12 +800,40 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 	const onAttributeChange = options.onAttributeChange || null;
 	const onSubtreeChange = options.onSubtreeChange || null;
 	const onInit = options.onInit || null;
+	const onAttrChange = options.onAttrChange || null;
+	const effects = options.effects || null;
 
 	function constructor(domRoot) {
 		const root = domRoot || document.body;
 		findElements(root, selector, attribute, ComponentFn);
 		if (onInit) onInit(root);
 	}
+
+	// Extract attribute names from selector — this is still the observed set
+	// used for registry lookup (byAttr), independent of the MutationObserver
+	// options below, which no longer filter attributes at all.
+	const observedAttributes = [];
+	if (selector.indexOf('[') !== -1) {
+		const re = /\[([\w-]+)/g;
+		let match;
+		while ((match = re.exec(selector)) !== null) {
+			observedAttributes.push(match[1]);
+		}
+	} else {
+		observedAttributes.push(selector);
+	}
+
+	_registerAttrEntry({
+		selector: selector,
+		attribute: attribute,
+		ComponentFn: ComponentFn,
+		onInit: onInit,
+		observed: observedAttributes.concat(extraAttributes),
+		onAttributeChange: onAttributeChange,
+		onAttrChange: onAttrChange,
+		effects: effects
+	});
+	_ensureAttrObserver();
 
 	guardBody(function () {
 		const observer = new MutationObserver(function (mutations) {
@@ -744,34 +875,13 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 							}
 						}
 					}
-				} else if (mutation.type === 'attributes') {
-					if (onAttributeChange && mutation.target[attribute]) {
-						onAttributeChange(mutation.target, mutation.attributeName);
-					} else {
-						findElements(mutation.target, selector, attribute, ComponentFn);
-						if (onInit) onInit(mutation.target);
-					}
 				}
 			}
 		});
 
-		// Extract attribute names from selector for attributeFilter
-		let observedAttributes = [];
-		if (selector.indexOf('[') !== -1) {
-			const re = /\[([\w-]+)/g;
-			let match;
-			while ((match = re.exec(selector)) !== null) {
-				observedAttributes.push(match[1]);
-			}
-		} else {
-			observedAttributes.push(selector);
-		}
-
 		observer.observe(document.body, {
 			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeFilter: observedAttributes.concat(extraAttributes)
+			subtree: true
 		});
 	}, componentTag || (selector.indexOf('[') === -1 ? selector.replace('data-', '') : 'component'));
 

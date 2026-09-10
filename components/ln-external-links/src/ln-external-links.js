@@ -1,4 +1,4 @@
-import { dispatch, guardBody } from '../../ln-core';
+import { dispatch, guardBody, observeAttributes } from '../../ln-core';
 
 (function() {
 	const DOM_ATTRIBUTE = 'lnExternalLinks';
@@ -76,21 +76,18 @@ import { dispatch, guardBody } from '../../ln-core';
 							}
 						}
 					}
-
-					if (mutation.type === 'attributes' && mutation.attributeName === 'href') {
-						const target = mutation.target;
-						if (target.matches && (target.matches('a') || target.matches('area'))) {
-							_processLink(target);
-						}
-					}
 				}
 			});
 
 			observer.observe(document.body, {
 				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: ['href']
+				subtree: true
+			});
+
+			observeAttributes(['href'], function (el) {
+				if (el.matches && (el.matches('a') || el.matches('area'))) {
+					_processLink(el);
+				}
 			});
 		}, 'ln-external-links');
 	}

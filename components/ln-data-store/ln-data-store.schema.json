@@ -10,6 +10,13 @@
 				"src/ln-data-store.js"
 			]
 		},
+		"data-ln-data-store-frozen": {
+			"direction": "runtime",
+			"sources": [
+				"ln-data-store-dev.scss",
+				"src/ln-data-store.js"
+			]
+		},
 		"data-ln-data-store-indexes": {
 			"direction": "author",
 			"sources": [
@@ -17,19 +24,19 @@
 			]
 		},
 		"data-ln-data-store-no-local-query": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-data-store.js"
 			]
 		},
 		"data-ln-data-store-search-fields": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-data-store.js"
 			]
 		},
 		"data-ln-data-store-stale": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-data-store.js"
 			]
@@ -41,7 +48,7 @@
 			]
 		},
 		"data-ln-data-store-window-page": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-data-store.js"
 			]
