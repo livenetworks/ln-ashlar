@@ -1,0 +1,18 @@
+# Local pipeline state — never shared.
+# .graphify_python and .graphify_root hold absolute paths from the machine that
+# built the graph; committing them breaks the rebuild hook on every other clone.
+.graphify_python
+.graphify_root
+cache/
+cost.json
+
+# Extraction intermediates, rewritten on every run.
+.graphify_detect.json
+.graphify_ast.json
+.graphify_semantic.json
+.graphify_cached.json
+.graphify_uncached.txt
+.graphify_chunk_*.json
+.graphify_analysis.json
+
+*.bak
