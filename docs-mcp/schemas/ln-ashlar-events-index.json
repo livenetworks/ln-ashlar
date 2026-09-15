@@ -159,9 +159,7 @@
 			"source": "mixed"
 		},
 		"ln-api-connector:request-bulk-delete": {
-			"emitted_by": [
-				"ln-data-coordinator"
-			],
+			"emitted_by": [],
 			"listened_by": [
 				"ln-api-connector",
 				"ln-couchdb-connector"
@@ -182,9 +180,7 @@
 			"source": "static"
 		},
 		"ln-api-connector:request-create": {
-			"emitted_by": [
-				"ln-data-coordinator"
-			],
+			"emitted_by": [],
 			"listened_by": [
 				"ln-api-connector",
 				"ln-couchdb-connector"
@@ -195,9 +191,7 @@
 			"source": "mixed"
 		},
 		"ln-api-connector:request-delete": {
-			"emitted_by": [
-				"ln-data-coordinator"
-			],
+			"emitted_by": [],
 			"listened_by": [
 				"ln-api-connector",
 				"ln-couchdb-connector"
@@ -219,9 +213,7 @@
 			"source": "mixed"
 		},
 		"ln-api-connector:request-query": {
-			"emitted_by": [
-				"ln-data-coordinator"
-			],
+			"emitted_by": [],
 			"listened_by": [
 				"ln-api-connector"
 			],
@@ -231,9 +223,7 @@
 			"source": "static"
 		},
 		"ln-api-connector:request-sync": {
-			"emitted_by": [
-				"ln-data-coordinator"
-			],
+			"emitted_by": [],
 			"listened_by": [
 				"ln-api-connector",
 				"ln-couchdb-connector"
@@ -244,9 +234,7 @@
 			"source": "mixed"
 		},
 		"ln-api-connector:request-update": {
-			"emitted_by": [
-				"ln-data-coordinator"
-			],
+			"emitted_by": [],
 			"listened_by": [
 				"ln-api-connector",
 				"ln-couchdb-connector"
@@ -782,6 +770,26 @@
 			"detail": "",
 			"source": "static"
 		},
+		"ln-data-coordinator:offline": {
+			"emitted_by": [
+				"ln-data-coordinator"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "",
+			"detail": "",
+			"source": "static"
+		},
+		"ln-data-coordinator:online": {
+			"emitted_by": [
+				"ln-data-coordinator"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "",
+			"detail": "",
+			"source": "static"
+		},
 		"ln-data-coordinator:request-bulk-delete": {
 			"emitted_by": [],
 			"listened_by": [
@@ -895,26 +903,6 @@
 			"listened_by": [
 				"ln-data-coordinator"
 			],
-			"cancelable": false,
-			"description": "",
-			"detail": "",
-			"source": "static"
-		},
-		"ln-data-store:offline": {
-			"emitted_by": [
-				"ln-data-coordinator"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "",
-			"detail": "",
-			"source": "static"
-		},
-		"ln-data-store:online": {
-			"emitted_by": [
-				"ln-data-coordinator"
-			],
-			"listened_by": [],
 			"cancelable": false,
 			"description": "",
 			"detail": "",
@@ -1249,6 +1237,7 @@
 				"ln-filter"
 			],
 			"listened_by": [
+				"ln-data-coordinator",
 				"ln-data-store",
 				"ln-list",
 				"ln-table",
@@ -1861,6 +1850,7 @@
 				"ln-search"
 			],
 			"listened_by": [
+				"ln-data-coordinator",
 				"ln-data-store",
 				"ln-list",
 				"ln-table"
@@ -1875,6 +1865,7 @@
 				"ln-sort"
 			],
 			"listened_by": [
+				"ln-data-coordinator",
 				"ln-data-store",
 				"ln-list",
 				"ln-sort",

@@ -605,48 +605,6 @@
 		"ln-data-coordinator": {
 			"emits": [
 				{
-					"name": "ln-api-connector:request-bulk-delete",
-					"cancelable": false,
-					"description": "Triggers bulk document deletes.",
-					"detail": "{ ids: Array, url?: String, idempotencyKey?: String, meta?: Object }",
-					"source": "static"
-				},
-				{
-					"name": "ln-api-connector:request-create",
-					"cancelable": false,
-					"description": "Dispatched to the connector child — direct path (no queue) or the queued-transport path via `ln-api-queue:send`.",
-					"detail": "{ data?, id?, ids?, url?, meta: Object }",
-					"source": "static"
-				},
-				{
-					"name": "ln-api-connector:request-delete",
-					"cancelable": false,
-					"description": "Triggers document DELETE.",
-					"detail": "{ id: ID, url?: String, idempotencyKey?: String, meta?: Object }",
-					"source": "static"
-				},
-				{
-					"name": "ln-api-connector:request-query",
-					"cancelable": false,
-					"description": "Triggers structured query/pagination fetch.",
-					"detail": "{ query?: Object, meta?: Object }",
-					"source": "static"
-				},
-				{
-					"name": "ln-api-connector:request-sync",
-					"cancelable": false,
-					"description": "Dispatched to the connector on `ln-data-store:request-remote-sync`, to trigger the delta fetch.",
-					"detail": "{ since: String, meta: Object }",
-					"source": "static"
-				},
-				{
-					"name": "ln-api-connector:request-update",
-					"cancelable": false,
-					"description": "Triggers document PUT edit.",
-					"detail": "{ id: ID, data: Object, expected_version?: Int, url?: String, idempotencyKey?: String, meta?: Object }",
-					"source": "static"
-				},
-				{
 					"name": "ln-api-queue:ack",
 					"cancelable": false,
 					"description": "Confirms or rejects a queue message.",
@@ -696,14 +654,14 @@
 					"source": "static"
 				},
 				{
-					"name": "ln-data-store:offline",
+					"name": "ln-data-coordinator:offline",
 					"cancelable": false,
 					"description": "",
 					"detail": "",
 					"source": "static"
 				},
 				{
-					"name": "ln-data-store:online",
+					"name": "ln-data-coordinator:online",
 					"cancelable": false,
 					"description": "",
 					"detail": "",
@@ -1041,6 +999,13 @@
 					"source": "static"
 				},
 				{
+					"name": "ln-filter:change",
+					"cancelable": false,
+					"description": "The user changed one filter. Carries **one key** per control; merged into `data-ln-data-coordinator-filters`. An empty `values` array removes that key.",
+					"detail": "{ key: String, values: Array, targetId: String }",
+					"source": "static"
+				},
+				{
 					"name": "ln-list:request-data",
 					"cancelable": false,
 					"description": "Query from a list to fetch items (same handling as `ln-table:request-data`).",
@@ -1052,6 +1017,20 @@
 					"cancelable": false,
 					"description": "Query from an `<select>`/options binder to fetch all records.",
 					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-search:change",
+					"cancelable": false,
+					"description": "The user changed the search term. The handler writes `data-ln-data-coordinator-search` and nothing else; the re-query is a declared reaction to that attribute.",
+					"detail": "{ term: String, tokens: Array, targetId: String, fields: Array }",
+					"source": "static"
+				},
+				{
+					"name": "ln-sort:change",
+					"cancelable": false,
+					"description": "The user changed the sort. Writes `-sort-field` + `-sort-direction`. `direction: 'none'`, or a `null` `field` (column-index sort), is treated as \"no sort\" and removes both.",
+					"detail": "{ field: String|null, column: Number|null, direction: 'asc'|'desc'|'none', targetId: String }",
 					"source": "static"
 				},
 				{

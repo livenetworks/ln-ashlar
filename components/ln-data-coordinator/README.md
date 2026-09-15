@@ -27,14 +27,14 @@ Add these attributes to view elements to bind them to this coordinator's child s
 
 Use `setPresenters` for fields like `updated_display`, `size_display`, `status_label`. The binder delivers them as-is.
 
-The coordinator listens on `this.dom` for `ln-data-store:ready`, `loaded`, `created`, `updated`, `deleted`, `synced` (only when `changed`), `ln-data-store:query-changed`, and `ln-data-store:request-page`. On request-page, it converts page offsets into `ln-api-connector:request-query` calls. On other store-change events, `_refreshAll()` re-queries all bound view elements using their last cached query parameters.
+The coordinator listens on `this.dom` for `ln-data-store:ready`, `loaded`, `created`, `updated`, `deleted`, `synced` (only when `changed`), `ln-data-store:query-changed`, and `ln-data-store:request-page`. On request-page, it converts page offsets into a `request-query` call on the paired connector's namespace (`ln-api-connector:request-query` or `ln-couchdb-connector:request-query`, depending on which connector is present). On other store-change events, `_refreshAll()` re-queries all bound view elements using their last cached query parameters.
 
 ### Zero-JS Example
 
 ```html
 <ul id="people-module" data-ln-data-coordinator hidden>
   <li id="people" data-ln-data-store></li>
-  <li data-ln-api-connector data-ln-api-endpoint="/api/people"></li>
+  <li data-ln-api-connector data-ln-api-connector-path="/api/people"></li>
 </ul>
 
 <section data-ln-table="people"
@@ -81,7 +81,7 @@ The coordinator acts as a parent wrapper enclosing the database cache and transp
 
 ```html
 <ul id="documents-module" data-ln-data-coordinator
-    data-ln-data-mapper="documents" hidden>
+    data-ln-data-coordinator-mapper="documents" hidden>
      
     <!-- Tier 1: Local Cache Database (IndexedDB - pure and network-blind) -->
     <li id="documents" data-ln-data-store 
@@ -90,8 +90,8 @@ The coordinator acts as a parent wrapper enclosing the database cache and transp
 
     <!-- Tier 2: Transport Gateway (API / REST Connector) -->
     <li data-ln-api-connector 
-        data-ln-api-base-url="https://api.livenetworks.com/v1"
-        data-ln-api-path="/documents">
+        data-ln-api-connector-base-url="https://api.livenetworks.com/v1"
+        data-ln-api-connector-path="/documents">
     </li>
 </ul>
 ```
@@ -103,8 +103,43 @@ The coordinator acts as a parent wrapper enclosing the database cache and transp
 | Attribute | Category | Description |
 |-----------|----------|-------------|
 | `id="name"` | Identity | Unique identifier of the coordinator (the coordinator name/domain/scope). |
-| `data-ln-data-coordinator` | Selector | Marker attribute to declare the component. |
-| `data-ln-data-mapper` | Mapping | Reference to an externally registered data mapper name (e.g. `documents`). Defaults to `id` if omitted. |
+| `data-ln-data-coordinator` | Selector | Marker attribute to declare the component. Its value is the coordinator's name; falls back to `id`. Views and query controls address **this** name, never a child's. |
+| `data-ln-data-coordinator-mapper` | Mapping | Reference to an externally registered data mapper name (e.g. `documents`). Defaults to `id` if omitted. |
+| `data-ln-data-coordinator-scope` | Scope | Opts an external `<form>` into this coordinator's write intake loop. |
+| `data-ln-data-coordinator-search` | Query | Current search term, a plain string. Absent or empty means no search. |
+| `data-ln-data-coordinator-filters` | Query | Active filters as a URL query string. A multi-value filter is a **repeated key**: `status=open&status=pending&type=invoice`. Absent means no filters. |
+| `data-ln-data-coordinator-sort-field` | Query | Field the result set is sorted by. Meaningful only together with `-sort-direction`. |
+| `data-ln-data-coordinator-sort-direction` | Query | `asc` or `desc`. Both sort attributes are removed together when sorting is cleared. |
+
+### The query lives here, in the form a browser would produce
+
+The coordinator is the only participant guaranteed to be present in its layer — the cache,
+the transport and the queue are all optional. The address and the query state are therefore
+**its own**, never a child's. A query is not a property of the cache; the cache is one thing
+that can *answer* a query.
+
+```html
+<ul data-ln-data-coordinator="documents"
+    data-ln-data-coordinator-search="acme"
+    data-ln-data-coordinator-sort-field="updated_at"
+    data-ln-data-coordinator-sort-direction="desc"
+    data-ln-data-coordinator-filters="status=open&status=pending&type=invoice" hidden>
+```
+
+Without JavaScript, a form does a `GET` and the browser lays the values out in a URL query
+string. JS only enhances: it takes that same thing and forwards it over AJAX. Every flip of
+representation between those two points is an unnecessary chance to get it wrong, so the
+attribute carries the form the browser itself would produce — parsed with native
+`URLSearchParams`, and a multi-value filter is the repeated key a checkbox group submits on
+its own. Sort is two axes rather than the connector's `sort_field` / `sort_dir`, because
+those names are transport configuration (overridable per connector via `paramKeys`) and do
+not belong in the coordinator's contract.
+
+All four are read **live** at the moment of use — never parsed once and cached in a JS field.
+An author may seed them in markup as the initial query, and a script or devtools may write
+them directly: an attribute write is honoured exactly like an `ln-search:change` event,
+because the reaction is declared on the attribute, not on the event. Writes are batched, so
+clearing a sort (two attribute removals) re-queries once, not twice.
 
 ---
 
@@ -113,33 +148,13 @@ The coordinator acts as a parent wrapper enclosing the database cache and transp
 The coordinator is built to be highly dynamic, reacting to runtime modifications in its DOM subtree.
 
 1. **Child Discovery**: The coordinator automatically locates its child components by querying its DOM subtree:
-   * **Store Cache**: Looks for `[data-ln-data-store]` and accesses `el.lnDataStore || el.lnStore`.
-   * **Transport Connector**: Looks for any connector selector (`[data-ln-api-connector]`, `[data-ln-couchdb-connector]`, `[data-ln-websocket-connector]`, `[data-ln-rest-connector]`) and accesses the universal alias `el.lnConnector`.
+   * **Store Cache**: Looks for `[data-ln-data-store]` and accesses `el.lnDataStore`.
+   * **Transport Connector**: Looks for any connector selector (`[data-ln-api-connector]`, `[data-ln-couchdb-connector]`, `[data-ln-websocket-connector]`) and accesses the matching instance (`el.lnApiConnector` or `el.lnCouchDbConnector`). The response event namespace (`ln-api-connector:*` or `ln-couchdb-connector:*`) is derived from whichever selector matched, not hardcoded.
    * **Offline Outbox (optional Child 3)**: Looks for `[data-ln-api-queue]` and accesses `el.lnApiQueue`. When present, write routing (below) enqueues instead of calling the connector directly. When absent, behavior is byte-for-byte the direct-connector path described in this document.
 
-2. **Mapper Resolution**: The coordinator resolves mapping functions using two strategies:
-   * **Inline Script (Highly Encapsulated)**: Looks for a nested `<script type="application/javascript" data-ln-mapper>` tag in its subtree:
-     ```html
-     <script type="application/javascript" data-ln-mapper>
-       ({
-         ingress(serverRaw) {
-           return {
-             id: serverRaw.id,
-             title: serverRaw.title,
-             status: serverRaw.status,
-             updated_at: Date.parse(serverRaw.updated_at) / 1000
-           };
-         },
-         egress(localDb) {
-           return {
-             title: localDb.title,
-             status: localDb.status
-           };
-         }
-       })
-     </script>
-     ```
-   * **External Registry (Reusability)**: If no inline script exists, it reads the `data-ln-data-mapper` attribute and looks up the mapper via `window.lnCore.getDataMapper(name)`.
+2. **Mapper Resolution**: The coordinator resolves mapping functions securely using the registry:
+   * **External Registry (Recommended & Secure)**: Reads the `data-ln-data-coordinator-mapper` attribute — falling back to the host element's `id` when the attribute is absent — and looks up the mapper via `window.lnCore.getDataMapper(name)`. Mappers are registered via `window.lnCore.registerDataMapper(name, mapper)`.
+   * **Inline Script Deprecation**: Nested `<script data-ln-mapper>` tags are deprecated and disabled due to XSS vulnerability risks (unsafe-eval).
    * **Fallback**: Defaults to a safe no-op mapper: `{ ingress: r => r, egress: r => r }`.
 
 ---
@@ -147,6 +162,31 @@ The coordinator is built to be highly dynamic, reacting to runtime modifications
 ## ⚡ The Event Loop Orchestration
 
 Because all events dispatched by the child components bubble up, the coordinator listens directly on its own DOM boundary. It manages the following flows seamlessly:
+
+### Query Intake — `ln-search:change` / `ln-filter:change` / `ln-sort:change`
+
+Query controls announce a **speech act**; the coordinator stores the resulting **state**. The
+handlers do exactly one thing: write the attribute. They never re-query directly.
+
+| Event | `detail` read | Written to |
+|---|---|---|
+| `ln-search:change` | `term` | `data-ln-data-coordinator-search` |
+| `ln-filter:change` | `key`, `values` | merged into `data-ln-data-coordinator-filters` |
+| `ln-sort:change` | `field`, `direction` | `-sort-field` + `-sort-direction` |
+
+Each handler calls `preventDefault()` to claim the event, and diffs against the current
+attribute value first — a filter reset that was never set, or a re-click producing the same
+sort, is not a query change and does nothing.
+
+`ln-filter:change` carries **one key** per control, so the attribute accumulates keys across
+however many filter controls are bound. An empty `values` array removes that key; when the
+last key goes, the attribute is removed rather than left as an empty string. `ln-sort:change`
+emits `direction: 'none'` to mean "sort removed", and `field` is `null` for a column-index
+sort — both are treated as "no sort", since neither is a meaningful server sort key.
+
+The re-query is **not** triggered from these handlers. It is declared once, as a reaction to
+the four query attributes (`extraAttributes` + `onAttributeChange`), and batched — so one
+sort change, which writes two attributes, still re-queries once.
 
 ### 0. Form Write Intake (native `submit`, claimed via `preventDefault()`)
 
@@ -156,7 +196,7 @@ the form itself always runs first). On every submit bubbling through:
 
 1. `if (e.defaultPrevented) return` — either `ln-validate`'s validation
    gate blocked an invalid submit, or another coordinator already claimed it.
-2. Reads `data-ln-form-scope` off `e.target` (the form). Absent → the
+2. Reads `data-ln-data-coordinator-scope` off `e.target` (the form). Absent → the
    form never opted in; leave the native submit alone.
 3. Claims it if either holds: scope value `=== this._name` (named
    override), or the scope is empty and the form is a DOM descendant of
@@ -307,7 +347,7 @@ only when the queue later commands the coordinator to send.
 The queue entry's opaque `meta.action` (the form's resource URL,
 persisted across sessions) now rides into the connector request's `url`
 field at send time; the connector executes the write against it, joined
-with `data-ln-api-base-url` exactly like the `path` fallback.
+with `data-ln-api-connector-base-url` exactly like the `path` fallback.
 
 The coordinator listens for `ln-api-queue:send` on the queue element. It
 maps `op` to the matching connector `:request-*` event (same egress/ingress flow as the
@@ -425,7 +465,7 @@ ignored otherwise):
    ```html
    <ul id="documents-module" data-ln-data-coordinator hidden>
      <li id="documents" data-ln-data-store></li>
-     <li data-ln-api-connector data-ln-api-base-url="/api" data-ln-api-path="/documents"></li>
+     <li data-ln-api-connector data-ln-api-connector-base-url="/api" data-ln-api-connector-path="/documents"></li>
 
      <!-- consumed once at init, then removed from the DOM -->
      <span data-ln-data-coordinator-dict="auth" hidden>Your session expired — please sign in again.</span>
@@ -456,9 +496,9 @@ The coordinator — not the store — decides WHEN to sync:
 * A module-level singleton wires **one shared** `window 'online'`,
   `window 'offline'`, and `document 'visibilitychange'` listener set across
   every coordinator instance on the page (not one per instance). On
-  `online`, dispatches `ln-data-store:online` on `document` once, then for each
+  `online`, dispatches `ln-data-coordinator:online` on `document` once, then for each
   coordinator with a loaded, non-syncing store: `store.forceSync()`. On
-  `offline`, dispatches `ln-data-store:offline` on `document` once. On
+  `offline`, dispatches `ln-data-coordinator:offline` on `document` once. On
   `visibilitychange` (tab visible again), for each coordinator whose store
   is stale: `store.forceSync()`.
 
@@ -473,15 +513,14 @@ view reads use the remote source directly.
 | `data-ln-data-coordinator-stale` | Seconds threshold before the store is considered stale; falls back to the store's own `data-ln-data-store-stale`; default 300; `-1` / `never` = never stale. |
 | `data-ln-data-coordinator-no-autosync` | Presence opts the coordinator out of online/visibility auto-sync; falls back to the store's own `data-ln-data-store-no-autosync`. |
 
-`ln-data-store:online` / `ln-data-store:offline` now require a coordinator on the
-page — the store itself no longer dispatches them (see the
-[ln-data-store README](../ln-data-store/README.md)).
+`ln-data-coordinator:online` / `ln-data-coordinator:offline` indicate network status
+for data coordination across the page.
 
 ---
 
 ## 💡 JS API (On the element)
 
-Access the coordinator instance programmatically via the `lnDataCoordinator` or `lnCoordinator` properties:
+Access the coordinator instance programmatically via the `lnDataCoordinator` property:
 
 ```javascript
 const coordinator = document.getElementById('documents-module').lnDataCoordinator;

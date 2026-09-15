@@ -15,3 +15,7 @@ docs-mcp/_incoming/
 # Continue.dev scaffolding. Per-developer IDE state, not project content, and
 # its mcpServers entry carries a bearer token — never commit it.
 .continue/
+
+# Knowledge graph output. Derived from the source tree by `graphify update`,
+# and it churns on every code change — regenerate locally, never commit.
+graphify-out/
