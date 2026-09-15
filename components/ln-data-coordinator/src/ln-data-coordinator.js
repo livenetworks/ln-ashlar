@@ -1,12 +1,15 @@
-import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMethod } from '../../ln-core';
-import { normalizeDataQuery, selectDataSource, composeQuery } from './data-read-policy';
+import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMethod, createBatcher } from '../../ln-core';
+import { normalizeDataQuery, selectDataSource, composeQuery, needsRemoteSupersede } from './data-read-policy';
 import { MutationReceipts } from './mutation-receipts';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-data-coordinator';
 	const DOM_ATTRIBUTE = 'lnDataCoordinator';
-	const DOM_ALIAS = 'lnCoordinator';
-	const SCOPE_ATTR = 'data-ln-form-scope';
+	const SCOPE_ATTR = 'data-ln-data-coordinator-scope';
+	const SEARCH_ATTR = 'data-ln-data-coordinator-search';
+	const FILTERS_ATTR = 'data-ln-data-coordinator-filters';
+	const SORT_FIELD_ATTR = 'data-ln-data-coordinator-sort-field';
+	const SORT_DIR_ATTR = 'data-ln-data-coordinator-sort-direction';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -23,14 +26,14 @@ import { MutationReceipts } from './mutation-receipts';
 		_globalSyncInstalled = true;
 
 		_onlineHandler = function () {
-			dispatch(document, 'ln-data-store:online', {});
+			dispatch(document, 'ln-data-coordinator:online', {});
 			_coordinators.forEach(function (coord) {
 				coord._maybeSync();
 			});
 		};
 
 		_offlineHandler = function () {
-			dispatch(document, 'ln-data-store:offline', {});
+			dispatch(document, 'ln-data-coordinator:offline', {});
 		};
 
 		_visibilityHandler = function () {
@@ -80,25 +83,37 @@ import { MutationReceipts } from './mutation-receipts';
 	// paired connector is ln-api-connector or ln-couchdb-connector.
 	const CONNECTOR_RESPONSE_NAMESPACES = ['ln-api-connector', 'ln-couchdb-connector'];
 
+	function _connectorNamespace(connectorEl) {
+		if (!connectorEl) return 'ln-api-connector';
+		if (connectorEl.hasAttribute('data-ln-couchdb-connector')) return 'ln-couchdb-connector';
+		if (connectorEl.hasAttribute('data-ln-websocket-connector')) return 'ln-websocket-connector';
+		return 'ln-api-connector';
+	}
+
 	// ─── Component Constructor ─────────────────────────────
 
 	function _component(dom) {
+		const self = this;
 		this.dom = dom;
 		this._name = dom.getAttribute('data-ln-data-coordinator') || dom.id;
 		if (!this._name) console.warn('[ln-data-coordinator] missing id — the coordinator cannot be addressed', dom);
 		dom[DOM_ATTRIBUTE] = this;
-		dom[DOM_ALIAS] = this;
 
+		this._destroyed = false;
 		this.mapper = null;
 		this._handlers = null;
 		this._boundQueries = new WeakMap();
 		this._boundDelivered = new WeakMap();
+		this._queryGens = new WeakMap();
 		this._mutationReceipts = new MutationReceipts();
 		this._dict = buildDict(dom, 'data-ln-data-coordinator-dict'); // flat key→string error-toast map; {} if none
 
-		this._parseStaleAttributes();
+		this._queueQueryRefresh = createBatcher(function () {
+			if (self._destroyed) return;
+			self._refreshAll(null, true);
+		});
 
-		this.refreshMapper();
+		this.refreshConfig();
 		_bindEvents(this);
 
 		_coordinators.add(this);
@@ -109,20 +124,31 @@ import { MutationReceipts } from './mutation-receipts';
 		return this;
 	}
 
-	// ─── Stale / No-Autosync Attribute Parsing ──────────────
+	// ─── Observable Live Attributes (Single Source of Truth) ──
 
-	_component.prototype._parseStaleAttributes = function () {
-		const children = this.findChildren();
-		const storeEl = children.storeEl;
+	Object.defineProperty(_component.prototype, '_staleThreshold', {
+		get: function () {
+			const children = this.findChildren();
+			const storeEl = children.storeEl;
+			const staleAttr = this.dom.getAttribute('data-ln-data-coordinator-stale')
+				|| (storeEl ? storeEl.getAttribute('data-ln-data-store-stale') : null);
+			if (staleAttr === 'never' || staleAttr === '-1') return -1;
+			const parsed = parseInt(staleAttr, 10);
+			return isNaN(parsed) ? 300 : parsed;
+		}
+	});
 
-		const staleAttr = this.dom.getAttribute('data-ln-data-coordinator-stale')
-			|| (storeEl ? storeEl.getAttribute('data-ln-data-store-stale') : null);
-		const parsed = parseInt(staleAttr, 10);
-		this._staleThreshold = (staleAttr === 'never' || staleAttr === '-1') ? -1 : (isNaN(parsed) ? 300 : parsed);
+	Object.defineProperty(_component.prototype, '_noAutosync', {
+		get: function () {
+			const children = this.findChildren();
+			const storeEl = children.storeEl;
+			return this.dom.hasAttribute('data-ln-data-coordinator-no-autosync')
+				|| (storeEl ? storeEl.hasAttribute('data-ln-data-store-no-autosync') : false);
+		}
+	});
 
-		const noAutosyncAttr = this.dom.hasAttribute('data-ln-data-coordinator-no-autosync')
-			|| (storeEl ? storeEl.hasAttribute('data-ln-data-store-no-autosync') : false);
-		this._noAutosync = !!noAutosyncAttr;
+	_component.prototype.refreshConfig = function () {
+		this.refreshMapper();
 	};
 
 	_component.prototype._isStale = function () {
@@ -151,6 +177,7 @@ import { MutationReceipts } from './mutation-receipts';
 		if (!store) return;
 
 		Promise.resolve(store.ready).then(function () {
+			if (self._destroyed) return;
 			const children = self.findChildren();
 			const currentStore = children.store;
 			if (currentStore && currentStore.initializationError) {
@@ -160,6 +187,7 @@ import { MutationReceipts } from './mutation-receipts';
 			if (!currentStore || !children.connector || self._noAutosync || currentStore.isSyncing) return;
 			if (!currentStore.hasCache || self._isStale()) currentStore.forceSync();
 		}).catch(function (error) {
+			if (self._destroyed) return;
 			self._reportReconciliationError('store-initialize', error, null);
 		});
 	};
@@ -176,7 +204,8 @@ import { MutationReceipts } from './mutation-receipts';
 		}
 
 		// 2. Resolve to registered external mapper
-		const mapperName = this.dom.getAttribute('data-ln-data-mapper') || this.dom.id;
+		const mapperName = this.dom.getAttribute('data-ln-data-coordinator-mapper')
+			|| this.dom.id;
 		if (mapperName && window.lnCore && typeof window.lnCore.getDataMapper === 'function') {
 			this.mapper = window.lnCore.getDataMapper(mapperName);
 		}
@@ -206,8 +235,8 @@ import { MutationReceipts } from './mutation-receipts';
 			storeEl: storeEl,
 			connectorEl: connectorEl,
 			queueEl: queueEl,
-			store: storeEl ? (storeEl.lnDataStore || storeEl.lnStore) : null,
-			connector: connectorEl ? (connectorEl.lnConnector || connectorEl.lnApiConnector || connectorEl.lnCouchDbConnector) : null,
+			store: storeEl ? storeEl.lnDataStore : null,
+			connector: connectorEl ? (connectorEl.lnApiConnector || connectorEl.lnCouchDbConnector) : null,
 			queue: queueEl ? queueEl.lnApiQueue : null
 		};
 	};
@@ -216,8 +245,8 @@ import { MutationReceipts } from './mutation-receipts';
 
 	_component.prototype._handleSubmitRecord = function (detail) {
 		const children = this.findChildren();
-		if (!children.storeEl) {
-			console.warn('[ln-data-coordinator] form submit claimed but no [data-ln-data-store] child found in "' + (this._name || '') + '"');
+		if (!children.storeEl && !children.connectorEl) {
+			console.warn('[ln-data-coordinator] form submit claimed but neither [data-ln-data-store] nor a connector child found in "' + (this._name || '') + '"');
 			return;
 		}
 
@@ -243,7 +272,9 @@ import { MutationReceipts } from './mutation-receipts';
 		this.refreshMapper();
 		const tempId = '_temp_' + _uuid();
 
-		dispatch(children.storeEl, 'ln-data-store:request-create', { tempId: tempId, data: data });
+		if (children.storeEl) {
+			dispatch(children.storeEl, 'ln-data-store:request-create', { tempId: tempId, data: data });
+		}
 
 		if (children.queue) {
 			dispatch(children.queueEl, 'ln-api-queue:request-enqueue', {
@@ -252,7 +283,7 @@ import { MutationReceipts } from './mutation-receipts';
 				meta: { tempId: tempId, action: action }
 			});
 		} else if (children.connector) {
-			dispatch(children.connectorEl, 'ln-api-connector:request-create', {
+			dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-create', {
 				data: this.mapper.egress(data), url: action,
 				meta: { entryId: _uuid(), queued: false, op: 'create', tempId: tempId }
 			});
@@ -262,7 +293,9 @@ import { MutationReceipts } from './mutation-receipts';
 	_component.prototype._fanOutUpdate = function (children, id, data, expectedVersion, action) {
 		this.refreshMapper();
 
-		dispatch(children.storeEl, 'ln-data-store:request-update', { id: id, data: data });
+		if (children.storeEl) {
+			dispatch(children.storeEl, 'ln-data-store:request-update', { id: id, data: data });
+		}
 
 		if (children.queue) {
 			dispatch(children.queueEl, 'ln-api-queue:request-enqueue', {
@@ -271,7 +304,7 @@ import { MutationReceipts } from './mutation-receipts';
 				meta: { id: id, action: action }
 			});
 		} else if (children.connector) {
-			dispatch(children.connectorEl, 'ln-api-connector:request-update', {
+			dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-update', {
 				id: id, data: this.mapper.egress(data), expected_version: expectedVersion, url: action,
 				meta: { entryId: _uuid(), queued: false, op: 'update', id: id }
 			});
@@ -281,14 +314,16 @@ import { MutationReceipts } from './mutation-receipts';
 	_component.prototype._fanOutDelete = function (children, id) {
 		this.refreshMapper();
 
-		dispatch(children.storeEl, 'ln-data-store:request-delete', { id: id });
+		if (children.storeEl) {
+			dispatch(children.storeEl, 'ln-data-store:request-delete', { id: id });
+		}
 
 		if (children.queue) {
 			dispatch(children.queueEl, 'ln-api-queue:request-enqueue', {
 				chainKey: id, op: 'delete', targetId: id, payload: null, expectedVersion: null, meta: { id: id }
 			});
 		} else if (children.connector) {
-			dispatch(children.connectorEl, 'ln-api-connector:request-delete', {
+			dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-delete', {
 				id: id, meta: { entryId: _uuid(), queued: false, op: 'delete', id: id }
 			});
 		}
@@ -298,14 +333,16 @@ import { MutationReceipts } from './mutation-receipts';
 		this.refreshMapper();
 		const bulkKey = ids.join(',');
 
-		dispatch(children.storeEl, 'ln-data-store:request-bulk-delete', { ids: ids });
+		if (children.storeEl) {
+			dispatch(children.storeEl, 'ln-data-store:request-bulk-delete', { ids: ids });
+		}
 
 		if (children.queue) {
 			dispatch(children.queueEl, 'ln-api-queue:request-enqueue', {
 				chainKey: bulkKey, op: 'bulk-delete', targetId: null, payload: { ids: ids }, expectedVersion: null, meta: { bulkKey: bulkKey, ids: ids }
 			});
 		} else if (children.connector) {
-			dispatch(children.connectorEl, 'ln-api-connector:request-bulk-delete', {
+			dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-bulk-delete', {
 				ids: ids, meta: { entryId: _uuid(), queued: false, op: 'bulk-delete', bulkKey: bulkKey }
 			});
 		}
@@ -339,6 +376,7 @@ import { MutationReceipts } from './mutation-receipts';
 	};
 
 	_component.prototype._reportReconciliationError = function (operation, error, meta) {
+		if (this._destroyed) return;
 		dispatch(this.dom, 'ln-data-coordinator:error', {
 			operation,
 			error,
@@ -357,14 +395,14 @@ import { MutationReceipts } from './mutation-receipts';
 					console.warn('[ln-data-coordinator] Cannot sync: store or connector not found in subtree');
 					return;
 				}
-				dispatch(children.connectorEl, 'ln-api-connector:request-sync', { since: e.detail.since, meta: { op: 'sync' } });
+				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-sync', { since: e.detail.since, meta: { op: 'sync' } });
 			},
 
 			requestPage: function (e) {
 				const children = self.findChildren();
 				if (!children.connectorEl) return;
 				const detail = e.detail || {};
-				dispatch(children.connectorEl, 'ln-api-connector:request-query', {
+				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
 					query: Object.assign({}, detail.query, {
 						offset: detail.offset,
 						limit: detail.limit,
@@ -375,25 +413,21 @@ import { MutationReceipts } from './mutation-receipts';
 
 			reqCreate: function (e) {
 				const children = self.findChildren();
-				if (!children.storeEl) return;
 				self._fanOutCreate(children, e.detail.data || {}, e.detail.action);
 			},
 
 			reqUpdate: function (e) {
 				const children = self.findChildren();
-				if (!children.storeEl) return;
 				self._fanOutUpdate(children, e.detail.id, e.detail.data || {}, e.detail.expected_version, e.detail.action);
 			},
 
 			reqDelete: function (e) {
 				const children = self.findChildren();
-				if (!children.storeEl) return;
 				self._fanOutDelete(children, e.detail.id);
 			},
 
 			reqBulkDelete: function (e) {
 				const children = self.findChildren();
-				if (!children.storeEl) return;
 				self._fanOutBulkDelete(children, e.detail.ids || []);
 			},
 
@@ -418,22 +452,22 @@ import { MutationReceipts } from './mutation-receipts';
 				const idempotencyKey = detail.idempotencyKey || entryId;
 
 				if (op === 'create') {
-					dispatch(children.connectorEl, 'ln-api-connector:request-create', {
+					dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-create', {
 						data: payload, url: resourceUrl, idempotencyKey: idempotencyKey,
 						meta: { entryId: entryId, queued: true, op: 'create', tempId: queueMeta.tempId }
 					});
 				} else if (op === 'update') {
-					dispatch(children.connectorEl, 'ln-api-connector:request-update', {
+					dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-update', {
 						id: targetId, data: payload, expected_version: expectedVersion, url: resourceUrl, idempotencyKey: idempotencyKey,
 						meta: { entryId: entryId, queued: true, op: 'update', id: targetId }
 					});
 				} else if (op === 'delete') {
-					dispatch(children.connectorEl, 'ln-api-connector:request-delete', {
+					dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-delete', {
 						id: targetId, idempotencyKey: idempotencyKey,
 						meta: { entryId: entryId, queued: true, op: 'delete', id: targetId }
 					});
 				} else if (op === 'bulk-delete') {
-					dispatch(children.connectorEl, 'ln-api-connector:request-bulk-delete', {
+					dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-bulk-delete', {
 						ids: (payload && payload.ids) ? payload.ids : [],
 						idempotencyKey: idempotencyKey,
 						meta: { entryId: entryId, queued: true, op: 'bulk-delete', bulkKey: queueMeta.bulkKey }
@@ -453,7 +487,7 @@ import { MutationReceipts } from './mutation-receipts';
 
 				let isMine;
 				if (scopeAttr) {
-					isMine = (scopeAttr === self._name || self._ownsStore(scopeAttr));
+					isMine = self._owns(scopeAttr);
 				} else {
 					isMine = (form.closest('[data-ln-data-coordinator]') === self.dom);
 				}
@@ -496,6 +530,7 @@ import { MutationReceipts } from './mutation-receipts';
 					if (meta.kind) {
 						if (meta.kind === 'table' || meta.kind === 'list' || meta.kind === 'chart') {
 							children.store.applyQuery(normalizedData, { total: e.detail.total }).then(function (decorated) {
+								if (meta.queryGen != null && !self._isCurrentGen(meta.targetEl, meta.queryGen)) return;
 								dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-loading', { loading: false });
 								dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-data', {
 									data: decorated,
@@ -510,10 +545,12 @@ import { MutationReceipts } from './mutation-receipts';
 							children.store.applyQuery(normalizedData, { total: e.detail.total }).then(function () {
 								return children.store.getAll({});
 							}).then(function (r) {
+								if (meta.queryGen != null && !self._isCurrentGen(meta.targetEl, meta.queryGen)) return;
 								dispatch(meta.targetEl, 'ln-options:set-data', { data: r.data });
 							});
 						} else if (meta.kind === 'stat') {
 							children.store.applyQuery(normalizedData, { total: e.detail.total }).then(function () {
+								if (meta.queryGen != null && !self._isCurrentGen(meta.targetEl, meta.queryGen)) return;
 								const count = e.detail.filtered !== undefined
 									? e.detail.filtered
 									: (e.detail.total !== undefined ? e.detail.total : normalizedData.length);
@@ -553,11 +590,13 @@ import { MutationReceipts } from './mutation-receipts';
 
 			connCreated: function (e) {
 				const children = self.findChildren();
-				if (!children.storeEl) return;
 				const meta = e.detail.meta || {};
 				const serverRecord = self.mapper.ingress(e.detail.record);
+				const reconciled = children.storeEl
+					? self._requestStoreMutation(children, 'update', { id: meta.tempId, data: serverRecord })
+					: Promise.resolve();
 
-				self._requestStoreMutation(children, 'update', { id: meta.tempId, data: serverRecord })
+				reconciled
 					.then(function () {
 						self._toastFromMessage(e.detail.message);
 						if (meta.queued && children.queue) {
@@ -575,11 +614,13 @@ import { MutationReceipts } from './mutation-receipts';
 
 			connUpdated: function (e) {
 				const children = self.findChildren();
-				if (!children.storeEl) return;
 				const meta = e.detail.meta || {};
 				const serverRecord = self.mapper.ingress(e.detail.record);
+				const reconciled = children.storeEl
+					? self._requestStoreMutation(children, 'update', { id: meta.id, data: serverRecord })
+					: Promise.resolve();
 
-				self._requestStoreMutation(children, 'update', { id: meta.id, data: serverRecord })
+				reconciled
 					.then(function () {
 						self._toastFromMessage(e.detail.message);
 						if (meta.queued && children.queue) {
@@ -593,7 +634,6 @@ import { MutationReceipts } from './mutation-receipts';
 
 			connDeleted: function (e) {
 				const children = self.findChildren();
-				if (!children.storeEl) return;
 				const meta = e.detail.meta || {};
 				// Optimistic delete already applied; no local reconciliation.
 				self._toastFromMessage(e.detail.message); // null on 204 → silent
@@ -604,7 +644,6 @@ import { MutationReceipts } from './mutation-receipts';
 
 			connBulkDeleted: function (e) {
 				const children = self.findChildren();
-				if (!children.storeEl) return;
 				const meta = e.detail.meta || {};
 				self._toastFromMessage(e.detail.message);
 				if (meta.queued && children.queue) {
@@ -616,7 +655,7 @@ import { MutationReceipts } from './mutation-receipts';
 				const detail = e.detail || {};
 				const meta = detail.meta || {};
 				const op = meta.op || detail.action;
-				const status = detail.status || 0;
+				const status = detail.status || (detail.error && detail.error.status) || 0;
 				const children = self.findChildren();
 
 				if (op === 'sync') {
@@ -640,8 +679,6 @@ import { MutationReceipts } from './mutation-receipts';
 					self._reportReconciliationError('query', detail.error || detail, meta);
 					return;
 				}
-
-				if (!children.storeEl) return;
 
 				const isAuth = status === 401 || status === 419;
 				const isTransient = status === 0 || status >= 500;
@@ -672,12 +709,14 @@ import { MutationReceipts } from './mutation-receipts';
 				let reconciliation = Promise.resolve();
 				if (isConflict && op === 'update') {
 					const remote = detail.data && detail.data.remote ? self.mapper.ingress(detail.data.remote) : null;
-					if (remote) {
+					if (remote && children.storeEl) {
 						reconciliation = self._requestStoreMutation(children, 'update', { id: meta.id, data: remote });
 					}
 					self._toastFromDict('conflict');
 				} else if (op === 'create') {
-					reconciliation = self._requestStoreMutation(children, 'delete', { id: meta.tempId });
+					if (children.storeEl) {
+						reconciliation = self._requestStoreMutation(children, 'delete', { id: meta.tempId });
+					}
 					self._toastFromDict('rejected');
 				} else {
 					// update/delete/bulk generic 4xx (incl. 404): leave local, next sync reconciles
@@ -727,6 +766,52 @@ import { MutationReceipts } from './mutation-receipts';
 			},
 			refreshSynced: function (e) {
 				if (e.detail && e.detail.changed) self._refreshAll(e.detail.meta, false);
+			},
+
+			searchChange: function (e) {
+				e.preventDefault();
+				const term = (e.detail && e.detail.term != null) ? e.detail.term : '';
+				if (term === (self.dom.getAttribute(SEARCH_ATTR) || '')) return;
+				self.dom.setAttribute(SEARCH_ATTR, term);
+			},
+
+			filterChange: function (e) {
+				e.preventDefault();
+				const key = e.detail && e.detail.key;
+				if (!key) return;
+				const values = (e.detail.values || []).slice();
+				const filters = self._currentQuery().filters;
+				const prev = filters[key];
+				const unchanged = prev
+					? (prev.length === values.length && prev.every((v, i) => v === values[i]))
+					: !values.length;
+				if (unchanged) return;
+				if (values.length) filters[key] = values;
+				else delete filters[key];
+				const params = new URLSearchParams();
+				Object.keys(filters).forEach(function (k) {
+					filters[k].forEach(function (v) { params.append(k, v); });
+				});
+				const next = params.toString();
+				if (next) self.dom.setAttribute(FILTERS_ATTR, next);
+				else self.dom.removeAttribute(FILTERS_ATTR);
+			},
+
+			sortChange: function (e) {
+				e.preventDefault();
+				const field = e.detail && e.detail.field;
+				const direction = e.detail && e.detail.direction;
+				const next = (field && direction && direction !== 'none') ? { field: field, direction: direction } : null;
+				const prev = self._currentQuery().sort;
+				const unchanged = (!prev && !next) || (prev && next && prev.field === next.field && prev.direction === next.direction);
+				if (unchanged) return;
+				if (next) {
+					self.dom.setAttribute(SORT_FIELD_ATTR, next.field);
+					self.dom.setAttribute(SORT_DIR_ATTR, next.direction);
+				} else {
+					self.dom.removeAttribute(SORT_FIELD_ATTR);
+					self.dom.removeAttribute(SORT_DIR_ATTR);
+				}
 			}
 		};
 
@@ -776,14 +861,42 @@ import { MutationReceipts } from './mutation-receipts';
 		self.dom.addEventListener('ln-data-store:mutation-error', self._handlers.mutationError);
 		self.dom.addEventListener('ln-data-store:synced', self._handlers.refreshSynced);
 		self.dom.addEventListener('ln-data-store:query-changed', self._handlers.refreshQuery);
+
+		// Query state — owned by the coordinator, written from the axis events
+		self.dom.addEventListener('ln-search:change', self._handlers.searchChange);
+		self.dom.addEventListener('ln-filter:change', self._handlers.filterChange);
+		self.dom.addEventListener('ln-sort:change', self._handlers.sortChange);
 	}
 
 	// ─── Store↔View Binder ───────────────────────────────────
 
-	_component.prototype._ownsStore = function (name) {
-		const children = this.findChildren();
-		if (children.store && children.store._name === name && name) return true;
-		return false;
+	_component.prototype._owns = function (name) {
+		return !!name && name === this._name;
+	};
+
+	// ─── Query State — owned by the coordinator, read live (§1 doctrine) ────
+
+	_component.prototype._currentQuery = function () {
+		const field = this.dom.getAttribute(SORT_FIELD_ATTR);
+		const direction = this.dom.getAttribute(SORT_DIR_ATTR);
+		const params = new URLSearchParams(this.dom.getAttribute(FILTERS_ATTR) || '');
+		const filters = {};
+		for (const key of new Set(params.keys())) filters[key] = params.getAll(key);
+		return {
+			search: this.dom.getAttribute(SEARCH_ATTR) || '',
+			filters: filters,
+			sort: (field && direction) ? { field: field, direction: direction } : null
+		};
+	};
+
+	_component.prototype._nextQueryGen = function (el) {
+		const gen = (this._queryGens.get(el) || 0) + 1;
+		this._queryGens.set(el, gen);
+		return gen;
+	};
+
+	_component.prototype._isCurrentGen = function (el, gen) {
+		return this._queryGens.get(el) === gen;
 	};
 
 	_component.prototype._serveData = function (e, kind) {
@@ -792,7 +905,7 @@ import { MutationReceipts } from './mutation-receipts';
 			: (kind === 'list' ? 'data-ln-list-source' : 'data-ln-chart-source');
 		const storeName = el.getAttribute(attrName);
 		if (!storeName) return;
-		if (!this._ownsStore(storeName)) return;
+		if (!this._owns(storeName)) return;
 
 		const request = e.detail || {};
 		const query = normalizeDataQuery(request);
@@ -804,14 +917,15 @@ import { MutationReceipts } from './mutation-receipts';
 		const ready = store && store.ready ? store.ready : Promise.resolve();
 
 		return ready.then(function () {
+			if (self._destroyed) return;
 			const source = selectDataSource(store, children.connector);
-			const effective = composeQuery(query, store && store.query);
+			const effective = composeQuery(query, self._currentQuery());
 			if (source === 'remote') {
 				// The source owns search/filter/sort even when it holds no rows yet —
 				// the view only contributes the page window, so the server must be
 				// asked with the composed query, not the view's request as it arrived.
 				dispatch(el, 'ln-' + kind + ':set-loading', { loading: true });
-				dispatch(children.connectorEl, 'ln-api-connector:request-query', {
+				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
 					query: effective,
 					meta: { targetEl: el, kind: kind, offset: effective.offset, limit: effective.limit }
 				});
@@ -823,7 +937,18 @@ import { MutationReceipts } from './mutation-receipts';
 				return;
 			}
 
+			const supersede = needsRemoteSupersede(store, children.connector, source);
+			const gen = supersede ? self._nextQueryGen(el) : null;
+			if (supersede) {
+				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
+					query: effective,
+					meta: { targetEl: el, kind: kind, offset: effective.offset, limit: effective.limit, queryGen: gen }
+				});
+			}
+
 			return store.getAll(effective).then(function (r) {
+				if (self._destroyed || !self._boundDelivered) return;
+				if (supersede && !self._isCurrentGen(el, gen)) return; // a newer request has already superseded this one
 				const detail = {
 					data: r.data,
 					total: r.total,
@@ -832,12 +957,13 @@ import { MutationReceipts } from './mutation-receipts';
 					queryGen: request.queryGen !== undefined ? request.queryGen : r.queryGen,
 					// The store answered from its own records while the server query
 					// is still out; the view renders it but keeps the refresh showing.
-					provisional: r.provisional === true
+					provisional: supersede || r.provisional === true
 				};
 				dispatch(el, 'ln-' + kind + ':set-data', detail);
 				self._boundDelivered.set(el, true);
 			});
 		}).catch(function (error) {
+			if (self._destroyed) return;
 			dispatch(el, 'ln-' + kind + ':set-loading', { loading: false });
 			dispatch(self.dom, 'ln-data-coordinator:error', {
 				operation: 'query',
@@ -852,7 +978,7 @@ import { MutationReceipts } from './mutation-receipts';
 	_component.prototype._serveOptions = function (e) {
 		const el = e.target;
 		const name = el.getAttribute('data-ln-options');
-		if (!this._ownsStore(name)) return;
+		if (!this._owns(name)) return;
 
 		const children = this.findChildren();
 		const store = children.store;
@@ -860,19 +986,33 @@ import { MutationReceipts } from './mutation-receipts';
 		const self = this;
 
 		return ready.then(function () {
-			const source = selectDataSource(store, children.connector, false);
+			if (self._destroyed) return;
+			const source = selectDataSource(store, children.connector);
 			if (source === 'remote') {
-				dispatch(children.connectorEl, 'ln-api-connector:request-query', {
+				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
 					query: {},
 					meta: { targetEl: el, kind: 'options' }
 				});
 				return;
 			}
 			if (source !== 'store') return;
+
+			const supersede = needsRemoteSupersede(store, children.connector, source);
+			const gen = supersede ? self._nextQueryGen(el) : null;
+			if (supersede) {
+				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
+					query: {},
+					meta: { targetEl: el, kind: 'options', queryGen: gen }
+				});
+			}
+
 			return store.getAll({}).then(function (r) {
+				if (self._destroyed) return;
+				if (supersede && !self._isCurrentGen(el, gen)) return;
 				dispatch(el, 'ln-options:set-data', { data: r.data });
 			});
 		}).catch(function (error) {
+			if (self._destroyed) return;
 			self._reportReconciliationError('options-query', error, { targetEl: el, kind: 'options' });
 		});
 	};
@@ -880,7 +1020,7 @@ import { MutationReceipts } from './mutation-receipts';
 	_component.prototype._serveStat = function (e) {
 		const el = e.target;
 		const name = el.getAttribute('data-ln-stat');
-		if (!this._ownsStore(name)) return;
+		if (!this._owns(name)) return;
 
 		const filters = e.detail && e.detail.filters ? e.detail.filters : null;
 		const children = this.findChildren();
@@ -889,21 +1029,35 @@ import { MutationReceipts } from './mutation-receipts';
 		const self = this;
 
 		return ready.then(function () {
+			if (self._destroyed) return;
 			const hasFilters = filters && Object.keys(filters).length > 0;
-			const requiresRemote = !!(children.connector && store && (((store.windowed || store._windowIndex) && hasFilters) || store.noLocalQuery));
-			const source = requiresRemote ? 'remote' : selectDataSource(store, children.connector, false);
+			const requiresRemote = !!(children.connector && store && ((store.windowed && hasFilters) || store.noLocalQuery));
+			const source = requiresRemote ? 'remote' : selectDataSource(store, children.connector);
 			if (source === 'remote') {
-				dispatch(children.connectorEl, 'ln-api-connector:request-query', {
+				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
 					query: { filters: filters },
 					meta: { targetEl: el, kind: 'stat' }
 				});
 				return;
 			}
 			if (source !== 'store') return;
+
+			const supersede = !requiresRemote && needsRemoteSupersede(store, children.connector, source);
+			const gen = supersede ? self._nextQueryGen(el) : null;
+			if (supersede) {
+				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
+					query: { filters: filters },
+					meta: { targetEl: el, kind: 'stat', queryGen: gen }
+				});
+			}
+
 			return store.count(filters).then(function (n) {
+				if (self._destroyed) return;
+				if (supersede && !self._isCurrentGen(el, gen)) return;
 				dispatch(el, 'ln-stat:set-count', { count: n });
 			});
 		}).catch(function (error) {
+			if (self._destroyed) return;
 			self._reportReconciliationError('stat-query', error, { targetEl: el, kind: 'stat' });
 		});
 	};
@@ -932,7 +1086,7 @@ import { MutationReceipts } from './mutation-receipts';
 				kind = 'stat';
 			}
 
-			if (!self._ownsStore(storeName)) continue;
+			if (!self._owns(storeName)) continue;
 
 			const children = self.findChildren();
 			const store = children.store;
@@ -949,22 +1103,33 @@ import { MutationReceipts } from './mutation-receipts';
 			}
 			if (kind === 'table' || kind === 'list' || kind === 'chart') {
 				const cached = self._boundQueries.get(el) || { sort: null, filters: {}, search: '' };
-				const effective = composeQuery(cached, store.query);
+				const effective = composeQuery(cached, self._currentQuery());
 
 				// Same read policy the view-initiated path applies. Without this the
 				// store-change refresh would query the cache even when the store has
 				// been told to leave queries to the server.
 				if (selectDataSource(store, children.connector) === 'remote') {
 					dispatch(el, 'ln-' + kind + ':set-loading', { loading: true });
-					dispatch(children.connectorEl, 'ln-api-connector:request-query', {
+					dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
 						query: effective,
 						meta: { targetEl: el, kind: kind, offset: effective.offset, limit: effective.limit }
 					});
 					continue;
 				}
 
-				(function (capturedEl, capturedKind) {
+				const supersede = needsRemoteSupersede(store, children.connector, selectDataSource(store, children.connector));
+				const gen = supersede ? self._nextQueryGen(el) : null;
+				if (supersede) {
+					dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
+						query: effective,
+						meta: { targetEl: el, kind: kind, offset: effective.offset, limit: effective.limit, queryGen: gen }
+					});
+				}
+
+				(function (capturedEl, capturedKind, capturedSupersede, capturedGen) {
 					store.getAll(effective).then(function (r) {
+						if (self._destroyed || !self._boundDelivered) return;
+						if (capturedSupersede && !self._isCurrentGen(capturedEl, capturedGen)) return;
 						const detail = {
 							data: r.data,
 							total: (syncMeta && syncMeta.total !== undefined) ? syncMeta.total : r.total,
@@ -977,13 +1142,14 @@ import { MutationReceipts } from './mutation-receipts';
 						dispatch(capturedEl, 'ln-' + capturedKind + ':set-loading', { loading: false });
 						dispatch(capturedEl, 'ln-' + capturedKind + ':set-data', detail);
 						self._boundDelivered.set(capturedEl, true);
-					});
-				})(el, kind);
+					}).catch(function () {});
+				})(el, kind, supersede, gen);
 			} else if (kind === 'options') {
 				(function (capturedEl) {
 					store.getAll({}).then(function (r) {
+						if (self._destroyed) return;
 						dispatch(capturedEl, 'ln-options:set-data', { data: r.data });
-					});
+					}).catch(function () {});
 				})(el);
 			} else if (kind === 'stat') {
 				const raw = el.getAttribute('data-ln-stat-filter');
@@ -991,16 +1157,19 @@ import { MutationReceipts } from './mutation-receipts';
 				if (raw) {
 					const colonIdx = raw.indexOf(':');
 					if (colonIdx !== -1) {
-						const field = raw.slice(0, colonIdx);
-						const val = raw.slice(colonIdx + 1);
-						filters = {};
-						filters[field] = [val];
+						const field = raw.slice(0, colonIdx).trim();
+						const val = raw.slice(colonIdx + 1).trim();
+						if (field) {
+							filters = {};
+							filters[field] = [val];
+						}
 					}
 				}
 				(function (capturedEl, capturedFilters) {
 					store.count(capturedFilters).then(function (n) {
+						if (self._destroyed) return;
 						dispatch(capturedEl, 'ln-stat:set-count', { count: n });
-					});
+					}).catch(function () {});
 				})(el, filters);
 			}
 		}
@@ -1011,6 +1180,7 @@ import { MutationReceipts } from './mutation-receipts';
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 
+		this._destroyed = true;
 		const self = this;
 		if (self._handlers) {
 			self.dom.removeEventListener('ln-data-store:request-remote-sync', self._handlers.sync);
@@ -1052,11 +1222,17 @@ import { MutationReceipts } from './mutation-receipts';
 			self.dom.removeEventListener('ln-data-store:synced', self._handlers.refreshSynced);
 			self.dom.removeEventListener('ln-data-store:query-changed', self._handlers.refreshQuery);
 
+			self.dom.removeEventListener('ln-search:change', self._handlers.searchChange);
+			self.dom.removeEventListener('ln-filter:change', self._handlers.filterChange);
+			self.dom.removeEventListener('ln-sort:change', self._handlers.sortChange);
+
 			self._handlers = null;
 		}
 
 		self._boundQueries = null;
 		self._boundDelivered = null;
+		self._queryGens = null;
+		self._queueQueryRefresh = null;
 		self._mutationReceipts.close(new Error('Data coordinator destroyed'));
 		self._mutationReceipts = null;
 
@@ -1064,7 +1240,6 @@ import { MutationReceipts } from './mutation-receipts';
 		_uninstallGlobalSync();
 
 		delete this.dom[DOM_ATTRIBUTE];
-		delete this.dom[DOM_ALIAS];
 	};
 
 	// ─── Attribute Sync ────────────────────────────────────────
@@ -1073,8 +1248,13 @@ import { MutationReceipts } from './mutation-receipts';
 		const instance = el[DOM_ATTRIBUTE];
 		if (!instance) return;
 
-		if (attrName === 'data-ln-data-mapper') {
+		if (attrName === 'data-ln-data-coordinator-mapper') {
 			instance.refreshMapper();
+			return;
+		}
+		if (attrName === SEARCH_ATTR || attrName === FILTERS_ATTR
+			|| attrName === SORT_FIELD_ATTR || attrName === SORT_DIR_ATTR) {
+			instance._queueQueryRefresh();
 		}
 	}
 
@@ -1082,7 +1262,11 @@ import { MutationReceipts } from './mutation-receipts';
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-data-coordinator', {
 		extraAttributes: [
-			'data-ln-data-mapper'
+			'data-ln-data-coordinator-mapper',
+			SEARCH_ATTR,
+			FILTERS_ATTR,
+			SORT_FIELD_ATTR,
+			SORT_DIR_ATTR
 		],
 		onAttributeChange: _syncAttribute
 	});

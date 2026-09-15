@@ -18,7 +18,7 @@ tags: [data, synchronization, local-first]
 
 - Serves as the central mediator of the Local-First data layer (offline-ready database synchronization).
 - Orchestrates and binds child database/transport components within its DOM sub-graph (e.g. [`ln-data-store`](./ln-data-store.md), [`ln-api-connector`](./ln-api-connector.md) / [`ln-couchdb-connector`](./ln-couchdb-connector.md), [`ln-api-queue`](./ln-api-queue.md)).
-- Intercepts native form submit actions globally on forms with a matching `data-ln-form-scope` to route writes.
+- Intercepts native form submit actions globally on forms with a matching `data-ln-data-coordinator-scope` to route writes.
 - Dispatches write operations in a **parallel fan-out** layout: triggers local database mutations and remote connector/queue uploads simultaneously.
 - Located in [`components/ln-data-coordinator/src/ln-data-coordinator.js`](../../components/ln-data-coordinator/src/ln-data-coordinator.js).
 
@@ -40,7 +40,7 @@ tags: [data, synchronization, local-first]
     <li data-ln-data-store id="users"></li>
     
     <!-- Remote connection endpoint (REST) -->
-    <li data-ln-api-connector data-ln-api-path="/api/users" id="users-connector"></li>
+    <li data-ln-api-connector data-ln-api-connector-path="/api/users" id="users-connector"></li>
     
     <!-- Offline transaction queue -->
     <li data-ln-api-queue id="users-queue"></li>
@@ -56,7 +56,7 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 <!-- Logical data definition -->
 <ul data-ln-data-coordinator hidden>
     <li data-ln-data-store id="users"></li>
-    <li data-ln-api-connector data-ln-api-path="/api/users"></li>
+    <li data-ln-api-connector data-ln-api-connector-path="/api/users"></li>
 </ul>
 
 <!-- UI View component consuming data -->
@@ -75,22 +75,40 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
-| `data-ln-data-coordinator` | Wrapper | Flag / Valueless | — | Activates the coordinator. |
-| `data-ln-data-mapper` | Wrapper | `String` | — | Optional custom data mapper function key name. |
+| `data-ln-data-coordinator` | Wrapper | `String` | falls back to `id` | Activates the coordinator. Its value is the coordinator's **name** — the address every view and query control binds to. |
+| `data-ln-data-coordinator-mapper` | Wrapper | `String` | — | Optional custom data mapper function key name. |
+| `data-ln-data-coordinator-scope` | `<form>` | `String` | — | Opts an external form into this coordinator's write intake loop. |
 | `data-ln-data-coordinator-stale` | Wrapper | `Number` | `300` | Stale cache window in seconds. Falls back to store rules. |
 | `data-ln-data-coordinator-no-autosync` | Wrapper | Flag | — | Disables automatic sync on visibility or online recovery events. |
-| `data-ln-table-source` | `[data-ln-table]` | `String` (Store ID) | — | Binds a table to this coordinator's child store; receives `ln-table:set-data`. |
-| `data-ln-list-source` | `[data-ln-list]` | `String` (Store ID) | — | Binds a list to this coordinator's child store; receives `ln-list:set-data`. |
-| `data-ln-chart-source` | `[data-ln-chart]` | `String` (Store ID) | — | Binds a chart to this coordinator's child store; receives `ln-chart:set-data`. |
-| `data-ln-options` | `<select>` | `String` (Store ID) | — | Populated with records via `ln-options:set-data`. |
-| `data-ln-stat` | Inline Element | `String` (Store ID) | — | Receives record count via `ln-stat:set-count`. |
+| `data-ln-data-coordinator-search` | Wrapper | `String` | — | Current search term. Read live; author-seedable. |
+| `data-ln-data-coordinator-filters` | Wrapper | `String` (URL query) | — | Active filters as a URL query string, parsed with `URLSearchParams`. A multi-value filter is a **repeated key**: `status=open&status=pending&type=invoice`. |
+| `data-ln-data-coordinator-sort-field` | Wrapper | `String` | — | Field the result set is sorted by. Meaningful only with `-sort-direction`. |
+| `data-ln-data-coordinator-sort-direction` | Wrapper | `asc` \| `desc` | — | Sort direction. Both sort attributes are removed together when sorting is cleared. |
+| `data-ln-table-source` | `[data-ln-table]` | `String` (Coordinator name) | — | Binds a table to this coordinator; receives `ln-table:set-data`. |
+| `data-ln-list-source` | `[data-ln-list]` | `String` (Coordinator name) | — | Binds a list to this coordinator; receives `ln-list:set-data`. |
+| `data-ln-chart-source` | `[data-ln-chart]` | `String` (Coordinator name) | — | Binds a chart to this coordinator; receives `ln-chart:set-data`. |
+| `data-ln-options` | `<select>` | `String` (Coordinator name) | — | Populated with records via `ln-options:set-data`. |
+| `data-ln-stat` | Inline Element | `String` (Coordinator name) | — | Receives record count via `ln-stat:set-count`. |
+
+> **The query is the coordinator's state, not the cache's.** The coordinator is the only
+> participant guaranteed to be present in its layer; the cache, the transport and the queue
+> are optional. The four query attributes therefore live on the coordinator's own host and
+> are read live at the moment of use. The serialisation is the one a browser produces by
+> itself: without JavaScript a form does a `GET` and lays the values out in a URL query
+> string, so the attribute carries exactly that and JS only forwards it. Sort is two axes
+> rather than the connector's `sort_field` / `sort_dir`, because those names are transport
+> configuration (overridable per connector via `paramKeys`) and do not belong here.
+>
+> **`*-source` names the coordinator, not the store.** A view binds to the coordinator's
+> name and never has to know whether a cache exists behind it — swapping to a
+> transport-only topology changes no view attribute.
 
 ### Programmatic JS API
 
 | Helper | Signature | Returns | Description |
 |---|---|---|---|
-| `element.lnCoordinator.refreshMapper` | `()` | `void` | Dynamically updates the configuration of the registered mapper. |
-| `element.lnCoordinator.destroy` | `()` | `void` | Restores bindings and unbinds child listeners. |
+| `element.lnDataCoordinator.refreshMapper` | `()` | `void` | Dynamically updates the configuration of the registered mapper. |
+| `element.lnDataCoordinator.destroy` | `()` | `void` | Restores bindings and unbinds child listeners. |
 
 ### Events API
 
@@ -104,6 +122,9 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 | `ln-data-store:request-remote-sync` | Listens | No | Requests remote delta synchronization. | `{ since: String }` |
 | `ln-api-queue:send` | Listens | No | Processes outbound offline queue writes. | `{ entryId: ID, op: String, payload: Object }` |
 | `ln-table:request-data` | Listens | No | Query from a table to fetch items. | `{ target: HTMLElement }` |
+| `ln-search:change` | Listens | No | The user changed the search term. The handler writes `data-ln-data-coordinator-search` and nothing else; the re-query is a declared reaction to that attribute. | `{ term: String, tokens: Array, targetId: String, fields: Array }` |
+| `ln-filter:change` | Listens | No | The user changed one filter. Carries **one key** per control; merged into `data-ln-data-coordinator-filters`. An empty `values` array removes that key. | `{ key: String, values: Array, targetId: String }` |
+| `ln-sort:change` | Listens | No | The user changed the sort. Writes `-sort-field` + `-sort-direction`. `direction: 'none'`, or a `null` `field` (column-index sort), is treated as "no sort" and removes both. | `{ field: String\|null, column: Number\|null, direction: 'asc'\|'desc'\|'none', targetId: String }` |
 | `ln-api-queue:request-enqueue` | Emits | No | Enqueues a transaction if offline. | `{ chainKey: String, op: String, payload: Object }` |
 | `ln-api-queue:ack` / `nack` | Emits | No | Confirms or rejects a queue message. | `{ entryId: ID, reason?: String }` |
 | `ln-toast:enqueue` | Emits | No | Dispatched to `window` for success/error alerts. | `{ message: String, type: String }` |
@@ -116,7 +137,7 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 | `ln-chart:request-data` | Listens | No | Query from a chart to fetch an ordered dataset. | `{ target: HTMLElement, sort, filters, search }` |
 | `ln-options:request-data` | Listens | No | Query from an `<select>`/options binder to fetch all records. | `{ target: HTMLElement }` |
 | `ln-stat:request-count` | Listens | No | Query from a stat/counter binder to fetch a record count. | `{ target: HTMLElement, filters?: Object }` |
-| `ln-{kind}:set-data` | Emits | No | Pattern row — `{kind}` is `table`, `list`, or `chart`, matching the requesting view's own namespace. Delivers the resolved query result. | `{ data: Array, total: Number, filtered: Number }` |
+| `ln-{kind}:set-data` | Emits | No | Pattern row — `{kind}` is `table`, `list`, or `chart`, matching the requesting view's own namespace. Delivers the resolved query result. When a cache **and** a transport are both present, this is dispatched **twice** for one query: the cache answers immediately with `provisional: true`, then the transport's authoritative answer supersedes it with `provisional: false`. See *The two-phase answer* below. | `{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number, provisional?: Boolean }` |
 | `ln-{kind}:set-loading` | Emits | No | Pattern row — `{kind}` is `table`, `list`, or `chart`. Dispatched instead of `set-data` while the store hasn't finished loading yet. | `{ loading: Boolean }` |
 | `ln-{kind}:page-failed` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Reports that a windowed page query failed, so the view can release that offset for a later retry. | `{ offset: Number }` |
 | `ln-{kind}:request-revalidate` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Sent to a windowed view on a store change in place of `set-data`: the view refreshes through its own window cache rather than being served store rows. | *(no payload)* |
@@ -136,6 +157,26 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 | `ln-api-queue:failed` | Listens | No | Terminal retry-exhaustion notification from the queue — surfaces a `network` toast via the dict. | `{ entryId: ID, chainKey: String, attempts: Number }` |
 | `ln-api-connector:fetched` / `:created` / `:updated` / `:deleted` / `:bulk-deleted` / `:error` | Listens | No | Connector response handling (also namespaced under `ln-couchdb-connector:...` — generalized across concrete connector implementations). Reconciles the store, fires toasts, and drives queue ack/nack. | *(shape per response — see [`ln-api-connector.md`](./ln-api-connector.md) Events API)* |
 
+**The two-phase answer**
+
+When both a cache and a transport are present, a query is answered **twice**. The cache
+answers immediately, flagged `provisional: true`; the view renders those rows and keeps its
+loading indicator on. The transport then answers authoritatively, the result is ingested into
+the cache and delivered with `provisional: false`, and the view clears the indicator.
+
+This is a protocol, not an optimisation: it is what makes a search feel instant on cached
+data while staying correct against the server. It is **not** a merge of two result sets — it
+is one answer arriving twice, the second superseding the first.
+
+`queryGen` is the generation counter that makes this safe. Each dual-dispatch query takes the
+next generation for that view element; an answer carrying a stale generation is discarded
+rather than overwriting a newer one. A store managing its own residency window
+(`data-ln-data-store-window`) opts itself out, because it already runs this exchange through
+`ln-data-store:request-page` and a second parallel request would race it.
+
+A topology with only one of the two answers once: cache-only serves locally, transport-only
+goes straight to the connector. **Absence of a participant is a topology, not an error.**
+
 ---
 
 ## 4. CSS Styling & Behavioral Concept
@@ -144,7 +185,7 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 - **Form Submit Integration:**
   Listens to the native `submit` event on `document` (bubble phase):
   1. Checks if `e.defaultPrevented` is true (e.g. blocked by `ln-validate` invalid checks).
-  2. Resolves `data-ln-form-scope` matching its namespace, or matches descendants.
+  2. Resolves `data-ln-data-coordinator-scope` matching its namespace, or matches descendants.
   3. Identifies effective method (e.g., hidden `_method` or form method POST/PUT/PATCH).
   4. Serializes form data via `serializeForm(form)` and routes payload through the parallel write pipeline.
 - **Error Taxonomy & Conflict Policy:**
@@ -203,7 +244,7 @@ sequenceDiagram
     participant Conn as ln-api-connector (HTTP)
 
     Note over Dev, Conn: Form Write Intake → Parallel Fan-Out
-    Dev->>Form: submit (data-ln-form-scope, method POST)
+    Dev->>Form: submit (data-ln-data-coordinator-scope, method POST)
     Form-->>Coord: native submit bubbles (unclaimed by ln-form gate)
     Coord->>Coord: preventDefault() — claim
     Coord->>Coord: serializeForm() + resolveFormMethod()

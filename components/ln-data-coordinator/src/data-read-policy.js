@@ -22,6 +22,14 @@ export function selectDataSource(store, connector) {
 	return 'none';
 }
 
+export function needsRemoteSupersede(store, connector, source) {
+	// A store-primary answer is provisional whenever an untouched connector can
+	// supersede it. A store managing its own residency window already runs this
+	// exchange through ln-data-store:request-page — a second, parallel request
+	// here would race it, so a windowed store opts itself out.
+	return source === 'store' && !!connector && !(store && store.windowed);
+}
+
 export function composeQuery(viewQuery, storeQuery) {
 	const q = Object.assign({}, viewQuery);
 	if (storeQuery) {

@@ -40,8 +40,44 @@
 				"src/ln-data-coordinator.js"
 			]
 		},
+		"data-ln-data-coordinator-filters": {
+			"direction": "both",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-data-coordinator-mapper": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
 		"data-ln-data-coordinator-no-autosync": {
 			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-data-coordinator-scope": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-data-coordinator-search": {
+			"direction": "both",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-data-coordinator-sort-direction": {
+			"direction": "both",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-data-coordinator-sort-field": {
+			"direction": "both",
 			"sources": [
 				"src/ln-data-coordinator.js"
 			]
@@ -53,10 +89,8 @@
 			]
 		},
 		"data-ln-data-mapper": {
-			"direction": "author",
-			"sources": [
-				"src/ln-data-coordinator.js"
-			]
+			"direction": null,
+			"sources": []
 		},
 		"data-ln-data-store": {
 			"direction": "author",
@@ -81,12 +115,6 @@
 			"direction": null,
 			"sources": [
 				"ln-data-coordinator-dev.scss"
-			]
-		},
-		"data-ln-form-scope": {
-			"direction": "author",
-			"sources": [
-				"src/ln-data-coordinator.js"
 			]
 		},
 		"data-ln-list-source": {
