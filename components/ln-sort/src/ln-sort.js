@@ -18,7 +18,7 @@ import { createSortComparator, getAriaSortValue, isSameSortTarget, normalizeSort
 	function _readItemValue(item, field) {
 		if (field) {
 			const el = item.querySelector('[data-ln-field="' + field + '"]');
-			if (el) return readValue(el);
+			return el ? readValue(el) : '';
 		}
 		return readValue(item);
 	}

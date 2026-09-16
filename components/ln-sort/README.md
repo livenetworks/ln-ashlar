@@ -132,6 +132,11 @@ is clicked, or on persisted-state restore.
 - **Persisting without a stable key.** `data-ln-persist` with no value falls back to `el.id`; a
   bare `<ul data-ln-sort data-ln-persist>` with no `id` silently skips persistence
   (see `ln-core.persistGet`/`persistSet` — `console.warn`s once).
+- **Assuming every item carries the declared field.** When `data-ln-sort-field`
+  is set and an item has no matching `[data-ln-field]`, that item's value is
+  empty — it never contributes to type detection and sorts as `0` in a numeric
+  column. Permanent non-data siblings (empty-state rows, totals rows) are the
+  usual case.
 
 ---
 
