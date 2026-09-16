@@ -1,4 +1,4 @@
-import { compareValues, detectValueType, dispatchCancelable, getLocale, hashGet, hashSet, hashSortDecode, hashSortEncode, persistGet, persistSet, queueBoot, readValue, registerComponent, resolveHashNamespace } from '../../ln-core';
+import { compareValues, detectValueType, dispatchCancelable, getLocale, hashGet, hashSet, hashSortDecode, hashSortEncode, queueBoot, readValue, registerComponent, resolveHashNamespace } from '../../ln-core';
 import { createSortComparator, getAriaSortValue, isSameSortTarget, normalizeSortDirection } from './sort-model.js';
 
 (function () {
@@ -78,7 +78,6 @@ import { createSortComparator, getAriaSortValue, isSameSortTarget, normalizeSort
 				dom.setAttribute(STATE_ATTR, 'none');
 				self._updateAriaSort('none');
 			}
-			if (dom.hasAttribute('data-ln-persist')) persistSet('sort', dom, null);
 		};
 		document.addEventListener('ln-sort:change', this._onSortChange);
 
@@ -141,17 +140,6 @@ import { createSortComparator, getAriaSortValue, isSameSortTarget, normalizeSort
 			}
 		}
 
-		if (!restored && dom.hasAttribute('data-ln-persist')) {
-			const saved = persistGet('sort', dom);
-			if (saved && saved.direction && saved.direction !== 'none') {
-				queueBoot(function () {
-					if (self._destroyed) return;
-					self._apply(saved.direction, true);
-				});
-			}
-			restored = true;
-		}
-
 		if (!restored) {
 			const initialDir = normalizeSortDirection(dom.getAttribute(STATE_ATTR));
 			if (initialDir && initialDir !== 'none') {
@@ -196,9 +184,6 @@ import { createSortComparator, getAriaSortValue, isSameSortTarget, normalizeSort
 		};
 
 		if (!skipStorage) {
-			if (this.dom.hasAttribute('data-ln-persist')) {
-				persistSet('sort', this.dom, normalized === 'none' ? null : detail);
-			}
 			if (this.hashEnabled) {
 				const encoded = hashSortEncode(this.field !== null ? this.field : this.column, normalized);
 				hashSet(this.nsKey, encoded);
@@ -297,6 +282,10 @@ import { createSortComparator, getAriaSortValue, isSameSortTarget, normalizeSort
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-sort', {
 		extraAttributes: [FIELD_ATTR, ITEMS_ATTR, STATE_ATTR, HASH_ATTR],
-		onAttributeChange: _syncAttribute
+		onAttributeChange: _syncAttribute,
+		persist: {
+			attr: STATE_ATTR,
+			hashActive: function (el) { return !!resolveHashNamespace(el, 'sort'); }
+		}
 	});
 })();

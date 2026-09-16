@@ -60,7 +60,7 @@
 		"data-ln-persist": {
 			"direction": "author",
 			"sources": [
-				"persist.js"
+				"helpers.js"
 			]
 		},
 		"data-ln-render-key": {

@@ -217,9 +217,10 @@ Clear triggers work universally without external coordinators:
 | `data-ln-search-clear-for` | Button | String | — | Remote clear button referencing target element ID. Clears linked input and resets target state. |
 | `data-ln-search-hide` | Target Children | Boolean | `false` | State attribute added to non-matching DOM elements (`"true"`). |
 | `data-ln-hash` | Target / Control | String (Optional) | — | Opt-in. Synchronizes search query to URL hash fragment (e.g. `#users-search:john`). Value is custom namespace; if empty defaults to `[targetId]-search`. |
-| `data-ln-persist` | Target (State Host) | String (Optional) | — | **Recommended.** Stores the term in `localStorage` and restores it on boot; omit it only when the search must start empty on every visit. Goes on `[data-ln-search]`, never on the input. The target needs an `id`, or give the attribute an explicit key (`data-ln-persist="key"`). An empty term removes the entry rather than storing `""`. Stored key format: `ln:search:{id}` (global by default); prefix the value with `page:` (e.g. `data-ln-persist="page:key"`) to opt into page-scoping, which stores `ln:search:{pathname}:{id}`. |
+| `data-ln-persist` | Target (State Host) | String (Optional) | — | **Recommended.** Stores the term in `localStorage` and restores it before boot; omit it only when the search must start empty on every visit. Goes on `[data-ln-search]`, never on the input. The target needs an `id`, or give the attribute an explicit key (`data-ln-persist="key"`). An empty term removes the entry rather than storing `""`. Stored key format: `ln:{id}:data-ln-search` (global by default); add `data-ln-persist-scope="page"` to opt into page-scoping, which stores `ln:{id}:{pathname}:data-ln-search`. No effect while `data-ln-hash` is active — hash wins, never double-written. |
+| `data-ln-persist-scope` | Target (State Host) | `"page"` | Absent (global) | Opt-in, independent attribute. Scopes the persisted key to the current URL pathname. |
 
-Boot precedence when more than one source carries a term: `data-ln-hash` wins first, then `data-ln-persist`, then the term authored on the target. The first match applies and the rest are skipped.
+Boot precedence when more than one source carries a term: `data-ln-hash` wins first (persist is skipped entirely while hash is active — never double-written), then `data-ln-persist` (restored via `ln-persist`'s sink before the target's own component instance is constructed), then the term authored on the target.
 
 ### Programmatic JS API
 

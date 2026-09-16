@@ -1,11 +1,10 @@
-import { dispatch, dispatchCancelable, isTargetDisabled, persistGet, persistSet, registerComponent, shouldIgnoreClick } from '../../ln-core';
+import { dispatch, dispatchCancelable, isTargetDisabled, registerComponent, shouldIgnoreClick } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-toggle';
 	const DOM_ATTRIBUTE = 'lnToggle';
 	const TRIGGER_ATTRIBUTE = 'data-ln-toggle-for';
 	const ACTION_ATTRIBUTE = 'data-ln-toggle-action';
-	const PERSIST_ATTRIBUTE = 'data-ln-persist';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -76,14 +75,6 @@ import { dispatch, dispatchCancelable, isTargetDisabled, persistGet, persistSet,
 		this.dom.addEventListener('ln-toggle:request-close', this._onRequestClose);
 		this.dom.addEventListener('ln-toggle:request-toggle', this._onRequestToggle);
 
-		// Restore persisted state
-		if (dom.hasAttribute(PERSIST_ATTRIBUTE)) {
-			const saved = persistGet('toggle', dom);
-			if (saved !== null) {
-				dom.setAttribute(DOM_SELECTOR, saved === 'open' ? 'open' : 'close');
-			}
-		}
-
 		this.isOpen = dom.getAttribute(DOM_SELECTOR) === 'open';
 
 		if (this.isOpen) {
@@ -145,9 +136,6 @@ import { dispatch, dispatchCancelable, isTargetDisabled, persistGet, persistSet,
 			el.classList.add('open');
 			_syncTriggerAria(el, true);
 			dispatch(el, 'ln-toggle:open', { target: el });
-			if (el.hasAttribute(PERSIST_ATTRIBUTE)) {
-				persistSet('toggle', el, 'open');
-			}
 		} else {
 			const before = dispatchCancelable(el, 'ln-toggle:before-close', { target: el });
 			if (before.defaultPrevented) {
@@ -158,15 +146,13 @@ import { dispatch, dispatchCancelable, isTargetDisabled, persistGet, persistSet,
 			el.classList.remove('open');
 			_syncTriggerAria(el, false);
 			dispatch(el, 'ln-toggle:close', { target: el });
-			if (el.hasAttribute(PERSIST_ATTRIBUTE)) {
-				persistSet('toggle', el, 'close');
-			}
 		}
 	}
 
 	// ─── Init ──────────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-toggle', {
-		onAttributeChange: _syncAttribute
+		onAttributeChange: _syncAttribute,
+		persist: { attr: DOM_SELECTOR, hashActive: null }
 	});
 })();

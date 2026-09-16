@@ -49,6 +49,13 @@ export function setDebugSink(sink) {
 	window.lnCore._debugSink = sink;
 }
 
+// Nullable persist restore/save sink. Installed/removed only by ln-persist
+// (components/ln-persist/src/ln-persist.js) — mirrors setDebugSink exactly.
+export function setPersistSink(sink) {
+	window.lnCore = window.lnCore || {};
+	window.lnCore._persistSink = sink;
+}
+
 export function dispatch(element, eventName, detail) {
 	const payload = detail || {};
 	if (window.lnCore._debugSink) window.lnCore._debugSink('event', eventName, element, payload);
@@ -346,6 +353,9 @@ export function findElements(root, selector, attribute, ComponentClass) {
 	}
 	for (const el of items) {
 		if (!el[attribute]) {
+			if (window.lnCore._persistSink && el.hasAttribute('data-ln-persist')) {
+				window.lnCore._persistSink(el, selector);
+			}
 			el[attribute] = new ComponentClass(el);
 		}
 	}
@@ -712,7 +722,7 @@ export function queueBoot(fn) {
 
 function _attrRegistry() {
 	window.lnCore = window.lnCore || {};
-	window.lnCore._attrRegistry = window.lnCore._attrRegistry || { byAttr: new Map(), reactive: [] };
+	window.lnCore._attrRegistry = window.lnCore._attrRegistry || { byAttr: new Map(), reactive: [], persist: [] };
 	return window.lnCore._attrRegistry;
 }
 
@@ -727,6 +737,7 @@ function _registerAttrEntry(entry) {
 	if (entry.onAttrChange || entry.effects) {
 		registry.reactive.push(entry);
 	}
+	if (entry.persist) registry.persist.push(entry);
 }
 
 // Processes one MutationRecord. Order is load-bearing: the reactive path
@@ -822,6 +833,7 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 	const onInit = options.onInit || null;
 	const onAttrChange = options.onAttrChange || null;
 	const effects = options.effects || null;
+	const persist = options.persist || null;
 
 	function constructor(domRoot) {
 		const root = domRoot || document.body;
@@ -851,7 +863,8 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 		observed: observedAttributes.concat(extraAttributes),
 		onAttributeChange: onAttributeChange,
 		onAttrChange: onAttrChange,
-		effects: effects
+		effects: effects,
+		persist: persist
 	});
 	_ensureAttrObserver();
 

@@ -14,7 +14,7 @@ It filters target elements either by comparing child dataset attributes (for cus
    - **Uncheck last value** → re-checks the sentinel (never allows empty selection).
    - **Check all values** → collapses to sentinel: unchecks all values, re-checks sentinel.
 3. **Plain Table Column Filtering:** By defining `data-ln-filter-col="N"`, the component filters plain HTML `<table>` rows by column cell text with AND logic across columns and OR logic within columns.
-4. **Local State Persistence:** Adding the `data-ln-persist` attribute saves active filter selections to `localStorage` under `ln:filter:{path}:{id}`.
+4. **Local State Persistence:** Adding the `data-ln-persist` attribute saves the active filter values (`data-ln-filter-values`) to `localStorage` under `ln:{id}:data-ln-filter-values` (global by default), or `ln:{id}:{path}:data-ln-filter-values` when `data-ln-persist-scope="page"` is present. The filter *key* is never persisted — only the active values.
 5. **Decoupled Two-Host Bridge:** Dispatches cancelable `ln-filter:change` events. Consumers (such as `ln-table` in SSR mode or `ln-data-store`) call `e.preventDefault()` to claim filtering and prevent default DOM item hiding.
 
 ---
@@ -71,8 +71,10 @@ Filters plain `<table>` rows by Column Index `2` (Department) and saves state to
 | `data-ln-filter-value` | `<input type="checkbox">` | The value to match. Active checkboxes show matching items; others are hidden. |
 | `data-ln-filter-reset` | `<input type="checkbox">` | Marks the reset ("All") sentinel. |
 | `data-ln-filter-col` | Container root | Opt-in. 0-based column index to filter plain `<table>` rows by column cell text. |
-| `data-ln-persist` | Container root | Opt-in. Persists active checkbox selections in `localStorage`. |
+| `data-ln-persist` | Container root | Opt-in. Persists active checkbox selections (`data-ln-filter-values`) in `localStorage`. |
+| `data-ln-persist-scope` | Container root | Opt-in, independent attribute. `"page"` scopes the persisted key to the current URL pathname. |
 | `data-ln-hash` | Container root | Opt-in. Synchronizes active filters to URL hash fragment (e.g. `#users-filter:status:active,pending`). Value is custom namespace; if empty defaults to `[targetId]-filter`. |
+| `data-ln-filter-values` | Container root | *State*. Comma-joined, percent-encoded list of currently active filter values. Written by the component, read by `ln-persist` for restore/save. |
 | `data-ln-filter-hide` | Children of target | *State*. Automatically toggled on non-matching elements (`display: none !important`). |
 
 
@@ -124,5 +126,5 @@ The canonical composition for table per-column filters.
   input.checked = true;
   input.dispatchEvent(new Event('change', { bubbles: true }));
   ```
-- **Missing `id` on Persisted Filters:** The `data-ln-persist` storage key relies on the filter element's ID (e.g. `<nav id="my-filter" data-ln-persist>`). If the ID is missing, the component will fail to initialize persistence.
+- **Missing `id` on Persisted Filters:** The `data-ln-persist` storage key relies on the filter element's ID (e.g. `<nav id="my-filter" data-ln-persist>`), unless an explicit `data-ln-persist="key"` value is given. If neither exists, `ln-persist` warns once and skips persistence for that element.
 - **Using `data-ln-filter-col` for ln-table column filters:** The `data-ln-filter-col` attribute (0-based column index for plain table row filtering) is for standalone `ln-filter` targeting a plain `<table>` — not for the `ln-table` component. For `ln-table`, use `data-ln-filter="<tableId>"` on the `<ul>` and `data-ln-table-filter-col="<fieldName>"` on the `<th>`.

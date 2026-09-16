@@ -105,6 +105,7 @@ Includes a trigger that opens the drawer, and a separate close-only button insid
 | `data-ln-toggle-for` | Trigger | Panel Element `id` | Required | Binds a trigger to a target panel by its HTML ID. |
 | `data-ln-toggle-action` | Trigger | `"open"` \| `"close"` \| `"toggle"` | `"toggle"` | Restricts trigger click behavior to only open, only close, or toggle the target. |
 | `data-ln-persist` | Panel | Presence \| `String` (key) | Absent | Enables state persistence. See [State & Persistence](#4-state--persistence) for the key format. |
+| `data-ln-persist-scope` | Panel | `"page"` | Absent (global) | Opt-in, independent attribute. Scopes the persisted key to the current URL pathname. |
 
 ### Events API
 
@@ -123,9 +124,9 @@ All events bubble up from the target panel element.
 ## 4. State & Persistence
 
 - **Storage:** `localStorage`
-- **Key format:** `ln:toggle:{pagePath}:{id}` — `pagePath` is `location.pathname` with trailing slashes stripped and lowercased (falls back to `/`). `id` is the value of `data-ln-persist="key"` when non-empty, otherwise the panel element's own `id` attribute.
-- **Written when:** the panel's open/close state actually changes (in `_syncAttribute`, right after the corresponding `ln-toggle:open` / `ln-toggle:close` event dispatches), and only when the panel carries `data-ln-persist`. **Cleared when:** never automatically — `ln-toggle` only ever writes `"open"` or `"close"` strings; entries are overwritten on the next state change but not removed.
-- **Invalidation / versioning:** none. There is no cache-version flush or stale-entry handling; a saved value is read back verbatim on the next page load via `persistGet` and re-applied to `data-ln-toggle` before the initial open state is computed.
+- **Key format:** `ln:{id}:data-ln-toggle`, or `ln:{id}:{pagePath}:data-ln-toggle` when `data-ln-persist-scope="page"` is present — `pagePath` is `location.pathname` with trailing slashes stripped and lowercased (falls back to `/`). `id` is the value of `data-ln-persist="key"` when non-empty, otherwise the panel element's own `id` attribute.
+- **Written when:** the panel's open/close state actually changes, observed by `ln-persist`'s shared attribute observer, and only when the panel carries `data-ln-persist`. **Cleared when:** never automatically — `ln-toggle` only ever writes `"open"` or `"close"` strings; entries are overwritten on the next state change but not removed.
+- **Invalidation / versioning:** none. There is no cache-version flush or stale-entry handling; a saved value is read back verbatim on the next page load by `ln-persist`'s sink and applied to `data-ln-toggle` before the panel's own component instance is constructed.
 
 ---
 
@@ -161,7 +162,7 @@ The visual expansion transition is powered by CSS Grid track sizing. The panel i
 > [!CAUTION]
 > 1. **Padding on Collapsible Panels:** Never apply padding directly to a container styled with `@mixin collapsible`. Padding is not affected by `grid-template-rows: 0fr`, which prevents the panel from collapsing fully, leaving a visual box. Always apply padding to the inner `.collapsible-body` instead.
 > 2. **Missing ID on Target Panel:** The panel element must carry a unique `id` attribute. Triggers match target elements by ID, and diagnostic styles (in dev mode) will highlight panels lacking an ID.
-> 3. **Persist Without an ID or Key:** If a panel has `data-ln-persist` but no `id` attribute and no `data-ln-persist="key"` value, the persistence key cannot be resolved. `persistGet`/`persistSet` log a console warning and silently no-op — the state simply never persists.
+> 3. **Persist Without an ID or Key:** If a panel has `data-ln-persist` but no `id` attribute and no `data-ln-persist="key"` value, the persistence key cannot be resolved. `ln-persist` logs a console warning and silently no-ops — the state simply never persists.
 
 ---
 

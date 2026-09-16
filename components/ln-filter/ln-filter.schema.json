@@ -48,6 +48,12 @@
 				"src/ln-filter.js"
 			]
 		},
+		"data-ln-filter-values": {
+			"direction": "both",
+			"sources": [
+				"src/ln-filter.js"
+			]
+		},
 		"data-ln-hash": {
 			"direction": null,
 			"sources": [
@@ -55,10 +61,8 @@
 			]
 		},
 		"data-ln-persist": {
-			"direction": "author",
-			"sources": [
-				"src/ln-filter.js"
-			]
+			"direction": null,
+			"sources": []
 		}
 	}
 }

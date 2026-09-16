@@ -1,5 +1,5 @@
 /* Live Networks - lnTabs (hash-aware tabs — supports <button> and <a href="#nsKey:key"> triggers) */
-import { dispatch, dispatchCancelable, hashGet, hashLinkClick, hashSet, persistGet, persistSet, registerComponent } from '../../ln-core';
+import { dispatch, dispatchCancelable, hashGet, hashLinkClick, hashSet, registerComponent } from '../../ln-core';
 import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './tabs-model.js';
 
 (function () {
@@ -85,13 +85,7 @@ import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './
 			window.addEventListener("hashchange", this._hashHandler);
 			this._hashHandler();
 		} else {
-			let initialKey = this.defaultKey;
-			if (this.dom.hasAttribute('data-ln-persist') && !this.hashEnabled) {
-				const saved = persistGet('tabs', this.dom);
-				if (saved !== null && saved in this.mapPanels) {
-					initialKey = saved;
-				}
-			}
+			const initialKey = resolveActiveTabKey(this.dom.getAttribute('data-ln-tabs-active'), Object.keys(this.mapPanels), this.defaultKey);
 			this.dom.setAttribute('data-ln-tabs-active', initialKey);
 		}
 	}
@@ -160,9 +154,6 @@ import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './
 			panel: this.mapPanels[key],
 			target: this.dom
 		});
-		if (this.dom.hasAttribute('data-ln-persist') && !this.hashEnabled) {
-			persistSet('tabs', this.dom, key);
-		}
 	};
 
 	_component.prototype.destroy = function () {
@@ -186,6 +177,16 @@ import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './
 		onAttributeChange: function (el) {
 			const key = el.getAttribute('data-ln-tabs-active');
 			el[DOM_ATTRIBUTE]._applyActive(key);
+		},
+		persist: {
+			attr: 'data-ln-tabs-active',
+			hashActive: function (el) {
+				const triggers = Array.from(el.querySelectorAll('[data-ln-tab]')).map(function (t) {
+					return { tagName: t.tagName, href: t.getAttribute('href') };
+				});
+				const nsKey = (el.getAttribute('data-ln-tabs-key') || el.id || '').toLowerCase().trim();
+				return determineTabsMode(triggers, nsKey).hashEnabled;
+			}
 		}
 	});
 })();

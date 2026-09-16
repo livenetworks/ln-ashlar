@@ -57,3 +57,28 @@ export function deriveActiveFilters(descriptors) {
 
 	return { key, values };
 }
+
+/**
+ * Encodes an array of active filter values into a comma-joined,
+ * percent-encoded string for persistence in a state attribute.
+ * @param {string[]} values
+ * @returns {string|null}
+ */
+export function encodeFilterValues(values) {
+	if (!Array.isArray(values) || values.length === 0) return null;
+	return values.map(encodeURIComponent).join(',');
+}
+
+/**
+ * Decodes a comma-joined, percent-encoded filter-values string back
+ * into an array.
+ * @param {string|null} raw
+ * @returns {string[]}
+ */
+export function decodeFilterValues(raw) {
+	if (!raw) return [];
+	return raw.split(',').map(function (v) {
+		try { return decodeURIComponent(v); }
+		catch (e) { return v; }
+	}).filter(Boolean);
+}

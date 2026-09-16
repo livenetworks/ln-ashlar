@@ -22,10 +22,8 @@
 			]
 		},
 		"data-ln-persist": {
-			"direction": "author",
-			"sources": [
-				"src/ln-sort.js"
-			]
+			"direction": null,
+			"sources": []
 		},
 		"data-ln-sort": {
 			"direction": "author",

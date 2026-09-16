@@ -61,8 +61,9 @@ panel.lnToggle.isOpen; // Returns true/false
 - `data-ln-toggle`: Placed on the panel to create the toggle instance.
 - `data-ln-toggle-for`: Placed on triggers referencing the panel ID.
 - `data-ln-toggle-action="open|close"`: Forces a trigger button to only open or only close the target.
-- `data-ln-persist`: Saves the panel state individually in `localStorage`. 
-  - storage key: `ln:toggle:{pagePath}:{id}`. Same IDs on different pages store separately.
+- `data-ln-persist`: Saves the panel state individually in `localStorage`.
+  - storage key: `ln:{id}:data-ln-toggle` (global by default).
+- `data-ln-persist-scope="page"`: Opt-in, independent attribute. Scopes the storage key to the current pathname: `ln:{id}:{pagePath}:data-ln-toggle`. Same IDs on different pages then store separately.
 
 ---
 
@@ -139,7 +140,7 @@ Combine the alert card with `data-ln-persist` so that once the user closes the a
 
 ## 🔧 Internals
 
-Source: `components/ln-toggle/ln-toggle.js`. Imports `registerComponent`, `dispatch`, `dispatchCancelable` from `ln-core/helpers.js` and `persistGet`/`persistSet` from `ln-core/persist.js` — no other library component.
+Source: `components/ln-toggle/ln-toggle.js`. Imports `registerComponent`, `dispatch`, `dispatchCancelable` from `ln-core/helpers.js` — no other library component. Persistence is declared, not imported: `registerComponent(...)` is passed `persist: { attr: DOM_SELECTOR, hashActive: null }`, and `ln-persist` (a separate component) does the restoring/saving from outside.
 
 ### Instance state
 
@@ -153,7 +154,7 @@ No cached trigger list, no saved previous-value for revert, no timer/queue — e
 ### Init
 
 `registerComponent` scans for `[data-ln-toggle]`, watches `data-ln-toggle` mutations, and instantiates panels. Triggers are handled document-wide by a single delegated click listener. `_component(dom)`:
-1. **Persistence restore** — if `data-ln-persist` is present, `persistGet('toggle', dom)`; a saved value is applied via `setAttribute` *inside the constructor*. The observer does fire for that write, but `el[DOM_ATTRIBUTE]` is still `undefined` at that point (assigned only after the constructor returns), so `_syncAttribute`'s instance guard catches it and the pipeline does not run — no spurious `:before-open`/`:open` during restore.
+1. **Persistence restore already happened** — if `data-ln-persist` is present, `ln-persist`'s sink already wrote the saved value onto `data-ln-toggle` via `setAttribute`, synchronously, *before* this constructor runs (inside `findElements`, immediately before `el[attribute] = new ComponentClass(el)`). The mutation-delivery microtask for that write fires *after* the constructor has already set `el.lnToggle` and read `isOpen` from the (already-restored) attribute, so `_syncAttribute`'s `shouldBeOpen === instance.isOpen` guard finds them equal and no-ops — no spurious `:before-open`/`:open` during restore.
 2. Reads the (possibly restored) attribute into `isOpen`, adds `.open` if true, calls `_syncTriggerAria` for the initial ARIA state.
 
 No `:open`/`:close` event fires at init — the attribute is already in its final state; there's been no transition.
@@ -171,9 +172,8 @@ Runs only when the mutated element already has an `lnToggle` instance (a brand-n
 3. `isOpen = true`, `.open` class added.
 4. `_syncTriggerAria(el, true)` — before the post-event, so `:open` listeners see settled ARIA.
 5. `dispatch('ln-toggle:open')`.
-6. If `data-ln-persist`: `persistSet('toggle', el, 'open')` — last, so a listener that removes `data-ln-persist` synchronously during `:open` skips the write.
 
-This ordering (cancelable → class → aria → event → persist) is the same shape for every transition in the library that follows the attribute-as-contract pattern.
+Persistence is not a step in this pipeline — `ln-persist`'s save handler is wired separately via `observeAttributes([DOM_SELECTOR], ...)` and reacts to the `data-ln-toggle` mutation on its own, after this function returns.
 
 ### `_syncTriggerAria`
 
@@ -181,7 +181,7 @@ Document-scoped `querySelectorAll('[data-ln-toggle-for="<id>"]')`, sets `aria-ex
 
 ### Persistence
 
-Key: `ln:toggle:{pagePath}:{id}` (`_resolveKey` in `ln-core/persist.js`); path-scoped and non-overrideable, so the same panel `id` on two routes stores independently. `persistGet`/`persistSet` wrap `localStorage` in `try/catch` and swallow failures silently (private browsing, quota, disabled storage) — toggle keeps working without persistence, no error surfaces.
+Key: `ln:{id}:data-ln-toggle` (global by default), or `ln:{id}:{pagePath}:data-ln-toggle` when `data-ln-persist-scope="page"` is present, so the same panel `id` on two routes can be made to store independently (`_resolveKey` in `ln-persist/src/ln-persist.js`). The sink wraps `localStorage` in `try/catch` and swallows failures silently (private browsing, quota, disabled storage) — toggle keeps working without persistence, no error surfaces.
 
 ### Destroy
 

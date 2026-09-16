@@ -151,8 +151,10 @@ The canonical composition for table per-column filters. `ln-filter` dispatches e
 | `data-ln-filter-value` | `<input type="checkbox">` | `String` | `""` | Value to match. Checked inputs keep matching items visible (OR logic within the same key). |
 | `data-ln-filter-reset` | `<input type="checkbox">` | Flag | — | Marks the reset sentinel input ("All"). Checking it unchecks every value input in the group. |
 | `data-ln-filter-col` | Container root | `Number` | — | 0-based column index to filter rows in a plain HTML `<table>` by cell content. |
-| `data-ln-persist` | Container root | Flag \| `String` | — | Enables `localStorage` persistence of the active filter state, keyed by the container's `id` or by the attribute's string value. |
+| `data-ln-persist` | Container root | Flag \| `String` | — | Enables `localStorage` persistence of `data-ln-filter-values`, keyed by the container's `id` or by the attribute's string value. |
+| `data-ln-persist-scope` | Container root | `"page"` | Absent (global) | Opt-in, independent attribute. Scopes the persisted key to the current URL pathname. |
 | `data-ln-hash` | Container root | Flag \| `String` | — | Opt-in. Synchronizes active filters to URL hash fragment (e.g. `#users-filter:status:active,pending`). Value is custom namespace; if empty defaults to `[targetId]-filter`. |
+| `data-ln-filter-values` | Container root | `String` | — | Component-written state attribute: the comma-joined, percent-encoded list of currently active filter values. Read by `ln-persist` for restore/save. |
 | `data-ln-filter-hide` | Target children / rows | `"true"` | — | Written by the component on elements that fail the active filters. |
 
 > [!NOTE]
@@ -204,7 +206,7 @@ The reset sentinel checkbox acts as an automatic coordinator:
 
 ### Performance and Persistence
 - **Batching:** Render calls are batched via a microtask queue (`createBatcher`) to prevent excessive layout recalculations during rapid sequential input changes.
-- **Persistence:** If `data-ln-persist` is defined, the state is persisted in `localStorage` under `ln:filter:<path>:<id>`.
+- **Persistence:** If `data-ln-persist` is defined, `data-ln-filter-values` is persisted in `localStorage` under `ln:<id>:data-ln-filter-values` (global), or `ln:<id>:<path>:data-ln-filter-values` when `data-ln-persist-scope="page"` is present. The filter *key* is never persisted — only the active values.
 
 ---
 
