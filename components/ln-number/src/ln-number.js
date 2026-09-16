@@ -76,7 +76,7 @@ import { calculateCursorPosition } from './number-model.js';
 					dom.dispatchEvent(new Event('input', { bubbles: true }));
 					return;
 				}
-				const num = typeof val === 'number' ? val : parseNumber(String(val), getLocale(dom));
+				const num = typeof val === 'number' ? val : parseFloat(String(val));
 				if (isNaN(num)) {
 					self._setDisplayRaw(String(val));
 					self._setHiddenRaw('');
@@ -130,7 +130,7 @@ import { calculateCursorPosition } from './number-model.js';
 		// ── Handle pre-filled value ─────────────────────────
 		const initial = dom.value;
 		if (initial !== '') {
-			const num = parseNumber(initial, getLocale(dom));
+			const num = parseFloat(initial);
 			if (!isNaN(num)) {
 				const maxDecimals = dom.getAttribute('data-ln-number-decimals');
 				this._setHiddenRaw(num);
@@ -156,7 +156,7 @@ import { calculateCursorPosition } from './number-model.js';
 			candidate = dom.textContent.trim();
 		}
 
-		const num = parseNumber(candidate, getLocale(dom));
+		const num = parseFloat(candidate);
 		if (!isNaN(num)) {
 			this._rawValue = num;
 			if (!dom.hasAttribute('data-ln-value')) {
@@ -316,9 +316,10 @@ import { calculateCursorPosition } from './number-model.js';
 			const raw = _inputValueDesc.get.call(this._hidden);
 			return raw === '' ? NaN : parseFloat(raw);
 		},
-		set: function (num) {
+		set: function (val) {
+			const num = typeof val === 'number' ? val : parseFloat(val);
 			if (this.isTextElement) {
-				if (typeof num !== 'number' || isNaN(num)) {
+				if (isNaN(num)) {
 					this._rawValue = null;
 					this.dom.textContent = '';
 				} else {
@@ -329,7 +330,7 @@ import { calculateCursorPosition } from './number-model.js';
 				return;
 			}
 
-			if (typeof num !== 'number' || isNaN(num)) {
+			if (isNaN(num)) {
 				this._setDisplayRaw('');
 				this._setHiddenRaw('');
 				this.dom.dispatchEvent(new Event('input', { bubbles: true }));
