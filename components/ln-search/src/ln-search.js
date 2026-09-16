@@ -306,6 +306,10 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 			if (target && target.parentElement && target.parentElement._lnSearchText !== undefined) {
 				delete target.parentElement._lnSearchText;
 			}
+		},
+		persist: {
+			attr: DOM_SELECTOR,
+			hashActive: function (el) { return !!_resolveSearchHashNamespace(el); }
 		}
 	});
 

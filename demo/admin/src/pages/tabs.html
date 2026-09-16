@@ -321,7 +321,7 @@ location.hash = 'user-tabs:settings&project-tabs:members';</code></pre>
 					<section class="section-card" data-demo-html>
 						<header><h3>Live demo — persistent tabs without hash sync</h3></header>
 						<main>
-							<p>No <code>id</code> (so no hash sync), explicit <code>data-ln-persist="settings-tabs"</code> (so the storage key doesn't depend on a generated <code>id</code>). The active tab is remembered across page loads via <code>localStorage</code> under key <code>ln:tabs:settings-tabs</code> — global by default, so the same key restores this tab set anywhere it appears. Prefix the value with <code>page:</code> to scope it to the current URL instead. Useful for "settings page" tabs where the user expects "the last tab I had open is the one I'll see when I come back."</p>
+							<p>No <code>id</code> (so no hash sync), explicit <code>data-ln-persist="settings-tabs"</code> (so the storage key doesn't depend on a generated <code>id</code>). The active tab is remembered across page loads via <code>localStorage</code> under key <code>ln:settings-tabs:data-ln-tabs-active</code> — global by default, so the same key restores this tab set anywhere it appears. Add <code>data-ln-persist-scope="page"</code> to scope it to the current URL instead. Useful for "settings page" tabs where the user expects "the last tab I had open is the one I'll see when I come back."</p>
 
 							<section data-ln-tabs data-ln-persist="settings-tabs" data-ln-tabs-default="general">
 								<nav>
@@ -337,12 +337,12 @@ location.hash = 'user-tabs:settings&project-tabs:members';</code></pre>
 
 								<section data-ln-panel="security" class="hidden">
 									<h4>Security</h4>
-									<p>Inspect <code>localStorage</code> in DevTools — you'll see the key <code>ln:tabs:…:settings-tabs</code> with the active key value.</p>
+									<p>Inspect <code>localStorage</code> in DevTools — you'll see the key <code>ln:settings-tabs:data-ln-tabs-active</code> with the active key value.</p>
 								</section>
 
 								<section data-ln-panel="notifications" class="hidden">
 									<h4>Notifications</h4>
-									<p>To clear: <code>localStorage.removeItem('ln:tabs:&lt;path&gt;:settings-tabs')</code>.</p>
+									<p>To clear: <code>localStorage.removeItem('ln:settings-tabs:data-ln-tabs-active')</code>.</p>
 								</section>
 							</section>
 						</main>

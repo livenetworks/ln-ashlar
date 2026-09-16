@@ -111,7 +111,36 @@
 		--padding-y: var(--size-xs);
 	}
 
-	button {
+	// Header actions compact to a 28px button. This is a DESCENDANT selector,
+	// so it also reaches a button that belongs to a nested field — that button
+	// is the field's own chrome, not a header action, and form-field-group
+	// stretches it to the field's full height. An explicit height beats
+	// `align-self: stretch`, so such a button has to be excluded here; it
+	// cannot defend itself by out-weighing this rule.
+	//
+	// Only ln-date needs the exclusion. Every other composite field clears
+	// (0,1,2) on its own, because its binding carries a :has() guard and :has()
+	// adopts its argument's specificity:
+	//   icon-group auto-bind  :is(label,div,span,search):has(>.ln-icon):has(>…) > button   (0,1,4)
+	//   search clear          search:has(> input[type="search"]) > button                  (0,1,3)
+	//   this rule             .card > header button                                        (0,1,2)
+	//   ln-date               [data-ln-date-field] > button                                (0,1,1)
+	// ln-date builds its own wrapper in JS, so it has nothing to guard against
+	// and its binding is a bare attribute — the one that falls below the line.
+	// A new composite field whose wrapper needs no :has() belongs in this list.
+	//
+	// Both :where()s are load-bearing:
+	//   inner — keeps the wrapper from lending ITS weight to the exclusion.
+	//   outer — :not() adopts its argument's specificity, which would lift this
+	//           rule to (0,1,3) and silently outrank consumers that override it
+	//           at equal weight by source order.
+	// Wrapped, the rule stays exactly (0,1,2); only its match set narrows.
+	//
+	// NOT written as [class*="group"]: that spelling means "field group" in
+	// components/_form.scss only because it is scoped under .form-element there.
+	// Unscoped it would also catch .btn-group and stop compacting a segmented
+	// group in a header — a regression, and those buttons already outrank this.
+	button:where(:not(:where([data-ln-date-field]) > button)) {
 		--btn-padding-y: var(--size-2xs);
 		--btn-padding-x: var(--size-xs);
 		font-size: var(--text-xs);

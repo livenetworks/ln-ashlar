@@ -117,7 +117,8 @@ Target a generic `<ul>`/`<li>` container by `id`. Set `data-ln-sort-items` for d
 | `data-ln-sort-state` | Same as root | `"none"`\|`"asc"`\|`"desc"` | `"none"` | *State*. Single Source of Truth. Drives which trigger button is visible via CSS. Observed by `MutationObserver`. |
 | `data-ln-sort-items` | Same as root | `String` | `null` | Opt-in. Deep CSS selector for default-DOM-behaviour reordering (mirrors `data-ln-search-items`). |
 | `data-ln-sort-dir` | `<button>` (inside root) | `"asc"`\|`"desc"`\|`"none"` | - | Identifies which sort action this trigger performs. |
-| `data-ln-persist` | Same as root | `String` (Optional) | - | Opt-in. Persists `{ field, column, direction }` to `localStorage`. Give each `[data-ln-sort]` its own value (or `id`) — persistence is per-instance, not per-table. |
+| `data-ln-persist` | Same as root | `String` (Optional) | - | Opt-in. Persists the `data-ln-sort-state` string (`"asc"\|"desc"\|"none"`) to `localStorage`. Give each `[data-ln-sort]` its own value (or `id`) — persistence is per-instance, not per-table. |
+| `data-ln-persist-scope` | Same as root | `"page"` | Absent (global) | Opt-in, independent attribute. Scopes the persisted key to the current URL pathname. |
 | `data-ln-hash` | Same as root | `String` (Optional) | - | Opt-in. Synchronizes sort state to URL hash fragment (e.g. `#users-sort:price.asc`). Value is the custom namespace; if empty defaults to `[targetId]-sort`. |
 
 ### Programmatic JS API (`element.lnSort`)
@@ -212,7 +213,7 @@ filter) via `table-base`'s `&:has([data-ln-sort]):has(.table-filter)` selector.
 > 1. **Setting both `data-ln-sort-field` and expecting the index fallback to also work.** They are never bridged. Pick one per instance based on the mode (SSR → index fallback; data-driven → field).
 > 2. **Multi-column sort.** Not supported — single sort only. Multiple `[data-ln-sort]` instances targeting the same target enforce mutual exclusion automatically (see §1 "Single sort, mutual exclusion & multi-control sync").
 > 3. **Expecting JS to own the click cycle.** It doesn't — the circular order is CSS-driven via `[data-ln-sort-state]`. If the three trigger buttons aren't authored per the canonical markup, the cycle breaks visually even though the JS click handling still works.
-> 4. **Persisting without a stable key.** `data-ln-persist` with no value falls back to `el.id`; a bare `<ul data-ln-sort data-ln-persist>` with no `id` silently skips persistence (`console.warn`s once).
+> 4. **Persisting without a stable key.** `data-ln-persist` with no value falls back to `el.id`; a bare `<ul data-ln-sort data-ln-persist>` with no `id` silently skips persistence (`ln-persist` `console.warn`s once). The persisted value is the plain `data-ln-sort-state` string, not a composite object.
 
 ---
 

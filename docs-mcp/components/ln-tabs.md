@@ -21,7 +21,7 @@ The `ln-tabs` component (~180 lines JS) manages N-way exclusive selection of con
 *   **Single Source of Truth:** Active state resides strictly in `data-ln-tabs-active="key"` on the host container. Click events, URL hash updates (`hashchange`), `localStorage` restoration, and programmatic changes all converge into `setAttribute('data-ln-tabs-active', key)`. The component's `MutationObserver` callback executes UI rendering via `_applyActive(key)`.
 *   **Dual Operating Modes (Trigger-Based):**
     1.  **Anchor Triggers (`<a href="#nsKey:key">`) → URL Hash Sync Mode:** Enables shareable, bookmarkable deep links with browser Back/Forward navigation. Uses `id` or `data-ln-tabs-key` on the wrapper as the namespace via [`components/ln-core/hash.js`](../../components/ln-core/hash.js).
-    2.  **Button Triggers (`<button>`) → localStorage Persist Mode:** Used for standard UI buttons. Does not mutate the URL. Opt-in persistence via `data-ln-persist` saves/restores state via [`components/ln-core/persist.js`](../../components/ln-core/persist.js).
+    2.  **Button Triggers (`<button>`) → localStorage Persist Mode:** Used for standard UI buttons. Does not mutate the URL. Opt-in persistence via `data-ln-persist` saves/restores state via [`components/ln-persist/src/ln-persist.js`](../../components/ln-persist/src/ln-persist.js).
 *   **Reactive ARIA & Focus Management:** Automatically updates `aria-selected` on triggers, toggles `.hidden` and `aria-hidden` on panels, and focuses the first focusable element inside newly activated panels (`data-ln-tabs-focus="true"` by default).
 
 > [!IMPORTANT]
@@ -106,6 +106,7 @@ The `ln-tabs` component (~180 lines JS) manages N-way exclusive selection of con
 | `data-ln-tab` | Trigger | String | `href` hash | Marks element as a tab trigger and defines its key. |
 | `data-ln-panel` | Panel | String | — | Marks element as a content panel matching a trigger key. |
 | `data-ln-persist` | Host | String / Flag | — | Enables `localStorage` persistence for button triggers. |
+| `data-ln-persist-scope` | Host | `"page"` | Absent (global) | Opt-in, independent attribute. Scopes the persisted key to the current URL pathname. |
 
 ### Programmatic JS API
 
@@ -180,7 +181,7 @@ sequenceDiagram
         Instance->>DOM: Read hash key via hashGet()
     else Button Mode (<button>)
         opt data-ln-persist present
-            Instance->>DOM: Read key via persistGet()
+            Note over DOM: ln-persist sink already restored data-ln-tabs-active before mount
         end
     end
 

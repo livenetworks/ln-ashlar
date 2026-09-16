@@ -1,5 +1,5 @@
-import { createBatcher, dispatch, dispatchCancelable, hashFilterDecode, hashFilterEncode, hashGet, hashSet, matchesFilterValues, persistGet, persistSet, queueBoot, registerComponent, resolveHashNamespace } from '../../ln-core';
-import { arraysDiffer, deriveActiveFilters, evaluateRowFilters } from './filter-model.js';
+import { createBatcher, dispatch, dispatchCancelable, hashFilterDecode, hashFilterEncode, hashGet, hashSet, matchesFilterValues, queueBoot, registerComponent, resolveHashNamespace } from '../../ln-core';
+import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValues, evaluateRowFilters } from './filter-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-filter';
@@ -10,6 +10,7 @@ import { arraysDiffer, deriveActiveFilters, evaluateRowFilters } from './filter-
 	const RESET_ATTR = 'data-ln-filter-reset';
 	const COL_ATTR = 'data-ln-filter-col';
 	const HASH_ATTR = 'data-ln-hash';
+	const VALUES_ATTR = 'data-ln-filter-values';
 
 	// Shared column filter state per plain table (AND across columns, OR within column)
 	const _tableFilters = new WeakMap();
@@ -110,15 +111,19 @@ import { arraysDiffer, deriveActiveFilters, evaluateRowFilters } from './filter-
 			}
 		}
 
-		if (!restored && dom.hasAttribute('data-ln-persist')) {
-			const saved = persistGet('filter', dom);
-			if (saved && saved.key && Array.isArray(saved.values) && saved.values.length > 0) {
-				_applyInputValues(dom, saved.key, saved.values);
-				queueBoot(function () {
-					if (self._destroyed) return;
-					self._render();
-				});
-				restored = true;
+		if (!restored) {
+			const values = decodeFilterValues(dom.getAttribute(VALUES_ATTR));
+			if (values.length > 0) {
+				const keyEl = dom.querySelector('[' + KEY_ATTR + ']');
+				const key = keyEl ? keyEl.getAttribute(KEY_ATTR) : null;
+				if (key) {
+					_applyInputValues(dom, key, values);
+					queueBoot(function () {
+						if (self._destroyed) return;
+						self._render();
+					});
+					restored = true;
+				}
 			}
 		}
 
@@ -245,13 +250,9 @@ import { arraysDiffer, deriveActiveFilters, evaluateRowFilters } from './filter-
 
 		this._lastSnapshot = { key: active.key, values: active.values.slice() };
 
-		if (this.dom.hasAttribute('data-ln-persist')) {
-			if (active.key && active.values.length > 0) {
-				persistSet('filter', this.dom, { key: active.key, values: active.values.slice() });
-			} else {
-				persistSet('filter', this.dom, null);
-			}
-		}
+		const encoded = encodeFilterValues(active.values);
+		if (encoded) this.dom.setAttribute(VALUES_ATTR, encoded);
+		else this.dom.removeAttribute(VALUES_ATTR);
 
 		if (this.hashEnabled) {
 			const encoded = hashFilterEncode(active.key, active.values);
@@ -368,13 +369,25 @@ import { arraysDiffer, deriveActiveFilters, evaluateRowFilters } from './filter-
 			if (instance.hashEnabled) {
 				window.addEventListener('hashchange', instance._onHashChange);
 			}
+		} else if (attrName === VALUES_ATTR) {
+			const values = decodeFilterValues(el.getAttribute(VALUES_ATTR));
+			const keyEl = el.querySelector('[' + KEY_ATTR + ']');
+			const key = keyEl ? keyEl.getAttribute(KEY_ATTR) : null;
+			if (key) {
+				_applyInputValues(el, key, values);
+				instance._render();
+			}
 		}
 	}
 
 	// ─── Registration ──────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-filter', {
-		extraAttributes: [HASH_ATTR],
-		onAttributeChange: _syncAttribute
+		extraAttributes: [HASH_ATTR, VALUES_ATTR],
+		onAttributeChange: _syncAttribute,
+		persist: {
+			attr: VALUES_ATTR,
+			hashActive: function (el) { return !!resolveHashNamespace(el, 'filter'); }
+		}
 	});
 })();

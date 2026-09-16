@@ -17,10 +17,8 @@
 			]
 		},
 		"data-ln-persist": {
-			"direction": "author",
-			"sources": [
-				"src/ln-tabs.js"
-			]
+			"direction": null,
+			"sources": []
 		},
 		"data-ln-tab": {
 			"direction": "author",

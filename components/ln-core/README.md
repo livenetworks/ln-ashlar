@@ -16,7 +16,6 @@ ln-core exposes helpers in these categories:
 - **Reactivity** — `reactiveState`, `deepReactive`, `createBatcher`
 - **Windowing** — sliding-window sparse cache for server-side virtualization (`createWindowCache`)
 - **Layout & Positioning** — viewport-aware positioning (`computePlacement`), measurement (`measureHidden`)
-- **Persistence** — localStorage wrappers with `ln:` prefix (`persistGet`, `persistSet`, `persistRemove`, `persistClear`)
 - **Hash codec** — namespaced URL fragment state (`hashParse`, `hashGet`, `hashSet`, `hashSortEncode`, `hashSortDecode`, `hashFilterEncode`, `hashFilterDecode`, `resolveHashNamespace`)
 - **Cryptography** — high-performance Web Crypto helpers for encryption at rest (`crypto.js`)
 - **Searching & Filtering** — query tokenization, multi-field and filter matching (`matching.js`)
@@ -412,6 +411,27 @@ observeAttributes(['href'], function (el, name, oldValue) {
   module-level side effects would roughly quadruple its standalone bundle
   size). Neither is an oversight; do not migrate them.
 
+### setPersistSink(sink)
+
+Nullable persist restore/save sink. Installed/removed only by `ln-persist`
+(`components/ln-persist/src/ln-persist.js`) — mirrors `setDebugSink`'s shape
+exactly. `findElements` calls `window.lnCore._persistSink(el, selector)`
+for any element carrying `data-ln-persist`, immediately before constructing
+its owning component's instance, when the sink is installed.
+
+```js
+import { setPersistSink } from '../ln-core';
+
+setPersistSink(function (el, selector) {
+    // restore/save logic keyed off the registry's persist: entries
+});
+```
+
+- `sink(el, selector)` — called synchronously inside `findElements`, before
+  the element's component instance is constructed.
+- No sink installed (`ln-persist` not loaded) → the check is a no-op.
+- See `components/ln-persist/README.md` for the full restore/save contract.
+
 ### defineAttrs(instance, dom, spec)
 
 Define live, getter-only properties on a component instance that read the DOM
@@ -685,104 +705,8 @@ const { width, height } = measureHidden(panel);
 
 ---
 
-## persist.js
-
-### persistGet(component, el)
-
-Read persisted value for an element. Returns the parsed JSON value or `null` (not found, or storage unavailable).
-
-- `component` — component name string (e.g. `'toggle'`, `'tabs'`, `'filter'`)
-- `el` — DOM element with `data-ln-persist` attribute
-
-Storage key resolved from `el`: uses `data-ln-persist` value if non-empty, otherwise element's `id`. If neither exists, emits `console.warn` and returns `null`.
-
-```js
-import { persistGet } from '../ln-core';
-const saved = persistGet('toggle', el); // null | 'open' | 'close'
-```
-
-### persistSet(component, el, value)
-
-Write a value to localStorage. Value is JSON-serialized. Silently no-ops if localStorage is unavailable or full.
-
-```js
-import { persistSet } from '../ln-core';
-persistSet('toggle', el, 'open');
-persistSet('sort', el, { field: 'name', column: null, direction: 'desc' });
-persistSet('filter', el, null);  // explicitly clears
-```
-
-### persistRemove(component, el)
-
-Remove a single persisted value for a specific element.
-
-```js
-import { persistRemove } from '../ln-core';
-persistRemove('tabs', el);
-```
-
-### persistClear(component)
-
-Remove ALL persisted values for a given component type. Scans all localStorage keys matching `ln:{component}:*`.
-
-```js
-import { persistClear } from '../ln-core';
-persistClear('toggle');     // removes all ln:toggle:* keys
-persistClear('sort'); // removes all ln:sort:* keys
-```
-
-Useful for "reset to defaults" functionality.
-
-### Storage key format
-
-Global by default:
-
-```
-ln:{component}:{id}
-```
-
-Page-scoped, opt-in via a `page:` prefix on the `data-ln-persist` value:
-
-```
-ln:{component}:{pagePath}:{id}
-```
-
-- `pagePath` — `location.pathname`, lowercase, trailing slash stripped, or `/` for root
-- `id` — element's `id` attribute, or the explicit `data-ln-persist="custom-key"` value (with the `page:` prefix stripped when present)
-
-Examples:
-```
-ln:toggle:sidebar
-ln:tabs:settings-tabs
-ln:sort:/admin/orders:orders-table-name    ← data-ln-persist="page:orders-table-name"
-ln:filter:/admin/users:status-filter       ← data-ln-persist="page:status-filter"
-```
-
-### Opt-in HTML attribute
-
-```html
-<!-- Uses element id as storage key (global) -->
-<section id="sidebar" data-ln-toggle="close" data-ln-persist>
-
-<!-- Explicit key (global, no id needed) -->
-<section data-ln-toggle="close" data-ln-persist="sidebar-section">
-
-<!-- Page-scoped: same id/key on different pages never collides -->
-<section data-ln-toggle="close" data-ln-persist="page:sidebar-section">
-```
-
-Persistence is always opt-in. Elements without `data-ln-persist` are never touched.
-
-Components that support `data-ln-persist` document the stored value
-shape in their own READMEs (ln-toggle, ln-accordion, ln-tabs,
-ln-sort, ln-filter).
-
-### Graceful degradation
-
-- localStorage disabled (private browsing) → silent no-op, components work normally without persistence
-- localStorage full → silent no-op on write, existing data preserved
-- Stale data (panel removed from DOM, column index out of range) → orphan key ignored gracefully
-- Missing `id` + no explicit key → `console.warn` once, persistence skipped for that element
+Persistence now lives in the standalone `ln-persist` component — see
+`components/ln-persist/README.md`.
 
 ---
 

@@ -29,6 +29,14 @@ import './ln-ui-coordinator/src/ln-ui-coordinator.js';
 import './ln-number/src/ln-number.js';
 import './ln-date/src/ln-date.js';
 import './ln-nav/src/ln-nav.js';
+// ln-persist installs its restore/save sink (setPersistSink) into
+// ln-core's shared findElements hook — see components/ln-persist. It
+// must import before any of its five owning components below
+// (ln-tabs, ln-toggle, ln-filter, ln-search, ln-sort) so the sink exists
+// before their own registerComponent() boot sweeps run. This is a plain
+// import-order requirement, not a boot gate — ln-persist does not hold
+// or delay any other component's initialization.
+import './ln-persist/src/ln-persist.js';
 import './ln-tabs/src/ln-tabs.js';
 import './ln-toggle/src/ln-toggle.js';
 import './ln-accordion/src/ln-accordion.js';

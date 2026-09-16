@@ -221,18 +221,18 @@ el.lnToggle.destroy();    // detach listeners, dispatch :destroyed</code></pre>
 					<section class="section-card">
 						<header><h3>Persistence</h3></header>
 						<main>
-							<p>Add <code>data-ln-persist</code> to a panel to remember its open/closed state in <code>localStorage</code>. State restores on page load before the first event fires. Storage key format is global by default: <code>ln:toggle:{id}</code>. Prefix the value with <code>page:</code> to scope the key to the current pathname instead: <code>ln:toggle:{pagePath}:{id}</code>.</p>
+							<p>Add <code>data-ln-persist</code> to a panel to remember its open/closed state in <code>localStorage</code>. State restores on page load before the first event fires. Storage key format is global by default: <code>ln:{id}:data-ln-toggle</code>. Add <code>data-ln-persist-scope="page"</code> to scope the key to the current pathname instead: <code>ln:{id}:{pagePath}:data-ln-toggle</code>.</p>
 							<div class="table-container">
 							<table>
 								<thead><tr><th>Markup</th><th>Page</th><th>Storage key</th></tr></thead>
 								<tbody>
-									<tr><td><code>&lt;aside id="sidebar" data-ln-toggle data-ln-persist&gt;</code></td><td>any</td><td><code>ln:toggle:sidebar</code></td></tr>
-									<tr><td><code>&lt;aside id="sidebar" data-ln-toggle data-ln-persist="left-panel"&gt;</code></td><td>any</td><td><code>ln:toggle:left-panel</code></td></tr>
-									<tr><td><code>&lt;section id="faq-1" data-ln-toggle data-ln-persist="page:faq-1"&gt;</code></td><td><code>/</code></td><td><code>ln:toggle:/:faq-1</code></td></tr>
+									<tr><td><code>&lt;aside id="sidebar" data-ln-toggle data-ln-persist&gt;</code></td><td>any</td><td><code>ln:sidebar:data-ln-toggle</code></td></tr>
+									<tr><td><code>&lt;aside id="sidebar" data-ln-toggle data-ln-persist="left-panel"&gt;</code></td><td>any</td><td><code>ln:left-panel:data-ln-toggle</code></td></tr>
+									<tr><td><code>&lt;section id="faq-1" data-ln-toggle data-ln-persist data-ln-persist-scope="page"&gt;</code></td><td><code>/</code></td><td><code>ln:faq-1:/:data-ln-toggle</code></td></tr>
 								</tbody>
 							</table>
 							</div>
-							<p>Keys are global by default — the same <code>id="sidebar"</code> on different pages resolves to the same key, so a shell element (e.g. a nav present on every page) shares one state everywhere. Use the <code>page:</code> prefix when the same <code>id</code> or key must resolve to a different key per page. Restore happens inside the constructor before reactivity starts; the user's choice always wins over markup defaults on subsequent visits.</p>
+							<p>Keys are global by default — the same <code>id="sidebar"</code> on different pages resolves to the same key, so a shell element (e.g. a nav present on every page) shares one state everywhere. Use <code>data-ln-persist-scope="page"</code> when the same <code>id</code> or key must resolve to a different key per page. Restore happens inside the constructor before reactivity starts; the user's choice always wins over markup defaults on subsequent visits.</p>
 							<p>If <code>data-ln-persist</code> is present but the element has neither an <code>id</code> nor an explicit key value, the persist module logs a warning and silently skips — the toggle continues to function without persistence. <code>localStorage</code> failures (private browsing, quota exceeded) are also silent.</p>
 						</main>
 					</section>

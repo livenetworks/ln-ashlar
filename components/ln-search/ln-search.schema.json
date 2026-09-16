@@ -22,10 +22,8 @@
 			]
 		},
 		"data-ln-persist": {
-			"direction": "author",
-			"sources": [
-				"src/ln-search.js"
-			]
+			"direction": null,
+			"sources": []
 		},
 		"data-ln-search": {
 			"direction": "both",

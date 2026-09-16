@@ -117,7 +117,8 @@ combined on the same target — pick one per table.
 | `data-ln-search-clear-for="targetId"` | `<button>` | Remote clear button targeting a specific element ID anywhere on the page. |
 | `data-ln-search-hide="true"` | Items in target | State attribute automatically set on non-matching elements (`display: none !important`). |
 | `data-ln-hash` | Target / Control | Opt-in. Synchronizes search query to URL hash fragment (e.g. `#users-search:john`). Value is custom namespace; if empty defaults to `[targetId]-search`. |
-| `data-ln-persist` | Target element | **Recommended.** Persists the search term to `localStorage` and restores it on boot; omit it only when the search must start empty on every visit. Goes on `[data-ln-search]`, never on the input. The target needs an `id`, or give the attribute an explicit value (`data-ln-persist="key"`). `data-ln-hash` takes precedence when the hash carries a value. Stored key format: `ln:search:{id}` (global by default); prefix the value with `page:` (e.g. `data-ln-persist="page:key"`) to opt into page-scoping, which stores `ln:search:{pathname}:{id}`. |
+| `data-ln-persist` | Target element | **Recommended.** Persists the search term to `localStorage` and restores it before boot; omit it only when the search must start empty on every visit. Goes on `[data-ln-search]`, never on the input. The target needs an `id`, or give the attribute an explicit value (`data-ln-persist="key"`). No effect while `data-ln-hash` is active on the target — hash wins, never double-written. Stored key format: `ln:{id}:data-ln-search` (global by default); add `data-ln-persist-scope="page"` to opt into page-scoping, which stores `ln:{id}:{pathname}:data-ln-search`. |
+| `data-ln-persist-scope` | Target element | Opt-in, independent attribute. `"page"` scopes the persisted key to the current URL pathname. |
 
 ### JavaScript API
 

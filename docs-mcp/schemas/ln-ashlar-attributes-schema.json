@@ -73,13 +73,6 @@
 					"role": "input",
 					"description": "Identifies item key property for DOM element reuse in renderList()."
 				},
-				"data-ln-persist": {
-					"type": "string",
-					"read_by": "ln-persist",
-					"consumed_by": "js",
-					"role": "input",
-					"description": "Storage key for persisting state in LocalStorage/SessionStorage."
-				},
 				"data-ln-debug": {
 					"type": "boolean",
 					"read_by": "ln-debug",
@@ -858,6 +851,20 @@
 					"consumed_by": "js",
 					"role": "input",
 					"description": "Maps column index or field name for table column filtering."
+				},
+				"data-ln-filter-values": {
+					"type": "string",
+					"read_by": "ln-filter",
+					"consumed_by": "both",
+					"role": "state",
+					"description": "State attribute holding the comma-joined, percent-encoded active filter values. Written by ln-filter on change, read by ln-persist for restore/save."
+				},
+				"data-ln-persist": {
+					"type": "string",
+					"read_by": "ln-persist",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Opt-in. Enables localStorage persistence of data-ln-filter-values, keyed by the container's id or by this attribute's string value."
 				}
 			}
 		},
@@ -1279,6 +1286,32 @@
 				}
 			}
 		},
+		"ln-persist": {
+			"element": {
+				"recommended_tag": "any",
+				"tag_enforced": false,
+				"note": "No instance of its own — restores/saves a single state attribute for elements owned by a persist-declaring component (ln-toggle, ln-tabs, ln-sort, ln-search, ln-filter). No effect on any other element."
+			},
+			"attributes": {
+				"data-ln-persist": {
+					"type": "string",
+					"read_by": "ln-persist",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Opt-in. Bare = use el.id as the storage key. data-ln-persist=\"key\" = explicit key override. Only has an effect on an element owned by a persist-declaring component."
+				},
+				"data-ln-persist-scope": {
+					"type": "string",
+					"enum": [
+						"page"
+					],
+					"read_by": "ln-persist",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Opt-in. Scopes the persisted key to the current URL pathname instead of the global default."
+				}
+			}
+		},
 		"ln-popover": {
 			"element": {
 				"recommended_tag": "div, section, form, a, button",
@@ -1439,6 +1472,13 @@
 					"consumed_by": "js",
 					"role": "input",
 					"description": "Button trigger to clear search term input."
+				},
+				"data-ln-persist": {
+					"type": "string",
+					"read_by": "ln-persist",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Opt-in. Enables localStorage persistence of the search term, keyed by the target's id or by this attribute's string value. No effect while data-ln-hash is active on the target."
 				}
 			}
 		},
@@ -1509,13 +1549,6 @@
 					"consumed_by": "js",
 					"role": "input",
 					"description": "Identifies which sort action a trigger <button> performs."
-				},
-				"data-ln-persist": {
-					"type": "string",
-					"read_by": "ln-sort",
-					"consumed_by": "js",
-					"role": "input",
-					"description": "Opt-in. Persists { field, column, direction } to localStorage, keyed per instance."
 				}
 			}
 		},
@@ -1831,6 +1864,13 @@
 					"consumed_by": "css",
 					"role": "input",
 					"description": "SCSS selector binding tab button to panel."
+				},
+				"data-ln-persist": {
+					"type": "string",
+					"read_by": "ln-persist",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Opt-in. Enables localStorage persistence of data-ln-tabs-active for button-trigger groups, keyed by the host's id or by this attribute's string value. No effect while the group is in URL-hash sync mode."
 				}
 			}
 		},
@@ -1943,6 +1983,13 @@
 					"consumed_by": "js",
 					"role": "input",
 					"description": "Action type for trigger click (default: 'toggle')."
+				},
+				"data-ln-persist": {
+					"type": "string",
+					"read_by": "ln-persist",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Opt-in. Enables localStorage persistence of the panel's open/close state, keyed by the panel's id or by this attribute's string value."
 				}
 			}
 		},
