@@ -8,16 +8,16 @@ It splits search into a **Control** (`data-ln-search-for="targetId"`) that manag
 
 ## ✅ Canonical Markup — Copy This (REQUIRED)
 
-**Hard rule — non-negotiable.** Every search or filter text input MUST use the full `.search` chrome below: the leading magnifier icon **and** the clear ("x") button.
+**Hard rule — non-negotiable.** Every search or filter text input MUST use the full `<search>` chrome below: the leading magnifier icon **and** the clear ("x") button.
 
 ```html
-<label class="search">
+<search aria-label="Search records">
 	<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 	<input type="search" placeholder="Search …" data-ln-search-for="<targetId>">
 	<button type="button" data-ln-search-clear aria-label="Clear search">
 		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 	</button>
-</label>
+</search>
 
 <ul id="<targetId>" data-ln-search="">
 	<li>Item Alpha</li>
@@ -33,6 +33,58 @@ For deep targeting (e.g. table rows or checkbox lists) add `data-ln-search-items
 	...
 </table>
 ```
+
+---
+
+## 📋 SSR Table Search — Without `ln-table` (REQUIRED shape)
+
+When a table's rows are already printed in `<tbody>` by the server and the
+**only** interaction is text search — no sort, no column filters, no
+data-driven mode — `ln-search` binds directly to the `<table>`. Do **not**
+add `data-ln-table`.
+
+```html
+<header class="ln-table__toolbar">
+	<search aria-label="Product search">
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+		<input type="search" data-ln-search-for="demo-table" aria-label="Search products">
+		<button type="button" data-ln-search-clear aria-label="Clear search">
+			<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+		</button>
+	</search>
+</header>
+
+<!-- data-ln-persist: the term survives a page reload. Drop it when the
+     search should start empty every visit. -->
+<table data-ln-search="" data-ln-search-items="tbody tr" data-ln-persist id="demo-table">
+	...
+</table>
+```
+
+Three rules govern this shape:
+
+1. `data-ln-search` goes on the `<table>` itself, not a wrapper `<div>` —
+   `data-ln-table` is absent.
+2. `data-ln-search-items="tbody tr"` is required. Without it, `_apply()`
+   falls back to `dom.children` — the `<thead>` and `<tbody>`, not rows. It
+   must be `tbody tr`, not bare `tr` — otherwise the header row's own `<tr>`
+   gets `data-ln-search-hide` when nothing matches.
+3. The toolbar is a `<header class="ln-table__toolbar">`, a sibling of the
+   `<table>` — never a `<tr><th colspan="N">` row inside `<thead>`. Only that
+   wrapper gets the compact toolbar layout from
+   `theme/components/_ln-table.scss`.
+
+See `demo/admin/src/pages/table.html` for the live reference.
+
+**This is a different case from `ln-table`.** The moment the table also
+needs column filters (`data-ln-table-filter-col`) or data-driven rows
+(`data-ln-table-source`), `data-ln-table` goes on the wrapper and `ln-table`
+owns search instead — see [`ln-table`](../ln-table/README.md#search-integration-ln-search).
+`ln-table` listens for `ln-search:change` on itself and calls
+`preventDefault()` unconditionally; since `dispatchCancelable` bubbles, the
+generic `ln-search` DOM-filter path (including `data-ln-search-items`) never
+runs while `data-ln-table` is present. The two modes are not meant to be
+combined on the same target — pick one per table.
 
 ---
 
@@ -65,6 +117,7 @@ For deep targeting (e.g. table rows or checkbox lists) add `data-ln-search-items
 | `data-ln-search-clear-for="targetId"` | `<button>` | Remote clear button targeting a specific element ID anywhere on the page. |
 | `data-ln-search-hide="true"` | Items in target | State attribute automatically set on non-matching elements (`display: none !important`). |
 | `data-ln-hash` | Target / Control | Opt-in. Synchronizes search query to URL hash fragment (e.g. `#users-search:john`). Value is custom namespace; if empty defaults to `[targetId]-search`. |
+| `data-ln-persist` | Target element | **Recommended.** Persists the search term to `localStorage` and restores it on boot; omit it only when the search must start empty on every visit. Goes on `[data-ln-search]`, never on the input. The target needs an `id`, or give the attribute an explicit value (`data-ln-persist="key"`). `data-ln-hash` takes precedence when the hash carries a value. Stored key format: `ln:search:{id}` (global by default); prefix the value with `page:` (e.g. `data-ln-persist="page:key"`) to opt into page-scoping, which stores `ln:search:{pathname}:{id}`. |
 
 ### JavaScript API
 

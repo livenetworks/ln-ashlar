@@ -88,10 +88,10 @@ is push.
     <table data-ln-table data-ln-table-source="orders">…</table>
 </section>
 
-<label class="search">
+<search aria-label="Search orders">
     <input type="search" placeholder="Search..." data-ln-search-for="orders">
     <button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon"><use href="#ln-icon-x"></use></svg></button>
-</label>
+</search>
 <ul data-ln-filter="orders">…</ul>
 <nav data-ln-sort="orders">
     <button type="button" data-ln-sort-field="total">Total</button>

@@ -29,7 +29,7 @@ There is no page-wide fallback. A coordinator that cannot resolve a target insid
 This boundary is what makes coordinators composable. Ten coordinators of the same type on one page each see only their own children, and there is no shared state to leak between them.
 
 ### 5. ID Binding Is Point-to-Point
-When one component is bound to another by id — `data-ln-search="<targetId>"`, `data-ln-modal-for="<modalId>"`, `data-ln-filter="<tableId>"` — it communicates with **that target and only that target**. It is not a broadcast.
+When one component is bound to another by id — `data-ln-search-for="<targetId>"`, `data-ln-modal-for="<modalId>"`, `data-ln-filter="<tableId>"` — it communicates with **that target and only that target**. It is not a broadcast.
 
 Such components dispatch their event **on the target element**, not on themselves. Delivery therefore depends on where the *target* lives, not where the trigger lives. A search input in a sidebar may legitimately drive a table inside a coordinator: the event originates on the table, which is the coordinator's own child, so rule 4 is satisfied without the input being a descendant of anything.
 

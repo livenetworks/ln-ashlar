@@ -123,15 +123,15 @@
 				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
 				<span class="app-name">ashlar-gui</span>
-				<label class="search sidebar-search" aria-label="Filter menu">
+				<search aria-label="Filter menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Filter menu…" aria-label="Filter menu" data-ln-search-for="demo-nav" data-ln-search-debounce="0">
+					<input type="search" placeholder="Filter menu…" aria-label="Filter menu" data-ln-search-for="demo-nav">
 					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
-				</label>
+				</search>
 			</header>
 
 			<main>
-				<nav class="nav" id="demo-nav" data-ln-nav="active" data-ln-search="" data-ln-search-items="li">
+				<nav class="nav" id="demo-nav" data-ln-nav="active" data-ln-search="" data-ln-search-items="li" data-ln-persist>
 					<ul>
 						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
@@ -248,7 +248,7 @@
 						<main>
 							<p>In <code>ln-ashlar</code>, search is implemented using the <strong>Two-Host / Attribute Bridge Architecture</strong>. It splits the search workflow into two decoupled roles:</p>
 							<ul>
-								<li><strong>The Control (<code>data-ln-search-for="targetId"</code>):</strong> Sits on the input element or wrapper. It manages keystroke capture, debounce delays (default 500ms), clear-button interactions, and writes the search term into the target's attribute.</li>
+								<li><strong>The Control (<code>data-ln-search-for="targetId"</code>):</strong> Sits on the input element or wrapper. It manages keystroke capture, clear-button interactions, and writes the search term into the target's attribute.</li>
 								<li><strong>The State Host (<code>data-ln-search="term"</code>):</strong> Sits on the target container (list, table, section). It owns the search term as the Single Source of Truth, detects attribute changes via <code>MutationObserver</code>, performs reverse synchronization to controls, dispatches <code>ln-search:change</code>, and runs tokenized AND matching.</li>
 							</ul>
 
@@ -292,13 +292,13 @@
 						<header><h3>Anatomy</h3></header>
 						<main>
 							<p>The canonical (required) form places <code>data-ln-search-for="targetId"</code> on the <code>&lt;input&gt;</code> and defines <code>data-ln-search=""</code> on the target container:</p>
-<pre><code>&lt;label class="search"&gt;
+<pre><code>&lt;search aria-label="Search countries"&gt;
   &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-icon-search"&gt;&lt;/use&gt;&lt;/svg&gt;
-  &lt;input type="search" placeholder="Search..." data-ln-search-for="my-list" data-ln-search-debounce="0"&gt;
+  &lt;input type="search" placeholder="Search..." data-ln-search-for="my-list"&gt;
   &lt;button type="button" data-ln-search-clear aria-label="Clear search"&gt;
     &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-icon-x"&gt;&lt;/use&gt;&lt;/svg&gt;
   &lt;/button&gt;
-&lt;/label&gt;
+&lt;/search&gt;
 
 &lt;ul id="my-list" data-ln-search=""&gt;
     &lt;li&gt;Argentina&lt;/li&gt;
@@ -329,7 +329,6 @@
 									<tr><td><code>data-ln-search-items="selector"</code></td><td>Target container</td><td>CSS selector for deep item matching instead of direct children.</td></tr>
 									<tr><td><code>data-ln-search-fields="a,b"</code></td><td>Target container</td><td>Comma-separated field names forwarded in <code>detail.fields</code>.</td></tr>
 									<tr><td><code>data-ln-search-exclude</code></td><td>Item root or descendant</td><td>On item root: exempt from filtering. On descendant: excludes subtree text.</td></tr>
-									<tr><td><code>data-ln-search-debounce="ms"</code></td><td>Control</td><td>Debounce delay in ms (default <code>500</code>, set <code>0</code> for instant local DOM search).</td></tr>
 									<tr><td><code>data-ln-search-clear</code></td><td><code>&lt;button&gt;</code> (in control or target empty-state)</td><td>Universal clear button. Clears input, resets target search state, and refocuses input.</td></tr>
 									<tr><td><code>data-ln-search-clear-for="targetId"</code></td><td><code>&lt;button&gt;</code> (anywhere)</td><td>Remote clear button targeting a specific element ID. Clears linked input and resets target state.</td></tr>
 									<tr><td><code>data-ln-search-hide="true"</code></td><td>Non-matching items (auto)</td><td>Set by default filter on items that do not match (styled with <code>display: none !important</code>).</td></tr>
@@ -361,13 +360,13 @@
 						<header><h3>Example — Filter a list (canonical input-host with tokenized AND matching)</h3></header>
 						<main>
 							<p>The canonical form with <code>data-ln-search-for="demo-list"</code>. Type multiple space-separated words (e.g. <code>"u k"</code> or <code>"unit stat"</code>) to test tokenized AND matching:</p>
-							<label class="search">
+							<search aria-label="Search countries">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-								<input type="search" placeholder="Search countries..." data-ln-search-for="demo-list" data-ln-search-debounce="0">
+								<input type="search" placeholder="Search countries..." data-ln-search-for="demo-list">
 								<button type="button" data-ln-search-clear aria-label="Clear search">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 								</button>
-							</label>
+							</search>
 							<ul id="demo-list" data-ln-search="">
 								<li>Argentina</li>
 								<li>Australia</li>
@@ -408,7 +407,7 @@ label:has(input[type="search"]) {
 						<header><h3>Example — Directly on the input (no wrapper)</h3></header>
 						<main>
 							<p><code>data-ln-search-for</code> directly on an <code>&lt;input&gt;</code> driving a list target:</p>
-							<input type="search" placeholder="Search teams..." data-ln-search-for="demo-teams" data-ln-search-debounce="0">
+							<input type="search" placeholder="Search teams..." data-ln-search-for="demo-teams">
 							<ul id="demo-teams" data-ln-search="">
 								<li>Engineering — builds the product</li>
 								<li>Design — creates user interfaces</li>
@@ -433,7 +432,7 @@ input[type="search"] {
 						<header><h3>Example — Custom event handler with <code>preventDefault()</code></h3></header>
 						<main>
 							<p>Listen for <code>ln-search:change</code> on the target, call <code>preventDefault()</code>, and own the visual response. This example shows a match counter instead of hiding elements:</p>
-							<input type="search" placeholder="Search (custom handler)..." data-ln-search-for="demo-custom" data-ln-search-debounce="0">
+							<input type="search" placeholder="Search (custom handler)..." data-ln-search-for="demo-custom">
 							<p id="demo-custom-result" aria-live="polite">Type to search...</p>
 							<ul id="demo-custom" data-ln-search="">
 								<li>Alpha framework</li>
@@ -456,7 +455,7 @@ input[type="search"] {
 						<header><h3>Example — Deep targeting with <code>data-ln-search-items</code> and Subtree Exclusion</h3></header>
 						<main>
 							<p>Items are nested under category sections. The target has <code>data-ln-search-items=".icon-cell"</code>. Action labels with <code>data-ln-search-exclude</code> are ignored during search text extraction:</p>
-							<input type="search" placeholder="Search icons..." data-ln-search-for="demo-icon-grid" data-ln-search-debounce="0">
+							<input type="search" placeholder="Search icons..." data-ln-search-for="demo-icon-grid">
 							<div id="demo-icon-grid" data-ln-search="" data-ln-search-items=".icon-cell">
 								<section>
 									<h4>Navigation</h4>
@@ -500,7 +499,7 @@ input[type="search"] {
 						<header><h3>Example — Server-side search simulation</h3></header>
 						<main>
 							<p>The handler calls <code>preventDefault()</code> and logs dispatched events:</p>
-							<input type="search" placeholder="Type rapidly to see debouncing..." data-ln-search-for="demo-server-target">
+							<input type="search" placeholder="Type to see dispatched search events..." data-ln-search-for="demo-server-target">
 							<output id="demo-server-target" data-ln-search="" hidden></output>
 							<div id="demo-server-log" aria-live="polite">Type to see dispatched search events...</div>
 						</main>
@@ -517,7 +516,7 @@ input[type="search"] {
 						<header><h3>Example — Pre-filled input (browser form-restore simulation)</h3></header>
 						<main>
 							<p>A pre-filled input simulates back-button restore. The control constructor detects the restored value and updates the target via <code>queueBoot</code>:</p>
-							<input type="search" value="france" data-ln-search-for="demo-prefilled" data-ln-search-debounce="0">
+							<input type="search" value="france" data-ln-search-for="demo-prefilled">
 							<ul id="demo-prefilled" data-ln-search="">
 								<li>Argentina</li>
 								<li>Brazil</li>
@@ -570,7 +569,6 @@ input[type="search"] {
 const controlEl = document.querySelector('[data-ln-search-for]');
 controlEl.lnSearchControl.targetId;          // string
 controlEl.lnSearchControl.input;             // HTMLInputElement
-controlEl.lnSearchControl.debounceTime;      // number (ms)
 controlEl.lnSearchControl.destroy();
 
 // State instance on the target
@@ -590,11 +588,8 @@ document.getElementById('demo-list').setAttribute('data-ln-search', 'argentina')
 							<h4>1. Putting <code>data-ln-search="targetId"</code> on the input</h4>
 							<p><code>data-ln-search</code> is the state attribute on the target. The input control must use <code>data-ln-search-for="targetId"</code>.</p>
 
-							<h4>2. Omitting <code>data-ln-search-debounce="0"</code> for local DOM search</h4>
-							<p>For instant filtering of static DOM items without network calls, always set <code>data-ln-search-debounce="0"</code> to remove the default 500ms throttle delay.</p>
-
-							<h4>3. Listening for <code>input</code> directly to bypass debounce</h4>
-							<p>Always listen for <code>ln-search:change</code> on the target element; you get automatic debouncing, normalized terms, and token arrays.</p>
+							<h4>2. Listening for <code>input</code> directly instead of <code>ln-search:change</code></h4>
+							<p>Always listen for <code>ln-search:change</code> on the target element; you get normalized terms and token arrays for free.</p>
 						</main>
 					</section>
 
@@ -605,13 +600,13 @@ document.getElementById('demo-list').setAttribute('data-ln-search', 'argentina')
 							<p>Adding <code>data-ln-hash</code> to the search input or target element synchronizes the search query into the URL hash fragment (e.g. <code>#demo-hash-search:react</code>). This enables deep-linking, shareable bookmarks, and browser Back/Forward navigation:</p>
 
 							<div class="search-wrap" style="margin-bottom: var(--size-md);">
-								<label class="search">
+								<search aria-label="Search technologies">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-									<input type="search" placeholder="Type to sync to URL hash..." data-ln-search-for="demo-hash-list" data-ln-search-debounce="0" data-ln-hash>
+									<input type="search" placeholder="Type to sync to URL hash..." data-ln-search-for="demo-hash-list" data-ln-hash>
 									<button type="button" data-ln-search-clear aria-label="Clear search">
 										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 									</button>
-								</label>
+								</search>
 							</div>
 
 							<ul id="demo-hash-list" data-ln-search="" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--size-xs);">
@@ -622,13 +617,13 @@ document.getElementById('demo-list').setAttribute('data-ln-search', 'argentina')
 								<li style="padding: var(--size-xs) var(--size-sm); background: var(--bg-sunken); border-radius: var(--radius-sm);">Svelte &amp; SvelteKit</li>
 							</ul>
 
-<pre><code>&lt;label class="search"&gt;
+<pre><code>&lt;search aria-label="Search technologies"&gt;
   &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-icon-search"&gt;&lt;/use&gt;&lt;/svg&gt;
-  &lt;input type="search" placeholder="Search..." data-ln-search-for="demo-hash-list" data-ln-search-debounce="0" data-ln-hash&gt;
+  &lt;input type="search" placeholder="Search..." data-ln-search-for="demo-hash-list" data-ln-hash&gt;
   &lt;button type="button" data-ln-search-clear aria-label="Clear search"&gt;
     &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-icon-x"&gt;&lt;/use&gt;&lt;/svg&gt;
   &lt;/button&gt;
-&lt;/label&gt;
+&lt;/search&gt;
 
 &lt;ul id="demo-hash-list" data-ln-search=""&gt;
   &lt;li&gt;JavaScript (ES2026)&lt;/li&gt;

@@ -78,7 +78,7 @@ if ($search !== '') {
 Recommended visual wrapper with ``:
 
 ```html
-<label class="search">
+<search aria-label="Search items">
     <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
     <input type="search" 
            placeholder="Search items..." 
@@ -88,7 +88,7 @@ Recommended visual wrapper with ``:
     <button type="button" data-ln-search-clear aria-label="Clear search">
         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
     </button>
-</label>
+</search>
 
 <ul id="items-list" data-ln-search="">
     <li>Item Alpha</li>
@@ -102,7 +102,7 @@ Recommended visual wrapper with ``:
 Targets specific descendant elements inside tables or complex trees:
 
 ```html
-<label class="search">
+<search aria-label="Search users">
     <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
     <input type="search" 
            placeholder="Search users..." 
@@ -112,7 +112,7 @@ Targets specific descendant elements inside tables or complex trees:
     <button type="button" data-ln-search-clear aria-label="Clear search">
         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
     </button>
-</label>
+</search>
 
 <table id="user-table" data-ln-search="" data-ln-search-items="tbody tr" data-ln-search-fields="name,role">
     <thead>
@@ -133,18 +133,56 @@ Targets specific descendant elements inside tables or complex trees:
 </table>
 ```
 
+### Variant 2: SSR Table Search Without `ln-table` (REQUIRED shape)
+
+When a table's rows are already printed in `<tbody>` by the server and the
+only interaction is text search — no sort, no column filters, no
+data-driven mode — `ln-search` binds directly to the `<table>`. `data-ln-table`
+is absent.
+
+```html
+<header class="ln-table__toolbar">
+    <search aria-label="Product search">
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+        <input type="search" data-ln-search-for="demo-table" aria-label="Search products">
+        <button type="button" data-ln-search-clear aria-label="Clear search">
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+        </button>
+    </search>
+</header>
+
+<!-- data-ln-persist: the term survives a page reload. Drop it when the
+     search should start empty every visit. -->
+<table data-ln-search="" data-ln-search-items="tbody tr" data-ln-persist id="demo-table">
+    ...
+</table>
+```
+
+Three rules:
+1. `data-ln-search` sits on the `<table>` itself, never a wrapper `<div>` — `data-ln-table` is absent.
+2. `data-ln-search-items="tbody tr"` is required — without it, `_apply()` falls back to `dom.children` (thead/tbody, not rows); it must be `tbody tr`, not bare `tr`, or the header row itself gets `data-ln-search-hide`.
+3. The toolbar is a `<header class="ln-table__toolbar">`, a sibling of the `<table>` — never a `<tr><th colspan="N">` row inside `<thead>`. Only that wrapper gets the compact toolbar layout.
+
+See `demo/admin/src/pages/table.html` for the live reference. The moment the
+table also needs column filters (`data-ln-table-filter-col`) or data-driven
+rows (`data-ln-table-source`), `data-ln-table` goes on the wrapper and
+[`ln-table`](./ln-table.md) owns search instead — the two shapes never
+combine on the same target, since `ln-table` calls `preventDefault()`
+unconditionally on `ln-search:change`, which (via event bubbling) supersedes
+`ln-search`'s own DOM-filter path.
+
 ### Search Clear Variants (`data-ln-search-clear`)
 
 Clear triggers work universally without external coordinators:
 
-1. **Inside `.search` Chrome (Sibling to Input):**
+1. **Inside `<search>` Chrome (Sibling to Input):**
 ```html
-<label class="search">
+<search aria-label="Search users">
     <input type="search" placeholder="Search..." data-ln-search-for="user-table">
     <button type="button" data-ln-search-clear aria-label="Clear search">
         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
     </button>
-</label>
+</search>
 ```
 
 2. **Inside Empty State (Target Container):**
@@ -179,6 +217,9 @@ Clear triggers work universally without external coordinators:
 | `data-ln-search-clear-for` | Button | String | — | Remote clear button referencing target element ID. Clears linked input and resets target state. |
 | `data-ln-search-hide` | Target Children | Boolean | `false` | State attribute added to non-matching DOM elements (`"true"`). |
 | `data-ln-hash` | Target / Control | String (Optional) | — | Opt-in. Synchronizes search query to URL hash fragment (e.g. `#users-search:john`). Value is custom namespace; if empty defaults to `[targetId]-search`. |
+| `data-ln-persist` | Target (State Host) | String (Optional) | — | **Recommended.** Stores the term in `localStorage` and restores it on boot; omit it only when the search must start empty on every visit. Goes on `[data-ln-search]`, never on the input. The target needs an `id`, or give the attribute an explicit key (`data-ln-persist="key"`). An empty term removes the entry rather than storing `""`. Stored key format: `ln:search:{id}` (global by default); prefix the value with `page:` (e.g. `data-ln-persist="page:key"`) to opt into page-scoping, which stores `ln:search:{pathname}:{id}`. |
+
+Boot precedence when more than one source carries a term: `data-ln-hash` wins first, then `data-ln-persist`, then the term authored on the target. The first match applies and the rest are skipped.
 
 ### Programmatic JS API
 
@@ -202,7 +243,7 @@ Visual styling relies on standard SCSS mixins and state attribute selectors:
 
 ```scss
 // Visual wrapper styling
-label.search {
+search:has(> input[type="search"]) {
     @include search;
 }
 

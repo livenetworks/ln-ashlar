@@ -75,7 +75,10 @@
 
 		// Search field drops to a full-width second row below the
 		// brand triad (enabled by `flex-wrap` above).
-		> .sidebar-search {
+		// :has() carries the weight — plain `> search` would tie with the
+		// widget base and fall to emission order. It also keeps a <search>
+		// region (input not a direct child) out of this rule.
+		> search:has(> input[type="search"]) {
 			@include w-full;
 			--margin-block: var(--size-xs);
 			@include mt(var(--margin-block));

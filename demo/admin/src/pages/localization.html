@@ -93,13 +93,13 @@
 				<span>Locale: English (US) [en-US]</span>
 			</button>
 			<div data-ln-popover id="locale-popover">
-				<label class="search" aria-label="Search locale">
+				<search aria-label="Search locale">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Search locale..." aria-label="Search locale" data-ln-search-for="locale-list" data-ln-search-debounce="0">
+					<input type="search" placeholder="Search locale..." aria-label="Search locale" data-ln-search-for="locale-list">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 					</button>
-				</label>
+				</search>
 				<ul id="locale-list" role="radiogroup" aria-label="Select locale" data-ln-search="" data-ln-search-items="label">
 					<li><label><input type="radio" name="demo-locale" value="en-US" checked> English (US)</label></li>
 					<li><label><input type="radio" name="demo-locale" value="en-GB"> English (UK)</label></li>

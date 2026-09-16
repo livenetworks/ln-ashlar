@@ -46,13 +46,13 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
 
     <!-- Header Toolbar with Search & Reset -->
     <header class="page-header">
-        <label class="search">
+        <search aria-label="Search employees">
             <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
             <input type="search" placeholder="Search employees... (Press '/')" data-ln-search-for="employee-table">
             <button type="button" data-ln-search-clear aria-label="Clear search">
                 <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
             </button>
-        </label>
+        </search>
         <button type="button" class="btn" data-ln-table-clear>
             <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter-off"></use></svg>
             <span>Reset Filters</span>
@@ -145,9 +145,9 @@ Multiple `data-ln-table-coordinator` wrappers can safely exist on the same page.
 <section class="section-card" data-ln-table-coordinator>
     <header class="page-header">
         <h2>Active Employees</h2>
-        <label class="search">
+        <search aria-label="Search active employees">
             <input type="search" placeholder="Search active..." data-ln-search-for="active-employees-table">
-        </label>
+        </search>
     </header>
     <div data-ln-table id="active-employees-table">
         <!-- Table 1 content -->

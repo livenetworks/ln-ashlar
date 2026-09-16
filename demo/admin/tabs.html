@@ -123,15 +123,15 @@
 				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
 				<span class="app-name">ashlar-gui</span>
-				<label class="search sidebar-search" aria-label="Filter menu">
+				<search aria-label="Filter menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Filter menu…" aria-label="Filter menu" data-ln-search-for="demo-nav" data-ln-search-debounce="0">
+					<input type="search" placeholder="Filter menu…" aria-label="Filter menu" data-ln-search-for="demo-nav">
 					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
-				</label>
+				</search>
 			</header>
 
 			<main>
-				<nav class="nav" id="demo-nav" data-ln-nav="active" data-ln-search="" data-ln-search-items="li">
+				<nav class="nav" id="demo-nav" data-ln-nav="active" data-ln-search="" data-ln-search-items="li" data-ln-persist>
 					<ul>
 						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
@@ -538,7 +538,7 @@ location.hash = 'user-tabs:settings&project-tabs:members';</code></pre>
 					<section class="section-card" data-demo-html>
 						<header><h3>Live demo — persistent tabs without hash sync</h3></header>
 						<main>
-							<p>No <code>id</code> (so no hash sync), explicit <code>data-ln-persist="settings-tabs"</code> (so the storage key doesn't depend on a generated <code>id</code>). The active tab is remembered across page loads via <code>localStorage</code> under key <code>ln:tabs:&lt;path&gt;:settings-tabs</code>. Useful for "settings page" tabs where the user expects "the last tab I had open is the one I'll see when I come back."</p>
+							<p>No <code>id</code> (so no hash sync), explicit <code>data-ln-persist="settings-tabs"</code> (so the storage key doesn't depend on a generated <code>id</code>). The active tab is remembered across page loads via <code>localStorage</code> under key <code>ln:tabs:settings-tabs</code> — global by default, so the same key restores this tab set anywhere it appears. Prefix the value with <code>page:</code> to scope it to the current URL instead. Useful for "settings page" tabs where the user expects "the last tab I had open is the one I'll see when I come back."</p>
 
 							<section data-ln-tabs data-ln-persist="settings-tabs" data-ln-tabs-default="general">
 								<nav>

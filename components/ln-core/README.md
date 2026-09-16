@@ -735,29 +735,40 @@ Useful for "reset to defaults" functionality.
 
 ### Storage key format
 
+Global by default:
+
+```
+ln:{component}:{id}
+```
+
+Page-scoped, opt-in via a `page:` prefix on the `data-ln-persist` value:
+
 ```
 ln:{component}:{pagePath}:{id}
 ```
 
 - `pagePath` — `location.pathname`, lowercase, trailing slash stripped, or `/` for root
-- `id` — element's `id` attribute, or the explicit `data-ln-persist="custom-key"` value
+- `id` — element's `id` attribute, or the explicit `data-ln-persist="custom-key"` value (with the `page:` prefix stripped when present)
 
 Examples:
 ```
-ln:toggle:/admin/users:sidebar
-ln:tabs:/settings:settings-tabs
-ln:sort:/admin/orders:orders-table-name
-ln:filter:/admin/users:status-filter
+ln:toggle:sidebar
+ln:tabs:settings-tabs
+ln:sort:/admin/orders:orders-table-name    ← data-ln-persist="page:orders-table-name"
+ln:filter:/admin/users:status-filter       ← data-ln-persist="page:status-filter"
 ```
 
 ### Opt-in HTML attribute
 
 ```html
-<!-- Uses element id as storage key -->
+<!-- Uses element id as storage key (global) -->
 <section id="sidebar" data-ln-toggle="close" data-ln-persist>
 
-<!-- Explicit key (no id needed) -->
+<!-- Explicit key (global, no id needed) -->
 <section data-ln-toggle="close" data-ln-persist="sidebar-section">
+
+<!-- Page-scoped: same id/key on different pages never collides -->
+<section data-ln-toggle="close" data-ln-persist="page:sidebar-section">
 ```
 
 Persistence is always opt-in. Elements without `data-ln-persist` are never touched.

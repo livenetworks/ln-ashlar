@@ -7,7 +7,6 @@
 				<section class="section-card" data-demo-html>
 					<header><h3>Employee Directory</h3></header>
 					<main>
-						<div data-ln-table data-ln-search="" id="employee-table">
 						<template data-ln-table-empty>
 							<article class="ln-table__empty-state">
 								<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
@@ -16,19 +15,16 @@
 								<button type="button" data-ln-table-clear>Clear all</button>
 							</article>
 						</template>
-						<table>
+						<header class="ln-table__toolbar">
+							<search aria-label="Search employees">
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+								<input type="search" placeholder="Search employees..." data-ln-search-for="employee-table">
+								<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+							</search>
+						</header>
+
+						<table data-ln-search="" data-ln-search-items="tbody tr" data-ln-persist id="employee-table">
 							<thead>
-								<tr>
-									<th colspan="5">
-										<div>
-											<label class="search">
-												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-												<input type="search" placeholder="Search employees..." data-ln-search-for="employee-table" data-ln-search-debounce="0">
-												<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
-											</label>
-										</div>
-									</th>
-								</tr>
 								<tr>
 									<th>
 										Name
@@ -210,17 +206,16 @@
 								</tr>
 							</tbody>
 						</table>
-						</div>
 
 						<!-- Department popover -->
 						<div data-ln-popover id="filter-dept">
-							<label class="search">
+							<search aria-label="Filter departments">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-								<input type="search" placeholder="Search..." data-ln-search-for="filter-dept-list" data-ln-search-debounce="0">
+								<input type="search" placeholder="Search..." data-ln-search-for="filter-dept-list">
 								<button type="button" data-ln-search-clear aria-label="Clear search">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 								</button>
-							</label>
+							</search>
 							<ul id="filter-dept-list" data-ln-filter="employee-table" data-ln-search="" data-ln-search-items="label">
 								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label></li>
 								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Design"> Design</label></li>
@@ -235,13 +230,13 @@
 
 						<!-- Role popover -->
 						<div data-ln-popover id="filter-role">
-							<label class="search">
+							<search aria-label="Filter roles">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-								<input type="search" placeholder="Search..." data-ln-search-for="filter-role-list" data-ln-search-debounce="0">
+								<input type="search" placeholder="Search..." data-ln-search-for="filter-role-list">
 								<button type="button" data-ln-search-clear aria-label="Clear search">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 								</button>
-							</label>
+							</search>
 							<ul id="filter-role-list" data-ln-filter="employee-table" data-ln-search="" data-ln-search-items="label">
 								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-reset checked> All</label></li>
 								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Accountant"> Accountant</label></li>

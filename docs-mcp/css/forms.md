@@ -17,7 +17,7 @@ tags: [forms, inputs, buttons, search, focus-ring, validation, controls]
 The `forms` styling system (`theme/config/mixins/_form.scss` and `theme/components/_form.scss`) handles input controls, responsive form grid layouts, validation states, and action buttons:
 
 - **Global Baseline:** Inputs, textareas, selects, and buttons receive standardized padding, typography (`var(--font-size)` / `var(--line-height)`), focus rings, and border radii out of the box.
-- **Icon Groups & Search:** A `<label>` wrapping an SVG icon and an input combines them into a seamless single control (`form-input-icon-group` and `.search`).
+- **Icon Groups & Search:** A `<label>` (or `<search>` for the dedicated search field) wrapping an SVG icon and an input combines them into a seamless single control (`form-input-icon-group` and `search`).
 - **Responsive 6-Column Form Grid (`form-grid`):** A CSS Grid layout with column spanning utilities (`.col-span-1` through `.col-span-6`) collapsing smoothly on small viewports.
 - **Required Indicator via CSS `:has()`:** Mandatory inputs with the HTML `required` attribute automatically display an indicator without manual asterisk characters.
 - **Button Variants:** Primary fill defaults automatically on `<button type="submit">`, while `.btn-ghost` and `.btn-soft` provide secondary actions.
@@ -52,13 +52,13 @@ The `forms` styling system (`theme/config/mixins/_form.scss` and `theme/componen
 ### Variant 1: Compact Search Field
 
 ```html
-<label class="search">
+<search aria-label="Filter records">
     <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
     <input type="search" placeholder="Filter records…">
     <button type="button" data-ln-search-clear aria-label="Clear search">
         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
     </button>
-</label>
+</search>
 ```
 
 ---
@@ -78,7 +78,6 @@ The `forms` styling system (`theme/config/mixins/_form.scss` and `theme/componen
 | `btn-soft` | mixin | — | Soft accent-tinted secondary button |
 | `btn-ghost` | mixin | — | Transparent ghost button with subtle hover background |
 | `.form-grid`, `.form-element`, `.form-actions` | class | — | Prototyping classes for form layouts |
-| `.search` | class | — | Prototyping class for search input wrapper |
 | `--input-padding-y` | token | `var(--size-xs-up)` (compact) / `var(--size-sm)` (comfortable) | Vertical input padding |
 | `--btn-padding-y` | token | `var(--size-xs-up)` (compact) / `var(--size-sm)` (comfortable) | Vertical button padding |
 

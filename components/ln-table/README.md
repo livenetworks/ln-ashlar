@@ -168,10 +168,10 @@ Column filters use static authored markup — a `[data-ln-popover]` block contai
 
 <!-- Popover: sibling to [data-ln-table], not inside it -->
 <div data-ln-popover id="filter-dept">
-	<label class="search">
+	<search aria-label="Filter departments">
 		<input type="search" data-ln-search-for="filter-dept-list" placeholder="Search...">
 		<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon"><use href="#ln-icon-x"></use></svg></button>
-	</label>
+	</search>
 	<ul id="filter-dept-list" data-ln-search="" data-ln-filter="my-table" data-ln-search-items="label">
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
@@ -259,6 +259,19 @@ wrapper — see `components/ln-sort/README.md`).
 ### Search integration (`ln-search`)
 
 SSR mode also self-binds `ln-search:change` directly on itself, mirroring `ln-sort:change` above — an SSR table with a `[data-ln-search-for="<its own id>"]` input works standalone, no coordinator required. Data-driven mode relies on `ln-table-coordinator` translating `ln-search:change` into `ln-table:set-search` — do not wrap an SSR table in `[data-ln-table-coordinator]`, it will double-process search.
+
+**Search-only SSR tables skip `ln-table` entirely.** If the table has no
+sort, no column filters, and no `data-ln-table-source` — just pre-rendered
+rows plus a search box — bind `ln-search` directly to the `<table>`
+(`data-ln-search`, `data-ln-search-items="tbody tr"`) and omit `data-ln-table`
+altogether. See [`ln-search`'s SSR table section](../ln-search/README.md) and
+`demo/admin/src/pages/table.html` for the canonical markup. `ln-table` is
+only needed once sort, column filters (`data-ln-table-filter-col`), or
+data-driven rows enter the picture — see `demo/admin/src/pages/table-filter.html`
+and `demo/admin/src/pages/table-sync.html`. The two shapes never combine on
+the same target: `ln-table` calls `preventDefault()` unconditionally on
+`ln-search:change`, and since `dispatchCancelable` bubbles, that supersedes
+`ln-search`'s own DOM-filter path the instant `data-ln-table` is present.
 
 ### MutationObserver flow (`ln-table.js`)
 

@@ -82,6 +82,19 @@ In SSR mode, the table is functional immediately with the server-rendered markup
 </div>
 ```
 
+> [!NOTE]
+> **Search-only SSR tables skip `ln-table` entirely.** If the table has no
+> sort, no column filters, and no `data-ln-table-source` — just pre-rendered
+> rows plus a search box — bind [`ln-search`](./ln-search.md) directly to the
+> `<table>` (`data-ln-search`, `data-ln-search-items="tbody tr"`) and omit
+> `data-ln-table` altogether. See `demo/admin/src/pages/table.html`. `ln-table`
+> is only needed once sort, column filters (`data-ln-table-filter-col`), or
+> data-driven rows enter the picture — see `demo/admin/src/pages/table-filter.html`
+> and `demo/admin/src/pages/table-sync.html`. The two shapes never combine on
+> the same target: `ln-table` calls `preventDefault()` unconditionally on
+> `ln-search:change`, and since the event bubbles, that supersedes `ln-search`'s
+> own DOM-filter path the instant `data-ln-table` is present.
+
 ---
 
 ### Variant 1: Data-Driven Mode

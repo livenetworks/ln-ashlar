@@ -21,6 +21,12 @@
 				"src/ln-search.js"
 			]
 		},
+		"data-ln-persist": {
+			"direction": "author",
+			"sources": [
+				"src/ln-search.js"
+			]
+		},
 		"data-ln-search": {
 			"direction": "both",
 			"sources": [
