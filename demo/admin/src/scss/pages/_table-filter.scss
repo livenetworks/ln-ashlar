@@ -21,9 +21,10 @@
 #filter-role {
 	@include popover;
 
-	// Search uses the full .search chrome (global auto-bind + .search
-	// component). Only delta: separate it from the list below.
-	> label.search {
+	// Search uses the full chrome (global auto-bind + the <search> binding
+	// in theme/components/_form.scss). Only delta: separate it from the
+	// list below.
+	> search {
 		@include mb(var(--size-sm));
 	}
 

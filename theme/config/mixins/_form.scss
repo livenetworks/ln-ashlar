@@ -164,10 +164,12 @@
 // shell via :focus-within; children suppress their own focus ring.
 //
 // Applied via semantic selectors (no class on the wrapper):
-//   - components/_form.scss → label:has(.ln-icon):has(text input)
+//   - components/_form.scss → :is(label, div, span, search):has(.ln-icon):has(text input)
 //   - components/_date.scss → [data-ln-date-field]
 
-@mixin form-field-group {
+// Split shell/parts so the binding can emit the wrapper's own chrome at base
+// weight while the child resets and state chrome keep full weight.
+@mixin form-field-group-shell {
 	@include form-input;       // visual shell: border, bg, radius, transition, outline
 	@include inline-flex;      // override form-input's block display
 	@include items-center;
@@ -176,7 +178,9 @@
 	width: auto;               // cancel form-input's w-full
 	padding: 0;                // shell owns NO padding; children manage their own
 	margin-bottom: 0;          // defensive: wrapping <label> carries form-label margin
+}
 
+@mixin form-field-group-parts {
 	&:focus-within {
 		@include _form-focus-style;
 
@@ -257,13 +261,18 @@
 	}
 }
 
+@mixin form-field-group {
+	@include form-field-group-shell;
+	@include form-field-group-parts;
+}
+
 // ─── Icon input group — search/icon field (thin wrapper) ──────────
 //
 // form-field-group + the search-clear control, which is the only piece
 // unique to this binding.
 
-@mixin form-input-icon-group {
-	@include form-field-group;
+@mixin form-input-icon-group-parts {
+	@include form-field-group-parts;
 
 	// Visually hide the clear button while the field is empty (visibility:hidden
 	// preserves layout space so the input width stays stable).
@@ -322,16 +331,22 @@
 	}
 }
 
+@mixin form-input-icon-group {
+	@include form-field-group-shell;
+	@include form-input-icon-group-parts;
+}
+
 // ─── Search field — compact icon-group variant (delta-only) ───────
 //
 // Opt-in refinements layered on top of the icon-group chrome that the
-// global auto-bind (components/_form.scss: label:has(> .ln-icon):has(>
-// search/text input)) already supplies. PREREQUISITE: the consumer is an
-// icon + search-input <label> so the auto-bind provides the base shell;
-// on a plain label this emits only the tweaks below, no chrome.
+// global auto-bind (components/_form.scss: :is(label, div, span, search):has(>
+// .ln-icon):has(> search/text input)) already supplies. PREREQUISITE: the
+// consumer is an icon + search-input <search> (or <label>) so the auto-bind
+// provides the base shell; on a plain wrapper this emits only the tweaks
+// below, no chrome.
 //
 // Usage (project/demo SCSS):
-//   label.search { @include search; }
+//   search:has(> input[type="search"]) { @include search; }
 
 @mixin search {
 	width: min(100%, 20rem);          // intrinsic capped field width

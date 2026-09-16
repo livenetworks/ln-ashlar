@@ -69,137 +69,132 @@
 					<section class="section-card" data-demo-html>
 						<header><h3>Live Demo — 500 rows with search, sort and filter</h3></header>
 						<main>
-							<div data-ln-table data-ln-search="" id="demo-table">
-								<template data-ln-table-empty>
-									<article class="ln-table__empty-state">
-										<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-										<h3>No results</h3>
-										<p>Try different search terms.</p>
-										<button data-ln-table-clear>Clear search</button>
-									</article>
-								</template>
+							<template data-ln-table-empty>
+								<article class="ln-table__empty-state">
+									<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+									<h3>No results</h3>
+									<p>Try different search terms.</p>
+									<button data-ln-table-clear>Clear search</button>
+								</article>
+							</template>
 
-								<table>
-									<thead>
-										<tr>
-											<th colspan="6">
-												<div>
-													<h3>Products</h3>
-													<label class="search">
-														<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-														<input type="search" placeholder="Search products..." data-ln-search-for="demo-table" data-ln-search-debounce="0">
-														<button type="button" data-ln-search-clear aria-label="Clear search">
-															<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
-														</button>
-													</label>
-													<span class="ln-table__count" id="demo-count"></span>
-												</div>
-											</th>
-										</tr>
-										<tr>
-											<th>
-												#
-												<ul data-ln-sort="demo-table">
-													<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
-													<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
-													<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
-												</ul>
-											</th>
-											<th>
-												Product
-												<ul data-ln-sort="demo-table">
-													<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
-													<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
-													<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
-												</ul>
-											</th>
-											<th data-ln-table-filter-col="category">
-												Category
-												<button type="button" class="table-filter" data-ln-popover-for="filter-category" aria-label="Filter category">
-													<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
-												</button>
-												<div id="filter-category" data-ln-popover>
-													<ul data-ln-filter="demo-table">
-														<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-reset checked> All</label></li>
-														<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Electronics"> Electronics</label></li>
-														<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Peripherals"> Peripherals</label></li>
-														<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Storage"> Storage</label></li>
-														<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Networking"> Networking</label></li>
-														<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Accessories"> Accessories</label></li>
-														<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Components"> Components</label></li>
-													</ul>
-												</div>
-												<ul data-ln-sort="demo-table">
-													<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
-													<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
-													<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
-												</ul>
-											</th>
-											<th class="numeric">
-												Price
-												<ul data-ln-sort="demo-table">
-													<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
-													<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
-													<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
-												</ul>
-											</th>
-											<th class="numeric">
-												Stock
-												<ul data-ln-sort="demo-table">
-													<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
-													<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
-													<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
-												</ul>
-											</th>
-											<th data-ln-table-filter-col="status">
-												Status
-												<button type="button" class="table-filter" data-ln-popover-for="filter-status" aria-label="Filter status">
-													<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
-												</button>
-												<div id="filter-status" data-ln-popover>
-													<ul data-ln-filter="demo-table">
-														<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
-														<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="In Stock"> In Stock</label></li>
-														<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Low Stock"> Low Stock</label></li>
-														<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Out of Stock"> Out of Stock</label></li>
-													</ul>
-												</div>
-												<ul data-ln-sort="demo-table">
-													<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
-													<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
-													<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
-												</ul>
-											</th>
-										</tr>
-									</thead>
-									<tbody id="demo-tbody">
-										<tr><td>1</td><td>Laptop Pro 15</td><td>Electronics</td><td data-ln-value="1499" data-ln-number class="numeric">1499</td><td data-ln-value="120" data-ln-number class="numeric">120</td><td>In Stock</td></tr>
-										<tr><td>2</td><td>Wireless Mouse M1</td><td>Peripherals</td><td data-ln-value="29" data-ln-number class="numeric">29</td><td data-ln-value="450" data-ln-number class="numeric">450</td><td>In Stock</td></tr>
-										<tr><td>3</td><td>USB-C Hub Multiport</td><td>Peripherals</td><td data-ln-value="59" data-ln-number class="numeric">59</td><td data-ln-value="85" data-ln-number class="numeric">85</td><td>In Stock</td></tr>
-										<tr><td>4</td><td>Mechanical Keyboard RGB</td><td>Peripherals</td><td data-ln-value="129" data-ln-number class="numeric">129</td><td data-ln-value="40" data-ln-number class="numeric">40</td><td>Low Stock</td></tr>
-										<tr><td>5</td><td>Monitor 27" 4K UHD</td><td>Electronics</td><td data-ln-value="499" data-ln-number class="numeric">499</td><td data-ln-value="15" data-ln-number class="numeric">15</td><td>Low Stock</td></tr>
-										<tr><td>6</td><td>Webcam HD 1080p</td><td>Peripherals</td><td data-ln-value="79" data-ln-number class="numeric">79</td><td data-ln-value="0" data-ln-number class="numeric">0</td><td>Out of Stock</td></tr>
-										<tr><td>7</td><td>Headset Pro Wireless</td><td>Accessories</td><td data-ln-value="199" data-ln-number class="numeric">199</td><td data-ln-value="210" data-ln-number class="numeric">210</td><td>In Stock</td></tr>
-										<tr><td>8</td><td>Docking Station Dual 4K</td><td>Accessories</td><td data-ln-value="249" data-ln-number class="numeric">249</td><td data-ln-value="60" data-ln-number class="numeric">60</td><td>In Stock</td></tr>
-										<tr><td>9</td><td>SSD 1TB NVMe PCIe4</td><td>Storage</td><td data-ln-value="119" data-ln-number class="numeric">119</td><td data-ln-value="310" data-ln-number class="numeric">310</td><td>In Stock</td></tr>
-										<tr><td>10</td><td>RAM 32GB DDR5 Kit</td><td>Components</td><td data-ln-value="159" data-ln-number class="numeric">159</td><td data-ln-value="95" data-ln-number class="numeric">95</td><td>In Stock</td></tr>
-										<tr><td>11</td><td>GPU Card RTX 4070</td><td>Components</td><td data-ln-value="699" data-ln-number class="numeric">699</td><td data-ln-value="8" data-ln-number class="numeric">8</td><td>Low Stock</td></tr>
-										<tr><td>12</td><td>Network Switch 24-Port</td><td>Networking</td><td data-ln-value="299" data-ln-number class="numeric">299</td><td data-ln-value="22" data-ln-number class="numeric">22</td><td>Low Stock</td></tr>
-										<tr><td>13</td><td>Power Supply 850W Gold</td><td>Components</td><td data-ln-value="139" data-ln-number class="numeric">139</td><td data-ln-value="140" data-ln-number class="numeric">140</td><td>In Stock</td></tr>
-										<tr><td>14</td><td>Cable Kit Modular sleeve</td><td>Accessories</td><td data-ln-value="39" data-ln-number class="numeric">39</td><td data-ln-value="500" data-ln-number class="numeric">500</td><td>In Stock</td></tr>
-										<tr><td>15</td><td>Mouse Pad XL Desk Mat</td><td>Accessories</td><td data-ln-value="19" data-ln-number class="numeric">19</td><td data-ln-value="0" data-ln-number class="numeric">0</td><td>Out of Stock</td></tr>
-										<tr><td>16</td><td>Screen Protector 27"</td><td>Accessories</td><td data-ln-value="25" data-ln-number class="numeric">25</td><td data-ln-value="180" data-ln-number class="numeric">180</td><td>In Stock</td></tr>
-										<tr><td>17</td><td>Router Wi-Fi 6E Pro</td><td>Networking</td><td data-ln-value="229" data-ln-number class="numeric">229</td><td data-ln-value="45" data-ln-number class="numeric">45</td><td>Low Stock</td></tr>
-										<tr><td>18</td><td>External HDD 4TB USB3</td><td>Storage</td><td data-ln-value="99" data-ln-number class="numeric">99</td><td data-ln-value="120" data-ln-number class="numeric">120</td><td>In Stock</td></tr>
-										<tr><td>19</td><td>Microphone USB Studio</td><td>Accessories</td><td data-ln-value="149" data-ln-number class="numeric">149</td><td data-ln-value="75" data-ln-number class="numeric">75</td><td>In Stock</td></tr>
-										<tr><td>20</td><td>Ergonomic Office Chair</td><td>Accessories</td><td data-ln-value="349" data-ln-number class="numeric">349</td><td data-ln-value="12" data-ln-number class="numeric">12</td><td>Low Stock</td></tr>
-									</tbody>
-								</table>
+							<header class="ln-table__toolbar">
+								<h3>Products</h3>
+								<search aria-label="Product search">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+									<input type="search" placeholder="Search products..." data-ln-search-for="demo-table" aria-label="Search products">
+									<button type="button" data-ln-search-clear aria-label="Clear search">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+									</button>
+								</search>
+								<span class="ln-table__count" id="demo-count"></span>
+							</header>
 
-								<footer class="ln-table__footer">
-									<span>Total Products: <strong data-ln-number>20</strong></span>
-								</footer>
-							</div>
+							<table data-ln-search="" data-ln-search-items="tbody tr" data-ln-persist id="demo-table">
+								<thead>
+									<tr>
+										<th>
+											#
+											<ul data-ln-sort="demo-table">
+												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+											</ul>
+										</th>
+										<th>
+											Product
+											<ul data-ln-sort="demo-table">
+												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+											</ul>
+										</th>
+										<th data-ln-table-filter-col="category">
+											Category
+											<button type="button" class="table-filter" data-ln-popover-for="filter-category" aria-label="Filter category">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
+											</button>
+											<div id="filter-category" data-ln-popover>
+												<ul data-ln-filter="demo-table">
+													<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-reset checked> All</label></li>
+													<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Electronics"> Electronics</label></li>
+													<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Peripherals"> Peripherals</label></li>
+													<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Storage"> Storage</label></li>
+													<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Networking"> Networking</label></li>
+													<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Accessories"> Accessories</label></li>
+													<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Components"> Components</label></li>
+												</ul>
+											</div>
+											<ul data-ln-sort="demo-table">
+												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+											</ul>
+										</th>
+										<th class="numeric">
+											Price
+											<ul data-ln-sort="demo-table">
+												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+											</ul>
+										</th>
+										<th class="numeric">
+											Stock
+											<ul data-ln-sort="demo-table">
+												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+											</ul>
+										</th>
+										<th data-ln-table-filter-col="status">
+											Status
+											<button type="button" class="table-filter" data-ln-popover-for="filter-status" aria-label="Filter status">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
+											</button>
+											<div id="filter-status" data-ln-popover>
+												<ul data-ln-filter="demo-table">
+													<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
+													<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="In Stock"> In Stock</label></li>
+													<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Low Stock"> Low Stock</label></li>
+													<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Out of Stock"> Out of Stock</label></li>
+												</ul>
+											</div>
+											<ul data-ln-sort="demo-table">
+												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+											</ul>
+										</th>
+									</tr>
+								</thead>
+								<tbody id="demo-tbody">
+									<tr><td>1</td><td>Laptop Pro 15</td><td>Electronics</td><td data-ln-value="1499" data-ln-number class="numeric">1499</td><td data-ln-value="120" data-ln-number class="numeric">120</td><td>In Stock</td></tr>
+									<tr><td>2</td><td>Wireless Mouse M1</td><td>Peripherals</td><td data-ln-value="29" data-ln-number class="numeric">29</td><td data-ln-value="450" data-ln-number class="numeric">450</td><td>In Stock</td></tr>
+									<tr><td>3</td><td>USB-C Hub Multiport</td><td>Peripherals</td><td data-ln-value="59" data-ln-number class="numeric">59</td><td data-ln-value="85" data-ln-number class="numeric">85</td><td>In Stock</td></tr>
+									<tr><td>4</td><td>Mechanical Keyboard RGB</td><td>Peripherals</td><td data-ln-value="129" data-ln-number class="numeric">129</td><td data-ln-value="40" data-ln-number class="numeric">40</td><td>Low Stock</td></tr>
+									<tr><td>5</td><td>Monitor 27" 4K UHD</td><td>Electronics</td><td data-ln-value="499" data-ln-number class="numeric">499</td><td data-ln-value="15" data-ln-number class="numeric">15</td><td>Low Stock</td></tr>
+									<tr><td>6</td><td>Webcam HD 1080p</td><td>Peripherals</td><td data-ln-value="79" data-ln-number class="numeric">79</td><td data-ln-value="0" data-ln-number class="numeric">0</td><td>Out of Stock</td></tr>
+									<tr><td>7</td><td>Headset Pro Wireless</td><td>Accessories</td><td data-ln-value="199" data-ln-number class="numeric">199</td><td data-ln-value="210" data-ln-number class="numeric">210</td><td>In Stock</td></tr>
+									<tr><td>8</td><td>Docking Station Dual 4K</td><td>Accessories</td><td data-ln-value="249" data-ln-number class="numeric">249</td><td data-ln-value="60" data-ln-number class="numeric">60</td><td>In Stock</td></tr>
+									<tr><td>9</td><td>SSD 1TB NVMe PCIe4</td><td>Storage</td><td data-ln-value="119" data-ln-number class="numeric">119</td><td data-ln-value="310" data-ln-number class="numeric">310</td><td>In Stock</td></tr>
+									<tr><td>10</td><td>RAM 32GB DDR5 Kit</td><td>Components</td><td data-ln-value="159" data-ln-number class="numeric">159</td><td data-ln-value="95" data-ln-number class="numeric">95</td><td>In Stock</td></tr>
+									<tr><td>11</td><td>GPU Card RTX 4070</td><td>Components</td><td data-ln-value="699" data-ln-number class="numeric">699</td><td data-ln-value="8" data-ln-number class="numeric">8</td><td>Low Stock</td></tr>
+									<tr><td>12</td><td>Network Switch 24-Port</td><td>Networking</td><td data-ln-value="299" data-ln-number class="numeric">299</td><td data-ln-value="22" data-ln-number class="numeric">22</td><td>Low Stock</td></tr>
+									<tr><td>13</td><td>Power Supply 850W Gold</td><td>Components</td><td data-ln-value="139" data-ln-number class="numeric">139</td><td data-ln-value="140" data-ln-number class="numeric">140</td><td>In Stock</td></tr>
+									<tr><td>14</td><td>Cable Kit Modular sleeve</td><td>Accessories</td><td data-ln-value="39" data-ln-number class="numeric">39</td><td data-ln-value="500" data-ln-number class="numeric">500</td><td>In Stock</td></tr>
+									<tr><td>15</td><td>Mouse Pad XL Desk Mat</td><td>Accessories</td><td data-ln-value="19" data-ln-number class="numeric">19</td><td data-ln-value="0" data-ln-number class="numeric">0</td><td>Out of Stock</td></tr>
+									<tr><td>16</td><td>Screen Protector 27"</td><td>Accessories</td><td data-ln-value="25" data-ln-number class="numeric">25</td><td data-ln-value="180" data-ln-number class="numeric">180</td><td>In Stock</td></tr>
+									<tr><td>17</td><td>Router Wi-Fi 6E Pro</td><td>Networking</td><td data-ln-value="229" data-ln-number class="numeric">229</td><td data-ln-value="45" data-ln-number class="numeric">45</td><td>Low Stock</td></tr>
+									<tr><td>18</td><td>External HDD 4TB USB3</td><td>Storage</td><td data-ln-value="99" data-ln-number class="numeric">99</td><td data-ln-value="120" data-ln-number class="numeric">120</td><td>In Stock</td></tr>
+									<tr><td>19</td><td>Microphone USB Studio</td><td>Accessories</td><td data-ln-value="149" data-ln-number class="numeric">149</td><td data-ln-value="75" data-ln-number class="numeric">75</td><td>In Stock</td></tr>
+									<tr><td>20</td><td>Ergonomic Office Chair</td><td>Accessories</td><td data-ln-value="349" data-ln-number class="numeric">349</td><td data-ln-value="12" data-ln-number class="numeric">12</td><td>Low Stock</td></tr>
+								</tbody>
+							</table>
+
+							<footer class="ln-table__footer">
+								<span>Total Products: <strong data-ln-number>20</strong></span>
+							</footer>
 						</main>
 						<script type="text/plain" data-demo-scss>
 // Table component base styling:

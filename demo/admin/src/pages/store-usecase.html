@@ -93,13 +93,13 @@
 						Delete selected (<span data-ln-table-selected></span>)
 					</button>
 				</div>
-				<label class="search">
+				<search aria-label="Search documents">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 					<input type="search" placeholder="Search…" data-ln-search-for="documents">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 					</button>
-				</label>
+				</search>
 				<button type="button" id="create-document" class="btn" data-ln-modal-for="document-modal" data-ln-fill-form="document-form">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
 					New
@@ -192,13 +192,13 @@
 
 <!-- Documents table: department filter popover -->
 <div data-ln-popover id="filter-documents-table-dept">
-	<label class="search">
+	<search aria-label="Filter departments">
 		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-		<input type="search" placeholder="Search..." data-ln-search-for="filter-documents-table-dept-list" data-ln-search-debounce="0">
+		<input type="search" placeholder="Search..." data-ln-search-for="filter-documents-table-dept-list">
 		<button type="button" data-ln-search-clear aria-label="Clear search">
 			<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 		</button>
-	</label>
+	</search>
 	<ul id="filter-documents-table-dept-list" data-ln-filter="documents" data-ln-search="" data-ln-search-items="label">
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
@@ -497,13 +497,13 @@
 
 <!-- People table: department filter popover -->
 <div data-ln-popover id="filter-people-dept">
-	<label class="search">
+	<search aria-label="Filter departments">
 		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-		<input type="search" placeholder="Search..." data-ln-search-for="filter-people-dept-list" data-ln-search-debounce="0">
+		<input type="search" placeholder="Search..." data-ln-search-for="filter-people-dept-list">
 		<button type="button" data-ln-search-clear aria-label="Clear search">
 			<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 		</button>
-	</label>
+	</search>
 	<ul id="filter-people-dept-list" data-ln-filter="people" data-ln-search="" data-ln-search-items="label">
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>

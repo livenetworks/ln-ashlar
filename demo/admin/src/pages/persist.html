@@ -1,7 +1,7 @@
 <!-- ln-page: title="Persist — ln-ashlar" h1="Persist" -->
 
 <h1>Persist</h1>
-				<p>localStorage persistence for UI component states. Opt-in via <code>data-ln-persist</code>. State is page-scoped — storage keys include the URL pathname so the same <code>id</code> on different pages never collides.</p>
+				<p>localStorage persistence for UI component states. Opt-in via <code>data-ln-persist</code>. State is global by default — the same <code>id</code> or key resolves to the same storage entry everywhere it appears. Prefix the value with <code>page:</code> (e.g. <code>data-ln-persist="page:key"</code>) to scope a key to the current URL pathname instead.</p>
 				<p><strong>How to test:</strong> Change any state below, then refresh the page — the state should be restored exactly as you left it.</p>
 
 				<!-- ─── Section 1: Toggle ─────────────────────────────── -->
@@ -21,7 +21,7 @@
 							<section id="persist-toggle-a" data-ln-toggle="close" data-ln-persist class="collapsible">
 								<article class="collapsible-body">
 									<p>This section remembers whether it was open or closed. Open it and refresh the page — it will still be open.</p>
-									<p>Storage key: <code>ln:toggle:{path}:persist-toggle-a</code></p>
+									<p>Storage key: <code>ln:toggle:persist-toggle-a</code></p>
 								</article>
 							</section>
 						</article>
@@ -37,7 +37,7 @@
 							<section id="persist-toggle-b" data-ln-toggle="close" data-ln-persist class="collapsible">
 								<article class="collapsible-body">
 									<p>Independent from Toggle A. Both persist their own state separately.</p>
-									<p>Storage key: <code>ln:toggle:{path}:persist-toggle-b</code></p>
+									<p>Storage key: <code>ln:toggle:persist-toggle-b</code></p>
 								</article>
 							</section>
 						</article>
@@ -74,7 +74,7 @@
 								<section id="acc-panel-1" data-ln-toggle="close" data-ln-persist class="collapsible">
 									<article class="collapsible-body">
 										<p>Content of panel 1. Opening this closes panels 2 and 3.</p>
-										<p>Storage key: <code>ln:toggle:{path}:acc-panel-1</code></p>
+										<p>Storage key: <code>ln:toggle:acc-panel-1</code></p>
 									</article>
 								</section>
 							</li>
@@ -86,7 +86,7 @@
 								<section id="acc-panel-2" data-ln-toggle="close" data-ln-persist class="collapsible">
 									<article class="collapsible-body">
 										<p>Content of panel 2. Opening this closes panels 1 and 3.</p>
-										<p>Storage key: <code>ln:toggle:{path}:acc-panel-2</code></p>
+										<p>Storage key: <code>ln:toggle:acc-panel-2</code></p>
 									</article>
 								</section>
 							</li>
@@ -98,7 +98,7 @@
 								<section id="acc-panel-3" data-ln-toggle="close" data-ln-persist class="collapsible">
 									<article class="collapsible-body">
 										<p>Content of panel 3. Opening this closes panels 1 and 2.</p>
-										<p>Storage key: <code>ln:toggle:{path}:acc-panel-3</code></p>
+										<p>Storage key: <code>ln:toggle:acc-panel-3</code></p>
 									</article>
 								</section>
 							</li>
@@ -124,7 +124,7 @@
 								<section data-ln-panel="general">
 									<h4>General</h4>
 									<p>Switch to Security or Notifications, then refresh — that tab will be restored from localStorage.</p>
-									<p>Storage key: <code>ln:tabs:{path}:persist-settings-tabs</code></p>
+									<p>Storage key: <code>ln:tabs:persist-settings-tabs</code></p>
 								</section>
 								<section data-ln-panel="security" class="hidden">
 									<h4>Security</h4>
@@ -168,7 +168,7 @@
 					<header><h3>4 — Table sort persistence</h3></header>
 					<main>
 						<p>Click a column header to sort, then refresh. The sort column and direction are restored.</p>
-						<p><code>data-ln-persist</code> goes on each <code>[data-ln-sort]</code> element individually — persistence is per sort instance, not per table. Give each one a distinct key. Sorting is single-column, so at most one <code>ln:sort:</code> key exists at a time — sorting a different column clears the previous column's stored key.</p>
+						<p><code>data-ln-persist</code> goes on each <code>[data-ln-sort]</code> element individually — persistence is per sort instance, not per table. Give each one a distinct key. These use the <code>page:</code> prefix so the sorted column is remembered per page rather than globally. Sorting is single-column, so at most one <code>ln:sort:</code> key exists at a time — sorting a different column clears the previous column's stored key.</p>
 
 						<div id="persist-table" data-ln-table>
 							<table>
@@ -176,7 +176,7 @@
 									<tr>
 										<th>
 											Name
-											<ul data-ln-sort="persist-table" data-ln-persist="name-sort">
+											<ul data-ln-sort="persist-table" data-ln-persist="page:name-sort">
 												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -184,7 +184,7 @@
 										</th>
 										<th>
 											Department
-											<ul data-ln-sort="persist-table" data-ln-persist="department-sort">
+											<ul data-ln-sort="persist-table" data-ln-persist="page:department-sort">
 												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -192,7 +192,7 @@
 										</th>
 										<th>
 											Role
-											<ul data-ln-sort="persist-table" data-ln-persist="role-sort">
+											<ul data-ln-sort="persist-table" data-ln-persist="page:role-sort">
 												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -200,7 +200,7 @@
 										</th>
 										<th class="numeric">
 											Salary
-											<ul data-ln-sort="persist-table" data-ln-persist="salary-sort">
+											<ul data-ln-sort="persist-table" data-ln-persist="page:salary-sort">
 												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -208,7 +208,7 @@
 										</th>
 										<th>
 											Start date
-											<ul data-ln-sort="persist-table" data-ln-persist="start-date-sort">
+											<ul data-ln-sort="persist-table" data-ln-persist="page:start-date-sort">
 												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -297,7 +297,7 @@
 							<li data-status="active">Frank Okafor — <strong>Active</strong></li>
 							<li data-status="archived">Grace Park — <strong>Archived</strong></li>
 						</ul>
-						<p><small>Storage key: <code>ln:filter:{path}:persist-filter</code> — value: <code>{ key: "status", values: ["active"] }</code></small></p>
+						<p><small>Storage key: <code>ln:filter:persist-filter</code> — value: <code>{ key: "status", values: ["active"] }</code></small></p>
 					</main>
 				</section>
 
@@ -322,10 +322,10 @@
 									<tr><th>Component</th><th>Key pattern</th><th>Example value</th></tr>
 								</thead>
 								<tbody>
-									<tr><td>ln-toggle</td><td><code>ln:toggle:{path}:{id}</code></td><td><code>"open"</code> or <code>"close"</code></td></tr>
-									<tr><td>ln-tabs</td><td><code>ln:tabs:{path}:{key}</code></td><td><code>"security"</code></td></tr>
-									<tr><td>ln-sort</td><td><code>ln:sort:{path}:{id}</code></td><td><code>{"field":null,"column":3,"direction":"desc","targetId":"persist-table"}</code></td></tr>
-									<tr><td>ln-filter</td><td><code>ln:filter:{path}:{id}</code></td><td><code>{"key":"status","values":["active"]}</code></td></tr>
+									<tr><td>ln-toggle</td><td><code>ln:toggle:{id}</code></td><td><code>"open"</code> or <code>"close"</code></td></tr>
+									<tr><td>ln-tabs</td><td><code>ln:tabs:{key}</code></td><td><code>"security"</code></td></tr>
+									<tr><td>ln-sort</td><td><code>ln:sort:{path}:{id}</code> (via <code>page:</code> prefix)</td><td><code>{"field":null,"column":3,"direction":"desc","targetId":"persist-table"}</code></td></tr>
+									<tr><td>ln-filter</td><td><code>ln:filter:{id}</code></td><td><code>{"key":"status","values":["active"]}</code></td></tr>
 								</tbody>
 							</table>
 							</div>

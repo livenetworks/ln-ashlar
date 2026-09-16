@@ -151,13 +151,13 @@ nav[data-ln-filter] {
 									<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="finance"> Finance</label></li>
 								</ul>
 							</nav>
-							<label class="search">
+							<search aria-label="Search name">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-								<input type="search" placeholder="Search name..." data-ln-search-for="combo-list" data-ln-search-debounce="0">
+								<input type="search" placeholder="Search name..." data-ln-search-for="combo-list">
 								<button type="button" data-ln-search-clear aria-label="Clear search">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 								</button>
-							</label>
+							</search>
 						</div>
 
 						<ul id="combo-list" data-ln-search="">
@@ -346,13 +346,13 @@ table {
 						<p>Column filter with authored options where a search input filters the checkbox list options dynamically.</p>
 
 						<div>
-							<label class="search">
+							<search aria-label="Search departments">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-								<input type="search" placeholder="Search departments..." data-ln-search-for="filter-dept-list-3" data-ln-search-debounce="0">
+								<input type="search" placeholder="Search departments..." data-ln-search-for="filter-dept-list-3">
 								<button type="button" data-ln-search-clear aria-label="Clear search">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 								</button>
-							</label>
+							</search>
 							<nav id="filter-dept-list-3" data-ln-filter="demo-table-3" data-ln-filter-col="2" data-ln-search="" data-ln-search-items="label">
 								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label>
 								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Engineering"> Engineering</label>

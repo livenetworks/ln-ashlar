@@ -123,15 +123,15 @@
 				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
 				<span class="app-name">ashlar-gui</span>
-				<label class="search sidebar-search" aria-label="Filter menu">
+				<search aria-label="Filter menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Filter menu…" aria-label="Filter menu" data-ln-search-for="demo-nav" data-ln-search-debounce="0">
+					<input type="search" placeholder="Filter menu…" aria-label="Filter menu" data-ln-search-for="demo-nav">
 					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
-				</label>
+				</search>
 			</header>
 
 			<main>
-				<nav class="nav" id="demo-nav" data-ln-nav="active" data-ln-search="" data-ln-search-items="li">
+				<nav class="nav" id="demo-nav" data-ln-nav="active" data-ln-search="" data-ln-search-items="li" data-ln-persist>
 					<ul>
 						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
@@ -438,18 +438,18 @@ el.lnToggle.destroy();    // detach listeners, dispatch :destroyed</code></pre>
 					<section class="section-card">
 						<header><h3>Persistence</h3></header>
 						<main>
-							<p>Add <code>data-ln-persist</code> to a panel to remember its open/closed state in <code>localStorage</code>. State restores on page load before the first event fires. Storage key format: <code>ln:toggle:{pagePath}:{id}</code>.</p>
+							<p>Add <code>data-ln-persist</code> to a panel to remember its open/closed state in <code>localStorage</code>. State restores on page load before the first event fires. Storage key format is global by default: <code>ln:toggle:{id}</code>. Prefix the value with <code>page:</code> to scope the key to the current pathname instead: <code>ln:toggle:{pagePath}:{id}</code>.</p>
 							<div class="table-container">
 							<table>
 								<thead><tr><th>Markup</th><th>Page</th><th>Storage key</th></tr></thead>
 								<tbody>
-									<tr><td><code>&lt;aside id="sidebar" data-ln-toggle data-ln-persist&gt;</code></td><td><code>/admin/users</code></td><td><code>ln:toggle:/admin/users:sidebar</code></td></tr>
-									<tr><td><code>&lt;aside id="sidebar" data-ln-toggle data-ln-persist="left-panel"&gt;</code></td><td><code>/admin/users</code></td><td><code>ln:toggle:/admin/users:left-panel</code></td></tr>
-									<tr><td><code>&lt;section id="faq-1" data-ln-toggle data-ln-persist&gt;</code></td><td><code>/</code></td><td><code>ln:toggle:/:faq-1</code></td></tr>
+									<tr><td><code>&lt;aside id="sidebar" data-ln-toggle data-ln-persist&gt;</code></td><td>any</td><td><code>ln:toggle:sidebar</code></td></tr>
+									<tr><td><code>&lt;aside id="sidebar" data-ln-toggle data-ln-persist="left-panel"&gt;</code></td><td>any</td><td><code>ln:toggle:left-panel</code></td></tr>
+									<tr><td><code>&lt;section id="faq-1" data-ln-toggle data-ln-persist="page:faq-1"&gt;</code></td><td><code>/</code></td><td><code>ln:toggle:/:faq-1</code></td></tr>
 								</tbody>
 							</table>
 							</div>
-							<p>Path is part of the key on purpose — same <code>id="sidebar"</code> on different pages resolves to two different keys, so each page remembers its own sidebar state. Restore happens inside the constructor before reactivity starts; the user's choice always wins over markup defaults on subsequent visits.</p>
+							<p>Keys are global by default — the same <code>id="sidebar"</code> on different pages resolves to the same key, so a shell element (e.g. a nav present on every page) shares one state everywhere. Use the <code>page:</code> prefix when the same <code>id</code> or key must resolve to a different key per page. Restore happens inside the constructor before reactivity starts; the user's choice always wins over markup defaults on subsequent visits.</p>
 							<p>If <code>data-ln-persist</code> is present but the element has neither an <code>id</code> nor an explicit key value, the persist module logs a warning and silently skips — the toggle continues to function without persistence. <code>localStorage</code> failures (private browsing, quota exceeded) are also silent.</p>
 						</main>
 					</section>

@@ -117,13 +117,13 @@
 				<div>
 					<h3>IndexedDB-backed Documents Table</h3>
 				</div>
-				<label class="search">
+				<search aria-label="Search cache">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 					<input type="search" placeholder="Search cache…" data-ln-search-for="demo-docs">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 					</button>
-				</label>
+				</search>
 				<button type="button" id="open-modal-btn" class="btn" data-ln-modal-for="doc-modal" data-ln-fill-form="doc-form">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
 					New Document
@@ -215,13 +215,13 @@
 
 <!-- Department filter popover -->
 <div data-ln-popover id="filter-demo-table-dept">
-	<label class="search">
+	<search aria-label="Filter departments">
 		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-		<input type="search" placeholder="Search..." data-ln-search-for="filter-demo-table-dept-list" data-ln-search-debounce="0">
+		<input type="search" placeholder="Search..." data-ln-search-for="filter-demo-table-dept-list">
 		<button type="button" data-ln-search-clear aria-label="Clear search">
 			<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 		</button>
-	</label>
+	</search>
 	<ul id="filter-demo-table-dept-list" data-ln-filter="demo-docs" data-ln-search="" data-ln-search-items="label">
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>

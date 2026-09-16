@@ -100,7 +100,7 @@ Here is the inventory of our zero-dependency vanilla JS components:
 | **ln-tooltip** | `data-ln-tooltip-enhance` | Lightweight mouse-over context tooltips. |
 | **ln-nav** | `data-ln-nav` | Collapsible mobile-navigation menus and drawer systems. |
 | **ln-filter** | `data-ln-filter` | Binds UI filters (like checkbox list dropdowns) to data streams. |
-| **ln-search** | `data-ln-search` | Captures input keystrokes, debounces them, and dispatches search queries. |
+| **ln-search** | `data-ln-search` | Captures input keystrokes and dispatches search queries. |
 | **ln-table** | `data-ln-table` | Base table features (sticky headers, simple client-side cell sorting). Supports data-driven virtual-scroll mode: clones rows from a template dynamically. |
 | **ln-sort** | `data-ln-sort` | Generic sort trigger (click cycles asc/desc/null, dispatches intent to a `ln-data-store`; not to be confused with `ln-sortable`'s drag & drop reorder). |
 | **ln-sortable** | `data-ln-sortable` | Drag-and-drop ordering for lists and table rows. |

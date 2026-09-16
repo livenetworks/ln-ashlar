@@ -74,13 +74,13 @@ behavior differs by mode:
 In SSR mode, the list is functional immediately with the server-rendered markup. Sort and search filters are run locally.
 
 ```html
-<label class="search">
+<search aria-label="Search documents">
   <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
   <input type="search" placeholder="Search..." data-ln-search-for="ssr-documents-list">
   <button type="button" data-ln-search-clear aria-label="Clear search">
     <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
   </button>
-</label>
+</search>
 
 <ul data-ln-sort="ssr-documents-list" data-ln-sort-field="title" data-ln-sort-state="none">
   <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
@@ -118,13 +118,13 @@ In Data-Driven mode, the list requests data via coordinator events and populates
     <!-- Global select-all checkbox -->
     <input type="checkbox" data-ln-list-select-all />
     
-    <label class="search">
+    <search aria-label="Search users">
       <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
       <input type="search" data-ln-search-for="users_list" placeholder="Search..." />
       <button type="button" data-ln-search-clear aria-label="Clear search">
         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
       </button>
-    </label>
+    </search>
 
     <ul data-ln-sort="users_list" data-ln-sort-field="name" data-ln-sort-state="none">
       <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>

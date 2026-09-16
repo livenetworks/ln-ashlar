@@ -129,7 +129,7 @@
 
 ## 🎨 8. Visual Layer vs. Functional Layer Separation & Search Rules
 
-* **Separation of Concerns:** Clearly separate visual styling (HTML chrome/wrappers and CSS classes, e.g. `.search`, `.collapsible`) from functional JS triggers (`data-ln-*` attributes). Visual markup classes are recommended globally as design standards even if JS logic is absent.
+* **Separation of Concerns:** Clearly separate visual styling (HTML chrome/wrappers and CSS classes, e.g. `.pills`, `.collapsible`) from functional JS triggers (`data-ln-*` attributes). Visual markup classes are recommended globally as design standards even if JS logic is absent.
 * **Search Debounce:** Debounce is owned by `ln-api-connector` via `data-ln-api-connector-query-debounce` — see `components/ln-api-connector/README.md` for the full contract.
 
 ---

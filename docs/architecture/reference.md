@@ -803,12 +803,12 @@ See [components/ln-core/README.md](../../components/ln-core/README.md) for the r
 <!-- Popover: placed as a sibling to [data-ln-table], NOT inside it          -->
 <!-- ln-popover teleports this to <body> on open — escapes overflow clipping -->
 <div data-ln-popover id="filter-my-table-dept">
-	<!-- Optional: search input targets the OPTIONS UL id, NOT the table id  -->
-	<!-- A data-ln-search targeting the table id triggers whole-table search  -->
+	<!-- Optional: search control points at the OPTIONS UL id, NOT the table id -->
+	<!-- Pointing it at the table id would trigger whole-table search instead   -->
 	<input type="search" placeholder="Search..."
-	       data-ln-search="filter-my-table-dept-list"
-	       data-ln-search-items="label">
-	<ul id="filter-my-table-dept-list" data-ln-filter="my-table">
+	       data-ln-search-for="filter-my-table-dept-list">
+	<!-- The state attribute and the item selector live on the target -->
+	<ul id="filter-my-table-dept-list" data-ln-filter="my-table" data-ln-search="" data-ln-search-items="label">
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
 		<!-- Domain enum options — include zero-record options -->
@@ -839,8 +839,10 @@ User checks a checkbox
 
 These must never share the same target id:
 
-- `data-ln-search="my-table-id"` on a global search input → triggers whole-table text search via `ln-table._onSearch`. Intentional table-wide behavior.
-- `data-ln-search="filter-options-ul-id"` on the search input inside a filter popover → filters which checkboxes are visible in the option list. Targets the `<ul>` of options, not the table.
+- `data-ln-search-for="my-table-id"` on a global search input → triggers whole-table text search. `ln-table` receives `ln-search:change` on its own root and cancels it, so the filtering is its own, not `ln-search`'s generic child-hiding. Intentional table-wide behavior.
+- `data-ln-search-for="filter-options-ul-id"` on the search input inside a filter popover → filters which checkboxes are visible in the option list. Targets the `<ul>` of options, not the table.
+
+The control always carries `data-ln-search-for`. The target carries `data-ln-search` (which holds the live term) plus an optional `data-ln-search-items` selector.
 
 ### Indicator Convention
 

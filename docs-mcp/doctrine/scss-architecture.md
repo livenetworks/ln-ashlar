@@ -89,7 +89,7 @@ Each functional JavaScript component folder (e.g., `components/ln-toggle/`, see 
 - **Global Mixins/Components (Visual chrome):** All visual design details (padding, font sizes, borders, colors, shadow values) must live under the main SCSS directories (`theme/config/mixins/` or `theme/components/`), compiled into `ln-ashlar-theme.css`.
 
 ### Helper-Class Convention
-Unprefixed helper classes are thin mixin bindings (`.search { @include search; }`) — visual, static presentation. The `ln-` prefix is reserved for JS-state classes exclusively; never mix the two roles on the same class.
+Unprefixed helper classes are thin mixin bindings (`.pills { @include pills; }`) — visual, static presentation. The `ln-` prefix is reserved for JS-state classes exclusively; never mix the two roles on the same class.
 
 ---
 
@@ -99,7 +99,7 @@ To avoid selector collisions and specificity bugs, follow these selector rules:
 
 1. **Presence Decoration is Forbidden:** Do **not** style components using the bare functional JS identifier (e.g., `[data-ln-modal] { padding: 16px; }` is prohibited). The attribute acts as an initialization selector for JS, not a style hook.
 2. **State Value Styling is Allowed:** Styling is allowed when selecting specific values of functional attributes representing a runtime state (e.g., `[data-ln-modal="open"] { display: flex; }` or `[data-ln-popover="open"] { opacity: 1; }`).
-3. **Use Semantic Classes for Visual Variants:** Apply standard visual classes (e.g., `.search`, `.collapsible`, `.btn`) for static visual presentation, decoupled from functional JS logic.
+3. **Use Semantic Classes for Visual Variants:** Apply standard visual classes (e.g., `.pills`, `.collapsible`, `.btn`) for static visual presentation, decoupled from functional JS logic.
 
 ---
 

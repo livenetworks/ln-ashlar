@@ -99,6 +99,42 @@
 	}
 }
 
+// ─── Panel search — search field inside a floating panel ───────
+// Shared by @mixin dropdown-menu and @mixin popover (which already @use's
+// this file for menu-items). The <search> icon-group base makes the widget
+// inline-flex and shrink-to-fit; in a block panel that leaves a baseline
+// descender gap under the field and lets it under-fill the panel.
+//
+// :has(> input[type="search"]) is structural, not decorative — <search> is
+// a REGION per spec, so a <search> wrapping a whole form must not match. It
+// also carries the weight this rule needs: under a [data-*] panel the
+// selector is (0,2,2) and outranks `search:has(> input[type="search"])`
+// (0,1,2), whose `width: min(100%, 20rem)` would otherwise cap the field.
+//
+// box-sizing is not restated — base/_reset.scss sets border-box on *.
+
+@mixin panel-search {
+	> search:has(> input[type="search"]) {
+		@include flex;      // block-level — kills the inline-flex baseline gap
+		@include w-full;
+		margin-bottom: var(--size-xs);
+	}
+
+	// Bare input shape (no <search> wrapper) — form-input already gives w-full.
+	> input[type="search"] {
+		margin-bottom: var(--size-xs);
+	}
+
+	// Divider when the search precedes the option list. The margin-top here
+	// collapses with the margin-bottom above (both block-level, same BFC),
+	// so the border sits in a symmetric size-xs gap — not a doubled one.
+	> :is(search:has(> input[type="search"]), input[type="search"]) + :is(ul, nav) {
+		border-top: var(--border-width) solid var(--color-border);
+		padding-top: var(--size-xs);
+		margin-top: var(--size-xs);
+	}
+}
+
 // ─── Dropdown menu — floating panel + menu items ───────
 @mixin dropdown-menu {
 	@include floating-panel;
@@ -109,18 +145,7 @@
 	min-width: var(--dropdown-min-width, 14rem);
 	@include enter-scale-fade;
 
-	.search {
-		display: flex;
-		@include w-full;
-		box-sizing: border-box;
-		margin-bottom: var(--size-xs);
-	}
-
-	.search + :is(ul, nav) {
-		border-top: var(--border-width) solid var(--color-border);
-		padding-top: var(--size-xs);
-		margin-top: var(--size-xs);
-	}
+	@include panel-search;
 
 	ul[data-ln-search] {
 		max-height: 15rem;

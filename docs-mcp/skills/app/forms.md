@@ -55,8 +55,8 @@ Count the **domain enum**, never the rows currently in the data.
 	<legend>Department</legend>
 	<button type="button" data-ln-popover-for="dept-select">Choose department…</button>
 	<div data-ln-popover id="dept-select">
-		<!-- ≥11 options: label.search + input data-ln-search="dept-list" data-ln-search-items="li" -->
-		<ul id="dept-list">
+		<!-- ≥11 options: <search> + input data-ln-search-for="dept-list"; the target carries data-ln-search and data-ln-search-items -->
+		<ul id="dept-list" data-ln-search="" data-ln-search-items="li">
 			<li><label><input type="radio" name="department" value="engineering"> Engineering</label></li>
 		</ul>
 	</div>

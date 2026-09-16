@@ -34,11 +34,12 @@ The `data-table-sync` pattern coordinates:
 
     <!-- Table Toolbar: Search, Filters, Stats -->
     <header class="table-toolbar">
-        <div class="search-box">
-            <input type="search" 
-                   data-ln-search="users-table" 
-                   placeholder="Search users...">
-        </div>
+        <search>
+            <input type="search"
+                   data-ln-search-for="users-table"
+                   placeholder="Search users..."
+                   aria-label="Search users">
+        </search>
         
         <div class="filter-controls">
             <select data-ln-filter="users-table">

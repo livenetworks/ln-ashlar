@@ -10,13 +10,13 @@ A unified, structure-agnostic, and local-first **Data Presenter Component** desi
 For a server-rendered list where the backend outputs `<li>` elements directly:
 
 ```html
-<label class="search">
+<search aria-label="Search documents">
     <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
     <input type="search" placeholder="Search..." data-ln-search-for="documents-list">
     <button type="button" data-ln-search-clear aria-label="Clear search">
         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
     </button>
-</label>
+</search>
 
 <ul id="documents-list" data-ln-list="documents" data-ln-search="">
     <li data-ln-item-id="1">Document A</li>
@@ -31,13 +31,13 @@ Opted-in by adding the `data-ln-list-source` attribute pointing to a `data-ln-da
 <!-- Store is the State Host for queries in Data-Driven mode -->
 <div data-ln-data-store="documents" data-ln-search=""></div>
 
-<label class="search">
+<search aria-label="Search documents">
     <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
     <input type="search" placeholder="Search..." data-ln-search-for="documents">
     <button type="button" data-ln-search-clear aria-label="Clear search">
         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
     </button>
-</label>
+</search>
 
 <section id="documents-grid" 
          data-ln-list="documents" 

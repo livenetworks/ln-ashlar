@@ -66,7 +66,7 @@
 - **Conciseness & Compactness**: Keep documentation lean, focused, and direct. Consolidate related HTML markup variants into compact code blocks, use clean concise API tables, and keep Mermaid sequence diagrams focused on high-level lifecycle flows (3-4 key participants max). Avoid multi-paragraph over-explanations.
 
 ## 4. Visual Layer vs. Functional Layer Separation & Search Rules
-- **Separation of Concerns:** Clearly separate visual styling (HTML chrome/wrappers and CSS classes, e.g. `.search`, `.collapsible`) from functional JS triggers (`data-ln-*` attributes). Visual markup classes are recommended globally as design standards even if JS logic is absent.
+- **Separation of Concerns:** Clearly separate visual styling (HTML chrome/wrappers and CSS classes, e.g. `.pills`, `.collapsible`) from functional JS triggers (`data-ln-*` attributes). Visual markup classes are recommended globally as design standards even if JS logic is absent.
 - **Search Debounce:** Debounce is owned by `ln-api-connector` via `data-ln-api-connector-query-debounce` — see `components/ln-api-connector/README.md` for the full contract.
 
 ## 5. UI/UX Confirmation & Gating Guidelines

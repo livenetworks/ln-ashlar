@@ -29,21 +29,7 @@
 	}
 
 	// Filter popover content: optional search + checkbox/radio option list
-	> label.search,
-	> input[type="search"] {
-		display: flex;
-		width: 100%;
-		box-sizing: border-box;
-		margin-bottom: var(--size-xs);
-	}
-
-	// Sibling divider when search precedes list
-	> label.search + :is(ul, nav),
-	> input[type="search"] + :is(ul, nav) {
-		border-top: var(--border-width) solid var(--color-border);
-		padding-top: var(--size-xs);
-		margin-top: var(--size-xs);
-	}
+	@include panel-search;
 
 	hr {
 		border: none;

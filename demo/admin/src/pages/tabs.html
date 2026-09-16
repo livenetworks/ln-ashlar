@@ -321,7 +321,7 @@ location.hash = 'user-tabs:settings&project-tabs:members';</code></pre>
 					<section class="section-card" data-demo-html>
 						<header><h3>Live demo — persistent tabs without hash sync</h3></header>
 						<main>
-							<p>No <code>id</code> (so no hash sync), explicit <code>data-ln-persist="settings-tabs"</code> (so the storage key doesn't depend on a generated <code>id</code>). The active tab is remembered across page loads via <code>localStorage</code> under key <code>ln:tabs:&lt;path&gt;:settings-tabs</code>. Useful for "settings page" tabs where the user expects "the last tab I had open is the one I'll see when I come back."</p>
+							<p>No <code>id</code> (so no hash sync), explicit <code>data-ln-persist="settings-tabs"</code> (so the storage key doesn't depend on a generated <code>id</code>). The active tab is remembered across page loads via <code>localStorage</code> under key <code>ln:tabs:settings-tabs</code> — global by default, so the same key restores this tab set anywhere it appears. Prefix the value with <code>page:</code> to scope it to the current URL instead. Useful for "settings page" tabs where the user expects "the last tab I had open is the one I'll see when I come back."</p>
 
 							<section data-ln-tabs data-ln-persist="settings-tabs" data-ln-tabs-default="general">
 								<nav>
