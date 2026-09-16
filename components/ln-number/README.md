@@ -74,6 +74,32 @@ The component reads the nearest ancestor `[lang]` attribute (typically `<html la
 | `mk` | `1.234.567` |
 | `en-US` | `1,234,567` |
 
+## Machine vs. human input
+
+Two different parsing rules apply depending on where a value comes from:
+
+- **Machine channel** — a pre-filled `value=""`, an authored `data-ln-value`, an authored `data-ln-number`,
+  and programmatic `el.value = "1234.56"` assignments are parsed canonically: dot is always the decimal
+  point, no locale grouping. This matches the HTML spec for `<input type="number">.value` and keeps authored
+  markup and backend payloads locale-independent — the same `data-ln-value="123.45"` means the same number
+  under every `lang`.
+- **Human channel** — pasting and typing into the field are parsed with the active locale's separators
+  (`getLocale`), because that reflects what the person actually typed.
+
+### Backend contract for `data-ln-value` / `data-ln-number`
+
+This is the standing raw-format contract for `data-ln-value` (see
+[`ln-core`'s `data-ln-value` primitive](file:///c:/laragon/www/ln-ashlar/components/ln-core/README.md#the-data-ln-value-primitive) —
+"plain number, dot decimal, NO thousands grouping") — `ln-number` now actually reads its inputs this way
+instead of running them through locale-aware parsing:
+
+- Dot as the decimal separator — `12345.67`.
+- No grouping separators, ever — never `12,345.67`, never `12.345,67`.
+- No currency symbol, no whitespace.
+- A leading minus is allowed; a bare integer is a valid value.
+- Display text stays free-form — the backend may put anything in the element's `textContent` or the visible
+  input's initial value; `ln-number` overwrites it with the locale-formatted number on init.
+
 ## Examples
 
 ```html
