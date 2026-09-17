@@ -3,10 +3,34 @@
 	"component": "ln-filter",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-col": {
+			"direction": "author",
+			"sources": [
+				"src/filter-model.js"
+			]
+		},
 		"data-ln-debug": {
 			"direction": null,
 			"sources": [
 				"ln-filter-dev.scss"
+			]
+		},
+		"data-ln-empty": {
+			"direction": "author",
+			"sources": [
+				"src/ln-filter.js"
+			]
+		},
+		"data-ln-empty-state": {
+			"direction": "author",
+			"sources": [
+				"src/ln-filter.js"
+			]
+		},
+		"data-ln-field": {
+			"direction": "author",
+			"sources": [
+				"src/filter-model.js"
 			]
 		},
 		"data-ln-filter": {
@@ -19,6 +43,7 @@
 		"data-ln-filter-col": {
 			"direction": "author",
 			"sources": [
+				"src/filter-model.js",
 				"src/ln-filter.js"
 			]
 		},
@@ -33,6 +58,7 @@
 			"direction": "author",
 			"sources": [
 				"ln-filter-dev.scss",
+				"src/filter-model.js",
 				"src/ln-filter.js"
 			]
 		},
@@ -56,6 +82,48 @@
 		},
 		"data-ln-hash": {
 			"direction": null,
+			"sources": [
+				"src/ln-filter.js"
+			]
+		},
+		"data-ln-popover": {
+			"direction": "author",
+			"sources": [
+				"src/filter-model.js"
+			]
+		},
+		"data-ln-popover-for": {
+			"direction": "author",
+			"sources": [
+				"src/filter-model.js"
+			]
+		},
+		"data-ln-sort-exclude": {
+			"direction": "author",
+			"sources": [
+				"src/ln-filter.js"
+			]
+		},
+		"data-ln-table-col": {
+			"direction": "author",
+			"sources": [
+				"src/filter-model.js"
+			]
+		},
+		"data-ln-table-empty": {
+			"direction": "author",
+			"sources": [
+				"src/ln-filter.js"
+			]
+		},
+		"data-ln-table-filter-col": {
+			"direction": "author",
+			"sources": [
+				"src/filter-model.js"
+			]
+		},
+		"data-ln-value": {
+			"direction": "author",
 			"sources": [
 				"src/ln-filter.js"
 			]

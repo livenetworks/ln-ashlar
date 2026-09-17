@@ -1,5 +1,5 @@
-import { createBatcher, dispatch, dispatchCancelable, hashFilterDecode, hashFilterEncode, hashGet, hashSet, matchesFilterValues, queueBoot, registerComponent, resolveHashNamespace } from '../../ln-core';
-import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValues, evaluateRowFilters } from './filter-model.js';
+import { createBatcher, dispatch, dispatchCancelable, hashFilterDecode, hashFilterEncode, hashGet, hashSet, matchesFilterValues, queueBoot, readValue, registerComponent, resolveHashNamespace } from '../../ln-core';
+import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValues, evaluateRowFilters, resolveColumnIndex } from './filter-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-filter';
@@ -272,8 +272,10 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 
 		if (defaultPrevented) return;
 
-		if (self.colIndex !== null) {
-			self._filterTableRows(active);
+		const table = target && (target.tagName === 'TABLE' ? target : (target.querySelector ? target.querySelector('table') : null));
+
+		if (table) {
+			self._filterTableRows(active, table);
 		} else {
 			if (!target) return;
 			const children = target.children;
@@ -294,14 +296,33 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 
 	// ─── Plain Table Row Filtering ─────────────────────────────
 
-	_component.prototype._filterTableRows = function (active) {
-		const target = document.getElementById(this.targetId);
-		if (!target) return;
+	function _readCell(cell) {
+		if (!cell) return '';
+		const childWithValue = cell.querySelector ? cell.querySelector('[data-ln-value]') : null;
+		return childWithValue ? readValue(childWithValue) : readValue(cell);
+	}
 
-		const table = target.tagName === 'TABLE' ? target : target.querySelector('table');
-		if (!table) return;
+	function _isSkipRow(row) {
+		if (!row || typeof row !== 'object') return true;
+		if (row.tagName === 'TEMPLATE') return true;
+		if (typeof row.hasAttribute === 'function' && (row.hasAttribute('data-ln-sort-exclude') || row.hasAttribute('hidden'))) return true;
+		if (row.classList && row.classList.contains('hidden')) return true;
+		if (row.style && row.style.display === 'none') return true;
+		if (typeof row.matches === 'function' && row.matches('.empty-state, .ln-table__empty, .ln-table__empty-state, [data-ln-empty], [data-ln-empty-state], [data-ln-table-empty]')) return true;
+		if (typeof row.querySelector === 'function' && row.querySelector('.empty-state, [data-ln-empty], [data-ln-empty-state]')) return true;
+		return false;
+	}
 
-		const key = active.key || (this.dom.getAttribute('data-ln-filter-key') || 'col' + this.colIndex);
+	_component.prototype._filterTableRows = function (active, table) {
+		if (!table) {
+			const target = document.getElementById(this.targetId);
+			if (!target) return;
+			table = target.tagName === 'TABLE' ? target : (target.querySelector ? target.querySelector('table') : null);
+			if (!table) return;
+		}
+
+		const resolvedCol = resolveColumnIndex(table, this.dom, active.key, this.colIndex);
+		const key = active.key || (this.dom.getAttribute('data-ln-filter-key') || (resolvedCol !== null ? 'col' + resolvedCol : 'attr-filter'));
 		const values = active.values;
 
 		if (!_tableFilters.has(table)) {
@@ -310,7 +331,11 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 		const filters = _tableFilters.get(table);
 
 		if (key && values.length > 0) {
-			filters[key] = { col: this.colIndex, values: values.slice() };
+			filters[key] = {
+				col: resolvedCol,
+				values: values.slice(),
+				attr: 'data-' + key
+			};
 		} else if (key) {
 			delete filters[key];
 		}
@@ -320,12 +345,14 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 			const rows = bodies[b].rows;
 			for (let r = 0; r < rows.length; r++) {
 				const row = rows[r];
+				if (_isSkipRow(row)) continue;
+
 				const cellValuesByCol = {};
 				for (let c = 0; c < row.cells.length; c++) {
-					cellValuesByCol[c] = row.cells[c].textContent.trim();
+					cellValuesByCol[c] = _readCell(row.cells[c]);
 				}
 
-				if (evaluateRowFilters(cellValuesByCol, filters)) {
+				if (evaluateRowFilters(cellValuesByCol, filters, row)) {
 					row.removeAttribute(HIDE_ATTR);
 				} else {
 					row.setAttribute(HIDE_ATTR, 'true');
@@ -340,16 +367,18 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this._destroyed = true;
 
-		if (this.colIndex !== null) {
-			const target = document.getElementById(this.targetId);
-			if (target) {
-				const table = target.tagName === 'TABLE' ? target : target.querySelector('table');
-				if (table && _tableFilters.has(table)) {
-					const filters = _tableFilters.get(table);
-					const key = this.dom.getAttribute('data-ln-filter-key') || 'col' + this.colIndex;
-					if (key && filters[key]) delete filters[key];
-					if (Object.keys(filters).length === 0) _tableFilters.delete(table);
+		const target = document.getElementById(this.targetId);
+		if (target) {
+			const table = target.tagName === 'TABLE' ? target : (target.querySelector ? target.querySelector('table') : null);
+			if (table && _tableFilters.has(table)) {
+				const filters = _tableFilters.get(table);
+				const resolvedCol = resolveColumnIndex(table, this.dom, this.dom.getAttribute('data-ln-filter-key'), this.colIndex);
+				const key = this.dom.getAttribute('data-ln-filter-key') || (resolvedCol !== null ? 'col' + resolvedCol : (this.colIndex !== null ? 'col' + this.colIndex : null));
+				if (key && filters[key]) {
+					delete filters[key];
+					this._filterTableRows({ key: null, values: [] }, table);
 				}
+				if (Object.keys(filters).length === 0) _tableFilters.delete(table);
 			}
 		}
 

@@ -4,7 +4,8 @@ import assert from 'node:assert/strict';
 import {
 	arraysDiffer,
 	deriveActiveFilters,
-	evaluateRowFilters
+	evaluateRowFilters,
+	resolveColumnIndex
 } from '../components/ln-filter/src/filter-model.js';
 
 test('arraysDiffer checks equality and differences between arrays', () => {
@@ -56,3 +57,49 @@ test('deriveActiveFilters extracts active key and checked non-reset values', () 
 	const resetResult = deriveActiveFilters(resetDescriptors);
 	assert.deepEqual(resetResult.values, []);
 });
+
+test('resolveColumnIndex resolves column index across multiple scenarios', () => {
+	// Explicit column index
+	assert.equal(resolveColumnIndex(null, null, 'category', 3), 3);
+
+	// Filter DOM with data-ln-filter-col
+	const mockDomWithCol = {
+		getAttribute: (attr) => attr === 'data-ln-filter-col' ? '2' : null,
+		closest: () => null
+	};
+	assert.equal(resolveColumnIndex(null, mockDomWithCol, 'category', null), 2);
+
+	// Header matching data-ln-table-filter-col
+	const mockTable = {
+		querySelectorAll: (sel) => [
+			{ cellIndex: 0, getAttribute: () => null, childNodes: [], textContent: '#' },
+			{ cellIndex: 1, getAttribute: () => null, childNodes: [], textContent: 'Product' },
+			{ cellIndex: 2, getAttribute: (attr) => attr === 'data-ln-table-filter-col' ? 'category' : null, childNodes: [], textContent: 'Category' },
+			{ cellIndex: 3, getAttribute: () => null, childNodes: [], textContent: 'Price' }
+		]
+	};
+	assert.equal(resolveColumnIndex(mockTable, null, 'category', null), 2);
+
+	// Header matching text content
+	assert.equal(resolveColumnIndex(mockTable, null, 'price', null), 3);
+
+	// Unresolvable returns null
+	assert.equal(resolveColumnIndex(mockTable, null, 'unknown', null), null);
+});
+
+test('evaluateRowFilters supports row attribute fallback', () => {
+	const filters = {
+		category: { col: null, values: ['electronics'], attr: 'data-category' }
+	};
+
+	const matchingRow = {
+		getAttribute: (attr) => attr === 'data-category' ? 'electronics' : null
+	};
+	const nonMatchingRow = {
+		getAttribute: (attr) => attr === 'data-category' ? 'furniture' : null
+	};
+
+	assert.equal(evaluateRowFilters({}, filters, matchingRow), true);
+	assert.equal(evaluateRowFilters({}, filters, nonMatchingRow), false);
+});
+
