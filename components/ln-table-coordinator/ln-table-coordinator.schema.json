@@ -3,7 +3,25 @@
 	"component": "ln-table-coordinator",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-field": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
 		"data-ln-filter": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
+		"data-ln-filter-col": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
+		"data-ln-filter-key": {
 			"direction": "author",
 			"sources": [
 				"src/ln-table-coordinator.js"

@@ -74,11 +74,14 @@ import { registerComponent, dispatch } from '../../ln-core';
 		// for one user change and emit two identical fetches.
 		function _resolveTable(e) {
 			const el = e.target;
-			if (el && el.hasAttribute && el.hasAttribute('data-ln-table')) return el;
+			if (el && el.hasAttribute && (el.hasAttribute('data-ln-table') || el.tagName === 'TABLE')) return el;
 			const targetId = (e.detail && e.detail.targetId) || (el && el.id);
 			if (!targetId) return null;
 			return dom.querySelector('[data-ln-table-source="' + targetId + '"]') ||
-			       dom.querySelector('[data-ln-table="' + targetId + '"]');
+			       dom.querySelector('[data-ln-table="' + targetId + '"]') ||
+			       dom.querySelector('#' + targetId) ||
+			       (dom.id === targetId ? dom : null) ||
+			       document.getElementById(targetId);
 		}
 
 		self._handlers = {
@@ -90,15 +93,19 @@ import { registerComponent, dispatch } from '../../ln-core';
 			filter: function (e) {
 				if (!e.detail) return;
 				const table = _resolveTable(e);
-				if (!table || !table.hasAttribute || !table.hasAttribute('data-ln-table')) return;
+				if (!table) return;
 
 				const key = e.detail.key;
 				const values = e.detail.values || [];
 
 				const ths = table.querySelectorAll('th');
 				for (let i = 0; i < ths.length; i++) {
-					if (ths[i].getAttribute('data-ln-table-filter-col') === key) {
-						const btn = ths[i].querySelector('[data-ln-table-col-filter]');
+					const colKey = ths[i].getAttribute('data-ln-table-filter-col') ||
+					               ths[i].getAttribute('data-ln-filter-col') ||
+					               ths[i].getAttribute('data-ln-filter-key') ||
+					               ths[i].getAttribute('data-ln-field');
+					if (colKey === key) {
+						const btn = ths[i].querySelector('[data-ln-table-col-filter], .table-filter');
 						if (btn) btn.classList.toggle('ln-filter-active', values.length > 0);
 						break;
 					}
@@ -111,14 +118,14 @@ import { registerComponent, dispatch } from '../../ln-core';
 				const clearBtn = e.target.closest('[data-ln-table-clear], [data-ln-table-clear-all]');
 				if (!clearBtn) return;
 
-				const table = clearBtn.closest('[data-ln-table]') || dom.querySelector('[data-ln-table]');
-				if (!table || !table.lnTable) return;
+				const table = clearBtn.closest('[data-ln-table], table') || dom.querySelector('[data-ln-table], table');
+				if (!table) return;
 
-				const name = table.lnTable.name || table.id;
+				const name = (table.lnTable && table.lnTable.name) || table.id;
 
 				const ths = table.querySelectorAll('th');
 				for (let i = 0; i < ths.length; i++) {
-					const filterBtn = ths[i].querySelector('[data-ln-table-col-filter]');
+					const filterBtn = ths[i].querySelector('[data-ln-table-col-filter], .table-filter');
 					if (filterBtn) filterBtn.classList.remove('ln-filter-active');
 				}
 
@@ -151,7 +158,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 				// A data-driven table is refreshed by its source: the control resets
 				// above already emit the query change. Only an SSR table, which holds
 				// its own rows, still needs to be told directly.
-				if (!table.hasAttribute('data-ln-table-source')) {
+				if (table.lnTable && !table.hasAttribute('data-ln-table-source')) {
 					dispatch(table, 'ln-table:request-clear-filters', { table: name });
 				}
 			}

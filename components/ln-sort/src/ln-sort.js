@@ -1,5 +1,5 @@
 import { compareValues, detectValueType, dispatchCancelable, getLocale, hashGet, hashSet, hashSortDecode, hashSortEncode, queueBoot, readValue, registerComponent, resolveHashNamespace } from '../../ln-core';
-import { createSortComparator, getAriaSortValue, isSameSortTarget, normalizeSortDirection } from './sort-model.js';
+import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortTarget, normalizeSortDirection, resolveSortItems } from './sort-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-sort';
@@ -25,10 +25,13 @@ import { createSortComparator, getAriaSortValue, isSameSortTarget, normalizeSort
 	// Target-scoped initial DOM order cache.
 	const _targetInitialOrders = new WeakMap();
 
-	function _readItemValue(item, field) {
+	function _readItemValue(item, field, column) {
 		if (field) {
 			const el = item.querySelector('[data-ln-field="' + field + '"]');
 			return el ? readValue(el) : '';
+		}
+		if (column !== null && column !== undefined && item.cells && item.cells[column]) {
+			return readValue(item.cells[column]);
 		}
 		return readValue(item);
 	}
@@ -45,6 +48,9 @@ import { createSortComparator, getAriaSortValue, isSameSortTarget, normalizeSort
 
 		this.itemsSelector = dom.getAttribute(ITEMS_ATTR) || null;
 		this._state = normalizeSortDirection(dom.getAttribute(STATE_ATTR));
+		if (!dom.hasAttribute(STATE_ATTR)) {
+			dom.setAttribute(STATE_ATTR, this._state);
+		}
 		this._destroyed = false;
 
 		this.nsKey = resolveHashNamespace(dom, 'sort');
@@ -175,6 +181,10 @@ import { createSortComparator, getAriaSortValue, isSameSortTarget, normalizeSort
 
 	_component.prototype._apply = function (direction, skipStorage) {
 		if (this._destroyed) return;
+		if (!this.field && this.column === null) {
+			const th = this.dom.closest('th');
+			if (th && th.cellIndex !== undefined) this.column = th.cellIndex;
+		}
 		const normalized = normalizeSortDirection(direction);
 		this._state = normalized;
 		if (this.dom.getAttribute(STATE_ATTR) !== normalized) {
@@ -209,11 +219,14 @@ import { createSortComparator, getAriaSortValue, isSameSortTarget, normalizeSort
 	// ─── Default DOM behaviour ─────────────────────────────────
 
 	_component.prototype._defaultSort = function (target, direction) {
-		const items = this.itemsSelector
-			? Array.from(target.querySelectorAll(this.itemsSelector))
-			: Array.from(target.children);
+		const allItems = resolveSortItems(target, this.itemsSelector);
+		if (!allItems.length) return;
+		const parent = allItems[0].parentNode;
+
+		const items = allItems.filter(function (el) {
+			return !isExcludedSortItem(el);
+		});
 		if (!items.length) return;
-		const parent = items[0].parentNode;
 
 		if (!_targetInitialOrders.has(target)) {
 			_targetInitialOrders.set(target, items.slice());
@@ -222,26 +235,36 @@ import { createSortComparator, getAriaSortValue, isSameSortTarget, normalizeSort
 		let ordered;
 		if (direction === 'none') {
 			const original = _targetInitialOrders.get(target) || items;
+			_targetInitialOrders.delete(target);
 			ordered = original.filter(function (el) {
-				return el.parentNode === parent;
+				return el.parentNode === parent && !isExcludedSortItem(el);
 			});
 		} else {
 			const field = this.field;
-			const values = items.map(function (el) { return _readItemValue(el, field); });
+			const column = this.column;
+			const values = items.map(function (el) { return _readItemValue(el, field, column); });
 			const type = detectValueType(values);
 			const collator = typeof Intl !== 'undefined'
-				? new Intl.Collator(getLocale(this.dom), { sensitivity: 'base' })
+				? new Intl.Collator(getLocale(this.dom), { sensitivity: 'base', numeric: true })
 				: null;
 
 			const comparator = createSortComparator(direction, type, collator, function (el) {
-				return _readItemValue(el, field);
+				return _readItemValue(el, field, column);
 			});
 
 			ordered = items.slice().sort(comparator);
 		}
 
 		const frag = document.createDocumentFragment();
-		for (let i = 0; i < ordered.length; i++) frag.appendChild(ordered[i]);
+		let orderIdx = 0;
+		for (let i = 0; i < allItems.length; i++) {
+			const el = allItems[i];
+			if (isExcludedSortItem(el)) {
+				frag.appendChild(el);
+			} else if (orderIdx < ordered.length) {
+				frag.appendChild(ordered[orderIdx++]);
+			}
+		}
 		parent.appendChild(frag);
 	};
 

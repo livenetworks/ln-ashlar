@@ -64,3 +64,54 @@ export function createSortComparator(direction, valueType, collator, getValueFn)
 		return compareValues(valA, valB, valueType, collator) * multiplier;
 	};
 }
+
+/**
+ * Determines whether a DOM element should be excluded from sorting (e.g. empty-state, hidden rows, templates).
+ * @param {Element|unknown} el
+ * @returns {boolean}
+ */
+export function isExcludedSortItem(el) {
+	if (!el || typeof el !== 'object' || el.nodeType !== 1) return true;
+	if (el.tagName === 'TEMPLATE') return true;
+	if (typeof el.hasAttribute === 'function') {
+		if (el.hasAttribute('data-ln-sort-exclude') || el.hasAttribute('hidden')) return true;
+	}
+	if (el.classList && el.classList.contains('hidden')) return true;
+	if (el.style && el.style.display === 'none') return true;
+	if (typeof el.matches === 'function') {
+		if (el.matches('.empty-state, .ln-table__empty, .ln-table__empty-state, [data-ln-empty], [data-ln-empty-state], [data-ln-table-empty]')) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Resolves the list of sortable DOM items from a target element.
+ * For tables without explicit selector, automatically targets the tbody rows.
+ * @param {Element|unknown} target
+ * @param {string|null} [itemsSelector]
+ * @returns {Element[]}
+ */
+export function resolveSortItems(target, itemsSelector) {
+	if (!target || typeof target !== 'object' || target.nodeType !== 1) return [];
+	const selector = itemsSelector
+		|| (typeof target.getAttribute === 'function' ? target.getAttribute('data-ln-sort-items') : null)
+		|| null;
+	if (selector && typeof target.querySelectorAll === 'function') {
+		return Array.from(target.querySelectorAll(selector));
+	}
+	if (target.tagName === 'TABLE') {
+		const tbody = target.tBodies && target.tBodies.length
+			? target.tBodies[0]
+			: (typeof target.querySelector === 'function' ? target.querySelector('tbody') : null);
+		if (tbody) {
+			return Array.from(tbody.children || []);
+		}
+		if (typeof target.querySelectorAll === 'function') {
+			return Array.from(target.querySelectorAll('tbody tr, tr'));
+		}
+	}
+	return Array.from(target.children || []);
+}
+

@@ -27,6 +27,7 @@
 		display: none;
 	}
 
+	&:not([data-ln-sort-state]) [data-ln-sort-dir="asc"],
 	&[data-ln-sort-state="none"] [data-ln-sort-dir="asc"],
 	&[data-ln-sort-state="asc"]  [data-ln-sort-dir="desc"],
 	&[data-ln-sort-state="desc"] [data-ln-sort-dir="none"] {

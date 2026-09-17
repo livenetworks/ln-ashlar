@@ -9,6 +9,18 @@
 				"ln-sort-dev.scss"
 			]
 		},
+		"data-ln-empty": {
+			"direction": "author",
+			"sources": [
+				"src/sort-model.js"
+			]
+		},
+		"data-ln-empty-state": {
+			"direction": "author",
+			"sources": [
+				"src/sort-model.js"
+			]
+		},
 		"data-ln-field": {
 			"direction": "author",
 			"sources": [
@@ -34,6 +46,12 @@
 				"src/ln-sort.js"
 			]
 		},
+		"data-ln-sort-exclude": {
+			"direction": "author",
+			"sources": [
+				"src/sort-model.js"
+			]
+		},
 		"data-ln-sort-field": {
 			"direction": "author",
 			"sources": [
@@ -43,13 +61,20 @@
 		"data-ln-sort-items": {
 			"direction": "author",
 			"sources": [
-				"src/ln-sort.js"
+				"src/ln-sort.js",
+				"src/sort-model.js"
 			]
 		},
 		"data-ln-sort-state": {
 			"direction": "both",
 			"sources": [
 				"src/ln-sort.js"
+			]
+		},
+		"data-ln-table-empty": {
+			"direction": "author",
+			"sources": [
+				"src/sort-model.js"
 			]
 		}
 	}

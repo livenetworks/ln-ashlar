@@ -282,9 +282,9 @@
 						</main>
 					</section>
 
-					<!-- Live Demo — 500 rows -->
-					<section class="section-card" data-demo-html>
-						<header><h3>Live Demo — 500 rows with search, sort and filter</h3></header>
+					<!-- Live Demo — 20 rows -->
+					<section class="section-card" data-demo-html data-ln-table-coordinator>
+						<header><h3>Live Demo — 20 rows with search, sort and filter</h3></header>
 						<main>
 							<template data-ln-table-empty>
 								<article class="ln-table__empty-state">
@@ -312,7 +312,7 @@
 									<tr>
 										<th>
 											#
-											<ul data-ln-sort="demo-table">
+											<ul data-ln-sort="demo-table" data-ln-sort-state="none">
 												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -320,7 +320,7 @@
 										</th>
 										<th>
 											Product
-											<ul data-ln-sort="demo-table">
+											<ul data-ln-sort="demo-table" data-ln-sort-state="none">
 												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -328,7 +328,7 @@
 										</th>
 										<th data-ln-table-filter-col="category">
 											Category
-											<button type="button" class="table-filter" data-ln-popover-for="filter-category" aria-label="Filter category">
+											<button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-category" aria-label="Filter category">
 												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 											</button>
 											<div id="filter-category" data-ln-popover>
@@ -342,7 +342,7 @@
 													<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Components"> Components</label></li>
 												</ul>
 											</div>
-											<ul data-ln-sort="demo-table">
+											<ul data-ln-sort="demo-table" data-ln-sort-state="none">
 												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -350,7 +350,7 @@
 										</th>
 										<th class="numeric">
 											Price
-											<ul data-ln-sort="demo-table">
+											<ul data-ln-sort="demo-table" data-ln-sort-state="none">
 												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -358,7 +358,7 @@
 										</th>
 										<th class="numeric">
 											Stock
-											<ul data-ln-sort="demo-table">
+											<ul data-ln-sort="demo-table" data-ln-sort-state="none">
 												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -377,7 +377,7 @@
 													<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Out of Stock"> Out of Stock</label></li>
 												</ul>
 											</div>
-											<ul data-ln-sort="demo-table">
+											<ul data-ln-sort="demo-table" data-ln-sort-state="none">
 												<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 												<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
