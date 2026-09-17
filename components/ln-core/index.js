@@ -8,4 +8,4 @@ export { calculateProgress } from './progress.js';
 export { parseDateInput, formatDateToISO } from './date.js';
 export { getSeparators, cleanNumericString, parseNumber, formatNumber } from './number.js';
 export { normalizeSearchTerm, tokenizeSearchQuery, parseSearchFields, matchesSearchTokens, collapseSearchParts, matchesFilterValues } from './matching.js';
-export { attrStr, attrInt, attrBool, attrList, defineAttrs } from './attrs.js';
+export { attrStr, attrInt, attrBool, attrList, defineAttrs, attrSpec, attrEffects } from './attrs.js';

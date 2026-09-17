@@ -1,13 +1,34 @@
-import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, decryptData, defineAttrs, attrInt, attrBool, attrList } from '../../ln-core';
+import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, decryptData, defineAttrs, attrSpec, attrInt, attrBool, attrList } from '../../ln-core';
 import { createWindowIndex } from './window-index.js';
 import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from './data-store-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-data-store';
 	const DOM_ATTRIBUTE = 'lnDataStore';
-	const NO_LOCAL_QUERY_ATTR = 'data-ln-data-store-no-local-query';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// ─── Custom Attribute Readers ───────────────────────────
+	// 'never' / '-1' mean "no staleness", everything unparsable means the default.
+	function _readStale(el, name, fallback) {
+		const raw = el.getAttribute(name);
+		if (raw === 'never' || raw === '-1') return -1;
+		const parsed = parseInt(raw, 10);
+		return isNaN(parsed) ? fallback : parsed;
+	}
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-data-store':                  { effect: _markFrozen },
+		'data-ln-data-store-indexes':          { effect: _markFrozen },
+		'data-ln-data-store-stale':            { prop: '_staleThreshold',  read: _readStale, fallback: 300 },
+		'data-ln-data-store-search-fields':    { prop: '_searchFields',    read: attrList },
+		'data-ln-data-store-no-local-query':   { prop: 'noLocalQuery',     read: attrBool },
+		'data-ln-data-store-window':           { prop: '_windowSize',      read: attrInt, fallback: 1000, effect: _applyWindowSize },
+		'data-ln-data-store-window-page':      { prop: '_windowPageSize',  read: attrInt, fallback: 200,  effect: _applyWindowPageSize }
+	};
+
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	const DB_NAME = 'ln_app_cache';
 	const META_STORE = '_meta';
@@ -204,26 +225,12 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 
 	// ─── Component Constructor ─────────────────────────────
 
-	// 'never' / '-1' mean "no staleness", everything unparsable means the default.
-	function _readStale(el, name, fallback) {
-		const raw = el.getAttribute(name);
-		if (raw === 'never' || raw === '-1') return -1;
-		const parsed = parseInt(raw, 10);
-		return isNaN(parsed) ? fallback : parsed;
-	}
-
 	function _component(dom) {
 		this.dom = dom;
 		this._name = dom.id;
 		if (!this._name) console.warn('[ln-data-store] missing id — the store cannot be addressed', dom);
 
-		defineAttrs(this, dom, {
-			_staleThreshold: [_readStale, 'data-ln-data-store-stale', 300],
-			_searchFields:   [attrList,   'data-ln-data-store-search-fields'],
-			noLocalQuery:    [attrBool,   NO_LOCAL_QUERY_ATTR],
-			_windowSize:     [attrInt,    'data-ln-data-store-window', 1000],
-			_windowPageSize: [attrInt,    'data-ln-data-store-window-page', 200]
-		});
+		defineAttrs(this, dom, ATTR_SPEC);
 
 		this._handlers = null;
 
@@ -931,16 +938,13 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 		}
 	}
 
+	function _applyWindowPageSize(el) {
+		const inst = el[DOM_ATTRIBUTE];
+		if (inst._windowIndex) inst._windowIndex.configure({ pageSize: inst._windowPageSize });
+	}
+
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-data-store', {
-		effects: {
-			'data-ln-data-store-window': _applyWindowSize,
-			'data-ln-data-store-window-page': el => {
-				const inst = el[DOM_ATTRIBUTE];
-				if (inst._windowIndex) inst._windowIndex.configure({ pageSize: inst._windowPageSize });
-			},
-			'data-ln-data-store-indexes': _markFrozen,
-			'data-ln-data-store': _markFrozen
-		}
+		attributes: ATTRIBUTES
 	});
 
 	window[DOM_ATTRIBUTE].clearAll = _clearAll;

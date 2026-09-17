@@ -84,10 +84,6 @@
 				"src/ln-table.js"
 			]
 		},
-		"data-ln-table-filter-col": {
-			"direction": null,
-			"sources": []
-		},
 		"data-ln-table-filtered": {
 			"direction": "author",
 			"sources": [

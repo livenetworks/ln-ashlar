@@ -38,10 +38,6 @@
 			"sources": [
 				"ln-confirm-dev.scss"
 			]
-		},
-		"data-ln-table": {
-			"direction": null,
-			"sources": []
 		}
 	}
 }

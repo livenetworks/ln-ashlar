@@ -88,10 +88,6 @@
 				"src/ln-data-coordinator.js"
 			]
 		},
-		"data-ln-data-mapper": {
-			"direction": null,
-			"sources": []
-		},
 		"data-ln-data-store": {
 			"direction": "author",
 			"sources": [
@@ -140,10 +136,6 @@
 			"sources": [
 				"src/ln-data-coordinator.js"
 			]
-		},
-		"data-ln-rest-connector": {
-			"direction": null,
-			"sources": []
 		},
 		"data-ln-stat": {
 			"direction": "author",

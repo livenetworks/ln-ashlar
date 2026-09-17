@@ -17,6 +17,17 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-filter':        {},
+		'data-ln-hash':          { effect: _syncAttribute },
+		'data-ln-filter-values': { effect: _syncAttribute },
+		'data-ln-filter-col':    {},
+		'data-ln-filter-key':    {},
+		'data-ln-filter-reset':  {},
+		'data-ln-filter-value':  {}
+	};
+
 	function _isReset(input) {
 		return input.hasAttribute(RESET_ATTR) || !input.getAttribute(VALUE_ATTR);
 	}
@@ -383,8 +394,7 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 	// ─── Registration ──────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-filter', {
-		extraAttributes: [HASH_ATTR, VALUES_ATTR],
-		onAttributeChange: _syncAttribute,
+		attributes: ATTRIBUTES,
 		persist: {
 			attr: VALUES_ATTR,
 			hashActive: function (el) { return !!resolveHashNamespace(el, 'filter'); }

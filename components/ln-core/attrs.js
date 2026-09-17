@@ -52,3 +52,40 @@ export function defineAttrs(instance, dom, spec) {
 	}
 	return instance;
 }
+
+/**
+ * One table per component is the single source of truth for its HOST
+ * attributes. Derivations below read it; nothing else declares an
+ * attribute name.
+ *
+ * Table entry shape:
+ *   'data-ln-x': { prop, read, fallback, effect } — any subset
+ *
+ * The scanner constraint at the top of this file applies to table KEYS:
+ * literal strings only. A computed key is invisible to
+ * scripts/sync-ln-schemas.mjs.
+ */
+export function attrSpec(table) {
+	const spec = {};
+	for (const name in table) {
+		const entry = table[name];
+		if (!entry || !entry.prop) continue;
+		spec[entry.prop] = [entry.read, name, entry.fallback];
+	}
+	return spec;
+}
+
+export function attrEffects(table) {
+	const effects = {};
+	for (const name in table) {
+		const entry = table[name];
+		if (!entry) continue;
+		if (entry.effect) effects[name] = entry.effect;
+	}
+	// null, not {} — `_registerAttrEntry` tests `entry.onAttrChange || entry.effects`,
+	// and an empty object is truthy. A table of pure getters would otherwise be
+	// pushed into `registry.reactive` and iterated on every data-ln-* mutation
+	// on the page while having nothing to run.
+	return Object.keys(effects).length ? effects : null;
+}
+

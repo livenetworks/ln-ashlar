@@ -8,6 +8,11 @@ import { dispatch, dispatchCancelable, isTargetDisabled, registerComponent, shou
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-toggle': { effect: _syncAttribute }
+	};
+
 	const instances = new Set();
 	let clickListener = null;
 
@@ -152,7 +157,7 @@ import { dispatch, dispatchCancelable, isTargetDisabled, registerComponent, shou
 	// ─── Init ──────────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-toggle', {
-		onAttributeChange: _syncAttribute,
+		attributes: ATTRIBUTES,
 		persist: { attr: DOM_SELECTOR, hashActive: null }
 	});
 })();

@@ -23,6 +23,25 @@ import {
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	function _syncAttribute(el) {
+		const inst = el[DOM_ATTRIBUTE];
+		if (!inst) return;
+		if (inst.isTextElement) {
+			inst._initTextElement();
+		} else if (inst.value) {
+			const date = parseDateInput(inst.value);
+			if (date) inst._displayFormatted(date);
+		}
+	}
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-date':        { effect: _syncAttribute },
+		'data-ln-date-format': { effect: _syncAttribute },
+		'data-ln-date-locale': { effect: _syncAttribute },
+		'data-ln-value':       { effect: _syncAttribute }
+	};
+
 	const _inputValueDesc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
 
 	// ─── Component Helpers ────────────────────────────────────
@@ -425,16 +444,8 @@ import {
 	// ─── Init ─────────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-date', {
-		extraAttributes: ['data-ln-date-format', 'data-ln-date-locale', 'data-ln-value', 'datetime', 'lang'],
-		onAttributeChange: function (el) {
-			const inst = el[DOM_ATTRIBUTE];
-			if (!inst) return;
-			if (inst.isTextElement) {
-				inst._initTextElement();
-			} else if (inst.value) {
-				const date = parseDateInput(inst.value);
-				if (date) inst._displayFormatted(date);
-			}
-		}
+		attributes: ATTRIBUTES,
+		extraAttributes: ['datetime', 'lang'],
+		onAttributeChange: _syncAttribute
 	});
 })();

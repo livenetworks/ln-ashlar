@@ -4,8 +4,22 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 	const DOM_SELECTOR = 'data-ln-couchdb-connector';
 	const DOM_ATTRIBUTE = 'lnCouchDbConnector';
 	const DOM_ALIAS = 'lnConnector';
-
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	function _syncAttribute(el) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+		instance.refreshConfig();
+	}
+
+	const ATTRIBUTES = {
+		'data-ln-couchdb-connector': {},
+		'data-ln-couchdb-url':       { effect: _syncAttribute },
+		'data-ln-couchdb-db':        { effect: _syncAttribute },
+		'data-ln-couchdb-auth':      { effect: _syncAttribute },
+		'data-ln-couchdb-headers':   { effect: _syncAttribute }
+	};
 
 	// ─── Response Envelope Unwrap (presence-checked `{message, content}`) ──
 	// Raw CouchDB never sends this envelope (content=body, message=null — no-op).
@@ -376,23 +390,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		delete this.dom[DOM_ALIAS];
 	};
 
-	// ─── Attribute Sync ────────────────────────────────────────
-
-	function _syncAttribute(el) {
-		const instance = el[DOM_ATTRIBUTE];
-		if (!instance) return;
-		instance.refreshConfig();
-	}
-
-	// ─── Registration ──────────────────────────────────────
-
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-couchdb-connector', {
-		extraAttributes: [
-			'data-ln-couchdb-url',
-			'data-ln-couchdb-db',
-			'data-ln-couchdb-auth',
-			'data-ln-couchdb-headers'
-		],
-		onAttributeChange: _syncAttribute
+		attributes: ATTRIBUTES
 	});
 })();

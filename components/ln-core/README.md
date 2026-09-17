@@ -359,12 +359,18 @@ registerComponent('data-ln-example', 'lnExample', _component, 'ln-example', {
   if it contains `[`, `.`, or `#` (e.g. `'[data-ln-foo]:not([disabled])'`).
 - `attribute` — JS-side key used both as `window[attribute]` (the
   constructor function) and `el[attribute]` (the per-element instance).
+- `options.attributes` — the component's attribute table. One entry per host
+  attribute the component reads or reacts to. Derives the `effects` map, the
+  live-getter spec (via `attrSpec` at call site), and scopes `options.onAttrChange` —
+  only declared keys reach the catch-all. When present, `options.effects` is ignored.
 - `options.effects` — `{ attributeName: handler(target, name, oldValue) }`.
   A per-attribute reaction dispatched by the shared attribute observer's
   registry. Fires when the mutated element already owns an instance
   (`el[attribute]` is truthy) and the attribute name starts with `data-ln-`.
 - `options.onAttrChange(target, name, oldValue)` — catch-all reaction for
-  any `data-ln-*` attribute on the host not covered by an `effects` key.
+  any `data-ln-*` attribute on the host not covered by an `effects` key and
+  present in `options.attributes` when a table is supplied. Without a table, the
+  catch-all is unscoped and fires for every `data-ln-*` attribute on the host.
   Same instance and prefix gate as `effects`.
 - `options.onAttributeChange(target, attrName)` — called when an attribute
   in this registration's observed set (the selector's own attribute name,
@@ -432,22 +438,36 @@ setPersistSink(function (el, selector) {
 - No sink installed (`ln-persist` not loaded) → the check is a no-op.
 - See `components/ln-persist/README.md` for the full restore/save contract.
 
-### defineAttrs(instance, dom, spec)
+### defineAttrs(instance, dom, spec), attrSpec(table), attrEffects(table)
 
 Define live, getter-only properties on a component instance that read the DOM
-on every access. Pairs with the typed readers `attrStr` / `attrInt` /
-`attrBool` / `attrList`, all sharing the `(el, name, fallback)` shape.
+on every access. One table per component is the single source of truth for its
+host attributes, feeding `defineAttrs` via `attrSpec` and `registerComponent` via
+`attributes`.
 
 ```js
-import { defineAttrs, attrInt, attrBool, attrList } from '../ln-core';
+import { registerComponent, defineAttrs, attrSpec, attrInt, attrBool, attrList } from '../ln-core';
 
-defineAttrs(this, dom, {
-    _windowSize: [attrInt, 'data-ln-example-window', 1000],
-    _tags:       [attrList, 'data-ln-example-tags'],
-    noSync:      [attrBool, 'data-ln-example-no-sync']
+const ATTRIBUTES = {
+    'data-ln-example-window':  { prop: '_windowSize', read: attrInt, fallback: 1000, effect: _applyWindowSize },
+    'data-ln-example-tags':    { prop: '_tags',       read: attrList },
+    'data-ln-example-no-sync': { prop: 'noSync',      read: attrBool }
+};
+
+const ATTR_SPEC = attrSpec(ATTRIBUTES);
+
+function _component(dom) {
+    defineAttrs(this, dom, ATTR_SPEC);
+}
+
+registerComponent('data-ln-example', 'lnExample', _component, 'ln-example', {
+    attributes: ATTRIBUTES
 });
 ```
 
+- `table` — `{ [attributeName]: { prop, read, fallback, effect } }`.
+- `attrSpec(table)` — derives `{ propName: [reader, attributeName, fallback] }` for entries declaring `prop`.
+- `attrEffects(table)` — derives `{ [attributeName]: effect }` for entries declaring `effect` (returns `null` when empty).
 - `spec` — `{ propName: [reader, attributeName, fallback] }`.
 - `attrStr` — returns `fallback` when the attribute is absent, else the raw
   string.

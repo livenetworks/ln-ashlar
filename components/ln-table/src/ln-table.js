@@ -1,4 +1,4 @@
-import { cloneTemplateScoped, createBatcher, createWindowCache, dispatch, fill, fillTemplate, getLocale, readValue, registerComponent, requestData } from '../../ln-core';
+import { cloneTemplateScoped, createBatcher, createWindowCache, dispatch, fill, fillTemplate, getLocale, readValue, registerComponent, requestData, attrBool } from '../../ln-core';
 import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, toggleSelectAll } from './table-model.js';
 
 (function () {
@@ -13,6 +13,49 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 	const FETCH_DEBOUNCE = 120;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	function _applyWindow(inst, val) {
+		if (!inst || !inst.isDataDriven) return;
+		const present = inst.dom.hasAttribute('data-ln-table-window');
+		if (present && !inst._windowed) {
+			inst._enterWindowedMode();
+			inst._kickWindowInitial();
+		} else if (!present && inst._windowed) {
+			inst._exitWindowedMode();
+		} else if (present && inst._windowed) {
+			const v = parseInt(val, 10);
+			if (v > 0) inst._cache.configure({ windowSize: v });
+		}
+	}
+
+	function _applyWindowPage(inst, val) {
+		if (!inst || !inst.isDataDriven || !inst._windowed || !inst._cache) return;
+		const v = parseInt(val, 10);
+		if (v > 0) inst._cache.configure({ pageSize: v });
+	}
+
+	function _applyWindowThreshold(inst, val) {
+		if (!inst || !inst.isDataDriven || !inst._windowed || !inst._cache) return;
+		const v = parseInt(val, 10);
+		if (v >= 0) inst._cache.configure({ threshold: v });
+	}
+
+	function _applyCount(inst, val) {
+		if (!inst || !inst.isDataDriven || !inst._windowed || !inst._cache) return;
+		const v = parseInt(val, 10);
+		if (v >= 0) inst._cache.setGrandTotal(v);
+	}
+
+	const ATTRIBUTES = {
+		'data-ln-table':                  { prop: 'name' },
+		'data-ln-table-source':           { prop: 'source' },
+		'data-ln-table-selectable':       { prop: '_selectable', read: attrBool },
+		'data-ln-table-window':           { effect: _applyWindow },
+		'data-ln-table-window-page':      { effect: _applyWindowPage },
+		'data-ln-table-window-threshold': { effect: _applyWindowThreshold },
+		'data-ln-table-count':            { effect: _applyCount }
+	};
 
 	// Singleton — same lang for all table instances on the page
 	const _collator = typeof Intl !== 'undefined'
@@ -1308,41 +1351,6 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 	// ─── Init ──────────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-table', {
-		extraAttributes: [
-			'data-ln-table-window',
-			'data-ln-table-window-page',
-			'data-ln-table-window-threshold',
-			'data-ln-table-count'
-		],
-		onAttributeChange: function (el, attrName) {
-			const inst = el[DOM_ATTRIBUTE];
-			if (!inst || !inst.isDataDriven) return;
-
-			if (attrName === 'data-ln-table-window') {
-				const present = el.hasAttribute('data-ln-table-window');
-				if (present && !inst._windowed) {
-					inst._enterWindowedMode();
-					inst._kickWindowInitial();
-				} else if (!present && inst._windowed) {
-					inst._exitWindowedMode();
-				} else if (present && inst._windowed) {
-					const v = parseInt(el.getAttribute('data-ln-table-window'), 10);
-					if (v > 0) inst._cache.configure({ windowSize: v });
-				}
-				return;
-			}
-
-			if (!inst._windowed || !inst._cache) return;
-			if (attrName === 'data-ln-table-window-page') {
-				const v = parseInt(el.getAttribute('data-ln-table-window-page'), 10);
-				if (v > 0) inst._cache.configure({ pageSize: v });
-			} else if (attrName === 'data-ln-table-window-threshold') {
-				const v = parseInt(el.getAttribute('data-ln-table-window-threshold'), 10);
-				if (v >= 0) inst._cache.configure({ threshold: v });
-			} else if (attrName === 'data-ln-table-count') {
-				const v = parseInt(el.getAttribute('data-ln-table-count'), 10);
-				if (v >= 0) inst._cache.setGrandTotal(v);
-			}
-		}
+		attributes: ATTRIBUTES
 	});
 })();

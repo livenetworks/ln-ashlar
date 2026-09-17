@@ -21,10 +21,6 @@
 				"src/ln-search.js"
 			]
 		},
-		"data-ln-persist": {
-			"direction": null,
-			"sources": []
-		},
 		"data-ln-search": {
 			"direction": "both",
 			"sources": [

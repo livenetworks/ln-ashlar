@@ -14,6 +14,12 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-search': { effect: _syncAttribute },
+		'data-ln-hash':   { effect: _syncAttribute }
+	};
+
 	// ─── DOM Helpers ───────────────────────────────────────────
 
 	function _resolveSearchHashNamespace(target) {
@@ -298,8 +304,7 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 	// ─── Registration ──────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _stateComponent, 'ln-search', {
-		extraAttributes: [HASH_ATTR],
-		onAttributeChange: _syncAttribute,
+		attributes: ATTRIBUTES,
 		onSubtreeChange: function (el, mut) {
 			const target = mut.target;
 			if (target && target._lnSearchText !== undefined) delete target._lnSearchText;

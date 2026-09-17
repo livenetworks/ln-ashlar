@@ -7,8 +7,19 @@ import { QueueStorage } from './queue-storage';
 	const BACKOFF_LADDER = [2000, 5000, 15000, 60000, 300000];
 	const MAX_ATTEMPTS = 8;
 	const LEASE_MS = 60000;
-
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	function _syncOnline(el) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+		instance._drain();
+	}
+
+	const ATTRIBUTES = {
+		'data-ln-api-queue':        {},
+		'data-ln-api-queue-online': { effect: _syncOnline }
+	};
 
 	function _uuid() {
 		try { return crypto.randomUUID(); }
@@ -323,14 +334,7 @@ import { QueueStorage } from './queue-storage';
 		delete self.dom[DOM_ATTRIBUTE];
 	};
 
-	function _syncAttr(el) {
-		const instance = el[DOM_ATTRIBUTE];
-		if (!instance) return;
-		instance._drain();
-	}
-
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-api-queue', {
-		extraAttributes: ['data-ln-api-queue-online'],
-		onAttributeChange: _syncAttr
+		attributes: ATTRIBUTES
 	});
 })();

@@ -51,10 +51,6 @@
 			"sources": [
 				"src/ln-ui-coordinator.js"
 			]
-		},
-		"data-ln-validate-error": {
-			"direction": null,
-			"sources": []
 		}
 	}
 }

@@ -30,6 +30,19 @@ if (typeof window !== 'undefined') {
 	window.lnRouter = router;
 }
 
+// ─── Attribute Contract (SSOT) ──────────────────────────
+function _reRegisterRoute(el) {
+	_unregisterRoute(el);
+	_registerRoute(el);
+	if (regionRegistry.size > 0) _boot();
+}
+
+const ATTRIBUTES = {
+	'data-ln-route':        { effect: _reRegisterRoute },
+	'data-ln-route-target': { effect: _reRegisterRoute },
+	'data-ln-route-title':  { effect: _reRegisterRoute }
+};
+
 // Per-region registry: Map<regionKey, { routes: Map<pattern, routeMetadata>, sorted: routeMetadata[] }>
 // regionKey = data-ln-route-target id, or '__primary__' for the default outlet
 const regionRegistry = new Map();
@@ -565,6 +578,6 @@ _component.prototype.destroy = function () {
 
 // registerComponent feeds registerRoute via onInit
 registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-router', {
-	extraAttributes: ['data-ln-route-target', 'data-ln-route-title'],
+	attributes: ATTRIBUTES,
 	onInit: function () { if (regionRegistry.size > 0) _boot(); }
 });

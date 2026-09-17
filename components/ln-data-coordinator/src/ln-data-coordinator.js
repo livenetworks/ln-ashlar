@@ -10,8 +10,32 @@ import { MutationReceipts } from './mutation-receipts';
 	const FILTERS_ATTR = 'data-ln-data-coordinator-filters';
 	const SORT_FIELD_ATTR = 'data-ln-data-coordinator-sort-field';
 	const SORT_DIR_ATTR = 'data-ln-data-coordinator-sort-direction';
-
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	function _applyMapper(el) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+		instance.refreshMapper();
+	}
+
+	function _applyQuery(el) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+		instance._queueQueryRefresh();
+	}
+
+	const ATTRIBUTES = {
+		'data-ln-data-coordinator':                {},
+		'data-ln-data-coordinator-scope':          {},
+		'data-ln-data-coordinator-mapper':         { effect: _applyMapper },
+		'data-ln-data-coordinator-search':         { effect: _applyQuery },
+		'data-ln-data-coordinator-filters':        { effect: _applyQuery },
+		'data-ln-data-coordinator-sort-field':     { effect: _applyQuery },
+		'data-ln-data-coordinator-sort-direction': { effect: _applyQuery },
+		'data-ln-data-coordinator-stale':          {},
+		'data-ln-data-coordinator-no-autosync':    {}
+	};
 
 	// ─── Sync Orchestration Singleton ──────────────────────
 
@@ -1242,32 +1266,7 @@ import { MutationReceipts } from './mutation-receipts';
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	// ─── Attribute Sync ────────────────────────────────────────
-
-	function _syncAttribute(el, attrName) {
-		const instance = el[DOM_ATTRIBUTE];
-		if (!instance) return;
-
-		if (attrName === 'data-ln-data-coordinator-mapper') {
-			instance.refreshMapper();
-			return;
-		}
-		if (attrName === SEARCH_ATTR || attrName === FILTERS_ATTR
-			|| attrName === SORT_FIELD_ATTR || attrName === SORT_DIR_ATTR) {
-			instance._queueQueryRefresh();
-		}
-	}
-
-	// ─── Registration ──────────────────────────────────────
-
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-data-coordinator', {
-		extraAttributes: [
-			'data-ln-data-coordinator-mapper',
-			SEARCH_ATTR,
-			FILTERS_ATTR,
-			SORT_FIELD_ATTR,
-			SORT_DIR_ATTR
-		],
-		onAttributeChange: _syncAttribute
+		attributes: ATTRIBUTES
 	});
 })();

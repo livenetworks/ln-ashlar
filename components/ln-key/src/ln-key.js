@@ -9,8 +9,33 @@ import { browserAlreadyHandles, composeExternalShortcut, eventToShortcut, inferK
 	const MODIFIER_ATTRIBUTE = 'data-ln-key-modifier';
 	const FOR_ATTRIBUTE = 'data-ln-key-for';
 	const FOR_DOM_ATTRIBUTE = 'lnKeyFor';
-
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	function _syncKey(el) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+		if (!el.hasAttribute(DOM_SELECTOR)) {
+			instance.destroy();
+			return;
+		}
+		instance.sync();
+	}
+
+	function _syncKeyFor(el) {
+		const instance = el[FOR_DOM_ATTRIBUTE];
+		if (instance && !el.hasAttribute(FOR_ATTRIBUTE)) instance.destroy();
+	}
+
+	const ATTRIBUTES = {
+		'data-ln-key':             { effect: _syncKey },
+		'data-ln-key-target':      { effect: _syncKey },
+		'data-ln-key-allow-input': { effect: _syncKey }
+	};
+
+	const FOR_ATTRIBUTES = {
+		'data-ln-key-for': { effect: _syncKeyFor }
+	};
 
 	const instances = new Set();
 	let keydownListener = null;
@@ -168,22 +193,10 @@ import { browserAlreadyHandles, composeExternalShortcut, eventToShortcut, inferK
 	}
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-key', {
-		extraAttributes: [TARGET_ATTRIBUTE, ALLOW_INPUT_ATTRIBUTE],
-		onAttributeChange: function (target) {
-			const instance = target[DOM_ATTRIBUTE];
-			if (!instance) return;
-			if (!target.hasAttribute(DOM_SELECTOR)) {
-				instance.destroy();
-				return;
-			}
-			instance.sync();
-		}
+		attributes: ATTRIBUTES
 	});
 
 	registerComponent(FOR_ATTRIBUTE, FOR_DOM_ATTRIBUTE, _externalComponent, 'ln-key-for', {
-		onAttributeChange: function (target) {
-			const instance = target[FOR_DOM_ATTRIBUTE];
-			if (instance && !target.hasAttribute(FOR_ATTRIBUTE)) instance.destroy();
-		}
+		attributes: FOR_ATTRIBUTES
 	});
 })();

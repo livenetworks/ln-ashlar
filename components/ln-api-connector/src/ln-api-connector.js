@@ -5,8 +5,27 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 	const DOM_SELECTOR = 'data-ln-api-connector';
 	const DOM_ATTRIBUTE = 'lnApiConnector';
 	const DOM_ALIAS = 'lnConnector';
-
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	function _syncAttribute(el) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+		instance.refreshConfig();
+	}
+
+	const ATTRIBUTES = {
+		'data-ln-api-connector':                {},
+		'data-ln-api-base-url':                 { effect: _syncAttribute },
+		'data-ln-api-path':                     { effect: _syncAttribute },
+		'data-ln-api-headers':                  { effect: _syncAttribute },
+		'data-ln-api-param-offset':             { effect: _syncAttribute },
+		'data-ln-api-param-limit':              { effect: _syncAttribute },
+		'data-ln-api-param-search':             { effect: _syncAttribute },
+		'data-ln-api-param-sort-field':         { effect: _syncAttribute },
+		'data-ln-api-param-sort-dir':           { effect: _syncAttribute },
+		'data-ln-api-connector-query-debounce': { effect: _syncAttribute }
+	};
 
 	// ─── Response Resolver ──────────────────────────────────
 
@@ -427,28 +446,7 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 		delete this.dom[DOM_ALIAS];
 	};
 
-	// ─── Attribute Sync ────────────────────────────────────────
-
-	function _syncAttribute(el) {
-		const instance = el[DOM_ATTRIBUTE];
-		if (!instance) return;
-		instance.refreshConfig();
-	}
-
-	// ─── Registration ──────────────────────────────────────
-
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-api-connector', {
-		extraAttributes: [
-			'data-ln-api-base-url',
-			'data-ln-api-path',
-			'data-ln-api-headers',
-			'data-ln-api-param-offset',
-			'data-ln-api-param-limit',
-			'data-ln-api-param-search',
-			'data-ln-api-param-sort-field',
-			'data-ln-api-param-sort-dir',
-			'data-ln-api-connector-query-debounce'
-		],
-		onAttributeChange: _syncAttribute
+		attributes: ATTRIBUTES
 	});
 })();

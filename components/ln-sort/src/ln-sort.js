@@ -12,6 +12,16 @@ import { createSortComparator, getAriaSortValue, isSameSortTarget, normalizeSort
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-sort':       { effect: _syncAttribute },
+		'data-ln-sort-field': { effect: _syncAttribute },
+		'data-ln-sort-dir':   {},
+		'data-ln-sort-items': { effect: _syncAttribute },
+		'data-ln-sort-state': { effect: _syncAttribute },
+		'data-ln-hash':       { effect: _syncAttribute }
+	};
+
 	// Target-scoped initial DOM order cache.
 	const _targetInitialOrders = new WeakMap();
 
@@ -281,8 +291,7 @@ import { createSortComparator, getAriaSortValue, isSameSortTarget, normalizeSort
 	// ─── Registration ──────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-sort', {
-		extraAttributes: [FIELD_ATTR, ITEMS_ATTR, STATE_ATTR, HASH_ATTR],
-		onAttributeChange: _syncAttribute,
+		attributes: ATTRIBUTES,
 		persist: {
 			attr: STATE_ATTR,
 			hashActive: function (el) { return !!resolveHashNamespace(el, 'sort'); }
