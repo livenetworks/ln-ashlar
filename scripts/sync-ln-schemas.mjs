@@ -577,6 +577,15 @@ function main() {
 	}
 
 	if (checkOnly) {
+		if (staleAttributesReport.length) {
+			console.error(`\nsync-ln-schemas --check: ${staleAttributesReport.length} застарени атрибути — шемата тврди атрибут што кодот веќе го нема:`);
+			for (const { comp, attr } of staleAttributesReport) {
+				console.error(`  - [${comp}] ${attr}`);
+			}
+			console.error('\nСекој бара одлука: врати го во кодот, или избриши го клучот од components/<comp>/<comp>.schema.json.');
+			process.exit(1);
+		}
+
 		if (changedFiles.length > 0 || manifestChanged) {
 			console.error(`\nsync-ln-schemas --check: бара ажурирање:`);
 			for (const f of changedFiles) {

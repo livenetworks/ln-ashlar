@@ -5,8 +5,31 @@ import { buildChartModel, parseChartSort, parseChartViewBox } from './chart-mode
 	const DOM_SELECTOR = 'data-ln-chart';
 	const DOM_ATTRIBUTE = 'lnChart';
 	const DEFAULT_VIEW_BOX = { x: 0, y: 0, width: 1000, height: 320 };
-
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	function _requestData(el) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+		instance.requestData();
+	}
+
+	function _renderChart(el) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+		instance._render();
+	}
+
+	const ATTRIBUTES = {
+		'data-ln-chart':         { effect: _renderChart },
+		'data-ln-chart-source':  { effect: _requestData },
+		'data-ln-chart-sort':    { effect: _requestData },
+		'data-ln-chart-type':    { effect: _renderChart },
+		'data-ln-chart-x':       { effect: _renderChart },
+		'data-ln-chart-y':       { effect: _renderChart },
+		'data-ln-chart-padding': { effect: _renderChart },
+		'data-ln-chart-zero':    { effect: _renderChart }
+	};
 
 	function setText(element, value) {
 		if (element) element.textContent = value;
@@ -147,23 +170,6 @@ import { buildChartModel, parseChartSort, parseChartViewBox } from './chart-mode
 	};
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-chart', {
-		extraAttributes: [
-			'data-ln-chart-source',
-			'data-ln-chart-x',
-			'data-ln-chart-y',
-			'data-ln-chart-type',
-			'data-ln-chart-padding',
-			'data-ln-chart-zero',
-			'data-ln-chart-sort'
-		],
-		onAttributeChange: function (el, attrName) {
-			const instance = el[DOM_ATTRIBUTE];
-			if (!instance) return;
-			if (attrName === 'data-ln-chart-source' || attrName === 'data-ln-chart-sort') {
-				instance.requestData();
-				return;
-			}
-			instance._render();
-		}
+		attributes: ATTRIBUTES
 	});
 })();

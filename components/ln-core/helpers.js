@@ -1,3 +1,5 @@
+import { attrEffects } from './attrs.js';
+
 // ─── Global Console Warning Interceptor (Production Mode) ──
 if (typeof window !== 'undefined') {
 	const originalWarn = console.warn;
@@ -772,7 +774,7 @@ function _handleAttrMutation(mut) {
 			if (!el[entry.attribute]) continue;
 			const effect = entry.effects && entry.effects[name];
 			if (effect) effect(el, name, mut.oldValue);
-			else if (entry.onAttrChange) entry.onAttrChange(el, name, mut.oldValue);
+			else if (entry.onAttrChange && (!entry.declared || entry.declared.has(name))) entry.onAttrChange(el, name, mut.oldValue);
 		}
 	}
 
@@ -833,6 +835,9 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 	const onInit = options.onInit || null;
 	const onAttrChange = options.onAttrChange || null;
 	const effects = options.effects || null;
+	const attributes = options.attributes || null;
+	const resolvedEffects = attributes ? attrEffects(attributes) : effects;
+	const declared = attributes ? new Set(Object.keys(attributes)) : null;
 	const persist = options.persist || null;
 
 	function constructor(domRoot) {
@@ -863,7 +868,8 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 		observed: observedAttributes.concat(extraAttributes),
 		onAttributeChange: onAttributeChange,
 		onAttrChange: onAttrChange,
-		effects: effects,
+		effects: resolvedEffects,
+		declared: declared,
 		persist: persist
 	});
 	_ensureAttrObserver();

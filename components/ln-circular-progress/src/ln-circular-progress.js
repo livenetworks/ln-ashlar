@@ -6,6 +6,18 @@ import { calculateProgress, dispatch, registerComponent } from '../../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	function _syncAttribute(el) {
+		const inst = el[DOM_ATTRIBUTE];
+		if (inst) _render.call(inst);
+	}
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-circular-progress':       { effect: _syncAttribute },
+		'data-ln-circular-progress-max':   { effect: _syncAttribute },
+		'data-ln-circular-progress-label': { effect: _syncAttribute }
+	};
+
 	const SVG_NS = 'http://www.w3.org/2000/svg';
 	const VIEW_SIZE = 36;
 	const RADIUS = 16;
@@ -111,10 +123,6 @@ import { calculateProgress, dispatch, registerComponent } from '../../ln-core';
 	// ─── Init ──────────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _constructor, 'ln-circular-progress', {
-		extraAttributes: ['data-ln-circular-progress-max', 'data-ln-circular-progress-label'],
-		onAttributeChange: function (el) {
-			const inst = el[DOM_ATTRIBUTE];
-			if (inst) _render.call(inst);
-		}
+		attributes: ATTRIBUTES
 	});
 })();

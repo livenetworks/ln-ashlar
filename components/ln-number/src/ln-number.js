@@ -7,6 +7,25 @@ import { calculateCursorPosition } from './number-model.js';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	function _syncAttribute(el) {
+		const inst = el[DOM_ATTRIBUTE];
+		if (!inst) return;
+		if (inst.isTextElement) {
+			inst._initTextElement();
+		} else if (!isNaN(inst.value)) {
+			inst._displayFormatted(inst.value);
+		}
+	}
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-number':          { effect: _syncAttribute },
+		'data-ln-value':           { effect: _syncAttribute },
+		'data-ln-number-decimals': { effect: _syncAttribute },
+		'data-ln-number-min':      { effect: _syncAttribute },
+		'data-ln-number-max':      { effect: _syncAttribute }
+	};
+
 	const _inputValueDesc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
 
 	// ─── Component ─────────────────────────────────────────────
@@ -375,21 +394,8 @@ import { calculateCursorPosition } from './number-model.js';
 	// ─── Init ──────────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-number', {
-		extraAttributes: [
-			'data-ln-value',
-			'data-ln-number-decimals',
-			'data-ln-number-min',
-			'data-ln-number-max',
-			'lang'
-		],
-		onAttributeChange: function (el) {
-			const inst = el[DOM_ATTRIBUTE];
-			if (!inst) return;
-			if (inst.isTextElement) {
-				inst._initTextElement();
-			} else if (!isNaN(inst.value)) {
-				inst._displayFormatted(inst.value);
-			}
-		}
+		attributes: ATTRIBUTES,
+		extraAttributes: ['lang'],
+		onAttributeChange: _syncAttribute
 	});
 })();

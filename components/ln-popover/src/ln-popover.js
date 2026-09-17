@@ -8,6 +8,12 @@ import { dispatch, dispatchCancelable, computePlacement, measureHidden, isVisibl
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-popover':          { effect: _syncAttribute },
+		'data-ln-popover-position': {}
+	};
+
 	// ─── Open-stack (Escape closes top of stack) ───────────────
 
 	const openStack = [];
@@ -274,40 +280,42 @@ import { dispatch, dispatchCancelable, computePlacement, measureHidden, isVisibl
 
 	// ─── Registration ──────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-popover', {
-		onAttributeChange: function (el) {
-			const instance = el[DOM_ATTRIBUTE];
-			if (!instance) return;
+	function _syncAttribute(el) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
 
-			const value = el.getAttribute(DOM_SELECTOR);
-			const shouldBeOpen = value === 'open';
+		const value = el.getAttribute(DOM_SELECTOR);
+		const shouldBeOpen = value === 'open';
 
-			if (shouldBeOpen === instance.isOpen) return;
+		if (shouldBeOpen === instance.isOpen) return;
 
-			if (shouldBeOpen) {
-				const before = dispatchCancelable(el, 'ln-popover:before-open', {
-					popoverId: el.id,
-					target: el,
-					trigger: instance.trigger
-				});
-				if (before.defaultPrevented) {
-					el.setAttribute(DOM_SELECTOR, 'closed');
-					return;
-				}
-				instance._applyOpen(instance.trigger);
-			} else {
-				const before = dispatchCancelable(el, 'ln-popover:before-close', {
-					popoverId: el.id,
-					target: el,
-					trigger: instance.trigger
-				});
-				if (before.defaultPrevented) {
-					el.setAttribute(DOM_SELECTOR, 'open');
-					return;
-				}
-				instance._applyClose();
+		if (shouldBeOpen) {
+			const before = dispatchCancelable(el, 'ln-popover:before-open', {
+				popoverId: el.id,
+				target: el,
+				trigger: instance.trigger
+			});
+			if (before.defaultPrevented) {
+				el.setAttribute(DOM_SELECTOR, 'closed');
+				return;
 			}
+			instance._applyOpen(instance.trigger);
+		} else {
+			const before = dispatchCancelable(el, 'ln-popover:before-close', {
+				popoverId: el.id,
+				target: el,
+				trigger: instance.trigger
+			});
+			if (before.defaultPrevented) {
+				el.setAttribute(DOM_SELECTOR, 'open');
+				return;
+			}
+			instance._applyClose();
 		}
+	}
+
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-popover', {
+		attributes: ATTRIBUTES
 	});
 
 	registerComponent(TRIGGER_SELECTOR, DOM_ATTRIBUTE + 'Trigger', _triggerComponent, 'ln-popover-trigger');

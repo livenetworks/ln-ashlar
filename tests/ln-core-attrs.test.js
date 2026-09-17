@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { attrStr, attrInt, attrBool, attrList, defineAttrs } from '../components/ln-core/attrs.js';
+import { attrStr, attrInt, attrBool, attrList, defineAttrs, attrSpec, attrEffects } from '../components/ln-core/attrs.js';
 
 const fakeEl = (attrs) => ({
 	getAttribute: name => (name in attrs ? attrs[name] : null),
@@ -57,3 +57,61 @@ test('defineAttrs properties are getter-only — assignment throws', () => {
 
 	assert.throws(() => { instance.name = 'nope'; }, TypeError);
 });
+
+test('attrSpec maps prop-bearing entries to defineAttrs triples', () => {
+	const table = {
+		'data-ln-x-window': { prop: '_w', read: attrInt, fallback: 1000 },
+		'data-ln-x-tag': { prop: 'tag', read: attrStr }
+	};
+	assert.deepEqual(attrSpec(table), {
+		_w: [attrInt, 'data-ln-x-window', 1000],
+		tag: [attrStr, 'data-ln-x-tag', undefined]
+	});
+});
+
+test('attrSpec skips entries with no prop', () => {
+	const fn = () => {};
+	const table = {
+		'data-ln-action': { effect: fn },
+		'data-ln-empty': {}
+	};
+	assert.deepEqual(attrSpec(table), {});
+});
+
+test('attrSpec output drives defineAttrs end-to-end', () => {
+	const backing = { 'data-ln-count': '42' };
+	const el = fakeEl(backing);
+	const table = {
+		'data-ln-count': { prop: 'count', read: attrInt, fallback: 0 }
+	};
+	const instance = {};
+	defineAttrs(instance, el, attrSpec(table));
+
+	assert.equal(instance.count, 42);
+	backing['data-ln-count'] = '99';
+	assert.equal(instance.count, 99);
+});
+
+test('attrEffects collects effect entries', () => {
+	const fn1 = () => {};
+	const fn2 = () => {};
+	const table = {
+		'data-ln-a': { prop: 'a', read: attrStr, effect: fn1 },
+		'data-ln-b': { effect: fn2 },
+		'data-ln-c': { prop: 'c', read: attrInt }
+	};
+	assert.deepEqual(attrEffects(table), {
+		'data-ln-a': fn1,
+		'data-ln-b': fn2
+	});
+});
+
+test('attrEffects returns null when the table declares no reactions', () => {
+	const table = {
+		'data-ln-a': { prop: 'a', read: attrStr },
+		'data-ln-b': { prop: 'b', read: attrInt, fallback: 10 }
+	};
+	assert.equal(attrEffects(table), null);
+	assert.equal(attrEffects({}), null);
+});
+

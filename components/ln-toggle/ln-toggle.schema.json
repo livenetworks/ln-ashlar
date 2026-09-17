@@ -9,10 +9,6 @@
 				"ln-toggle-dev.scss"
 			]
 		},
-		"data-ln-persist": {
-			"direction": null,
-			"sources": []
-		},
 		"data-ln-toggle": {
 			"direction": "both",
 			"sources": [

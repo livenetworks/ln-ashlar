@@ -6,6 +6,11 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-modal': { effect: _syncAttribute }
+	};
+
 	// ─── Component Constructor ─────────────────────────────
 
 	function _component(dom) {
@@ -145,6 +150,6 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 	// ─── Init ──────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-modal', {
-		onAttributeChange: _syncAttribute
+		attributes: ATTRIBUTES
 	});
 })();

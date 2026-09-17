@@ -9,6 +9,11 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-sortable': { effect: _syncEnabled }
+	};
+
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
@@ -198,6 +203,6 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 	// ─── Init ──────────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-sortable', {
-		onAttributeChange: _syncEnabled
+		attributes: ATTRIBUTES
 	});
 })();

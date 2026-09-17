@@ -7,6 +7,17 @@ import { resolveProgressMax } from './progress-model.js';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	function _syncAttribute(el) {
+		const inst = el[DOM_ATTRIBUTE];
+		if (inst) _render.call(inst);
+	}
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-progress':     { effect: _syncAttribute },
+		'data-ln-progress-max': { effect: _syncAttribute }
+	};
+
 	function _constructor(dom) {
 		this.dom = dom;
 		this._parentObserver = null;
@@ -74,11 +85,7 @@ import { resolveProgressMax } from './progress-model.js';
 		_constructor,
 		'ln-progress',
 		{
-			extraAttributes: ['data-ln-progress-max'],
-			onAttributeChange: function (el) {
-				const inst = el[DOM_ATTRIBUTE];
-				if (inst) _render.call(inst);
-			}
+			attributes: ATTRIBUTES
 		}
 	);
 })();

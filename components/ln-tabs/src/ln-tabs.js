@@ -8,6 +8,20 @@ import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './
 
 	if (window[DOM_ATTRIBUTE] !== undefined && window[DOM_ATTRIBUTE] !== null) return;
 
+	function _syncActive(el) {
+		const key = el.getAttribute('data-ln-tabs-active');
+		if (el[DOM_ATTRIBUTE]) el[DOM_ATTRIBUTE]._applyActive(key);
+	}
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-tabs':         {},
+		'data-ln-tabs-active':  { effect: _syncActive },
+		'data-ln-tabs-default': {},
+		'data-ln-tabs-focus':   {},
+		'data-ln-tabs-key':     {}
+	};
+
 	function _component(dom) { this.dom = dom; this.activeKey = null; _init.call(this); return this; }
 
 	function _init() {
@@ -173,11 +187,7 @@ import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './
 	// ─── Init ──────────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-tabs', {
-		extraAttributes: ['data-ln-tabs-active'],
-		onAttributeChange: function (el) {
-			const key = el.getAttribute('data-ln-tabs-active');
-			el[DOM_ATTRIBUTE]._applyActive(key);
-		},
+		attributes: ATTRIBUTES,
 		persist: {
 			attr: 'data-ln-tabs-active',
 			hashActive: function (el) {

@@ -7,6 +7,12 @@ import { calculateRelativeTime, resolveDateFormatOptions } from './time-model.js
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-time':        { effect: _onAttributeChange },
+		'data-ln-time-locale': { effect: _onAttributeChange }
+	};
+
 	// ─── Formatter Cache ──────────────────────────────────────
 	const _formatters = {};
 	const _relativeFormatters = {};
@@ -192,7 +198,8 @@ import { calculateRelativeTime, resolveDateFormatOptions } from './time-model.js
 
 	// ─── Registration ─────────────────────────────────────────
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _constructor, 'ln-time', {
-		extraAttributes: ['datetime', 'data-ln-time-locale', 'lang'],
+		attributes: ATTRIBUTES,
+		extraAttributes: ['datetime', 'lang'],
 		onAttributeChange: _onAttributeChange,
 		onInit: _onInit
 	});

@@ -1,4 +1,4 @@
-import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent, readValue, createWindowCache, createBatcher, getLocale, detectValueType, compareValues } from '../../ln-core';
+import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent, readValue, createWindowCache, createBatcher, getLocale, detectValueType, compareValues, attrBool } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-list';
@@ -11,6 +11,49 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	const FETCH_DEBOUNCE = 120;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	function _applyWindow(inst, val) {
+		if (!inst || !inst.isDataDriven) return;
+		const present = inst.dom.hasAttribute('data-ln-list-window');
+		if (present && !inst._windowed) {
+			inst._enterWindowedMode();
+			inst._kickWindowInitial();
+		} else if (!present && inst._windowed) {
+			inst._exitWindowedMode();
+		} else if (present && inst._windowed) {
+			const v = parseInt(val, 10);
+			if (v > 0) inst._cache.configure({ windowSize: v });
+		}
+	}
+
+	function _applyWindowPage(inst, val) {
+		if (!inst || !inst.isDataDriven || !inst._windowed || !inst._cache) return;
+		const v = parseInt(val, 10);
+		if (v > 0) inst._cache.configure({ pageSize: v });
+	}
+
+	function _applyWindowThreshold(inst, val) {
+		if (!inst || !inst.isDataDriven || !inst._windowed || !inst._cache) return;
+		const v = parseInt(val, 10);
+		if (v >= 0) inst._cache.configure({ threshold: v });
+	}
+
+	function _applyCount(inst, val) {
+		if (!inst || !inst.isDataDriven || !inst._windowed || !inst._cache) return;
+		const v = parseInt(val, 10);
+		if (v >= 0) inst._cache.setGrandTotal(v);
+	}
+
+	const ATTRIBUTES = {
+		'data-ln-list':                  { prop: 'name' },
+		'data-ln-list-source':           { prop: 'source' },
+		'data-ln-list-selectable':       { prop: '_selectable', read: attrBool },
+		'data-ln-list-window':           { effect: _applyWindow },
+		'data-ln-list-window-page':      { effect: _applyWindowPage },
+		'data-ln-list-window-threshold': { effect: _applyWindowThreshold },
+		'data-ln-list-count':            { effect: _applyCount }
+	};
 
 	function _formatNum(n, dom) {
 		if (n == null || isNaN(n)) return '';
@@ -1250,42 +1293,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	};
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-list', {
-		extraAttributes: [
-			'data-ln-list-window',
-			'data-ln-list-window-page',
-			'data-ln-list-window-threshold',
-			'data-ln-list-count'
-		],
-		onAttributeChange: function (el, attrName) {
-			const inst = el[DOM_ATTRIBUTE];
-			if (!inst || !inst.isDataDriven) return;
-
-			if (attrName === 'data-ln-list-window') {
-				const present = el.hasAttribute('data-ln-list-window');
-				if (present && !inst._windowed) {
-					inst._enterWindowedMode();
-					inst._kickWindowInitial();
-				} else if (!present && inst._windowed) {
-					inst._exitWindowedMode();
-				} else if (present && inst._windowed) {
-					const v = parseInt(el.getAttribute('data-ln-list-window'), 10);
-					if (v > 0) inst._cache.configure({ windowSize: v });
-				}
-				return;
-			}
-
-			if (!inst._windowed || !inst._cache) return;
-			if (attrName === 'data-ln-list-window-page') {
-				const v = parseInt(el.getAttribute('data-ln-list-window-page'), 10);
-				if (v > 0) inst._cache.configure({ pageSize: v });
-			} else if (attrName === 'data-ln-list-window-threshold') {
-				const v = parseInt(el.getAttribute('data-ln-list-window-threshold'), 10);
-				if (v >= 0) inst._cache.configure({ threshold: v });
-			} else if (attrName === 'data-ln-list-count') {
-				const v = parseInt(el.getAttribute('data-ln-list-count'), 10);
-				if (v >= 0) inst._cache.setGrandTotal(v);
-			}
-		}
+		attributes: ATTRIBUTES
 	});
 })();
 

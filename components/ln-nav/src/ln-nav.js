@@ -6,6 +6,12 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-nav':       { effect: _syncAttribute },
+		'data-ln-nav-exact': { effect: _syncAttribute }
+	};
+
 	// ─── pushState / replaceState singleton patch ──────────────
 	history._lnNavCallbacks = history._lnNavCallbacks || [];
 
@@ -143,7 +149,6 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 	// ─── Init ──────────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-nav', {
-		extraAttributes: ['data-ln-nav-exact'],
-		onAttributeChange: _syncAttribute
+		attributes: ATTRIBUTES
 	});
 })();
