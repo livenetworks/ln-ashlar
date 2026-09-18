@@ -1,20 +1,35 @@
-import { buildDict, cloneTemplateScoped, dispatch, dispatchCancelable, fill, getLocale, registerComponent } from '../../ln-core';
+import { buildDict, cloneTemplateScoped, dispatch, dispatchCancelable, fill, getLocale, registerComponent, defineAttrs, attrSpec, attrStr, attrInt } from '../../ln-core';
 import { formatFileSize, getFileExtension, isFileTypeAllowed, parseAcceptExtensions } from './upload-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-upload';
 	const DOM_ATTRIBUTE = 'lnUpload';
-	const DICT_SELECTOR = 'data-ln-upload-dict';
-	const ACCEPT_ATTR = 'data-ln-upload-accept';
-	const DELETE_ATTR = 'data-ln-upload-delete';
-	const MAX_SIZE_ATTR = 'data-ln-upload-max-size';
-	const MAX_FILES_ATTR = 'data-ln-upload-max-files';
-	const FILE_FIELD_ATTR = 'data-ln-upload-file-field';
-	const IDS_FIELD_ATTR = 'data-ln-upload-ids-field';
 	const DEFAULT_FILE_FIELD = 'file';
 	const DEFAULT_IDS_FIELD = 'file_ids[]';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-upload':            { prop: 'uploadUrl', read: attrStr, fallback: '' },
+		'data-ln-upload-accept':     {},
+		'data-ln-upload-delete':     { prop: 'deleteUrlPattern', read: attrStr, fallback: '' },
+		'data-ln-upload-max-size':   { prop: 'maxSize', read: attrInt, fallback: 0 },
+		'data-ln-upload-max-files':  { prop: 'maxFiles', read: attrInt, fallback: 0 },
+		'data-ln-upload-file-field': { prop: 'fileFieldName', read: attrStr, fallback: DEFAULT_FILE_FIELD },
+		'data-ln-upload-ids-field':  { prop: 'idsFieldName', read: attrStr, fallback: DEFAULT_IDS_FIELD },
+		'data-ln-upload-dict':       {},
+		'data-ln-upload-zone':       {},
+		'data-ln-upload-list':       {},
+		'data-ln-upload-item':       {},
+		'data-ln-upload-action':     {},
+		'data-ln-upload-state':      {},
+		'data-ln-upload-id':         {},
+		'data-ln-upload-local-id':   {},
+		'data-ln-upload-size':       {},
+		'data-ln-upload-ext':        {}
+	};
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	function _formatSize(bytes, locale, dict) {
 		return formatFileSize(bytes, locale, dict);
@@ -29,7 +44,8 @@ import { formatFileSize, getFileExtension, isFileTypeAllowed, parseAcceptExtensi
 
 	function _component(dom) {
 		this.dom = dom;
-		this.dict = buildDict(dom, DICT_SELECTOR);
+		defineAttrs(this, dom, ATTR_SPEC);
+		this.dict = buildDict(dom, 'data-ln-upload-dict');
 		this.locale = getLocale(dom);
 
 		this.zone = dom.querySelector('[data-ln-upload-zone]') || dom;
@@ -40,14 +56,7 @@ import { formatFileSize, getFileExtension, isFileTypeAllowed, parseAcceptExtensi
 			console.warn('[ln-upload] Missing <input type="file"> in container:', dom);
 		}
 
-		this.uploadUrl = dom.getAttribute(DOM_SELECTOR) || '';
-		this.deleteUrlPattern = dom.getAttribute(DELETE_ATTR) || '';
-		this.fileFieldName = dom.getAttribute(FILE_FIELD_ATTR) || DEFAULT_FILE_FIELD;
-		this.idsFieldName = dom.getAttribute(IDS_FIELD_ATTR) || DEFAULT_IDS_FIELD;
-		this.maxSize = +dom.getAttribute(MAX_SIZE_ATTR) || 0;
-		this.maxFiles = +dom.getAttribute(MAX_FILES_ATTR) || 0;
-
-		const acceptStr = dom.getAttribute(ACCEPT_ATTR) || (this.input ? this.input.getAttribute('accept') : '');
+		const acceptStr = dom.getAttribute('data-ln-upload-accept') || (this.input ? this.input.getAttribute('accept') : '');
 		this.allowedExts = parseAcceptExtensions(acceptStr);
 
 		this.uploadedFiles = new Map();
@@ -638,5 +647,7 @@ import { formatFileSize, getFileExtension, isFileTypeAllowed, parseAcceptExtensi
 
 	// ─── Registration ──────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-upload');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-upload', {
+		attributes: ATTRIBUTES
+	});
 })();

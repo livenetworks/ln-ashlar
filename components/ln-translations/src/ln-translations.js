@@ -1,10 +1,26 @@
-import { cloneTemplate, dispatch, dispatchCancelable, registerComponent } from '../../ln-core';
+import { cloneTemplate, dispatch, dispatchCancelable, registerComponent, defineAttrs, attrSpec, attrStr } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-translations';
 	const DOM_ATTRIBUTE = 'lnTranslations';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-translations':              {},
+		'data-ln-translations-default':      { prop: 'defaultLang', read: attrStr, fallback: '' },
+		'data-ln-translations-placeholder':  { prop: 'placeholderLabel', read: attrStr, fallback: '{lang} translation' },
+		'data-ln-translations-remove-label': { prop: 'removeLabel', read: attrStr, fallback: 'Remove {lang}' },
+		'data-ln-translations-locales':      { prop: '_localesRaw', read: attrStr, fallback: '' },
+		'data-ln-translations-active':        {},
+		'data-ln-translations-add':           {},
+		'data-ln-translations-lang':          {},
+		'data-ln-translations-prefix':        {},
+		'data-ln-translatable':              {},
+		'data-ln-translatable-lang':         {}
+	};
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	// ─── Default locales (override via data-ln-translations-locales JSON) ──
 
@@ -18,18 +34,15 @@ import { cloneTemplate, dispatch, dispatchCancelable, registerComponent } from '
 
 	function _component(dom) {
 		this.dom = dom;
+		defineAttrs(this, dom, ATTR_SPEC);
 		this.activeLanguages = new Set();
-		this.defaultLang = dom.getAttribute('data-ln-translations-default') || '';
-		this.placeholderLabel = dom.getAttribute('data-ln-translations-placeholder') || '{lang} translation';
-		this.removeLabel = dom.getAttribute('data-ln-translations-remove-label') || 'Remove {lang}';
 		this.badgesEl = dom.querySelector('[data-ln-translations-active]');
 		this.menuEl = dom.querySelector('[data-ln-dropdown] > [data-ln-toggle]');
 
 		// Parse locales from attribute or use defaults
-		const localesAttr = dom.getAttribute('data-ln-translations-locales');
 		this.locales = DEFAULT_LOCALES;
-		if (localesAttr) {
-			try { this.locales = JSON.parse(localesAttr); }
+		if (this._localesRaw) {
+			try { this.locales = JSON.parse(this._localesRaw); }
 			catch (e) { console.warn('[ln-translations] Invalid JSON in data-ln-translations-locales'); }
 		}
 
@@ -276,5 +289,7 @@ import { cloneTemplate, dispatch, dispatchCancelable, registerComponent } from '
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-translations');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-translations', {
+		attributes: ATTRIBUTES
+	});
 })();

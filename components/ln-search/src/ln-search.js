@@ -1,4 +1,4 @@
-import { dispatchCancelable, hashGet, hashSet, queueBoot, registerComponent, resolveHashNamespace } from '../../ln-core';
+import { dispatchCancelable, hashGet, hashSet, queueBoot, registerComponent, resolveHashNamespace, defineAttrs, attrSpec, attrStr } from '../../ln-core';
 import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSearchFields, tokenizeSearchQuery } from '../../ln-core/matching.js';
 
 (function () {
@@ -16,9 +16,17 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-search': { effect: _syncAttribute },
-		'data-ln-hash':   { effect: _syncAttribute }
+		'data-ln-search':           { effect: _syncAttribute },
+		'data-ln-hash':             { effect: _syncAttribute },
+		'data-ln-search-for':       { prop: 'targetId', read: attrStr, fallback: null },
+		'data-ln-search-fields':    {},
+		'data-ln-search-items':     {},
+		'data-ln-search-exclude':   {},
+		'data-ln-search-hide':      {},
+		'data-ln-search-clear-for': {}
 	};
+
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	// ─── DOM Helpers ───────────────────────────────────────────
 
@@ -165,7 +173,7 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 
 	function _controlComponent(dom) {
 		this.dom = dom;
-		this.targetId = dom.getAttribute(CONTROL_SELECTOR);
+		defineAttrs(this, dom, ATTR_SPEC);
 		this.input = _resolveInput(dom);
 
 		this._attachHandler();

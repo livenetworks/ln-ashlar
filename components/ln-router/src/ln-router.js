@@ -38,9 +38,11 @@ function _reRegisterRoute(el) {
 }
 
 const ATTRIBUTES = {
-	'data-ln-route':        { effect: _reRegisterRoute },
-	'data-ln-route-target': { effect: _reRegisterRoute },
-	'data-ln-route-title':  { effect: _reRegisterRoute }
+	'data-ln-route':          { effect: _reRegisterRoute },
+	'data-ln-route-target':   { effect: _reRegisterRoute },
+	'data-ln-route-title':    { effect: _reRegisterRoute },
+	'data-ln-route-keep':     {},
+	'data-ln-router-hydrate': {}
 };
 
 // Per-region registry: Map<regionKey, { routes: Map<pattern, routeMetadata>, sorted: routeMetadata[] }>

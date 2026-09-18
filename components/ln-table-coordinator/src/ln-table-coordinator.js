@@ -6,6 +6,11 @@ import { registerComponent, dispatch } from '../../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-table-coordinator': {}
+	};
+
 	// ─── Keyboard Navigation Search Focus ('/' shortcut) ──
 	// Deliberate, user-approved exception to host-scoping: this is a
 	// page-level keyboard affordance, not coordination between a host and
@@ -182,5 +187,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-table-coordinator');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-table-coordinator', {
+		attributes: ATTRIBUTES
+	});
 })();

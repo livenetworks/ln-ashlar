@@ -25,7 +25,8 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 		'data-ln-data-store-search-fields':    { prop: '_searchFields',    read: attrList },
 		'data-ln-data-store-no-local-query':   { prop: 'noLocalQuery',     read: attrBool },
 		'data-ln-data-store-window':           { prop: '_windowSize',      read: attrInt, fallback: 1000, effect: _applyWindowSize },
-		'data-ln-data-store-window-page':      { prop: '_windowPageSize',  read: attrInt, fallback: 200,  effect: _applyWindowPageSize }
+		'data-ln-data-store-window-page':      { prop: '_windowPageSize',  read: attrInt, fallback: 200,  effect: _applyWindowPageSize },
+		'data-ln-data-store-frozen':           {}
 	};
 
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
@@ -189,17 +190,38 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 		.then(records => getCryptoKey() ? Promise.all(records.map(r => _decryptRecord(r))) : records);
 
 	const _getRecord = (storeName, id) => _tx(storeName, 'readonly')
-		.then(store => store ? _idbRequest(store.get(id)) : null)
+		.then(store => {
+			if (!store) return null;
+			return _idbRequest(store.get(id)).then(res => {
+				if (res !== undefined) return res;
+				if (typeof id === 'string' && id.trim() !== '' && !isNaN(Number(id))) {
+					return _idbRequest(store.get(Number(id)));
+				}
+				if (typeof id === 'number') {
+					return _idbRequest(store.get(String(id)));
+				}
+				return null;
+			});
+		})
 		.then(record => record ? _decryptRecord(record) : null);
 
 	const _getMultipleRecords = (storeName, ids) => _getDb().then(db => {
 		if (!db) return [];
 		const tx = db.transaction(storeName, 'readonly');
 		const store = tx.objectStore(storeName);
-		const promises = ids.map(id => _idbRequest(store.get(id)));
+		const promises = ids.map(id => _idbRequest(store.get(id)).then(res => {
+			if (res !== undefined) return res;
+			if (typeof id === 'string' && id.trim() !== '' && !isNaN(Number(id))) {
+				return _idbRequest(store.get(Number(id)));
+			}
+			if (typeof id === 'number') {
+				return _idbRequest(store.get(String(id)));
+			}
+			return null;
+		}));
 		return Promise.all(promises).then(records => {
 			if (getCryptoKey()) {
-				return Promise.all(records.map(r => _decryptRecord(r)));
+				return Promise.all(records.map(r => r ? _decryptRecord(r) : null));
 			}
 			return records;
 		});
@@ -210,7 +232,17 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 		return prepPromise.then(prepped => _tx(storeName, 'readwrite').then(store => store ? _idbRequest(store.put(prepped)) : null));
 	};
 
-	const _deleteRecord = (storeName, id) => _tx(storeName, 'readwrite').then(store => store ? _idbRequest(store.delete(id)) : null);
+	const _deleteRecord = (storeName, id) => _tx(storeName, 'readwrite').then(store => {
+		if (!store) return null;
+		return _idbRequest(store.delete(id)).then(() => {
+			if (typeof id === 'string' && id.trim() !== '' && !isNaN(Number(id))) {
+				return _idbRequest(store.delete(Number(id)));
+			}
+			if (typeof id === 'number') {
+				return _idbRequest(store.delete(String(id)));
+			}
+		});
+	});
 	const _clearStore = storeName => _tx(storeName, 'readwrite').then(store => store ? _idbRequest(store.clear()) : null);
 	const _countRecords = storeName => _tx(storeName, 'readonly').then(store => store ? _idbRequest(store.count()) : 0);
 
@@ -389,16 +421,17 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 		return _getRecord(self._name, id).then(existing => {
 			if (!existing) throw new Error(`Record not found: ${id}`);
 
-			const updated = { ...existing, ...data };
+			const canonicalId = existing.id;
+			const updated = { ...existing, ...data, id: canonicalId };
 			const newId = data.id;
-			const isRekey = newId !== undefined && newId !== id;
+			const isRekey = newId !== undefined && newId !== canonicalId;
 
 			const write = isRekey
-				? _rekeyRecord(self._name, id, updated)
+				? _rekeyRecord(self._name, canonicalId, { ...updated, id: newId })
 				: _putRecord(self._name, updated);
 
 			return write.then(() => _persistMutationMeta(self, 0)).then(() => {
-				dispatch(self.dom, 'ln-data-store:updated', { store: self._name, record: updated, previous: existing, requestId });
+				dispatch(self.dom, 'ln-data-store:updated', { store: self._name, record: isRekey ? { ...updated, id: newId } : updated, previous: existing, requestId });
 			});
 		});
 	}
@@ -410,8 +443,9 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 				return;
 			}
 
-			return _deleteRecord(self._name, id).then(() => _persistMutationMeta(self, -1)).then(() => {
-				dispatch(self.dom, 'ln-data-store:deleted', { store: self._name, id, requestId });
+			const canonicalId = existing.id;
+			return _deleteRecord(self._name, canonicalId).then(() => _persistMutationMeta(self, -1)).then(() => {
+				dispatch(self.dom, 'ln-data-store:deleted', { store: self._name, id: canonicalId, requestId });
 			});
 		});
 	}
@@ -523,7 +557,14 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 			return new Promise((resolve, reject) => {
 				const tx = db.transaction(storeName, 'readwrite');
 				const store = tx.objectStore(storeName);
-				ids.forEach(id => store.delete(id));
+				ids.forEach(id => {
+					store.delete(id);
+					if (typeof id === 'string' && id.trim() !== '' && !isNaN(Number(id))) {
+						store.delete(Number(id));
+					} else if (typeof id === 'number') {
+						store.delete(String(id));
+					}
+				});
 				tx.oncomplete = () => resolve();
 				tx.onerror = () => reject(tx.error);
 			});

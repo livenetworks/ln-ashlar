@@ -1,4 +1,4 @@
-import { dispatch, registerComponent } from '../../ln-core';
+import { dispatch, registerComponent, defineAttrs, attrSpec, attrStr } from '../../ln-core';
 import { formatStatValue, parseStatFilter } from './stat-model.js';
 
 (function () {
@@ -7,12 +7,18 @@ import { formatStatValue, parseStatFilter } from './stat-model.js';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-stat':        { prop: '_storeName', read: attrStr, fallback: '' },
+		'data-ln-stat-filter': { prop: '_filterRaw', read: attrStr, fallback: '' }
+	};
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
+
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
 		this.dom = dom;
-		this._storeName = dom.getAttribute(DOM_SELECTOR);
-		this._filters = parseStatFilter(dom.getAttribute('data-ln-stat-filter'));
+		defineAttrs(this, dom, ATTR_SPEC);
 
 		const self = this;
 
@@ -25,7 +31,7 @@ import { formatStatValue, parseStatFilter } from './stat-model.js';
 		// Request initial count from coordinator
 		dispatch(dom, 'ln-stat:request-count', {
 			stat: this._storeName,
-			filters: this._filters
+			filters: parseStatFilter(this._filterRaw)
 		});
 
 		return this;
@@ -39,5 +45,7 @@ import { formatStatValue, parseStatFilter } from './stat-model.js';
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-stat');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-stat', {
+		attributes: ATTRIBUTES
+	});
 })();

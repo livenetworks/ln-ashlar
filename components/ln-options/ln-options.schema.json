@@ -10,20 +10,20 @@
 			]
 		},
 		"data-ln-options": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"ln-options-dev.scss",
 				"src/ln-options.js"
 			]
 		},
 		"data-ln-options-label": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-options.js"
 			]
 		},
 		"data-ln-options-value": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-options.js"
 			]

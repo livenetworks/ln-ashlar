@@ -23,7 +23,7 @@
 			]
 		},
 		"data-ln-form-action-method": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-form.js"
 			]

@@ -109,7 +109,7 @@
 		<!-- Package modal -->
 <dialog class="ln-modal" data-ln-modal data-ln-ui-coordinator data-ln-modal-mode="new" id="package-modal">
 	<form data-ln-form="package-form" id="package-form"
-	      data-ln-form-scope="packages"
+	      data-ln-data-coordinator-scope="packages"
 	      method="post"
 	      action="/packages"
 	      data-ln-form-action-edit>
@@ -193,7 +193,7 @@
 		<!-- Tenant create modal -->
 <dialog class="ln-modal" data-ln-modal data-ln-ui-coordinator data-ln-modal-mode="new" id="tenant-modal">
 	<form data-ln-form="tenant-create" id="tenant-create-form"
-	      data-ln-form-scope="tenants"
+	      data-ln-data-coordinator-scope="tenants"
 	      method="post"
 	      action="/tenants">
 		<header>
@@ -528,7 +528,7 @@
 		<section class="section-card">
 			<main>
 				<form data-ln-form="tenant-form" id="tenant-form"
-				      data-ln-form-scope="tenants"
+				      data-ln-data-coordinator-scope="tenants"
 				      method="post"
 				      action="/tenants"
 				      data-ln-form-action-edit>

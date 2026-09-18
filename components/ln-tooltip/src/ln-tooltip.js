@@ -9,6 +9,15 @@ import { computePlacement, dispatch, registerComponent } from '../../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-tooltip-enhance':   {},
+		'data-ln-tooltip-enhanced':  {},
+		'data-ln-tooltip':           {},
+		'data-ln-tooltip-position':  {},
+		'data-ln-tooltip-placement': {}
+	};
+
 	let uidCounter = 0;
 	let portal = null;
 	let activeTooltipNode = null;
@@ -202,7 +211,10 @@ import { computePlacement, dispatch, registerComponent } from '../../ln-core';
 		'[' + TRIGGER_SELECTOR + '], [data-ln-tooltip-enhanced], [' + TEXT_ATTR + '][title]',
 		DOM_ATTRIBUTE,
 		_component,
-		'ln-tooltip'
+		'ln-tooltip',
+		{
+			attributes: ATTRIBUTES
+		}
 	);
 })();
 

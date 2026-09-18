@@ -1,4 +1,4 @@
-import { cloneTemplateScoped, dispatch, fillTemplate, formatNumber, getLocale, registerComponent } from '../../ln-core';
+import { cloneTemplateScoped, dispatch, fillTemplate, formatNumber, getLocale, registerComponent, defineAttrs, attrSpec, attrStr } from '../../ln-core';
 import { buildChartModel, parseChartSort, parseChartViewBox } from './chart-model.js';
 
 (function () {
@@ -21,7 +21,7 @@ import { buildChartModel, parseChartSort, parseChartViewBox } from './chart-mode
 	}
 
 	const ATTRIBUTES = {
-		'data-ln-chart':         { effect: _renderChart },
+		'data-ln-chart':         { prop: 'name', read: attrStr, fallback: '', effect: _renderChart },
 		'data-ln-chart-source':  { effect: _requestData },
 		'data-ln-chart-sort':    { effect: _requestData },
 		'data-ln-chart-type':    { effect: _renderChart },
@@ -30,6 +30,7 @@ import { buildChartModel, parseChartSort, parseChartViewBox } from './chart-mode
 		'data-ln-chart-padding': { effect: _renderChart },
 		'data-ln-chart-zero':    { effect: _renderChart }
 	};
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	function setText(element, value) {
 		if (element) element.textContent = value;
@@ -37,7 +38,7 @@ import { buildChartModel, parseChartSort, parseChartViewBox } from './chart-mode
 
 	function _component(dom) {
 		this.dom = dom;
-		this.name = dom.getAttribute(DOM_SELECTOR) || '';
+		defineAttrs(this, dom, ATTR_SPEC);
 		this.source = dom.getAttribute('data-ln-chart-source') || this.name;
 		this.plot = dom.querySelector('[data-ln-chart-plot]');
 		this.line = dom.querySelector('[data-ln-chart-line]');

@@ -10,8 +10,10 @@ import { dispatch, dispatchCancelable, computePlacement, measureHidden, isVisibl
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-popover':          { effect: _syncAttribute },
-		'data-ln-popover-position': {}
+		'data-ln-popover':           { effect: _syncAttribute },
+		'data-ln-popover-for':       {},
+		'data-ln-popover-position':  {},
+		'data-ln-popover-placement': {}
 	};
 
 	// ─── Open-stack (Escape closes top of stack) ───────────────

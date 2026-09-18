@@ -11,6 +11,13 @@ import { isFieldValid, resolveActiveErrorKeys } from './validate-model.js';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-validate':        {},
+		'data-ln-validate-errors': {},
+		'data-ln-validate-error':  {}
+	};
+
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
@@ -191,5 +198,7 @@ import { isFieldValid, resolveActiveErrorKeys } from './validate-model.js';
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-validate');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-validate', {
+		attributes: ATTRIBUTES
+	});
 })();

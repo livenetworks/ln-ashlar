@@ -1,10 +1,16 @@
-import { dispatch, registerComponent, holdInit, releaseInit } from '../../ln-core';
+import { dispatch, registerComponent, holdInit, releaseInit, defineAttrs, attrSpec, attrStr } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'template[data-ln-include]';
 	const DOM_ATTRIBUTE = 'lnInclude';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-include': { prop: 'url', read: attrStr, fallback: '' }
+	};
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	// Module-level deduplication Map for shared fetch requests
 	const _fetchCache = new Map();
@@ -13,7 +19,7 @@ import { dispatch, registerComponent, holdInit, releaseInit } from '../../ln-cor
 
 	function _component(dom) {
 		this.dom = dom;
-		this.url = dom.getAttribute('data-ln-include');
+		defineAttrs(this, dom, ATTR_SPEC);
 		this._held = false;
 		this._destroyed = false;
 
@@ -99,5 +105,7 @@ import { dispatch, registerComponent, holdInit, releaseInit } from '../../ln-cor
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-include');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-include', {
+		attributes: ATTRIBUTES
+	});
 })();

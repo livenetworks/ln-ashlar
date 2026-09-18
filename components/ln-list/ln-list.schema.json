@@ -52,7 +52,7 @@
 			]
 		},
 		"data-ln-list": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"ln-list-dev.scss",
 				"src/ln-list.js"
@@ -96,7 +96,7 @@
 			]
 		},
 		"data-ln-list-selectable": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-list.js"
 			]

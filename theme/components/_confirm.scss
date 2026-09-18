@@ -1,5 +1,6 @@
-@use '../config/mixins' as *;
-
-.ln-confirm-tooltip {
-	@include confirm-tooltip;
+// Armed state — rebind the accent token so a button carrying @mixin btn turns
+// red while confirming and theme overrides keep applying. See
+// theme/base/_global.scss for this being the documented colour-variant hook.
+[data-ln-confirm-state="confirming"] {
+	--color-primary: var(--color-error);
 }

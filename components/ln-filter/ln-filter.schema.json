@@ -34,7 +34,7 @@
 			]
 		},
 		"data-ln-filter": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"ln-filter-dev.scss",
 				"src/ln-filter.js"

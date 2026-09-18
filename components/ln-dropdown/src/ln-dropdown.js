@@ -1,18 +1,26 @@
-import { dispatch, computePlacement, measureHidden, registerComponent } from '../../ln-core';
+import { dispatch, computePlacement, measureHidden, registerComponent, defineAttrs, attrSpec, attrStr } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-dropdown';
 	const DOM_ATTRIBUTE = 'lnDropdown';
-	const POSITION_ATTR = 'data-ln-dropdown-position';
-	const PLACEMENT_ATTR = 'data-ln-dropdown-placement';
 	const DEFAULT_POSITION = 'bottom-end';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-dropdown':           {},
+		'data-ln-dropdown-position':  { prop: 'position', read: attrStr, fallback: DEFAULT_POSITION },
+		'data-ln-dropdown-placement': {},
+		'data-ln-dropdown-menu':      {}
+	};
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
 		this.dom = dom;
+		defineAttrs(this, dom, ATTR_SPEC);
 		this.toggleEl = dom.querySelector('[data-ln-toggle]');
 		this._boundDocClick = null;
 		this._docClickTimeout = null;
@@ -134,7 +142,7 @@ import { dispatch, computePlacement, measureHidden, registerComponent } from '..
 			self._removeResizeCloseListener();
 			self.toggleEl.style.top = '';
 			self.toggleEl.style.left = '';
-			self.toggleEl.removeAttribute(PLACEMENT_ATTR);
+			self.toggleEl.removeAttribute('data-ln-dropdown-placement');
 			// :popover-open guard — a boot-opened menu (persist/static "open") was never shown via showPopover()
 			if (typeof self.toggleEl.hidePopover === 'function' && self.toggleEl.matches(':popover-open')) self.toggleEl.hidePopover();
 			dispatch(dom, 'ln-dropdown:close', { target: e.detail.target });
@@ -184,11 +192,11 @@ import { dispatch, computePlacement, measureHidden, registerComponent } from '..
 		const rect = this.triggerBtn.getBoundingClientRect();
 		const size = measureHidden(this.toggleEl);
 		const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--size-xs')) * 16 || 4;
-		const position = this.dom.getAttribute(POSITION_ATTR) || DEFAULT_POSITION;
+		const position = this.position || DEFAULT_POSITION;
 		const p = computePlacement(rect, size, position, gap);
 		this.toggleEl.style.top = p.top + 'px';
 		this.toggleEl.style.left = p.left + 'px';
-		this.toggleEl.setAttribute(PLACEMENT_ATTR, p.placement);
+		this.toggleEl.setAttribute('data-ln-dropdown-placement', p.placement);
 	};
 
 	// ─── Outside click ─────────────────────────────────────────
@@ -271,7 +279,7 @@ import { dispatch, computePlacement, measureHidden, registerComponent } from '..
 			this.toggleEl.hidePopover();
 		}
 		if (this.toggleEl) {
-			this.toggleEl.removeAttribute(PLACEMENT_ATTR);
+			this.toggleEl.removeAttribute('data-ln-dropdown-placement');
 			this.toggleEl.removeEventListener('ln-toggle:open', this._onToggleOpen);
 			this.toggleEl.removeEventListener('ln-toggle:close', this._onToggleClose);
 		}
@@ -281,5 +289,7 @@ import { dispatch, computePlacement, measureHidden, registerComponent } from '..
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-dropdown');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-dropdown', {
+		attributes: ATTRIBUTES
+	});
 })();

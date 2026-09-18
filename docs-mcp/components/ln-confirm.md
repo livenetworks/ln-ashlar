@@ -17,7 +17,7 @@ tags: [interactions, confirmation, validation]
 ## 1. Core Behavior & Responsibility
 
 - Intercepts the first user click on protected buttons/links to present an in-place confirmation message.
-- Morphs button contents during confirmation (swaps `hidden` on child states, updates text, or swaps icon with check and shows a CSS tooltip).
+- Morphs button contents during confirmation (swaps `hidden` on child states, updates text, or swaps the icon to a check).
 - Automatically resets back to the idle state if the timeout (default: 3s) expires without a second click.
 - Steps out of the way of the default action on the second click, letting the native `click` or `submit` event proceed.
 - Stops propagation on both clicks, so neither the arming nor the accepting click reaches an ancestor click surface (clickable card, row handler).
@@ -71,9 +71,9 @@ Ideal for simple text buttons where the prompt is passed cleanly via the attribu
 </form>
 ```
 
-### Variant 3: Icon-Only Button with Tooltip
+### Variant 3: Icon-Only Button
 
-For compact layouts and table rows. Replaces the SVG icon path with `#ln-icon-check` and reveals a CSS tooltip bubble.
+For compact layouts and table rows. Replaces the SVG icon path with `#ln-icon-check` and swaps `aria-label` to the prompt, backed by a transient `role="alert"` announcer. No bubble is rendered — `ln-confirm` does not do tooltips. Compose [`ln-tooltip`](./ln-tooltip.md) if the button needs one.
 
 #### HTML Markup
 ```html
@@ -96,8 +96,8 @@ For compact layouts and table rows. Replaces the SVG icon path with `#ln-icon-ch
 |---|---|---|---|---|
 | `data-ln-confirm` | Trigger | `String` | — | Initializes the component. Contains the confirmation text. Left empty for Two-Element Mode. |
 | `data-ln-confirm-timeout` | Trigger | `Number` | `3` | Time in seconds before returning to the idle state. |
-| `data-confirming` | Trigger | `Boolean` (auto) | — | Added dynamically as `"true"` while waiting for confirmation. Used for CSS styling. |
-| `data-tooltip-text` | Trigger | `String` (auto) | — | Holds the bubble message text in icon-only mode. |
+| `data-ln-confirm-state` | Trigger | `Boolean` (auto) | — | Added dynamically as `"true"` while waiting for confirmation. Used for CSS styling. |
+| `data-ln-confirm-announcer` | injected `<span>` | Marker (auto) | — | Marks the transient `role="alert"` node appended in icon-only mode. |
 | `data-ln-confirm-idle` | Child | Element | — | Target visible in the idle state. |
 | `data-ln-confirm-active` | Child | Element | — | Target visible in the active confirming state. |
 
@@ -105,7 +105,7 @@ For compact layouts and table rows. Replaces the SVG icon path with `#ln-icon-ch
 
 | Helper | Signature | Returns | Description |
 |---|---|---|---|
-| `element.lnConfirm.confirming` | *Property* | `Boolean` | Returns `true` if the button is currently in confirming state. |
+| `element.lnConfirm.confirming` | *Property* | `Boolean` | Live read-only getter over data-ln-confirm-state. Assigning to it throws. |
 | `element.lnConfirm.destroy` | `()` | `void` | Restores original markup and cleans up listeners. |
 
 ### Events API
@@ -118,29 +118,31 @@ For compact layouts and table rows. Replaces the SVG icon path with `#ln-icon-ch
 
 ## 4. CSS Styling & Behavioral Concept
 
-The visual design for icon-only confirmation bubbles utilizes a CSS tooltip bubble positioned relative to the trigger.
+`ln-confirm` ships almost no styling of its own. Two co-located rules in
+`components/ln-confirm/ln-confirm.scss` are functional rather than decorative, and reach the
+page through `ln-ashlar-core.css`:
 
-### SCSS Mixin Implementation (`theme/config/mixins/_confirm.scss`)
 ```scss
-@use 'tooltip' as *;
+[data-ln-confirm] [hidden]  { display: none; }   /* П4 hiding contract */
+[data-ln-confirm-announcer] { /* visually hidden */ }
+```
 
-@mixin confirm-tooltip {
-    position: relative;
-    overflow: visible !important;
-    color: hsl(var(--color-error)) !important;
+The only themed rule rebinds the accent token while the button is armed:
 
-    &::after {
-        @include tooltip-bubble;
-        content: attr(data-tooltip-text);
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        --margin-block: var(--size-sm);
-        margin-bottom: var(--margin-block);
-    }
+```scss
+/* theme/components/_confirm.scss */
+[data-ln-confirm-state="confirming"] {
+    --color-primary: var(--color-error);
 }
 ```
+
+`theme/base/_global.scss` documents this token rebind as the way to express a colour
+variant, so a button carrying `@mixin btn` turns red while armed. A bare, unstyled
+`<button>` has no variant to recolour and shows no colour change; its armed signal is the
+icon swap.
+
+`ln-confirm` renders no tooltip, bubble or overlay of any kind. Use
+[`ln-tooltip`](./ln-tooltip.md) when a button needs one.
 
 ---
 
@@ -149,7 +151,7 @@ The visual design for icon-only confirmation bubbles utilizes a CSS tooltip bubb
 ### ARIA & Keyboard
 
 - **Dynamic `aria-label`:** In icon-only mode, the `aria-label` is dynamically updated to the confirmation message and restored upon reset.
-- **Dynamic Announcer (`role="alert"`):** A temporary screen-reader-only helper is injected with `role="alert"` so assistive technology immediately announces the prompt.
+- **Dynamic Announcer (`role="alert"`):** In icon-only mode a transient `<span data-ln-confirm-announcer role="alert">` is appended to the button carrying the prompt text, and removed on reset. The button is deliberately not also made a live region in this mode — a nested live region double-announces.
 - **Focus Preservation:** Focus is kept on the button itself so the user can hit `Space` or `Enter` to confirm.
 
 ### Common Pitfalls & Anti-patterns
@@ -173,8 +175,8 @@ sequenceDiagram
     User->>Button: First click (Click)
     Button->>JS: Intercept click event
     JS->>JS: Prevent default & stop propagation
-    JS->>Button: Set data-confirming="true"
-    JS->>Button: Morph content (Text or Check icon + Tooltip)
+    JS->>Button: Set data-ln-confirm-state="confirming"
+    JS->>Button: Morph content (text, child states, or check icon)
     JS->>JS: Emit Event: ln-confirm:waiting
     JS->>JS: Start auto-revert timeout
     

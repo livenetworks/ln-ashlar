@@ -156,7 +156,7 @@ To support validation errors returned from the backend (e.g. "username taken").
 
 > [!CAUTION]
 > 1. **Missing `.form-element` wrapper:** `ln-validate` looks up the DOM tree to locate the error container. If the `.form-element` parent wrapper is missing, associated error messages will not be shown.
-> 2. **Initializing on the `<form>` element:** `data-ln-validate` must only be attached to individual input elements. For the form scope, use `data-ln-form-scope`.
+> 2. **Initializing on the `<form>` element:** `data-ln-validate` must only be attached to individual input elements. For the form scope, use `data-ln-data-coordinator-scope`.
 
 ---
 

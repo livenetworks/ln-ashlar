@@ -22,7 +22,7 @@
 			]
 		},
 		"data-ln-upload": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"ln-upload-dev.scss",
 				"ln-upload.scss",
@@ -42,7 +42,7 @@
 			]
 		},
 		"data-ln-upload-delete": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-upload.js"
 			]
@@ -61,7 +61,7 @@
 			]
 		},
 		"data-ln-upload-file-field": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-upload.js"
 			]
@@ -73,7 +73,7 @@
 			]
 		},
 		"data-ln-upload-ids-field": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-upload.js"
 			]
@@ -99,13 +99,13 @@
 			]
 		},
 		"data-ln-upload-max-files": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-upload.js"
 			]
 		},
 		"data-ln-upload-max-size": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-upload.js"
 			]

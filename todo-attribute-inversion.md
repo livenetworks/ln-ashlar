@@ -15,58 +15,58 @@ Attrs legend:
 
 | Component | Attrs | Refactor |
 |---|:---:|:---:|
-| `ln-accordion` | n/a | [ ] |
+| `ln-accordion` | [x] | [ ] |
 | `ln-ajax` | n/a | [ ] |
-| `ln-api-connector` | skip? | [ ] |
+| `ln-api-connector` | [x] | [ ] |
 | `ln-api-queue` | [x] | [ ] |
-| `ln-autoresize` | n/a | [ ] |
-| `ln-autosave` | skip? | [ ] |
-| `ln-chart` | partial | [ ] |
+| `ln-autoresize` | [x] | [ ] |
+| `ln-autosave` | [x] | [ ] |
+| `ln-chart` | [x] | [ ] |
 | `ln-circular-progress` | [x] | [ ] |
 | `ln-confirm` | skip? | [ ] |
-| `ln-couchdb-connector` | [ ] | [ ] |
-| `ln-data-coordinator` | [ ] | [ ] |
+| `ln-couchdb-connector` | [x] | [ ] |
+| `ln-data-coordinator` | [x] | [ ] |
 | `ln-data-store` | [x] | [ ] |
-| `ln-date` | [ ] | [ ] |
-| `ln-debug` | — | [ ] |
-| `ln-dropdown` | — | [ ] |
-| `ln-editor` | — | [ ] |
-| `ln-external-links` | — | [ ] |
-| `ln-fill` | — | [ ] |
-| `ln-filter` | [ ] | [ ] |
-| `ln-form` | — | [ ] |
-| `ln-http` | — | [ ] |
-| `ln-icon` | — | [ ] |
-| `ln-include` | — | [ ] |
-| `ln-key` | [ ] | [ ] |
-| `ln-link` | — | [ ] |
-| `ln-list` | [ ] | [ ] |
-| `ln-modal` | [ ] | [ ] |
-| `ln-nav` | [ ] | [ ] |
-| `ln-number` | [ ] | [ ] |
-| `ln-options` | — | [ ] |
-| `ln-persist` | — | [ ] |
-| `ln-popover` | [ ] | [ ] |
-| `ln-progress` | [ ] | [ ] |
-| `ln-router` | [ ] | [ ] |
-| `ln-search` | [ ] | [ ] |
-| `ln-slug` | — | [ ] |
-| `ln-sort` | [ ] | [ ] |
-| `ln-sortable` | [ ] | [ ] |
-| `ln-stat` | — | [ ] |
-| `ln-table` | [ ] | [ ] |
-| `ln-table-coordinator` | — | [ ] |
-| `ln-tabs` | [ ] | [ ] |
-| `ln-time` | [ ] | [ ] |
-| `ln-toast` | — | [ ] |
-| `ln-toggle` | [ ] | [ ] |
-| `ln-tooltip` | — | [ ] |
-| `ln-translations` | — | [ ] |
-| `ln-ui-coordinator` | — | [ ] |
-| `ln-upload` | — | [ ] |
-| `ln-validate` | — | [ ] |
+| `ln-date` | [x] | [ ] |
+| `ln-debug` | [x] | [ ] |
+| `ln-dropdown` | [x] | [ ] |
+| `ln-editor` | [x] | [ ] |
+| `ln-external-links` | n/a | [ ] |
+| `ln-fill` | n/a | [ ] |
+| `ln-filter` | [x] | [ ] |
+| `ln-form` | [x] | [ ] |
+| `ln-http` | n/a | [ ] |
+| `ln-icon` | n/a | [ ] |
+| `ln-include` | [x] | [ ] |
+| `ln-key` | [x] | [ ] |
+| `ln-link` | n/a | [ ] |
+| `ln-list` | [x] | [ ] |
+| `ln-modal` | [x] | [ ] |
+| `ln-nav` | [x] | [ ] |
+| `ln-number` | [x] | [ ] |
+| `ln-options` | [x] | [ ] |
+| `ln-persist` | n/a | [ ] |
+| `ln-popover` | [x] | [ ] |
+| `ln-progress` | [x] | [ ] |
+| `ln-router` | [x] | [ ] |
+| `ln-search` | [x] | [ ] |
+| `ln-slug` | [x] | [ ] |
+| `ln-sort` | [x] | [ ] |
+| `ln-sortable` | [x] | [ ] |
+| `ln-stat` | [x] | [ ] |
+| `ln-table` | [x] | [ ] |
+| `ln-table-coordinator` | [x] | [ ] |
+| `ln-tabs` | [x] | [ ] |
+| `ln-time` | [x] | [ ] |
+| `ln-toast` | [x] | [ ] |
+| `ln-toggle` | [x] | [ ] |
+| `ln-tooltip` | [x] | [ ] |
+| `ln-translations` | [x] | [ ] |
+| `ln-ui-coordinator` | [x] | [ ] |
+| `ln-upload` | [x] | [ ] |
+| `ln-validate` | [x] | [ ] |
 
-**Totals:** 50 components. Attrs — 1 done, 23 to do, 26 not applicable. Refactor — 0 done.
+**Totals:** 50 components. Attrs — 42 done, 7 n/a, 1 skip (`ln-confirm`). Refactor — 0 done.
 
 ## Reference pattern — SUPERSEDED
 

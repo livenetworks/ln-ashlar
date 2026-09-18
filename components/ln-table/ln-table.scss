@@ -6,10 +6,6 @@
 	display: none;
 }
 
-[data-ln-table]:has([data-confirming]) {
-	overflow: visible;
-}
-
 .ln-table__spacer {
 	margin: 0 !important;
 	padding: 0 !important;

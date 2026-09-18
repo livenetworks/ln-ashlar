@@ -1,5 +1,5 @@
 /* Live Networks - lnTabs (hash-aware tabs — supports <button> and <a href="#nsKey:key"> triggers) */
-import { dispatch, dispatchCancelable, hashGet, hashLinkClick, hashSet, registerComponent } from '../../ln-core';
+import { dispatch, dispatchCancelable, hashGet, hashLinkClick, hashSet, registerComponent, attrSpec, defineAttrs } from '../../ln-core';
 import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './tabs-model.js';
 
 (function () {
@@ -13,16 +13,22 @@ import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './
 		if (el[DOM_ATTRIBUTE]) el[DOM_ATTRIBUTE]._applyActive(key);
 	}
 
+	function _readTabsKey(el, name)     { return (el.getAttribute(name) || el.id || '').toLowerCase().trim(); }
+	function _readTabsFocus(el, name)   { return (el.getAttribute(name) || 'true').toLowerCase() !== 'false'; }
+
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
 		'data-ln-tabs':         {},
 		'data-ln-tabs-active':  { effect: _syncActive },
 		'data-ln-tabs-default': {},
-		'data-ln-tabs-focus':   {},
-		'data-ln-tabs-key':     {}
+		'data-ln-tabs-focus':   { prop: 'autoFocus', read: _readTabsFocus },
+		'data-ln-tabs-key':     { prop: 'nsKey', read: _readTabsKey },
+		'data-ln-tab':          {}
 	};
 
-	function _component(dom) { this.dom = dom; this.activeKey = null; _init.call(this); return this; }
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
+
+	function _component(dom) { this.dom = dom; defineAttrs(this, dom, ATTR_SPEC); this.activeKey = null; _init.call(this); return this; }
 
 	function _init() {
 		this.tabs   = Array.from(this.dom.querySelectorAll("[data-ln-tab]"));
@@ -32,7 +38,6 @@ import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './
 			tagName: t.tagName,
 			href: t.getAttribute('href')
 		}));
-		this.nsKey = (this.dom.getAttribute("data-ln-tabs-key") || this.dom.id || "").toLowerCase().trim();
 		const modeInfo = determineTabsMode(triggerDescriptors, this.nsKey);
 		this.hashEnabled = modeInfo.hashEnabled;
 
@@ -57,9 +62,10 @@ import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './
 			if (key) this.mapPanels[key] = p;
 		}
 
-		this.defaultKey   = (this.dom.getAttribute("data-ln-tabs-default") || "").toLowerCase().trim()
+		// Not a pure attribute mirror: falls back to the first tab key, which
+		// only exists once mapTabs is built. A reader cannot reach instance state.
+		this.defaultKey = (this.dom.getAttribute("data-ln-tabs-default") || "").toLowerCase().trim()
 			|| Object.keys(this.mapTabs)[0] || "";
-		this.autoFocus    = (this.dom.getAttribute("data-ln-tabs-focus") || "true").toLowerCase() !== "false";
 
 		const self = this;
 		this._clickHandlers = [];

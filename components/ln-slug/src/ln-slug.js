@@ -1,4 +1,4 @@
-import { registerComponent } from '../../ln-core';
+import { registerComponent, defineAttrs, attrSpec, attrStr } from '../../ln-core';
 import { generateSlug } from './slug-model.js';
 
 (function () {
@@ -6,6 +6,12 @@ import { generateSlug } from './slug-model.js';
 	const DOM_ATTRIBUTE = 'lnSlug';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-slug-from': { prop: 'sourceName', read: attrStr, fallback: '' }
+	};
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	function _component(dom) {
 		if (dom.tagName !== 'INPUT') {
@@ -17,14 +23,14 @@ import { generateSlug } from './slug-model.js';
 			console.warn('[ln-slug] Slug input is not inside a <form>:', dom);
 			return this;
 		}
-		const sourceName = dom.getAttribute(DOM_SELECTOR);
-		const source = form.elements[sourceName];
+		defineAttrs(this, dom, ATTR_SPEC);
+		const source = form.elements[this.sourceName];
 		if (!source) {
-			console.warn('[ln-slug] Source field "' + sourceName + '" not found in form:', dom);
+			console.warn('[ln-slug] Source field "' + this.sourceName + '" not found in form:', dom);
 			return this;
 		}
 		if (typeof source.addEventListener !== 'function') {
-			console.warn('[ln-slug] Source field "' + sourceName + '" is a RadioNodeList (same-name group) — single source field required:', dom);
+			console.warn('[ln-slug] Source field "' + this.sourceName + '" is a RadioNodeList (same-name group) — single source field required:', dom);
 			return this;
 		}
 
@@ -69,5 +75,7 @@ import { generateSlug } from './slug-model.js';
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-slug');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-slug', {
+		attributes: ATTRIBUTES
+	});
 })();

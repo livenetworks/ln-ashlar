@@ -10,7 +10,7 @@
 			]
 		},
 		"data-ln-include": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"ln-include-dev.scss",
 				"src/ln-include.js"

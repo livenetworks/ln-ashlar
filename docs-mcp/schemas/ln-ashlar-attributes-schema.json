@@ -456,21 +456,36 @@
 					"read_by": "ln-confirm",
 					"consumed_by": "js",
 					"role": "input",
-					"description": "Timeout in ms before active confirmation resets to idle (default: 3000)."
+					"description": "Time in seconds before an active confirmation resets to idle (default: 3). Fractional values are allowed; a non-positive or unparseable value is treated as unset."
 				},
 				"data-ln-confirm-idle": {
 					"type": "string",
 					"read_by": "ln-confirm",
 					"consumed_by": "js",
 					"role": "input",
-					"description": "Original button text restored after timeout."
+					"description": "Marker on the child element shown while idle. The component toggles its hidden attribute; it carries no value."
 				},
 				"data-ln-confirm-active": {
 					"type": "string",
 					"read_by": "ln-confirm",
 					"consumed_by": "js",
 					"role": "input",
-					"description": "Confirmation step button label."
+					"description": "Marker on the child element shown while armed. The component toggles its hidden attribute; it carries no value."
+				},
+				"data-ln-confirm-state": {
+					"type": "string",
+					"enum": ["confirming"],
+					"read_by": "ln-confirm (SCSS), ln-table (SCSS)",
+					"consumed_by": "css",
+					"role": "state",
+					"description": "Runtime-written. Present as \"confirming\" while the button is armed and awaiting the second click; absent when idle. Read by CSS and exposed as the live .confirming getter on the instance. Authoring it in markup is out of contract."
+				},
+				"data-ln-confirm-announcer": {
+					"type": "string",
+					"read_by": "ln-confirm (SCSS)",
+					"consumed_by": "css",
+					"role": "marker",
+					"description": "Marks the transient role=\"alert\" span appended to the button in icon-only mode so assistive technology speaks the prompt. Removed on reset. A co-located core rule hides it visually."
 				}
 			}
 		},
@@ -902,7 +917,7 @@
 					"role": "input",
 					"description": "HTTP method spoofing value placed in _method hidden field."
 				},
-				"data-ln-form-scope": {
+				"data-ln-data-coordinator-scope": {
 					"type": "string",
 					"read_by": "ln-data-coordinator",
 					"consumed_by": "js",

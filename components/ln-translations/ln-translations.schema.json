@@ -55,7 +55,7 @@
 			]
 		},
 		"data-ln-translations-default": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-translations.js"
 			]
@@ -67,13 +67,13 @@
 			]
 		},
 		"data-ln-translations-locales": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-translations.js"
 			]
 		},
 		"data-ln-translations-placeholder": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-translations.js"
 			]
@@ -85,7 +85,7 @@
 			]
 		},
 		"data-ln-translations-remove-label": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-translations.js"
 			]

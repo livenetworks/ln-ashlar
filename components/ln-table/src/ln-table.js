@@ -1,4 +1,4 @@
-import { cloneTemplateScoped, createBatcher, createWindowCache, dispatch, fill, fillTemplate, getLocale, readValue, registerComponent, requestData, attrBool } from '../../ln-core';
+import { cloneTemplateScoped, createBatcher, createWindowCache, dispatch, fill, fillTemplate, getLocale, readValue, registerComponent, requestData, attrBool, attrStr, attrSpec, defineAttrs } from '../../ln-core';
 import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, toggleSelectAll } from './table-model.js';
 
 (function () {
@@ -48,14 +48,25 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 	}
 
 	const ATTRIBUTES = {
-		'data-ln-table':                  { prop: 'name' },
-		'data-ln-table-source':           { prop: 'source' },
+		'data-ln-table':                  { prop: 'name', read: attrStr, fallback: '' },
+		'data-ln-table-source':           { prop: 'source', read: attrStr, fallback: '' },
 		'data-ln-table-selectable':       { prop: '_selectable', read: attrBool },
 		'data-ln-table-window':           { effect: _applyWindow },
 		'data-ln-table-window-page':      { effect: _applyWindowPage },
 		'data-ln-table-window-threshold': { effect: _applyWindowThreshold },
-		'data-ln-table-count':            { effect: _applyCount }
+		'data-ln-table-count':            { effect: _applyCount },
+		'data-ln-table-row':              {},
+		'data-ln-table-row-id':           {},
+		'data-ln-table-row-action':       {},
+		'data-ln-table-row-select':       {},
+		'data-ln-table-col':              {},
+		'data-ln-table-col-select':       {},
+		'data-ln-table-cell-attr':        {},
+		'data-ln-table-empty':            {},
+		'data-ln-table-select-all-label': {}
 	};
+
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	// Singleton — same lang for all table instances on the page
 	const _collator = typeof Intl !== 'undefined'
@@ -86,6 +97,7 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 
 	function _component(dom) {
 		this.dom = dom;
+		defineAttrs(this, dom, ATTR_SPEC);
 		this.table = dom.querySelector('table');
 		this.tbody = dom.querySelector('[data-ln-table-body]') || dom.querySelector('tbody');
 		this.thead = dom.querySelector('thead');
@@ -109,8 +121,6 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 		}
 
 		this.isDataDriven = dom.hasAttribute('data-ln-table-source');
-		this.name = dom.getAttribute(DOM_SELECTOR) || '';
-		this.source = dom.getAttribute('data-ln-table-source') || '';
 
 		this._data = [];
 		this._filteredData = [];
@@ -189,7 +199,6 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 		dom.addEventListener('ln-table:request-clear-filters', this._onRequestClearFilters);
 
 		// --- Selection (both modes) ---
-		this._selectable = dom.hasAttribute('data-ln-table-selectable');
 		this._selectableActive = false;
 		if (this._selectable) {
 			this._enableSelection();

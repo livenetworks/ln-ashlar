@@ -4,7 +4,7 @@
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
 		"data-ln-couchdb-auth": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-couchdb-connector.js"
 			]
@@ -16,7 +16,7 @@
 			]
 		},
 		"data-ln-couchdb-db": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-couchdb-connector.js"
 			]
@@ -28,7 +28,7 @@
 			]
 		},
 		"data-ln-couchdb-url": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-couchdb-connector.js"
 			]

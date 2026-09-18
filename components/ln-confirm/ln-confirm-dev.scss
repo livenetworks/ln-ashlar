@@ -15,4 +15,10 @@
 	[data-ln-confirm=""]:not(:has([data-ln-confirm-idle])):not(:has([data-ln-confirm-active])) {
 		@include dev-inline-error("data-ln-confirm has empty prompt and no idle/active child elements");
 	}
+
+	// 4. Two-Element Mode: the active child must carry `hidden` in the authored markup,
+	//    otherwise both labels render at rest
+	[data-ln-confirm]:not([data-ln-confirm-state="confirming"]) [data-ln-confirm-active]:not([hidden]) {
+		@include dev-inline-error("ln-confirm [data-ln-confirm-active] is missing the hidden attribute");
+	}
 }

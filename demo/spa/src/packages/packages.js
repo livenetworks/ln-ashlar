@@ -1,7 +1,7 @@
 (function () {
 	'use strict';
 
-	// Write path is native-first (data-ln-form-scope="packages" on
+	// Write path is native-first (data-ln-data-coordinator-scope="packages" on
 	// #package-form, which serves both create and edit via modal-mode) —
 	// react to either store outcome by closing the modal.
 	['ln-data-store:created', 'ln-data-store:updated'].forEach(function (ev) {

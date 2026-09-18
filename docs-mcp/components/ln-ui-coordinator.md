@@ -158,7 +158,7 @@ The coordinator itself is headless and handles orchestration logic without injec
 
 ### Common Pitfalls
 > [!CAUTION]
-> 1. **Do not nest conflicting submit handlers:** Forms using `data-ln-form-scope` belong to [`ln-data-coordinator`](./ln-data-coordinator.md) and will bypass standard `ln-ui-coordinator` AJAX flows.
+> 1. **Do not nest conflicting submit handlers:** Forms using `data-ln-data-coordinator-scope` belong to [`ln-data-coordinator`](./ln-data-coordinator.md) and will bypass standard `ln-ui-coordinator` AJAX flows.
 > 2. **Ensure unique modal IDs:** Deep-link hash navigation (`#modalId`) requires each modal to carry a unique `id` attribute.
 
 ---

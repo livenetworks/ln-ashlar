@@ -111,7 +111,7 @@
 Only the flags that change a decision. Everything else → `get_attribute`.
 
 - `ln-table` + `data-ln-table-window` → server-side sliding-window virtualization exists; don't hand-roll paging.
-- `ln-form` + `data-ln-form-scope` → local-first write path; the coordinator claims submit, so **do not** also add `ln-ajax`.
+- `ln-form` + `data-ln-data-coordinator-scope` → local-first write path; the coordinator claims submit, so **do not** also add `ln-ajax`.
 - `data-ln-persist` → available on `ln-toggle` and `ln-tabs` for localStorage state.
 - `ln-accordion` → removing the wrapper attribute turns panels multi-open. No config needed.
 - `ln-toast` → server can render items directly for SSR flash messages; JS only hydrates timers.

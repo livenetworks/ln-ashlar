@@ -10,7 +10,9 @@ import { dispatch, dispatchCancelable, isTargetDisabled, registerComponent, shou
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-toggle': { effect: _syncAttribute }
+		'data-ln-toggle':        { effect: _syncAttribute },
+		'data-ln-toggle-for':    {},
+		'data-ln-toggle-action': {}
 	};
 
 	const instances = new Set();

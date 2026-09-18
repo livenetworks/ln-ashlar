@@ -1,4 +1,4 @@
-import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent, readValue, createWindowCache, createBatcher, getLocale, detectValueType, compareValues, attrBool } from '../../ln-core';
+import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent, readValue, createWindowCache, createBatcher, getLocale, detectValueType, compareValues, attrBool, attrStr, defineAttrs, attrSpec } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-list';
@@ -46,14 +46,18 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	}
 
 	const ATTRIBUTES = {
-		'data-ln-list':                  { prop: 'name' },
-		'data-ln-list-source':           { prop: 'source' },
+		'data-ln-list':                  { prop: 'name', read: attrStr, fallback: '' },
+		'data-ln-list-source':           { prop: 'source', read: attrStr, fallback: '' },
 		'data-ln-list-selectable':       { prop: '_selectable', read: attrBool },
 		'data-ln-list-window':           { effect: _applyWindow },
 		'data-ln-list-window-page':      { effect: _applyWindowPage },
 		'data-ln-list-window-threshold': { effect: _applyWindowThreshold },
-		'data-ln-list-count':            { effect: _applyCount }
+		'data-ln-list-count':            { effect: _applyCount },
+		'data-ln-list-empty':            {},
+		'data-ln-list-field':            {}
 	};
+
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	function _formatNum(n, dom) {
 		if (n == null || isNaN(n)) return '';
@@ -104,10 +108,9 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 	function _component(dom) {
 		this.dom = dom;
+		defineAttrs(this, dom, ATTR_SPEC);
 		this.tbody = dom.querySelector('[data-ln-list-body]') || dom;
 		this.isDataDriven = dom.hasAttribute('data-ln-list-source');
-		this.name = dom.getAttribute(DOM_SELECTOR) || '';
-		this.source = dom.getAttribute('data-ln-list-source') || '';
 
 		// Footer elements — both modes
 		this._totalSpan = dom.querySelector('[data-ln-list-total]');
@@ -205,7 +208,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		dom.addEventListener('ln-list:request-clear-filters', this._onRequestClearFilters);
 
 		// --- Selection (both modes) ---
-		this._selectable = dom.hasAttribute('data-ln-list-selectable');
 		this._selectableActive = false;
 		if (this._selectable) {
 			this._enableSelection();

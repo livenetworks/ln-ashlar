@@ -10,6 +10,14 @@ import { buildAutosaveKey, parseAutosaveDebounce } from './autosave-model.js';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-autosave':                {},
+		'data-ln-autosave-debounce-input': {},
+		'data-ln-autosave-clear':          {},
+		'data-ln-autosave-exclude':        {}
+	};
+
 	function _isFormField(el) {
 		const tag = el.tagName;
 		return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
@@ -141,5 +149,7 @@ import { buildAutosaveKey, parseAutosaveDebounce } from './autosave-model.js';
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-autosave');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-autosave', {
+		attributes: ATTRIBUTES
+	});
 })();

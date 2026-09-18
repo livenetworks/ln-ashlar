@@ -1,13 +1,24 @@
 // ==========================================================================
-// ln-confirm — Functional Two-Element Mode Toggle
+// ln-confirm — Functional Hiding Contract & Announcer
 // ==========================================================================
 
-[data-ln-confirm] {
-	&:not([data-confirming="true"]) [data-ln-confirm-active] {
-		display: none;
-	}
+// П4 hiding contract: native `hidden` is the mechanism — the component toggles it
+// on the idle/active children. This backs up the UA default at (0,2,0) so a
+// `display` set on a child cannot defeat it.
+[data-ln-confirm] [hidden] {
+	display: none;
+}
 
-	&[data-confirming="true"] [data-ln-confirm-idle] {
-		display: none;
-	}
+// Injected announcer. This file ships in the CORE bundle and `.sr-only` does not,
+// so the hiding cannot be delegated to the theme.
+[data-ln-confirm-announcer] {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border-width: 0;
 }
