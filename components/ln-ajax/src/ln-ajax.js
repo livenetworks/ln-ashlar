@@ -3,7 +3,7 @@ import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink, observeAt
 (function () {
 	const DOM_SELECTOR = 'data-ln-ajax';
 	const DOM_ATTRIBUTE = 'lnAjax';
-	const SCOPE_ATTR = 'data-ln-form-scope';
+	const SCOPE_ATTR = 'data-ln-data-coordinator-scope';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -49,7 +49,7 @@ import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink, observeAt
 			if (form.hasAttribute(SCOPE_ATTR)) {
 				if (!form[DOM_ATTRIBUTE + 'ScopeWarned']) {
 					form[DOM_ATTRIBUTE + 'ScopeWarned'] = true;
-					console.warn('[ln-ajax] Form has data-ln-form-scope — the ln-data-coordinator write pipeline takes precedence; skipping ajax interception for this form.');
+					console.warn('[ln-ajax] Form has data-ln-data-coordinator-scope — the ln-data-coordinator write pipeline takes precedence; skipping ajax interception for this form.');
 				}
 				continue;
 			}

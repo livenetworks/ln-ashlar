@@ -6,6 +6,13 @@ import { dispatch, dispatchCancelable, registerComponent, cloneTemplateScoped } 
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-editor':        {},
+		'data-ln-editor-action': {},
+		'data-ln-editor-source': {}
+	};
+
 	// ─── Allowed tags for paste sanitization ───────────────────
 	const ALLOWED_TAGS = {
 		P: true, BR: true, STRONG: true, B: true, EM: true, I: true,
@@ -655,5 +662,7 @@ import { dispatch, dispatchCancelable, registerComponent, cloneTemplateScoped } 
 
 	// ─── Init ─────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-editor');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-editor', {
+		attributes: ATTRIBUTES
+	});
 })();

@@ -8,6 +8,11 @@ import { ensureDebugGate, refreshDebugHosts } from './gate.js';
 
 	if (typeof window !== 'undefined' && window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-debug': {}
+	};
+
 	ensureDebugGate();
 
 	function _component(dom) {
@@ -27,6 +32,7 @@ import { ensureDebugGate, refreshDebugHosts } from './gate.js';
 	};
 
 	const _ctor = registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-debug', {
+		attributes: ATTRIBUTES,
 		onInit: function (node) {
 			if (typeof document !== 'undefined') {
 				scheduleVerification(node && node.ownerDocument ? node.ownerDocument : document);

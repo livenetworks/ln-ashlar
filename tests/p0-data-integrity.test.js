@@ -242,3 +242,46 @@ test('closing mutation receipts rejects every outstanding request', async () => 
 	await assert.rejects(first, error);
 	await assert.rejects(second, error);
 });
+
+test('IndexedDB ID coercion fallback resolves string vs numeric keys', async () => {
+	const dbName = `ln-idb-key-test-${process.pid}-${++databaseSequence}`;
+	const openReq = indexedDB.open(dbName, 1);
+	await new Promise((resolve, reject) => {
+		openReq.onupgradeneeded = () => {
+			openReq.result.createObjectStore('items', { keyPath: 'id' });
+		};
+		openReq.onsuccess = resolve;
+		openReq.onerror = () => reject(openReq.error);
+	});
+
+	const db = openReq.result;
+	try {
+		const putTx = db.transaction('items', 'readwrite');
+		putTx.objectStore('items').put({ id: 1, title: 'Document #1' });
+		await new Promise(resolve => { putTx.oncomplete = resolve; });
+
+		const getWithFallback = (store, id) => new Promise(resolve => {
+			store.get(id).onsuccess = e => {
+				const res = e.target.result;
+				if (res !== undefined) return resolve(res);
+				if (typeof id === 'string' && id.trim() !== '' && !isNaN(Number(id))) {
+					store.get(Number(id)).onsuccess = e2 => resolve(e2.target.result);
+				} else if (typeof id === 'number') {
+					store.get(String(id)).onsuccess = e2 => resolve(e2.target.result);
+				} else {
+					resolve(null);
+				}
+			};
+		});
+
+		const readTx = db.transaction('items', 'readonly');
+		const store = readTx.objectStore('items');
+		const foundByString = await getWithFallback(store, '1');
+		assert.equal(foundByString?.id, 1);
+		assert.equal(foundByString?.title, 'Document #1');
+	} finally {
+		db.close();
+		indexedDB.deleteDatabase(dbName);
+	}
+});
+

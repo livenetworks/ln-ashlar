@@ -1,17 +1,24 @@
-import { populateForm, dispatch, registerComponent } from '../../ln-core';
+import { populateForm, dispatch, registerComponent, defineAttrs, attrSpec, attrStr } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-form';
 	const DOM_ATTRIBUTE = 'lnForm';
-	const ACTION_EDIT_ATTR   = 'data-ln-form-action-edit';
-	const ACTION_METHOD_ATTR = 'data-ln-form-action-method';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-form':               {},
+		'data-ln-form-action-edit':   { prop: '_actionEdit',   read: attrStr, fallback: '' },
+		'data-ln-form-action-method': { prop: '_actionMethod', read: attrStr, fallback: 'PUT' }
+	};
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(form) {
 		this.dom = form;
+		defineAttrs(this, form, ATTR_SPEC);
 		this._baseAction = form.getAttribute('action') || '';
 
 		const self = this;
@@ -66,19 +73,19 @@ import { populateForm, dispatch, registerComponent } from '../../ln-core';
 	};
 
 	_component.prototype._applyActionMode = function (record) {
-		if (!this.dom.hasAttribute(ACTION_EDIT_ATTR)) return;
+		if (!this.dom.hasAttribute('data-ln-form-action-edit')) return;
 
 		const id = record && record.id != null && record.id !== '' ? record.id : null;
 		const methodInput = this._ensureMethodInput();
 
 		if (id !== null) {
-			const template = this.dom.getAttribute(ACTION_EDIT_ATTR);
+			const template = this._actionEdit;
 			if (template) {
 				this.dom.setAttribute('action', template.replace(':id', encodeURIComponent(id)));
 			} else {
 				this.dom.setAttribute('action', this._baseAction.replace(/\/$/, '') + '/' + encodeURIComponent(id));
 			}
-			methodInput.value = this.dom.getAttribute(ACTION_METHOD_ATTR) || 'PUT';
+			methodInput.value = this._actionMethod || 'PUT';
 		} else {
 			this.dom.setAttribute('action', this._baseAction);
 			methodInput.value = '';
@@ -95,5 +102,7 @@ import { populateForm, dispatch, registerComponent } from '../../ln-core';
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-form');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-form', {
+		attributes: ATTRIBUTES
+	});
 })();

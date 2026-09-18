@@ -242,7 +242,7 @@
 									<strong>The Platform Default (Trigger Action):</strong> The core action — standard form submits (<code>type="submit"</code>) or link targets (<code>href</code>) — is declared natively on the HTML button or link, untouched by the component.
 								</li>
 								<li>
-									<strong>The Visual Morph (In-Place States):</strong> The button represents its state through HTML attributes (<code>data-confirming="true"</code>). CSS mixins (<code>@include confirm-tooltip</code>) read attributes to transition text values or reveal overlay icon tooltips.
+									<strong>The Visual Morph (In-Place States):</strong> The button represents its state through HTML attributes (<code>data-ln-confirm-state="confirming"</code>). CSS reads that attribute — <code>theme/components/_confirm.scss</code> rebinds <code>--color-primary</code> to the error token while the button is armed.
 								</li>
 								<li>
 									<strong>The State Gate (<code>ln-confirm</code>):</strong> The JavaScript component coordinates the armed state. It schedules the countdown timer, intercepts the first user interaction, and reverts labels or icon paths on expiration.
@@ -251,7 +251,7 @@
 
 							<h4>How the Interaction Flows</h4>
 							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
-								<li>The user clicks a destructive button. The component intercepts the event, calls <code>e.preventDefault()</code> and <code>e.stopImmediatePropagation()</code>, transitions the button to <code>data-confirming="true"</code>, replaces its label/icon with the armed prompt, schedules an auto-revert timer, and dispatches <code>ln-confirm:waiting</code>.</li>
+								<li>The user clicks a destructive button. The component intercepts the event, calls <code>e.preventDefault()</code> and <code>e.stopImmediatePropagation()</code>, transitions the button to <code>data-ln-confirm-state="confirming"</code>, replaces its label/icon with the armed prompt, schedules an auto-revert timer, and dispatches <code>ln-confirm:waiting</code>.</li>
 								<li>If the user clicks the armed button again before the timer expires, the component intercepts the second click, runs cleanups synchronously, calls <code>stopPropagation()</code> so the click stays on the button, and lets the default action proceed. The browser executes the natural submit, navigate, or AJAX handler.</li>
 								<li>If the timer expires before a second click arrives, the button automatically clears the armed state, restores its original text or icon, and disarms.</li>
 							</ol>
@@ -268,11 +268,11 @@
 							<ul>
 								<li><strong>1. Two-Element Mode (Recommended &amp; HTML-First):</strong> Separates idle and active contents using <code>[data-ln-confirm-idle]</code> and <code>[data-ln-confirm-active]</code>. Zero string replacement in JS, preserving complex child nodes (icons, badges) and ensuring 100% translatable HTML.</li>
 								<li><strong>2. Shorthand Attribute Mode:</strong> Uses <code>data-ln-confirm="Are you sure?"</code> on simple text buttons. The prompt string is read directly from the HTML attribute.</li>
-								<li><strong>3. Icon-Only Mode:</strong> Automatically detects buttons with only an SVG icon. Swaps the <code>href</code> to <code>#ln-icon-check</code>, applies <code>.ln-confirm-tooltip</code>, and displays the prompt in a CSS tooltip bubble.</li>
+								<li><strong>3. Icon-Only Mode:</strong> Automatically detects buttons with only an SVG icon. Swaps the <code>href</code> to <code>#ln-icon-check</code> and swaps <code>aria-label</code> to the prompt. No tooltip is rendered — compose <code>ln-tooltip</code> if the button needs one.</li>
 							</ul>
 
 							<h4>What state goes where</h4>
-							<p>"Should this button confirm before action?" lives on <code>data-ln-confirm</code> (presence). "Currently armed?" lives on <code>data-confirming="true"</code> on the button — the public CSS hook. "Auto-revert timeout (seconds)" lives on <code>data-ln-confirm-timeout</code>. "Original label" / "original icon <code>href</code>" live on the JS instance, captured at construction (text) or at first arm (icon).</p>
+							<p>"Should this button confirm before action?" lives on <code>data-ln-confirm</code> (presence). "Currently armed?" lives on <code>data-ln-confirm-state="confirming"</code> on the button — the public CSS hook. "Auto-revert timeout (seconds)" lives on <code>data-ln-confirm-timeout</code>. "Original label" / "original icon <code>href</code>" live on the JS instance, captured at construction (text) or at first arm (icon).</p>
 							<p>The underlying destructive action — <code>type="submit"</code>, <code>href</code>, an existing <code>click</code> listener — is owned by you, untouched by <code>ln-confirm</code>. The component does not run it; the second click does, by way of the platform's default action handling.</p>
 						</main>
 					</section>
@@ -289,9 +289,7 @@
 									<tr><td><code>data-ln-confirm-idle</code></td><td>Child element</td><td>Markup</td><td>The content displayed while the button is in the idle state (Two-Element Mode).</td></tr>
 									<tr><td><code>data-ln-confirm-active</code></td><td>Child element</td><td>Markup</td><td>The content displayed while the button is armed in confirming state (Two-Element Mode). Should initially have <code>hidden</code>.</td></tr>
 									<tr><td><code>data-ln-confirm-timeout="3"</code></td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code></td><td>Auto-revert delay in seconds. Default <code>3</code>. Accepts decimals (<code>"1.5"</code>). Read fresh at first-click time inside <code>_startTimer</code>; mutating mid-armed does NOT extend the running timer (NOT in the observer's <code>attributeFilter</code>).</td></tr>
-									<tr><td><code>data-confirming="true"</code></td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code> (auto)</td><td>Set by JS while the button is armed. Removed on second click, on timer fire, or on <code>destroy()</code>. Public CSS hook for the confirming state.</td></tr>
-									<tr><td><code>.ln-confirm-tooltip</code> (class)</td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code> (auto)</td><td>Added in icon-only mode while armed. Removed on revert. Marker for the tooltip-bubble CSS in <code>@mixin confirm-tooltip</code>.</td></tr>
-									<tr><td><code>data-tooltip-text="text"</code></td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code> (auto)</td><td>Set in icon-only mode while armed. Carries the prompt text for the CSS-driven <code>::after</code> tooltip bubble (read via <code>attr(data-tooltip-text)</code> in <code>@mixin confirm-tooltip</code>). Distinct from <code>data-ln-tooltip</code>.</td></tr>
+									<tr><td><code>data-ln-confirm-state="confirming"</code></td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code> (auto)</td><td>Set by JS while the button is armed. Removed on second click, on timer fire, or on <code>destroy()</code>. Public CSS hook for the confirming state.</td></tr>
 								</tbody>
 							</table>
 							</div>
@@ -354,7 +352,7 @@ button[data-ln-confirm] {
 					<section class="section-card" data-demo-html>
 						<header><h3>Example — Icon-only buttons</h3></header>
 						<main>
-							<p>The constructor sees empty text and a <code>svg.ln-icon use</code> child, so the icon-only branch runs on first click: the trash icon swaps to a check icon, the button gets <code>.ln-confirm-tooltip</code> + <code>data-tooltip-text="Delete?"</code>, and CSS renders a tooltip bubble above the button via <code>@mixin confirm-tooltip</code>. The icon-only branch also handles screen-reader output — it captures the original <code>aria-label</code> ("Delete"), swaps it to the prompt text ("Delete?"), and appends a transient <code>&lt;span class="sr-only" role="alert"&gt;</code> announcer inside the button. AT speaks the prompt on first click; on revert, the announcer is removed and the original <code>aria-label</code> is restored. Try it with VoiceOver / NVDA.</p>
+							<p>The constructor sees empty text and a <code>svg.ln-icon use</code> child, so the icon-only branch runs on first click: the trash icon swaps to a check icon. The icon-only branch also handles screen-reader output — it captures the original <code>aria-label</code> ("Delete"), swaps it to the prompt text ("Delete?"), and appends a transient <code>&lt;span data-ln-confirm-announcer role="alert"&gt;</code> announcer inside the button. AT speaks the prompt on first click; on revert, the announcer is removed and the original <code>aria-label</code> is restored. Try it with VoiceOver / NVDA.</p>
 							<ul class="demo-actions">
 								<li>
 									<button aria-label="Delete" data-ln-confirm="Delete?">
@@ -374,9 +372,9 @@ button[data-ln-confirm] {
 							</ul>
 						</main>
 						<script type="text/plain" data-demo-scss>
-// Tooltip style is applied via confirm-tooltip mixin:
-.ln-confirm-tooltip {
-    @include confirm-tooltip;
+// Armed state rebinds the accent token:
+[data-ln-confirm-state="confirming"] {
+    --color-primary: var(--color-error);
 }
 						</script>
 					</section>
@@ -525,7 +523,7 @@ button[data-ln-confirm-timeout] {
 					<section class="section-card" data-demo-html>
 						<header><h3>Example — Inside <code>[data-ln-table]</code> (overflow escape)</h3></header>
 						<main>
-							<p><code>ln-table</code> uses <code>overflow: clip</code> on <code>[data-ln-table]</code>, which would clip the icon-only mode's tooltip bubble. The co-located rule <code>[data-ln-table]:has([data-confirming]) { overflow: visible; }</code> reverts the table to <code>overflow: visible</code> while ANY descendant button is armed. The moment the button reverts, <code>:has()</code> unmatches and the clip is restored.</p>
+							<p><code>ln-table</code> uses <code>overflow: clip</code> on <code>[data-ln-table]</code>, which would clip the icon-only mode's tooltip bubble. The co-located rule <code>[data-ln-table]:has([data-ln-confirm-state]) { overflow: visible; }</code> reverts the table to <code>overflow: visible</code> while ANY descendant button is armed. The moment the button reverts, <code>:has()</code> unmatches and the clip is restored.</p>
 							<div data-ln-table>
 								<table>
 									<thead><tr><th>Item</th><th>Status</th><th>Actions</th></tr></thead>
@@ -556,7 +554,7 @@ button[data-ln-confirm-timeout] {
 						</main>
 						<script type="text/plain" data-demo-scss>
 // Table overflow escape for tooltip bubbles:
-[data-ln-table]:has([data-confirming]) {
+[data-ln-table]:has([data-ln-confirm-state]) {
     overflow: visible;
 }
 						</script>

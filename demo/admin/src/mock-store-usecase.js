@@ -61,15 +61,89 @@
 		const path = u.pathname;
 		const records = await getRecords();
 
-		// GET /api/documents (full or delta)
+		// GET /api/documents (full, delta sync, or query)
 		if (path === ENDPOINT && method === 'GET') {
 			const since = u.searchParams.get('since');
-			if (since != null) {
+			if (since != null && since !== '' && since !== 'null') {
 				const sinceN = Number(since);
 				const upserted = records.filter((r) => r.updated_at > sinceN);
 				return jsonResponse({ data: upserted, deleted: [], synced_at: nowSec() });
 			}
-			return jsonResponse({ data: records, synced_at: nowSec() });
+
+			let result = records.slice();
+
+			// 1. Text search across title, department, owner
+			const search = (u.searchParams.get('search') || '').toLowerCase().trim();
+			if (search) {
+				result = result.filter((r) =>
+					(r.title && r.title.toLowerCase().includes(search)) ||
+					(r.department && r.department.toLowerCase().includes(search)) ||
+					(r.owner && r.owner.toLowerCase().includes(search))
+				);
+			}
+
+			// 2. Field Filters (department, status, priority)
+			const dept = u.searchParams.get('department');
+			if (dept) {
+				const allowed = dept.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
+				if (allowed.length) {
+					result = result.filter((r) => r.department && allowed.includes(r.department.toLowerCase()));
+				}
+			}
+
+			const status = u.searchParams.get('status');
+			if (status) {
+				const allowed = status.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
+				if (allowed.length) {
+					result = result.filter((r) => r.status && allowed.includes(r.status.toLowerCase()));
+				}
+			}
+
+			const priority = u.searchParams.get('priority');
+			if (priority) {
+				const allowed = priority.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
+				if (allowed.length) {
+					result = result.filter((r) => r.priority && allowed.includes(r.priority.toLowerCase()));
+				}
+			}
+
+			const filteredCount = result.length;
+
+			// 3. Sorting
+			const sortField = u.searchParams.get('sort_field');
+			const sortDir = u.searchParams.get('sort_dir') || 'asc';
+			if (sortField) {
+				result.sort((a, b) => {
+					const valA = a[sortField];
+					const valB = b[sortField];
+					if (valA == null && valB == null) return 0;
+					if (valA == null) return 1;
+					if (valB == null) return -1;
+					let cmp = 0;
+					if (typeof valA === 'number' && typeof valB === 'number') {
+						cmp = valA - valB;
+					} else {
+						cmp = String(valA).localeCompare(String(valB));
+					}
+					return sortDir === 'desc' ? -cmp : cmp;
+				});
+			}
+
+			// 4. Pagination
+			const offsetParam = u.searchParams.get('offset');
+			const limitParam = u.searchParams.get('limit');
+			if (offsetParam != null || limitParam != null) {
+				const offset = offsetParam ? parseInt(offsetParam, 10) : 0;
+				const limit = limitParam ? parseInt(limitParam, 10) : 25;
+				result = result.slice(offset, offset + limit);
+			}
+
+			return jsonResponse({
+				data: result,
+				total: records.length,
+				filtered: filteredCount,
+				synced_at: nowSec()
+			});
 		}
 
 		// POST /api/documents (create)

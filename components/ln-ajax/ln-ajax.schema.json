@@ -10,16 +10,16 @@
 				"src/ln-ajax.js"
 			]
 		},
+		"data-ln-data-coordinator-scope": {
+			"direction": "author",
+			"sources": [
+				"src/ln-ajax.js"
+			]
+		},
 		"data-ln-debug": {
 			"direction": null,
 			"sources": [
 				"ln-ajax-dev.scss"
-			]
-		},
-		"data-ln-form-scope": {
-			"direction": "author",
-			"sources": [
-				"src/ln-ajax.js"
 			]
 		}
 	}

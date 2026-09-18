@@ -363,8 +363,8 @@
 					<td>{{ title }}</td>
 					<td>{{ department }}</td>
 					<td>{{ status }}</td>
-					<td>{{ size_display }}</td>
-					<td>{{ updated_display }}</td>
+					<td data-ln-value="{{ file_size }}"><data value="{{ file_size }}" data-ln-value="{{ file_size }}" data-ln-number>{{ file_size }}</data> KB</td>
+					<td data-ln-value="{{ updated_at }}"><time datetime="{{ updated_at }}" data-ln-value="{{ updated_at }}" data-ln-date="medium">{{ updated_at }}</time></td>
 					<td>
 						<ul class="row-actions">
 							<li><button data-ln-table-row-action="edit" aria-label="Edit"
@@ -444,7 +444,7 @@
 <dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="document-modal">
 	<form data-ln-form="document-form" novalidate
 	      id="document-form"
-	      data-ln-form-scope="documents"
+	      data-ln-data-coordinator-scope="documents"
 	      method="post"
 	      action="/api/documents"
 	      data-ln-form-action-edit>
@@ -517,38 +517,7 @@
 	const formEl  = document.querySelector('[data-ln-form="document-form"]');
 	const documentModal = document.getElementById('document-modal');
 
-	let lastQuery = { sort: null, filters: {}, search: '' }, pendingDelete = null;
-
-	const filterOptions = {
-		department: ['Finance', 'HR', 'IT', 'Legal', 'Marketing', 'Operations'],
-		status:     ['Approved', 'Archived', 'Draft', 'Pending']
-	};
-
-	const decorate = r => Object.assign({}, r, {
-		updated_display: new Date(r.updated_at * 1000).toLocaleString(),
-		size_display: r.file_size >= 1024 ? (r.file_size / 1024).toFixed(1) + ' MB' : (r.file_size || 0) + ' KB'
-	});
-
-	const refresh = () => storeEl.lnDataStore?.getAll(lastQuery).then(r => {
-		tableEl.dispatchEvent(new CustomEvent('ln-table:set-data', {
-			bubbles: true,
-			detail: { data: r.data.map(decorate), total: r.total, filtered: r.filtered, filterOptions }
-		}));
-	});
-
-	// Store Listeners
-	['ready', 'loaded', 'created', 'updated', 'deleted'].forEach(ev =>
-		storeEl.addEventListener(`ln-data-store:${ev}`, refresh)
-	);
-	storeEl.addEventListener('ln-data-store:synced', e => e.detail.changed && refresh());
-
-	// Table Listeners
-	document.addEventListener('ln-table:request-data', e => {
-		if (e.detail.table === 'documents') {
-			lastQuery = { sort: e.detail.sort, filters: e.detail.filters, search: e.detail.search };
-			refresh();
-		}
-	});
+	let pendingDelete = null;
 
 	document.addEventListener('ln-table:row-action', e => {
 		if (e.detail.table !== 'documents') return;
@@ -557,7 +526,7 @@
 		}
 	});
 
-	// Write path is native-first (data-ln-form-scope on #document-form) —
+	// Write path is native-first (data-ln-data-coordinator-scope on #document-form) —
 	// react to the store outcome instead of a form-level event. This demo JS
 	// only closes the modal once the record has been handed off.
 	['ln-data-store:created', 'ln-data-store:updated'].forEach(ev => storeEl.addEventListener(ev, () => {
@@ -687,7 +656,7 @@
 					<td>{{ title }}</td>
 					<td>{{ department }}</td>
 					<td>{{ status }}</td>
-					<td>{{ updated_at }}</td>
+					<td data-ln-value="{{ updated_at }}"><time datetime="{{ updated_at }}" data-ln-value="{{ updated_at }}" data-ln-date="medium">{{ updated_at }}</time></td>
 				</tr>
 			</template>
 

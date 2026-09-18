@@ -34,7 +34,7 @@
 			]
 		},
 		"data-ln-sort": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"ln-sort-dev.scss",
 				"src/ln-sort.js"
@@ -53,7 +53,7 @@
 			]
 		},
 		"data-ln-sort-field": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-sort.js"
 			]

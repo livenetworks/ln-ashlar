@@ -16,7 +16,7 @@ flowchart TB
 		CHART["figure data-ln-chart<br/><b>data-ln-chart-source='documents'</b>"]
 		SELECT["select<br/><b>data-ln-options='documents'</b>"]
 		STAT["span<br/><b>data-ln-stat='documents'</b>"]
-		FORM["form<br/><b>data-ln-form-scope='documents-module'</b>"]
+		FORM["form<br/><b>data-ln-data-coordinator-scope='documents-module'</b>"]
 	end
 
 	subgraph module["ul id='documents-module' · data-ln-data-coordinator · hidden"]
@@ -48,8 +48,8 @@ flowchart TB
 `data-ln-table-source`, `data-ln-list-source`, `data-ln-chart-source`,
 `data-ln-options` и `data-ln-stat`.
 
-**2. `id`-то на координаторот.** Таргет само за именуван `data-ln-form-scope`.
-Празен `data-ln-form-scope` не е референца туку содржување — координаторот
+**2. `id`-то на координаторот.** Таргет само за именуван `data-ln-data-coordinator-scope`.
+Празен `data-ln-data-coordinator-scope` не е референца туку содржување — координаторот
 проверува дали формата е DOM потомок.
 
 **3. Содржување.** Ги врзува трите деца — store, конектор, редица. Ниту едно од

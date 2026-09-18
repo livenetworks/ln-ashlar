@@ -6,7 +6,7 @@ A zero-dependency, ultra-lightweight **Interaction Gate Primitive** (~131 lines 
 
 ## 🧭 Philosophy & Architecture
 
-1. **In-Place Morphing:** Instead of launching heavy, separate dialogs or using frozen, unstyleable `window.confirm()` scripts, confirmation lives **directly on the target button**. It preserves structural styling while using CSS mixins to display temporary labels or icon tooltips.
+1. **In-Place Morphing:** Instead of launching heavy, separate dialogs or using frozen, unstyleable `window.confirm()` scripts, confirmation lives **directly on the target button**. It preserves structural styling while swapping labels, child states or the icon in place.
 2. **Platform Event Release:** `ln-confirm` does not implement a custom `accept` handler. The acceptance is the standard platform `click` event. On the second click, the component steps out of the way of the *default action* — form submissions (`type="submit"`), links (`href`), or custom AJAX click listeners execute natively. It does **not** step out of the way of propagation: the click stops at the button on both clicks, so an ancestor click surface never sees it.
 3. **Graceful Auto-Revert:** The gate is timed. When armed, a countdown timer is scheduled. If a second click does not arrive within the window, the button cleanly reverts to its idle text or icon state.
 
@@ -59,8 +59,8 @@ On click, the idle content hides and the active content unhides, without mutatin
 | :--- | :--- | :--- |
 | `data-ln-confirm="Prompt"` | `<button>`, `<a>` | Action gate marker. Empty value defaults to `"Confirm?"` (in legacy mode). If using Two-Element Mode, this value is left blank. |
 | `data-ln-confirm-timeout="3"` | `<button>`, `<a>` | Auto-revert delay in seconds (default `3`). |
-| `data-confirming="true"` | `<button>` (auto) | Managed state. Set during active confirmation; acts as public CSS hook. |
-| `data-tooltip-text="Prompt"` | `<button>` (auto) | Managed state. Displays tooltip bubble in legacy icon-only mode. |
+| `data-ln-confirm-state="confirming"` | `<button>` (auto) | Managed state. Set during active confirmation; acts as public CSS hook. |
+| `data-ln-confirm-announcer` | injected `<span>` (auto) | Marker on the transient `role="alert"` node that speaks the prompt in icon-only mode. |
 | `data-ln-confirm-idle` | Any child | Defines the idle state layout/content (button icon/text) in Two-Element Mode. |
 | `data-ln-confirm-active` | Any child | Defines the confirmation prompt content in Two-Element Mode. |
 
@@ -73,7 +73,7 @@ Access the confirmation instance directly via the `lnConfirm` property on the bu
 ```javascript
 const button = document.getElementById('delete-btn');
 
-// 1. Check if armed (Boolean getter)
+// 1. Check if armed (live read-only getter over data-ln-confirm-state)
 if (button.lnConfirm.confirming) { ... }
 
 // 2. Disarm immediately, restore visual states, and unbind listeners
@@ -118,7 +118,7 @@ The click handler branches on `this.confirming`.
 **First click** (`confirming === false`) — arm:
 - `preventDefault()` blocks the platform action (submit / navigate).
 - `stopImmediatePropagation()` stops *later* same-element listeners, so a project's own analytics/validation click handler does not fire on the arming click — only on the second, accepting click. Listeners bound *before* ln-confirm still run, which is why the bundle must be defer-loaded.
-- `_enterConfirm()`: set `confirming`, write `data-confirming="true"` (CSS hook), swap the button to its confirm presentation (see Modes), schedule the auto-revert timer, dispatch `ln-confirm:waiting`.
+- `_enterConfirm()`: set `confirming`, write `data-ln-confirm-state="confirming"` (CSS hook), swap the button to its confirm presentation (see Modes), schedule the auto-revert timer, dispatch `ln-confirm:waiting`.
 
 **Second click** (`confirming === true`) — accept:
 - No `preventDefault` — the click runs its native default (form submit, link nav, existing handler) unmodified. That is the whole design: insert a checkpoint, then step out.
@@ -129,36 +129,84 @@ Containment covers listener-based ancestors. It does not cover an ancestor `<a h
 
 There is deliberately no `ln-confirm:accept` event and no second-click cancel signal — "accept" is just the native click; listen on the form `submit`, the link, or the button `click`.
 
-### Construction-time snapshot
+### Attribute contract
 
-`originalText` (`dom.textContent.trim()`) and `confirmText` (`data-ln-confirm`, default `"Confirm?"`) are captured **once at construction**, not per click. Mutating the button's text or the attribute afterwards does not propagate to the live instance — the contract is snapshotted once and run on every click. This is intentional: re-reading per confirm would race AJAX-driven content updates and change the button text mid-confirm.
+The `ATTRIBUTES` table is the single source of truth for the host attributes. Each entry
+with a `prop` becomes a **live getter** via `defineAttrs` — `confirmText`, `timeout` and
+`confirming` read the DOM on every access, so nothing is copied into instance state and
+there is no sync step. The getters have no setter; assigning to them throws.
 
-For the same reason the shared observer watches `data-ln-confirm` only, **not** `data-ln-confirm-timeout`. The timeout is read once, at arm time, in `_startTimer` (`parseFloat`, falling back to `3` on `NaN`/`≤0`). Changing it while armed does not affect the running timer — set it before the user arms.
+`data-ln-confirm` and `data-ln-confirm-timeout` are therefore read at the moment they are
+used — the prompt when the button arms, the timeout when `_startTimer` schedules the
+revert. Changing the timeout while armed does not affect the already-running timer.
+
+No entry declares an `effect`, so the component is deliberately non-reactive: the shared
+observer watches `data-ln-confirm` for instance creation only, and editing any of these
+attributes never runs component code on its own.
+
+`originalText` is the one genuine snapshot — it is `dom.textContent.trim()` captured at
+construction, not an attribute, and is what `_reset` restores. Text mode therefore reverts
+to the label the button had when it was hydrated; use Two-Element mode for labels that
+change at runtime.
 
 ### Modes
 
 - **Two-Element (recommended):** if the button contains `[data-ln-confirm-idle]` and `[data-ln-confirm-active]`, the component only toggles their `hidden` attribute — no DOM mutation, so inner icons / selection-count spans survive and all text stays authored in HTML.
 - **Legacy text:** no child markers → `dom.textContent` is swapped to `confirmText` and restored on revert.
-- **Icon-only:** fires when `originalText === ''` **and** a `svg.ln-icon use` exists at confirm time (checked fresh, to handle async-rendered icons). Swaps `<use href>` to `#ln-icon-check` (ln-icon fetches it on demand), adds `.ln-confirm-tooltip` + `data-tooltip-text`, and handles a11y (below). Everything is restored symmetrically in `_reset`.
+- **Icon-only:** fires when `originalText === ''` **and** a `svg.ln-icon use` exists at confirm time (checked fresh, to handle async-rendered icons). Swaps `<use href>` to `#ln-icon-check` (ln-icon fetches it on demand) and handles a11y (below). Everything is restored symmetrically in `_reset`.
 
 ### Icon-only accessibility
 
-The tooltip bubble is a CSS `::after` — invisible to AT. So the icon branch also:
+The icon swap is silent to AT and there is no visible text to read. So the icon branch:
 1. swaps `aria-label` to `confirmText` (original captured, restored on reset), and
-2. sets `aria-live="polite"` directly on the button so AT announces the updated confirmation prompt without injecting dynamic DOM nodes. Restored symmetrically on reset.
+2. appends a transient `<span data-ln-confirm-announcer role="alert">` carrying the prompt,
+   removed again in `_reset`.
 
-Text mode needs neither: `textContent` *is* the accessible name.
+`role="alert"` is its own assertive live region, which is why this branch deliberately does
+**not** also set `aria-live` on the button — a live region nested inside a live region gets
+announced twice. The two-element branch does still set `aria-live="polite"`, because there
+the button's own content changes (`hidden` flips) and nothing is injected.
+
+The announcer is hidden by a co-located rule on `[data-ln-confirm-announcer]` rather than
+by `.sr-only`: this component's SCSS ships in `ln-ashlar-core.css` and `.sr-only` does not,
+so a core-only consumer would otherwise see the prompt printed inside the button.
+
+Text mode needs neither: `textContent` *is* the accessible name, and changing it is itself
+the announcement.
 
 ### CSS hooks
 
-Co-located SCSS is two JS-state rules (the accepted co-located exception):
+Co-located SCSS carries two functional rules. This file ships in the **core** bundle, so
+neither may lean on theme tokens or theme utilities:
 
 ```scss
-[data-confirming]:not(.ln-confirm-tooltip) { --color-primary: var(--color-error); }
-[data-ln-table]:has([data-confirming])     { overflow: visible; }
+[data-ln-confirm] [hidden]  { display: none; }
+[data-ln-confirm-announcer] { /* visually hidden, no theme dependency */ }
 ```
 
-The first rebinds `--color-primary` to `--color-error` while armed — the red fill falls out of `@mixin btn` reading the primary token, so theme overrides apply automatically. `:not(.ln-confirm-tooltip)` avoids double-coloring icon mode, where `@mixin confirm-tooltip` owns the color. The second lifts `ln-table`'s `overflow: clip` so the icon tooltip isn't clipped by the row while any confirm in the table is armed; other scrollable containers need their own parallel rule.
+The first is the П4 hiding contract: native `hidden` is the mechanism — `_enterConfirm` and
+`_reset` toggle it on the idle/active children — and the rule backs the UA default up at
+(0,2,0) so a `display` set on a child cannot defeat it. There is deliberately no second,
+state-keyed rule performing the same hiding. A two-element button whose
+`[data-ln-confirm-active]` is missing `hidden` in the authored markup is a markup bug, and
+`ln-confirm-dev.scss` says so under `[data-ln-debug]` instead of silently papering over it.
+
+The single themed rule rebinds the accent token while armed:
+
+```scss
+// theme/components/_confirm.scss
+[data-ln-confirm-state="confirming"] { --color-primary: var(--color-error); }
+```
+
+`theme/base/_global.scss` documents this as *the* way to express a colour variant, so a
+button carrying `@mixin btn` — including `button[type="submit"]` — turns red while armed and
+theme overrides keep working. A bare `<button>` runs only `@mixin button-base`, whose
+`color: var(--btn-fg)` never reads `--color-primary`; it has no variant to recolour, so its
+armed signal is the icon swap alone. That is deliberate, not an oversight.
+
+`ln-confirm` renders no bubble, no tooltip and no overlay, and therefore needs no ancestor
+to relax `overflow`. A button that also wants a tooltip composes
+[ln-tooltip](../ln-tooltip/README.md) alongside it.
 
 ### Destroy
 

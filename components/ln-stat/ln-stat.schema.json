@@ -10,14 +10,14 @@
 			]
 		},
 		"data-ln-stat": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"ln-stat-dev.scss",
 				"src/ln-stat.js"
 			]
 		},
 		"data-ln-stat-filter": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-stat.js"
 			]

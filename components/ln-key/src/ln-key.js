@@ -34,7 +34,8 @@ import { browserAlreadyHandles, composeExternalShortcut, eventToShortcut, inferK
 	};
 
 	const FOR_ATTRIBUTES = {
-		'data-ln-key-for': { effect: _syncKeyFor }
+		'data-ln-key-for':      { effect: _syncKeyFor },
+		'data-ln-key-modifier': {}
 	};
 
 	const instances = new Set();

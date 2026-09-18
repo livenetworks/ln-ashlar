@@ -1,4 +1,4 @@
-import { registerComponent, dispatch, getHeaders, parseHeaders } from '../../ln-core';
+import { registerComponent, dispatch, getHeaders, parseHeaders, defineAttrs, attrSpec, attrStr } from '../../ln-core';
 import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './connector-core';
 
 (function () {
@@ -16,9 +16,9 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 
 	const ATTRIBUTES = {
 		'data-ln-api-connector':                {},
-		'data-ln-api-base-url':                 { effect: _syncAttribute },
-		'data-ln-api-path':                     { effect: _syncAttribute },
-		'data-ln-api-headers':                  { effect: _syncAttribute },
+		'data-ln-api-base-url':                 { prop: 'baseUrl',    read: attrStr, fallback: '',   effect: _syncAttribute },
+		'data-ln-api-path':                     { prop: 'path',       read: attrStr, fallback: '',   effect: _syncAttribute },
+		'data-ln-api-headers':                  { prop: 'rawHeaders', read: attrStr, fallback: null, effect: _syncAttribute },
 		'data-ln-api-param-offset':             { effect: _syncAttribute },
 		'data-ln-api-param-limit':              { effect: _syncAttribute },
 		'data-ln-api-param-search':             { effect: _syncAttribute },
@@ -26,6 +26,7 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 		'data-ln-api-param-sort-dir':           { effect: _syncAttribute },
 		'data-ln-api-connector-query-debounce': { effect: _syncAttribute }
 	};
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	// ─── Response Resolver ──────────────────────────────────
 
@@ -43,6 +44,7 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 
 	function _component(dom) {
 		this.dom = dom;
+		defineAttrs(this, dom, ATTR_SPEC);
 		dom[DOM_ATTRIBUTE] = this;
 		dom[DOM_ALIAS] = this; // Set alias for compatibility
 
@@ -60,10 +62,7 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 	_component.prototype.refreshConfig = function () {
 		const dom = this.dom;
 
-		this.baseUrl = dom.getAttribute('data-ln-api-base-url') || '';
-		this.path = dom.getAttribute('data-ln-api-path') || '';
 		this.credentials = 'same-origin';
-		this.rawHeaders = dom.getAttribute('data-ln-api-headers');
 		this.headers = parseHeaders(this.rawHeaders);
 
 		const paramKeys = {};

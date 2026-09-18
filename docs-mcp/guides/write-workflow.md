@@ -24,10 +24,10 @@ When a user submits a form, the action boundary determines which layer intercept
 |---|---|---|---|
 | **1. Native Browser** | None | Traditional browser page reload. Submits data to `action` endpoint using `method` (and Laravel-style spoofed `_method`). | Standard Server-Side Rendered (SSR) pages (e.g. Laravel Blade templates). |
 | **2. Progressive AJAX** | `data-ln-ajax` | Intercepts click/submit, executes `fetch()` asynchronously, prevents page reload, and expects a structured JSON fragment response. | SSR pages with progressive enhancement (updating partial page regions without complete reloads). |
-| **3. Scoped Local-First** | `data-ln-form-scope` | Leaves the submit native (after the validation gate). `ln-data-coordinator` claims it via `preventDefault()` on `document`, serializes it itself, writing instantly to `ln-data-store` (IndexedDB) and queuing for server synchronization. | Local-First and Single-Page Applications (SPA) where the local database is the immediate source of truth. |
+| **3. Scoped Local-First** | `data-ln-data-coordinator-scope` | Leaves the submit native (after the validation gate). `ln-data-coordinator` claims it via `preventDefault()` on `document`, serializes it itself, writing instantly to `ln-data-store` (IndexedDB) and queuing for server synchronization. | Local-First and Single-Page Applications (SPA) where the local database is the immediate source of truth. |
 
 > [!IMPORTANT]
-> **Priority Rule:** `data-ln-form-scope` always takes priority over `data-ln-ajax`. A form cannot be both AJAX-driven and database-scoped; mixing these on a single form will log a development warning.
+> **Priority Rule:** `data-ln-data-coordinator-scope` always takes priority over `data-ln-ajax`. A form cannot be both AJAX-driven and database-scoped; mixing these on a single form will log a development warning.
 >
 > **Method Gating:** The local-first write pipeline only intercepts submissions when the effective method is `POST`, `PUT`, or `PATCH`. Standard `GET` forms (such as search filters) nested inside coordinators run natively, bypassing the write pipeline.
 
@@ -49,7 +49,7 @@ During a local-first write operation, responsibilities are cleanly isolated amon
 ## 3. Step-by-Step CRUD Scenarios
 
 ### Scenario 1: Creating a Record (POST)
-1. **Submit:** The user submits a form configured with `data-ln-form-scope` and `method="POST"`.
+1. **Submit:** The user submits a form configured with `data-ln-data-coordinator-scope` and `method="POST"`.
 2. **Intake:** `ln-form` intercepts the submission only to validate; `ln-data-coordinator` claims the native submit and serializes the fields itself.
 3. **Claim:** The coordinator checks the event scope, claims it (`claimed = true`), and generates a temporary ID with a `_temp_` prefix (e.g. `_temp_df88b0...`).
 4. **Parallel Fan-Out:** The coordinator triggers two independent branches synchronously:
@@ -158,7 +158,7 @@ To standardise successes and dispatch notifications automatically, all write ope
 ## 6. Common Pitfalls and Developer Errors
 
 - **Missing `method="post"` on Scoped Forms:** If `method` is omitted, some browsers default to `GET`. `ln-data-coordinator` only claims `POST`/`PUT`/`PATCH` submits for the write pipeline — a `GET` form is never claimed, regardless of field validity. If every field is valid, the browser executes a native page reload and appends inputs as a query string; `ln-validate`'s submit gate still blocks the reload if fields are invalid (it runs on every method), but a validation pass on an accidentally-`GET` form still bypasses the write pipeline entirely. Always declare `method="post"` explicitly on scoped forms.
-- **Mismatched Scope Names:** If `data-ln-form-scope="name"` does not match the coordinator's `id="name"`, the coordinator will ignore the submit — no console warning, the native submit proceeds untouched (progressive-enhancement fallback).
+- **Mismatched Scope Names:** If `data-ln-data-coordinator-scope="name"` does not match the coordinator's `id="name"`, the coordinator will ignore the submit — no console warning, the native submit proceeds untouched (progressive-enhancement fallback).
 - **Base URL and HTTP Session Cookies:** The `ln-*-connector` components submit requests with `credentials: 'same-origin'` to safeguard against CSRF attacks. If you define a cross-origin `data-ln-api-base-url` targeting an external domain, cookies will not be sent. Use a same-origin backend proxy gateway instead.
 
 ---

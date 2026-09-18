@@ -1,4 +1,4 @@
-import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
+import { registerComponent, dispatch, dispatchCancelable, defineAttrs, attrSpec, attrBool } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-nav';
@@ -9,8 +9,10 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
 		'data-ln-nav':       { effect: _syncAttribute },
-		'data-ln-nav-exact': { effect: _syncAttribute }
+		'data-ln-nav-exact': { prop: 'exact', read: attrBool, effect: _syncAttribute }
 	};
+
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	// ─── pushState / replaceState singleton patch ──────────────
 	history._lnNavCallbacks = history._lnNavCallbacks || [];
@@ -33,8 +35,8 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 
 	function _component(dom) {
 		this.dom = dom;
+		defineAttrs(this, dom, ATTR_SPEC);
 		this.activeClass = dom.getAttribute(DOM_SELECTOR) || 'active';
-		this.exact = dom.hasAttribute('data-ln-nav-exact');
 
 		this.updateHandler = () => this.update();
 
@@ -139,8 +141,6 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 				}
 				instance.activeClass = newClass;
 			}
-		} else if (attrName === 'data-ln-nav-exact') {
-			instance.exact = el.hasAttribute('data-ln-nav-exact');
 		}
 
 		instance.update();

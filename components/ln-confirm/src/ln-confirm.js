@@ -1,23 +1,50 @@
-import { registerComponent, dispatch, shouldIgnoreClick } from '../../ln-core';
+import { registerComponent, dispatch, shouldIgnoreClick, defineAttrs, attrSpec, attrBool } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-confirm';
 	const DOM_ATTRIBUTE = 'lnConfirm';
-	const TIMEOUT_ATTR = 'data-ln-confirm-timeout';
+	const STATE_ATTR = 'data-ln-confirm-state';
+	const ANNOUNCER_ATTR = 'data-ln-confirm-announcer';
 	const DEFAULT_TIMEOUT = 3;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-	function _getTimeout(dom) {
-		const val = parseFloat(dom.getAttribute(TIMEOUT_ATTR));
-		return (isNaN(val) || val <= 0) ? DEFAULT_TIMEOUT : val;
+	// `attrStr` would keep an empty attribute as '' and blank the button.
+	function _readPrompt(el, name, fallback) {
+		return el.getAttribute(name) || fallback;
 	}
+
+	// Seconds, fractional allowed; non-positive or unparseable counts as unset.
+	// `attrInt` does neither.
+	function _readTimeout(el, name, fallback) {
+		const val = parseFloat(el.getAttribute(name));
+		return (isNaN(val) || val <= 0) ? fallback : val;
+	}
+
+	// The bubble is a CSS ::after — invisible to AT. `role="alert"` is its own
+	// assertive live region, so the button must NOT also be one: a live region
+	// nested in a live region gets announced twice.
+	function _makeAnnouncer(text) {
+		const el = document.createElement('span');
+		el.setAttribute(ANNOUNCER_ATTR, '');
+		el.setAttribute('role', 'alert');
+		el.textContent = text;
+		return el;
+	}
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-confirm':         { prop: 'confirmText', read: _readPrompt,  fallback: 'Confirm?' },
+		'data-ln-confirm-timeout': { prop: 'timeout',     read: _readTimeout, fallback: DEFAULT_TIMEOUT },
+		'data-ln-confirm-state':   { prop: 'confirming',  read: attrBool }
+	};
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
 		this.dom = dom;
-		this.confirming = false;
+		defineAttrs(this, dom, ATTR_SPEC);
 		this.revertTimer = null;
 		this._submitted = false;
 
@@ -26,13 +53,8 @@ import { registerComponent, dispatch, shouldIgnoreClick } from '../../ln-core';
 		this.activeEl = dom.querySelector('[data-ln-confirm-active]');
 		this.isTwoElementMode = Boolean(this.idleEl || this.activeEl);
 
-		if (this.isTwoElementMode) {
-			this.originalText = '';
-			this.confirmText = '';
-		} else {
-			this.originalText = dom.textContent.trim();
-			this.confirmText = dom.getAttribute(DOM_SELECTOR) || 'Confirm?';
-		}
+		// Not an attribute — a snapshot of the authored label, restored on revert.
+		this.originalText = this.isTwoElementMode ? '' : dom.textContent.trim();
 
 		const self = this;
 		this._onClick = function (e) {
@@ -58,8 +80,7 @@ import { registerComponent, dispatch, shouldIgnoreClick } from '../../ln-core';
 	}
 
 	_component.prototype._enterConfirm = function () {
-		this.confirming = true;
-		this.dom.setAttribute('data-confirming', 'true');
+		this.dom.setAttribute(STATE_ATTR, 'confirming');
 
 		this.originalAriaLabel = this.dom.getAttribute('aria-label');
 		this.originalAriaLive = this.dom.getAttribute('aria-live');
@@ -79,10 +100,8 @@ import { registerComponent, dispatch, shouldIgnoreClick } from '../../ln-core';
 				this.isIconButton = true;
 				this.originalIconHref = iconUse.getAttribute('href');
 				iconUse.setAttribute('href', '#ln-icon-check');
-				this.dom.classList.add('ln-confirm-tooltip');
-				this.dom.setAttribute('data-tooltip-text', this.confirmText);
 				this.dom.setAttribute('aria-label', this.confirmText);
-				this.dom.setAttribute('aria-live', 'polite');
+				this.dom.appendChild(_makeAnnouncer(this.confirmText));
 			} else {
 				this.dom.textContent = this.confirmText;
 			}
@@ -97,7 +116,7 @@ import { registerComponent, dispatch, shouldIgnoreClick } from '../../ln-core';
 			clearTimeout(this.revertTimer);
 		}
 		const self = this;
-		const ms = _getTimeout(this.dom) * 1000;
+		const ms = this.timeout * 1000;
 		this.revertTimer = setTimeout(function () {
 			self._reset();
 		}, ms);
@@ -105,8 +124,7 @@ import { registerComponent, dispatch, shouldIgnoreClick } from '../../ln-core';
 
 	_component.prototype._reset = function () {
 		this._submitted = false;
-		this.confirming = false;
-		this.dom.removeAttribute('data-confirming');
+		this.dom.removeAttribute(STATE_ATTR);
 
 		if (this.isTwoElementMode) {
 			if (this.idleEl) this.idleEl.removeAttribute('hidden');
@@ -117,8 +135,8 @@ import { registerComponent, dispatch, shouldIgnoreClick } from '../../ln-core';
 				if (iconUse && this.originalIconHref) {
 					iconUse.setAttribute('href', this.originalIconHref);
 				}
-				this.dom.classList.remove('ln-confirm-tooltip');
-				this.dom.removeAttribute('data-tooltip-text');
+				const announcer = this.dom.querySelector('[' + ANNOUNCER_ATTR + ']');
+				if (announcer) announcer.remove();
 				this.isIconButton = false;
 				this.originalIconHref = null;
 			} else {
@@ -157,5 +175,7 @@ import { registerComponent, dispatch, shouldIgnoreClick } from '../../ln-core';
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-confirm');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-confirm', {
+		attributes: ATTRIBUTES
+	});
 })();

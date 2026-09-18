@@ -30,7 +30,7 @@
 			]
 		},
 		"data-ln-toast-max": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-toast.js"
 			]

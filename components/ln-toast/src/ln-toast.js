@@ -1,5 +1,5 @@
 /* Live Networks — ln-toast (side-accent with icons) */
-import { guardBody, cloneTemplateScoped, fill, registerComponent, dispatch } from '../../ln-core';
+import { guardBody, cloneTemplateScoped, fill, registerComponent, dispatch, defineAttrs, attrSpec, attrInt } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = "data-ln-toast";
@@ -7,6 +7,16 @@ import { guardBody, cloneTemplateScoped, fill, registerComponent, dispatch } fro
 	const TEMPLATE_NAME = "ln-toast-item";
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-toast':         {},
+		'data-ln-toast-timeout': { prop: 'timeoutDefault', read: attrInt, fallback: 6000 },
+		'data-ln-toast-max':     { prop: 'max',            read: attrInt, fallback: 5 },
+		'data-ln-toast-close':   {},
+		'data-ln-toast-item':    {}
+	};
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	function _promoteTopLayer(container) {
 		if (!container || !(container instanceof HTMLElement)) return;
@@ -33,8 +43,7 @@ import { guardBody, cloneTemplateScoped, fill, registerComponent, dispatch } fro
 
 	function _Component(dom) {
 		this.dom = dom;
-		this.timeoutDefault = +(dom.getAttribute("data-ln-toast-timeout") ?? 6000);
-		this.max = +(dom.getAttribute("data-ln-toast-max") ?? 5);
+		defineAttrs(this, dom, ATTR_SPEC);
 
 		const items = Array.from(dom.querySelectorAll("[data-ln-toast-item]"));
 		while (items.length > this.max) dom.removeChild(items.shift());
@@ -219,5 +228,7 @@ import { guardBody, cloneTemplateScoped, fill, registerComponent, dispatch } fro
 		});
 	}, 'ln-toast');
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _Component, 'ln-toast');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _Component, 'ln-toast', {
+		attributes: ATTRIBUTES
+	});
 })();

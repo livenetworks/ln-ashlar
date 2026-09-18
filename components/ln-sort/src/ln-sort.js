@@ -1,4 +1,4 @@
-import { compareValues, detectValueType, dispatchCancelable, getLocale, hashGet, hashSet, hashSortDecode, hashSortEncode, queueBoot, readValue, registerComponent, resolveHashNamespace } from '../../ln-core';
+import { compareValues, detectValueType, dispatchCancelable, getLocale, hashGet, hashSet, hashSortDecode, hashSortEncode, queueBoot, readValue, registerComponent, resolveHashNamespace, attrStr, attrSpec, defineAttrs } from '../../ln-core';
 import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortTarget, normalizeSortDirection, resolveSortItems } from './sort-model.js';
 
 (function () {
@@ -7,20 +7,25 @@ import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortT
 	const FIELD_ATTR = 'data-ln-sort-field';
 	const STATE_ATTR = 'data-ln-sort-state';
 	const DIR_ATTR = 'data-ln-sort-dir';
-	const ITEMS_ATTR = 'data-ln-sort-items';
 	const HASH_ATTR = 'data-ln-hash';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	function _readOrNull(el, name) {
+		return el.getAttribute(name) || null;
+	}
+
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-sort':       { effect: _syncAttribute },
-		'data-ln-sort-field': { effect: _syncAttribute },
+		'data-ln-sort':       { prop: 'targetId',      read: attrStr, fallback: null },
+		'data-ln-sort-field': { prop: 'field',         read: _readOrNull, effect: _syncAttribute },
 		'data-ln-sort-dir':   {},
-		'data-ln-sort-items': { effect: _syncAttribute },
+		'data-ln-sort-items': { prop: 'itemsSelector', read: _readOrNull },
 		'data-ln-sort-state': { effect: _syncAttribute },
 		'data-ln-hash':       { effect: _syncAttribute }
 	};
+
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	// Target-scoped initial DOM order cache.
 	const _targetInitialOrders = new WeakMap();
@@ -40,13 +45,11 @@ import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortT
 
 	function _component(dom) {
 		this.dom = dom;
-		this.targetId = dom.getAttribute(DOM_SELECTOR);
-		this.field = dom.getAttribute(FIELD_ATTR) || null;
+		defineAttrs(this, dom, ATTR_SPEC);
 
 		const th = dom.closest('th');
 		this.column = (!this.field && th) ? th.cellIndex : null;
 
-		this.itemsSelector = dom.getAttribute(ITEMS_ATTR) || null;
 		this._state = normalizeSortDirection(dom.getAttribute(STATE_ATTR));
 		if (!dom.hasAttribute(STATE_ATTR)) {
 			dom.setAttribute(STATE_ATTR, this._state);
@@ -287,18 +290,13 @@ import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortT
 		const instance = el[DOM_ATTRIBUTE];
 		if (!instance || instance._destroyed) return;
 		if (attrName === FIELD_ATTR) {
-			instance.field = el.getAttribute(FIELD_ATTR) || null;
 			const th = el.closest('th');
 			instance.column = (!instance.field && th) ? th.cellIndex : null;
-		} else if (attrName === ITEMS_ATTR) {
-			instance.itemsSelector = el.getAttribute(ITEMS_ATTR) || null;
 		} else if (attrName === STATE_ATTR) {
 			const nextState = normalizeSortDirection(el.getAttribute(STATE_ATTR));
 			if (nextState !== instance._state) {
 				instance._apply(nextState);
 			}
-		} else if (attrName === DOM_SELECTOR) {
-			instance.targetId = el.getAttribute(DOM_SELECTOR);
 		} else if (attrName === HASH_ATTR) {
 			if (instance.hashEnabled && instance._onHashChange) {
 				window.removeEventListener('hashchange', instance._onHashChange);

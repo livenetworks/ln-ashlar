@@ -168,7 +168,7 @@
 (function () {
 	'use strict';
 
-	// Write path is native-first (data-ln-form-scope="packages" on
+	// Write path is native-first (data-ln-data-coordinator-scope="packages" on
 	// #package-form, which serves both create and edit via modal-mode) —
 	// react to either store outcome by closing the modal.
 	['ln-data-store:created', 'ln-data-store:updated'].forEach(function (ev) {
@@ -278,7 +278,7 @@
 (function () {
 	'use strict';
 
-	// Write path is native-first (data-ln-form-scope="tenants" on
+	// Write path is native-first (data-ln-data-coordinator-scope="tenants" on
 	// #tenant-form) — react to the store outcome instead of a form-level event.
 	document.addEventListener('ln-data-store:updated', function (e) {
 		if (e.detail.store !== 'tenants') return;
@@ -290,7 +290,7 @@
 (function () {
 	'use strict';
 
-	// Write path is native-first (data-ln-form-scope="tenants" on
+	// Write path is native-first (data-ln-data-coordinator-scope="tenants" on
 	// #tenant-create-form) — ln-data-coordinator claims the native submit;
 	// react to the store outcome instead of a form-level event.
 	document.addEventListener('ln-data-store:created', function (e) {

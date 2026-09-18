@@ -255,7 +255,7 @@
 						<ol>
 							<li>The user types in a field. The field's <code>ln-validate</code> primitive catches the <code>input</code> or <code>change</code> event, marks the field as touched, evaluates validity using <code>dom.checkValidity()</code>, updates the input's visual classes (<code>.ln-validate-valid</code> / <code>.ln-validate-invalid</code>), toggles the matching error in the error list, and dispatches a bubbled <code>ln-validate:valid</code> or <code>ln-validate:invalid</code> CustomEvent.</li>
 							<li>The event bubbles up to the root <code>[data-ln-form]</code>. The coordinator intercepts it, scans the active fields, and re-calculates the submit button's <code>disabled</code> state.</li>
-							<li>Without <code>data-ln-form-scope</code>, submit is left entirely native — the browser submits to <code>action</code>/<code>method</code> as usual, or a separate ajax component may intercept the native <code>submit</code> event. With <code>data-ln-form-scope</code>, a valid submit is still left native — the matching <code>ln-data-coordinator</code> claims it via <code>preventDefault()</code> (document, bubble phase) and serializes the form itself.</li>
+							<li>Without <code>data-ln-data-coordinator-scope</code>, submit is left entirely native — the browser submits to <code>action</code>/<code>method</code> as usual, or a separate ajax component may intercept the native <code>submit</code> event. With <code>data-ln-data-coordinator-scope</code>, a valid submit is still left native — the matching <code>ln-data-coordinator</code> claims it via <code>preventDefault()</code> (document, bubble phase) and serializes the form itself.</li>
 						</ol>
 
 						<h4>Why This Decoupled Approach is Superior</h4>
@@ -971,7 +971,7 @@ button.btn-icon {
 }</code></pre>
 
 						<h4>Coordinator (local-first write pages)</h4>
-						<pre><code>&lt;form id="my-form" data-ln-form data-ln-form-scope="my-resource"
+						<pre><code>&lt;form id="my-form" data-ln-form data-ln-data-coordinator-scope="my-resource"
       method="post" action="/api/resource" data-ln-form-action-edit&gt;
 
 // The nearest (or named) [data-ln-data-coordinator] claims
@@ -1239,7 +1239,7 @@ input:focus-visible {
 	};
 
 	// ─── 1A — Live demo event log ──────────────────────────────
-	// demo-form-grid has no data-ln-form-scope, so ln-form never intercepts
+	// demo-form-grid has no data-ln-data-coordinator-scope, so ln-form never intercepts
 	// submit (see js/ln-form/README.md §6) — listen to the native event and
 	// serialize with FormData, exactly as an unscoped-form consumer would.
 	const liveForm = document.getElementById('demo-form-grid');

@@ -1,4 +1,4 @@
-// Mock REST Interceptor for the Write Workflow demo (data-ln-form-scope).
+// Mock REST Interceptor for the Write Workflow demo (data-ln-data-coordinator-scope).
 // Only intercepts requests to the demo's resource path (/documents);
 // everything else falls through to the real window.fetch.
 (function () {

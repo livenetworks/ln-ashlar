@@ -1,4 +1,4 @@
-import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMethod, createBatcher } from '../../ln-core';
+import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMethod, createBatcher, attrSpec, defineAttrs } from '../../ln-core';
 import { normalizeDataQuery, selectDataSource, composeQuery, needsRemoteSupersede } from './data-read-policy';
 import { MutationReceipts } from './mutation-receipts';
 
@@ -25,8 +25,12 @@ import { MutationReceipts } from './mutation-receipts';
 		instance._queueQueryRefresh();
 	}
 
+	function _readName(el, name) {
+		return el.getAttribute(name) || el.id;
+	}
+
 	const ATTRIBUTES = {
-		'data-ln-data-coordinator':                {},
+		'data-ln-data-coordinator':                { prop: '_name', read: _readName },
 		'data-ln-data-coordinator-scope':          {},
 		'data-ln-data-coordinator-mapper':         { effect: _applyMapper },
 		'data-ln-data-coordinator-search':         { effect: _applyQuery },
@@ -34,8 +38,11 @@ import { MutationReceipts } from './mutation-receipts';
 		'data-ln-data-coordinator-sort-field':     { effect: _applyQuery },
 		'data-ln-data-coordinator-sort-direction': { effect: _applyQuery },
 		'data-ln-data-coordinator-stale':          {},
-		'data-ln-data-coordinator-no-autosync':    {}
+		'data-ln-data-coordinator-no-autosync':    {},
+		'data-ln-data-coordinator-dict':           {}
 	};
+
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	// ─── Sync Orchestration Singleton ──────────────────────
 
@@ -119,7 +126,7 @@ import { MutationReceipts } from './mutation-receipts';
 	function _component(dom) {
 		const self = this;
 		this.dom = dom;
-		this._name = dom.getAttribute('data-ln-data-coordinator') || dom.id;
+		defineAttrs(this, dom, ATTR_SPEC);
 		if (!this._name) console.warn('[ln-data-coordinator] missing id — the coordinator cannot be addressed', dom);
 		dom[DOM_ATTRIBUTE] = this;
 
@@ -948,10 +955,11 @@ import { MutationReceipts } from './mutation-receipts';
 				// The source owns search/filter/sort even when it holds no rows yet —
 				// the view only contributes the page window, so the server must be
 				// asked with the composed query, not the view's request as it arrived.
+				const gen = self._nextQueryGen(el);
 				dispatch(el, 'ln-' + kind + ':set-loading', { loading: true });
 				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
 					query: effective,
-					meta: { targetEl: el, kind: kind, offset: effective.offset, limit: effective.limit }
+					meta: { targetEl: el, kind: kind, offset: effective.offset, limit: effective.limit, queryGen: gen }
 				});
 				return;
 			}
@@ -1013,9 +1021,10 @@ import { MutationReceipts } from './mutation-receipts';
 			if (self._destroyed) return;
 			const source = selectDataSource(store, children.connector);
 			if (source === 'remote') {
+				const gen = self._nextQueryGen(el);
 				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
 					query: {},
-					meta: { targetEl: el, kind: 'options' }
+					meta: { targetEl: el, kind: 'options', queryGen: gen }
 				});
 				return;
 			}
@@ -1058,9 +1067,10 @@ import { MutationReceipts } from './mutation-receipts';
 			const requiresRemote = !!(children.connector && store && ((store.windowed && hasFilters) || store.noLocalQuery));
 			const source = requiresRemote ? 'remote' : selectDataSource(store, children.connector);
 			if (source === 'remote') {
+				const gen = self._nextQueryGen(el);
 				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
 					query: { filters: filters },
-					meta: { targetEl: el, kind: 'stat' }
+					meta: { targetEl: el, kind: 'stat', queryGen: gen }
 				});
 				return;
 			}
@@ -1133,10 +1143,11 @@ import { MutationReceipts } from './mutation-receipts';
 				// store-change refresh would query the cache even when the store has
 				// been told to leave queries to the server.
 				if (selectDataSource(store, children.connector) === 'remote') {
+					const gen = self._nextQueryGen(el);
 					dispatch(el, 'ln-' + kind + ':set-loading', { loading: true });
 					dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
 						query: effective,
-						meta: { targetEl: el, kind: kind, offset: effective.offset, limit: effective.limit }
+						meta: { targetEl: el, kind: kind, offset: effective.offset, limit: effective.limit, queryGen: gen }
 					});
 					continue;
 				}

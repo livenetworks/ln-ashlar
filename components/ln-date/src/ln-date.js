@@ -36,10 +36,14 @@ import {
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-date':        { effect: _syncAttribute },
-		'data-ln-date-format': { effect: _syncAttribute },
-		'data-ln-date-locale': { effect: _syncAttribute },
-		'data-ln-value':       { effect: _syncAttribute }
+		'data-ln-date':          { effect: _syncAttribute },
+		'data-ln-date-format':   { effect: _syncAttribute },
+		'data-ln-date-locale':   { effect: _syncAttribute },
+		'data-ln-value':         { effect: _syncAttribute },
+		'data-ln-date-dict':     {},
+		'data-ln-date-dict-key': {},
+		'data-ln-date-field':    {},
+		'data-ln-date-label':    {}
 	};
 
 	const _inputValueDesc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');

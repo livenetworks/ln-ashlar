@@ -1,4 +1,4 @@
-import { createBatcher, dispatch, dispatchCancelable, hashFilterDecode, hashFilterEncode, hashGet, hashSet, matchesFilterValues, queueBoot, readValue, registerComponent, resolveHashNamespace } from '../../ln-core';
+import { attrSpec, attrStr, createBatcher, defineAttrs, dispatch, dispatchCancelable, hashFilterDecode, hashFilterEncode, hashGet, hashSet, matchesFilterValues, queueBoot, readValue, registerComponent, resolveHashNamespace } from '../../ln-core';
 import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValues, evaluateRowFilters, resolveColumnIndex } from './filter-model.js';
 
 (function () {
@@ -19,14 +19,17 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-filter':        {},
+		'data-ln-filter':        { prop: 'targetId', read: attrStr, fallback: null },
 		'data-ln-hash':          { effect: _syncAttribute },
 		'data-ln-filter-values': { effect: _syncAttribute },
 		'data-ln-filter-col':    {},
 		'data-ln-filter-key':    {},
 		'data-ln-filter-reset':  {},
-		'data-ln-filter-value':  {}
+		'data-ln-filter-value':  {},
+		'data-ln-filter-hide':   {}
 	};
+
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	function _isReset(input) {
 		return input.hasAttribute(RESET_ATTR) || !input.getAttribute(VALUE_ATTR);
@@ -67,7 +70,7 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 
 	function _component(dom) {
 		this.dom = dom;
-		this.targetId = dom.getAttribute(DOM_SELECTOR);
+		defineAttrs(this, dom, ATTR_SPEC);
 
 		// Column index for plain table row filtering (null = standard child attribute filter)
 		const colAttr = dom.getAttribute(COL_ATTR);

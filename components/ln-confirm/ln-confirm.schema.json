@@ -4,7 +4,7 @@
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
 		"data-ln-confirm": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"ln-confirm-dev.scss",
 				"ln-confirm.scss",
@@ -15,6 +15,12 @@
 			"direction": "author",
 			"sources": [
 				"ln-confirm-dev.scss",
+				"src/ln-confirm.js"
+			]
+		},
+		"data-ln-confirm-announcer": {
+			"direction": "both",
+			"sources": [
 				"ln-confirm.scss",
 				"src/ln-confirm.js"
 			]
@@ -23,12 +29,18 @@
 			"direction": "author",
 			"sources": [
 				"ln-confirm-dev.scss",
-				"ln-confirm.scss",
+				"src/ln-confirm.js"
+			]
+		},
+		"data-ln-confirm-state": {
+			"direction": "runtime",
+			"sources": [
+				"ln-confirm-dev.scss",
 				"src/ln-confirm.js"
 			]
 		},
 		"data-ln-confirm-timeout": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-confirm.js"
 			]

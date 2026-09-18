@@ -10,7 +10,7 @@
 			]
 		},
 		"data-ln-nav-exact": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-nav.js"
 			]

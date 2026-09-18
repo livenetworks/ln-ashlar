@@ -10,7 +10,7 @@
 			]
 		},
 		"data-ln-slug-from": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"ln-slug-dev.scss",
 				"src/ln-slug.js"

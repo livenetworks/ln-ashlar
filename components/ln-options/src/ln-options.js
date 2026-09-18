@@ -1,4 +1,4 @@
-import { registerComponent, dispatch } from '../../ln-core';
+import { registerComponent, dispatch, defineAttrs, attrSpec, attrStr } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-options';
@@ -6,13 +6,19 @@ import { registerComponent, dispatch } from '../../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-options':       { prop: '_storeName',  read: attrStr, fallback: '' },
+		'data-ln-options-value': { prop: '_valueField', read: attrStr, fallback: 'id' },
+		'data-ln-options-label': { prop: '_labelField', read: attrStr, fallback: 'name' }
+	};
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
+
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
 		this.dom = dom;
-		this._storeName = dom.getAttribute(DOM_SELECTOR);
-		this._valueField = dom.getAttribute('data-ln-options-value') || 'id';
-		this._labelField = dom.getAttribute('data-ln-options-label') || 'name';
+		defineAttrs(this, dom, ATTR_SPEC);
 
 		const self = this;
 
@@ -70,5 +76,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-options');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-options', {
+		attributes: ATTRIBUTES
+	});
 })();

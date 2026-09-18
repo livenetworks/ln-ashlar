@@ -29,7 +29,7 @@ Two flows cross the concerns:
   own `request-data` intent. The coordinator that owns the matching store
   resolves it against the store's query engine and delivers
   `ln-{kind}:set-data`. The renderer draws.
-- **Write.** A scoped form (`data-ln-form-scope`) — or a coordinator-
+- **Write.** A scoped form (`data-ln-data-coordinator-scope`) — or a coordinator-
   namespaced `request-create`/`-update`/`-delete`/`-bulk-delete` event for
   non-form writes — reaches `ln-data-coordinator`, which claims it,
   serializes it, and fans out in parallel: an optimistic write to the store,
@@ -67,7 +67,7 @@ record lands in IndexedDB immediately and the store fans out
 `_pending` flag.
 
 `ln-data-coordinator`: the mediator. Claims scoped form submits
-(`data-ln-form-scope`) or coordinator-namespaced request events, serializes
+(`data-ln-data-coordinator-scope`) or coordinator-namespaced request events, serializes
 and maps the payload, and fans out from one synchronous handler to the store
 (local write) and, independently, to the transport layer (`ln-*-connector`
 directly, or `ln-api-queue`'s outbox when present). Reconciles server
@@ -165,7 +165,7 @@ it is what makes ln-ashlar local-first.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Submit: user submits (data-ln-form-scope)
+    [*] --> Submit: user submits (data-ln-data-coordinator-scope)
     Submit --> ValidateGate: ln-validate's own submit listener
     ValidateGate --> [*]: invalid (block, focus first field)
     ValidateGate --> Claim: valid, submit left native
@@ -225,7 +225,7 @@ stateDiagram-v2
     DrainDrop --> [*]
 ```
 
-**Happy path.** A scoped form submits (`data-ln-form-scope`, method `POST` /
+**Happy path.** A scoped form submits (`data-ln-data-coordinator-scope`, method `POST` /
 `PUT` / `PATCH`). `ln-validate`'s own submit listener runs first and blocks
 only if a field is invalid; a valid submit is left native and bubbles to
 `document`, where `ln-data-coordinator` claims it with `preventDefault()`,
@@ -346,7 +346,7 @@ global listeners on this event."
 
 The scoped form is the canonical write trigger — `ln-data-coordinator`
 listens on `document` at the **bubble** phase only, so `ln-validate`'s own
-submit gate always runs first (see §2.4). `data-ln-form-scope` matches a
+submit gate always runs first (see §2.4). `data-ln-data-coordinator-scope` matches a
 form to its coordinator by name (or by DOM containment when the scope is
 empty); an unmatched scope falls through as an ordinary native submit, no
 console warning. For programmatic writes (imports, scripts), dispatch the
@@ -415,7 +415,7 @@ form.addEventListener('submit', e => {
 ```
 
 `ln-form` never listens for `submit` and never calls `serializeForm`. A
-scoped form (`data-ln-form-scope`) leaves its own submit native;
+scoped form (`data-ln-data-coordinator-scope`) leaves its own submit native;
 `ln-data-coordinator` claims it at the `document` bubble phase, serializes
 it, and decides whether to write optimistically, queue, or retry. The form
 has no concept of temp ids or IndexedDB — crossing this boundary would make
@@ -759,7 +759,7 @@ _scan(document.body);  // init
 | **Coordinator** | A component or script that listens for events on one element and writes attributes (or dispatches events) on another, never calling instance methods directly. Two flavours — page-level (consumer-written shim that bridges data-flow components) and library-shipped (encapsulates a reusable cross-component rule, e.g. `ln-accordion`, or the data layer's own `ln-data-coordinator`). For details, see the [Coordinator Doctrine](coordinator.md). |
 | **Store** | An `ln-data-store` instance (marker attribute `data-ln-data-store`, identified by its `id`) bound to a single resource. One element, one cache. It is a pure cache — it holds no write queue of its own; the optional offline outbox lives in `ln-api-queue`. |
 | **Renderer** | Any element with `data-ln-table-source`, `data-ln-list-source`, `data-ln-chart-source`, `data-ln-options`, or `data-ln-stat`. Receives `ln-{kind}:set-data` / `:set-loading` (or `:set-count` for stats) from the coordinator that owns the matching store. |
-| **Scoped form** | `data-ln-form-scope="<name>"` on a `<form>` matches it to the `data-ln-data-coordinator` of the same name (or, when empty, to the nearest containing coordinator). The coordinator claims its native submit at the `document` bubble phase, after `ln-validate`'s own gate has already run. |
+| **Scoped form** | `data-ln-data-coordinator-scope="<name>"` on a `<form>` matches it to the `data-ln-data-coordinator` of the same name (or, when empty, to the nearest containing coordinator). The coordinator claims its native submit at the `document` bubble phase, after `ln-validate`'s own gate has already run. |
 | **Intent** | A UI component's output describing what the user wants — sort by column X descending, filter by status, search for "foo". Produced by `ln-sort`, `ln-filter`, `ln-search`; delivered via `request-data`, consumed by the coordinator through the owning store's `getAll()` options. |
 | **Optimistic write** | Writing to the local cache before the server confirms. There is no `_pending` flag — a create's only marker is its `_temp_<uuid>` id, held until the server response arrives. |
 | **Reconcile** | Replacing a `_temp_<uuid>` with the server's authoritative id via an **ordinary** `ln-data-store:request-update` (the store detects the id mismatch and rekeys). There is no separate `confirmMutation` — reconciliation reuses the same update event a normal edit would dispatch. |

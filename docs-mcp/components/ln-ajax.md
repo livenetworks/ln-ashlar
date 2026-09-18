@@ -19,7 +19,7 @@ tags: [ajax, navigation, form, network]
 The `ln-ajax` component implements **HTML-over-the-wire** interactions. It intercepts standard link navigations and form submissions inside an observed container and converts them into AJAX requests, updating designated DOM regions dynamically. It is defined in [ln-ajax.js](../../components/ln-ajax/src/ln-ajax.js).
 
 *   **Navigation Hijacking:** Intercepts click events on all child `<a>` links and submit events on all child `<form>` elements (unless exempted with `data-ln-ajax="false"`).
-*   **Write Pipeline Precedence:** Form structures that carry the `data-ln-form-scope` write routing attribute are ignored by `ln-ajax` (the coordinator's write workflow handles them). `ln-ajax` prints a single `console.warn` notifying the developer of the override.
+*   **Write Pipeline Precedence:** Form structures that carry the `data-ln-data-coordinator-scope` write routing attribute are ignored by `ln-ajax` (the coordinator's write workflow handles them). `ln-ajax` prints a single `console.warn` notifying the developer of the override.
 *   **HTML-over-the-wire Updates:** Upon receiving a successful JSON response, `ln-ajax` performs the following updates:
     *   `title`: Updates `document.title`.
     *   `content`: Iterates through a key-value map `{ "target-id": "HTML content" }`, finding each DOM node by ID and overwriting its `innerHTML`.
@@ -166,7 +166,7 @@ Visual styling governs the disabled loading states and the injection spinner ele
 >    }
 >    ```
 > 2. **Neglecting Hash Anchors:** anchors navigating internally to page fragments (e.g., `<a href="#settings">`) should carry `data-ln-ajax="false"` to prevent unneeded routing scans.
-> 3. **Form Scope Collision:** Do not combine `data-ln-ajax` and `data-ln-form-scope` on the same form. Form-scope targets are reserved for local-first coordinator routing and will bypass `ln-ajax`.
+> 3. **Form Scope Collision:** Do not combine `data-ln-ajax` and `data-ln-data-coordinator-scope` on the same form. Form-scope targets are reserved for local-first coordinator routing and will bypass `ln-ajax`.
 
 ---
 
@@ -209,4 +209,4 @@ sequenceDiagram
 
 - [`ln-toast`](./ln-toast.md) — Receives global `ln-toast:enqueue` notifications triggered by response messages.
 - [`ln-router`](./ln-router.md) — Listens for history state shifts to keep UI routing synchronized.
-- [`ln-form`](./ln-form.md) — Normal forms can be enriched with `ln-ajax` for async submissions. Forms utilizing `data-ln-form-scope` are managed by the [`ln-data-coordinator`](./ln-data-coordinator.md).
+- [`ln-form`](./ln-form.md) — Normal forms can be enriched with `ln-ajax` for async submissions. Forms utilizing `data-ln-data-coordinator-scope` are managed by the [`ln-data-coordinator`](./ln-data-coordinator.md).

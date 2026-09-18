@@ -7,6 +7,12 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-ui-coordinator':      {},
+		'data-ln-ui-coordinator-dict': {}
+	};
+
 	// Resolve the active coordinator dictionary for a given event target.
 	// Climbs the DOM hierarchy of UI coordinators and merges dictionary keys from
 	// root to leaf so nested coordinators inherit and selectively override outer translations.
@@ -391,5 +397,7 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-ui-coordinator');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-ui-coordinator', {
+		attributes: ATTRIBUTES
+	});
 })();

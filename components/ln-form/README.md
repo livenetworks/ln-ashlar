@@ -65,7 +65,7 @@ at all. Validation display and the submit gate are owned entirely by
 | `data-ln-form` | `<form>` | Initializes the coordinator. |
 | `data-ln-form-action-edit` | `<form>` | Opt-in RESTful action routing. See below. |
 | `data-ln-form-action-method="PUT"` | `<form>` | Override verb for `_method` (default `PUT`). Requires `data-ln-form-action-edit`. |
-| `data-ln-form-scope` | `<form>` | Opt-in local-first write path. Empty = nearest ancestor `[data-ln-data-coordinator]`. Named = explicit coordinator override. Intercepts submit; incompatible with native/ajax submit on the same form. |
+| `data-ln-data-coordinator-scope` | `<form>` | Opt-in local-first write path, carried by the form but read by `ln-data-coordinator`. Empty = nearest ancestor `[data-ln-data-coordinator]`. Named = explicit coordinator override. Intercepts submit; incompatible with native/ajax submit on the same form. |
 
 ### JS API
 
@@ -170,21 +170,21 @@ them.
 
 ---
 
-## 5b. Local-first write routing (`data-ln-form-scope`)
+## 5b. Local-first write routing (`data-ln-data-coordinator-scope`)
 
-A form carrying `data-ln-form-scope` becomes the universal write entry
+A form carrying `data-ln-data-coordinator-scope` becomes the universal write entry
 point for local-first/SPA pages. The `submit` event is intercepted at
 three possible rungs, and whichever rung claims it decides the archetype:
 
 1. **Nobody** — native browser submit to `action` (+ `_method`), SSR.
 2. **`ln-ajax`** — fetch to `action`, page stays put (progressive
    enhancement). `ln-ajax` explicitly skips forms carrying
-   `data-ln-form-scope` (see the `ln-ajax` README).
-3. **`ln-data-coordinator`** — a form with `data-ln-form-scope` has its
+   `data-ln-data-coordinator-scope` (see the `ln-ajax` README).
+3. **`ln-data-coordinator`** — a form with `data-ln-data-coordinator-scope` has its
    valid submit left native; `ln-form` never intercepts it beyond the
    validation gate (§7 below). The nearest ancestor
    `[data-ln-data-coordinator]` (or the named coordinator, if
-   `data-ln-form-scope="name"`) listens for the native `submit` on
+   `data-ln-data-coordinator-scope="name"`) listens for the native `submit` on
    `document` (bubble phase), claims it with `preventDefault()` once its
    own scope/containment matches, serializes the form itself, and routes
    it through the store → queue → connector write pipeline. See the

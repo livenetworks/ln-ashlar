@@ -467,7 +467,7 @@
 <dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="doc-modal">
 	<form data-ln-form="doc-form" novalidate
 	      id="doc-form"
-	      data-ln-form-scope="demo-docs"
+	      data-ln-data-coordinator-scope="demo-docs"
 	      method="post"
 	      action="/documents"
 	      data-ln-form-action-edit>
@@ -652,7 +652,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	});
 
-	// Write path is native-first (data-ln-form-scope on #doc-form) — react
+	// Write path is native-first (data-ln-data-coordinator-scope on #doc-form) — react
 	// to the store outcome instead of a form-level event.
 	['ln-data-store:created', 'ln-data-store:updated'].forEach(function (ev) {
 		storeEl.addEventListener(ev, function () {

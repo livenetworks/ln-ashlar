@@ -5,8 +5,8 @@
 @use 'spacing' as *;
 @use 'motion' as *;
 
-// Shared dark-bubble chrome for ::after pseudo-tooltips (tooltip, confirm)
-// and JS-portal tooltip-element. Reads the theme-root token pair
+// Shared dark-bubble chrome for the ::after pseudo-tooltip and the
+// JS-portal tooltip-element. Reads the theme-root token pair
 // (--fg-default / --bg-base) NOT the rebindable --color-fg / --color-bg:
 // the ::after inherits custom properties from its trigger, and many
 // components locally rebind --color-fg/--color-bg (btn, accordion,

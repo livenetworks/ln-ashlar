@@ -56,7 +56,7 @@
 		const path = u.pathname;
 		const records = loadBackendData();
 
-		// GET /api/documents (sync / changes feed)
+		// GET /api/documents (sync / changes feed or query)
 		if (path === ENDPOINT && method === 'GET') {
 			const since = u.searchParams.get('since');
 			if (since != null && since !== '' && since !== 'null') {
@@ -67,10 +67,73 @@
 				}));
 				return jsonResponse({ data: updatedRecords, deleted: [], synced_at: Math.floor(Date.now() / 1000) });
 			}
+
+			let result = records.slice();
+
+			const search = (u.searchParams.get('search') || '').toLowerCase().trim();
+			if (search) {
+				result = result.filter(r =>
+					(r.title && r.title.toLowerCase().includes(search)) ||
+					(r.department && r.department.toLowerCase().includes(search)) ||
+					(r.author && r.author.name && r.author.name.toLowerCase().includes(search))
+				);
+			}
+
+			const dept = u.searchParams.get('department');
+			if (dept) {
+				const allowed = dept.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+				if (allowed.length) {
+					result = result.filter(r => r.department && allowed.includes(r.department.toLowerCase()));
+				}
+			}
+
+			const status = u.searchParams.get('status');
+			if (status) {
+				const allowed = status.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+				if (allowed.length) {
+					result = result.filter(r => r.status && allowed.includes(r.status.toLowerCase()));
+				}
+			}
+
+			const filteredCount = result.length;
+
+			const sortField = u.searchParams.get('sort_field');
+			const sortDir = u.searchParams.get('sort_dir') || 'asc';
+			if (sortField) {
+				result.sort((a, b) => {
+					const valA = a[sortField];
+					const valB = b[sortField];
+					if (valA == null && valB == null) return 0;
+					if (valA == null) return 1;
+					if (valB == null) return -1;
+					let cmp = 0;
+					if (typeof valA === 'number' && typeof valB === 'number') {
+						cmp = valA - valB;
+					} else {
+						cmp = String(valA).localeCompare(String(valB));
+					}
+					return sortDir === 'desc' ? -cmp : cmp;
+				});
+			}
+
+			const offsetParam = u.searchParams.get('offset');
+			const limitParam = u.searchParams.get('limit');
+			if (offsetParam != null || limitParam != null) {
+				const offset = offsetParam ? parseInt(offsetParam, 10) : 0;
+				const limit = limitParam ? parseInt(limitParam, 10) : 25;
+				result = result.slice(offset, offset + limit);
+			}
+
 			window.dispatchEvent(new CustomEvent('demo-telemetry-net', {
-				detail: { message: `GET /api/documents -> Full Load (${records.length} records)` }
+				detail: { message: `GET /api/documents -> Query (matched ${filteredCount} of ${records.length} records)` }
 			}));
-			return jsonResponse({ data: records, deleted: [], synced_at: Math.floor(Date.now() / 1000) });
+			return jsonResponse({
+				data: result,
+				total: records.length,
+				filtered: filteredCount,
+				deleted: [],
+				synced_at: Math.floor(Date.now() / 1000)
+			});
 		}
 
 		const simFailureEl = document.getElementById('sim-failure');

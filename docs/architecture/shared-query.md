@@ -101,7 +101,7 @@ is push.
 Reads address the **source** (`data-ln-table-source`, `data-ln-list-source`,
 `data-ln-chart-source`, `data-ln-options`, `data-ln-stat`,
 `data-ln-search-for`, `data-ln-filter`, `data-ln-sort`). Writes address the **coordinator**
-(`ln-data-coordinator:request-*`, `data-ln-form-scope`).
+(`ln-data-coordinator:request-*`, `data-ln-data-coordinator-scope`).
 
 ---
 

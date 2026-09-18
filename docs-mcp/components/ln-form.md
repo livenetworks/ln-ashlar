@@ -84,7 +84,7 @@ Configured for both creation and modification. Uses dynamic action path template
 | `data-ln-form-action-edit` | `<form>` | `String` | — | Path pattern used in edit mode. Overrides the form action. `:id` is replaced by the actual ID. |
 | `data-ln-form-action-method` | `<form>` | `String` | `"PUT"` | HTTP method placed in the hidden `_method` field when editing. |
 | `data-ln-fill-as` | Input control | `String` | — | Maps a record key to this input if it differs from the `name` attribute. |
-| `data-ln-form-scope` | `<form>` | `String` | — | Associates the form with a specific `data-ln-data-coordinator`. |
+| `data-ln-data-coordinator-scope` | `<form>` | `String` | — | Associates the form with a specific `data-ln-data-coordinator`. |
 
 ### Programmatic JS API
 

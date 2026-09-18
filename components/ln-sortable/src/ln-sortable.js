@@ -11,7 +11,8 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-sortable': { effect: _syncEnabled }
+		'data-ln-sortable':         { effect: _syncEnabled },
+		'data-ln-sortable-handle':  {}
 	};
 
 	// ─── Component ─────────────────────────────────────────────

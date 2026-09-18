@@ -74,7 +74,7 @@ The `modal-crud` pattern uses a **single `<form>` inside a `<dialog data-ln-moda
 
 <!-- Shared Modal Dialog -->
 <dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="package-modal" aria-labelledby="package-modal-title">
-    <form data-ln-form="package-form" id="package-form" data-ln-form-scope="packages" method="post" action="/api/packages" data-ln-form-action-edit="/api/packages/:id">
+    <form data-ln-form="package-form" id="package-form" data-ln-data-coordinator-scope="packages" method="post" action="/api/packages" data-ln-form-action-edit="/api/packages/:id">
         <input type="hidden" name="id">
         
         <header>

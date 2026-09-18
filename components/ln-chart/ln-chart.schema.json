@@ -4,7 +4,7 @@
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
 		"data-ln-chart": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"ln-chart-dev.scss",
 				"src/ln-chart.js"

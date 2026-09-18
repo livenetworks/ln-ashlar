@@ -4,7 +4,7 @@
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
 		"data-ln-api-base-url": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-api-connector.js"
 			]
@@ -22,7 +22,7 @@
 			]
 		},
 		"data-ln-api-headers": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-api-connector.js"
 			]
@@ -58,7 +58,7 @@
 			]
 		},
 		"data-ln-api-path": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-api-connector.js"
 			]

@@ -6,6 +6,11 @@ import { dispatch, registerComponent } from '../../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-accordion': {}
+	};
+
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
@@ -37,5 +42,7 @@ import { dispatch, registerComponent } from '../../ln-core';
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-accordion');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-accordion', {
+		attributes: ATTRIBUTES
+	});
 })();

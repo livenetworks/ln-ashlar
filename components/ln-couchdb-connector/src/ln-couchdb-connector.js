@@ -1,4 +1,4 @@
-import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from '../../ln-core';
+import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders, defineAttrs, attrSpec, attrStr } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-couchdb-connector';
@@ -15,11 +15,12 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 
 	const ATTRIBUTES = {
 		'data-ln-couchdb-connector': {},
-		'data-ln-couchdb-url':       { effect: _syncAttribute },
-		'data-ln-couchdb-db':        { effect: _syncAttribute },
-		'data-ln-couchdb-auth':      { effect: _syncAttribute },
+		'data-ln-couchdb-url':       { prop: 'url',  read: attrStr, fallback: '', effect: _syncAttribute },
+		'data-ln-couchdb-db':        { prop: 'db',   read: attrStr, fallback: '', effect: _syncAttribute },
+		'data-ln-couchdb-auth':      { prop: 'auth', read: attrStr, fallback: '', effect: _syncAttribute },
 		'data-ln-couchdb-headers':   { effect: _syncAttribute }
 	};
+	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 
 	// ─── Response Envelope Unwrap (presence-checked `{message, content}`) ──
 	// Raw CouchDB never sends this envelope (content=body, message=null — no-op).
@@ -35,6 +36,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 
 	function _component(dom) {
 		this.dom = dom;
+		defineAttrs(this, dom, ATTR_SPEC);
 		dom[DOM_ATTRIBUTE] = this;
 		dom[DOM_ALIAS] = this; // Alias for 3-tier compatibility
 
@@ -50,9 +52,6 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 	_component.prototype.refreshConfig = function () {
 		const dom = this.dom;
 
-		this.url = dom.getAttribute('data-ln-couchdb-url') || '';
-		this.db = dom.getAttribute('data-ln-couchdb-db') || '';
-		this.auth = dom.getAttribute('data-ln-couchdb-auth') || '';
 		this.credentials = 'same-origin';
 
 		const rawHeaders = dom.getAttribute('data-ln-couchdb-headers') || '';
