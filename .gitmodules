@@ -1,4 +1,0 @@
-[submodule ".claude"]
-	path = .claude
-	url = git@github.com:livenetworks/claude-skills.git
-	branch = main
