@@ -10,7 +10,11 @@ tags: [forms, editors, inputs, rich-text]
 
 # 📝 ln-editor
 
-> **Classification:** 🟢 Simple Component / Visual Rich Text Editor
+> **Classification:** 🟢 Simple Component / Visual Rich Text Editor  
+> Applied to a `<div data-ln-editor>` wrapper enclosing an authored `<div role="toolbar">` and a `<textarea name="...">`.
+> On initialization, it hides the textarea and injects a `<div contenteditable="true" role="textbox">` populated with the initial content.
+> Toolbar clicks execute text commands on the selection; on every `input` event, it sanitizes markup and writes
+> `textarea.value = editable.innerHTML` so native form submissions send current HTML.
 
 ---
 

@@ -10,7 +10,8 @@ tags: [forms, data-binding, programmatic-fill]
 
 # 🟢 ln-fill
 
-> **Classification:** 🟢 Simple component / Global behavior (Layer 1 - Form/Display Binder)
+> **Classification:** 🟢 Simple component / Global behavior (Layer 1 - Form/Display Binder)  
+> Applied declaratively to clickable triggers (`<button data-ln-fill-form="formId" data-ln-fill-key="value">`). It catches delegated document click events, normalizes `data-ln-fill-*` attributes into a payload object, and invokes targeted dispatch via `lnCore.lnFill()` to fire `ln-fill` CustomEvents directly at the addressed form or container. It manages no form validation, modal toggling, or backend storage, serving strictly as an event-driven DOM field populator.
 
 ---
 

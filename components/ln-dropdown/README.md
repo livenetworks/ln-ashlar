@@ -1,6 +1,8 @@
 # ln-dropdown
 
-> A menu-grade coordinator that adds click-outside, top-layer promotion, and automatic positioning on top of `ln-toggle`.
+> Applied to a `<div data-ln-dropdown>` wrapper enclosing a trigger button and a `<ul data-ln-toggle>` menu.
+> When the menu emits `ln-toggle:open`, it sets `popover="manual"` on the menu, calls `showPopover()`, and calculates inline `top`/`left` coordinates.
+> On outside `click` or `Escape` key, it sets `setAttribute('data-ln-toggle', 'close')` on the menu.
 
 ---
 

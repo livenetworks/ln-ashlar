@@ -1,6 +1,6 @@
 # ln-router
 
-> A zero-dependency, template-driven, client-side SPA router that maps URLs to route templates and renders them declaratively.
+> Declared globally with route definitions in `<template data-ln-route="...">` elements rendering into `<main data-ln-outlet>` or auxiliary targets (`data-ln-route-target`). It intercepts click events on same-origin `<a>` tags and listens for `popstate`, matches the URL against specificity-ranked route patterns, and clones templates into designated outlets with `document.startViewTransition()` support. It unmounts old views by calling `.destroy()` on child components, leaving data fetching and view filling to route coordinators.
 
 ---
 

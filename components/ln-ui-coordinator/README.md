@@ -1,5 +1,7 @@
 # ln-ui-coordinator
 
+> Applied to a container element (`<main data-ln-ui-coordinator>`). It listens for clicks on `[data-ln-modal-for]` triggers and `a[href^="#"]` anchors to open `[data-ln-modal]` dialogs and synchronize the URL hash, intercepts bubbling `ln-ajax:success`/`ln-ajax:error` and `ln-upload:error` events to dispatch `ln-toast:enqueue` notifications, and extracts `data-ln-fill-*` attributes to dispatch `ln-fill:request`. It never inspects internal form validation states, keeping forms and dialogs strictly encapsulated.
+
 A general-purpose **Layer 2 Coordinator** that mediates UI triggers, modals (`ln-modal`), AJAX (`ln-ajax`), uploads (`ln-upload`), record filling (`ln-fill`), and toast notifications (`ln-toast`).
 
 ---

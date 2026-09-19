@@ -1,8 +1,8 @@
 # ln-sortable
 
-A zero-dependency, high-performance **Drag & Drop Reordering Primitive** driven by browser Pointer Events APIs, designed for seamless mouse and touch interactions.
-
-It focuses strictly on visual DOM restructuring, delegating server-side synchronization, database persistence, and list state saves completely to the parent coordinator via telemetry events.
+> Applied to a `<ul data-ln-sortable>` or `<ol>` list. It listens for `pointerdown`, `pointermove`, and `pointerup` events
+> on list items (or `[data-ln-sortable-handle]`). On drag, it adds `.ln-sortable--dragging`, repositions items in the DOM via
+> `insertBefore`, and places a placeholder element. On release, it removes drag classes, purges the placeholder, and emits an `ln-sortable:change` CustomEvent.
 
 ---
 
@@ -10,7 +10,7 @@ It focuses strictly on visual DOM restructuring, delegating server-side synchron
 
 1. **Pointer Concurrency:** Built natively on Pointer Events APIs (`pointerdown`, `pointermove`, `pointerup`). It replaces heavy HTML5 Drag & Drop frameworks, offering high-performance dragging and layout shifts across desktop, mobile, and hybrid touch displays.
 2. **Visual Isolation:** The primitive does not import or inject inline styles or layout rules. Instead, it exposes CSS state hooks (e.g. `.ln-sortable--dragging`) on active elements, leaving transitions and placeholders fully to the stylesheet.
-3. **HTML Attribute as Single Source of Truth:** Component states are governed entirely by the `data-ln-sortable` attribute. Standard JS API calls (`enable()`, `disable()`) write directly to the attribute, which is observed via `MutationObserver` to coordinate internals.
+3. **HTML Attribute as Single Source of Truth:** Component states are governed entirely by the `data-ln-sortable` attribute. Writing the attribute is the only way to enable or disable the component; the write is observed via `MutationObserver` to coordinate internals.
 
 ---
 
@@ -87,7 +87,7 @@ Fired when an item drop successfully changes the DOM index order.
 - **Payload (`detail`)**: `{ item: HTMLElement, oldIndex: number, newIndex: number }`
 
 ### `ln-sortable:enabled` / `ln-sortable:disabled`
-Fired when `data-ln-sortable` toggles between enabled and `"disabled"` (via `enable()`/`disable()` or a direct attribute write, picked up by the shared `MutationObserver`).
+Fired when `data-ln-sortable` toggles between enabled and `"disabled"` — written directly on the host and picked up by the shared `MutationObserver`.
 - **Payload (`detail`)**: `{ target: HTMLElement }`
 
 ### `ln-sortable:destroyed`
@@ -126,7 +126,7 @@ On `pointerdown`: if the target (or an ancestor) carries `data-ln-sortable-handl
 
 ### Attribute-driven enable/disable
 
-`data-ln-sortable` (absent value) = enabled, `data-ln-sortable="disabled"` = disabled. `enable()`/`disable()` write the attribute; the shared `MutationObserver` picks up the change, updates `isEnabled` inline, and dispatches `ln-sortable:enabled`/`ln-sortable:disabled`. No cancelable before-event for enable/disable — the state change is immediate.
+`data-ln-sortable` (absent value) = enabled, `data-ln-sortable="disabled"` = disabled. The shared `MutationObserver` picks up the attribute write, updates `isEnabled` inline, and dispatches `ln-sortable:enabled`/`ln-sortable:disabled`. No cancelable before-event — the state change is immediate.
 
 ### MutationObserver
 

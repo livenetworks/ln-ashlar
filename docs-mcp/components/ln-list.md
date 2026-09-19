@@ -10,7 +10,11 @@ tags: [lists, cards, virtual-scrolling, sorting, selection]
 
 # 📋 ln-list
 
-> **Classification:** 🟢 Simple component / Presenter (Layer 1 - Presenter Component)
+> **Classification:** 🟢 Simple component / Presenter (Layer 1 - Presenter Component)  
+> Applied to a list or grid container via `data-ln-list="name"`. In SSR mode, it coordinates direct DOM search,
+> filter, and sort interactions on its child items. In data-driven mode (`data-ln-list-source="store"`), it listens for
+> `ln-data-store:data` CustomEvents, clones `<template data-ln-template="name-row">`, populates fields via `fill()`,
+> and mounts rendered items into `[data-ln-list-body]` with optional virtual scroll windowing.
 
 ---
 

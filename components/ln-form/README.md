@@ -1,11 +1,9 @@
 # ln-form
 
-A minimal **form manipulation** primitive. `ln-form` does exactly two
-things to a native `<form>`: populate it when an `ln-fill` event delivers
-a record, and rewrite `action` / `_method` for RESTful edit routing.
-Submit is entirely native HTML — `ln-form` does not listen for `submit`
-at all. Validation display and the submit gate are owned entirely by
-[`ln-validate`](../ln-validate/README.md).
+> Applied to a native `<form data-ln-form action="..." method="...">`. It listens for `ln-fill` events carrying a record payload:
+> populating matching controls (`[name="key"]`) and dispatching synthetic `input`/`change` events to update dependent components.
+> On edit workflows, it updates `form.action` and ensures an `<input type="hidden" name="_method" value="PUT">` exists for RESTful
+> method spoofing, without intercepting native form submission.
 
 ---
 

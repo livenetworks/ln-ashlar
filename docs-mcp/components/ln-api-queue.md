@@ -10,7 +10,8 @@ tags: [network, database, offline, queue]
 
 # 📥 ln-api-queue
 
-> **Classification:** 🌐 Simple component / Offline Outbox Queue
+> **Classification:** 🌐 Simple component / Offline Outbox Queue  
+> Applied to an outbox element (`<li data-ln-api-queue>`) nested inside `data-ln-data-coordinator`. It listens for `ln-api-queue:request-enqueue` from the coordinator, persists mutations to an internal `IndexedDB` outbox (`ln_api_queue`) with monotonic per-scope sequence counters, and emits `ln-api-queue:send` CustomEvents for FIFO dispatch. It never initiates network requests directly, updating retry attempts with exponential backoff until acknowledged via `ack`/`nack`.
 
 ---
 

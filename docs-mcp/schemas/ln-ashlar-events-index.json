@@ -1725,6 +1725,56 @@
 			"detail": "{ data: Array }",
 			"source": "static"
 		},
+		"ln-picklist:before-move": {
+			"emitted_by": [
+				"ln-picklist"
+			],
+			"listened_by": [],
+			"cancelable": true,
+			"description": "Dispatched before the item is re-parented. Canceling aborts the move and reverts the checkbox.",
+			"detail": "{ item: HTMLElement, from: HTMLElement, to: HTMLElement, checkbox: HTMLInputElement }",
+			"source": "static"
+		},
+		"ln-picklist:destroyed": {
+			"emitted_by": [
+				"ln-picklist"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "Dispatched when the instance is destroyed.",
+			"detail": "{ target: HTMLElement }",
+			"source": "static"
+		},
+		"ln-picklist:disabled": {
+			"emitted_by": [
+				"ln-picklist"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "Dispatched when the root attribute becomes `\"disabled\"`.",
+			"detail": "{ target: HTMLElement }",
+			"source": "static"
+		},
+		"ln-picklist:enabled": {
+			"emitted_by": [
+				"ln-picklist"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "Dispatched when the root attribute transitions away from `\"disabled\"`.",
+			"detail": "{ target: HTMLElement }",
+			"source": "static"
+		},
+		"ln-picklist:move": {
+			"emitted_by": [
+				"ln-picklist"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "Dispatched after the item has been re-parented.",
+			"detail": "{ item: HTMLElement, from: HTMLElement, to: HTMLElement, checkbox: HTMLInputElement }",
+			"source": "static"
+		},
 		"ln-popover:before-close": {
 			"emitted_by": [
 				"ln-popover"

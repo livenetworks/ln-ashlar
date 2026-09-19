@@ -1,8 +1,9 @@
 # ln-filter
 
-A zero-dependency, event-driven **Generic List & Table Filter Primitive** that manages item visibility states through declarative checkbox controls.
-
-It filters target elements either by comparing child dataset attributes (for custom cards/lists) or scanning table column cell contents (for plain HTML tables). It operates independently of and in harmony with `ln-search`, combining multiple filter criteria seamlessly.
+> Applied to a `<nav data-ln-filter="targetId">` control containing `<input type="checkbox">` filters with `data-ln-filter-value`
+> and a `data-ln-filter-reset` sentinel. On checkbox `change`, it updates active values and keeps the sentinel in sync. It evaluates
+> items on the target container or table by dataset attributes or column index, sets `data-ln-filter-hide` and `.hidden` on non-matching
+> elements, and emits a cancelable `ln-filter:change` CustomEvent.
 
 ---
 

@@ -1,5 +1,7 @@
 # ln-options
 
+> Applied to a `<select data-ln-options="storeName" data-ln-options-value="id" data-ln-options-label="name">` element inside a coordinator subtree. It emits `ln-options:request-data` on initialization and listens for `ln-options:set-data` to populate `<option>` elements while preserving the placeholder and restoring previous selection. It never accesses IndexedDB or network endpoints directly, leaving data resolution entirely to `ln-data-coordinator`.
+
 Populates a `<select>` element with records from an `ln-data-store` via the `ln-data-coordinator` binder. Opt-in: add `data-ln-options="<storeName>"` to any `<select>` inside (or reachable by) a coordinator subtree.
 
 No `<template>` needed — ln-options writes `<option>` elements directly (value + label only).

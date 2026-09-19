@@ -38,6 +38,7 @@
 | `ln-upload` | Drag-and-drop file intake | Single trivial file input; camera capture |
 | `ln-autosave` | Long forms, comment boxes — draft persistence to localStorage | Sensitive data (unencrypted) |
 | `ln-autoresize` | Textareas with unpredictable content length | Fixed-height inputs |
+| `ln-picklist` | Choosing a subset from a long pool — available list on the left, chosen on the right | Few options -> inline pill group; filtering a view rather than moving items -> `ln-filter` |
 
 ## Navigation
 

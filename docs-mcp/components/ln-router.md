@@ -10,7 +10,8 @@ tags: [router, spa, routing, navigation, view-transitions]
 
 # 🧭 ln-router
 
-> **Classification:** ⚙️ Coordinator / Core Engine (Layer 3 - SPA Routing Engine)
+> **Classification:** ⚙️ Coordinator / Core Engine (Layer 3 - SPA Routing Engine)  
+> Declared globally with route definitions in `<template data-ln-route="...">` elements rendering into `<main data-ln-outlet>` or auxiliary targets (`data-ln-route-target`). It intercepts click events on same-origin `<a>` tags and listens for `popstate`, matches the URL against specificity-ranked route patterns, and clones templates into designated outlets with `document.startViewTransition()` support. It unmounts old views by calling `.destroy()` on child components, leaving data fetching and view filling to route coordinators.
 
 ---
 

@@ -1,6 +1,8 @@
 # ln-slug
 
-Auto-slug micro-component — mirrors a slugified version of a source field into a slug field while the slug field is pristine. Stops mirroring once the user types directly into the slug field; resumes if the slug field is cleared.
+> Applied to an `<input name="slug" data-ln-slug-from="sourceName">` within a `<form>`. It queries the source field by `name`
+> and listens for its native `input` events: while the slug input remains pristine, it computes the slugified string and sets
+> `slug.value`, dispatching a synthetic `input` event. If the user types directly into the slug field, it marks it as dirty and halts mirroring until cleared.
 
 ## Attributes
 

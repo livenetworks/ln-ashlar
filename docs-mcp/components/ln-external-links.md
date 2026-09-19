@@ -10,7 +10,10 @@ tags: [security, accessibility, telemetry, links]
 
 # 🌐 ln-external-links
 
-> **Classification:** 🟢 Simple component / Global Behavior (Layer 1 - Security & Accessibility)
+> **Classification:** 🟢 Simple component / Global Behavior (Layer 1 - Security & Accessibility)  
+> Runs globally across `document.body` watching all `<a>` and `<area>` elements. When an element's `href` host
+> differs from `window.location.host`, it sets `target="_blank"`, merges `rel="noopener noreferrer"`,
+> appends a `<span class="sr-only">(opens in new tab)</span>`, and marks it with `data-ln-external-link="processed"` to prevent redundant mutations.
 
 ---
 

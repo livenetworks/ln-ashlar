@@ -1,6 +1,8 @@
 # ln-external-links
 
-Auto-decorates every cross-host `<a>` and `<area>` on the page with `target="_blank"`, merged `rel="noopener noreferrer"`, and a screen-reader hint span. Runs on page load and on every DOM mutation; no opt-in attribute, no init call, no API surface for consumers to wire.
+> Runs globally across `document.body` watching all `<a>` and `<area>` elements. When an element's `href` host
+> differs from `window.location.host`, it sets `target="_blank"`, merges `rel="noopener noreferrer"`,
+> appends a `<span class="sr-only">(opens in new tab)</span>`, and marks it with `data-ln-external-link="processed"` to prevent redundant mutations.
 
 ## Markup anatomy
 

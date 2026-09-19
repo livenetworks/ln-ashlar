@@ -1,7 +1,8 @@
 # ln-circular-progress
 
-> Attribute-driven SVG ring renderer. Set `data-ln-circular-progress="75"` on an
-> empty host; the component builds the SVG, watches the attribute, and redraws on every change. The attribute IS the state — no imperative setter.
+> Applied to an empty host element via `data-ln-circular-progress="value"`. On initialization, it injects an inline `<svg>`
+> ring and a `<strong>` percentage label. An attribute observer watches `data-ln-circular-progress`: it calculates the circle's
+> `stroke-dashoffset` from the clamped percentage, updates `strong.textContent`, and synchronizes `aria-valuenow` on the host.
 
 ## Quick start
 

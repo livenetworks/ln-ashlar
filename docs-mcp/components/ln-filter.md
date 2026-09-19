@@ -10,7 +10,11 @@ tags: [filter, list, table, accessibility, persistent]
 
 # 🎯 ln-filter
 
-> **Classification:** 🟢 Simple component
+> **Classification:** 🟢 Simple component  
+> Applied to a `<nav data-ln-filter="targetId">` control containing `<input type="checkbox">` filters with `data-ln-filter-value`
+> and a `data-ln-filter-reset` sentinel. On checkbox `change`, it updates active values and keeps the sentinel in sync. It evaluates
+> items on the target container or table by dataset attributes or column index, sets `data-ln-filter-hide` and `.hidden` on non-matching
+> elements, and emits a cancelable `ln-filter:change` CustomEvent.
 
 ---
 

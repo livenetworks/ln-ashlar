@@ -35,17 +35,7 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 		return this;
 	}
 
-	// ─── Public API ────────────────────────────────────────────
-
-	_component.prototype.enable = function () {
-		if (this.isEnabled) return;
-		this.dom.setAttribute(DOM_SELECTOR, '');
-	};
-
-	_component.prototype.disable = function () {
-		if (!this.isEnabled) return;
-		this.dom.setAttribute(DOM_SELECTOR, 'disabled');
-	};
+	// ─── Lifecycle ─────────────────────────────────────────────
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;

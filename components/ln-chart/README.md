@@ -1,5 +1,7 @@
 # `ln-chart`
 
+> Applied to a container element (`<figure data-ln-chart="name" data-ln-chart-source="sales">`) containing an SVG canvas (`<svg data-ln-chart-plot>`). It listens for `ln-chart:set-data` events dispatched by `ln-data-coordinator`, calculates linear coordinates within the authored `viewBox`, and updates the geometry of child `<polyline data-ln-chart-line>` and `<polygon data-ln-chart-area>` elements. It holds no private data caches, acting purely as a presentational SVG renderer driven by CSS custom properties.
+
 A zero-dependency, responsive SVG dataset renderer for `ln-ashlar`. It is the
 chart equivalent of `ln-table` / `ln-list`: the component owns only its SVG DOM
 and rendering state, while `ln-data-coordinator` owns local-store and API

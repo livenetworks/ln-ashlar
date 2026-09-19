@@ -1,8 +1,9 @@
 # ln-http
 
-A zero-dependency, global **HTTP Concurrency Coordinator** that intercepts browser network operations to prevent race conditions, out-of-order responses, and duplicate submission side-effects.
-
-It manages requests on two distinct pipelines: **Path A** (transparent GET/HEAD URL-deduplication wrapping `window.fetch`) and **Path B** (explicit key-based event-driven cancellations for POST/PUT/DELETE).
+> A window-level HTTP concurrency coordinator (`window.lnHttp`). It transparently intercepts `fetch()` to call
+> `AbortController.abort()` on superseded in-flight GET/HEAD requests targeting the exact same URL. Additionally, it listens
+> globally for `ln-http:request` CustomEvents bearing a unique `key`: automatically aborting any running request with the same
+> key, executing the fetch, and dispatching `ln-http:response` or `ln-http:error`.
 
 ---
 

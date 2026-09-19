@@ -561,6 +561,8 @@ const $ = /* @__PURE__ */ new Set([
   "data-ln-panel",
   "data-ln-persist",
   "data-ln-persist-scope",
+  "data-ln-picklist",
+  "data-ln-picklist-list",
   "data-ln-popover",
   "data-ln-popover-for",
   "data-ln-popover-placement",

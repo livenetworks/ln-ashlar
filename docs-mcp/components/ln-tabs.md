@@ -10,7 +10,11 @@ tags: [tabs, navigation, accessibility, deep-linking, state]
 
 # 📂 ln-tabs
 
-> **Classification:** 🟢 Simple component / State Manager (Layer 1 - UI Primitive)
+> **Classification:** 🟢 Simple component / State Manager (Layer 1 - UI Primitive)  
+> Applied to a wrapper `<section data-ln-tabs>` containing trigger buttons (`data-ln-tab="key"`) and panels (`data-ln-panel="key"`).
+> On trigger `click`, it writes `data-ln-tabs-active="key"` on the wrapper. An attribute observer synchronizes the DOM:
+> toggling `class="hidden"` and `aria-hidden` on panels, and updating `aria-selected` on triggers. When configured with an `id`
+> and anchor triggers (`<a href="#id:key">`), it synchronizes the active tab with `window.location.hash` for deep-linking and browser history persistence.
 
 ---
 

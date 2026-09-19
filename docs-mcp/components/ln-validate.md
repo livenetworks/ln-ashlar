@@ -10,7 +10,11 @@ tags: [forms, validation, accessibility]
 
 # 🛡️ ln-validate
 
-> **Classification:** 🟢 Simple component / Validity State Adapter
+> **Classification:** 🟢 Simple component / Validity State Adapter  
+> Applied to form controls (`<input data-ln-validate>`, `<select>`, `<textarea>`) inside a `.form-element` wrapper.
+> On initialization, it injects `novalidate` on the parent `<form>` and intercepts the form `submit` event.
+> On field `blur` or `input` (after touched), it checks native `input.validity`, toggles the `.hidden` class on matching
+> `[data-ln-validate-error="rule"]` elements, and sets `aria-invalid`; on submit with errors, it calls `e.preventDefault()` and focuses the first invalid field.
 
 ---
 

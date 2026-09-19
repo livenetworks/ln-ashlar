@@ -1,5 +1,7 @@
 # ln-stat
 
+> Applied to an inline or block element (`<strong data-ln-stat="storeName" data-ln-stat-filter="active:true">`). On initialization, it bubbles an `ln-stat:request-count` CustomEvent to `ln-data-coordinator` and listens for `ln-stat:set-count`, updating its `textContent` with the resolved number and removing the `.is-loading` class. It stores zero count state internally, relying entirely on the coordinator to re-deliver counts on store mutations.
+
 Displays a live count from an `ln-data-store` via the `ln-data-coordinator` binder. Updates automatically on every store mutation. Opt-in: add `data-ln-stat="<storeName>"` to any inline element.
 
 ---

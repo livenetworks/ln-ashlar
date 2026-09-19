@@ -1,0 +1,22 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Structure Check: a picklist is meaningless without both lists
+	[data-ln-picklist]:not(:has([data-ln-picklist-list="available"])) {
+		@include dev-inline-error("data-ln-picklist is missing [data-ln-picklist-list='available']");
+	}
+
+	[data-ln-picklist]:not(:has([data-ln-picklist-list="selected"])) {
+		@include dev-inline-error("data-ln-picklist is missing [data-ln-picklist-list='selected']");
+	}
+
+	// 2. Orphan Check: a list must live inside a picklist root
+	[data-ln-picklist-list]:not([data-ln-picklist] *) {
+		@include dev-inline-error("[data-ln-picklist-list] is orphaned (not inside a [data-ln-picklist] root)");
+	}
+
+	// 3. Value Check: the list marker only accepts these two sides
+	[data-ln-picklist-list]:not([data-ln-picklist-list="available"], [data-ln-picklist-list="selected"]) {
+		@include dev-inline-error("[data-ln-picklist-list] must be \"available\" or \"selected\"");
+	}
+}

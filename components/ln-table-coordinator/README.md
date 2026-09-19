@@ -1,5 +1,7 @@
 # ln-table-coordinator
 
+> Applied to a wrapper element (`<div data-ln-table-coordinator>`) enclosing a table, search controls, and filter popovers. It listens for `ln-filter:change` within its host to toggle `.ln-filter-active` classes on header `<th>` buttons, intercepts `click` on `[data-ln-table-clear]` to reset search inputs and uncheck filter checkboxes, and captures page `'/'` `keydown` to focus the search input. It acts strictly as a Layer 2 mediator, never rendering table rows or holding query caches.
+
 A zero-dependency, per-instance, host-scoped coordinator component that wires external search hosts (`ln-search`), column filter popovers (`ln-filter`), header filter indicators, and clear button triggers to a single `ln-table`.
 
 `ln-table` itself is a Layer 1 primitive: it manages internal data state, virtual scroll rendering, pagination/windowing cache, row template cloning, cell formatting, and selection DOM state. `ln-table-coordinator` is the Layer 2 policy and mediator that wires external UI controls to `ln-table`.

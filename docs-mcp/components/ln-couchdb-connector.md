@@ -10,7 +10,8 @@ tags: [network, database, couchdb, sync]
 
 # 🔗 ln-couchdb-connector
 
-> **Classification:** 🌐 Simple component / Remote DB Connection Driver
+> **Classification:** 🌐 Simple component / Remote DB Connection Driver  
+> Applied to a gateway element (`<div data-ln-couchdb-connector data-ln-couchdb-url="..." data-ln-couchdb-db="...">`) inside a coordinator. It listens for database request CustomEvents (`ln-couchdb-connector:request-query`, `create`, `update`, `delete`), queries CouchDB `_changes` feeds with sequence tokens for delta sync, and maps `id` to `_id`/`_rev` on mutations via REST `fetch()`. Upon resolution, it emits `ln-couchdb-connector:data` or mutation response events to the parent coordinator.
 
 ---
 

@@ -1,6 +1,9 @@
 # ln-upload
 
-File upload component — drag-and-drop zone with progress tracking, client-side validation, SSR hydration, and automatic hidden input sync for form submissions.
+> Applied to a `<div data-ln-upload="URL">` container enclosing an `<input type="file" hidden>` and a drop zone
+> (`[data-ln-upload-zone]`). It intercepts file drops and picker changes, validates file constraints, clones `<template data-ln-template="ln-upload-item">`,
+> and uploads files via `fetch(FormData)`. On upload completion, it injects an `<input type="hidden" name="file_ids[]" value="id">`
+> into the DOM for native form submission.
 
 ## Rationale & Mindset
 

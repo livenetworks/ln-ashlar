@@ -1,11 +1,8 @@
 # ln-sort
 
-A zero-dependency, event-driven **Sort Control Primitive** that announces a sort intent on a
-target element via a cancelable event, letting tables, lists, or custom integrations intercept
-it or fall back to a built-in DOM-reorder default.
-
-It follows the same contract shape as `ln-search`: dispatch-only-to-target, cancelable,
-default-DOM-behaviour fallback. Unlike `ln-filter`, it never dual-dispatches to itself.
+> Applied to a `<ul data-ln-sort="targetId" data-ln-sort-state="none">` control containing directional buttons (`data-ln-sort-dir="asc|desc|none"`).
+> Clicking a button updates `data-ln-sort-state` on the control and dispatches a cancelable `ln-sort:change` event to the target element.
+> If unprevented, it reorders target child rows or items in the DOM using numeric or `localeCompare` string sorting.
 
 ---
 

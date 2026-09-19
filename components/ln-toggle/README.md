@@ -1,6 +1,8 @@
 # ln-toggle
 
-> The smallest reactive primitive in `ln-ashlar` — a highly-specialized binary state machine. 
+> Applied to any collapsible panel element via `data-ln-toggle`, with triggers bound from anywhere in the DOM via `data-ln-toggle-for="id"`.
+> It listens for trigger clicks and reacts to direct attribute mutations to toggle binary `open`/`close` state. The `data-ln-toggle`
+> attribute is the single source of truth — automatically keeping `aria-expanded` and the `.open` CSS class in sync with zero JS height calculations or shadow state.
 
 ---
 

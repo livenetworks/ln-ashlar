@@ -10,7 +10,8 @@ tags: [ui, coordinator, modal, ajax, upload, form, toast, hash-navigation]
 
 # 🎼 ln-ui-coordinator
 
-> **Classification:** 🟡 Coordinator (Layer 2 - General UI Hub & Mediator)
+> **Classification:** 🟡 Coordinator (Layer 2 - General UI Hub & Mediator)  
+> Applied to a container element (`<main data-ln-ui-coordinator>`). It listens for clicks on `[data-ln-modal-for]` triggers and `a[href^="#"]` anchors to open `[data-ln-modal]` dialogs and synchronize the URL hash, intercepts bubbling `ln-ajax:success`/`ln-ajax:error` and `ln-upload:error` events to dispatch `ln-toast:enqueue` notifications, and extracts `data-ln-fill-*` attributes to dispatch `ln-fill:request`. It never inspects internal form validation states, keeping forms and dialogs strictly encapsulated.
 
 ---
 

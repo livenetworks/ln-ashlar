@@ -10,7 +10,8 @@ tags: [forms, options, select, inputs]
 
 # 🗂️ ln-options
 
-> **Classification:** 🟢 Simple Component / Layer 1 Form Helper
+> **Classification:** 🟢 Simple Component / Layer 1 Form Helper  
+> Applied to a `<select data-ln-options="storeName" data-ln-options-value="id" data-ln-options-label="name">` element inside a coordinator subtree. It emits `ln-options:request-data` on initialization and listens for `ln-options:set-data` to populate `<option>` elements while preserving the placeholder and restoring previous selection. It never accesses IndexedDB or network endpoints directly, leaving data resolution entirely to `ln-data-coordinator`.
 
 ---
 

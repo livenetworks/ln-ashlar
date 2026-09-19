@@ -1,0 +1,66 @@
+@use 'layout' as *;
+@use 'form' as *;
+@use 'display' as *;
+@use 'borders' as *;
+@use 'focus' as *;
+@use 'interaction' as *;
+
+// ─── Picklist ──────────────────────────────────────────────────
+// Two lists side by side: available on the left, selected on the
+// right. Checking an item moves it across (ln-picklist), so both
+// lists look the same — a vertical stack of checkbox pills.
+//
+// Structure:
+//   [data-ln-picklist]
+//     > *                              a pane (author's own markup)
+//       > ul[data-ln-picklist-list]    the items
+//         > li > label > input         one checkbox pill
+//
+// Deliberately `check-list-outline`, NOT `check-list`: @mixin pill
+// hides the input with `display: none`, which drops the checkbox out
+// of the tab order — and here the checkbox IS the control, not a
+// decorative marker. `pill-outline` keeps it visible and focusable.
+//
+// Usage:
+//   [data-ln-picklist] { @include picklist; }
+
+@mixin picklist {
+	@include grid-2;
+	--gap: var(--size-md);
+
+	[data-ln-picklist-list] {
+		@include check-list-outline;
+		@include flex-col;
+		@include border;
+
+		// pill-outline draws a border per item; this keeps them apart.
+		--row-gap: var(--size-2xs);
+		gap: var(--row-gap);
+
+		border-radius: var(--radius);
+		--padding-y: var(--size-xs);
+		--padding-x: var(--size-xs);
+		padding: var(--padding-y) var(--padding-x);
+
+		// A hundred items must not stretch the page.
+		--max-height: 20rem;
+		max-height: var(--max-height);
+		overflow-y: auto;
+	}
+
+	// The input stays visible (pill-outline reverts pill's display:none),
+	// so the ring belongs on the pill that surrounds it.
+	[data-ln-picklist-list] li label:has(> input:focus-visible) {
+		@include focus-ring;
+	}
+
+	// The component's own state, expressed as the attribute value it writes.
+	&[data-ln-picklist="disabled"] [data-ln-picklist-list] {
+		--color-fg: var(--fg-muted);
+		color: var(--color-fg);
+
+		li label {
+			@include cursor-not-allowed;
+		}
+	}
+}

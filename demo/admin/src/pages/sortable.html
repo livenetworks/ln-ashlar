@@ -249,14 +249,11 @@ list.setAttribute('data-ln-sortable', 'disabled');</code></pre>
 					<main>
 						<pre><code>var list = document.querySelector('[data-ln-sortable]');
 
-// Via API (sets the attribute, observer syncs state)
-list.lnSortable.enable();     // sets data-ln-sortable=""
-list.lnSortable.disable();    // sets data-ln-sortable="disabled"
-list.lnSortable.isEnabled;    // boolean
+// State is written on the attribute; the observer syncs internals
+list.setAttribute('data-ln-sortable', 'disabled');   // disable
+list.setAttribute('data-ln-sortable', '');           // enable
 
-// Via attribute (identical result)
-list.setAttribute('data-ln-sortable', 'disabled');
-list.setAttribute('data-ln-sortable', '');
+list.lnSortable.isEnabled;    // boolean (read-only query)
 
 // Constructor — only for non-standard cases
 window.lnSortable(container);</code></pre>

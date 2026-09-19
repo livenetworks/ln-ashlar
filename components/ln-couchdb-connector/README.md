@@ -1,5 +1,7 @@
 # `data-ln-couchdb-connector`
 
+> Applied to a gateway element (`<div data-ln-couchdb-connector data-ln-couchdb-url="..." data-ln-couchdb-db="...">`) inside a coordinator. It listens for database request CustomEvents (`ln-couchdb-connector:request-query`, `create`, `update`, `delete`), queries CouchDB `_changes` feeds with sequence tokens for delta sync, and maps `id` to `_id`/`_rev` on mutations via REST `fetch()`. Upon resolution, it emits `ln-couchdb-connector:data` or mutation response events to the parent coordinator.
+
 A zero-dependency, Local-First sync transport component that implements the Transport Gateway pattern of `ln-ashlar` for CouchDB and Sync Gateway instances.
 
 This component encapsulates all connection parameters (CouchDB base URL, database name, auth credentials, headers) and provides a declarative, event-driven, or programmatic way to talk to any CouchDB-compatible backend using standard Changes Feed (`_changes`) protocols. It isolates networking concerns completely, making your cache store (`data-ln-data-store`) and visual presentation layers fully network-agnostic.

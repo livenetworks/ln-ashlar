@@ -1,6 +1,9 @@
 # ln-confirm
 
-A zero-dependency, ultra-lightweight **Interaction Gate Primitive** (~131 lines of JavaScript) that creates a self-contained, two-click confirmation checkpoint on standard buttons. It intercepts accidental clicks, morphs in-place to reveal confirmation prompts, and passes the second click directly to native platform events.
+> Applied directly to `<button data-ln-confirm>` or `<a data-ln-confirm>`. On the first `click`, it calls
+> `e.preventDefault()`, sets `data-ln-confirm-state="confirming"`, unhides `[data-ln-confirm-active]` (or swaps text),
+> and starts a `setTimeout`. A second `click` before timeout lets the native event proceed; if the timer fires first,
+> it clears the attribute and restores the original DOM content.
 
 ---
 

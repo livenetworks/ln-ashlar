@@ -1,0 +1,200 @@
+<!-- ln-page: title="Picklist — ln-ashlar" h1="Picklist" -->
+
+<h1>Picklist</h1>
+
+				<!-- Overview / philosophy -->
+				<section class="section-card">
+					<header><h3>Overview &amp; Philosophy</h3></header>
+					<main>
+						<p>One parent element — the root — is what the component is applied to. It listens for the <code>change</code> event: on select it moves the item to the other list, on uncheck it returns it. That simple.</p>
+
+						<p>Why it is worth having at all: <code>&lt;select multiple&gt;</code> is hostile — it demands ctrl-clicking, gives no room to see what you picked, and loses the selection the moment the scroll position surprises you. A picklist puts the pool on the left and the choices on the right, both fully visible.</p>
+
+						<p>The component is deliberately tiny. <strong>The checkbox is the state.</strong> Its <code>checked</code> property and the list the <code>&lt;li&gt;</code> currently sits in are the same fact, and <code>name</code>/<code>value</code> carry the selection to the server natively — unchecked boxes are simply not submitted. There are no hidden inputs, no state attribute, and no JS mirror to keep in sync.</p>
+
+						<p>Everything else composes. Filtering is <code>ln-search</code> pointed at each list. Counts, empty states and bulk actions belong to the page or a coordinator. Ordering is <code>ln-sortable</code>. The component does one thing: it listens for <code>change</code> and moves the item.</p>
+
+						<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/components/ln-picklist/README.md"><code>ln-picklist</code> README</a>.</p>
+					</main>
+				</section>
+
+				<!-- Live demo -->
+				<section class="section-card">
+					<header><h3>Live — with search on both lists</h3></header>
+					<main>
+						<p>Check an item and it moves right; uncheck it and it comes back. Type in either search box to narrow a long list — that is <code>ln-search</code> composed on top, not part of the component.</p>
+
+						<form id="picklist-form">
+							<section data-ln-picklist id="countries">
+
+								<section>
+									<header>
+										<h4 id="pool-heading">Available</h4>
+									</header>
+
+									<label class="search">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+										<input type="search" data-ln-search-for="pool" placeholder="Search available…">
+										<button type="button" data-ln-search-clear aria-label="Clear search">
+											<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+										</button>
+									</label>
+
+									<ul data-ln-picklist-list="available" id="pool" data-ln-search aria-labelledby="pool-heading">
+										<li><label><input type="checkbox" name="countries[]" value="ar"> Argentina</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="au"> Australia</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="at"> Austria</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="be"> Belgium</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="br"> Brazil</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="ca"> Canada</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="cl"> Chile</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="hr"> Croatia</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="cz"> Czechia</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="dk"> Denmark</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="ee"> Estonia</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="fi"> Finland</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="fr"> France</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="de"> Germany</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="gr"> Greece</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="hu"> Hungary</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="is"> Iceland</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="ie"> Ireland</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="it"> Italy</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="jp"> Japan</label></li>
+									</ul>
+								</section>
+
+								<section>
+									<header>
+										<h4 id="picked-heading">Selected</h4>
+									</header>
+
+									<label class="search">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+										<input type="search" data-ln-search-for="picked" placeholder="Search selected…">
+										<button type="button" data-ln-search-clear aria-label="Clear search">
+											<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+										</button>
+									</label>
+
+									<ul data-ln-picklist-list="selected" id="picked" data-ln-search aria-labelledby="picked-heading">
+										<li><label><input type="checkbox" name="countries[]" value="nl" checked> Netherlands</label></li>
+									</ul>
+								</section>
+
+							</section>
+
+							<div class="form-actions">
+								<button type="reset">Reset</button>
+								<button type="submit">Submit</button>
+							</div>
+						</form>
+
+						<h4>Serialized body</h4>
+						<p>The form submits natively — no component JS is involved in producing this.</p>
+						<pre id="picklist-output">(submit to see the body)</pre>
+					</main>
+				</section>
+
+				<!-- Events -->
+				<section class="section-card">
+					<header><h3>Events</h3></header>
+					<main>
+						<p><code>ln-picklist:before-move</code> is cancelable. Tick the box below to cap the selection at five — a rejected move reverts the checkbox, so the DOM never contradicts itself.</p>
+
+						<label>
+							<input type="checkbox" id="picklist-cap">
+							Limit the selection to 5 items
+						</label>
+
+						<h4>Event log</h4>
+						<pre id="picklist-log">(interact with the lists above)</pre>
+					</main>
+				</section>
+
+				<!-- Disabled -->
+				<section class="section-card">
+					<header><h3>Read-only</h3></header>
+					<main>
+						<p><code>data-ln-picklist="disabled"</code> blocks moving. The browser toggles the box before any listener runs, so the component <em>reverts</em> the toggle rather than merely ignoring it — otherwise the box would read checked while the item stayed put.</p>
+
+						<button type="button" id="picklist-toggle-disabled">Toggle disabled</button>
+					</main>
+				</section>
+
+				<!-- Attributes -->
+				<section class="section-card">
+					<header><h3>Attributes</h3></header>
+					<main>
+						<div class="table-container">
+							<table>
+								<thead>
+									<tr><th>Attribute</th><th>Element</th><th>Values</th><th>Description</th></tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td><code>data-ln-picklist</code></td>
+										<td>Root</td>
+										<td><code>""</code> | <code>"disabled"</code></td>
+										<td>Initializes the component. <code>"disabled"</code> blocks moving.</td>
+									</tr>
+									<tr>
+										<td><code>data-ln-picklist-list</code></td>
+										<td><code>&lt;ul&gt;</code></td>
+										<td><code>available</code> | <code>selected</code></td>
+										<td>Marks which list is which. Both are required.</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<p>The item carries no attribute of its own — it is resolved from the checkbox that changed.</p>
+					</main>
+				</section>
+
+<script>
+(function () {
+	'use strict';
+
+	const root = document.getElementById('countries');
+	const form = document.getElementById('picklist-form');
+	const output = document.getElementById('picklist-output');
+	const log = document.getElementById('picklist-log');
+	const cap = document.getElementById('picklist-cap');
+	const selected = root.querySelector('[data-ln-picklist-list="selected"]');
+
+	function write(line) {
+		log.textContent = line + '\n' + log.textContent;
+	}
+
+	root.addEventListener('ln-picklist:before-move', function (e) {
+		if (!cap.checked) return;
+		if (e.detail.to !== selected) return;
+		if (selected.children.length < 5) return;
+
+		e.preventDefault();
+		write('before-move CANCELED — cap of 5 reached');
+	});
+
+	root.addEventListener('ln-picklist:move', function (e) {
+		const side = e.detail.to === selected ? 'selected' : 'available';
+		write('move → ' + side + ' : ' + e.detail.checkbox.value);
+	});
+
+	root.addEventListener('ln-picklist:enabled', function () { write('enabled'); });
+	root.addEventListener('ln-picklist:disabled', function () { write('disabled'); });
+
+	form.addEventListener('submit', function (e) {
+		e.preventDefault();
+		const body = new URLSearchParams(new FormData(form)).toString();
+		output.textContent = body || '(nothing selected)';
+	});
+
+	document.getElementById('picklist-toggle-disabled').addEventListener('click', function () {
+		if (root.getAttribute('data-ln-picklist') === 'disabled') {
+			root.setAttribute('data-ln-picklist', '');
+		} else {
+			root.setAttribute('data-ln-picklist', 'disabled');
+		}
+	});
+})();
+</script>

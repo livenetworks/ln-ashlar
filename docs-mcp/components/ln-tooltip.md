@@ -10,7 +10,10 @@ tags: [tooltip, overlay, positioning, simple-component]
 
 # 💡 ln-tooltip
 
-> **Classification:** 🟢 Simple Component
+> **Classification:** 🟢 Simple Component  
+> Applied to any element via `data-ln-tooltip="text"`. Pure CSS displays a `::after` pseudo-element on `:hover` and `:focus`.
+> With `data-ln-tooltip-enhance`, `mouseenter`/`focus` injects a `<div role="tooltip">` into a single shared `<div id="ln-tooltip-portal">` in `<body>`,
+> calls `portal.showPopover()`, and calculates inline `top`/`left`; `mouseleave`/`blur` calls `portal.hidePopover()`.
 
 ---
 

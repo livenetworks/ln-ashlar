@@ -10,7 +10,11 @@ tags: [ajax, navigation, form, network]
 
 # 🌐 ln-ajax
 
-> **Classification:** 🟢 Simple component (Layer 1 - Dynamic Content & Network Engine)
+> **Classification:** 🟢 Simple component (Layer 1 - Dynamic Content & Network Engine)  
+> Applied to a container, link, or form via `data-ln-ajax`. It intercepts native `<a>` clicks and `<form>` submits,
+> calling `e.preventDefault()` and issuing an AJAX request with `X-Requested-With: XMLHttpRequest`. On receiving a JSON
+> response containing HTML fragments (`{ content: { "#id": "<html>" } }`), it replaces the target elements in the DOM in-place
+> and updates browser history via `history.pushState()`.
 
 ---
 

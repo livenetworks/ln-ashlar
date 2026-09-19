@@ -1,9 +1,8 @@
 # ln-progress
 
-> A passive linear-progress renderer. Author writes
-> `data-ln-progress="42"` on a bar element; the component picks up the
-> change via MutationObserver and writes the new `width` as a
-> percentage. Around 85 lines of JS.
+> Applied to a child bar element via `data-ln-progress="value"` inside a track container. An attribute observer detects
+> changes to `data-ln-progress` or `data-ln-progress-max`: it calculates `percentage = (value / max) * 100`, sets inline
+> `style.width = percentage + '%'`, and synchronizes `aria-valuenow` on the element with zero internal state.
 
 ## Integration
 

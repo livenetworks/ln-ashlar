@@ -10,7 +10,10 @@ tags: [modal, dialog, overlay, simple-component]
 
 # 🪟 ln-modal
 
-> **Classification:** 🟢 Simple Component
+> **Classification:** 🟢 Simple Component  
+> Applied to a `<dialog data-ln-modal id="...">`, paired with a `<button data-ln-modal-for="...">` and dismiss buttons (`data-ln-modal-close`).
+> On trigger `click`, it sets `data-ln-modal="open"`, calls `dialog.showModal()`, and adds `.ln-modal-open` to `document.body`.
+> On dismiss `click`, backdrop click, or native `Escape`, it sets `data-ln-modal="close"`, calls `dialog.close()`, and removes `.ln-modal-open`.
 
 ---
 

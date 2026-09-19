@@ -10,7 +10,11 @@ tags: [localization, formatting, time, date]
 
 # 🕒 ln-time
 
-> **Classification:** 🟢 Simple Component / Timezone-Aware Formatter
+> **Classification:** 🟢 Simple Component / Timezone-Aware Formatter  
+> Applied to a `<time data-ln-time="..." datetime="...">` element where `datetime` holds a Unix timestamp in seconds.
+> On initialization and on attribute mutation, it formats the timestamp using browser `Intl.DateTimeFormat` or `Intl.RelativeTimeFormat`
+> and writes the localized string to `time.textContent`. When set to `relative`, a shared 60-second timer periodically recalculates
+> and updates `textContent` without polling the server.
 
 ---
 

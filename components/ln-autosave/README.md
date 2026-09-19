@@ -1,6 +1,9 @@
 # ln-autosave
 
-A zero-dependency, localStorage-backed **Draft Buffer Primitive** that prevents data loss by capturing form states. It automatically saves drafts on field boundaries, restores values on load, and clears them cleanly on submit, reset, or custom cancellations.
+> Applied to a `<form id="..." data-ln-autosave>`. On initialization, it reads draft JSON from `localStorage.getItem(key)`
+> and populates form fields, dispatching synthetic `input` and `change` events. On field `focusout` or `change`, it serializes
+> form values — strictly excluding passwords (`input[type="password"]`) and `[data-ln-autosave-exclude]` — and saves them
+> via `localStorage.setItem(key, json)`. On form `submit`, `reset`, or click on `[data-ln-autosave-clear]`, it calls `localStorage.removeItem(key)` to purge the draft.
 
 ---
 

@@ -10,7 +10,8 @@ tags: [icons, svg, sprite, cache]
 
 # 🎨 ln-icon
 
-> **Classification:** ⚛️ Service (Layer 3 - SVG Sprite Loader Service)
+> **Classification:** ⚛️ Service (Layer 3 - SVG Sprite Loader Service)  
+> Applied to standard SVG references (`<svg class="ln-icon"><use href="#ln-icon-home"></use></svg>`). It monitors the DOM via `MutationObserver` for `<use>` tags, dynamically fetches missing SVG paths from a CDN or custom asset endpoint, caches them in `localStorage` under the `lni:` prefix, and injects them into a single hidden `#ln-icon-sprite` symbol sheet at the start of `<body>`. It executes zero JS rendering after hydration, leaving styling and color inheritance entirely to CSS `currentColor`.
 
 ---
 

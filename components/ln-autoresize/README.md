@@ -1,6 +1,8 @@
 # ln-autoresize
 
-A zero-dependency, high-performance **UX Helper Primitive** (~47 lines of JavaScript) that dynamically resizes a `<textarea>` to track its content. It grows as the user types and collapses instantly as text is deleted.
+> Applied directly to a `<textarea data-ln-autoresize rows="1">`. It listens for native `input` events:
+> in the handler, it resets `textarea.style.height = 'auto'`, reads `textarea.scrollHeight`, and sets
+> `textarea.style.height = textarea.scrollHeight + 'px'`. It carries zero state, executing a synchronous layout calculation to expand and collapse the box dynamically.
 
 ---
 

@@ -10,7 +10,10 @@ tags: [toast, notification, messaging, viewports]
 
 # 🔔 ln-toast
 
-> **Classification:** 🟢 Simple component / Viewport Service (Layer 1 - UI Messaging)
+> **Classification:** 🟢 Simple component / Viewport Service (Layer 1 - UI Messaging)  
+> Applied to a `<ul data-ln-toast>` live region. It listens on `window` for `ln-toast:enqueue` CustomEvents:
+> on event, it clones the toast template, appends the `<li>` to the container, and starts a `setTimeout` auto-dismiss timer.
+> On timeout or dismiss button click, it adds a `.closing` CSS class and calls `container.removeChild(li)` upon animation completion.
 
 ---
 

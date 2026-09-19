@@ -1,5 +1,7 @@
 # `data-ln-api-connector`
 
+> Applied to a gateway element (`<li data-ln-api-connector data-ln-api-connector-path="/api/path">`) inside a coordinator. It listens for request CustomEvents (`ln-api-connector:request-query`, `create`, `update`, `delete`), attaches a forced `X-LN-Response: data` header, and issues RESTful `fetch()` calls. Upon resolution, it parses JSON payloads and emits `ln-api-connector:data` or mutation response events to the parent coordinator.
+
 A zero-dependency, Local-First sync transport component that implements the Transport Gateway pattern of `ln-ashlar`.
 
 This component encapsulates all connection parameters (base URLs, auth tokens, headers, paths) and provides a declarative, event-driven, or programmatic way to talk to any RESTful or JSON API backend. It isolates networking concerns completely, making your cache store (`data-ln-data-store`) and visual presentation layers fully network-agnostic.

@@ -1,8 +1,9 @@
 # ln-ajax
 
-A zero-dependency, event-driven **HTML Fragment Swapping Primitive** that intercepts clicks on `<a>` elements and submits on `<form>` tags to enable instant, SPA-like navigation without full page reloads.
-
-It communicates via a structured server JSON protocol, exchanging targeted DOM updates, updating browser history states, and re-attaching lifecycle managers to newly injected nodes.
+> Applied to a container, link, or form via `data-ln-ajax`. It intercepts native `<a>` clicks and `<form>` submits,
+> calling `e.preventDefault()` and issuing an AJAX request with `X-Requested-With: XMLHttpRequest`. On receiving a JSON
+> response containing HTML fragments (`{ content: { "#id": "<html>" } }`), it replaces the target elements in the DOM in-place
+> and updates browser history via `history.pushState()`.
 
 ---
 

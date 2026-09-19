@@ -1,8 +1,9 @@
 # ln-time
 
-A zero-dependency, progressive **Timezone-Aware Timestamp Formatter** that localizes standard HTML `<time>` elements using native browser APIs.
-
-It replaces server-rendered fallback text with localized, timezone-aware date and time formats, performing automatic live updates for relative timestamps using a single shared timer scheduler.
+> Applied to a `<time data-ln-time="..." datetime="...">` element where `datetime` holds a Unix timestamp in seconds.
+> On initialization and on attribute mutation, it formats the timestamp using browser `Intl.DateTimeFormat` or `Intl.RelativeTimeFormat`
+> and writes the localized string to `time.textContent`. When set to `relative`, a shared 60-second timer periodically recalculates
+> and updates `textContent` without polling the server.
 
 ---
 

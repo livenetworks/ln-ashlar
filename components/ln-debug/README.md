@@ -1,6 +1,6 @@
 # ln-debug
 
-> The diagnostic and contract verification component of `ln-ashlar` that provides intelligent developer warnings, cross-reference validation, and typo detection in development mode.
+> Activated via the `data-ln-debug` attribute on `<html>` or `<body>`. It gates library console warnings (`[ln-`), listens to DOM mutations and `ln-*` CustomEvents, verifies cross-references (`data-ln-*-for`, `data-ln-*-source`), and flags misspelled library attributes against the schema manifest using Levenshtein distance. It introduces zero production overhead, remaining dormant or excluded outside development mode without modifying DOM structure.
 
 ---
 

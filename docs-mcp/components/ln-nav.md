@@ -10,7 +10,10 @@ tags: [navigation, routing, active-state, accessibility]
 
 # 🧭 ln-nav
 
-> **Classification:** 🟢 Simple component / UI Navigation (Layer 1 - UI Navigation)
+> **Classification:** 🟢 Simple component / UI Navigation (Layer 1 - UI Navigation)  
+> Applied to a `<nav data-ln-nav="className">` element. On initialization and on `popstate` or `pushState` events,
+> it compares each child `<a href>` against `window.location.pathname`. It adds the configured class name and `aria-current="page"`
+> to the matching link while removing them from inactive siblings, updating automatically when the DOM or browser URL changes.
 
 ---
 

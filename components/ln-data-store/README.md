@@ -1,8 +1,9 @@
 # ln-data-store
 
-A zero-dependency, local-first **Database Cache Store** backed by standard browser `IndexedDB`. It acts as a pure client-side database cache, maintaining records locally, executing high-performance querying in-memory, and applying optimistic mutations directly — a record is a record, with no pending state, snapshots, or rollback machinery.
-
-It possesses no visual interface and is **completely blind to the network** (no fetch, status codes, paths, or URLs). Instead, it communicates strictly via custom DOM events, allowing the parent **Data Coordinator** to orchestrate syncs and mutations.
+> Applied to a hidden element via `data-ln-data-store id="name"`. It initializes and queries an IndexedDB database
+> (`ln_app_cache`) with automatic schema upgrades and optional AES-GCM encryption. It is completely blind to the network:
+> listening for request CustomEvents (`ln-data-store:request-query`, `request-save`, `request-delete`), resolving results
+> against local records, and emitting `ln-data-store:stale` when cached data exceeds its configured timeout.
 
 ---
 

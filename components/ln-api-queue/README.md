@@ -1,5 +1,7 @@
 # `data-ln-api-queue`
 
+> Applied to an outbox element (`<li data-ln-api-queue>`) nested inside `data-ln-data-coordinator`. It listens for `ln-api-queue:request-enqueue` from the coordinator, persists mutations to an internal `IndexedDB` outbox (`ln_api_queue`) with monotonic per-scope sequence counters, and emits `ln-api-queue:send` CustomEvents for FIFO dispatch. It never initiates network requests directly, updating retry attempts with exponential backoff until acknowledged via `ack`/`nack`.
+
 A zero-dependency, Local-First **offline write outbox** component that implements the persistent-queue tier of `ln-ashlar`'s 3-tier data layer.
 
 This component persists pending mutations to its own `IndexedDB` database and replays them, FIFO per chain, once the coordinator can execute transport for them. It is **connector-blind and id-blind** — it never calls the network itself, never knows about REST paths, and never interprets `entryId`/`targetId`/`chainKey` beyond bookkeeping. The parent `ln-data-coordinator` executes the actual transport call on the queue's `ln-api-queue:send` command and reports the outcome back via `ack` / `nack`.

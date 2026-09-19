@@ -1,6 +1,9 @@
 # ln-list
 
-A unified, structure-agnostic, and local-first **Data Presenter Component** designed to render datasets in list, card, section, or grid layouts. It connects to `ln-data-store` via CustomEvents using the **Coordinator Pattern**, supporting client-side filtering, sorting, searching, and high-performance **Virtual Scrolling** for large datasets.
+> Applied to a list or grid container via `data-ln-list="name"`. In SSR mode, it coordinates direct DOM search,
+> filter, and sort interactions on its child items. In data-driven mode (`data-ln-list-source="store"`), it listens for
+> `ln-data-store:data` CustomEvents, clones `<template data-ln-template="name-row">`, populates fields via `fill()`,
+> and mounts rendered items into `[data-ln-list-body]` with optional virtual scroll windowing.
 
 ---
 

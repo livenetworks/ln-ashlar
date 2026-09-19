@@ -10,7 +10,10 @@ tags: [progress, svg, visualization]
 
 # ⭕ ln-circular-progress
 
-> **Classification:** 🟢 Simple component (Layer 1 - Data Visualization)
+> **Classification:** 🟢 Simple component (Layer 1 - Data Visualization)  
+> Applied to an empty host element via `data-ln-circular-progress="value"`. On initialization, it injects an inline `<svg>`
+> ring and a `<strong>` percentage label. An attribute observer watches `data-ln-circular-progress`: it calculates the circle's
+> `stroke-dashoffset` from the clamped percentage, updates `strong.textContent`, and synchronizes `aria-valuenow` on the host.
 
 ---
 

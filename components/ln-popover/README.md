@@ -1,6 +1,8 @@
 # ln-popover
 
-> Viewport-aware click-triggered rich-content overlays, managed reactively via the DOM.
+> Applied to a container via `data-ln-popover id="..."`, paired with a `<button data-ln-popover-for="...">`.
+> On trigger `click`, it sets `popover="manual"` on the container, calls `showPopover()`, sets inline `top`/`left` coordinates, and writes `data-ln-popover="open"`.
+> On outside `click` or `Escape`, it calls `hidePopover()` and writes `data-ln-popover="closed"`.
 
 ---
 

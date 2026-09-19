@@ -10,7 +10,11 @@ tags: [upload, file-upload, drag-and-drop, progress, forms, hydration]
 
 # 📁 ln-upload
 
-> **Classification:** 🟢 Simple Component
+> **Classification:** 🟢 Simple Component  
+> Applied to a `<div data-ln-upload="URL">` container enclosing an `<input type="file" hidden>` and a drop zone
+> (`[data-ln-upload-zone]`). It intercepts file drops and picker changes, validates file constraints, clones `<template data-ln-template="ln-upload-item">`,
+> and uploads files via `fetch(FormData)`. On upload completion, it injects an `<input type="hidden" name="file_ids[]" value="id">`
+> into the DOM for native form submission.
 
 ---
 

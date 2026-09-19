@@ -1,5 +1,7 @@
 # ln-icon
 
+> Applied to standard SVG references (`<svg class="ln-icon"><use href="#ln-icon-home"></use></svg>`). It monitors the DOM via `MutationObserver` for `<use>` tags, dynamically fetches missing SVG paths from a CDN or custom asset endpoint, caches them in `localStorage` under the `lni:` prefix, and injects them into a single hidden `#ln-icon-sprite` symbol sheet at the start of `<body>`. It executes zero JS rendering after hydration, leaving styling and color inheritance entirely to CSS `currentColor`.
+
 A zero-dependency, local-first **On-Demand SVG Sprite Generator** that dynamically monitors, fetches, and compiles SVG icons at runtime.
 
 Instead of bundling thousands of heavy vector paths or requiring complex manual build steps, it intercepts standard DOM `<use>` tags, fetches vector definitions from a remote CDN, caches them in `localStorage`, and injects them into a single unified hidden SVG sprite sheet.

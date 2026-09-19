@@ -1,6 +1,9 @@
 # ln-date
 
-Locale-aware date formatting with native browser picker.
+> Applied to an `<input type="date" data-ln-date name="...">`. On initialization, it wraps the element in a
+> `<span data-ln-date-field>` containing a visible text input, a hidden native date picker, a hidden `<input type="hidden" name="...">`
+> for form submission, and a calendar button. On button `click`, it calls `showPicker()` on the date picker; on text input `blur`,
+> it parses the entered string, updates the hidden ISO input, and reformats the visible text.
 
 ## Usage
 

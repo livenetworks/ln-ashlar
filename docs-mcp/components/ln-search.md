@@ -10,7 +10,11 @@ tags: [search, filter, dom-filtering, attribute-bridge]
 
 # 🔍 ln-search
 
-> **Classification:** 🟢 Simple component / Search Primitive (Layer 1 - Two-Host Attribute Bridge)
+> **Classification:** 🟢 Simple component / Search Primitive (Layer 1 - Two-Host Attribute Bridge)  
+> Applied via a two-host bridge: an `<input type="search" data-ln-search-for="targetId">` controls an element
+> (`data-ln-search id="targetId"`). Typing fires native `input` events that write `target.setAttribute('data-ln-search', input.value)`.
+> A `MutationObserver` on the target observes attribute changes, matches items against search tokens, and adds `data-ln-search-hide`
+> and `.hidden` to non-matching elements. Clicking `[data-ln-search-clear]` sets `data-ln-search=""` and clears the input.
 
 ---
 

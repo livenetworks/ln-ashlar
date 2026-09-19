@@ -10,7 +10,10 @@ tags: [progress, visualization, accessibility]
 
 # ➖ ln-progress
 
-> **Classification:** 🟢 Simple component / Passive Vector Renderer (Layer 1 - Data Visualization)
+> **Classification:** 🟢 Simple component / Passive Vector Renderer (Layer 1 - Data Visualization)  
+> Applied to a child bar element via `data-ln-progress="value"` inside a track container. An attribute observer detects
+> changes to `data-ln-progress` or `data-ln-progress-max`: it calculates `percentage = (value / max) * 100`, sets inline
+> `style.width = percentage + '%'`, and synchronizes `aria-valuenow` on the element with zero internal state.
 
 ---
 

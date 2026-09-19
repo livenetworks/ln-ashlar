@@ -1,8 +1,9 @@
 # ln-persist
 
-A registry-driven, no-instance component that restores and saves a single
-state attribute to `localStorage` for the components that opt in — attribute
-declared, not function called.
+> Applied as a declarative decorator attribute (`data-ln-persist`) to an element owned by a persist-enabled component.
+> On initialization, it reads stored state from `localStorage.getItem(storageKey)` and applies it via `el.setAttribute(attr, value)`.
+> A `MutationObserver` watches the component's state attribute: whenever it changes, it synchronizes the new value back to
+> `localStorage.setItem(storageKey, value)` with zero imperative JS API calls.
 
 `data-ln-persist` only has an effect on an element owned by a component that
 declares `options.persist` — currently `ln-toggle`, `ln-tabs`, `ln-sort`,

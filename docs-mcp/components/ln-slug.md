@@ -10,7 +10,10 @@ tags: [forms, slugs, helper, formatting]
 
 # 🔗 ln-slug
 
-> **Classification:** 🟢 Simple Component / Layer 1 Form Helper
+> **Classification:** 🟢 Simple Component / Layer 1 Form Helper  
+> Applied to an `<input name="slug" data-ln-slug-from="sourceName">` within a `<form>`. It queries the source field by `name`
+> and listens for its native `input` events: while the slug input remains pristine, it computes the slugified string and sets
+> `slug.value`, dispatching a synthetic `input` event. If the user types directly into the slug field, it marks it as dirty and halts mirroring until cleared.
 
 ---
 

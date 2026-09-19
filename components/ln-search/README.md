@@ -1,8 +1,9 @@
 # ln-search
 
-A zero-dependency, decoupled **Two-Host Search Primitive** built on the Attribute Bridge pattern.
-
-It splits search into a **Control** (`data-ln-search-for="targetId"`) that manages user inputs and clear triggers, and a **State Host** (`data-ln-search="term"`) on the target element (table, list, container) that observes its own attribute, coordinates two-way control sync, and dispatches cancelable change events.
+> Applied via a two-host bridge: an `<input type="search" data-ln-search-for="targetId">` controls an element
+> (`data-ln-search id="targetId"`). Typing fires native `input` events that write `target.setAttribute('data-ln-search', input.value)`.
+> A `MutationObserver` on the target observes attribute changes, matches items against search tokens, and adds `data-ln-search-hide`
+> and `.hidden` to non-matching elements. Clicking `[data-ln-search-clear]` sets `data-ln-search=""` and clears the input.
 
 ---
 

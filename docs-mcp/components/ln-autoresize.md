@@ -10,7 +10,10 @@ tags: [forms, inputs, textarea, layout]
 
 # ↕️ ln-autoresize
 
-> **Classification:** 🟢 Simple Component / Layer 1 UI Utility
+> **Classification:** 🟢 Simple Component / Layer 1 UI Utility  
+> Applied directly to a `<textarea data-ln-autoresize rows="1">`. It listens for native `input` events:
+> in the handler, it resets `textarea.style.height = 'auto'`, reads `textarea.scrollHeight`, and sets
+> `textarea.style.height = textarea.scrollHeight + 'px'`. It carries zero state, executing a synchronous layout calculation to expand and collapse the box dynamically.
 
 ---
 

@@ -10,7 +10,11 @@ tags: [interactions, confirmation, validation]
 
 # 🛡️ ln-confirm
 
-> **Classification:** 🟢 Simple component / Interaction Gate Primitive
+> **Classification:** 🟢 Simple component / Interaction Gate Primitive  
+> Applied directly to `<button data-ln-confirm>` or `<a data-ln-confirm>`. On the first `click`, it calls
+> `e.preventDefault()`, sets `data-ln-confirm-state="confirming"`, unhides `[data-ln-confirm-active]` (or swaps text),
+> and starts a `setTimeout`. A second `click` before timeout lets the native event proceed; if the timer fires first,
+> it clears the attribute and restores the original DOM content.
 
 ---
 

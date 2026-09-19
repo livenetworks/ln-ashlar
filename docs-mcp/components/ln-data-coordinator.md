@@ -10,7 +10,11 @@ tags: [data, synchronization, local-first]
 
 # 🌐 ln-data-coordinator
 
-> **Classification:** ⚙️ Coordinator (Coordinator / Orchestrator)
+> **Classification:** ⚙️ Coordinator (Coordinator / Orchestrator)  
+> Applied to a parent container (`<ul data-ln-data-coordinator hidden>`) enclosing a `data-ln-data-store` and a
+> `data-ln-api-connector`. It catches store staleness and pagination requests to dispatch fetch events to the connector,
+> populating the store with server responses (`request-populate`). On store data mutations, it executes local queries and
+> dispatches `set-data` events directly to bound view elements (`data-ln-table-source`, `data-ln-list-source`).
 
 ---
 

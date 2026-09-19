@@ -10,7 +10,8 @@ tags: [debug, diagnostics, verifier, contracts, linter, dev-tooling]
 
 # 🛠️ ln-debug
 
-> **Classification:** 🟢 Simple Component / Service (Layer 1 - Developer Tooling & Contract Verifier)
+> **Classification:** 🟢 Simple Component / Service (Layer 1 - Developer Tooling & Contract Verifier)  
+> Activated via the `data-ln-debug` attribute on `<html>` or `<body>`. It gates library console warnings (`[ln-`), listens to DOM mutations and `ln-*` CustomEvents, verifies cross-references (`data-ln-*-for`, `data-ln-*-source`), and flags misspelled library attributes against the schema manifest using Levenshtein distance. It introduces zero production overhead, remaining dormant or excluded outside development mode without modifying DOM structure.
 
 ---
 

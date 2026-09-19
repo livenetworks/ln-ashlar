@@ -10,7 +10,10 @@ tags: [sort, table, list, ordering, dom-filtering]
 
 # ⇅ ln-sort
 
-> **Classification:** 🟢 Simple component / Sort Control Primitive (Layer 1 - Sort Intent & Default DOM Reorder)
+> **Classification:** 🟢 Simple component / Sort Control Primitive (Layer 1 - Sort Intent & Default DOM Reorder)  
+> Applied to a `<ul data-ln-sort="targetId" data-ln-sort-state="none">` control containing directional buttons (`data-ln-sort-dir="asc|desc|none"`).
+> Clicking a button updates `data-ln-sort-state` on the control and dispatches a cancelable `ln-sort:change` event to the target element.
+> If unprevented, it reorders target child rows or items in the DOM using numeric or `localeCompare` string sorting.
 
 ---
 

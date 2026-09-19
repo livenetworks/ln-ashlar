@@ -1,0 +1,3 @@
+@use '../config/mixins' as *;
+
+[data-ln-picklist] { @include picklist; }

@@ -57,6 +57,7 @@ import './ln-table-coordinator/src/ln-table-coordinator.js';
 import './ln-list/src/ln-list.js';
 import './ln-circular-progress/src/ln-circular-progress.js';
 import './ln-sortable/src/ln-sortable.js';
+import './ln-picklist/src/ln-picklist.js';
 import './ln-confirm/src/ln-confirm.js';
 import './ln-translations/src/ln-translations.js';
 import './ln-autosave/src/ln-autosave.js';

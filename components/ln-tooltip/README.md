@@ -1,8 +1,8 @@
 # ln-tooltip
 
-A zero-dependency, progressively enhanced **Dual-Layer Tooltip Primitive** that displays lightweight contextual descriptions on hover and focus.
-
-It supports two levels of execution: a **pure CSS baseline** (zero JS footprint, utilizing pseudo-elements) and a **JS progressive enhancement layer** (top-layer promoted via the native Popover API to escape parent clipping, viewport-aware auto-flipping, and automated `aria-describedby` wiring).
+> Applied to any element via `data-ln-tooltip="text"`. Pure CSS displays a `::after` pseudo-element on `:hover` and `:focus`.
+> With `data-ln-tooltip-enhance`, `mouseenter`/`focus` injects a `<div role="tooltip">` into a single shared `<div id="ln-tooltip-portal">` in `<body>`,
+> calls `portal.showPopover()`, and calculates inline `top`/`left`; `mouseleave`/`blur` calls `portal.hidePopover()`.
 
 ---
 

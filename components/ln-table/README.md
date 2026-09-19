@@ -1,6 +1,9 @@
 # ln-table
 
-A zero-dependency, high-performance table presenter component that supports both Server-Rendered (SSR) Mode and Data-Driven Mode in `ln-ashlar`.
+> Applied to a table container via `<div data-ln-table id="...">` or `<table>`. In SSR mode, it indexes server-rendered
+> `<tbody>` rows, intercepting `ln-search`, `ln-filter`, and `ln-sort` CustomEvents to toggle `.hidden` on `<tr>` elements
+> or reorder rows in the DOM. In data-driven mode (`data-ln-table-source="store"`), it listens for `ln-data-store:data` events,
+> clones `<template data-ln-table-row>`, populates cells via `fill()`, and mounts rendered rows into `<tbody>` with sliding-window virtual scrolling.
 
 ---
 

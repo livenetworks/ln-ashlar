@@ -10,7 +10,10 @@ tags: [interactions, drag-and-drop, sorting, list]
 
 # 🔀 ln-sortable
 
-> **Classification:** 🟢 Simple Component / Drag & Drop Reordering Primitive
+> **Classification:** 🟢 Simple Component / Drag & Drop Reordering Primitive  
+> Applied to a `<ul data-ln-sortable>` or `<ol>` list. It listens for `pointerdown`, `pointermove`, and `pointerup` events
+> on list items (or `[data-ln-sortable-handle]`). On drag, it adds `.ln-sortable--dragging`, repositions items in the DOM via
+> `insertBefore`, and places a placeholder element. On release, it removes drag classes, purges the placeholder, and emits an `ln-sortable:change` CustomEvent.
 
 ---
 

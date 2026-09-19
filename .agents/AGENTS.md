@@ -63,6 +63,13 @@
   7. `## 7. Related Components & Coordinators`
 - **Relative Links Requirement**: Always use relative paths for file links in component documentation (e.g. `../../components/ln-tooltip/src/ln-tooltip.js`, `./ln-confirm.md`), NEVER absolute `file:///` URLs.
 - Lead documentation with user/developer usage examples; keep internal JS engine code dumps out of consumer docs.
+- **Mandatory Executive Summary / Mental Model Blockquote**:
+  Every component documentation file (`components/<name>/README.md` and `docs-mcp/components/<name>.md`) MUST begin directly beneath the `# ln-{name}` heading with a concise 2–3 sentence blockquote (`> ...`).
+  This blockquote defines the component's strict architectural boundary and mental model:
+  1. **DOM root & attachment**: What element carries the component and what child elements/lists it wraps.
+  2. **Trigger & event mechanism**: How changes are detected (native events, user interactions, or attribute mutations).
+  3. **Single Source of Truth & Zero-Bloat Invariant**: What state drives it (e.g., native control state, DOM attribute), and what is strictly forbidden (zero hidden inputs, zero state mirrors, no speculative JS coordinators).
+  *Purpose*: Instantly establishes the architectural boundary so AI agents and developers never over-engineer, hallucinate synthetic state, or add unnecessary glue code.
 - **Conciseness & Compactness**: Keep documentation lean, focused, and direct. Consolidate related HTML markup variants into compact code blocks, use clean concise API tables, and keep Mermaid sequence diagrams focused on high-level lifecycle flows (3-4 key participants max). Avoid multi-paragraph over-explanations.
 
 ## 4. Visual Layer vs. Functional Layer Separation & Search Rules

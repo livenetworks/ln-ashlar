@@ -10,7 +10,11 @@ tags: [forms, populate, REST]
 
 # 📝 ln-form
 
-> **Classification:** 🟢 Simple component / Form Coordinator
+> **Classification:** 🟢 Simple component / Form Coordinator  
+> Applied to a native `<form data-ln-form action="..." method="...">`. It listens for `ln-fill` events carrying a record payload:
+> populating matching controls (`[name="key"]`) and dispatching synthetic `input`/`change` events to update dependent components.
+> On edit workflows, it updates `form.action` and ensures an `<input type="hidden" name="_method" value="PUT">` exists for RESTful
+> method spoofing, without intercepting native form submission.
 
 ---
 

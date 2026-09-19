@@ -1,7 +1,8 @@
 # ln-nav
 
-Active link highlighter — automatically marks the active link in navigation based on the current URL.
-Works with `pushState` (ln-ajax) and `popstate` (browser back/forward).
+> Applied to a `<nav data-ln-nav="className">` element. On initialization and on `popstate` or `pushState` events,
+> it compares each child `<a href>` against `window.location.pathname`. It adds the configured class name and `aria-current="page"`
+> to the matching link while removing them from inactive siblings, updating automatically when the DOM or browser URL changes.
 
 ## Integration
 

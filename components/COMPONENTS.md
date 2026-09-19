@@ -1003,6 +1003,7 @@ The component calls `_ensureDefaultItemTemplate()` at the top of `_initUpload()`
 | ln-table | Instance | `data-ln-table` | Data table (search, filter, sort, virtual scroll; opt-in server-side windowed virtualization via `data-ln-table-window`) |
 | ln-chart | Instance | `data-ln-chart` | SVG line/area dataset renderer with `ln-data-coordinator` binding |
 | ln-sortable | Instance | `data-ln-sortable` | Drag & drop reorder |
+| ln-picklist | Instance | `data-ln-picklist` | Two-list checkbox selection |
 | ln-dropdown | Instance | `data-ln-dropdown` | Positioned dropdown menu (wraps ln-toggle) |
 | ln-popover | Instance | `data-ln-popover` | Rich popover with viewport-aware positioning and ESC-stack management |
 | ln-key | Instance | `data-ln-key` | Keyboard shortcut primitive that triggers native click or focus behavior |

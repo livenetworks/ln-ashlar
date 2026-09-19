@@ -1,5 +1,7 @@
 # ln-include
 
+> Applied to a template element (`<template data-ln-include="/path.html">`). On initial page boot, it delays page-wide component sweeps, shares fetch promises across duplicate URLs, and injects the retrieved HTML into the template's `.content` fragment before dispatching `ln-include:loaded`. It acts solely as an asynchronous template loader without initializing child components or modifying router consumers.
+
 External partial loader for `<template>` elements.
 
 `ln-include` lets the *content* of an existing `<template>` be loaded from an external file asynchronously, while the template keeps its own identity. Because only the content moves, no consuming component changes: `cloneTemplate` and router view cloning continue to function seamlessly.

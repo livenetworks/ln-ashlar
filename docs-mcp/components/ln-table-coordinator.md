@@ -10,7 +10,8 @@ tags: [table, coordinator, search, filter, keyboard-shortcuts]
 
 # 🧭 ln-table-coordinator
 
-> **Classification:** 🟡 Coordinator Component
+> **Classification:** 🟡 Coordinator Component  
+> Applied to a wrapper element (`<div data-ln-table-coordinator>`) enclosing a table, search controls, and filter popovers. It listens for `ln-filter:change` within its host to toggle `.ln-filter-active` classes on header `<th>` buttons, intercepts `click` on `[data-ln-table-clear]` to reset search inputs and uncheck filter checkboxes, and captures page `'/'` `keydown` to focus the search input. It acts strictly as a Layer 2 mediator, never rendering table rows or holding query caches.
 
 ---
 

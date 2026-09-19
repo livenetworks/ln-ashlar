@@ -1,5 +1,7 @@
 # ln-key
 
+> Applied directly to an interactive control (`<button data-ln-key="Ctrl+S">`, `<input data-ln-key="Ctrl+K">`) or via an external key map (`<ul data-ln-key-modifier="Ctrl">`). It listens for global `keydown` events, normalizes modifier combinations, and activates target elements by calling `.click()` on buttons/links or `.focus()` on inputs and editable surfaces. It remains completely decoupled from other components, relying strictly on native browser event dispatch without storing synthetic shortcut state.
+
 `ln-key` binds one or more keyboard shortcuts to the natural DOM interaction of an existing target. It is a behavior primitive: it does not know about `ln-modal`, `ln-router`, `ln-toggle`, or any other Ashlar component.
 
 ## Basic usage

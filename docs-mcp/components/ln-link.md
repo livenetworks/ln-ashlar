@@ -10,7 +10,8 @@ tags: [link, click, helper, navigation]
 
 # 🔗 ln-link
 
-> **Classification:** 🟢 Simple component (Layer 1 - Navigation Helper)
+> **Classification:** 🟢 Simple component (Layer 1 - Navigation Helper)  
+> Applied to a table, tbody, or container element (`<table data-ln-link>`, `<div data-ln-link>`). It listens for container `click` events, resolves the first anchor tag (`row.querySelector('a')`) in document order, and calls `.click()` on that anchor while bypassing clicks on nested interactive elements (`<button>`, `<input>`, `<select>`, `<textarea>`). It dynamically appends a viewport status bar (`.ln-link-status`) mirroring the native URL preview on hover, leaving navigation entirely to the platform or SPA router.
 
 ---
 

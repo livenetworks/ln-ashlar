@@ -1,6 +1,8 @@
 # ln-accordion
 
-> A lightweight, stateless **Coordinator** that enforces a single-open rule across a list of independent `ln-toggle` panels.
+> Applied to a parent container (`data-ln-accordion`) wrapping multiple independent `ln-toggle` panels.
+> It carries zero internal state and listens solely for bubbling `ln-toggle:open` events from its children.
+> When one panel opens, it enforces mutual exclusivity by setting `data-ln-toggle="close"` on all open siblings — leaving all ARIA management, click handling, and CSS transitions entirely to `ln-toggle`.
 
 ---
 

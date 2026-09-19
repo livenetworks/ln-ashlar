@@ -10,7 +10,11 @@ tags: [tables, data-grid, virtual-scrolling, sorting, selection]
 
 # 📊 ln-table
 
-> **Classification:** 🟢 Simple component / Presenter (Layer 1 - Data Grid View)
+> **Classification:** 🟢 Simple component / Presenter (Layer 1 - Data Grid View)  
+> Applied to a table container via `<div data-ln-table id="...">` or `<table>`. In SSR mode, it indexes server-rendered
+> `<tbody>` rows, intercepting `ln-search`, `ln-filter`, and `ln-sort` CustomEvents to toggle `.hidden` on `<tr>` elements
+> or reorder rows in the DOM. In data-driven mode (`data-ln-table-source="store"`), it listens for `ln-data-store:data` events,
+> clones `<template data-ln-table-row>`, populates cells via `fill()`, and mounts rendered rows into `<tbody>` with sliding-window virtual scrolling.
 
 ---
 

@@ -1,8 +1,9 @@
 # ln-validate
 
-A zero-dependency, high-performance **Validity Primitive** that wraps the browser's native `ValidityState` API. It manages when to evaluate inputs, how to toggle visual error indicators, and when to dispatch validation events to form-level coordinators.
-
-It maintains no custom rules in JavaScript; instead, it relies fully on native HTML markup constraints (`required`, `minlength`, `type="email"`, `pattern`) and standard CSS classes.
+> Applied to form controls (`<input data-ln-validate>`, `<select>`, `<textarea>`) inside a `.form-element` wrapper.
+> On initialization, it injects `novalidate` on the parent `<form>` and intercepts the form `submit` event.
+> On field `blur` or `input` (after touched), it checks native `input.validity`, toggles the `.hidden` class on matching
+> `[data-ln-validate-error="rule"]` elements, and sets `aria-invalid`; on submit with errors, it calls `e.preventDefault()` and focuses the first invalid field.
 
 ---
 

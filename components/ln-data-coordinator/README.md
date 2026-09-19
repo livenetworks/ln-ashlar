@@ -1,8 +1,9 @@
 # `data-ln-data-coordinator`
 
-A zero-dependency, Local-First **Data Coordinator** component that orchestrates the full 3-Tier Data Layer in `ln-ashlar`: it bridges the local cache store to remote connectors **and** delivers live data to bound view components (tables, lists, charts, selects, stat counters) with zero application JavaScript.
-
-This component monitors its DOM subtree, intercepts events, and coordinates the lifecycle between a **Local Storage Cache** (`data-ln-data-store`) and any **Transport Gateway** (`data-ln-*-connector`). It also listens on `document` for view-binding requests and refreshes all bound view elements on every store mutation.
+> Applied to a parent container (`<ul data-ln-data-coordinator hidden>`) enclosing a `data-ln-data-store` and a
+> `data-ln-api-connector`. It catches store staleness and pagination requests to dispatch fetch events to the connector,
+> populating the store with server responses (`request-populate`). On store data mutations, it executes local queries and
+> dispatches `set-data` events directly to bound view elements (`data-ln-table-source`, `data-ln-list-source`).
 
 ---
 

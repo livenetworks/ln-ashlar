@@ -1,5 +1,7 @@
 # ln-translations
 
+> Applied to a form element (`<form data-ln-translations data-ln-translations-default="en">`). It coordinates translatable input containers (`[data-ln-translatable="field"]`), dynamically cloning the inner form controls with deterministic nested names (`trans[lang][field]`) when languages are added, and synchronizes active language badges and dropdown menus via `<template>` elements. It manages no network transport or validation, submitting cloned fields natively through the standard `<form>` submission pipeline.
+
 A zero-dependency, event-driven **Form Translation Coordinator** that manages inline multi-lingual inputs by dynamically cloning translatable fields on-demand.
 
 Instead of writing custom layout handlers to manage multi-language fields, this component intercepts locale additions and removals, duplicates translatable fields with appropriate naming conventions, and handles pre-rendered server payloads automatically.

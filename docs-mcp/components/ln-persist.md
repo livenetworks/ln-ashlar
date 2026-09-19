@@ -10,7 +10,11 @@ tags: [persist, localstorage, state, storage]
 
 # 🟢 ln-persist
 
-> **Classification:** 🟢 Simple component (no instance, no `DOM_ATTRIBUTE` — a document-level sink)
+> **Classification:** 🟢 Simple component (no instance, no `DOM_ATTRIBUTE` — a document-level sink)  
+> Applied as a declarative decorator attribute (`data-ln-persist`) to an element owned by a persist-enabled component.
+> On initialization, it reads stored state from `localStorage.getItem(storageKey)` and applies it via `el.setAttribute(attr, value)`.
+> A `MutationObserver` watches the component's state attribute: whenever it changes, it synchronizes the new value back to
+> `localStorage.setItem(storageKey, value)` with zero imperative JS API calls.
 
 ---
 

@@ -10,7 +10,7 @@
 			]
 		},
 		"data-ln-sortable": {
-			"direction": "both",
+			"direction": "author",
 			"sources": [
 				"ln-sortable-dev.scss",
 				"src/ln-sortable.js"

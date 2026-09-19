@@ -1,8 +1,6 @@
 # ln-fill
 
-> Declarative click-triggered form/display fill. A document-level delegated
-> click listener — not a per-element component. Composes with `data-ln-modal-for`
-> on the same button.
+> Applied declaratively to clickable triggers (`<button data-ln-fill-form="formId" data-ln-fill-key="value">`). It catches delegated document click events, normalizes `data-ln-fill-*` attributes into a payload object, and invokes targeted dispatch via `lnCore.lnFill()` to fire `ln-fill` CustomEvents directly at the addressed form or container. It manages no form validation, modal toggling, or backend storage, serving strictly as an event-driven DOM field populator.
 
 ---
 

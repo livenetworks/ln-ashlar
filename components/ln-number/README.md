@@ -1,6 +1,9 @@
 # ln-number
 
-Real-time locale-aware number formatting for input fields.
+> Applied to an `<input type="number" name="..." data-ln-number>` or text input. On initialization, it converts the visible element
+> to `<input type="text" inputmode="decimal">` and injects a hidden `<input type="hidden" name="...">` for form submission.
+> On user `input`, it parses digits, writes the unformatted number to `hiddenInput.value`, and writes the formatted localized
+> string (`Intl.NumberFormat`) into `visibleInput.value` while preserving cursor position.
 
 ## Usage
 

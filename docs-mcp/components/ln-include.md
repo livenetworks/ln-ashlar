@@ -10,7 +10,8 @@ tags: [core, loader, templates, partials]
 
 # 📦 ln-include
 
-> **Classification:** 🟢 Simple component (Layer 1)
+> **Classification:** 🟢 Simple component (Layer 1)  
+> Applied to a template element (`<template data-ln-include="/path.html">`). On initial page boot, it delays page-wide component sweeps, shares fetch promises across duplicate URLs, and injects the retrieved HTML into the template's `.content` fragment before dispatching `ln-include:loaded`. It acts solely as an asynchronous template loader without initializing child components or modifying router consumers.
 
 ---
 

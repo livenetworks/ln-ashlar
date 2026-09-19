@@ -1806,6 +1806,46 @@
 			"emits": [],
 			"listens": []
 		},
+		"ln-picklist": {
+			"emits": [
+				{
+					"name": "ln-picklist:before-move",
+					"cancelable": true,
+					"description": "Dispatched before the item is re-parented. Canceling aborts the move and reverts the checkbox.",
+					"detail": "{ item: HTMLElement, from: HTMLElement, to: HTMLElement, checkbox: HTMLInputElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-picklist:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when the instance is destroyed.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-picklist:disabled",
+					"cancelable": false,
+					"description": "Dispatched when the root attribute becomes `\"disabled\"`.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-picklist:enabled",
+					"cancelable": false,
+					"description": "Dispatched when the root attribute transitions away from `\"disabled\"`.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				},
+				{
+					"name": "ln-picklist:move",
+					"cancelable": false,
+					"description": "Dispatched after the item has been re-parented.",
+					"detail": "{ item: HTMLElement, from: HTMLElement, to: HTMLElement, checkbox: HTMLInputElement }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
 		"ln-popover": {
 			"emits": [
 				{

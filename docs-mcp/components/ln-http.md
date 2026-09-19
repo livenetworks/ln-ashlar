@@ -10,7 +10,11 @@ tags: [http, fetch, request, network]
 
 # 🌐 ln-http
 
-> **Classification:** ⚛️ Service (Layer 3 - Network/Fetch Middleware)
+> **Classification:** ⚛️ Service (Layer 3 - Network/Fetch Middleware)  
+> A window-level HTTP concurrency coordinator (`window.lnHttp`). It transparently intercepts `fetch()` to call
+> `AbortController.abort()` on superseded in-flight GET/HEAD requests targeting the exact same URL. Additionally, it listens
+> globally for `ln-http:request` CustomEvents bearing a unique `key`: automatically aborting any running request with the same
+> key, executing the fetch, and dispatching `ln-http:response` or `ln-http:error`.
 
 ---
 
