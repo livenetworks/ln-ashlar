@@ -32,15 +32,15 @@
 										<h4 id="pool-heading">Available</h4>
 									</header>
 
-									<label class="search">
+									<search aria-label="Search available">
 										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 										<input type="search" data-ln-search-for="pool" placeholder="Search available…">
 										<button type="button" data-ln-search-clear aria-label="Clear search">
 											<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 										</button>
-									</label>
+									</search>
 
-									<ul data-ln-picklist-list="available" id="pool" data-ln-search aria-labelledby="pool-heading">
+									<ul data-ln-picklist-list="available" id="pool" data-ln-search="" aria-labelledby="pool-heading">
 										<li><label><input type="checkbox" name="countries[]" value="ar"> Argentina</label></li>
 										<li><label><input type="checkbox" name="countries[]" value="au"> Australia</label></li>
 										<li><label><input type="checkbox" name="countries[]" value="at"> Austria</label></li>
@@ -61,6 +61,7 @@
 										<li><label><input type="checkbox" name="countries[]" value="ie"> Ireland</label></li>
 										<li><label><input type="checkbox" name="countries[]" value="it"> Italy</label></li>
 										<li><label><input type="checkbox" name="countries[]" value="jp"> Japan</label></li>
+										<li><label><input type="checkbox" name="countries[]" value="nl" checked> Netherlands</label></li>
 									</ul>
 								</section>
 
@@ -69,17 +70,15 @@
 										<h4 id="picked-heading">Selected</h4>
 									</header>
 
-									<label class="search">
+									<search aria-label="Search selected">
 										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 										<input type="search" data-ln-search-for="picked" placeholder="Search selected…">
 										<button type="button" data-ln-search-clear aria-label="Clear search">
 											<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 										</button>
-									</label>
+									</search>
 
-									<ul data-ln-picklist-list="selected" id="picked" data-ln-search aria-labelledby="picked-heading">
-										<li><label><input type="checkbox" name="countries[]" value="nl" checked> Netherlands</label></li>
-									</ul>
+									<ul data-ln-picklist-list="selected" id="picked" data-ln-search="" aria-labelledby="picked-heading"></ul>
 								</section>
 
 							</section>
@@ -96,105 +95,19 @@
 					</main>
 				</section>
 
-				<!-- Events -->
-				<section class="section-card">
-					<header><h3>Events</h3></header>
-					<main>
-						<p><code>ln-picklist:before-move</code> is cancelable. Tick the box below to cap the selection at five — a rejected move reverts the checkbox, so the DOM never contradicts itself.</p>
-
-						<label>
-							<input type="checkbox" id="picklist-cap">
-							Limit the selection to 5 items
-						</label>
-
-						<h4>Event log</h4>
-						<pre id="picklist-log">(interact with the lists above)</pre>
-					</main>
-				</section>
-
-				<!-- Disabled -->
-				<section class="section-card">
-					<header><h3>Read-only</h3></header>
-					<main>
-						<p><code>data-ln-picklist="disabled"</code> blocks moving. The browser toggles the box before any listener runs, so the component <em>reverts</em> the toggle rather than merely ignoring it — otherwise the box would read checked while the item stayed put.</p>
-
-						<button type="button" id="picklist-toggle-disabled">Toggle disabled</button>
-					</main>
-				</section>
-
-				<!-- Attributes -->
-				<section class="section-card">
-					<header><h3>Attributes</h3></header>
-					<main>
-						<div class="table-container">
-							<table>
-								<thead>
-									<tr><th>Attribute</th><th>Element</th><th>Values</th><th>Description</th></tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td><code>data-ln-picklist</code></td>
-										<td>Root</td>
-										<td><code>""</code> | <code>"disabled"</code></td>
-										<td>Initializes the component. <code>"disabled"</code> blocks moving.</td>
-									</tr>
-									<tr>
-										<td><code>data-ln-picklist-list</code></td>
-										<td><code>&lt;ul&gt;</code></td>
-										<td><code>available</code> | <code>selected</code></td>
-										<td>Marks which list is which. Both are required.</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-						<p>The item carries no attribute of its own — it is resolved from the checkbox that changed.</p>
-					</main>
-				</section>
 
 <script>
 (function () {
 	'use strict';
 
-	const root = document.getElementById('countries');
 	const form = document.getElementById('picklist-form');
 	const output = document.getElementById('picklist-output');
-	const log = document.getElementById('picklist-log');
-	const cap = document.getElementById('picklist-cap');
-	const selected = root.querySelector('[data-ln-picklist-list="selected"]');
-
-	function write(line) {
-		log.textContent = line + '\n' + log.textContent;
-	}
-
-	root.addEventListener('ln-picklist:before-move', function (e) {
-		if (!cap.checked) return;
-		if (e.detail.to !== selected) return;
-		if (selected.children.length < 5) return;
-
-		e.preventDefault();
-		write('before-move CANCELED — cap of 5 reached');
-	});
-
-	root.addEventListener('ln-picklist:move', function (e) {
-		const side = e.detail.to === selected ? 'selected' : 'available';
-		write('move → ' + side + ' : ' + e.detail.checkbox.value);
-	});
-
-	root.addEventListener('ln-picklist:enabled', function () { write('enabled'); });
-	root.addEventListener('ln-picklist:disabled', function () { write('disabled'); });
 
 	form.addEventListener('submit', function (e) {
 		e.preventDefault();
 		const body = new URLSearchParams(new FormData(form)).toString();
 		output.textContent = body || '(nothing selected)';
 	});
-
-	document.getElementById('picklist-toggle-disabled').addEventListener('click', function () {
-		if (root.getAttribute('data-ln-picklist') === 'disabled') {
-			root.setAttribute('data-ln-picklist', '');
-		} else {
-			root.setAttribute('data-ln-picklist', 'disabled');
-		}
-	});
 })();
 </script>
+

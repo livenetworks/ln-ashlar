@@ -6,12 +6,14 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 	const DOM_SELECTOR = 'data-ln-picklist';
 	const DOM_ATTRIBUTE = 'lnPicklist';
 	const LIST_ATTR = 'data-ln-picklist-list';
+	const MAX_ATTR = 'data-ln-picklist-max';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
 		'data-ln-picklist':      { effect: _syncEnabled },
+		'data-ln-picklist-max':  { effect: _syncMax },
 		'data-ln-picklist-list': {}
 	};
 
@@ -25,6 +27,7 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 	function _component(dom) {
 		this.dom = dom;
 		this.isEnabled = dom.getAttribute(DOM_SELECTOR) !== 'disabled';
+		this.max = _readMax(dom);
 
 		this.available = dom.querySelector('[' + LIST_ATTR + '="available"]');
 		this.selected = dom.querySelector('[' + LIST_ATTR + '="selected"]');
@@ -39,14 +42,16 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 		this._onChange = this._onChange.bind(this);
 		dom.addEventListener('change', this._onChange);
 
-		// Snapshot the authored placement. A form reset restores `checked` —
-		// the browser cannot put the nodes back where they came from.
+		// Snapshot the authored items in document order.
 		this._initial = [];
 		for (const list of [this.available, this.selected]) {
 			for (const item of list.children) {
-				this._initial.push({ item: item, list: list });
+				this._initial.push(item);
 			}
 		}
+
+		// Initial sync: transfer checked items to selected, unchecked to available.
+		this.sync();
 
 		this._form = dom.closest('form');
 		if (this._form) {
@@ -68,27 +73,66 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
+	// ─── Instance API ──────────────────────────────────────────
+
+	_component.prototype.enable = function () {
+		this.dom.setAttribute(DOM_SELECTOR, '');
+	};
+
+	_component.prototype.disable = function () {
+		this.dom.setAttribute(DOM_SELECTOR, 'disabled');
+	};
+
+	_component.prototype.sync = function () {
+		if (!this.available || !this.selected) return;
+
+		// Include any dynamically added items not yet tracked
+		const currentItems = Array.from(this.available.children).concat(Array.from(this.selected.children));
+		for (let i = 0; i < currentItems.length; i++) {
+			if (!this._initial.includes(currentItems[i])) {
+				this._initial.push(currentItems[i]);
+			}
+		}
+
+		let selectedCount = 0;
+		for (let i = 0; i < this._initial.length; i++) {
+			const item = this._initial[i];
+			if (!item.isConnected) continue;
+			const checkbox = item.querySelector('input[type="checkbox"]');
+			if (!checkbox) continue;
+
+			let targetList;
+			if (checkbox.checked) {
+				if (this.max === null || selectedCount < this.max) {
+					targetList = this.selected;
+					selectedCount++;
+				} else {
+					checkbox.checked = false;
+					targetList = this.available;
+				}
+			} else {
+				targetList = this.available;
+			}
+			targetList.appendChild(item);
+		}
+	};
+
 	// ─── Form Reset ────────────────────────────────────────────
 	//
 	// Resetting a form restores every control to its default SILENTLY — the
 	// spec fires no `change` and no `input` for them, only `reset` on the form
-	// itself. So the change handler never hears about it, and the items would
-	// stay in whichever list the user left them while their boxes flipped back.
+	// itself. Re-syncing in recorded order rebuilds both lists according to
+	// defaultChecked.
 
 	_component.prototype._onFormReset = function (e) {
 		const self = this;
 
 		// `reset` fires BEFORE the controls are restored, and it is cancelable,
 		// so the work is deferred and re-checked — the same shape ln-editor
-		// uses to re-read its textarea. Re-appending in the recorded order
-		// rebuilds both lists exactly as they were authored.
+		// uses to re-read its textarea.
 		setTimeout(function () {
 			if (self._destroyed || e.defaultPrevented) return;
-
-			for (const entry of self._initial) {
-				// Never resurrect an item the page removed on purpose.
-				if (entry.item.isConnected) entry.list.appendChild(entry.item);
-			}
+			self.sync();
 		}, 0);
 	};
 
@@ -121,6 +165,18 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 		// re-append in place and emit a move that never happened.
 		if (from === to) return;
 
+		// Enforce maximum selection limit if configured
+		if (to === this.selected && this.max !== null && this.selected.children.length >= this.max) {
+			checkbox.checked = !checkbox.checked;
+			dispatch(this.dom, 'ln-picklist:max-reached', {
+				max: this.max,
+				item: item,
+				checkbox: checkbox,
+				count: this.selected.children.length
+			});
+			return;
+		}
+
 		// One record, both events — they describe the same move.
 		const detail = { item: item, from: from, to: to, checkbox: checkbox };
 
@@ -143,6 +199,13 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 
 	// ─── Attribute Sync ────────────────────────────────────────
 
+	function _readMax(el) {
+		const raw = el.getAttribute(MAX_ATTR);
+		if (raw === null || raw === '') return null;
+		const parsed = parseInt(raw, 10);
+		return isNaN(parsed) || parsed < 0 ? null : parsed;
+	}
+
 	function _syncEnabled(el) {
 		const instance = el[DOM_ATTRIBUTE];
 		if (!instance) return;
@@ -150,6 +213,12 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 		if (shouldBeEnabled === instance.isEnabled) return;
 		instance.isEnabled = shouldBeEnabled;
 		dispatch(el, shouldBeEnabled ? 'ln-picklist:enabled' : 'ln-picklist:disabled', { target: el });
+	}
+
+	function _syncMax(el) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+		instance.max = _readMax(el);
 	}
 
 	// ─── Init ──────────────────────────────────────────────────

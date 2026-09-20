@@ -57,8 +57,10 @@ Everything else composes:
 </section>
 ```
 
-Items rendered into `selected` must have their checkbox `checked`. The two must
-agree — that agreement is the component's whole contract.
+On initialization, `ln-picklist` automatically scans all items and transfers any checked
+checkbox (`<input type="checkbox" checked>`) into the `selected` list. All items can be
+authored in the `available` pool from backend templates, leaving `selected` initially
+empty. On form reset, both lists are automatically re-synchronized with `defaultChecked`.
 
 ### With search on both lists
 
@@ -70,22 +72,30 @@ list's `id` and it hides non-matching `<li>` children for free:
 	<section>
 		<h3 id="pool-h">Available</h3>
 
-		<label class="search">
+		<search aria-label="Search available">
 			<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 			<input type="search" data-ln-search-for="pool" placeholder="Search…">
 			<button type="button" data-ln-search-clear aria-label="Clear search">
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 			</button>
-		</label>
+		</search>
 
-		<ul data-ln-picklist-list="available" id="pool" data-ln-search aria-labelledby="pool-h">
+		<ul data-ln-picklist-list="available" id="pool" data-ln-search="" aria-labelledby="pool-h">
 			…
 		</ul>
 	</section>
 
 	<section>
 		<h3 id="picked-h">Selected</h3>
-		<ul data-ln-picklist-list="selected" id="picked" data-ln-search aria-labelledby="picked-h">
+		<search aria-label="Search selected">
+			<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+			<input type="search" data-ln-search-for="picked" placeholder="Search…">
+			<button type="button" data-ln-search-clear aria-label="Clear search">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+			</button>
+		</search>
+
+		<ul data-ln-picklist-list="selected" id="picked" data-ln-search="" aria-labelledby="picked-h">
 			…
 		</ul>
 	</section>
@@ -105,6 +115,7 @@ of its two lists.
 | Attribute | Element | Values | Description |
 |---|---|---|---|
 | `data-ln-picklist` | Root | `""` \| `"disabled"` | Initializes the component. `"disabled"` blocks moving. |
+| `data-ln-picklist-max` | Root | integer (e.g. `"5"`) | Maximum selection limit. Blocks further additions to `selected` and dispatches `ln-picklist:max-reached`. |
 | `data-ln-picklist-list` | `<ul>` / `<ol>` | `available` \| `selected` | Marks which list is which. Both are required. |
 
 There is no attribute on the item. It is found from the checkbox that changed.
@@ -115,7 +126,10 @@ Accessed via `element.lnPicklist`:
 
 | Helper | Signature | Description |
 |---|---|---|
-| `destroy` | `()` | Detaches the listener and cleans up the instance property. |
+| `enable` | `()` | Allows moving (sets `data-ln-picklist=""`). |
+| `disable` | `()` | Blocks moving (sets `data-ln-picklist="disabled"`). |
+| `sync` | `()` | Synchronizes items between available/selected according to checkbox state. |
+| `destroy` | `()` | Detaches listeners and cleans up the instance property. |
 
 ---
 
@@ -123,22 +137,18 @@ Accessed via `element.lnPicklist`:
 
 All events bubble from the root.
 
+### `ln-picklist:max-reached`
+
+Fires when an item move to `selected` is blocked because the `data-ln-picklist-max` limit has been reached. The checkbox is automatically reverted.
+
+`detail`: `{ max, item, checkbox, count }`
+
 ### `ln-picklist:before-move`
 
 Cancelable. Fires before the item moves. Calling `preventDefault()` aborts the
 move **and reverts the checkbox**, so the DOM never contradicts itself.
 
 `detail`: `{ item, from, to, checkbox }`
-
-```js
-// Cap the selection at five.
-root.addEventListener('ln-picklist:before-move', function (e) {
-	if (e.detail.to === root.querySelector('[data-ln-picklist-list="selected"]')
-		&& e.detail.to.children.length >= 5) {
-		e.preventDefault();
-	}
-});
-```
 
 ### `ln-picklist:move`
 

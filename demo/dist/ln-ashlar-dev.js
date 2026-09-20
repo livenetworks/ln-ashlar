@@ -615,6 +615,7 @@ const E = /* @__PURE__ */ new Set([
   "data-ln-persist-scope",
   "data-ln-picklist",
   "data-ln-picklist-list",
+  "data-ln-picklist-max",
   "data-ln-popover",
   "data-ln-popover-for",
   "data-ln-popover-placement",

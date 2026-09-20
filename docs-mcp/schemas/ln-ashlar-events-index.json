@@ -1731,7 +1731,7 @@
 			],
 			"listened_by": [],
 			"cancelable": true,
-			"description": "Dispatched before the item is re-parented. Canceling aborts the move and reverts the checkbox.",
+			"description": "Dispatched before an item is re-parented. Calling `preventDefault()` cancels the move and reverts the checkbox.",
 			"detail": "{ item: HTMLElement, from: HTMLElement, to: HTMLElement, checkbox: HTMLInputElement }",
 			"source": "static"
 		},
@@ -1751,7 +1751,7 @@
 			],
 			"listened_by": [],
 			"cancelable": false,
-			"description": "Dispatched when the root attribute becomes `\"disabled\"`.",
+			"description": "Dispatched when root attribute transitions to `\"disabled\"`.",
 			"detail": "{ target: HTMLElement }",
 			"source": "static"
 		},
@@ -1761,8 +1761,18 @@
 			],
 			"listened_by": [],
 			"cancelable": false,
-			"description": "Dispatched when the root attribute transitions away from `\"disabled\"`.",
+			"description": "Dispatched when root attribute transitions away from `\"disabled\"`.",
 			"detail": "{ target: HTMLElement }",
+			"source": "static"
+		},
+		"ln-picklist:max-reached": {
+			"emitted_by": [
+				"ln-picklist"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "Dispatched when a move to `selected` is blocked by `data-ln-picklist-max`. Reverts the checkbox.",
+			"detail": "{ max: number, item: HTMLElement, checkbox: HTMLInputElement, count: number }",
 			"source": "static"
 		},
 		"ln-picklist:move": {
@@ -1771,7 +1781,7 @@
 			],
 			"listened_by": [],
 			"cancelable": false,
-			"description": "Dispatched after the item has been re-parented.",
+			"description": "Dispatched after an item has been re-parented into the target list.",
 			"detail": "{ item: HTMLElement, from: HTMLElement, to: HTMLElement, checkbox: HTMLInputElement }",
 			"source": "static"
 		},

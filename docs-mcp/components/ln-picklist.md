@@ -3,41 +3,44 @@ name: ln-picklist
 classification: simple
 status: stable
 domain: frontend
-summary: A dual-list selection primitive where checking a checkbox moves the <li> via appendChild into selected, and unchecking returns it to available.
+summary: A dual-list selection primitive where checking a checkbox transfers the <li> into the selected list, and unchecking returns it to available. Supports declarative selection capping via data-ln-picklist-max.
 source: components/ln-picklist/src/ln-picklist.js
-tags: [forms, selection, lists, checkbox]
+tags: [forms, selection, lists, checkbox, picklist]
 ---
 
 # 🔀 ln-picklist
 
 > **Classification:** 🟢 Simple Component / Two-List Selection Primitive  
 > Applied to a container (`data-ln-picklist`) wrapping `<ul data-ln-picklist-list="available">` and `<ul data-ln-picklist-list="selected">`.
-> It listens for native `change` events on child `<input type="checkbox">`: when `checked` is true, it moves the parent `<li>` via
-> `appendChild` into the `selected` list; when unchecked, it returns it to `available`. Native checkboxes drive both DOM placement
-> and form submission (`name`/`value`) with zero hidden inputs or state mirrors.
+> On mount, it automatically scans and transfers any `<input type="checkbox" checked>` into the `selected` list. It then listens for native
+> `change` events on child checkboxes: checking moves the parent `<li>` via `appendChild` into `selected`; unchecking returns it to `available`.
+> Native checkboxes drive DOM placement, optional selection caps (`data-ln-picklist-max`), and form submission (`name`/`value`) with zero hidden inputs or state mirrors.
 
 ---
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-picklist` component is a two-list selection primitive that transfers `<li>` items between an "available" list and a "selected" list in response to native checkbox `change` events.
+The `ln-picklist` component is an autonomous two-list selection primitive designed for picking subsets from large pools (e.g., countries, tags, permissions, assignees):
 
-- **Core Role:** Moves an `<li>` between an "available" list and a "selected" list in response to the `change` event of the checkbox it contains.
-- **The checkbox is the state.** Its `checked` property and the list the item currently sits in are the same fact. `name` / `value` carry the selection to the server natively — unchecked boxes are not submitted — so the component keeps **no hidden inputs, no state attribute and no JS mirror**.
-- Located in [`components/ln-picklist/src/ln-picklist.js`](../../components/ln-picklist/src/ln-picklist.js).
+- **Single Source of Truth:** The checkbox *is* the state. Its `checked` property and its placement in either the `available` or `selected` list are the exact same fact.
+- **Automatic Hydration:** Backend templates render all options directly into the first list (`data-ln-picklist-list="available"`). Items marked with native `checked` are automatically transferred into the `selected` list upon component mount.
+- **Native Form Submission:** When the wrapping `<form>` submits, the browser natively collects all checked checkboxes with their `name` and `value`. No JS serialization or hidden inputs are involved.
+- **Selection Capping (`data-ln-picklist-max`):** Declaratively limits the maximum number of items that can be transferred to the `selected` list. Attempts exceeding the cap are blocked, reverted, and emit `ln-picklist:max-reached`.
+- **Form Reset Integration:** When the parent `<form>` resets, the component defers and re-syncs both lists according to each input's native `defaultChecked` property, maintaining relative authored order.
 
 > [!IMPORTANT]
-> **What the component does NOT do (Orthogonality Doctrine):**
-> - **Does NOT search or filter** — compose [`ln-search`](./ln-search.md) against each list's `id`; it hides non-matching children on its own.
-> - **Does NOT render counts, empty states or "select all"** — presentation and bulk policy belong to the page or a Layer 2 coordinator.
-> - **Does NOT restore source order** — an unchecked item is appended to the end of the available list.
-> - **Does NOT touch foreign attributes** — a moved item keeps any `data-ln-search-hide` an `ln-search` put on it; cross-component reconciliation is a coordinator's job.
+> **Orthogonality Doctrine (What the component does NOT do):**
+> - **Does NOT implement its own search or filtering:** Compose [`ln-search`](./ln-search.md) with canonical `<search>` landmarks targeting each list's `id`.
+> - **Does NOT render counter badges, empty states, or "Select All":** Presentation and bulk policies belong to the page or a Layer 2 coordinator.
+> - **Does NOT touch foreign attributes:** A moved item preserves all existing classes and data attributes (such as `data-ln-search-hide`).
 
 ---
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-### Base HTML Markup
+### Base HTML Markup (Automatic Initial Hydration)
+
+Render all options into the `available` list. Preselected items simply include the native `checked` attribute:
 
 ```html
 <section data-ln-picklist>
@@ -48,119 +51,150 @@ The `ln-picklist` component is a two-list selection primitive that transfers `<l
                 Germany
             </label>
         </li>
+        <li>
+            <label>
+                <input type="checkbox" name="countries[]" value="nl" checked>
+                Netherlands
+            </label>
+        </li>
     </ul>
 
     <ul data-ln-picklist-list="selected"></ul>
 </section>
 ```
 
-Items rendered into `selected` must carry `checked`. That agreement is the component's entire contract.
+Upon initialization, `ln-picklist` automatically transfers the Netherlands `<li>` into the `selected` list.
 
-### Variant 1: Searchable lists (composition with `ln-search`)
+### Variant 1: Maximum Selection Cap (`data-ln-picklist-max`)
+
+Enforce an upper bound on allowed selections directly in HTML:
+
+```html
+<section data-ln-picklist data-ln-picklist-max="3">
+    <ul data-ln-picklist-list="available">
+        <li><label><input type="checkbox" name="roles[]" value="admin"> Administrator</label></li>
+        <li><label><input type="checkbox" name="roles[]" value="editor"> Editor</label></li>
+        <li><label><input type="checkbox" name="roles[]" value="viewer"> Viewer</label></li>
+        <li><label><input type="checkbox" name="roles[]" value="billing"> Billing</label></li>
+    </ul>
+
+    <ul data-ln-picklist-list="selected"></ul>
+</section>
+```
+
+When 3 items are selected, checking a 4th item reverts the checkbox and emits `ln-picklist:max-reached`.
+
+### Variant 2: Searchable Lists (Composed with `ln-search`)
+
+Compose `ln-search` controls above each list using Ashlar's canonical `<search>` landmark:
 
 ```html
 <section data-ln-picklist>
     <section>
         <h3 id="pool-h">Available</h3>
-        <label class="search">
+        <search aria-label="Search available">
             <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-            <input type="search" data-ln-search-for="pool" placeholder="Search…">
+            <input type="search" data-ln-search-for="pool" placeholder="Search available…">
             <button type="button" data-ln-search-clear aria-label="Clear search">
                 <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
             </button>
-        </label>
-        <ul data-ln-picklist-list="available" id="pool" data-ln-search aria-labelledby="pool-h">…</ul>
+        </search>
+        <ul data-ln-picklist-list="available" id="pool" data-ln-search="" aria-labelledby="pool-h">…</ul>
     </section>
 
     <section>
         <h3 id="picked-h">Selected</h3>
-        <ul data-ln-picklist-list="selected" id="picked" data-ln-search aria-labelledby="picked-h">…</ul>
+        <search aria-label="Search selected">
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+            <input type="search" data-ln-search-for="picked" placeholder="Search selected…">
+            <button type="button" data-ln-search-clear aria-label="Clear search">
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+            </button>
+        </search>
+        <ul data-ln-picklist-list="selected" id="picked" data-ln-search="" aria-labelledby="picked-h">…</ul>
     </section>
 </section>
 ```
 
-The search input's own `change` bubbles to the picklist root and is ignored: the component only acts on checkboxes whose `<li>` sits directly in one of its two lists.
+The search inputs' `input` and `change` events bubble safely to the root and are ignored: `ln-picklist` only reacts to checkboxes within its two child lists.
 
-### Variant 2: Read-only
+### Variant 3: Disabled (Read-only)
 
 ```html
 <section data-ln-picklist="disabled"> … </section>
 ```
 
-Checking is reverted rather than merely ignored, so the DOM cannot drift out of agreement with itself.
+Clicking checkboxes while disabled is rejected immediately by reverting `checked` back to its previous state without moving the DOM node.
 
 ---
 
 ## 3. Declarative API Contract (Attributes & Events)
 
-### Attributes Table
+### Declarative Attributes (Single Source of Truth)
 
-| Attribute | Element | Type / Values | Default | Description |
+| Attribute | Element | Values | Default | Description |
 |---|---|---|---|---|
-| `data-ln-picklist` | Root | `""` \| `"disabled"` | `""` | Initializes the component. `"disabled"` blocks moving. |
+| `data-ln-picklist` | Root | `""` \| `"disabled"` | `""` | Initializes the component. `"disabled"` blocks item transfers. |
+| `data-ln-picklist-max` | Root | integer (e.g. `"5"`) | — | Maximum selection cap. Excess transfers are blocked and emit `ln-picklist:max-reached`. |
 | `data-ln-picklist-list` | `<ul>` / `<ol>` | `available` \| `selected` | — | Marks which list is which. Both are required. |
-
-The item carries no attribute of its own — it is resolved from the checkbox that changed.
 
 ### Programmatic JS API
 
-Instance interfaces accessed via `element.lnPicklist`:
+Instance methods accessed via `element.lnPicklist`:
 
 | Helper | Signature | Returns | Description |
 |---|---|---|---|
-| `element.lnPicklist.enable` | `()` | `void` | Allows moving (sets `data-ln-picklist=""`). |
-| `element.lnPicklist.disable` | `()` | `void` | Blocks moving (sets `data-ln-picklist="disabled"`). |
-| `element.lnPicklist.destroy` | `()` | `void` | Detaches the listener and removes the instance property. |
+| `element.lnPicklist.enable` | `()` | `void` | Enables transfers (sets `data-ln-picklist=""`). |
+| `element.lnPicklist.disable` | `()` | `void` | Disables transfers (sets `data-ln-picklist="disabled"`). |
+| `element.lnPicklist.sync` | `()` | `void` | Re-scans items and aligns DOM placement with checkbox states. |
+| `element.lnPicklist.destroy` | `()` | `void` | Detaches listeners and cleans up the instance reference. |
 
 ### Events API
 
+All events bubble from the component root (`{ bubbles: true }`):
+
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-picklist:before-move` | Emits | Yes | Dispatched before the item is re-parented. Canceling aborts the move and reverts the checkbox. | `{ item: HTMLElement, from: HTMLElement, to: HTMLElement, checkbox: HTMLInputElement }` |
-| `ln-picklist:move` | Emits | No | Dispatched after the item has been re-parented. | `{ item: HTMLElement, from: HTMLElement, to: HTMLElement, checkbox: HTMLInputElement }` |
-| `ln-picklist:enabled` | Emits | No | Dispatched when the root attribute transitions away from `"disabled"`. | `{ target: HTMLElement }` |
-| `ln-picklist:disabled` | Emits | No | Dispatched when the root attribute becomes `"disabled"`. | `{ target: HTMLElement }` |
+| `ln-picklist:max-reached` | Emits | No | Dispatched when a move to `selected` is blocked by `data-ln-picklist-max`. Reverts the checkbox. | `{ max: number, item: HTMLElement, checkbox: HTMLInputElement, count: number }` |
+| `ln-picklist:before-move` | Emits | Yes | Dispatched before an item is re-parented. Calling `preventDefault()` cancels the move and reverts the checkbox. | `{ item: HTMLElement, from: HTMLElement, to: HTMLElement, checkbox: HTMLInputElement }` |
+| `ln-picklist:move` | Emits | No | Dispatched after an item has been re-parented into the target list. | `{ item: HTMLElement, from: HTMLElement, to: HTMLElement, checkbox: HTMLInputElement }` |
+| `ln-picklist:enabled` | Emits | No | Dispatched when root attribute transitions away from `"disabled"`. | `{ target: HTMLElement }` |
+| `ln-picklist:disabled` | Emits | No | Dispatched when root attribute transitions to `"disabled"`. | `{ target: HTMLElement }` |
 | `ln-picklist:destroyed` | Emits | No | Dispatched when the instance is destroyed. | `{ target: HTMLElement }` |
 
 ---
 
-## 4. State & Persistence
+## 4. CSS Styling & Behavioral Concept
 
-There is no component state to persist. The selection lives entirely in the DOM: which `<li>` is in which list, and the `checked` property of its checkbox. A form submit serializes it natively.
+The styling is driven by `@mixin picklist` in [`theme/components/_picklist.scss`](../../theme/components/_picklist.scss):
 
-**Form reset** is the one case the DOM cannot handle alone. Resetting a form restores every control to its default *silently* — the spec fires no `change` and no `input` for the controls, only `reset` on the form — so the component would never hear about it and the items would stay in whichever list the user left them while their boxes flipped back. The component therefore snapshots the authored placement at boot and, on `reset`, re-appends each item to the list it came from. The work is deferred with `setTimeout(…, 0)` because `reset` fires *before* the controls are restored, and skipped when another listener cancelled the reset.
-
----
-
-## 5. CSS Styling & Behavioral Concept
-
-`@mixin picklist` (bound to `[data-ln-picklist]` in `theme/components/_picklist.scss`) lays the two lists side by side and applies `check-list-outline` to each — a vertical stack of checkbox pills.
-
-`check-list-outline` rather than `check-list` is deliberate: `@mixin pill` hides the input with `display: none`, which removes the checkbox from the tab order. Here the checkbox **is** the control, so `pill-outline`'s `> input { display: revert; }` is required. The focus ring is delivered by `label:has(> input:focus-visible)`.
-
-Each list is a scroll surface (`max-height` + `overflow-y: auto`) so a hundred items do not stretch the page.
+- **Grid Layout:** Lays out both panes side-by-side using `@include grid-2` with `var(--size-md)` gap.
+- **Outlined Checkbox Pills:** Both lists apply `@include check-list-outline`. Unlike `@mixin pill` (which hides the `<input>` with `display: none`), `check-list-outline` keeps native `<input type="checkbox">` visible and keyboard-focusable via `display: revert`.
+- **Vertical Rhythm & Scroll:** Lists maintain `--max-height: 20rem` with `overflow-y: auto`, ensuring long candidate pools do not stretch the viewport.
+- **Focus Ring:** Focus outlines are applied via `[data-ln-picklist-list] li label:has(> input:focus-visible)`.
+- **Disabled Treatment:** When `[data-ln-picklist="disabled"]` is active, lists switch to `var(--fg-muted)` and labels receive `cursor: not-allowed`.
 
 ---
 
-## 6. Accessibility (ARIA) & Common Pitfalls
+## 5. Accessibility (ARIA) & Common Pitfalls
 
-### ARIA & Keyboard
+### ARIA & Keyboard Mechanics
 
-- **Native semantics throughout.** The accessible name of each control is the item's own label text, and `checked` conveys selection — nothing needs to change when an item moves, which is why this design uses checkboxes rather than action buttons.
-- **Focus survives the move.** Re-parenting a node that holds focus blurs it to `<body>` in Chromium, so focus is restored to the checkbox afterwards — but only when it genuinely had focus, so a synthetic `change` cannot steal it.
-- Give each list an `aria-labelledby` pointing at its pane heading.
+- **Native Checkbox Semantics:** Each choice is an `<input type="checkbox">` wrapped in a `<label>`. Screen readers announce native state (`"checked"` / `"unchecked"`) and keyboard users toggle choices via `Space`.
+- **Focus Preservation:** Re-parenting focused DOM elements blurs focus to `<body>` in Chromium. `ln-picklist` preserves focus by calling `checkbox.focus()` after `appendChild` only when the element was actively focused.
+- **List Labelling:** Always attach `aria-labelledby` on each `<ul data-ln-picklist-list>` pointing to its corresponding section heading (e.g., `aria-labelledby="pool-heading"`).
 
 ### Common Pitfalls & Anti-patterns
 
 > [!CAUTION]
-> 1. **Mismatched initial markup:** rendering a checked item in `available`, or an unchecked item in `selected`, leaves the two halves of the contract disagreeing until the user touches that checkbox.
-> 2. **Omitting one of the two lists:** the component logs a warning and does not attach its listener. With `data-ln-debug` on `<body>` the diagnostic is drawn in place by `ln-picklist-dev.scss`.
-> 3. **Expecting a name on the item:** the submitted value is the checkbox's own `name`/`value`. Use one array-style `name` and a distinct `value` per item.
-> 4. **Expecting the available list to keep its order:** unchecked items are appended, not reinserted at their original index.
+> 1. **Using `<select multiple>` instead of checkboxes:** Native multi-selects require complex Ctrl/Cmd keyboard mechanics, cannot embed rich HTML/icons, and fail to submit unhighlighted options natively. Use `ln-picklist` with checkboxes.
+> 2. **Wrapping search buttons inside `<label class="search">`:** Anti-pattern. Always use the semantic HTML5 `<search>` element.
+> 3. **Omitting either `available` or `selected` list:** Both lists are mandatory. Omitting one triggers a console warning and halts initialization.
+> 4. **Manually syncing hidden inputs:** Strictly forbidden. The checkbox itself carries `name="fieldName[]"` and `value`. Unchecked boxes are omitted from standard form payloads automatically.
 
 ---
 
-## 7. Flow Diagram & Lifecycle
+## 6. Sequence & Lifecycle Flow
 
 ```mermaid
 sequenceDiagram
@@ -171,40 +205,42 @@ sequenceDiagram
     participant JS as ln-picklist.js
     participant Lists as available / selected
 
-    Root->>JS: Component mount
-    JS->>Lists: Resolve both lists
-    alt a list is missing
-        JS-->>Root: console.warn, no listener attached
-    else both present
-        JS->>Root: addEventListener('change')
-    end
+    Root->>JS: Mount & scan DOM
+    JS->>JS: Snapshot initial authored item order
+    JS->>Lists: sync(): Transfer checked items to selected
+    JS->>Root: addEventListener('change')
 
-    User->>Box: Toggle
+    User->>Box: Click checkbox (toggle checked)
     Box->>Root: change (bubbles)
-    JS->>JS: Resolve checkbox → li → parent list
-    alt target is not an item of this picklist
-        JS-->>Root: ignore
-    else disabled
-        JS->>Box: revert checked
-    else same list
-        JS-->>Root: ignore (no-op move)
-    else
-        JS->>Root: Emit cancelable 'ln-picklist:before-move'
-        alt canceled
-            JS->>Box: revert checked
-        else allowed
-            JS->>Lists: appendChild(item)
-            JS->>Box: restore focus (only if it had it)
-            JS->>Root: Emit 'ln-picklist:move'
+    JS->>JS: Filter event: Resolve li & parent list
+
+    alt Picklist is disabled
+        JS->>Box: Revert checked state
+    else Target is selected & count >= max (data-ln-picklist-max)
+        JS->>Box: Revert checked state
+        JS->>Root: Dispatch 'ln-picklist:max-reached'
+    else Normal Move
+        JS->>Root: Dispatch cancelable 'ln-picklist:before-move'
+        alt Canceled by consumer (e.preventDefault())
+            JS->>Box: Revert checked state
+        else Allowed
+            JS->>Lists: appendChild(li)
+            JS->>Box: Restore focus (if previously focused)
+            JS->>Root: Dispatch 'ln-picklist:move'
         end
     end
+
+    Note over User,JS: On Form Reset (form.reset())
+    Root->>JS: reset event on parent form
+    JS->>JS: Deferred setTimeout(0): sync()
+    JS->>Lists: Re-append items in original order matching defaultChecked
 ```
 
 ---
 
-## 8. Related Components
+## 7. Related Components & Coordinators
 
-- [`ln-search`](./ln-search.md) — filters each list; composed, never embedded.
-- [`ln-sortable`](./ln-sortable.md) — the lifecycle and attribute-driven enable/disable shape this component follows.
-- [`ln-filter`](./ln-filter.md) — checkbox groups that filter a view rather than move items.
-- [`ln-list`](./ln-list.md) — a single list presenter with selection, virtual scrolling and templates.
+- [`ln-search`](./ln-search.md) — Composed on top of each picklist pane to filter available and selected pools without coupling.
+- [`ln-sortable`](./ln-sortable.md) — Provides drag-and-drop reordering for selected items if explicit manual sequencing is needed.
+- [`ln-filter`](./ln-filter.md) — Inline checkbox pill filters used to filter tabular views rather than transferring items between pools.
+- [`ln-table`](./ln-table.md) — Full data grid component with column filtering and sorting.
