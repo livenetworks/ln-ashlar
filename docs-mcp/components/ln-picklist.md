@@ -130,9 +130,9 @@ Clicking checkboxes while disabled is rejected immediately by reverting `checked
 
 ## 3. Declarative API Contract (Attributes & Events)
 
-### Declarative Attributes (Single Source of Truth)
+### Attributes Table
 
-| Attribute | Element | Values | Default | Description |
+| Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-picklist` | Root | `""` \| `"disabled"` | `""` | Initializes the component. `"disabled"` blocks item transfers. |
 | `data-ln-picklist-max` | Root | integer (e.g. `"5"`) | — | Maximum selection cap. Excess transfers are blocked and emit `ln-picklist:max-reached`. |
