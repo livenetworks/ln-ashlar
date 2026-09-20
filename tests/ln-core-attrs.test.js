@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { attrStr, attrInt, attrBool, attrList, defineAttrs, attrSpec, attrEffects } from '../components/ln-core/attrs.js';
+import { attrStr, attrInt, attrBool, attrList, defineAttrs, attrSpec, attrEffects, reactiveNames } from '../components/ln-core/attrs.js';
 
 const fakeEl = (attrs) => ({
 	getAttribute: name => (name in attrs ? attrs[name] : null),
@@ -113,5 +113,80 @@ test('attrEffects returns null when the table declares no reactions', () => {
 	};
 	assert.equal(attrEffects(table), null);
 	assert.equal(attrEffects({}), null);
+});
+
+// ─── reactiveNames ─────────────────────────────────────────
+//
+// These guard the shared attribute observer's name index. The first two are
+// the regressions that a naive implementation produces.
+
+test('reactiveNames indexes declared effect attributes, not just the selector attribute', () => {
+	// ln-list-shaped: the selector is data-ln-list, but the effects live on
+	// suffixed names. Indexing off `observed` (as byAttr does) would reach
+	// only data-ln-list and silently kill the live window reconfiguration.
+	const entry = {
+		attribute: 'lnList',
+		effects: {
+			'data-ln-list-window': () => {},
+			'data-ln-list-count': () => {}
+		},
+		declared: new Set(['data-ln-list', 'data-ln-list-window', 'data-ln-list-count']),
+		onAttrChange: null
+	};
+
+	const names = reactiveNames(entry);
+	assert.ok(names.has('data-ln-list-window'));
+	assert.ok(names.has('data-ln-list-count'));
+
+	// data-ln-list is declared but has no effect, and onAttrChange is null —
+	// today's loop already does nothing for it, so it must NOT be indexed.
+	// `declared` narrows onAttrChange; on its own it does not summon a run.
+	assert.equal(names.has('data-ln-list'), false);
+});
+
+test('two entries declaring the same attribute both land under that key', () => {
+	// data-ln-hash carries an effect in ln-filter, ln-search and ln-sort.
+	const a = { attribute: 'lnFilter', effects: { 'data-ln-hash': () => {} }, declared: null, onAttrChange: null };
+	const b = { attribute: 'lnSearch', effects: { 'data-ln-hash': () => {} }, declared: null, onAttrChange: null };
+
+	const index = new Map();
+	for (const entry of [a, b]) {
+		for (const name of reactiveNames(entry)) {
+			if (!index.has(name)) index.set(name, []);
+			index.get(name).push(entry);
+		}
+	}
+
+	assert.equal(index.get('data-ln-hash').length, 2);   // Map.set would leave 1
+});
+
+test('reactiveNames returns null for a wildcard entry — onAttrChange with no declared set', () => {
+	const entry = { attribute: 'lnThing', effects: null, declared: null, onAttrChange: () => {} };
+	assert.equal(reactiveNames(entry), null);
+});
+
+test('reactiveNames covers declared names that carry no effect', () => {
+	const entry = {
+		attribute: 'lnThing',
+		effects: { 'data-ln-thing-mode': () => {} },
+		declared: new Set(['data-ln-thing', 'data-ln-thing-mode']),
+		onAttrChange: () => {}
+	};
+
+	const names = reactiveNames(entry);
+	assert.deepEqual([...names].sort(), ['data-ln-thing', 'data-ln-thing-mode']);
+});
+
+test('reactiveNames treats effects without onAttrChange as indexable, not wildcard', () => {
+	const entry = { attribute: 'lnThing', effects: { 'data-ln-thing': () => {} }, declared: null, onAttrChange: null };
+	const names = reactiveNames(entry);
+	assert.notEqual(names, null);
+	assert.deepEqual([...names], ['data-ln-thing']);
+});
+
+test('reactiveNames returns an empty Set, not null, for an entry with neither', () => {
+	const names = reactiveNames({ attribute: 'lnThing', effects: null, declared: null, onAttrChange: null });
+	assert.notEqual(names, null);
+	assert.equal(names.size, 0);
 });
 

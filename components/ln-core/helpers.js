@@ -1,23 +1,27 @@
-import { attrEffects } from './attrs.js';
+import { attrEffects, reactiveNames } from './attrs.js';
 
 // ─── Global Console Warning Interceptor (Production Mode) ──
 if (typeof window !== 'undefined') {
-	const originalWarn = console.warn;
-	console.warn = function (...args) {
-		const isLibraryWarning = typeof args[0] === 'string' &&
-			(args[0].startsWith('[ln-') || args[0].startsWith('[lnCore'));
+	window.lnCore = window.lnCore || {};
+	if (!window.lnCore._warnBound) {
+		window.lnCore._warnBound = true;
+		const originalWarn = console.warn;
+		console.warn = function (...args) {
+			const isLibraryWarning = typeof args[0] === 'string' &&
+				(args[0].startsWith('[ln-') || args[0].startsWith('[lnCore'));
 
-		if (isLibraryWarning) {
-			const isDebug =
-				document.documentElement.hasAttribute('data-ln-debug') ||
-				(document.body && document.body.hasAttribute('data-ln-debug'));
+			if (isLibraryWarning) {
+				const isDebug =
+					document.documentElement.hasAttribute('data-ln-debug') ||
+					(document.body && document.body.hasAttribute('data-ln-debug'));
 
-			if (!isDebug) {
-				return;
+				if (!isDebug) {
+					return;
+				}
 			}
-		}
-		originalWarn.apply(console, args);
-	};
+			originalWarn.apply(console, args);
+		};
+	}
 }
 
 // ─── Template Cache ────────────────────────────────────────
@@ -724,8 +728,15 @@ export function queueBoot(fn) {
 
 function _attrRegistry() {
 	window.lnCore = window.lnCore || {};
-	window.lnCore._attrRegistry = window.lnCore._attrRegistry || { byAttr: new Map(), reactive: [], persist: [] };
-	return window.lnCore._attrRegistry;
+	const registry = window.lnCore._attrRegistry = window.lnCore._attrRegistry
+		|| { byAttr: new Map(), reactive: [], persist: [] };
+
+	// Backfilled rather than assumed: a standalone bundle built before these
+	// two keys existed may have created the registry first, and every bundle
+	// on the page shares this one object.
+	registry.byReactive = registry.byReactive || new Map();
+	registry.reactiveWildcard = registry.reactiveWildcard || [];
+	return registry;
 }
 
 function _registerAttrEntry(entry) {
@@ -737,9 +748,37 @@ function _registerAttrEntry(entry) {
 		registry.byAttr.get(name).push(entry);
 	}
 	if (entry.onAttrChange || entry.effects) {
+		// Kept: window.lnCore._attrRegistry is a surface other code reads.
+		// It is simply no longer walked on the hot path.
 		registry.reactive.push(entry);
+
+		// An array per key, never a single value — ln-filter, ln-search and
+		// ln-sort all declare an effect on `data-ln-hash`, and a Map.set here
+		// would silently keep one of the three.
+		const names = reactiveNames(entry);
+		if (names === null) {
+			registry.reactiveWildcard.push(entry);
+		} else {
+			for (const name of names) {
+				if (!registry.byReactive.has(name)) registry.byReactive.set(name, []);
+				registry.byReactive.get(name).push(entry);
+			}
+		}
 	}
 	if (entry.persist) registry.persist.push(entry);
+}
+
+// The reactive dispatch body, unchanged from when it was inlined below —
+// including the instance gate and the effect-before-onAttrChange precedence.
+// `oldValue` is a parameter because the MutationRecord does not reach here.
+function _runReactive(list, el, name, oldValue) {
+	for (let i = 0; i < list.length; i++) {
+		const entry = list[i];
+		if (!el[entry.attribute]) continue;
+		const effect = entry.effects && entry.effects[name];
+		if (effect) effect(el, name, oldValue);
+		else if (entry.onAttrChange && (!entry.declared || entry.declared.has(name))) entry.onAttrChange(el, name, oldValue);
+	}
 }
 
 // Processes one MutationRecord. Order is load-bearing: the reactive path
@@ -769,13 +808,15 @@ function _handleAttrMutation(mut) {
 	// observe lang/datetime, ln-external-links observes href, none of which are
 	// data-ln-*; prefix-guarding the whole callback would break those)
 	if (name.indexOf('data-ln-') === 0) {
-		for (let i = 0; i < registry.reactive.length; i++) {
-			const entry = registry.reactive[i];
-			if (!el[entry.attribute]) continue;
-			const effect = entry.effects && entry.effects[name];
-			if (effect) effect(el, name, mut.oldValue);
-			else if (entry.onAttrChange && (!entry.declared || entry.declared.has(name))) entry.onAttrChange(el, name, mut.oldValue);
-		}
+		// Indexed by declared name, so a mutation nobody declared costs one
+		// Map miss instead of a walk over every reactive entry in the build.
+		const byName = registry.byReactive.get(name);
+		if (byName) _runReactive(byName, el, name, mut.oldValue);
+
+		// Wildcards — `onAttrChange` without `declared` — cannot be keyed by
+		// name, so they keep their own list. Empty today; the escape hatch
+		// would otherwise die silently the moment someone used it.
+		if (registry.reactiveWildcard.length) _runReactive(registry.reactiveWildcard, el, name, mut.oldValue);
 	}
 
 	if (!entries) return;
@@ -811,6 +852,88 @@ function _ensureAttrObserver() {
 			attributes: true,
 			subtree: true,
 			attributeOldValue: true
+		});
+	}, 'ln-core');
+}
+
+// ─── Lifecycle Observer & Registry (Single Shared Observer) ───
+
+function _lifecycleRegistry() {
+	window.lnCore = window.lnCore || {};
+	const registry = window.lnCore._lifecycleRegistry = window.lnCore._lifecycleRegistry || [];
+	return registry;
+}
+
+function _handleChildListMutation(mutation) {
+	const registry = _lifecycleRegistry();
+	if (!registry.length) return;
+
+	if (mutation.target) {
+		for (let r = 0; r < registry.length; r++) {
+			const entry = registry[r];
+			if (entry.onSubtreeChange) {
+				const query = entry.query;
+				const host = mutation.target.nodeType === 1
+					? (mutation.target.matches(query) ? mutation.target : mutation.target.closest(query))
+					: (mutation.target.parentElement ? mutation.target.parentElement.closest(query) : null);
+				if (host) entry.onSubtreeChange(host, mutation);
+			}
+		}
+	}
+
+	for (let j = 0; j < mutation.addedNodes.length; j++) {
+		const node = mutation.addedNodes[j];
+		if (node.nodeType === 1) {
+			for (let r = 0; r < registry.length; r++) {
+				const entry = registry[r];
+				findElements(node, entry.selector, entry.attribute, entry.ComponentFn);
+				if (entry.onInit) entry.onInit(node);
+			}
+		}
+	}
+
+	for (let j = 0; j < mutation.removedNodes.length; j++) {
+		const node = mutation.removedNodes[j];
+		if (node.nodeType === 1) {
+			for (let r = 0; r < registry.length; r++) {
+				const entry = registry[r];
+				const query = entry.query;
+				const items = Array.from(node.querySelectorAll(query));
+				if (node.matches && node.matches(query)) {
+					items.push(node);
+				}
+				for (let k = 0; k < items.length; k++) {
+					const item = items[k];
+					if (!document.contains(item)) {
+						const inst = item[entry.attribute];
+						if (inst && typeof inst.destroy === 'function') {
+							inst.destroy();
+						}
+						delete item[entry.attribute];
+					}
+				}
+			}
+		}
+	}
+}
+
+function _ensureLifecycleObserver() {
+	window.lnCore = window.lnCore || {};
+	if (window.lnCore._lifecycleObserverBound) return;
+	window.lnCore._lifecycleObserverBound = true;
+
+	guardBody(function () {
+		const observer = new MutationObserver(function (mutations) {
+			for (let i = 0; i < mutations.length; i++) {
+				const mutation = mutations[i];
+				if (mutation.type === 'childList') {
+					_handleChildListMutation(mutation);
+				}
+			}
+		});
+		observer.observe(document.body, {
+			childList: true,
+			subtree: true
 		});
 	}, 'ln-core');
 }
@@ -874,55 +997,18 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 	});
 	_ensureAttrObserver();
 
-	guardBody(function () {
-		const observer = new MutationObserver(function (mutations) {
-			for (let i = 0; i < mutations.length; i++) {
-				const mutation = mutations[i];
-				if (mutation.type === 'childList') {
-					if (onSubtreeChange && mutation.target) {
-						const isComplex = selector.indexOf('[') !== -1 || selector.indexOf('.') !== -1 || selector.indexOf('#') !== -1;
-						const query = isComplex ? selector : '[' + selector + ']';
-						const host = mutation.target.nodeType === 1
-							? (mutation.target.matches(query) ? mutation.target : mutation.target.closest(query))
-							: (mutation.target.parentElement ? mutation.target.parentElement.closest(query) : null);
-						if (host) onSubtreeChange(host, mutation);
-					}
-					for (let j = 0; j < mutation.addedNodes.length; j++) {
-						const node = mutation.addedNodes[j];
-						if (node.nodeType === 1) {
-							findElements(node, selector, attribute, ComponentFn);
-							if (onInit) onInit(node);
-						}
-					}
-					for (let j = 0; j < mutation.removedNodes.length; j++) {
-						const node = mutation.removedNodes[j];
-						if (node.nodeType === 1) {
-							const isComplex = selector.indexOf('[') !== -1 || selector.indexOf('.') !== -1 || selector.indexOf('#') !== -1;
-							const query = isComplex ? selector : '[' + selector + ']';
-							const items = Array.from(node.querySelectorAll(query));
-							if (node.matches && node.matches(query)) {
-								items.push(node);
-							}
-							for (let k = 0; k < items.length; k++) {
-								const item = items[k];
-								if (!document.contains(item)) {
-									const inst = item[attribute];
-									if (inst && typeof inst.destroy === 'function') {
-										inst.destroy();
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		});
+	const isComplex = selector.indexOf('[') !== -1 || selector.indexOf('.') !== -1 || selector.indexOf('#') !== -1;
+	const query = isComplex ? selector : '[' + selector + ']';
 
-		observer.observe(document.body, {
-			childList: true,
-			subtree: true
-		});
-	}, componentTag || (selector.indexOf('[') === -1 ? selector.replace('data-', '') : 'component'));
+	_lifecycleRegistry().push({
+		selector: selector,
+		attribute: attribute,
+		ComponentFn: ComponentFn,
+		onInit: onInit,
+		onSubtreeChange: onSubtreeChange,
+		query: query
+	});
+	_ensureLifecycleObserver();
 
 	window[attribute] = constructor;
 

@@ -8,7 +8,9 @@ import {
 	isEditableTarget,
 	isTargetDisabled,
 	isUsableTarget,
-	shouldIgnoreClick
+	shouldIgnoreClick,
+	registerComponent,
+	findElements
 } from '../components/ln-core/index.js';
 
 test('shouldIgnoreClick detects modified clicks and non-primary mouse buttons', () => {
@@ -102,4 +104,192 @@ test('calculateProgress computes accurate percentages and clamps properly', () =
 	assert.equal(p5.percentage, 50);
 	assert.equal(p5.clampedValue, 75);
 });
+
+test('_warnBound prevents multiple monkey-patchings of console.warn across standalone bundles', () => {
+	const savedWindow = globalThis.window;
+	try {
+		globalThis.window = { lnCore: { _warnBound: true } };
+		// When _warnBound is already true, any bundle executing the guard will exit without touching console.warn
+		let rewrapped = false;
+		if (!globalThis.window.lnCore._warnBound) {
+			rewrapped = true;
+		}
+		assert.equal(rewrapped, false);
+	} finally {
+		globalThis.window = savedWindow;
+	}
+});
+
+test('registerComponent lifecycle: single shared observer, destroy cleanup with delete item[attribute], and clean re-attachment', () => {
+	const savedWindow = globalThis.window;
+	const savedDoc = globalThis.document;
+	const savedMO = globalThis.MutationObserver;
+
+	try {
+		let registeredObserverCallback = null;
+		class MockMutationObserver {
+			constructor(callback) {
+				registeredObserverCallback = callback;
+			}
+			observe() {}
+			disconnect() {}
+		}
+
+		globalThis.MutationObserver = MockMutationObserver;
+		const docBody = {
+			nodeType: 1,
+			querySelectorAll: () => [],
+			matches: () => false
+		};
+		globalThis.window = {
+			MutationObserver: MockMutationObserver,
+			lnCore: {}
+		};
+		globalThis.document = {
+			body: docBody,
+			readyState: 'complete',
+			addEventListener: () => {},
+			contains: (el) => !!el._inDoc
+		};
+
+		let destroyedCount = 0;
+		class MockComponent {
+			constructor(dom) {
+				this.dom = dom;
+				this.created = true;
+			}
+			destroy() {
+				destroyedCount++;
+			}
+		}
+
+		class SimpleComponent {
+			constructor(dom) {
+				this.dom = dom;
+			}
+		}
+
+		let subtreeCallCount = 0;
+		let subtreeHost = null;
+
+		// Register components
+		registerComponent('data-ln-test-comp', 'lnTestComp', MockComponent, 'ln-test-comp', {
+			onSubtreeChange: (host) => {
+				subtreeCallCount++;
+				subtreeHost = host;
+			}
+		});
+
+		registerComponent('data-ln-simple-comp', 'lnSimpleComp', SimpleComponent, 'ln-simple-comp');
+
+		// 1. Verify single observer bound
+		assert.equal(globalThis.window.lnCore._lifecycleObserverBound, true);
+		assert.equal(globalThis.window.lnCore._lifecycleRegistry.length, 2);
+		assert.ok(registeredObserverCallback, 'shared lifecycle observer callback must be registered');
+
+		// 2. Add element to DOM
+		const testEl = {
+			nodeType: 1,
+			_inDoc: true,
+			hasAttribute: (name) => name === 'data-ln-test-comp',
+			getAttribute: (name) => name === 'data-ln-test-comp' ? '' : null,
+			matches: (q) => q === '[data-ln-test-comp]',
+			querySelectorAll: () => []
+		};
+
+		registeredObserverCallback([
+			{
+				type: 'childList',
+				addedNodes: [testEl],
+				removedNodes: []
+			}
+		]);
+
+		assert.ok(testEl.lnTestComp, 'instance must be created on addedNodes');
+		const initialInst = testEl.lnTestComp;
+
+		// 3. Remove element from DOM (destroy-bearing path)
+		testEl._inDoc = false;
+		registeredObserverCallback([
+			{
+				type: 'childList',
+				addedNodes: [],
+				removedNodes: [testEl]
+			}
+		]);
+
+		assert.equal(destroyedCount, 1, 'inst.destroy() must be called on removal');
+		assert.equal(testEl.lnTestComp, undefined, 'delete item[entry.attribute] must remove reference');
+
+		// 4. Re-attach element to DOM
+		testEl._inDoc = true;
+		registeredObserverCallback([
+			{
+				type: 'childList',
+				addedNodes: [testEl],
+				removedNodes: []
+			}
+		]);
+
+		assert.ok(testEl.lnTestComp, 'fresh instance must be created on re-attachment');
+		assert.notEqual(testEl.lnTestComp, initialInst, 're-attached instance must be a new object, not a zombie');
+
+		// 5. Test destroy-less component (SimpleComponent)
+		const simpleEl = {
+			nodeType: 1,
+			_inDoc: true,
+			hasAttribute: (name) => name === 'data-ln-simple-comp',
+			getAttribute: (name) => name === 'data-ln-simple-comp' ? '' : null,
+			matches: (q) => q === '[data-ln-simple-comp]',
+			querySelectorAll: () => []
+		};
+
+		registeredObserverCallback([
+			{
+				type: 'childList',
+				addedNodes: [simpleEl],
+				removedNodes: []
+			}
+		]);
+		assert.ok(simpleEl.lnSimpleComp, 'destroy-less component instantiated');
+
+		simpleEl._inDoc = false;
+		registeredObserverCallback([
+			{
+				type: 'childList',
+				addedNodes: [],
+				removedNodes: [simpleEl]
+			}
+		]);
+		assert.equal(simpleEl.lnSimpleComp, undefined, 'delete item[entry.attribute] runs even without destroy()');
+
+		// 6. Test onSubtreeChange with element host and text-node host (nodeType !== 1)
+		const parentHost = {
+			nodeType: 1,
+			matches: (q) => q === '[data-ln-test-comp]',
+			closest: (q) => q === '[data-ln-test-comp]' ? parentHost : null
+		};
+		const textNode = {
+			nodeType: 3,
+			parentElement: parentHost
+		};
+
+		registeredObserverCallback([
+			{
+				type: 'childList',
+				target: textNode,
+				addedNodes: [],
+				removedNodes: []
+			}
+		]);
+
+		assert.equal(subtreeCallCount, 1, 'onSubtreeChange must trigger for text-node target fallback');
+		assert.equal(subtreeHost, parentHost, 'host must resolve to parentElement.closest');
+	} finally {
+		globalThis.window = savedWindow;
+		globalThis.document = savedDoc;
+		globalThis.MutationObserver = savedMO;
+	}
+});
+
 

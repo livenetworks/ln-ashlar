@@ -89,3 +89,31 @@ export function attrEffects(table) {
 	return Object.keys(effects).length ? effects : null;
 }
 
+/**
+ * The attribute names a registry entry should be indexed under, so the shared
+ * observer can reach it by name instead of walking every reactive entry.
+ *
+ * Note this reads `entry.effects` — the DERIVED table produced by
+ * `attrEffects` above — not the raw component table. An entry is indexed
+ * under every name it declares, which for a component like `ln-list` means
+ * the suffixed names (`data-ln-list-window`) and not only the selector.
+ *
+ * Internal to ln-core, and deliberately NOT re-exported from index.js: unlike
+ * `attrSpec` / `attrEffects`, which take the attribute table a component author
+ * writes, this takes a registry entry — a shape no author ever constructs.
+ * Publishing it would make the entry shape semver-load-bearing for no caller.
+ *
+ * @param {Object} entry - a registry entry: { effects, onAttrChange, declared }
+ * @returns {Set<string>|null} names to index under, or null for a wildcard —
+ *   `onAttrChange` without `declared` asks for EVERY data-ln-* mutation and
+ *   by definition cannot be keyed by name.
+ */
+export function reactiveNames(entry) {
+	if (entry.onAttrChange && !entry.declared) return null;
+
+	const names = new Set();
+	if (entry.effects) for (const n in entry.effects) names.add(n);
+	if (entry.onAttrChange && entry.declared) for (const n of entry.declared) names.add(n);
+	return names;
+}
+

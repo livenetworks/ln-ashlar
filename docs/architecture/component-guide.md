@@ -159,8 +159,11 @@ registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-time', {
   catch-all for every other `data-ln-*` on the host not covered by `effects`.
 - No attribute list to maintain for performance — the shared observer already
   watches every mutation under `<body>`. Cost is one Map lookup per mutation,
-  guarded by an echo check (`oldValue === current value` → skip) and, on the
-  reactive path, a `data-ln-` prefix check.
+  guarded by an echo check (`oldValue === current value` → skip); a `data-ln-`
+  name costs a second lookup into the reactive index, which is keyed by the
+  names you declare, so a mutation no component declared reaches no component.
+  Declaring an `effect` is what puts your component on that index — the cost of
+  a reaction is paid by the pages that use it, not by every page in the build.
 - **Do not add your own attribute `MutationObserver`** for attributes on your
   own host element — that duplicates delivery and drifts from the shared
   invariant.
