@@ -1,0 +1,111 @@
+// ==========================================================================
+// Presentation Call to Action (CTA) — ln-ashlar
+// ==========================================================================
+// High-conversion banners with ambient gradients, glows, and dual action rows.
+// Provided as mixins, semantic selectors (#cta), and classes.
+// ==========================================================================
+
+@mixin cta-box {
+	position: relative;
+	overflow: hidden;
+	background-color: var(--bg-elevated);
+	border: var(--border-width) solid color-mix(in srgb, hsl(var(--color-primary)) 28%, var(--color-border));
+	border-radius: var(--radius-2xl);
+	padding: clamp(2.5rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3.5rem);
+	text-align: center;
+	box-shadow: 0 20px 50px -15px hsl(var(--color-primary) / 0.15), var(--shadow-lg);
+
+	&::before {
+		content: '';
+		position: absolute;
+		inset-inline-start: 50%;
+		top: -6rem;
+		transform: translateX(-50%);
+		width: clamp(20rem, 60vw, 45rem);
+		height: clamp(12rem, 30vw, 25rem);
+		background: radial-gradient(
+			ellipse at center,
+			hsl(var(--color-primary) / 0.22) 0%,
+			transparent 70%
+		);
+		filter: blur(50px);
+		pointer-events: none;
+		z-index: 0;
+	}
+
+	> * {
+		position: relative;
+		z-index: 1;
+	}
+
+	h2,
+	.cta-title {
+		font-size: var(--text-section-title);
+		line-height: var(--lh-section-title);
+		font-weight: 800;
+		letter-spacing: -0.03em;
+		color: var(--color-fg);
+		text-wrap: balance;
+		margin-block-start: 0;
+		margin-block-end: var(--size-md);
+	}
+
+	p,
+	.cta-lead {
+		font-size: var(--text-lead);
+		line-height: var(--lh-lead);
+		color: var(--fg-muted);
+		text-wrap: pretty;
+		margin-inline: auto;
+		margin-block-end: var(--size-xl);
+		max-width: var(--max-w-prose);
+	}
+
+	.badge-pill,
+	.cta-badge {
+		margin-block-end: var(--size-md);
+	}
+
+	nav,
+	footer,
+	.cta-actions {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: var(--size-md);
+	}
+
+	&.cta-island-card {
+		text-align: left;
+		padding: clamp(1.75rem, 3.5vw, 2.5rem);
+
+		.island-badge,
+		> span.badge-pill {
+			margin-block-end: var(--size-md);
+		}
+
+		.island-title,
+		h3 {
+			margin-block-start: 0;
+			margin-block-end: var(--size-xs);
+		}
+
+		.island-desc,
+		p {
+			color: var(--fg-muted);
+			font-size: var(--text-sm);
+			margin-block-start: 0;
+			margin-block-end: var(--size-lg);
+			line-height: 1.55;
+		}
+	}
+}
+
+// ─── Declarative Selectors ───────────────────────────────────────────────────
+
+#cta .cta-box,
+#cta article,
+.cta-box {
+	@include cta-box;
+}

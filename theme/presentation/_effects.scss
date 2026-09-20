@@ -1,0 +1,216 @@
+// ==========================================================================
+// Presentation Effects & Atmosphere — ln-ashlar
+// ==========================================================================
+// Ambient spotlight gradients, glassmorphism, glowing hover surfaces,
+// and presentation container patterns.
+// ==========================================================================
+
+// ---------------------------------------------------------------------------
+// Ambient Spotlights (CSS-only glowing background layers)
+// ---------------------------------------------------------------------------
+.ambient-glow-top {
+	position: relative;
+
+	&::before {
+		content: '';
+		position: absolute;
+		inset-inline-start: 50%;
+		top: -10rem;
+		transform: translateX(-50%);
+		width: clamp(20rem, 80vw, 65rem);
+		height: clamp(15rem, 40vw, 35rem);
+		background: radial-gradient(
+			ellipse at center,
+			hsl(var(--color-primary) / var(--spotlight-opacity, 0.18)) 0%,
+			hsl(var(--color-primary) / calc(var(--spotlight-opacity, 0.18) * 0.4)) 45%,
+			transparent 70%
+		);
+		filter: blur(60px);
+		pointer-events: none;
+		z-index: 0;
+	}
+
+	> * {
+		position: relative;
+		z-index: 1;
+	}
+}
+
+.ambient-glow-bottom {
+	position: relative;
+
+	&::after {
+		content: '';
+		position: absolute;
+		inset-inline-start: 50%;
+		bottom: -10rem;
+		transform: translateX(-50%);
+		width: clamp(20rem, 80vw, 65rem);
+		height: clamp(15rem, 40vw, 30rem);
+		background: radial-gradient(
+			ellipse at center,
+			hsl(var(--color-primary) / var(--spotlight-opacity, 0.15)) 0%,
+			transparent 70%
+		);
+		filter: blur(60px);
+		pointer-events: none;
+		z-index: 0;
+	}
+
+	> * {
+		position: relative;
+		z-index: 1;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Background Patterns (Clean, modern dot & grid textures)
+// ---------------------------------------------------------------------------
+.pattern-dots {
+	background-image: radial-gradient(
+		color-mix(in srgb, var(--color-border) 60%, transparent) 1px,
+		transparent 1px
+	);
+	background-size: 24px 24px;
+}
+
+.pattern-grid {
+	background-image:
+		linear-gradient(to right, color-mix(in srgb, var(--color-border) 25%, transparent) 1px, transparent 1px),
+		linear-gradient(to bottom, color-mix(in srgb, var(--color-border) 25%, transparent) 1px, transparent 1px);
+	background-size: 40px 40px;
+}
+
+// ---------------------------------------------------------------------------
+// Glassmorphism Surfaces
+// ---------------------------------------------------------------------------
+@mixin glass-panel {
+	background-color: color-mix(in srgb, var(--bg-elevated) 72%, transparent);
+	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
+	border: var(--border-width) solid color-mix(in srgb, var(--color-border) 65%, transparent);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-sm);
+}
+
+.glass-panel {
+	@include glass-panel;
+}
+
+// ---------------------------------------------------------------------------
+// Hover Glow & Elevation
+// ---------------------------------------------------------------------------
+@mixin glow-hover {
+	transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+
+	&:hover {
+		transform: translateY(-2px);
+		box-shadow:
+			0 12px 30px -10px hsl(var(--color-primary) / 0.18),
+			0 0 1px 1px color-mix(in srgb, hsl(var(--color-primary)) 35%, transparent),
+			var(--shadow-md);
+		border-color: color-mix(in srgb, hsl(var(--color-primary)) 45%, transparent);
+	}
+}
+
+.glow-hover {
+	@include glow-hover;
+}
+
+// ---------------------------------------------------------------------------
+// App Mockup Frame (Browser / Device Window Chrome)
+// ---------------------------------------------------------------------------
+.mockup-frame {
+	position: relative;
+	background-color: var(--bg-elevated);
+	border: var(--border-width) solid var(--color-border);
+	border-radius: var(--radius-xl);
+	box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3), var(--shadow-xl);
+	overflow: hidden;
+
+	.mockup-bar {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: var(--size-xs-up) var(--size-md);
+		background-color: color-mix(in srgb, var(--bg-recessed) 80%, var(--bg-elevated));
+		border-bottom: var(--border-width) solid var(--color-border);
+
+		.mockup-dot {
+			width: 0.625rem;
+			height: 0.625rem;
+			border-radius: var(--radius-full);
+			background-color: var(--color-border);
+
+			&:nth-child(1) { background-color: #ff5f56; }
+			&:nth-child(2) { background-color: #ffbd2e; }
+			&:nth-child(3) { background-color: #27c93f; }
+		}
+
+		.mockup-url {
+			margin-inline-start: auto;
+			margin-inline-end: auto;
+			font-family: var(--font-mono);
+			font-size: var(--text-xs);
+			color: var(--fg-muted);
+			background-color: var(--bg-base);
+			padding: 0.125rem 1rem;
+			border-radius: var(--radius-sm);
+			border: var(--border-width) solid var(--color-border);
+		}
+	}
+
+	.mockup-body {
+		padding: var(--size-lg);
+		background-color: var(--bg-base);
+	}
+}
+
+.mockup-stage {
+	min-height: 17.5rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	padding: clamp(2rem, 5vw, 3rem) var(--size-lg);
+}
+
+.mockup-stage-card {
+	padding: var(--size-xl);
+	max-width: 32rem;
+	width: 100%;
+
+	.stage-badge {
+		margin-block-end: var(--size-sm);
+	}
+
+	.stage-title {
+		margin-block-start: 0;
+		margin-block-end: var(--size-xs);
+		font-size: var(--text-heading-sm);
+	}
+
+	.stage-desc {
+		margin-block-start: 0;
+		margin-block-end: var(--size-md);
+		font-size: var(--text-sm);
+		color: var(--fg-muted);
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Subtle Keyframe Animations
+// ---------------------------------------------------------------------------
+@keyframes subtle-float {
+	0%, 100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-6px);
+	}
+}
+
+.animate-float {
+	animation: subtle-float 6s ease-in-out infinite;
+}

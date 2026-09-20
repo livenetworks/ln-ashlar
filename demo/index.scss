@@ -83,6 +83,12 @@ p {
 	background: var(--bg-elevated);
 	@include rounded-full;
 	color: var(--fg-muted);
+
+	&.badge-new {
+		background: hsl(var(--color-primary) / 0.15);
+		color: hsl(var(--color-primary));
+		border: 1px solid hsl(var(--color-primary) / 0.3);
+	}
 }
 
 .footer {

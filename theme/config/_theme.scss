@@ -120,6 +120,39 @@
 	--color-accent-tint: color-mix(in srgb, hsl(var(--color-primary)) 24%, var(--bg-base));
 }
 
+[data-theme="aurora"] {
+	--brand-primary: 158 80% 30%;
+
+	&[data-mode="dark"],
+	:where([data-mode="dark"]) & {
+		--brand-primary: 158 80% 55%;
+		--color-accent-fg: hsl(var(--color-ink));
+		--check-mark: var(--check-mark-on-dark);
+	}
+}
+
+[data-theme="violet"] {
+	--brand-primary: 255 75% 48%;
+
+	&[data-mode="dark"],
+	:where([data-mode="dark"]) & {
+		--brand-primary: 255 85% 72%;
+		--color-accent-fg: hsl(var(--color-ink));
+		--check-mark: var(--check-mark-on-dark);
+	}
+}
+
+[data-theme="cyber"] {
+	--brand-primary: 198 95% 38%;
+
+	&[data-mode="dark"],
+	:where([data-mode="dark"]) & {
+		--brand-primary: 198 95% 58%;
+		--color-accent-fg: hsl(var(--color-ink));
+		--check-mark: var(--check-mark-on-dark);
+	}
+}
+
 // ---------------------------------------------------------------------------
 // Named skins — structural/physics presets. Polarity-agnostic. Activation:
 //   <html data-skin="glass">

@@ -1,0 +1,108 @@
+// ==========================================================================
+// Presentation Feature Grid & Cards — ln-ashlar
+// ==========================================================================
+// Multi-column responsive feature cards with icons and hover highlights.
+// Provided as mixins, semantic selectors (#features-list li), and classes.
+// ==========================================================================
+
+@mixin feature-grid {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: var(--size-lg);
+
+	@media (min-width: 640px) {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	@media (min-width: 1024px) {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	&.feature-grid-4 {
+		@media (min-width: 1024px) {
+			grid-template-columns: repeat(4, 1fr);
+		}
+	}
+}
+
+@mixin feature-card {
+	list-style: none;
+	margin: 0;
+	background-color: var(--bg-elevated);
+	border: var(--border-width) solid var(--color-border);
+	border-radius: var(--radius-xl);
+	padding: clamp(1.5rem, 2.5vw, 2rem);
+	transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+
+	&:hover {
+		transform: translateY(-2px);
+		box-shadow:
+			0 10px 25px -8px hsl(var(--color-primary) / 0.14),
+			var(--shadow-md);
+		border-color: color-mix(in srgb, hsl(var(--color-primary)) 35%, var(--color-border));
+
+		> div:first-child,
+		> figure:first-child,
+		.feature-icon-wrap {
+			transform: scale(1.05);
+			background-color: color-mix(in srgb, hsl(var(--color-primary)) 18%, var(--bg-base));
+		}
+	}
+
+	> div:first-child,
+	> figure:first-child,
+	.feature-icon-wrap {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 3.25rem;
+		height: 3.25rem;
+		border-radius: var(--radius-lg);
+		background-color: color-mix(in srgb, hsl(var(--color-primary)) 12%, var(--bg-base));
+		color: hsl(var(--color-primary));
+		border: var(--border-width) solid color-mix(in srgb, hsl(var(--color-primary)) 25%, transparent);
+		margin-block-end: var(--size-md);
+		transition: transform var(--transition-fast), background-color var(--transition-fast);
+
+		svg,
+		.ln-icon {
+			width: 1.5rem;
+			height: 1.5rem;
+		}
+	}
+
+	h3,
+	.feature-title {
+		font-size: var(--text-heading-sm);
+		font-weight: 700;
+		letter-spacing: -0.015em;
+		color: var(--color-fg);
+		margin-block-start: 0;
+		margin-block-end: var(--size-xs-up);
+	}
+
+	p,
+	.feature-desc {
+		font-size: var(--text-body-md);
+		color: var(--fg-muted);
+		line-height: 1.55;
+		margin: 0;
+	}
+}
+
+// ─── Declarative Selectors ───────────────────────────────────────────────────
+
+#features-list,
+#features ul,
+.feature-grid {
+	@include feature-grid;
+}
+
+#features-list > li,
+#features ul > li,
+.feature-card {
+	@include feature-card;
+}

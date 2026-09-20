@@ -1,0 +1,129 @@
+// ==========================================================================
+// Presentation Footer — ln-ashlar
+// ==========================================================================
+// Multi-column responsive marketing footer, brand column, and copyright row.
+// ==========================================================================
+
+.site-footer {
+	background-color: var(--bg-base);
+	border-top: var(--border-width) solid var(--color-border);
+	padding-block-start: clamp(3rem, 6vw, 5rem);
+	padding-block-end: clamp(2rem, 4vw, 3rem);
+	margin-block-start: clamp(3rem, 6vw, 6rem);
+
+	.footer-grid,
+	> .landing-container > div:first-child {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: clamp(2rem, 4vw, 3.5rem);
+
+		@media (min-width: 640px) {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		@media (min-width: 960px) {
+			grid-template-columns: 2fr repeat(3, 1fr);
+		}
+	}
+
+	.footer-brand,
+	.footer-grid > div:first-child {
+		.brand-name,
+		> a:first-child {
+			display: flex;
+			align-items: center;
+			gap: var(--size-xs-up);
+			font-weight: 750;
+			font-size: var(--text-base);
+			color: var(--color-fg);
+			text-decoration: none;
+			margin-block-end: var(--size-sm);
+
+			.brand-logo,
+			span:first-child {
+				width: 1.75rem;
+				height: 1.75rem;
+				font-size: var(--text-xs);
+			}
+		}
+
+		.brand-desc,
+		p {
+			font-size: var(--text-sm);
+			color: var(--fg-muted);
+			line-height: 1.6;
+			max-width: 24rem;
+			margin: 0;
+			margin-block-end: var(--size-md);
+		}
+	}
+
+	.footer-col,
+	nav {
+		.footer-title,
+		h4 {
+			font-size: var(--text-xs);
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: var(--color-fg);
+			margin-block-start: 0;
+			margin-block-end: var(--size-md);
+		}
+
+		.footer-links,
+		ul {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			flex-direction: column;
+			gap: var(--size-xs-up);
+
+			li {
+				margin: 0;
+				padding: 0;
+			}
+
+			a {
+				font-size: var(--text-sm);
+				color: var(--fg-muted);
+				text-decoration: none;
+				transition: color var(--transition-fast);
+
+				&:hover {
+					color: var(--color-fg);
+				}
+			}
+		}
+	}
+
+	.footer-bottom,
+	> .landing-container > div:last-child {
+		margin-block-start: clamp(2.5rem, 5vw, 4rem);
+		padding-block-start: var(--size-lg);
+		border-top: var(--border-width) solid color-mix(in srgb, var(--color-border) 60%, transparent);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: var(--size-md);
+		font-size: var(--text-xs);
+		color: var(--fg-muted);
+
+		.footer-legal,
+		nav {
+			display: flex;
+			gap: var(--size-md);
+
+			a {
+				color: var(--fg-muted);
+				text-decoration: none;
+
+				&:hover {
+					color: var(--color-fg);
+				}
+			}
+		}
+	}
+}

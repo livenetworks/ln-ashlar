@@ -60,6 +60,7 @@ function compileSassFiles() {
 	const stylesheets = [
 		{ src: 'ln-ashlar-core.scss', out: 'ln-ashlar-core.css' },
 		{ src: 'ln-ashlar-theme.scss', out: 'ln-ashlar-theme.css' },
+		{ src: 'ln-ashlar-landing.scss', out: 'ln-ashlar-landing.css' },
 		{ src: 'ln-ashlar.scss', out: 'ln-ashlar.css' },
 		{ src: 'ln-ashlar-dev.scss', out: 'ln-ashlar-dev.css' }
 	];

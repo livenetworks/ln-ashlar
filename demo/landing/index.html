@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="dark" data-theme="ocean" data-skin="default">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ln-ashlar — Modern Presentation & Marketing Design System</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	
+	<!-- Presentation Stylesheet -->
+	<link rel="stylesheet" href="../dist/ln-ashlar-landing.css">
+	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css">
+	<link rel="stylesheet" href="landing.css">
+	
+	<!-- ln-ashlar JavaScript Bundle -->
+	<script src="../dist/ln-ashlar.iife.js" defer></script>
+</head>
+<body>
+
+	<!-- ================================================================== -->
+	<!-- 1. Sticky Navigation Header with Live Theme Controls               -->
+	<!-- ================================================================== -->
+	<header class="site-header">
+		<div class="landing-container">
+			<nav class="site-nav" aria-label="Main Navigation">
+				<a href="#" class="nav-brand">
+					<span class="brand-logo">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-sparkles"></use></svg>
+					</span>
+					<span>ln-ashlar <small>presentation</small></span>
+				</a>
+
+				<ul class="nav-menu">
+					<li><a href="#features" class="nav-link">Features</a></li>
+					<li><a href="#bento" class="nav-link">Bento Grid</a></li>
+					<li><a href="#showcase" class="nav-link">Scoped Islands</a></li>
+					<li><a href="#pricing" class="nav-link">Pricing</a></li>
+					<li><a href="#testimonials" class="nav-link">Reviews</a></li>
+					<li><a href="#faq" class="nav-link">FAQ</a></li>
+				</ul>
+
+				<div class="nav-actions">
+					<!-- Mode Switcher (Dark / Light) -->
+					<button type="button" class="btn btn-ghost btn-sm" id="btn-toggle-mode" title="Toggle Light/Dark Mode" aria-label="Toggle Light/Dark Mode">
+						<svg class="ln-icon" id="mode-icon" aria-hidden="true"><use href="#ln-icon-moon"></use></svg>
+					</button>
+
+					<!-- Theme Preset Selector -->
+					<div>
+						<button type="button" class="btn btn-ghost btn-sm" id="landing-theme-trigger" data-ln-popover-for="landing-theme-popover" aria-label="Theme Presets">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-palette"></use></svg>
+							<span>Theme</span>
+						</button>
+						<div popover="manual" data-ln-popover id="landing-theme-popover" class="landing-theme-popover">
+							<span class="picker-section-title">Brand Themes</span>
+							<div class="picker-grid">
+								<button type="button" class="btn btn-ghost btn-sm" data-set-theme="ocean">Ocean</button>
+								<button type="button" class="btn btn-ghost btn-sm" data-set-theme="sunset">Sunset</button>
+								<button type="button" class="btn btn-ghost btn-sm" data-set-theme="midnight">Midnight</button>
+								<button type="button" class="btn btn-ghost btn-sm" data-set-theme="glass">Glass</button>
+								<button type="button" class="btn btn-ghost btn-sm" data-set-theme="aurora">Aurora</button>
+								<button type="button" class="btn btn-ghost btn-sm" data-set-theme="violet">Violet</button>
+								<button type="button" class="btn btn-ghost btn-sm" data-set-theme="cyber">Cyber</button>
+							</div>
+
+							<span class="picker-section-title">Skins</span>
+							<div class="picker-grid">
+								<button type="button" class="btn btn-ghost btn-sm" data-set-skin="default">Default</button>
+								<button type="button" class="btn btn-ghost btn-sm" data-set-skin="soft">Soft</button>
+								<button type="button" class="btn btn-ghost btn-sm" data-set-skin="glass">Glass</button>
+								<button type="button" class="btn btn-ghost btn-sm" data-set-skin="outline">Outline</button>
+							</div>
+						</div>
+					</div>
+
+					<a href="#pricing" class="btn btn-sm">Get Started</a>
+				</div>
+			</nav>
+		</div>
+	</header>
+
+	<main>
+		<!-- ============================================================== -->
+		<!-- 2. Hero Section                                                -->
+		<!-- ============================================================== -->
+		<section id="hero" class="hero-section hero-centered ambient-glow-top">
+			<div class="landing-container">
+				<!-- Pill Announcement Badge -->
+				<div class="hero-badge-wrap">
+					<a href="#bento" class="badge-pill">
+						<span class="badge-dot"></span>
+						<span>Presenting ln-ashlar Landing Design System</span>
+						<span aria-hidden="true">&rarr;</span>
+					</a>
+				</div>
+
+				<!-- Fluid Display Headline -->
+				<h1 class="hero-title">
+					Unleash high-impact web design with <span class="text-gradient-vibrant">modern primitives</span>
+				</h1>
+
+				<!-- Lead Paragraph -->
+				<p class="hero-lead">
+					Experience fluid typography, ambient lighting, asymmetric bento grids, and seamless 3-axis theming built from the ground up for presentation web pages.
+				</p>
+
+				<!-- Dual Call to Action Buttons -->
+				<div class="hero-actions">
+					<a href="#pricing" class="btn btn-hero btn-glow">
+						<span>Start Building Today</span>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-right"></use></svg>
+					</a>
+					<a href="#showcase" class="btn btn-hero btn-outline">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-eye"></use></svg>
+						<span>Explore Scoped Islands</span>
+					</a>
+				</div>
+
+				<!-- App Mockup Window Frame -->
+				<div class="hero-preview">
+					<figure class="mockup-frame animate-float">
+						<div class="mockup-bar">
+							<span class="mockup-dot"></span>
+							<span class="mockup-dot"></span>
+							<span class="mockup-dot"></span>
+							<span class="mockup-url">https://ashlar.livenetworks.io/preview</span>
+						</div>
+						<div class="mockup-body pattern-grid mockup-stage">
+							<div class="glass-panel mockup-stage-card">
+								<span class="badge-pill stage-badge">Interactive UI Preview</span>
+								<h3 class="stage-title">Live 3-Axis Theme Cascading</h3>
+								<p class="stage-desc">
+									Every element here is dynamically bound to <code>data-mode</code>, <code>data-theme</code>, and <code>data-skin</code>.
+								</p>
+								<div class="actions-row justify-center">
+									<button type="button" class="btn btn-sm">Primary Action</button>
+									<button type="button" class="btn btn-outline btn-sm">Secondary Action</button>
+								</div>
+							</div>
+						</div>
+					</figure>
+				</div>
+
+				<!-- Social Proof Logo Strip -->
+				<div class="hero-social-proof">
+					<p class="proof-label">Trusted by forward-thinking engineering teams</p>
+					<ul>
+						<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-box"></use></svg> Apex Labs</li>
+						<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-cpu"></use></svg> Vortex Cloud</li>
+						<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layers"></use></svg> Spectra UI</li>
+						<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-database"></use></svg> Nexus Data</li>
+						<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-shield-check"></use></svg> Zenith Systems</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 3. Bento Grid Section                                          -->
+		<!-- ============================================================== -->
+		<section class="landing-section" id="bento">
+			<div class="landing-container">
+				<header class="section-header text-center">
+					<span class="section-eyebrow">Bento Architecture</span>
+					<h2 class="section-title">Engineered for modern presentation aesthetics</h2>
+					<p class="section-lead">
+						A cohesive visual design system with zero bloated utility classes. Clean semantic markup that looks extraordinary.
+					</p>
+				</header>
+
+				<div class="bento-grid">
+					<!-- Bento Item 1: Fluid Typography (Span 7) -->
+					<article class="bento-card bento-span-7 glow-hover">
+						<div class="bento-header">
+							<span class="section-eyebrow">Fluid Typography</span>
+							<h3 class="bento-title">Responsive clamp() typography with zero layout shifts</h3>
+							<p class="bento-desc">
+								Headlines and leads scale continuously with the viewport using modern CSS <code>clamp()</code> functions, tight letter-spacing, and automatic <code>text-wrap: balance</code>.
+							</p>
+						</div>
+						<div class="bento-visual glass-panel bento-type-sample">
+							<div class="text-gradient type-display">
+								Aa &bull; Dynamic Gradient Text
+							</div>
+							<p class="type-code">
+								font-size: clamp(2.5rem, 5.5vw + 0.5rem, 4.75rem);
+							</p>
+						</div>
+					</article>
+
+					<!-- Bento Item 2: 3-Axis Theming (Span 5) -->
+					<article class="bento-card bento-span-5 glow-hover">
+						<div class="bento-header">
+							<span class="section-eyebrow">Orthogonal Theming</span>
+							<h3 class="bento-title">3-Axis Theming Engine</h3>
+							<p class="bento-desc">
+								Separate polarity (<code>data-mode</code>), brand palette (<code>data-theme</code>), and structural physics (<code>data-skin</code>).
+							</p>
+						</div>
+						<div class="bento-visual bento-pill-group">
+							<span class="badge-pill">Light & Dark</span>
+							<span class="badge-pill">7 Color Themes</span>
+							<span class="badge-pill">4 Physical Skins</span>
+							<span class="badge-pill">Scoped Islands</span>
+						</div>
+					</article>
+
+					<!-- Bento Item 3: Glassmorphism & Ambient Depth (Span 5) -->
+					<article class="bento-card bento-span-5 glow-hover">
+						<div class="bento-header">
+							<span class="section-eyebrow">Visual Effects</span>
+							<h3 class="bento-title">Ambient Glows & Glassmorphism</h3>
+							<p class="bento-desc">
+								Subtle radial spotlights, backdrop-filter blurs, and hover elevations calibrated for AAA contrast.
+							</p>
+						</div>
+						<div class="bento-visual glass-panel bento-glass-sample">
+							<span class="badge-dot"></span>
+							<small>backdrop-filter: blur(16px);</small>
+						</div>
+					</article>
+
+					<!-- Bento Item 4: Zero Bloat Primitives (Span 7) -->
+					<article class="bento-card bento-span-7 glow-hover">
+						<div class="bento-header">
+							<span class="section-eyebrow">Ashlar Primitives</span>
+							<h3 class="bento-title">Zero Bloat, 100% Semantic HTML5</h3>
+							<p class="bento-desc">
+								No 40-utility-class div soup. Clean semantic elements styled by a lightweight, modular SCSS architecture that compiles into lean production bundles.
+							</p>
+						</div>
+						<div class="bento-visual glass-panel bento-code-sample">
+							<span class="token-tag">&lt;section</span> class=<span class="token-attr">"hero-section"</span><span class="token-tag">&gt;</span><br>
+							&nbsp;&nbsp;<span class="token-tag">&lt;h1</span> class=<span class="token-attr">"hero-title"</span><span class="token-tag">&gt;</span>Title<span class="token-tag">&lt;/h1&gt;</span><br>
+							<span class="token-tag">&lt;/section&gt;</span>
+						</div>
+					</article>
+				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 3b. Bento Showcase: Semantic IDs + SCSS Mixin Composition      -->
+		<!-- ============================================================== -->
+		<section id="bento-mixins" class="landing-section">
+			<div class="landing-container">
+				<header class="section-header text-center">
+					<span class="section-eyebrow">Project SCSS Composition</span>
+					<h2 class="section-title">Authored via Semantic IDs &amp; Mixins (Zero Classes)</h2>
+					<p class="section-lead">
+						Notice: <strong>ZERO classes</strong> on the elements below! The grid and card layouts are composed entirely in project SCSS (<code>landing.scss</code>) via <code>#bento-id-showcase</code> using <code>@include bento-grid</code>, <code>@include bento-card</code>, <code>@include bento-span()</code>, and <code>@include glow-hover</code>.
+					</p>
+				</header>
+
+				<div id="bento-id-showcase">
+					<!-- Bento Item A (Span 7 via #bento-card-performance) -->
+					<article id="bento-card-performance">
+						<div class="bento-header">
+							<span class="section-eyebrow">Performance Architecture</span>
+							<h3 class="bento-title">Sub-50ms Interaction to Next Paint (INP)</h3>
+							<p class="bento-desc">
+								By avoiding heavy JavaScript styling runtimes, Ashlar components preserve full compositor-thread execution for instantaneous scroll and hover reactions.
+							</p>
+						</div>
+						<div class="bento-visual glass-panel bento-code-sample">
+							<span class="token-tag">#bento-id-showcase</span> {<br>
+							&nbsp;&nbsp;<span class="token-attr">@include bento-grid;</span><br>
+							&nbsp;&nbsp;article { <span class="token-attr">@include bento-card; @include glow-hover;</span> }<br>
+							}
+						</div>
+					</article>
+
+					<!-- Bento Item B (Span 5 via #bento-card-theming) -->
+					<article id="bento-card-theming">
+						<div class="bento-header">
+							<span class="section-eyebrow">Zero Specificity Wars</span>
+							<h3 class="bento-title">Decoupled CSS Cascade</h3>
+							<p class="bento-desc">
+								ID selectors compose cleanly with Ashlar's <code>:where()</code> value declarations without fighting library specificity.
+							</p>
+						</div>
+						<div class="bento-visual bento-pill-group">
+							<span class="badge-pill">No Utility Clutter</span>
+							<span class="badge-pill">100% Semantic Tags</span>
+							<span class="badge-pill">Mixin Driven</span>
+						</div>
+					</article>
+
+					<!-- Bento Item C (Span 5 via #bento-card-motion) -->
+					<article id="bento-card-motion">
+						<div class="bento-header">
+							<span class="section-eyebrow">Adaptive Physics</span>
+							<h3 class="bento-title">Hardware-Accelerated Glows</h3>
+							<p class="bento-desc">
+								Ambient elevations and focus rings are driven by custom property rebinds, enabling seamless skin transitions.
+							</p>
+						</div>
+						<div class="bento-visual glass-panel bento-glass-sample">
+							<span class="badge-dot"></span>
+							<small>@include glow-hover;</small>
+						</div>
+					</article>
+
+					<!-- Bento Item D (Span 7 via #bento-card-semantics) -->
+					<article id="bento-card-semantics">
+						<div class="bento-header">
+							<span class="section-eyebrow">Maintainability</span>
+							<h3 class="bento-title">Single Source of Truth in SCSS</h3>
+							<p class="bento-desc">
+								Changes to column spans or physical properties reside in a single project SCSS declaration rather than hundreds of HTML templates.
+							</p>
+						</div>
+						<div class="bento-visual glass-panel bento-code-sample">
+							<span class="token-tag">#bento-card-semantics</span> {<br>
+							&nbsp;&nbsp;<span class="token-attr">@include bento-span(7);</span><br>
+							}
+						</div>
+					</article>
+				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 4. Feature Grid Section                                        -->
+		<!-- ============================================================== -->
+		<section class="landing-section" id="features">
+			<div class="landing-container">
+				<header class="section-header text-center">
+					<span class="section-eyebrow">Built for Performance</span>
+					<h2 class="section-title">Everything your marketing site requires</h2>
+					<p class="section-lead">
+						Designed for high conversion, lightning-fast Core Web Vitals, and effortless developer experience.
+					</p>
+				</header>
+
+				<ul id="features-list">
+					<!-- Feature 1 -->
+					<li>
+						<div>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-device-laptop"></use></svg>
+						</div>
+						<h3>Fluid Responsive Scaling</h3>
+						<p>
+							Every headline, section padding, and container width adapts seamlessly across mobile, tablet, desktop, and ultrawide displays.
+						</p>
+					</li>
+
+					<!-- Feature 2 -->
+					<li>
+						<div>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-palette"></use></svg>
+						</div>
+						<h3>7 Built-in Brand Palettes</h3>
+						<p>
+							Includes Ocean, Sunset, Midnight, Glass, and new presentation-ready Aurora, Violet, and Cyber presets with solved AAA contrast.
+						</p>
+					</li>
+
+					<!-- Feature 3 -->
+					<li>
+						<div>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-box"></use></svg>
+						</div>
+						<h3>4 Structural Skins</h3>
+						<p>
+							Switch instantly between Default, Glass (frosted flat borders), Soft (volumetric curves and deep shadows), and Outline styles.
+						</p>
+					</li>
+
+					<!-- Feature 4 -->
+					<li>
+						<div>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-bolt"></use></svg>
+						</div>
+						<h3>100/100 Core Web Vitals</h3>
+						<p>
+							Pure CSS animations running on the GPU compositor thread with zero Cumulative Layout Shift and sub-50ms Interaction to Next Paint.
+						</p>
+					</li>
+
+					<!-- Feature 5 -->
+					<li>
+						<div>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-components"></use></svg>
+						</div>
+						<h3>Vanilla JS Component Synergy</h3>
+						<p>
+							Effortlessly integrate Ashlar's accordions for FAQs, modals for demo inquiries, and tabs for billing switches.
+						</p>
+					</li>
+
+					<!-- Feature 6 -->
+					<li>
+						<div>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-shield-check"></use></svg>
+						</div>
+						<h3>WCAG AAA Accessibility</h3>
+						<p>
+							Semantic HTML5 landmark tags, native ARIA attributes, high-contrast text polarity ladders, and full keyboard navigation.
+						</p>
+					</li>
+				</ul>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 5. Split Showcase Section with Scoped Theme Island             -->
+		<!-- ============================================================== -->
+		<section class="landing-section" id="showcase">
+			<div class="landing-container">
+				<div class="split-layout">
+					<div>
+						<span class="section-eyebrow">Scoped Island Architecture</span>
+						<h2 class="section-title">Nest arbitrary theme islands anywhere in the DOM</h2>
+						<p class="section-lead">
+							Need a dark hero inside a light website? Or a custom brand color callout inside a neutral document? Ashlar’s decoupled derivation engine makes it trivial with just one attribute.
+						</p>
+						<ul class="checklist">
+							<li>
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg>
+								Zero CSS class conflicts or specificity wars
+							</li>
+							<li>
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg>
+								Child components automatically re-derive all tokens
+							</li>
+							<li>
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg>
+								Fully functional across all browsers without polyfills
+							</li>
+						</ul>
+						<a href="#pricing" class="btn">Explore Pricing</a>
+					</div>
+
+					<!-- Real Scoped Island -->
+					<div>
+						<div class="cta-box glow-hover cta-island-card" data-mode="dark" data-theme="violet">
+							<span class="badge-pill">Scoped Island: data-theme="violet"</span>
+							<h3 class="section-sub">Independent Color Scope</h3>
+							<p>
+								This card explicitly sets <code>data-mode="dark" data-theme="violet"</code>. All buttons, borders, and text inside rebind instantly.
+							</p>
+							<div class="actions-row">
+								<button type="button" class="btn btn-sm">Violet Accent Button</button>
+								<button type="button" class="btn btn-outline btn-sm">Outline</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 6. Metrics & Statistics Callout                                -->
+		<!-- ============================================================== -->
+		<section id="stats" class="landing-section-sm ambient-glow-bottom">
+			<div class="landing-container">
+				<ul id="stats-list">
+					<li>
+						<strong class="text-gradient" data-ln-number="99.9%">99.9%</strong>
+						<span>Infrastructure Uptime</span>
+						<p>Reliable global edge delivery</p>
+					</li>
+					<li>
+						<strong class="text-gradient" data-ln-number="50ms">&lt; 50ms</strong>
+						<span>Interaction Latency</span>
+						<p>Near-instantaneous UI response</p>
+					</li>
+					<li>
+						<strong class="text-gradient" data-ln-number="0kB">0 kB</strong>
+						<span>Runtime Dependencies</span>
+						<p>100% vanilla web standards</p>
+					</li>
+					<li>
+						<strong class="text-gradient" data-ln-number="10000000">10M+</strong>
+						<span>Components Loaded</span>
+						<p>Trusted by enterprise applications</p>
+					</li>
+				</ul>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 7. Pricing Tables Section                                      -->
+		<!-- ============================================================== -->
+		<section class="landing-section" id="pricing">
+			<div class="landing-container">
+				<header class="section-header text-center">
+					<span class="section-eyebrow">Transparent Pricing</span>
+					<h2 class="section-title">Plans that scale with your product</h2>
+					<p class="section-lead">
+						Start free for individual projects, upgrade as your team expands.
+					</p>
+
+					<div class="pricing-switcher">
+						<span class="switcher-label">Billed Monthly</span>
+						<span class="discount-pill">Save 20% on Annual</span>
+					</div>
+				</header>
+
+				<ul id="pricing-list">
+					<!-- Tier 1: Starter -->
+					<li>
+						<div>
+							<h3>Starter</h3>
+							<p>Essential tools for individual developers and prototypes.</p>
+							<data value="0" class="pricing-amount">
+								<span class="currency">$</span>
+								<span class="value">0</span>
+								<span class="period">/ month</span>
+							</data>
+
+							<ul>
+								<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg> Full CSS Design System</li>
+								<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg> 7 Built-in Theme Presets</li>
+								<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg> Fluid Typography Primitives</li>
+								<li aria-disabled="true"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg> Priority Support</li>
+							</ul>
+						</div>
+
+						<footer>
+							<a href="#" class="btn btn-outline">Get Started Free</a>
+						</footer>
+					</li>
+
+					<!-- Tier 2: Pro (Popular) -->
+					<li data-popular>
+						<span data-badge>Most Popular</span>
+						<div>
+							<h3>Professional</h3>
+							<p>For fast-growing startups and scaling digital teams.</p>
+							<data value="49" class="pricing-amount">
+								<span class="currency">$</span>
+								<span class="value">49</span>
+								<span class="period">/ month</span>
+							</data>
+
+							<ul>
+								<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg> Everything in Starter</li>
+								<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg> Complete Presentation Modules</li>
+								<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg> 50+ Ashlar Vanilla JS Components</li>
+								<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg> Dedicated Developer Support</li>
+							</ul>
+						</div>
+
+						<footer>
+							<a href="#" class="btn btn-glow">Upgrade to Pro</a>
+						</footer>
+					</li>
+
+					<!-- Tier 3: Enterprise -->
+					<li>
+						<div>
+							<h3>Enterprise</h3>
+							<p>Advanced customization and dedicated architecture reviews.</p>
+							<data value="199" class="pricing-amount">
+								<span class="currency">$</span>
+								<span class="value">199</span>
+								<span class="period">/ month</span>
+							</data>
+
+							<ul>
+								<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg> Custom Brand Palette Engineering</li>
+								<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg> Infinite Scoped Theme Islands</li>
+								<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg> 99.99% SLA Guarantee</li>
+								<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg> 24/7 Priority Hotline</li>
+							</ul>
+						</div>
+
+						<footer>
+							<a href="#" class="btn btn-outline">Contact Sales</a>
+						</footer>
+					</li>
+				</ul>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 8. Testimonials Section                                        -->
+		<!-- ============================================================== -->
+		<section id="testimonials" class="landing-section">
+			<div class="landing-container">
+				<header class="section-header text-center">
+					<span class="section-eyebrow">Customer Stories</span>
+					<h2 class="section-title">Loved by frontend engineers</h2>
+					<p class="section-lead">
+						Hear what product designers and developers have to say about ln-ashlar.
+					</p>
+				</header>
+
+				<ul class="cards-grid">
+					<!-- Review 1 -->
+					<li>
+						<div class="testimonial-rating" aria-label="5 out of 5 stars">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-star-filled"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-star-filled"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-star-filled"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-star-filled"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-star-filled"></use></svg>
+						</div>
+						<blockquote>
+							<p>"ln-ashlar completely transformed how we build marketing websites. The fluid clamp typography and bento layouts give us bespoke agency-quality design out of the box."</p>
+						</blockquote>
+						<footer>
+							<div class="author-avatar">
+								<img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='44' height='44' fill='%236366f1'><rect width='44' height='44'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff' font-family='sans-serif' font-size='16'>EK</text></svg>" alt="Elena Kane">
+							</div>
+							<div class="author-info">
+								<cite>Elena Kane</cite>
+								<span>VP of Design, NovaStream</span>
+							</div>
+						</footer>
+					</li>
+
+					<!-- Review 2 -->
+					<li>
+						<div class="testimonial-rating" aria-label="5 out of 5 stars">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-star-filled"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-star-filled"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-star-filled"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-star-filled"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-star-filled"></use></svg>
+						</div>
+						<blockquote>
+							<p>"The orthogonal 3-axis theming is genius. Switching between dark and light modes, and changing brand skins on individual sections without breaking CSS specificity is game-changing."</p>
+						</blockquote>
+						<footer>
+							<div class="author-avatar">
+								<img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='44' height='44' fill='%2310b981'><rect width='44' height='44'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff' font-family='sans-serif' font-size='16'>MR</text></svg>" alt="Marcus Reynolds">
+							</div>
+							<div class="author-info">
+								<cite>Marcus Reynolds</cite>
+								<span>Principal Architect, StackLogic</span>
+							</div>
+						</footer>
+					</li>
+
+					<!-- Review 3 -->
+					<li>
+						<div class="testimonial-rating" aria-label="5 out of 5 stars">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-star-filled"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-star-filled"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-star-filled"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-star-filled"></use></svg>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-star-filled"></use></svg>
+						</div>
+						<blockquote>
+							<p>"Zero external dependencies, impeccable semantic HTML5, and first-class keyboard navigation. Our Lighthouse scores jumped to 100 on every single metric."</p>
+						</blockquote>
+						<footer>
+							<div class="author-avatar">
+								<img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='44' height='44' fill='%23f59e0b'><rect width='44' height='44'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff' font-family='sans-serif' font-size='16'>SL</text></svg>" alt="Sarah Lindqvist">
+							</div>
+							<div class="author-info">
+								<cite>Sarah Lindqvist</cite>
+								<span>Lead Frontend Engineer, Veloce</span>
+							</div>
+						</footer>
+					</li>
+				</ul>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 9. Interactive FAQ Section (Using Ashlar's ln-accordion)        -->
+		<!-- ============================================================== -->
+		<section class="landing-section" id="faq">
+			<div class="landing-container-narrow">
+				<header class="section-header text-center">
+					<span class="section-eyebrow">Frequently Asked Questions</span>
+					<h2 class="section-title">Got questions? We've got answers</h2>
+					<p class="section-lead">
+						Explore answers to common questions about ln-ashlar's architecture and usage.
+					</p>
+				</header>
+
+				<!-- ln-accordion & ln-toggle synergy -->
+				<ul data-ln-accordion id="faq-accordion">
+					<li>
+						<header data-ln-toggle-for="faq-panel-1">
+							<strong>How does the presentation CSS differ from the admin CSS?</strong>
+							<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-chevron-down"></use></svg>
+						</header>
+						<section id="faq-panel-1" data-ln-toggle="open" class="collapsible">
+							<div class="collapsible-body">
+								<p>The admin CSS is optimized for data density, complex data tables, and application shells with compact 14px body text. The presentation CSS is designed for high-impact marketing pages, featuring fluid <code>clamp()</code> display typography, ambient lighting glows, bento grids, and high-conversion CTAs.</p>
+							</div>
+						</section>
+					</li>
+
+					<li>
+						<header data-ln-toggle-for="faq-panel-2">
+							<strong>Can I use Ashlar interactive components on my landing page?</strong>
+							<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-chevron-down"></use></svg>
+						</header>
+						<section id="faq-panel-2" data-ln-toggle="close" class="collapsible">
+							<div class="collapsible-body">
+								<p>Yes! The presentation bundle includes full styling and support for Ashlar's vanilla JS components such as accordions (like this FAQ), modals for lead generation, tabs for pricing periods, and dropdown menus.</p>
+							</div>
+						</section>
+					</li>
+
+					<li>
+						<header data-ln-toggle-for="faq-panel-3">
+							<strong>How do Scoped Mode Islands work?</strong>
+							<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-chevron-down"></use></svg>
+						</header>
+						<section id="faq-panel-3" data-ln-toggle="close" class="collapsible">
+							<div class="collapsible-body">
+								<p>Any HTML container can declare <code>data-mode="dark"</code> or <code>data-theme="violet"</code>. Ashlar's derivation engine automatically calculates all surface colors, contrasts, and border tokens for that container and its descendants without affecting the rest of the page.</p>
+							</div>
+						</section>
+					</li>
+
+					<li>
+						<header data-ln-toggle-for="faq-panel-4">
+							<strong>Are external icon libraries or frameworks required?</strong>
+							<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-chevron-down"></use></svg>
+						</header>
+						<section id="faq-panel-4" data-ln-toggle="close" class="collapsible">
+							<div class="collapsible-body">
+								<p>No external frameworks are required. Ashlar uses vanilla HTML5, modern CSS custom properties, and lightweight vanilla JS. The built-in <code>ln-icon</code> component seamlessly bundles and manages SVG sprites.</p>
+							</div>
+						</section>
+					</li>
+				</ul>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 10. High-Impact Call to Action Banner                          -->
+		<!-- ============================================================== -->
+		<section id="cta" class="landing-section">
+			<div class="landing-container">
+				<div class="cta-box">
+					<span class="badge-pill">Get Started in Seconds</span>
+					<h2>Ready to build your next presentation website?</h2>
+					<p>
+						Experience the speed of clean semantic markup paired with state-of-the-art modern aesthetics.
+					</p>
+					<nav>
+						<a href="#pricing" class="btn btn-hero btn-glow">Start Your Free Trial</a>
+						<a href="../index.html" class="btn btn-hero btn-outline">Back to Demos</a>
+					</nav>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<!-- ================================================================== -->
+	<!-- 11. Presentation Footer                                            -->
+	<!-- ================================================================== -->
+	<footer class="site-footer">
+		<div class="landing-container">
+			<div class="footer-grid">
+				<!-- Brand Column -->
+				<div>
+					<a href="#" class="brand-name">
+						<span class="brand-logo">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-sparkles"></use></svg>
+						</span>
+						<span>ln-ashlar</span>
+					</a>
+					<p>
+						LiveNetworks unified frontend library. Clean vanilla JS components and modular CSS design systems for modern applications and presentation pages.
+					</p>
+				</div>
+
+				<!-- Column 1: Product -->
+				<nav aria-label="Product Links">
+					<h4>Product</h4>
+					<ul>
+						<li><a href="#features">Features</a></li>
+						<li><a href="#bento">Bento Grids</a></li>
+						<li><a href="#pricing">Pricing Plans</a></li>
+						<li><a href="../admin/index.html">Admin Dashboard</a></li>
+						<li><a href="../spa/">DocuFlow SPA</a></li>
+					</ul>
+				</nav>
+
+				<!-- Column 2: Resources -->
+				<nav aria-label="Resource Links">
+					<h4>Resources</h4>
+					<ul>
+						<li><a href="../../docs-mcp/">Documentation</a></li>
+						<li><a href="#faq">FAQ</a></li>
+						<li><a href="../../DOCTRINE.md">Architecture Doctrine</a></li>
+						<li><a href="../scoped-theme.html">Scoped Theming</a></li>
+					</ul>
+				</nav>
+
+				<!-- Column 3: Legal & Company -->
+				<nav aria-label="Company Links">
+					<h4>Company</h4>
+					<ul>
+						<li><a href="#">About LiveNetworks</a></li>
+						<li><a href="#">Careers</a></li>
+						<li><a href="#">Privacy Policy</a></li>
+						<li><a href="#">Terms of Service</a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="footer-bottom">
+				<div>&copy; 2026 Live Networks. All rights reserved. Built with ln-ashlar.</div>
+				<nav aria-label="Legal Links">
+					<a href="#">Privacy</a>
+					<a href="#">Terms</a>
+					<a href="#">Security</a>
+				</nav>
+			</div>
+		</div>
+	</footer>
+
+	<!-- Live Appearance Switcher Script -->
+	<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const root = document.documentElement;
+
+		// 1. Mode Toggle (Dark / Light)
+		const btnToggleMode = document.getElementById('btn-toggle-mode');
+		const modeIconUse = document.querySelector('#mode-icon use');
+
+		function updateModeIcon(mode) {
+			if (modeIconUse) {
+				modeIconUse.setAttribute('href', mode === 'dark' ? '#ln-icon-sun' : '#ln-icon-moon');
+			}
+		}
+
+		if (btnToggleMode) {
+			btnToggleMode.addEventListener('click', () => {
+				const current = root.getAttribute('data-mode') || 'dark';
+				const next = current === 'dark' ? 'light' : 'dark';
+				root.setAttribute('data-mode', next);
+				updateModeIcon(next);
+			});
+		}
+
+		// 2. Theme Presets
+		document.querySelectorAll('[data-set-theme]').forEach(btn => {
+			btn.addEventListener('click', () => {
+				const theme = btn.getAttribute('data-set-theme');
+				root.setAttribute('data-theme', theme);
+				const popover = document.getElementById('landing-theme-popover');
+				if (popover && popover.lnPopover) popover.lnPopover.close();
+			});
+		});
+
+		// 3. Skin Presets
+		document.querySelectorAll('[data-set-skin]').forEach(btn => {
+			btn.addEventListener('click', () => {
+				const skin = btn.getAttribute('data-set-skin');
+				root.setAttribute('data-skin', skin);
+				const popover = document.getElementById('landing-theme-popover');
+				if (popover && popover.lnPopover) popover.lnPopover.close();
+			});
+		});
+	});
+	</script>
+</body>
+</html>

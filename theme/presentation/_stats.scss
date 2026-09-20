@@ -1,0 +1,87 @@
+// ==========================================================================
+// Presentation Metrics & Statistics — ln-ashlar
+// ==========================================================================
+// Large fluid metrics callouts for social proof and product benchmarks.
+// Provided as mixins, semantic selectors (#stats-list li), and classes.
+// ==========================================================================
+
+@mixin stat-grid {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: var(--size-lg);
+
+	@media (min-width: 600px) {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	@media (min-width: 1024px) {
+		grid-template-columns: repeat(4, 1fr);
+	}
+}
+
+@mixin stat-item {
+	list-style: none;
+	margin: 0;
+	padding: clamp(1.25rem, 2.5vw, 2rem);
+	background-color: var(--bg-elevated);
+	border: var(--border-width) solid var(--color-border);
+	border-radius: var(--radius-xl);
+	text-align: center;
+	transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+
+	&:hover {
+		transform: translateY(-2px);
+		border-color: color-mix(in srgb, hsl(var(--color-primary)) 40%, var(--color-border));
+		box-shadow: var(--shadow-sm);
+	}
+
+	strong,
+	b,
+	data,
+	.stat-number {
+		display: block;
+		font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+		font-weight: 800;
+		letter-spacing: -0.03em;
+		line-height: 1.1;
+		margin-block-start: 0;
+		margin-block-end: var(--size-xs);
+		color: var(--color-fg);
+	}
+
+	span,
+	label,
+	.stat-label {
+		display: block;
+		font-size: var(--text-sm);
+		font-weight: 600;
+		color: var(--color-fg);
+		margin-block-start: 0;
+		margin-block-end: var(--size-2xs);
+	}
+
+	p,
+	small,
+	.stat-desc {
+		font-size: var(--text-xs);
+		color: var(--fg-muted);
+		margin: 0;
+	}
+}
+
+// ─── Declarative Selectors ───────────────────────────────────────────────────
+
+#stats-list,
+#stats ul,
+.stat-grid {
+	@include stat-grid;
+}
+
+#stats-list > li,
+#stats ul > li,
+.stat-item {
+	@include stat-item;
+}

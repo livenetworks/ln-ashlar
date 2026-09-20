@@ -1,0 +1,163 @@
+// ==========================================================================
+// Presentation Typography — ln-ashlar
+// ==========================================================================
+// Fluid display typography, gradient headlines, balanced text, and badges.
+// ==========================================================================
+
+.hero-title {
+	font-size: var(--text-hero);
+	line-height: var(--lh-hero);
+	font-weight: 800;
+	letter-spacing: -0.035em;
+	color: var(--color-fg);
+	text-wrap: balance;
+	margin-block-start: 0;
+	margin-block-end: var(--size-md);
+}
+
+.hero-lead {
+	font-size: var(--text-lead);
+	line-height: var(--lh-lead);
+	color: var(--fg-muted);
+	font-weight: 400;
+	text-wrap: pretty;
+	margin-block-start: 0;
+	margin-block-end: var(--size-xl);
+	max-width: var(--max-w-prose);
+}
+
+.section-title {
+	font-size: var(--text-section-title);
+	line-height: var(--lh-section-title);
+	font-weight: 750;
+	letter-spacing: -0.03em;
+	color: var(--color-fg);
+	text-wrap: balance;
+	margin-block-start: 0;
+	margin-block-end: var(--size-sm-up);
+}
+
+.section-sub {
+	font-size: var(--text-section-sub);
+	line-height: var(--lh-section-sub);
+	font-weight: 650;
+	letter-spacing: -0.02em;
+	color: var(--color-fg);
+	margin-block-start: 0;
+	margin-block-end: var(--size-sm);
+}
+
+.section-lead {
+	font-size: var(--text-lead);
+	line-height: var(--lh-lead);
+	color: var(--fg-muted);
+	text-wrap: pretty;
+	margin-block-start: 0;
+	margin-block-end: var(--size-lg);
+	max-width: var(--max-w-prose);
+}
+
+.section-eyebrow,
+.eyebrow,
+.kicker {
+	display: inline-block;
+	font-size: var(--text-xs);
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: hsl(var(--color-primary));
+	margin-block-end: var(--size-sm);
+}
+
+// ---------------------------------------------------------------------------
+// Pill Badges (Announcement / Status banners above headlines)
+// ---------------------------------------------------------------------------
+.badge-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-xs);
+	padding: var(--size-2xs) var(--size-sm-up);
+	border-radius: var(--radius-full);
+	font-size: var(--text-xs);
+	font-weight: 500;
+	line-height: 1.4;
+	background-color: color-mix(in srgb, hsl(var(--color-primary)) 12%, var(--bg-base));
+	color: hsl(var(--color-primary));
+	border: var(--border-width) solid color-mix(in srgb, hsl(var(--color-primary)) 25%, transparent);
+	text-decoration: none;
+	transition: var(--transition-fast);
+
+	&:hover {
+		background-color: color-mix(in srgb, hsl(var(--color-primary)) 18%, var(--bg-base));
+		border-color: color-mix(in srgb, hsl(var(--color-primary)) 40%, transparent);
+		color: hsl(var(--color-primary));
+	}
+
+	.badge-dot {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: var(--radius-full);
+		background-color: hsl(var(--color-primary));
+		box-shadow: 0 0 8px hsl(var(--color-primary));
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Gradient Text
+// ---------------------------------------------------------------------------
+.text-gradient {
+	background: linear-gradient(135deg, hsl(var(--color-primary)), hsl(var(--color-secondary, var(--color-primary))));
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	color: transparent;
+	display: inline-block;
+}
+
+// High-impact multi-stop gradient for Hero headlines
+.text-gradient-vibrant {
+	background: linear-gradient(
+		135deg,
+		hsl(var(--color-primary)),
+		hsl(from hsl(var(--color-primary)) calc(h + 35) 90% 60%),
+		hsl(from hsl(var(--color-primary)) calc(h + 70) 95% 70%)
+	);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	color: transparent;
+	display: inline-block;
+}
+
+.text-balance {
+	text-wrap: balance;
+}
+
+.text-pretty {
+	text-wrap: pretty;
+}
+
+.text-center {
+	text-align: center;
+}
+
+.text-muted {
+	color: var(--fg-muted);
+}
+
+// ---------------------------------------------------------------------------
+// Refined presentation inline links
+// ---------------------------------------------------------------------------
+.landing-section p a:not(.btn),
+.landing-section li a:not(.btn) {
+	color: hsl(var(--color-primary));
+	text-decoration: underline;
+	text-decoration-color: hsl(var(--color-primary) / 0.4);
+	text-underline-offset: 3px;
+	transition: text-decoration-color var(--transition-fast), color var(--transition-fast);
+
+	&:hover {
+		color: hsl(from hsl(var(--color-primary)) h s calc(l + 6));
+		text-decoration-color: hsl(var(--color-primary));
+	}
+}

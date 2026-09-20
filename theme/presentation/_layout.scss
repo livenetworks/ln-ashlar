@@ -1,0 +1,173 @@
+// ==========================================================================
+// Presentation Layout & Containers — ln-ashlar
+// ==========================================================================
+// Full-width responsive containers, section rhythm, and split layout grids.
+// ==========================================================================
+
+html,
+body {
+	height: auto;
+	min-height: 100%;
+	overflow-x: hidden;
+	overflow-y: auto;
+	background-color: var(--bg-base);
+}
+
+.landing-container {
+	width: 100%;
+	max-width: var(--container-landing-max-w);
+	margin-inline: auto;
+	padding-inline: var(--container-padding-x);
+}
+
+.landing-container-narrow {
+	width: 100%;
+	max-width: var(--container-narrow-max-w);
+	margin-inline: auto;
+	padding-inline: var(--container-padding-x);
+}
+
+.landing-section {
+	padding-block: var(--section-spacing-y);
+	position: relative;
+}
+
+.landing-section-sm {
+	padding-block: var(--section-spacing-sm);
+	position: relative;
+}
+
+// ---------------------------------------------------------------------------
+// Section Headers (Title + Eyebrow + Lead)
+// ---------------------------------------------------------------------------
+.section-header {
+	margin-block-end: clamp(2.5rem, 4.5vw, 4rem);
+
+	&.text-center {
+		text-align: center;
+
+		.section-lead {
+			margin-inline: auto;
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Split Presentation Layout (Side-by-side text & graphic)
+// ---------------------------------------------------------------------------
+.split-layout {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: clamp(2rem, 5vw, 4.5rem);
+	align-items: center;
+
+	@media (min-width: 960px) {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	&.split-reverse {
+		@media (min-width: 960px) {
+			> :first-child {
+				order: 2;
+			}
+			> :last-child {
+				order: 1;
+			}
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Responsive Flex Rows / Actions
+// ---------------------------------------------------------------------------
+.actions-row {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: var(--size-md);
+
+	&.justify-center {
+		justify-content: center;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Semantic Presentation Checklist
+// ---------------------------------------------------------------------------
+.checklist {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	margin-block-end: var(--size-xl);
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-sm);
+
+	li {
+		display: flex;
+		align-items: center;
+		gap: var(--size-xs-up);
+		font-size: var(--text-body-md);
+		color: var(--color-fg);
+		margin: 0;
+
+		svg,
+		.ln-icon {
+			color: hsl(var(--color-primary));
+			flex-shrink: 0;
+			width: 1.125rem;
+			height: 1.125rem;
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Reusable Presentation Card Grids
+// ---------------------------------------------------------------------------
+.cards-grid,
+.grid-3 {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: var(--size-lg);
+
+	@media (min-width: 768px) {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	@media (min-width: 1024px) {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+.grid-2 {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: var(--size-lg);
+
+	@media (min-width: 768px) {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+.grid-4 {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: var(--size-lg);
+
+	@media (min-width: 600px) {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	@media (min-width: 1024px) {
+		grid-template-columns: repeat(4, 1fr);
+	}
+}

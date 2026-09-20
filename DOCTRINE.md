@@ -3,6 +3,9 @@
 > **Official Engineering Standards and Architectural Doctrines for `ln-ashlar`**  
 > This document defines the mandatory design principles, state management models, event contracts, and authoring guidelines for both human developers and AI assistants.
 
+> [!TIP]
+> **Presentation & Marketing Websites:** For guidelines, fluid typography, bento grids, and semantic rules specific to public marketing and presentation pages, see [PRESENTATION-DOCTRINE.md](PRESENTATION-DOCTRINE.md).
+
 ---
 
 ## 🏛️ 1. Three-Layer Architecture

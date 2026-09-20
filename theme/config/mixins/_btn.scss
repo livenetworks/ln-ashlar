@@ -32,7 +32,7 @@
 	@include inline-flex;
 	@include items-center;
 	@include justify-center;
-	gap: var(--gap);
+	gap: var(--gap, var(--size-xs-up));
 	--padding-y: var(--btn-padding-y, var(--size-sm));
 	--padding-x: var(--btn-padding-x, var(--size-md));
 	padding: var(--padding-y) var(--padding-x);
@@ -44,6 +44,8 @@
 	outline: none;
 	background: var(--btn-bg);
 	color: var(--btn-fg);
+	text-decoration: none;
+	cursor: pointer;
 	@include transition-colors;
 
 	&:hover:not(:disabled),
@@ -51,6 +53,7 @@
 		background: var(--btn-bg-hover);
 		color: var(--btn-fg-hover);
 		border-color: var(--btn-border-hover);
+		text-decoration: none;
 	}
 
 	&:focus-visible {

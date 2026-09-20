@@ -8,14 +8,14 @@
 //   #add-user        { @include btn; }
 //   #users-table ul  { @include btn-group; }
 //
-// See CLAUDE.md "Button Architecture" and "Button Groups vs Pill Groups"
-// for the production pattern.
-
-.btn         { @include btn; }
-.btn-soft    { @include btn-soft; }
-.btn-ghost   { @include btn-ghost; }
-.btn-outline { @include btn-outline; }
-.btn-link    { @include btn-link; }
+// Prototype-tier and universal button classes.
+// These classes apply to both <button> and <a> (link-buttons) ensuring
+// full button geometry, padding, alignment, and theme variables:
+.btn         { @include button-base; @include btn; }
+.btn-soft    { @include button-base; @include btn-soft; }
+.btn-ghost   { @include button-base; @include btn-ghost; }
+.btn-outline { @include button-base; @include btn-outline; }
+.btn-link    { @include button-base; @include btn-link; }
 .btn-sm      { @include btn-sm; }
 .btn-lg      { @include btn-lg; }
 

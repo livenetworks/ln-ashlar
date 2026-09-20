@@ -3,10 +3,6 @@
 	"component": "ln-table",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
-		"data-ln-confirm-state": {
-			"direction": null,
-			"sources": []
-		},
 		"data-ln-debug": {
 			"direction": null,
 			"sources": [

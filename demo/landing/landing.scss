@@ -1,0 +1,58 @@
+// ==========================================================================
+// Landing Demo Project SCSS — ln-ashlar
+// ==========================================================================
+// Demonstrates semantic ID selector composition with ln-ashlar presentation mixins:
+// Pure semantic HTML in #bento-id-showcase without any component or utility classes!
+// ==========================================================================
+
+@use '../../theme/presentation/bento' as *;
+@use '../../theme/presentation/effects' as *;
+
+// ─── Semantic Bento Showcase via ID & Mixin Composition ───────────────────
+#bento-id-showcase {
+	@include bento-grid;
+
+	article {
+		@include bento-card;
+		@include glow-hover;
+	}
+
+	#bento-card-performance {
+		@include bento-span(7);
+	}
+
+	#bento-card-theming {
+		@include bento-span(5);
+	}
+
+	#bento-card-motion {
+		@include bento-span(5);
+	}
+
+	#bento-card-semantics {
+		@include bento-span(7);
+	}
+}
+
+// ─── Semantic Testimonials Selector Composition ───────────────────────────
+#testimonials {
+	blockquote {
+		font-size: var(--text-body-md);
+		line-height: 1.6;
+		color: var(--color-fg);
+		font-style: normal;
+		margin: 0;
+		margin-block-end: var(--size-xl);
+
+		p {
+			margin: 0;
+		}
+	}
+}
+
+// ─── Semantic FAQ Accordion Composition ──────────────────────────────────
+#faq-accordion {
+	max-width: 800px;
+	margin-inline: auto;
+}
+

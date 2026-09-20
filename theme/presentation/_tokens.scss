@@ -1,0 +1,39 @@
+// ==========================================================================
+// Presentation Design Tokens — ln-ashlar
+// ==========================================================================
+// Scales for marketing, landing pages, hero sections, and feature showcases.
+// Supplements core tokens with fluid typography and marketing layout variables.
+// ==========================================================================
+
+:root {
+	// -----------------------------------------------------------------------
+	// Presentation Containers & Section Rhythm
+	// -----------------------------------------------------------------------
+	--container-landing-max-w: 80rem;       // 1280px
+	--container-narrow-max-w:  56rem;       // 896px
+	--container-padding-x:     clamp(1rem, 3.5vw, 2.5rem);
+
+	--section-spacing-y:       clamp(4rem, 8vw, 7.5rem);
+	--section-spacing-sm:      clamp(2.5rem, 5vw, 4rem);
+
+	// -----------------------------------------------------------------------
+	// Presentation Fluid Typography (clamp-based)
+	// -----------------------------------------------------------------------
+	--text-hero:          clamp(2.5rem, 5.5vw + 0.5rem, 4.75rem);
+	--lh-hero:            1.08;
+
+	--text-section-title: clamp(2rem, 3.8vw + 0.25rem, 3.25rem);
+	--lh-section-title:   1.15;
+
+	--text-section-sub:   clamp(1.25rem, 2.2vw, 1.75rem);
+	--lh-section-sub:     1.25;
+
+	--text-lead:          clamp(1.0625rem, 1.2vw + 0.5rem, 1.3rem);
+	--lh-lead:            1.6;
+
+	// -----------------------------------------------------------------------
+	// Ambient & Lighting Tokens
+	// -----------------------------------------------------------------------
+	--spotlight-opacity: 0.15;
+	--hero-glow-spread:  40rem;
+}
