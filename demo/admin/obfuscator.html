@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>HTTP — ln-ashlar</title>
+	<title>ln-obfuscator — ln-ashlar</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -63,7 +63,7 @@
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
 				</button>
-				<h1>HTTP</h1>
+				<h1>ln-obfuscator</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
@@ -171,13 +171,13 @@
 						<li><a href="editor.html"><span class="nav-label">Editor</span></a></li>
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
-						<li><a href="http.html" aria-current="page"><span class="nav-label">HTTP</span></a></li>
+						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
 						<li><a href="include.html"><span class="nav-label">Include</span></a></li>
 						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
 						<li><a href="localization.html"><span class="nav-label">Localization (Date &amp; Number)</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
-						<li><a href="obfuscator.html"><span class="nav-label">Obfuscator</span></a></li>
+						<li><a href="obfuscator.html" aria-current="page"><span class="nav-label">Obfuscator</span></a></li>
 						<li><a href="persist.html"><span class="nav-label">Persist</span></a></li>
 						<li><a href="picklist.html"><span class="nav-label">Picklist</span></a></li>
 						<li><a href="popover.html"><span class="nav-label">Popover</span></a></li>
@@ -219,408 +219,325 @@
 		<!-- Content -->
 		<section>
 			<div class="app-content-wrapper">
-<!--
-	The mock fetch interceptor MUST be installed before the deferred
-	ln-ashlar.iife.js loads, so ln-http captures the mock as its
-	_origFetch. Inline scripts in the page body run during parsing,
-	before defer scripts execute — this snippet runs first.
--->
-<script class="mock-related" src="dist/mock-http.js"></script>
+<style>
+	#obf-event-log {
+		max-height: 12rem;
+		overflow-y: auto;
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: 0.85rem;
+		padding: var(--space-xs);
+		background: var(--bg-surface-subtle);
+		border-radius: var(--radius-sm);
+		list-style: none;
+		margin: 0;
+	}
+	#obf-event-log li {
+		padding-block: 0.25rem;
+		border-block-end: var(--border-width) solid var(--border-subtle);
+	}
+	#obf-event-log li:last-child { border-block-end: 0; }
+	#obf-event-log:empty::before {
+		content: 'No events logged yet — inject a node below or refresh.';
+		color: var(--fg-muted);
+	}
+	.obf-sandbox {
+		min-height: 4rem;
+		padding: var(--space-sm);
+		border: 1px dashed var(--border-subtle);
+		border-radius: var(--radius-sm);
+		background: var(--bg-surface-subtle);
+		margin-top: var(--space-xs);
+	}
+	.raw-code-badge {
+		display: inline-block;
+		font-size: 0.75rem;
+		background: var(--bg-surface-active);
+		padding: 0.1rem 0.35rem;
+		border-radius: var(--radius-xs);
+		margin-bottom: var(--space-xs);
+	}
+</style>
 
-<h1>HTTP</h1>
-
-					<!-- Overview / philosophy -->
-					<section class="section-card">
-						<header><h3>Overview &amp; Philosophy</h3></header>
-						<main>
-							<p>In modern asynchronous web applications, managing network concurrency is highly complex. Rapid keystrokes inside search fields, quick clicks on list reordering controls, or multi-modal submissions often trigger overlapping HTTP requests. Without strict controls, these requests finish out-of-order, corrupting the UI with stale data ("race conditions") or executing duplicate transactions on the database.</p>
-
-							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-http</code>, a lightweight, zero-dependency **HTTP Concurrency Coordinator**. Instead of requiring developers to pass manual <code>AbortController</code> signals inside every fetch, `ln-http` operates globally. It coordinates in-flight requests on two parallel channels (Path A and Path B) to handle transparent URL-keyed de-duplication and explicit key-based cancellations.</p>
-
-							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
-								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
-									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-icon-info-circle"></use></svg>
-									The Concurrency Doctrine
-								</h4>
-								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
-									A concurrency coordinator does not inject credentials, authorize tokens, or format JSON bodies. It focuses strictly on request cancellations. It runs as a global utility capturing fetch promises and aborting obsolete ones, leaving custom headers and payloads fully to the caller. <strong>The browser's native AbortController is the underlying contract.</strong>
-								</p>
-							</div>
-
-							<h4>Two Parallel Concurrency Channels</h4>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
-								<li>
-									<strong>Path A (Transparent URL-Keyed GET de-duplication):</strong> Wraps the global <code>window.fetch</code> natively. Whenever a GET or HEAD request is fired, it scans in-flight records. If it finds a matching URL (e.g. during fast keystroke searches), it automatically aborts the previous request. POST, PUT, and DELETE methods are **never** auto-canceled here to prevent dropping user intent.
-								</li>
-								<li>
-									<strong>Path B (Explicit Key-Based Event Cancellation):</strong> Listens for <code>ln-http:request</code> events bubbling from descendants. If the request carries an explicit string `key` (e.g. `reorder-list-1`), any matching in-flight request—regardless of HTTP method—is instantly aborted. This prevents double-click issues on destructive actions and lists reordering.
-								</li>
-							</ol>
-
-							<h4>How the Cancellation Flow Coheres</h4>
-							<p>When a de-duplicated request is canceled:</p>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
-								<li>A new request arrives on Path A or B, matching the active URL or key.</li>
-								<li>The coordinator calls <code>.abort()</code> on the older request's `AbortController` instantly, and wipes its cache pointer.</li>
-								<li>The browser terminates the older network socket immediately. The initial fetch promise rejects with an <code>AbortError</code>, which is safely captured and ignored by presenters, while the new request runs cleanly.</li>
-							</ol>
-
-							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-http/README.md"><code>ln-http</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-http/README.md">architecture reference</a>.</p>
-						</main>
-					</section>
-
-<!-- Demo 1 — Search-as-you-type (Path A) -->
-<section class="section-card" data-demo-html>
-	<header><h3>Demo 1 — Search-as-you-type (Path A)</h3></header>
-	<main>
-		<p>Type rapidly. Each keystroke fires a GET to <code>/api/search?q=…</code>. Different URLs (different <code>q</code>) run independently; same URLs (e.g. backspacing to a previously-typed query) collapse — the older aborts. The log shows abort errors with <code>AbortError</code>; only the latest typed query's response renders.</p>
-		<section id="demo1">
-			<div class="form-element">
-				<label for="demo1-input">Search employees</label>
-				<input type="search" id="demo1-input" placeholder="Type a name to search… (try typing fast)">
-			</div>
-			<h4>Event log</h4>
-			<pre id="demo1-log" class="demo-log"></pre>
-			<h4>Results</h4>
-			<ul id="demo1-results" class="demo-results"></ul>
-		</section>
-	</main>
-</section>
-
-<!-- Demo 2 — Drag-reorder (Path B) -->
-<section class="section-card" data-demo-html>
-	<header><h3>Demo 2 — Drag-reorder POST with explicit key (Path B)</h3></header>
-	<main>
-		<p>Click <strong>Move up</strong> / <strong>Move down</strong> rapidly. Each click dispatches a POST <code>ln-http:request</code> with <code>key: 'reorder-list-1'</code>. Path A would NOT cancel POSTs by URL; Path B aborts the previous in-flight one because the keys match. The log shows that fast clicks produce only one <code>ln-http:response</code> at the end.</p>
-		<section id="demo2">
-			<ul id="demo2-list" class="demo-reorder">
-				<!-- Filled at init -->
-			</ul>
-			<h4>Event log</h4>
-			<pre id="demo2-log" class="demo-log"></pre>
-		</section>
-	</main>
-</section>
-
-<!-- Demo 3 — Independent POSTs -->
-<section class="section-card" data-demo-html>
-	<header><h3>Demo 3 — Independent POSTs (no dedup)</h3></header>
-	<main>
-		<p>Click <strong>Create both</strong> to fire two POSTs to <code>/api/users</code> with different bodies. Path A does not auto-cancel non-idempotent methods; both succeed independently. Each call is a raw <code>fetch()</code> — no <code>ln-http:request</code> dispatch needed.</p>
-		<section id="demo3">
-			<nav class="demo-actions">
-				<button type="button" id="demo3-btn">Create both</button>
-			</nav>
-			<h4>Event log</h4>
-			<pre id="demo3-log" class="demo-log"></pre>
-		</section>
-	</main>
-</section>
-
-<!-- Demo 4 — Cancel by URL (Path A) -->
-<section class="section-card" data-demo-html>
-	<header><h3>Demo 4 — Cancel a slow GET by URL (Path A)</h3></header>
-	<main>
-		<p>Click <strong>Start slow GET</strong> to fire a <code>fetch('/api/slow')</code> that takes 4s. Click <strong>Cancel /api/slow</strong> to call <code>lnHttp.cancel('/api/slow')</code>. The original fetch promise rejects with <code>AbortError</code>; the result panel shows that.</p>
-		<section id="demo4">
-			<nav class="demo-actions">
-				<button type="button" id="demo4-start">Start slow GET</button>
-				<button type="button" id="demo4-cancel">Cancel /api/slow</button>
-			</nav>
-			<h4>Event log</h4>
-			<pre id="demo4-log" class="demo-log"></pre>
-		</section>
-	</main>
-</section>
-
-<!-- Demo 5 — Cancel by key (Path B) -->
-<section class="section-card" data-demo-html>
-	<header><h3>Demo 5 — Cancel a Path B request by key</h3></header>
-	<main>
-		<p>Click <strong>Start reorder POST</strong> to dispatch a Path B request with <code>key: 'demo5-key'</code>. Click <strong>Cancel demo5-key</strong> to call <code>lnHttp.cancelByKey('demo5-key')</code>. Aborted Path B requests fire NO event (silent abort); the log records the cancel call and the absence of any <code>ln-http:response</code>.</p>
-		<section id="demo5">
-			<nav class="demo-actions">
-				<button type="button" id="demo5-start">Start reorder POST</button>
-				<button type="button" id="demo5-cancel">Cancel demo5-key</button>
-			</nav>
-			<h4>Event log</h4>
-			<pre id="demo5-log" class="demo-log"></pre>
-		</section>
-	</main>
-</section>
-
-<!-- Demo 6 — Inflight inspector -->
-<section class="section-card" data-demo-html>
-	<header><h3>Demo 6 — Inflight inspector</h3></header>
-	<main>
-		<p>Live readout of <code>lnHttp.inflight</code>. Path A entries appear as <code>{ method, url }</code>; Path B entries appear as <code>{ key }</code>. A Path B GET with a <code>key</code> appears in BOTH (one entry per map). Polled every 200&nbsp;ms.</p>
-		<section id="demo6">
-			<nav class="demo-actions">
-				<button type="button" id="demo6-trigger-a">Fire two slow GETs (Path A)</button>
-				<button type="button" id="demo6-trigger-b">Fire keyed GET (Path B + Path A)</button>
-				<button type="button" id="demo6-cancel-all">Cancel all</button>
-			</nav>
-			<h4>Currently in flight</h4>
-			<pre id="demo6-out" class="demo-log">[]</pre>
-		</section>
-	</main>
-</section>
-
-<!-- ln-http vs ln-ajax -->
+<!-- Overview -->
 <section class="section-card">
-	<header><h3>ln-http vs ln-ajax</h3></header>
+	<header><h3>Overview</h3></header>
 	<main>
+		<p>The <code>ln-obfuscator</code> component is an autonomous anti-crawler utility. It prevents automated email harvesters, telephone scrapers, and bot crawlers from extracting raw contact info and proprietary text from static HTML responses.</p>
+		<p>It can be placed on <strong>any HTML element</strong> — plain text spans, paragraphs, table cells, or anchor tags (<code>&lt;a&gt;</code>). Upon boot, it traverses all child text nodes and automatically deobfuscates them in place. For links, it simultaneously deobfuscates the <code>href</code> attribute (e.g. <code>mailto:</code> or <code>tel:</code> targets).</p>
 		<div class="table-container">
-		<table>
-			<thead><tr><th></th><th>ln-http</th><th>ln-ajax</th></tr></thead>
-			<tbody>
-				<tr><td>Purpose</td><td>Transport coordination (dedup, cancel)</td><td>HTML page navigation</td></tr>
-				<tr><td>Wraps <code>window.fetch</code>?</td><td>Yes (Path A) — transparent</td><td>No — calls native <code>fetch</code></td></tr>
-				<tr><td>Event API</td><td><code>ln-http:request</code> → <code>ln-http:response</code> / <code>ln-http:error</code> (Path B)</td><td><code>ln-ajax:before-start</code> / <code>:start</code> / <code>:complete</code> / <code>:error</code></td></tr>
-				<tr><td>Per-element attribute</td><td>None (global service)</td><td><code>data-ln-ajax</code> on element / link / form</td></tr>
-				<tr><td>Auto-cancel</td><td>GET/HEAD on same URL (Path A); any method by <code>key</code> (Path B)</td><td>None</td></tr>
-				<tr><td>Header injection</td><td>None</td><td>Adds <code>X-Requested-With</code> + <code>X-CSRF-TOKEN</code> from meta</td></tr>
-				<tr><td>Body handling</td><td>Forwarded raw — consumer composes</td><td>Builds <code>FormData</code> from form, appends <code>_token</code></td></tr>
-				<tr><td>Response parsing</td><td>None — forwards raw <code>Response</code></td><td><code>.json()</code> on the response</td></tr>
-				<tr><td>Visual feedback</td><td>None</td><td>Spinner + <code>ln-ajax--loading</code> class on element</td></tr>
-				<tr><td>Use when</td><td>You want dedup / cancel coordination across raw <code>fetch</code> calls</td><td>You want links / forms to swap server-rendered HTML without a full page load</td></tr>
-			</tbody>
-		</table>
+			<table>
+				<thead><tr><th>Attribute</th><th>Element</th><th>Default</th><th>Description</th></tr></thead>
+				<tbody>
+					<tr>
+						<td><code>data-ln-obfuscator</code></td>
+						<td>Any element</td>
+						<td><code>13</code></td>
+						<td>Triggers deobfuscation. Optional integer sets ROT shift (1–25). If empty, defaults to ROT13.</td>
+					</tr>
+					<tr>
+						<td><code>data-ln-obfuscator-codec</code></td>
+						<td>Any element</td>
+						<td><code>"rot"</code></td>
+						<td>Selects cipher algorithm: <code>"rot"</code> (letters/digits Caesar), <code>"base64"</code> (universal UTF-8), or <code>"xor"</code> (keyed symmetric).</td>
+					</tr>
+					<tr>
+						<td><code>data-ln-obfuscator-key</code></td>
+						<td>Any element</td>
+						<td><code>"ln-ashlar"</code></td>
+						<td>Custom secret key for <code>"xor"</code> codec. Providing this attribute automatically activates the XOR codec.</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
-		<p>The two coexist. <code>ln-ajax</code>'s internal <code>fetch</code> calls go through <code>ln-http</code>'s wrapper transparently — its GET path inherits Path A dedup. Their concerns don't overlap.</p>
 	</main>
 </section>
 
-<!-- Wiring script — runs after defer bundles, after DOMContentLoaded -->
+<!-- Live Static Showcase -->
+<section class="section-card" data-demo-html>
+	<header><h3>Static Examples (Authored in HTML)</h3></header>
+	<main>
+		<p>These elements were delivered in the raw HTML payload as obfuscated strings. <code>ln-obfuscator</code> executed automatically upon page boot and hydrated them into readable text and actionable links:</p>
+
+		<div class="grid grid-2 gap-md">
+			<div class="card p-sm">
+				<span class="raw-code-badge">Authored: &lt;a data-ln-obfuscator href="znvygb:pbagnpg@rknzcyr.pbz"&gt;pbagnpg@rknzcyr.pbz&lt;/a&gt;</span>
+				<h4>Email Protection (Default ROT13)</h4>
+				<p>
+					Contact us at:
+					<a data-ln-obfuscator href="znvygb:pbagnpg@rknzcyr.pbz">pbagnpg@rknzcyr.pbz</a>
+				</p>
+			</div>
+
+			<div class="card p-sm">
+				<span class="raw-code-badge">Authored: &lt;a data-ln-obfuscator href="gry:+612-03-456-789"&gt;+612-03-456-789&lt;/a&gt;</span>
+				<h4>Telephone Protection (Digits Rotated)</h4>
+				<p>
+					Direct phone:
+					<a data-ln-obfuscator href="gry:+612-03-456-789">+612-03-456-789</a>
+				</p>
+			</div>
+
+			<div class="card p-sm">
+				<span class="raw-code-badge">Authored: &lt;p data-ln-obfuscator data-ln-obfuscator-codec="base64"&gt;0JrQvtC90YLQsNC60YIg0YLQtdC70LXRhNC+0L06IDA3MCAxMjMgNDU2&lt;/p&gt;</span>
+				<h4>Universal Cyrillic (Base64 Codec)</h4>
+				<p data-ln-obfuscator data-ln-obfuscator-codec="base64">0JrQvtC90YLQsNC60YIg0YLQtdC70LXRhNC+0L06IDA3MCAxMjMgNDU2</p>
+			</div>
+
+			<div class="card p-sm">
+				<span class="raw-code-badge">Authored: &lt;p data-ln-obfuscator data-ln-obfuscator-codec="xor" data-ln-obfuscator-key="тајна"&gt;...&lt;/p&gt;</span>
+				<h4>Keyed Symmetric XOR (Cyrillic + Symbols)</h4>
+				<p data-ln-obfuscator data-ln-obfuscator-codec="xor" data-ln-obfuscator-key="тајна">ARgADgElAT8AAAE4ATLruLPSvsSw4aTwtOCx0KDctKyz37y4+GxSYGRSa4rxqOeN8IHjsfCE5K75</p>
+			</div>
+		</div>
+	</main>
+</section>
+
+<!-- Preservation of Nested HTML -->
+<section class="section-card" data-demo-html>
+	<header><h3>Safe Text-Node Traversal (Preserves Child HTML)</h3></header>
+	<main>
+		<p>Unlike naive <code>innerHTML</code> replacers that corrupt HTML tag names (e.g. turning <code>&lt;strong&gt;</code> into <code>&lt;fgebat&gt;</code>), <code>ln-obfuscator</code> walks individual text nodes with <code>TreeWalker</code>. Child formatting tags remain 100% intact:</p>
+
+		<div class="card p-sm">
+			<span class="raw-code-badge">Authored: &lt;div data-ln-obfuscator&gt;Grkg jvgu &lt;strong&gt;obyq&lt;/strong&gt; naq &lt;em&gt;vgnyvp&lt;/em&gt;...&lt;/div&gt;</span>
+			<div data-ln-obfuscator>
+				Guvf vf n cnentencu jvgu <strong>obyq rzcunfvf</strong>, <em>vgnyvpfglyr</em>, naq <code>va-yvar pbqr</code> jvgubhg qrfgeblvat na ragver gnt fgehpgher!
+			</div>
+		</div>
+	</main>
+</section>
+
+<!-- Interactive Playground & Dynamic Injection -->
+<section class="section-card">
+	<header><h3>Interactive Playground &amp; Dynamic Injection</h3></header>
+	<main>
+		<p>Test the client-side codec API (<code>window.lnObfuscator.obfuscate</code> / <code>window.lnObfuscator.deobfuscate</code>) across ROT, Base64, and XOR, and verify dynamic DOM injection via <code>MutationObserver</code>:</p>
+
+		<form id="obf-playground-form" onsubmit="return false;" class="stack gap-sm">
+			<div class="form-element">
+				<label for="obf-input-text">Text to Obfuscate / Deobfuscate (Supports Latin, Cyrillic, CJK, etc.)</label>
+				<input type="text" id="obf-input-text" value="Контакт: contact@example.com (тел: 070 123 456)" placeholder="Enter text here...">
+			</div>
+
+			<div class="grid grid-3 gap-sm">
+				<div class="form-element">
+					<label for="obf-codec-select">Algorithm / Codec</label>
+					<select id="obf-codec-select">
+						<option value="xor" selected>XOR + Base64 (Universal Keyed)</option>
+						<option value="base64">Base64 (Universal Unicode)</option>
+						<option value="rot">ROT (Caesar - Latin &amp; Digits)</option>
+					</select>
+				</div>
+				<div class="form-element" id="obf-key-wrap">
+					<label for="obf-key-input">XOR Secret Key</label>
+					<input type="text" id="obf-key-input" value="тајна" placeholder="Enter key...">
+				</div>
+				<div class="form-element hidden" id="obf-shift-wrap">
+					<label for="obf-shift-select">ROT Cipher Shift</label>
+					<select id="obf-shift-select">
+						<option value="13" selected>ROT 13 (Standard)</option>
+						<option value="1">ROT 1</option>
+						<option value="5">ROT 5</option>
+						<option value="7">ROT 7</option>
+						<option value="19">ROT 19</option>
+						<option value="25">ROT 25</option>
+					</select>
+				</div>
+				<div class="form-element">
+					<label for="obf-target-type">Injection Element Type</label>
+					<select id="obf-target-type">
+						<option value="p" selected>Paragraph (&lt;p&gt;)</option>
+						<option value="email">Email Link (&lt;a href="mailto:..."&gt;)</option>
+						<option value="phone">Phone Link (&lt;a href="tel:..."&gt;)</option>
+						<option value="span">Inline Span (&lt;span&gt;)</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="cluster gap-sm">
+				<button type="button" class="btn" id="obf-btn-encode">
+					<span>Encode with Codec</span>
+				</button>
+				<button type="button" class="btn btn-primary" id="obf-btn-inject">
+					<span>Inject Obfuscated into DOM</span>
+				</button>
+				<button type="button" class="btn btn-ghost" id="obf-btn-clear">
+					<span>Clear Sandbox</span>
+				</button>
+			</div>
+
+			<div class="form-element">
+				<label for="obf-output-text">Codec Output (Raw Transformed String)</label>
+				<input type="text" id="obf-output-text" readonly placeholder="Output appears here...">
+			</div>
+		</form>
+
+		<h4 class="mt-md">Live Sandbox Container</h4>
+		<p class="text-sm text-muted">When an obfuscated element is appended below, <code>ln-obfuscator</code>'s lifecycle observer detects it and deobfuscates it immediately.</p>
+		<div id="obf-sandbox" class="obf-sandbox"></div>
+	</main>
+</section>
+
+<!-- Event Telemetry Log -->
+<section class="section-card">
+	<header><h3>Lifecycle Event Telemetry</h3></header>
+	<main>
+		<p>Listening for <code>ln-obfuscator:deobfuscated</code> on <code>document</code>:</p>
+		<ul id="obf-event-log"></ul>
+	</main>
+</section>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-	const pad   = function (n) { return n < 10 ? '0' + n : '' + n; };
-	const stamp = function () {
-		const d = new Date();
-		return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + '.' + String(d.getMilliseconds()).padStart(3, '0');
-	};
-	const writeLog = function (pre, line) {
-		pre.textContent += '[' + stamp() + '] ' + line + '\n';
-		pre.scrollTop = pre.scrollHeight;
-	};
+	const inputText = document.getElementById('obf-input-text');
+	const codecSelect = document.getElementById('obf-codec-select');
+	const keyWrap = document.getElementById('obf-key-wrap');
+	const keyInput = document.getElementById('obf-key-input');
+	const shiftWrap = document.getElementById('obf-shift-wrap');
+	const shiftSelect = document.getElementById('obf-shift-select');
+	const targetType = document.getElementById('obf-target-type');
+	const outputText = document.getElementById('obf-output-text');
+	const btnEncode = document.getElementById('obf-btn-encode');
+	const btnInject = document.getElementById('obf-btn-inject');
+	const btnClear = document.getElementById('obf-btn-clear');
+	const sandbox = document.getElementById('obf-sandbox');
+	const eventLog = document.getElementById('obf-event-log');
 
-	// ─── Demo 1 — Search-as-you-type (Path A) ─────────────────────────
-	(function () {
-		const input   = document.getElementById('demo1-input');
-		const log     = document.getElementById('demo1-log');
-		const results = document.getElementById('demo1-results');
-		if (!input) return;
+	function updateCodecInputs() {
+		const codec = codecSelect.value;
+		if (codec === 'xor') {
+			keyWrap.classList.remove('hidden');
+			shiftWrap.classList.add('hidden');
+		} else if (codec === 'rot') {
+			keyWrap.classList.add('hidden');
+			shiftWrap.classList.remove('hidden');
+		} else {
+			keyWrap.classList.add('hidden');
+			shiftWrap.classList.add('hidden');
+		}
+	}
+	codecSelect.addEventListener('change', updateCodecInputs);
+	updateCodecInputs();
 
-		input.addEventListener('input', async function () {
-			const q = input.value.trim();
-			if (!q) { results.innerHTML = ''; return; }
-			const url = '/api/search?q=' + encodeURIComponent(q);
-			writeLog(log, 'fetch  ' + url);
-			try {
-				const response = await fetch(url);
-				const json = await response.json();
-				writeLog(log, 'resolved q="' + json.q + '"  matches=' + json.results.length);
-				if (input.value.trim() !== q) return; // older response, ignore
-				results.innerHTML = '';
-				for (const u of json.results) {
-					const li = document.createElement('li');
-					li.textContent = u.name + ' — ' + u.department;
-					results.appendChild(li);
-				}
-			} catch (err) {
-				if (err.name === 'AbortError') {
-					writeLog(log, 'aborted q="' + q + '" (superseded by newer keystroke)');
-					return;
-				}
-				writeLog(log, 'error  ' + (err && err.message ? err.message : String(err)));
+	function logEvent(msg) {
+		const li = document.createElement('li');
+		const time = new Date().toLocaleTimeString();
+		li.textContent = '[' + time + '] ' + msg;
+		eventLog.appendChild(li);
+		eventLog.scrollTop = eventLog.scrollHeight;
+	}
+
+	// Listen for ln-obfuscator:deobfuscated
+	document.addEventListener('ln-obfuscator:deobfuscated', function (e) {
+		const tag = e.target.tagName.toLowerCase();
+		const codec = e.detail && e.detail.codec ? e.detail.codec : 'rot';
+		const shift = e.detail && e.detail.shift ? e.detail.shift : 13;
+		const key = e.detail && e.detail.key ? ' key="' + e.detail.key + '"' : '';
+		const text = e.target.textContent.trim().slice(0, 40);
+		logEvent('ln-obfuscator:deobfuscated on <' + tag + '> (codec: ' + codec + (codec === 'rot' ? ', shift: ' + shift : key) + ') → "' + text + '"');
+	});
+
+	function getCodecOptions() {
+		const codec = codecSelect.value;
+		const shift = parseInt(shiftSelect.value, 10) || 13;
+		const key = keyInput.value.trim() || 'ln-ashlar';
+		return { codec, shift, key };
+	}
+
+	if (btnEncode) {
+		btnEncode.addEventListener('click', function () {
+			if (!window.lnObfuscator || !window.lnObfuscator.obfuscate) return;
+			const opts = getCodecOptions();
+			const val = inputText.value;
+			outputText.value = window.lnObfuscator.obfuscate(val, opts);
+		});
+	}
+
+	if (btnInject) {
+		btnInject.addEventListener('click', function () {
+			if (!window.lnObfuscator || !window.lnObfuscator.obfuscate) return;
+			const opts = getCodecOptions();
+			const val = inputText.value || 'test@example.com';
+			const type = targetType.value;
+			const encText = window.lnObfuscator.obfuscate(val, opts);
+
+			let el;
+			if (type === 'email') {
+				el = document.createElement('a');
+				const encHref = window.lnObfuscator.obfuscate('mailto:' + val, opts);
+				el.setAttribute('href', encHref);
+				el.textContent = encText;
+			} else if (type === 'phone') {
+				el = document.createElement('a');
+				const encHref = window.lnObfuscator.obfuscate('tel:' + val, opts);
+				el.setAttribute('href', encHref);
+				el.textContent = encText;
+			} else if (type === 'span') {
+				el = document.createElement('span');
+				el.textContent = encText;
+			} else {
+				el = document.createElement('p');
+				el.textContent = encText;
 			}
-		});
-	})();
 
-	// ─── Demo 2 — Drag-reorder POST (Path B) ──────────────────────────
-	(function () {
-		const list = document.getElementById('demo2-list');
-		const log  = document.getElementById('demo2-log');
-		if (!list) return;
-
-		const items = [
-			{ id: 1, label: 'Plan sprint'        },
-			{ id: 2, label: 'Review designs'     },
-			{ id: 3, label: 'Sync with backend'  },
-			{ id: 4, label: 'Update changelog'   }
-		];
-
-		const render = function () {
-			list.innerHTML = '';
-			items.forEach(function (item, idx) {
-				const li = document.createElement('li');
-				li.textContent = item.label + ' ';
-				const up = document.createElement('button');
-				up.type = 'button';
-				up.textContent = 'Move up';
-				up.disabled = idx === 0;
-				up.addEventListener('click', function () { move(idx, idx - 1); });
-				const down = document.createElement('button');
-				down.type = 'button';
-				down.textContent = 'Move down';
-				down.disabled = idx === items.length - 1;
-				down.addEventListener('click', function () { move(idx, idx + 1); });
-				li.appendChild(up);
-				li.appendChild(down);
-				list.appendChild(li);
-			});
-		};
-
-		const move = function (from, to) {
-			const [m] = items.splice(from, 1);
-			items.splice(to, 0, m);
-			render();
-			const ids = items.map(function (i) { return i.id; });
-			writeLog(log, 'dispatch  POST /api/lists/1/reorder  ids=[' + ids.join(',') + ']  key=reorder-list-1');
-			list.dispatchEvent(new CustomEvent('ln-http:request', {
-				bubbles: true,
-				detail: {
-					url:    '/api/lists/1/reorder',
-					method: 'POST',
-					body:   JSON.stringify({ ids: ids }),
-					key:    'reorder-list-1'
+			el.setAttribute('data-ln-obfuscator', opts.codec === 'rot' && opts.shift !== 13 ? String(opts.shift) : '');
+			if (opts.codec !== 'rot') {
+				el.setAttribute('data-ln-obfuscator-codec', opts.codec);
+				if (opts.codec === 'xor') {
+					el.setAttribute('data-ln-obfuscator-key', opts.key);
 				}
-			}));
-		};
-
-		list.addEventListener('ln-http:response', async function (e) {
-			if (!e.detail.ok) {
-				writeLog(log, 'response  status=' + e.detail.status + ' (non-2xx)');
-				return;
 			}
-			const json = await e.detail.response.json();
-			writeLog(log, 'response  status=' + e.detail.status + '  savedAt=' + json.savedAt + '  order=[' + json.order.join(',') + ']');
-		});
-		list.addEventListener('ln-http:error', function (e) {
-			writeLog(log, 'error  ' + (e.detail.error && e.detail.error.message ? e.detail.error.message : 'network error'));
-		});
 
-		render();
-	})();
-
-	// ─── Demo 3 — Independent POSTs (no dedup) ───────────────────────
-	(function () {
-		const btn = document.getElementById('demo3-btn');
-		const log = document.getElementById('demo3-log');
-		if (!btn) return;
-
-		const post = async function (name) {
-			writeLog(log, 'fetch  POST /api/users  name=' + name);
-			try {
-				const r = await fetch('/api/users', {
-					method:  'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body:    JSON.stringify({ name: name })
-				});
-				const json = await r.json();
-				writeLog(log, 'resolved  name=' + name + '  id=' + json.id + '  status=' + r.status);
-			} catch (err) {
-				writeLog(log, 'rejected  name=' + name + '  ' + (err && err.message ? err.message : String(err)));
-			}
-		};
-
-		btn.addEventListener('click', function () {
-			post('Ana Kovachevska');
-			post('Marko Petrovski');
+			sandbox.appendChild(el);
+			logEvent('Injected <' + el.tagName.toLowerCase() + '> with obfuscated payload: "' + encText + '"');
 		});
-	})();
+	}
 
-	// ─── Demo 4 — Cancel slow GET by URL (Path A) ────────────────────
-	(function () {
-		const startBtn  = document.getElementById('demo4-start');
-		const cancelBtn = document.getElementById('demo4-cancel');
-		const log       = document.getElementById('demo4-log');
-		if (!startBtn) return;
-
-		startBtn.addEventListener('click', async function () {
-			writeLog(log, 'fetch  GET /api/slow  (4s delay)');
-			try {
-				const r = await fetch('/api/slow');
-				const json = await r.json();
-				writeLog(log, 'resolved  ' + JSON.stringify(json));
-			} catch (err) {
-				if (err.name === 'AbortError') {
-					writeLog(log, 'aborted  /api/slow (cancel button pressed)');
-					return;
-				}
-				writeLog(log, 'rejected  ' + (err && err.message ? err.message : String(err)));
-			}
+	if (btnClear) {
+		btnClear.addEventListener('click', function () {
+			sandbox.innerHTML = '';
 		});
-		cancelBtn.addEventListener('click', function () {
-			const aborted = window.lnHttp ? window.lnHttp.cancel('/api/slow') : false;
-			writeLog(log, 'lnHttp.cancel("/api/slow") → ' + aborted);
-		});
-	})();
-
-	// ─── Demo 5 — Cancel Path B by key ───────────────────────────────
-	(function () {
-		const root      = document.getElementById('demo5');
-		const startBtn  = document.getElementById('demo5-start');
-		const cancelBtn = document.getElementById('demo5-cancel');
-		const log       = document.getElementById('demo5-log');
-		if (!root) return;
-
-		root.addEventListener('ln-http:response', async function (e) {
-			const json = await e.detail.response.json();
-			writeLog(log, 'ln-http:response  status=' + e.detail.status + '  savedAt=' + json.savedAt);
-		});
-		root.addEventListener('ln-http:error', function (e) {
-			writeLog(log, 'ln-http:error  ' + (e.detail.error && e.detail.error.message ? e.detail.error.message : 'network error'));
-		});
-
-		startBtn.addEventListener('click', function () {
-			writeLog(log, 'dispatch  POST /api/lists/2/reorder  key=demo5-key');
-			root.dispatchEvent(new CustomEvent('ln-http:request', {
-				bubbles: true,
-				detail: {
-					url:    '/api/lists/2/reorder',
-					method: 'POST',
-					body:   JSON.stringify({ ids: [3, 2, 1] }),
-					key:    'demo5-key'
-				}
-			}));
-		});
-		cancelBtn.addEventListener('click', function () {
-			const aborted = window.lnHttp ? window.lnHttp.cancelByKey('demo5-key') : false;
-			writeLog(log, 'lnHttp.cancelByKey("demo5-key") → ' + aborted + '  (no event will fire — silent abort)');
-		});
-	})();
-
-	// ─── Demo 6 — Inflight inspector ─────────────────────────────────
-	(function () {
-		const out      = document.getElementById('demo6-out');
-		const triggerA = document.getElementById('demo6-trigger-a');
-		const triggerB = document.getElementById('demo6-trigger-b');
-		const cancelAll = document.getElementById('demo6-cancel-all');
-		const root     = document.getElementById('demo6');
-		if (!out) return;
-
-		setInterval(function () {
-			if (!window.lnHttp) { out.textContent = 'lnHttp not loaded'; return; }
-			out.textContent = JSON.stringify(window.lnHttp.inflight, null, 2) || '[]';
-		}, 200);
-
-		triggerA.addEventListener('click', function () {
-			// Two slow GETs to different URLs — both visible as Path A entries.
-			fetch('/api/slow').catch(function () {});
-			fetch('/api/search?q=demo6').catch(function () {});
-		});
-		triggerB.addEventListener('click', function () {
-			// A keyed Path B GET — appears in both _keyed (key) and _inflight (method+url).
-			root.dispatchEvent(new CustomEvent('ln-http:request', {
-				bubbles: true,
-				detail: { url: '/api/slow', method: 'GET', key: 'demo6-poll' }
-			}));
-		});
-		cancelAll.addEventListener('click', function () {
-			if (window.lnHttp) window.lnHttp.cancelAll();
-		});
-	})();
+	}
 });
 </script>
 			</div>

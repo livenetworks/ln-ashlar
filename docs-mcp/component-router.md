@@ -88,6 +88,7 @@
 | Component | Use for | Don't use for |
 |---|---|---|
 | `ln-time` | Auto-updating relative timestamps | Precise absolute dates → plain `<time>` |
+| `ln-obfuscator` | Anti-crawler text & email/phone/link obfuscation (`data-ln-obfuscator`) | Cryptographic encryption at rest/in transit → `ln-core crypto` |
 | `ln-translations` | Static text swapping by language key | User-generated content; RTL layout (CSS concern) |
 | `ln-dictionary` | *TODO — confirm scope via `get_component`* | |
 | `ln-icon` | Sprite-based icons, localStorage-cached | Inline one-off SVGs |

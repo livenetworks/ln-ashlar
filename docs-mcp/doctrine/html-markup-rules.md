@@ -61,6 +61,7 @@ Headings name content — they are not a visual size utility.
 - **Date/Time:** Always use `<time datetime="2026-07-23">` instead of a bare `<span>` for timestamps.
 - **Separators:** Use `<hr>` for a thematic break instead of `<div class="divider">`.
 - **Numeric Values:** Use `<data value="…">` or `<strong>` for numeric values — never a heading.
+- **Email & Phone Protection (Anti-Harvesting):** Always protect publicly authored contact email addresses (`mailto:`) and telephone numbers (`tel:`) with `data-ln-obfuscator` by default (e.g. `<a data-ln-obfuscator href="znvygb:pbagnpg@rknzcyr.pbz">pbagnpg@rknzcyr.pbz</a>`) to prevent automated scraper harvesting, unless explicitly instructed to output raw text.
 
 > [!IMPORTANT]
 > **Coexistence with `data-ln-value` for Tables & Lists:**

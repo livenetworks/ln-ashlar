@@ -127,6 +127,7 @@
 
 * **Single-Element Actions (`ln-confirm`):** The `ln-confirm` component (in-place two-click confirmation) is strictly reserved for **single-element, low-impact actions** (e.g. deleting a single table row, archiving a single document). It must never be used for complex or high-risk actions. Prefers Two-Element Mode (`data-ln-confirm-idle`/`data-ln-confirm-active`) for HTML-first clarity.
 * **Bulk Actions & High-Impact Operations (`ln-modal`):** For actions that affect multiple items simultaneously (e.g. bulk deleting selected tenants, batch status updates) or actions with major side effects, using in-place `ln-confirm` is strictly forbidden. Instead, a confirmation modal (`ln-modal`) **MUST** be shown listing affected resources, impact summary, and explicit "Confirm" / "Cancel" actions.
+* **Email & Contact Protection (Anti-Harvesting):** Publicly authored contact email addresses (`mailto:`) and telephone numbers (`tel:`) in HTML shells, footers, headers, and contact cards **MUST** be protected with `ln-obfuscator` (`data-ln-obfuscator`) by default to prevent crawler spam harvesting, unless the developer or prompt explicitly requests raw/unobfuscated output. E.g. `<a data-ln-obfuscator href="znvygb:pbagnpg@rknzcyr.pbz">pbagnpg@rknzcyr.pbz</a>`.
 
 ---
 

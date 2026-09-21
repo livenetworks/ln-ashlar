@@ -45,6 +45,7 @@ import './ln-popover/src/ln-popover.js';
 import './ln-tooltip/src/ln-tooltip.js';
 import './ln-toast/src/ln-toast.js';
 import './ln-upload/src/ln-upload.js';
+import './ln-obfuscator/src/ln-obfuscator.js';
 import './ln-external-links/src/ln-external-links.js';
 import './ln-link/src/ln-link.js';
 import './ln-key/src/ln-key.js';

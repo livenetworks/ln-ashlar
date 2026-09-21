@@ -1782,6 +1782,25 @@
 				}
 			]
 		},
+		"ln-obfuscator": {
+			"emits": [
+				{
+					"name": "ln-obfuscator:deobfuscated",
+					"cancelable": false,
+					"description": "Dispatched on the target element immediately after deobfuscation.",
+					"detail": "{ target: HTMLElement, codec: string, shift: number, key: string | null }",
+					"source": "static"
+				},
+				{
+					"name": "ln-obfuscator:destroyed",
+					"cancelable": false,
+					"description": "Dispatched when `el.lnObfuscator.destroy()` is called.",
+					"detail": "{ target: HTMLElement }",
+					"source": "static"
+				}
+			],
+			"listens": []
+		},
 		"ln-options": {
 			"emits": [
 				{

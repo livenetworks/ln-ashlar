@@ -37,6 +37,7 @@
     - **Numbers & Totals**: MUST use semantic inline tags (`<strong>`, `<b>`, `<data value="...">`, `<td>`) with `data-ln-number`.
     - **Controls & Actions**: MUST use `<button type="button">` / `<button type="submit">`, `<label>`, `<fieldset>`, `<legend>`.
     - **Structural Lists vs. Editorial Prose**: `<ul>` and `<ol>` are clean UI primitives by default (`list-style: none`, `margin: 0`, `padding: 0`) for repeating components (menus, tabs, chips, accordions, button groups). Editorial text lists with bullet discs, decimal numbers, and vertical rhythm are opt-in and live strictly within `.prose` (`@include prose`).
+  - **Email & Contact Protection (Anti-Harvesting Doctrine)**: Publicly authored contact email addresses (`mailto:`) and telephone numbers (`tel:`) in HTML shells, templates, footers, and cards MUST be protected using `ln-obfuscator` (`data-ln-obfuscator`) by default to prevent crawler spam harvesting (e.g. `<a data-ln-obfuscator href="znvygb:pbagnpg@rknzcyr.pbz">pbagnpg@rknzcyr.pbz</a>`), unless the user explicitly specifies leaving raw/unobfuscated text.
   - Machine-readable attributes (`datetime`, `data-ln-value`) MUST be preserved for screen readers and ARIA accessibility while the visible text content is formatted dynamically according to locale.
 
 ### E. Lifecycle Events, Detail Guards & Async Cancellation Invariants

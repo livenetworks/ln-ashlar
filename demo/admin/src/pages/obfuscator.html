@@ -1,0 +1,323 @@
+<!-- ln-page: title="ln-obfuscator — ln-ashlar" h1="ln-obfuscator" -->
+
+<style>
+	#obf-event-log {
+		max-height: 12rem;
+		overflow-y: auto;
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: 0.85rem;
+		padding: var(--space-xs);
+		background: var(--bg-surface-subtle);
+		border-radius: var(--radius-sm);
+		list-style: none;
+		margin: 0;
+	}
+	#obf-event-log li {
+		padding-block: 0.25rem;
+		border-block-end: var(--border-width) solid var(--border-subtle);
+	}
+	#obf-event-log li:last-child { border-block-end: 0; }
+	#obf-event-log:empty::before {
+		content: 'No events logged yet — inject a node below or refresh.';
+		color: var(--fg-muted);
+	}
+	.obf-sandbox {
+		min-height: 4rem;
+		padding: var(--space-sm);
+		border: 1px dashed var(--border-subtle);
+		border-radius: var(--radius-sm);
+		background: var(--bg-surface-subtle);
+		margin-top: var(--space-xs);
+	}
+	.raw-code-badge {
+		display: inline-block;
+		font-size: 0.75rem;
+		background: var(--bg-surface-active);
+		padding: 0.1rem 0.35rem;
+		border-radius: var(--radius-xs);
+		margin-bottom: var(--space-xs);
+	}
+</style>
+
+<!-- Overview -->
+<section class="section-card">
+	<header><h3>Overview</h3></header>
+	<main>
+		<p>The <code>ln-obfuscator</code> component is an autonomous anti-crawler utility. It prevents automated email harvesters, telephone scrapers, and bot crawlers from extracting raw contact info and proprietary text from static HTML responses.</p>
+		<p>It can be placed on <strong>any HTML element</strong> — plain text spans, paragraphs, table cells, or anchor tags (<code>&lt;a&gt;</code>). Upon boot, it traverses all child text nodes and automatically deobfuscates them in place. For links, it simultaneously deobfuscates the <code>href</code> attribute (e.g. <code>mailto:</code> or <code>tel:</code> targets).</p>
+		<div class="table-container">
+			<table>
+				<thead><tr><th>Attribute</th><th>Element</th><th>Default</th><th>Description</th></tr></thead>
+				<tbody>
+					<tr>
+						<td><code>data-ln-obfuscator</code></td>
+						<td>Any element</td>
+						<td><code>13</code></td>
+						<td>Triggers deobfuscation. Optional integer sets ROT shift (1–25). If empty, defaults to ROT13.</td>
+					</tr>
+					<tr>
+						<td><code>data-ln-obfuscator-codec</code></td>
+						<td>Any element</td>
+						<td><code>"rot"</code></td>
+						<td>Selects cipher algorithm: <code>"rot"</code> (letters/digits Caesar), <code>"base64"</code> (universal UTF-8), or <code>"xor"</code> (keyed symmetric).</td>
+					</tr>
+					<tr>
+						<td><code>data-ln-obfuscator-key</code></td>
+						<td>Any element</td>
+						<td><code>"ln-ashlar"</code></td>
+						<td>Custom secret key for <code>"xor"</code> codec. Providing this attribute automatically activates the XOR codec.</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</main>
+</section>
+
+<!-- Live Static Showcase -->
+<section class="section-card" data-demo-html>
+	<header><h3>Static Examples (Authored in HTML)</h3></header>
+	<main>
+		<p>These elements were delivered in the raw HTML payload as obfuscated strings. <code>ln-obfuscator</code> executed automatically upon page boot and hydrated them into readable text and actionable links:</p>
+
+		<div class="grid grid-2 gap-md">
+			<div class="card p-sm">
+				<span class="raw-code-badge">Authored: &lt;a data-ln-obfuscator href="znvygb:pbagnpg@rknzcyr.pbz"&gt;pbagnpg@rknzcyr.pbz&lt;/a&gt;</span>
+				<h4>Email Protection (Default ROT13)</h4>
+				<p>
+					Contact us at:
+					<a data-ln-obfuscator href="znvygb:pbagnpg@rknzcyr.pbz">pbagnpg@rknzcyr.pbz</a>
+				</p>
+			</div>
+
+			<div class="card p-sm">
+				<span class="raw-code-badge">Authored: &lt;a data-ln-obfuscator href="gry:+612-03-456-789"&gt;+612-03-456-789&lt;/a&gt;</span>
+				<h4>Telephone Protection (Digits Rotated)</h4>
+				<p>
+					Direct phone:
+					<a data-ln-obfuscator href="gry:+612-03-456-789">+612-03-456-789</a>
+				</p>
+			</div>
+
+			<div class="card p-sm">
+				<span class="raw-code-badge">Authored: &lt;p data-ln-obfuscator data-ln-obfuscator-codec="base64"&gt;0JrQvtC90YLQsNC60YIg0YLQtdC70LXRhNC+0L06IDA3MCAxMjMgNDU2&lt;/p&gt;</span>
+				<h4>Universal Cyrillic (Base64 Codec)</h4>
+				<p data-ln-obfuscator data-ln-obfuscator-codec="base64">0JrQvtC90YLQsNC60YIg0YLQtdC70LXRhNC+0L06IDA3MCAxMjMgNDU2</p>
+			</div>
+
+			<div class="card p-sm">
+				<span class="raw-code-badge">Authored: &lt;p data-ln-obfuscator data-ln-obfuscator-codec="xor" data-ln-obfuscator-key="тајна"&gt;...&lt;/p&gt;</span>
+				<h4>Keyed Symmetric XOR (Cyrillic + Symbols)</h4>
+				<p data-ln-obfuscator data-ln-obfuscator-codec="xor" data-ln-obfuscator-key="тајна">ARgADgElAT8AAAE4ATLruLPSvsSw4aTwtOCx0KDctKyz37y4+GxSYGRSa4rxqOeN8IHjsfCE5K75</p>
+			</div>
+		</div>
+	</main>
+</section>
+
+<!-- Preservation of Nested HTML -->
+<section class="section-card" data-demo-html>
+	<header><h3>Safe Text-Node Traversal (Preserves Child HTML)</h3></header>
+	<main>
+		<p>Unlike naive <code>innerHTML</code> replacers that corrupt HTML tag names (e.g. turning <code>&lt;strong&gt;</code> into <code>&lt;fgebat&gt;</code>), <code>ln-obfuscator</code> walks individual text nodes with <code>TreeWalker</code>. Child formatting tags remain 100% intact:</p>
+
+		<div class="card p-sm">
+			<span class="raw-code-badge">Authored: &lt;div data-ln-obfuscator&gt;Grkg jvgu &lt;strong&gt;obyq&lt;/strong&gt; naq &lt;em&gt;vgnyvp&lt;/em&gt;...&lt;/div&gt;</span>
+			<div data-ln-obfuscator>
+				Guvf vf n cnentencu jvgu <strong>obyq rzcunfvf</strong>, <em>vgnyvpfglyr</em>, naq <code>va-yvar pbqr</code> jvgubhg qrfgeblvat na ragver gnt fgehpgher!
+			</div>
+		</div>
+	</main>
+</section>
+
+<!-- Interactive Playground & Dynamic Injection -->
+<section class="section-card">
+	<header><h3>Interactive Playground &amp; Dynamic Injection</h3></header>
+	<main>
+		<p>Test the client-side codec API (<code>window.lnObfuscator.obfuscate</code> / <code>window.lnObfuscator.deobfuscate</code>) across ROT, Base64, and XOR, and verify dynamic DOM injection via <code>MutationObserver</code>:</p>
+
+		<form id="obf-playground-form" onsubmit="return false;" class="stack gap-sm">
+			<div class="form-element">
+				<label for="obf-input-text">Text to Obfuscate / Deobfuscate (Supports Latin, Cyrillic, CJK, etc.)</label>
+				<input type="text" id="obf-input-text" value="Контакт: contact@example.com (тел: 070 123 456)" placeholder="Enter text here...">
+			</div>
+
+			<div class="grid grid-3 gap-sm">
+				<div class="form-element">
+					<label for="obf-codec-select">Algorithm / Codec</label>
+					<select id="obf-codec-select">
+						<option value="xor" selected>XOR + Base64 (Universal Keyed)</option>
+						<option value="base64">Base64 (Universal Unicode)</option>
+						<option value="rot">ROT (Caesar - Latin &amp; Digits)</option>
+					</select>
+				</div>
+				<div class="form-element" id="obf-key-wrap">
+					<label for="obf-key-input">XOR Secret Key</label>
+					<input type="text" id="obf-key-input" value="тајна" placeholder="Enter key...">
+				</div>
+				<div class="form-element hidden" id="obf-shift-wrap">
+					<label for="obf-shift-select">ROT Cipher Shift</label>
+					<select id="obf-shift-select">
+						<option value="13" selected>ROT 13 (Standard)</option>
+						<option value="1">ROT 1</option>
+						<option value="5">ROT 5</option>
+						<option value="7">ROT 7</option>
+						<option value="19">ROT 19</option>
+						<option value="25">ROT 25</option>
+					</select>
+				</div>
+				<div class="form-element">
+					<label for="obf-target-type">Injection Element Type</label>
+					<select id="obf-target-type">
+						<option value="p" selected>Paragraph (&lt;p&gt;)</option>
+						<option value="email">Email Link (&lt;a href="mailto:..."&gt;)</option>
+						<option value="phone">Phone Link (&lt;a href="tel:..."&gt;)</option>
+						<option value="span">Inline Span (&lt;span&gt;)</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="cluster gap-sm">
+				<button type="button" class="btn" id="obf-btn-encode">
+					<span>Encode with Codec</span>
+				</button>
+				<button type="button" class="btn btn-primary" id="obf-btn-inject">
+					<span>Inject Obfuscated into DOM</span>
+				</button>
+				<button type="button" class="btn btn-ghost" id="obf-btn-clear">
+					<span>Clear Sandbox</span>
+				</button>
+			</div>
+
+			<div class="form-element">
+				<label for="obf-output-text">Codec Output (Raw Transformed String)</label>
+				<input type="text" id="obf-output-text" readonly placeholder="Output appears here...">
+			</div>
+		</form>
+
+		<h4 class="mt-md">Live Sandbox Container</h4>
+		<p class="text-sm text-muted">When an obfuscated element is appended below, <code>ln-obfuscator</code>'s lifecycle observer detects it and deobfuscates it immediately.</p>
+		<div id="obf-sandbox" class="obf-sandbox"></div>
+	</main>
+</section>
+
+<!-- Event Telemetry Log -->
+<section class="section-card">
+	<header><h3>Lifecycle Event Telemetry</h3></header>
+	<main>
+		<p>Listening for <code>ln-obfuscator:deobfuscated</code> on <code>document</code>:</p>
+		<ul id="obf-event-log"></ul>
+	</main>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+	const inputText = document.getElementById('obf-input-text');
+	const codecSelect = document.getElementById('obf-codec-select');
+	const keyWrap = document.getElementById('obf-key-wrap');
+	const keyInput = document.getElementById('obf-key-input');
+	const shiftWrap = document.getElementById('obf-shift-wrap');
+	const shiftSelect = document.getElementById('obf-shift-select');
+	const targetType = document.getElementById('obf-target-type');
+	const outputText = document.getElementById('obf-output-text');
+	const btnEncode = document.getElementById('obf-btn-encode');
+	const btnInject = document.getElementById('obf-btn-inject');
+	const btnClear = document.getElementById('obf-btn-clear');
+	const sandbox = document.getElementById('obf-sandbox');
+	const eventLog = document.getElementById('obf-event-log');
+
+	function updateCodecInputs() {
+		const codec = codecSelect.value;
+		if (codec === 'xor') {
+			keyWrap.classList.remove('hidden');
+			shiftWrap.classList.add('hidden');
+		} else if (codec === 'rot') {
+			keyWrap.classList.add('hidden');
+			shiftWrap.classList.remove('hidden');
+		} else {
+			keyWrap.classList.add('hidden');
+			shiftWrap.classList.add('hidden');
+		}
+	}
+	codecSelect.addEventListener('change', updateCodecInputs);
+	updateCodecInputs();
+
+	function logEvent(msg) {
+		const li = document.createElement('li');
+		const time = new Date().toLocaleTimeString();
+		li.textContent = '[' + time + '] ' + msg;
+		eventLog.appendChild(li);
+		eventLog.scrollTop = eventLog.scrollHeight;
+	}
+
+	// Listen for ln-obfuscator:deobfuscated
+	document.addEventListener('ln-obfuscator:deobfuscated', function (e) {
+		const tag = e.target.tagName.toLowerCase();
+		const codec = e.detail && e.detail.codec ? e.detail.codec : 'rot';
+		const shift = e.detail && e.detail.shift ? e.detail.shift : 13;
+		const key = e.detail && e.detail.key ? ' key="' + e.detail.key + '"' : '';
+		const text = e.target.textContent.trim().slice(0, 40);
+		logEvent('ln-obfuscator:deobfuscated on <' + tag + '> (codec: ' + codec + (codec === 'rot' ? ', shift: ' + shift : key) + ') → "' + text + '"');
+	});
+
+	function getCodecOptions() {
+		const codec = codecSelect.value;
+		const shift = parseInt(shiftSelect.value, 10) || 13;
+		const key = keyInput.value.trim() || 'ln-ashlar';
+		return { codec, shift, key };
+	}
+
+	if (btnEncode) {
+		btnEncode.addEventListener('click', function () {
+			if (!window.lnObfuscator || !window.lnObfuscator.obfuscate) return;
+			const opts = getCodecOptions();
+			const val = inputText.value;
+			outputText.value = window.lnObfuscator.obfuscate(val, opts);
+		});
+	}
+
+	if (btnInject) {
+		btnInject.addEventListener('click', function () {
+			if (!window.lnObfuscator || !window.lnObfuscator.obfuscate) return;
+			const opts = getCodecOptions();
+			const val = inputText.value || 'test@example.com';
+			const type = targetType.value;
+			const encText = window.lnObfuscator.obfuscate(val, opts);
+
+			let el;
+			if (type === 'email') {
+				el = document.createElement('a');
+				const encHref = window.lnObfuscator.obfuscate('mailto:' + val, opts);
+				el.setAttribute('href', encHref);
+				el.textContent = encText;
+			} else if (type === 'phone') {
+				el = document.createElement('a');
+				const encHref = window.lnObfuscator.obfuscate('tel:' + val, opts);
+				el.setAttribute('href', encHref);
+				el.textContent = encText;
+			} else if (type === 'span') {
+				el = document.createElement('span');
+				el.textContent = encText;
+			} else {
+				el = document.createElement('p');
+				el.textContent = encText;
+			}
+
+			el.setAttribute('data-ln-obfuscator', opts.codec === 'rot' && opts.shift !== 13 ? String(opts.shift) : '');
+			if (opts.codec !== 'rot') {
+				el.setAttribute('data-ln-obfuscator-codec', opts.codec);
+				if (opts.codec === 'xor') {
+					el.setAttribute('data-ln-obfuscator-key', opts.key);
+				}
+			}
+
+			sandbox.appendChild(el);
+			logEvent('Injected <' + el.tagName.toLowerCase() + '> with obfuscated payload: "' + encText + '"');
+		});
+	}
+
+	if (btnClear) {
+		btnClear.addEventListener('click', function () {
+			sandbox.innerHTML = '';
+		});
+	}
+});
+</script>
