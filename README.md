@@ -277,4 +277,9 @@ demo/admin/{component}.html ← Standalone interactive playground pages for JS c
 
 ## 📄 License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+**ln-ashlar** is dual-licensed:
+
+- **Open Source Projects:** Free to use under the **[GNU General Public License v3.0 (GPLv3)](LICENSE)**. Any project bundling or distributing ln-ashlar under this license must also make its source code available under GPLv3.
+- **Commercial / Closed-Source Projects:** A commercial license is required to use ln-ashlar in proprietary applications, SaaS platforms, or client products without GPLv3 copyleft obligations.
+
+For commercial licensing and enterprise support inquiries, please contact: [licensing@livenetworks.mk](mailto:licensing@livenetworks.mk) — see the [LICENSE](LICENSE) file for full details.
