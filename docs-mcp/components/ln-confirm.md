@@ -127,7 +127,7 @@ For compact layouts and table rows. Replaces the SVG icon path with `#ln-icon-ch
 page through `ln-ashlar-core.css`:
 
 ```scss
-[data-ln-confirm] [hidden]  { display: none; }   /* П4 hiding contract */
+[data-ln-confirm] [hidden]  { display: none; }   /* §4 hiding contract */
 [data-ln-confirm-announcer] { /* visually hidden */ }
 ```
 

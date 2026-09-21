@@ -18,7 +18,7 @@ tags: [crypto, security, encryption, service]
 
 The `ln-crypto` utility is a reusable client-side cryptographic service situated in the core utility layer. It provides a simplified wrapper around the browser's native **Web Crypto API** for secure data encryption and decryption. It is defined in [crypto.js](../../components/ln-core/crypto.js).
 
-*   **AES-GCM Encryption:** Uses Galois/Counter Mode (AES-GCM) симетрично шифрирање to provide high performance and integrity protection (authenticated encryption).
+*   **AES-GCM Encryption:** Uses Galois/Counter Mode (AES-GCM) symmetric encryption to provide high performance and integrity protection (authenticated encryption).
 *   **SHA-256 Key Derivation:** Hashes a user password or string secret to derive a secure 256-bit cryptographic key.
 *   **Randomized IVs:** Generates a new 12-byte initialization vector (IV) via `crypto.getRandomValues()` for every encryption operation, preventing pattern analysis attacks.
 *   **Memory Isolation:** Isolates the active cryptographic key inside a private module variable (`_cryptoKey`), preventing simple access via global browser console scope (`window`).

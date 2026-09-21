@@ -241,7 +241,7 @@ The reset sentinel checkbox acts as an automatic coordinator:
 
 ---
 
-## 6. Sequence Flow Diagram
+## 6. Flow Diagram & Lifecycle
 
 ```mermaid
 sequenceDiagram

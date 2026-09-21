@@ -213,7 +213,7 @@ goes straight to the connector. **Absence of a participant is a topology, not an
 
 ---
 
-## 6. Дијаграм на Текот и Животен Циклус
+## 6. Flow Diagram & Lifecycle
 
 ### A. View Query & Remote Sync Cycle (Read Flow)
 

@@ -121,7 +121,7 @@ The component is purely behavioral and requires no dedicated stylesheet. It oper
 
 ---
 
-## 6. Sequence & Lifecycle Flow
+## 6. Flow Diagram & Lifecycle
 
 ```mermaid
 sequenceDiagram
@@ -149,7 +149,7 @@ sequenceDiagram
 
 ---
 
-## 7. Related Components & Coordinators
+## 7. Related Components
 
 - [`ln-external-links.md`](./ln-external-links.md) — Global outbound link sanitizer that cooperates with deobfuscated URLs.
 - [`ln-link.md`](./ln-link.md) — Makes whole blocks or cards clickable.

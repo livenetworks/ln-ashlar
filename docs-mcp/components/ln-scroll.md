@@ -102,33 +102,39 @@ The component is purely behavioral. It does not dictate visual appearance or req
 
 ---
 
-## 6. Sequence & Lifecycle Flow
+## 6. Flow Diagram & Lifecycle
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant User as User
+    actor User as User
     participant Trigger as a / button [data-ln-scroll]
-    participant Target as Target Element (#apply)
-    participant Field as Form Field
+    participant Scroll as ln-scroll
+    participant Target as Target Element (#id)
 
-    User->>Trigger: Click
-    Trigger->>Trigger: Resolve target from data-ln-scroll or href
-    opt data-ln-scroll-set present
-        Trigger->>Field: Set value & dispatch input/change
-    end
-    Trigger->>Trigger: Dispatch ln-scroll:before-scroll (cancelable)
-    Trigger->>Target: scrollIntoView({ behavior: smooth })
-    Trigger->>Trigger: Dispatch ln-scroll:scrolled
-    opt Focus enabled
-        Trigger->>Target: Focus first interactive control (delay: 450ms)
+    User->>Trigger: Click (primary click, no modifiers)
+    Trigger->>Scroll: Intercept click event
+    Scroll->>Scroll: e.preventDefault()
+    Scroll->>Scroll: Emit cancelable "ln-scroll:before-scroll"
+    alt Canceled via e.preventDefault()
+        Scroll-->>User: Abort scroll operation
+    else Confirmed
+        opt Form population (data-ln-scroll-set)
+            Scroll->>Target: Query input controls & set values
+            Scroll->>Target: Dispatch synthetic "input" & "change" events
+        end
+        Scroll->>Target: el.scrollIntoView({ behavior: 'smooth' })
+        Scroll->>Scroll: Emit "ln-scroll:scrolled"
+        opt Accessible focus management
+            Scroll->>Target: focus({ preventScroll: true })
+        end
     end
 ```
 
 ---
 
-## 7. Related Components & Coordinators
+## 7. Related Components
 
-- [`ln-link.md`](./ln-link.md) — Makes whole blocks or cards clickable.
-- [`ln-nav.md`](./ln-nav.md) — Main site and sidebar navigation.
+- [`ln-link.md`](./ln-link.md) — Makes whole container elements clickable.
+- [`ln-nav.md`](./ln-nav.md) — Manages dynamic navigation state across links.
 - [`ln-form.md`](./ln-form.md) — Form prefilling and record mapping.
