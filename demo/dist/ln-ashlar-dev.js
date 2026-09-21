@@ -285,15 +285,15 @@ function lt(t, e) {
 function ot(t, e, n, a, r = {}) {
   const l = r.extraAttributes || [], o = r.onAttributeChange || null, i = r.onSubtreeChange || null, d = r.onInit || null, s = r.onAttrChange || null, c = r.effects || null, u = r.attributes || null, f = u ? Q(u) : c, y = u ? new Set(Object.keys(u)) : null, z = r.persist || null;
   function m(v) {
-    const h = v || document.body;
-    x(h, t, e, n), d && d(h);
+    const w = v || document.body;
+    x(w, t, e, n), d && d(w);
   }
   const C = [];
   if (t.indexOf("[") !== -1) {
     const v = /\[([\w-]+)/g;
-    let h;
-    for (; (h = v.exec(t)) !== null; )
-      C.push(h[1]);
+    let w;
+    for (; (w = v.exec(t)) !== null; )
+      C.push(w[1]);
   } else
     C.push(t);
   B({
@@ -436,10 +436,10 @@ function ft(t, e) {
   const a = t.getAttribute("data-ln-sort") || t.getAttribute("data-ln-search-for") || t.getAttribute("data-ln-search") || t.getAttribute("data-ln-filter") || t.id;
   return a ? e ? a + "-" + e : a : e || null;
 }
-function wt(t, e) {
+function ht(t, e) {
   return !e || e === "none" || t === null || t === void 0 ? null : String(t) + "." + e;
 }
-function ht(t) {
+function wt(t) {
   return !t || typeof t != "string" ? null : t.endsWith(".asc") ? { fieldOrColumn: t.slice(0, -4), direction: "asc" } : t.endsWith(".desc") ? { fieldOrColumn: t.slice(0, -5), direction: "desc" } : null;
 }
 function pt(t, e) {
@@ -458,7 +458,7 @@ function bt(t) {
   }).filter(Boolean) : [];
   return { key: n, values: r };
 }
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.hashParse = k, window.lnCore.hashGet = st, window.lnCore.hashSet = ct, window.lnCore.hashLinkClick = ut, window.lnCore.resolveHashNamespace = ft, window.lnCore.hashSortEncode = wt, window.lnCore.hashSortDecode = ht, window.lnCore.hashFilterEncode = pt, window.lnCore.hashFilterDecode = bt);
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.hashParse = k, window.lnCore.hashGet = st, window.lnCore.hashSet = ct, window.lnCore.hashLinkClick = ut, window.lnCore.resolveHashNamespace = ft, window.lnCore.hashSortEncode = ht, window.lnCore.hashSortDecode = wt, window.lnCore.hashFilterEncode = pt, window.lnCore.hashFilterDecode = bt);
 const E = /* @__PURE__ */ new Set([
   "data-ln-accordion",
   "data-ln-ajax",
@@ -631,6 +631,13 @@ const E = /* @__PURE__ */ new Set([
   "data-ln-route-target",
   "data-ln-route-title",
   "data-ln-router-hydrate",
+  "data-ln-scroll",
+  "data-ln-scroll-behavior",
+  "data-ln-scroll-block",
+  "data-ln-scroll-delay",
+  "data-ln-scroll-focus",
+  "data-ln-scroll-set",
+  "data-ln-scroll-update-hash",
   "data-ln-search",
   "data-ln-search-clear",
   "data-ln-search-clear-for",
@@ -924,24 +931,24 @@ function g(t = typeof document < "u" ? document : null, e = 50, n = null) {
 function I(t, e, n, a) {
   t === "event" ? (console.groupCollapsed("[ln-debug] event", e), console.log("target", n), console.log("detail", a), console.groupEnd()) : t === "attr" && (console.groupCollapsed("[ln-debug] attr", e), console.log("target", n), console.log("old → new", a.oldValue, "→", a.newValue), console.groupEnd());
 }
-let w = [];
+let h = [];
 function St() {
-  w = Array.from(document.body.querySelectorAll("[data-ln-debug]")), document.body.hasAttribute("data-ln-debug") && w.push(document.body);
+  h = Array.from(document.body.querySelectorAll("[data-ln-debug]")), document.body.hasAttribute("data-ln-debug") && h.push(document.body);
 }
 function _t(t) {
-  for (let e = 0; e < w.length; e++)
-    if (w[e].contains(t)) return !0;
+  for (let e = 0; e < h.length; e++)
+    if (h[e].contains(t)) return !0;
   return !1;
 }
 function xt(t, e, n, a) {
   if (n === window || n === document) {
-    w.indexOf(document.body) !== -1 && I(t, e, n, a);
+    h.indexOf(document.body) !== -1 && I(t, e, n, a);
     return;
   }
   _t(n) && I(t, e, n, a);
 }
 function _() {
-  St(), X(w.length > 0 ? xt : null);
+  St(), X(h.length > 0 ? xt : null);
 }
 function L() {
   _();

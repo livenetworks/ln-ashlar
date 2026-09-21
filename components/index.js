@@ -48,6 +48,7 @@ import './ln-upload/src/ln-upload.js';
 import './ln-obfuscator/src/ln-obfuscator.js';
 import './ln-external-links/src/ln-external-links.js';
 import './ln-link/src/ln-link.js';
+import './ln-scroll/src/ln-scroll.js';
 import './ln-key/src/ln-key.js';
 import './ln-progress/src/ln-progress.js';
 import './ln-filter/src/ln-filter.js';

@@ -2,7 +2,7 @@
 name: ln-obfuscator
 classification: simple
 status: stable
-domain: security
+domain: frontend
 summary: Autonomous component for anti-crawler obfuscation and deobfuscation of plain text, emails, telephone numbers, and links using reversible ROT, Base64, and XOR ciphers.
 source: components/ln-obfuscator/src/ln-obfuscator.js
 tags: [security, obfuscation, rot13, base64, xor, email-protection, spam-prevention, crawlers]

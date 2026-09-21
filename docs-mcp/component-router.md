@@ -70,6 +70,7 @@
 | Component | Use for | Don't use for |
 |---|---|---|
 | `ln-key` | Application keyboard shortcuts or grouped retrofit maps that activate/focus existing semantic targets | Replacing native button/link keyboard behavior; arbitrary command execution |
+| `ln-scroll` | Smooth anchor scrolling to targets (`href` or `data-ln-scroll`) with optional form presets | Full SPA page navigation → `ln-router` |
 
 ## Data Flow & AJAX
 

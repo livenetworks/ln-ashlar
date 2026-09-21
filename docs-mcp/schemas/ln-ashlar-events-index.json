@@ -1925,6 +1925,36 @@
 			"detail": "{ path: String }",
 			"source": "static"
 		},
+		"ln-scroll:before-scroll": {
+			"emitted_by": [
+				"ln-scroll"
+			],
+			"listened_by": [],
+			"cancelable": true,
+			"description": "Dispatched on link/button before scrolling begins. Calling `e.preventDefault()` halts scroll.",
+			"detail": "{ target: HTMLElement, link: HTMLElement, href: string }",
+			"source": "static"
+		},
+		"ln-scroll:destroyed": {
+			"emitted_by": [
+				"ln-scroll"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "Dispatched when `el.lnScroll.destroy()` is invoked.",
+			"detail": "{ target: HTMLElement }",
+			"source": "static"
+		},
+		"ln-scroll:scrolled": {
+			"emitted_by": [
+				"ln-scroll"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "Dispatched immediately after `scrollIntoView` is triggered.",
+			"detail": "{ target: HTMLElement, link: HTMLElement, href: string }",
+			"source": "static"
+		},
 		"ln-search:change": {
 			"emitted_by": [
 				"ln-search"
