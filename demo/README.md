@@ -13,6 +13,8 @@ This directory contains the codebase, assets, and templates for demonstrating th
     * **`scss/`** — Custom styling for the admin theme.
     * **`build-pages.mjs`** — Node.js script that merges page templates with the master shell.
   * **`dist/`** — Compiled assets (compiled CSS, JavaScript, and mock scripts).
+* **`landing/`** — Presentation & marketing demo (hero, bento grids, pricing, FAQ accordion, theme switchers).
+* **`corporate/`** — Corporate & enterprise demo (architectural photography, practice areas, leadership, and blog/insights section).
 * **`docuflow/`** — Spacing/layout demo representing document flow styles.
 * **`spa/`** — Single-page application integration demo.
 

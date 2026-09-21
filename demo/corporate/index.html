@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="dark" data-theme="ocean" data-skin="default">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Ashlar Global Partners — Strategic Advisory & Capital Markets</title>
+	
+	<!-- Modern Fonts -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,500;1,700&display=swap" rel="stylesheet">
+	
+	<!-- ln-ashlar Stylesheets -->
+	<link rel="stylesheet" href="../dist/ln-ashlar-landing.css">
+	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css">
+	<link rel="stylesheet" href="corporate.css">
+	
+	<!-- ln-ashlar JavaScript Bundle -->
+	<script src="../dist/ln-ashlar.iife.js" defer></script>
+</head>
+<body>
+
+	<!-- ================================================================== -->
+	<!-- 1. Corporate Navigation Masthead                                    -->
+	<!-- ================================================================== -->
+	<header class="corporate-nav">
+		<div class="corporate-container">
+			<div class="nav-inner">
+				<a href="#" class="brand">
+					<span class="brand-mark">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-sparkles"></use></svg>
+					</span>
+					<span class="brand-title">
+						Ashlar Global
+						<small>Partners &bull; Advisory</small>
+					</span>
+				</a>
+
+				<nav aria-label="Main Navigation">
+					<ul class="nav-links">
+						<li><a href="#about">Heritage</a></li>
+						<li><a href="#capabilities">Capabilities</a></li>
+						<li><a href="#presence">Global Presence</a></li>
+						<li><a href="#insights">Insights & Blog</a></li>
+						<li><a href="#leadership">Leadership</a></li>
+					</ul>
+				</nav>
+
+				<div class="nav-actions">
+					<!-- Mode Switcher (Dark / Light) -->
+					<button type="button" class="btn btn-ghost btn-sm" id="btn-toggle-mode" title="Toggle Light/Dark Mode" aria-label="Toggle Light/Dark Mode">
+						<svg class="ln-icon" id="mode-icon" aria-hidden="true"><use href="#ln-icon-moon"></use></svg>
+					</button>
+
+					<!-- Theme Preset Popover -->
+					<div>
+						<button type="button" class="btn btn-ghost btn-sm" id="theme-picker-trigger" data-ln-popover-for="corporate-theme-popover" aria-label="Appearance Presets">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-palette"></use></svg>
+							<span>Theme</span>
+						</button>
+						<div popover="manual" data-ln-popover id="corporate-theme-popover" class="landing-theme-popover">
+							<span class="picker-section-title">Corporate Themes</span>
+							<div class="picker-grid">
+								<button type="button" class="btn btn-ghost btn-sm" data-set-theme="ocean">Ocean Navy</button>
+								<button type="button" class="btn btn-ghost btn-sm" data-set-theme="midnight">Midnight</button>
+								<button type="button" class="btn btn-ghost btn-sm" data-set-theme="sunset">Sunset Gold</button>
+								<button type="button" class="btn btn-ghost btn-sm" data-set-theme="aurora">Aurora Green</button>
+							</div>
+							<span class="picker-section-title">Skins</span>
+							<div class="picker-grid">
+								<button type="button" class="btn btn-ghost btn-sm" data-set-skin="default">Default</button>
+								<button type="button" class="btn btn-ghost btn-sm" data-set-skin="outline">Architectural Outline</button>
+								<button type="button" class="btn btn-ghost btn-sm" data-set-skin="soft">Soft Surface</button>
+							</div>
+						</div>
+					</div>
+
+					<button type="button" class="btn btn-sm" data-ln-toggle-for="modal-advisory" data-ln-toggle-action="open">
+						Request Advisory
+					</button>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<main>
+		<!-- ============================================================== -->
+		<!-- 2. Photographic Editorial Hero                                  -->
+		<!-- ============================================================== -->
+		<section id="hero">
+			<div class="hero-backdrop" aria-hidden="true">
+				<img src="assets/hero.jpg" alt="Ashlar Global Headquarters architectural facade">
+			</div>
+
+			<div class="corporate-container">
+				<div class="hero-content">
+					<span class="hero-tag">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-shield-check"></use></svg>
+						Institutional Advisory &bull; Est. 1994
+					</span>
+					<h1>Strategic clarity for a complex global economy</h1>
+					<p class="hero-desc">
+						We advise multinational corporations, sovereign institutions, and investment leaders on transformational capital allocation, market expansion, and sustainable governance.
+					</p>
+					<div class="hero-actions">
+						<button type="button" class="btn btn-hero btn-glow" data-ln-toggle-for="modal-advisory" data-ln-toggle-action="open">
+							<span>Schedule Private Consultation</span>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-right"></use></svg>
+						</button>
+						<a href="#insights" class="btn btn-hero btn-outline">
+							<span>Read 2026 Executive Outlook</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 3. Heritage & Guiding Tenets Split                             -->
+		<!-- ============================================================== -->
+		<section id="about" class="corporate-section">
+			<div class="corporate-container">
+				<div class="about-grid">
+					<div class="about-photo">
+						<img src="assets/about.jpg" alt="Executive board conference room overlooking financial district">
+						<div class="photo-overlay-card">
+							<strong>Executive Committee Deliberations</strong>
+							<span>Convened quarterly across London, New York, and Zurich to review cross-border allocations.</span>
+						</div>
+					</div>
+
+					<div class="about-text">
+						<header class="corporate-header">
+							<span class="eyebrow">
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-building"></use></svg>
+								Firm Heritage & Philosophy
+							</span>
+							<h2>Enduring trust built across three decades of market volatility</h2>
+						</header>
+
+						<blockquote>
+							"True strategic counsel does not react to quarterly noise. It illuminates the macroeconomic structural shifts that define generations."
+						</blockquote>
+
+						<p>
+							Founded on the principle of unyielding fiduciary integrity, Ashlar Global Partners operates as an independent advisory firm without underwriting conflicts or proprietary balance-sheet obligations.
+						</p>
+
+						<ul class="pillars-list">
+							<li>
+								<strong>Fiduciary Independence</strong>
+								<span>Zero proprietary trading conflicts; advice aligned strictly with client longevity.</span>
+							</li>
+							<li>
+								<strong>Global Intelligence</strong>
+								<span>Active analytical presence in 28 principal financial and technological hubs.</span>
+							</li>
+							<li>
+								<strong>Quantitative Rigor</strong>
+								<span>Evidence-backed scenario models stress-tested against historical liquidity shocks.</span>
+							</li>
+							<li>
+								<strong>Sustainable Stewardship</strong>
+								<span>Long-range ESG and governance architectures built to withstand regulatory scrutiny.</span>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 4. Practice Areas & Advisory Capabilities                      -->
+		<!-- ============================================================== -->
+		<section id="capabilities" class="corporate-section corporate-section-alt">
+			<div class="corporate-container">
+				<header class="corporate-header text-center">
+					<span class="eyebrow">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layers"></use></svg>
+						Advisory Divisions
+					</span>
+					<h2>Comprehensive capabilities for enterprise leadership</h2>
+					<p>
+						Tailored advisory solutions engineered for high-stakes corporate transitions, cross-border restructuring, and technological modernization.
+					</p>
+				</header>
+
+				<ul class="capabilities-grid">
+					<li>
+						<div class="capability-icon">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-chart"></use></svg>
+						</div>
+						<h3>Strategic Capital & M&amp;A</h3>
+						<p>
+							Providing sovereign funds and Fortune 500 boards with discreet counsel on cross-border mergers, buyouts, and joint venture syndications.
+						</p>
+						<ul>
+							<li>Divestitures &amp; Carve-Outs</li>
+							<li>Cross-Border Sovereign Clearances</li>
+							<li>Fairness Opinion &amp; Valuation</li>
+						</ul>
+					</li>
+
+					<li>
+						<div class="capability-icon">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-cpu"></use></svg>
+						</div>
+						<h3>Enterprise AI &amp; Digital Modernization</h3>
+						<p>
+							Architecting scalable digital transformations, core data infrastructure overhauls, and enterprise intelligence integrations.
+						</p>
+						<ul>
+							<li>Data Architecture Strategy</li>
+							<li>Generative AI Governance</li>
+							<li>Cloud Sovereignty &amp; Security</li>
+						</ul>
+					</li>
+
+					<li>
+						<div class="capability-icon">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-box"></use></svg>
+						</div>
+						<h3>Sustainable Infrastructure &amp; ESG</h3>
+						<p>
+							Advising utility providers, transport consortia, and industrial leaders on renewable transitions and green bond underwriting frameworks.
+						</p>
+						<ul>
+							<li>Decarbonization Pathways</li>
+							<li>Scope 1–3 Compliance Audits</li>
+							<li>Green Capital Syndication</li>
+						</ul>
+					</li>
+
+					<li>
+						<div class="capability-icon">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-shield-check"></use></svg>
+						</div>
+						<h3>Governance, Risk &amp; Compliance</h3>
+						<p>
+							Designing resilient board governance structures, geopolitical risk mitigation matrices, and multi-jurisdictional compliance protocols.
+						</p>
+						<ul>
+							<li>Board Succession Planning</li>
+							<li>Sanctions &amp; Trade Controls</li>
+							<li>Crisis Management Frameworks</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 5. Enterprise Metrics & Global Footprint                       -->
+		<!-- ============================================================== -->
+		<section id="presence" class="corporate-section">
+			<div class="corporate-container">
+				<header class="corporate-header text-center">
+					<span class="eyebrow">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-globe"></use></svg>
+						Global Reach
+					</span>
+					<h2>Scale, permanence, and measurable impact</h2>
+					<p>
+						Our advisory teams deploy across primary financial centers to support complex cross-border transactions in real time.
+					</p>
+				</header>
+
+				<ul class="metrics-row">
+					<li>
+						<strong data-ln-number="48.5">$48.5B</strong>
+						<span>Cumulative Advised Capital</span>
+						<p>Completed transactions across energy, technology, and manufacturing.</p>
+					</li>
+					<li>
+						<strong data-ln-number="28">28</strong>
+						<span>Global Office Hubs</span>
+						<p>Fully staffed advisory presences spanning Europe, Americas, and APAC.</p>
+					</li>
+					<li>
+						<strong data-ln-number="99.2">99.2%</strong>
+						<span>Client Mandate Retention</span>
+						<p>Over 80% of current advisory engagements represent repeat mandates.</p>
+					</li>
+					<li>
+						<strong data-ln-number="32">32+</strong>
+						<span>Years Operational Track Record</span>
+						<p>Continuous executive guidance through four major macroeconomic cycles.</p>
+					</li>
+				</ul>
+
+				<div class="offices-bar">
+					<span class="label">Principal Advisory Hubs:</span>
+					<ul>
+						<li>London</li>
+						<li>New York</li>
+						<li>Zurich</li>
+						<li>Singapore</li>
+						<li>Tokyo</li>
+						<li>Frankfurt</li>
+						<li>Dubai</li>
+						<li>Hong Kong</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 6. Featured Insights & Blog Section (Core User Requirement)    -->
+		<!-- ============================================================== -->
+		<section id="insights" class="corporate-section corporate-section-alt">
+			<div class="corporate-container">
+				<header class="corporate-header text-center">
+					<span class="eyebrow">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-book"></use></svg>
+						Thought Leadership &bull; Research &bull; Blog
+					</span>
+					<h2>Executive perspectives on global market frontiers</h2>
+					<p>
+						Deep-dive intelligence, proprietary quarterly dispatches, and macroeconomic analysis authored by Ashlar Global senior partners.
+					</p>
+				</header>
+
+				<!-- Category Filter Tabs -->
+				<nav class="insights-filter" aria-label="Article Categories">
+					<button type="button" class="active" aria-pressed="true">All Dispatches</button>
+					<button type="button" aria-pressed="false">Global Strategy</button>
+					<button type="button" aria-pressed="false">Enterprise Tech &amp; AI</button>
+					<button type="button" aria-pressed="false">Sustainable Capital</button>
+					<button type="button" aria-pressed="false">Corporate Governance</button>
+				</nav>
+
+				<!-- Lead Editorial Story (Hero Post) -->
+				<div class="featured-article">
+					<article>
+						<div class="article-cover">
+							<img src="assets/blog-market.jpg" alt="Financial district skyline reflecting on water at dawn">
+							<span class="category-pill">Global Strategy &bull; Cover Story</span>
+						</div>
+
+						<div class="article-body">
+							<div class="meta-row">
+								<time datetime="2026-09-18" data-ln-date="long">September 18, 2026</time>
+								<span class="separator" aria-hidden="true">&bull;</span>
+								<span class="read-time">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-clock"></use></svg>
+									8 min read
+								</span>
+							</div>
+
+							<h3>
+								<a href="#">The Reconfiguration of Sovereign Reserves: Navigating Multi-Polar Liquidity and Trade Currencies</a>
+							</h3>
+
+							<p>
+								As central banking institutions diversify balance sheet holdings beyond traditional single-currency baskets, multinational CFOs must recalculate treasury hedging, sovereign risk exposure, and bilateral settlement mechanisms.
+							</p>
+
+							<div class="author-row">
+								<img src="assets/exec-ceo.jpg" alt="Jonathan Vance">
+								<div class="author-details">
+									<cite>Jonathan Vance</cite>
+									<span>Senior Managing Partner &amp; Chief Executive</span>
+								</div>
+							</div>
+						</div>
+					</article>
+				</div>
+
+				<!-- Article Grid (Subsequent In-depth Dispatches) -->
+				<ul class="articles-grid">
+					<!-- Article 1: Enterprise AI -->
+					<li>
+						<article>
+							<div class="card-cover">
+								<img src="assets/blog-tech.jpg" alt="Modern enterprise data center and automated intelligence laboratory">
+								<span class="badge-category">Technology &amp; AI</span>
+							</div>
+							<div class="card-body">
+								<div class="card-meta">
+									<time datetime="2026-09-12" data-ln-date="medium">Sep 12, 2026</time>
+									<span aria-hidden="true">&bull;</span>
+									<span>6 min read</span>
+								</div>
+								<h3>
+									<a href="#">Governing Autonomous Enterprise Intelligence: Fiduciary Oversight in Algorithmic Decisioning</a>
+								</h3>
+								<p>
+									Why enterprise boards must establish sovereign audit gates for generative systems before integrating neural agents into automated supply chains.
+								</p>
+								<footer>
+									<span class="author-credit">Dr. Claire Montclair</span>
+									<a href="#" class="read-link">
+										<span>Read Dispatch</span>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-right"></use></svg>
+									</a>
+								</footer>
+							</div>
+						</article>
+					</li>
+
+					<!-- Article 2: Sustainability & Infrastructure -->
+					<li>
+						<article>
+							<div class="card-cover">
+								<img src="assets/blog-sustainability.jpg" alt="Biophilic sustainable corporate skyscraper with vertical vegetation and solar arrays">
+								<span class="badge-category">Sustainable Capital</span>
+							</div>
+							<div class="card-body">
+								<div class="card-meta">
+									<time datetime="2026-09-04" data-ln-date="medium">Sep 4, 2026</time>
+									<span aria-hidden="true">&bull;</span>
+									<span>5 min read</span>
+								</div>
+								<h3>
+									<a href="#">Accelerating Industrial Decarbonization: Capex Frameworks for Net-Zero Brownfield Upgrades</a>
+								</h3>
+								<p>
+									Structuring transitional debt instruments that satisfy strict European Taxonomy mandates while protecting operational EBITDA margins.
+								</p>
+								<footer>
+									<span class="author-credit">David Sterling</span>
+									<a href="#" class="read-link">
+										<span>Read Dispatch</span>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-right"></use></svg>
+									</a>
+								</footer>
+							</div>
+						</article>
+					</li>
+
+					<!-- Article 3: Heritage & Governance -->
+					<li>
+						<article>
+							<div class="card-cover">
+								<img src="assets/about.jpg" alt="Executive board conference table during strategic briefing">
+								<span class="badge-category">Corporate Governance</span>
+							</div>
+							<div class="card-body">
+								<div class="card-meta">
+									<time datetime="2026-08-28" data-ln-date="medium">Aug 28, 2026</time>
+									<span aria-hidden="true">&bull;</span>
+									<span>7 min read</span>
+								</div>
+								<h3>
+									<a href="#">The Modern Boardroom Under Scrutiny: Shareholder Activism in an Age of Regulatory Transparency</a>
+								</h3>
+								<p>
+									Strategic defenses against opportunistic activist campaigns: proactive stakeholder engagement and transparent capital return disclosures.
+								</p>
+								<footer>
+									<span class="author-credit">Jonathan Vance</span>
+									<a href="#" class="read-link">
+										<span>Read Dispatch</span>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-right"></use></svg>
+									</a>
+								</footer>
+							</div>
+						</article>
+					</li>
+				</ul>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 7. Executive Leadership & Governance                           -->
+		<!-- ============================================================== -->
+		<section id="leadership" class="corporate-section">
+			<div class="corporate-container">
+				<header class="corporate-header text-center">
+					<span class="eyebrow">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-users"></use></svg>
+						Executive Governance
+					</span>
+					<h2>Senior leadership guided by seasoned stewardship</h2>
+					<p>
+						Our managing partners average over 25 years of senior executive experience in multilateral finance, technology, and sovereign advisory.
+					</p>
+				</header>
+
+				<ul class="leadership-grid">
+					<li>
+						<div class="leader-photo">
+							<img src="assets/exec-ceo.jpg" alt="Jonathan Vance, Senior Managing Partner & CEO">
+						</div>
+						<div class="leader-info">
+							<h3>Jonathan Vance</h3>
+							<span class="role">Senior Managing Partner &amp; CEO</span>
+							<p>
+								Oversees global operations and cross-border advisory mandates. Formerly Vice Chair of Global Financial Allocations at Bank of Zurich; advisor to G20 treasury delegations.
+							</p>
+							<div class="credentials">
+								<span>MBA Harvard</span>
+								<span>FCA Fellow</span>
+								<span>28 yrs Exp</span>
+							</div>
+						</div>
+					</li>
+
+					<li>
+						<div class="leader-photo">
+							<img src="assets/exec-partner.jpg" alt="Dr. Claire Montclair, Managing Partner & Global Head of Strategy">
+						</div>
+						<div class="leader-info">
+							<h3>Dr. Claire Montclair</h3>
+							<span class="role">Managing Partner &amp; Head of Strategy</span>
+							<p>
+								Leads the firm's global intelligence institute and digital infrastructure practice. Renowned authority on macroeconomic risk modeling and algorithmic governance.
+							</p>
+							<div class="credentials">
+								<span>D.Phil Oxford</span>
+								<span>World Economic Forum Fellow</span>
+								<span>24 yrs Exp</span>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</section>
+
+		<!-- ============================================================== -->
+		<!-- 8. Executive Consultation Callout                              -->
+		<!-- ============================================================== -->
+		<section id="advisory-cta" class="corporate-section">
+			<div class="corporate-container">
+				<div class="cta-card">
+					<div class="cta-copy">
+						<h2>Commence an executive advisory dialogue</h2>
+						<p>
+							Schedule a confidential preliminary briefing with our senior leadership team to explore strategic capital allocations, restructuring, or governance.
+						</p>
+					</div>
+					<div>
+						<button type="button" class="btn btn-hero btn-glow" data-ln-toggle-for="modal-advisory" data-ln-toggle-action="open">
+							<span>Request Private Briefing</span>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-right"></use></svg>
+						</button>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<!-- ================================================================== -->
+	<!-- 9. Comprehensive Corporate Footer                                  -->
+	<!-- ================================================================== -->
+	<footer class="corporate-footer">
+		<div class="corporate-container">
+			<div class="footer-top">
+				<div class="footer-brand">
+					<a href="#" class="brand">
+						<span class="brand-mark">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-sparkles"></use></svg>
+						</span>
+						<span class="brand-title">
+							Ashlar Global
+							<small>Partners &bull; Advisory</small>
+						</span>
+					</a>
+					<p>
+						Independent strategic counsel, capital allocation advisory, and governance architectures for international enterprises and sovereign bodies.
+					</p>
+				</div>
+
+				<div class="footer-col">
+					<h4>Advisory Practices</h4>
+					<ul>
+						<li><a href="#capabilities">Strategic Capital &amp; M&amp;A</a></li>
+						<li><a href="#capabilities">Enterprise AI &amp; Tech</a></li>
+						<li><a href="#capabilities">Sustainable Infrastructure</a></li>
+						<li><a href="#capabilities">Governance &amp; Risk</a></li>
+						<li><a href="#presence">Global Office Footprint</a></li>
+					</ul>
+				</div>
+
+				<div class="footer-col">
+					<h4>Insights &amp; Research</h4>
+					<ul>
+						<li><a href="#insights">Executive Dispatches (Blog)</a></li>
+						<li><a href="#insights">Quarterly Macroeconomic Outlook</a></li>
+						<li><a href="#insights">Sovereign Reserves Report</a></li>
+						<li><a href="#insights">AI Governance Whitepaper</a></li>
+						<li><a href="#leadership">Senior Leadership Profiles</a></li>
+					</ul>
+				</div>
+
+				<div class="footer-col">
+					<h4>Global Headquarters</h4>
+					<ul>
+						<li>
+							<address>
+								<strong>London (HQ)</strong><br>
+								One Canada Square, Canary Wharf<br>
+								London E14 5AA, United Kingdom
+							</address>
+						</li>
+						<li>
+							<address>
+								<strong>New York</strong><br>
+								30 Hudson Yards, 64th Floor<br>
+								New York, NY 10001, USA
+							</address>
+						</li>
+						<li>
+							<address>
+								<strong>Zurich</strong><br>
+								Bahnhofstrasse 45<br>
+								8001 Zürich, Switzerland
+							</address>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="footer-bottom">
+				<div class="disclaimer">
+					&copy; 2026 Ashlar Global Partners LLP. All rights reserved. Ashlar Global Partners LLP is authorized and regulated by the Financial Conduct Authority (FCA Ref: 789214) in the UK, registered with the Securities and Exchange Commission (SEC) in the United States, and compliant with Swiss FINMA regulatory standards. Material presented herein is for informational purposes only. Built with <code>ln-ashlar</code>.
+				</div>
+				<nav aria-label="Legal Disclosures">
+					<a href="#">Regulatory Disclosures</a>
+					<a href="#">Privacy Policy</a>
+					<a href="#">Terms of Engagement</a>
+					<a href="#">FCA Pillar 3</a>
+				</nav>
+			</div>
+		</div>
+	</footer>
+
+	<!-- ================================================================== -->
+	<!-- 10. Interactive Advisory Request Modal Dialog                      -->
+	<!-- ================================================================== -->
+	<dialog id="modal-advisory" data-ln-modal class="modal">
+		<div class="modal-box">
+			<header class="modal-header">
+				<div class="modal-title">
+					<h3>Request Confidential Executive Briefing</h3>
+					<small>Directly with an Ashlar Global Senior Managing Partner</small>
+				</div>
+				<button type="button" class="btn btn-ghost btn-sm" data-ln-toggle-for="modal-advisory" data-ln-toggle-action="close" aria-label="Close dialog">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-close"></use></svg>
+				</button>
+			</header>
+
+			<div class="modal-body">
+				<form id="form-advisory" data-ln-form>
+					<fieldset>
+						<legend>Entity &amp; Executive Credentials</legend>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="adv-name">Executive Name</label>
+								<input type="text" id="adv-name" name="name" placeholder="e.g. Eleanor Vance" required>
+							</div>
+							<div class="form-group">
+								<label for="adv-title">Title / Role</label>
+								<input type="text" id="adv-title" name="title" placeholder="e.g. Chief Financial Officer" required>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="adv-org">Institution / Organization</label>
+								<input type="text" id="adv-org" name="organization" placeholder="e.g. Sovereign Wealth Corp" required>
+							</div>
+							<div class="form-group">
+								<label for="adv-email">Corporate Email</label>
+								<input type="email" id="adv-email" name="email" placeholder="e.vance@institution.com" required>
+							</div>
+						</div>
+					</fieldset>
+
+					<fieldset>
+						<legend>Mandate Scope</legend>
+						<div class="form-group">
+							<label for="adv-practice">Practice Area of Inquiry</label>
+							<select id="adv-practice" name="practice" required>
+								<option value="">Select primary advisory division...</option>
+								<option value="ma">Strategic Capital &amp; Cross-Border M&amp;A</option>
+								<option value="tech">Enterprise AI &amp; Digital Modernization</option>
+								<option value="esg">Sustainable Infrastructure &amp; Green Capital</option>
+								<option value="gov">Governance, Risk &amp; Compliance</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="adv-notes">Brief Overview of Inquiry</label>
+							<textarea id="adv-notes" name="notes" rows="3" placeholder="Discreet overview of transaction scope, timeline, and confidentiality requirements..."></textarea>
+						</div>
+					</fieldset>
+
+					<footer class="modal-footer">
+						<button type="button" class="btn btn-ghost" data-ln-toggle-for="modal-advisory" data-ln-toggle-action="close">
+							Cancel
+						</button>
+						<button type="submit" class="btn btn-hero btn-glow">
+							<span>Transmit Inquiry Under NDA</span>
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-right"></use></svg>
+						</button>
+					</footer>
+				</form>
+			</div>
+		</div>
+	</dialog>
+
+	<!-- Live Appearance Switcher Script -->
+	<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const root = document.documentElement;
+
+		// 1. Mode Toggle (Dark / Light)
+		const btnToggleMode = document.getElementById('btn-toggle-mode');
+		const modeIconUse = document.querySelector('#mode-icon use');
+
+		function updateModeIcon(mode) {
+			if (modeIconUse) {
+				modeIconUse.setAttribute('href', mode === 'dark' ? '#ln-icon-sun' : '#ln-icon-moon');
+			}
+		}
+
+		if (btnToggleMode) {
+			btnToggleMode.addEventListener('click', () => {
+				const current = root.getAttribute('data-mode') || 'dark';
+				const next = current === 'dark' ? 'light' : 'dark';
+				root.setAttribute('data-mode', next);
+				updateModeIcon(next);
+			});
+		}
+
+		// 2. Theme Presets
+		document.querySelectorAll('[data-set-theme]').forEach(btn => {
+			btn.addEventListener('click', () => {
+				const theme = btn.getAttribute('data-set-theme');
+				root.setAttribute('data-theme', theme);
+				const popover = document.getElementById('corporate-theme-popover');
+				if (popover && popover.lnPopover) popover.lnPopover.close();
+			});
+		});
+
+		// 3. Skin Presets
+		document.querySelectorAll('[data-set-skin]').forEach(btn => {
+			btn.addEventListener('click', () => {
+				const skin = btn.getAttribute('data-set-skin');
+				root.setAttribute('data-skin', skin);
+				const popover = document.getElementById('corporate-theme-popover');
+				if (popover && popover.lnPopover) popover.lnPopover.close();
+			});
+		});
+
+		// 4. Category Filter Buttons Interaction
+		const filterButtons = document.querySelectorAll('.insights-filter button');
+		filterButtons.forEach(btn => {
+			btn.addEventListener('click', () => {
+				filterButtons.forEach(b => {
+					b.classList.remove('active');
+					b.setAttribute('aria-pressed', 'false');
+				});
+				btn.classList.add('active');
+				btn.setAttribute('aria-pressed', 'true');
+			});
+		});
+	});
+	</script>
+</body>
+</html>

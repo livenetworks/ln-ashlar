@@ -1,5 +1,13 @@
 @use '../theme/config/mixins' as *;
 
+html,
+body {
+	height: auto;
+	min-height: 100%;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
 body {
 	background-color: var(--bg-recessed);
 	color: var(--fg-default);
@@ -7,6 +15,7 @@ body {
 	margin: 0;
 	@include flex-center;
 	@include min-h-screen;
+	padding-block: 2.5rem;
 }
 
 .container {
