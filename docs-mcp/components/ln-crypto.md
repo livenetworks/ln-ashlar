@@ -62,10 +62,13 @@ async function performSecureOperation() {
 
 | Helper | Signature | Returns | Description |
 |---|---|---|---|
-| `setCryptoKey` | `(secretString: String)` | `Promise<void>` | Derives a 256-bit AES-GCM key using SHA-256. Passing an empty/falsy value clears the current key in memory. |
+| `setCryptoKey` | `(secretString: String, options?: Object)` | `Promise<void>` | Derives a 256-bit AES-GCM key using SHA-256 (default) or PBKDF2 (`options.method: 'pbkdf2'`). Passing empty/falsy clears the key. |
 | `getCryptoKey` | `()` | `CryptoKey` \| `null` | Returns the currently active `CryptoKey` instance or `null`. |
-| `encryptData` | `(plainData: any, key?: CryptoKey)` | `Promise<Object>` \| `Promise<any>` | Encrypts serialized JSON/string data. Returns `{ encrypted: true, iv: Base64, data: Base64 }`. Returns original data unaltered if key is missing or encryption fails. |
-| `decryptData` | `(encryptedObject: Object, key?: CryptoKey)` | `Promise<any>` | Decrypts an encrypted object back to its original JSON structure or string. Returns `{ ...encryptedObject, decryptionError: true }` if key is wrong or decryption fails. |
+| `clearCryptoKey`| `()` | `void` | Clears the active key from memory. |
+| `hasCryptoKey` | `()` | `Boolean` | Returns whether an active cryptographic key is loaded. |
+| `deriveCryptoKey` | `(secretString: String, options?: Object)` | `Promise<CryptoKey>` | Standalone key derivation using PBKDF2 (100k iterations, SHA-256) or SHA-256. |
+| `encryptData` | `(plainData: any, keyOrOptions?: CryptoKey\|Object)` | `Promise<Object>` | Encrypts serialized data. Returns versioned envelope `{ v: 1, alg: 'AES-GCM', encrypted: true, iv: Base64, data: Base64 }`. Throws `Error` on missing key or failure (Fail-Closed). |
+| `decryptData` | `(encryptedObject: Object, keyOrOptions?: CryptoKey\|Object)` | `Promise<any>` | Decrypts v1 and legacy v0 envelopes. Throws `Error` on failure, or returns `{ ...encryptedObject, decryptionError: true }` if `{ silent: true }` is specified. |
 
 ---
 

@@ -148,7 +148,7 @@ Tracked decisions regarding formalization, correctness, and framework guarantees
 | Feature / Initiative | Scope & Description | Status | Decision Rationale |
 |---|---|---|---|
 | **`ln-debug` Contract Verifier & Dev Warnings** | Intelligent dev-mode checks (missing data sources, wrong attribute spelling, missing templates). Zero prod overhead. | ✅ **Complete** | Generic reference resolvers (`*-for`, `*-source`, `*-store`), manifest typo checker, lifecycle queueBoot timing. |
-| **Crypto & Security Hardening** | Fail-closed (`throw` on failure), PBKDF2 with salt, versioned AES-GCM payloads in `ln-core/crypto.js`. | ⏳ **Deferred (Later Phase)** | Голем зафат, се остава за крајна фаза на безбедносно заокружување. |
+| **Crypto & Security Hardening** | Fail-closed (`throw` on failure), PBKDF2 with salt, versioned AES-GCM payloads in `ln-core/crypto.js`. | ✅ **Complete** | Имплементирани fail-closed семантики, PBKDF2 со детерминистичка сол, v1 верзиониран envelope, стек-безбеден Base64 и 100% тест покриеност. |
 | **Async Lifecycle & AbortController** | Standardized `AbortController` and `_destroyed` guards across async components (`ln-upload`, `ln-autosave`, etc.). | ⏸️ **On Hold** | Се одложува за следна фаза. |
 | **Component Conformance Suite** | Generic multi-invariant test runner (mount/destroy/reattach/leak tests) across all 50 components. | ⏸️ **On Hold** | Не е критично во моментов; ќе се разгледа понатаму. |
 | **Data Coordinator Refactor & Query Planner** | Splitting coordinator into 6 sub-modules + building SQL-style query planner for `ln-data-store`. | ❌ **Rejected (Over-engineering)** | Оценето како непотребно усложнување и наметнување туѓа архитектура надвор од DOM-first филозофијата. |

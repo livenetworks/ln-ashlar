@@ -148,7 +148,7 @@ This service module exposes no declarative HTML attributes directly on itself.
 - [`ln-persist`](./ln-persist.md) — `persistGet`, `persistSet`, `persistRemove`, `persistClear`
 - [`ln-hash`](./ln-hash.md) — `hashParse`, `hashGet`, `hashSet`, `hashLinkClick`, `hashSortEncode`, `hashSortDecode`, `hashFilterEncode`, `hashFilterDecode`, `resolveHashNamespace`
 - [`positioning`](./positioning.md) — `computePlacement`, `measureHidden`
-- [`ln-crypto`](./ln-crypto.md) — `setCryptoKey`, `getCryptoKey`, `encryptData`, `decryptData`
+- [`ln-crypto`](./ln-crypto.md) — `setCryptoKey`, `getCryptoKey`, `clearCryptoKey`, `hasCryptoKey`, `deriveCryptoKey`, `encryptData`, `decryptData`
 - **`attrs.js`** — `attrStr`, `attrInt`, `attrBool`, `attrList`, `defineAttrs`
 - **`date.js`** — `parseDateInput`, `formatDateToISO`
 - **`number.js`** — `getSeparators`, `cleanNumericString`, `parseNumber`, `formatNumber`

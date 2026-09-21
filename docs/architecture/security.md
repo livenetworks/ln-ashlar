@@ -39,21 +39,29 @@ This document outlines the security architecture, threat model mitigations, and 
 ### Core Cryptographic Helpers
 These functions are defined in `components/ln-core/crypto.js` and re-exported under `window.lnCore`:
 
-* **`setCryptoKey(secretString)`**:
-  Derives a cryptographically strong 256-bit key from a user-supplied passphrase or server-provided session token using a `SHA-256` digest, then imports it as an active `AES-GCM` key.
+* **`setCryptoKey(secretString, options = {})`**:
+  Derives a 256-bit AES-GCM key from a passphrase or session token using `SHA-256` (default, backward-compatible) or `PBKDF2` (`options.method: 'pbkdf2'`, 100,000 iterations, with deterministic salt). Passing a falsy value clears the key.
 * **`getCryptoKey()`**:
-  Returns the active derived `CryptoKey` object.
-* **`encryptData(plainData)`**:
-  Encrypts arbitrary data (objects are auto-serialized to JSON) using **AES-GCM 256-bit** encryption with a unique, cryptographically random 12-byte Initialization Vector (IV) generated per record. Returns a flat object:
+  Returns the active derived `CryptoKey` object or `null`.
+* **`clearCryptoKey()`**:
+  Clears the active key from memory.
+* **`hasCryptoKey()`**:
+  Returns boolean indicating if an active key is loaded.
+* **`deriveCryptoKey(passphrase, options = {})`**:
+  Standalone helper deriving an AES-GCM `CryptoKey` using PBKDF2 (100k iterations) or SHA-256.
+* **`encryptData(plainData, keyOrOptions)`**:
+  Encrypts arbitrary data (objects auto-serialized to JSON) using **AES-GCM 256-bit** with a unique 12-byte IV. Enforces **Fail-Closed** semantics (throws an `Error` if key is missing or encryption fails). Returns a versioned envelope:
   ```json
   {
+    "v": 1,
+    "alg": "AES-GCM",
     "encrypted": true,
     "iv": "base64-string...",
     "data": "base64-ciphertext..."
   }
   ```
-* **`decryptData(encryptedObject)`**:
-  Decrypts an encrypted payload using the active key and IV, automatically re-parsing the output to a JSON object if applicable.
+* **`decryptData(encryptedObject, keyOrOptions)`**:
+  Decrypts an encrypted payload using AES-GCM. Supports both v1 envelopes and legacy unversioned envelopes. Enforces **Fail-Closed** semantics (throws on missing key or tampered ciphertext). Accepts `{ silent: true }` option for resilient bulk store reads (returns `{ ...encryptedObject, decryptionError: true }` without throwing).
 
 ---
 

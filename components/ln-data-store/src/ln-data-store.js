@@ -159,16 +159,14 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 		if (!encryptedPayload || !encryptedPayload.encrypted) return record;
 
 		return {
-			id: recordId,
-			encrypted: true,
-			iv: encryptedPayload.iv,
-			data: encryptedPayload.data
+			...encryptedPayload,
+			id: recordId
 		};
 	}
 
 	async function _decryptRecord(record) {
 		if (!record || !record.encrypted || !getCryptoKey()) return record;
-		return decryptData(record);
+		return decryptData(record, { silent: true });
 	}
 
 	// ─── IndexedDB CRUD Helpers ────────────────────────────

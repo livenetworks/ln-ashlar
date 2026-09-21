@@ -3,7 +3,7 @@ export { reactiveState, deepReactive, createBatcher } from './reactive.js';
 export { createWindowCache } from './window-cache.js';
 export { hashParse, hashGet, hashSet, hashLinkClick, resolveHashNamespace, hashSortEncode, hashSortDecode, hashFilterEncode, hashFilterDecode } from './hash.js';
 export { computePlacement, measureHidden } from './positioning.js';
-export { setCryptoKey, getCryptoKey, encryptData, decryptData } from './crypto.js';
+export { setCryptoKey, getCryptoKey, clearCryptoKey, hasCryptoKey, deriveCryptoKey, encryptData, decryptData, uint8ToBase64, base64ToUint8 } from './crypto.js';
 export { calculateProgress } from './progress.js';
 export { parseDateInput, formatDateToISO } from './date.js';
 export { getSeparators, cleanNumericString, parseNumber, formatNumber } from './number.js';
