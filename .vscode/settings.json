@@ -1,1 +1,5 @@
-{}
+{
+	"html.customData": [
+		"./ln-ashlar.html-data.json"
+	]
+}

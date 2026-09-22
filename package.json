@@ -24,10 +24,14 @@
   ],
   "main": "./dist/ln-ashlar.js",
   "style": "./dist/ln-ashlar.css",
+  "web-types": "./web-types.json",
   "files": [
     "dist/",
     "theme/",
-    "components/"
+    "components/",
+    "ln-ashlar.html-data.json",
+    "web-types.json",
+    "ln-ashlar.xsd"
   ],
   "exports": {
     ".": {

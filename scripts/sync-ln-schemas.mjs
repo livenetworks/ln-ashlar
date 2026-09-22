@@ -517,6 +517,231 @@ function serializeSchema(compName, newAttrs, existingObj = null) {
 	return JSON.stringify(result, null, '\t') + '\n';
 }
 
+function escapeXml(str) {
+	return String(str || '')
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&apos;');
+}
+
+/**
+ * Генерира VS Code / W3C HTML Custom Data формат (ln-ashlar.html-data.json).
+ * @param {Map<string, object>} globalAttrMetadata
+ * @returns {string}
+ */
+export function generateHtmlCustomData(globalAttrMetadata) {
+	const sortedNames = [...globalAttrMetadata.keys()].sort();
+	const globalAttributes = [];
+
+	for (const name of sortedNames) {
+		const meta = globalAttrMetadata.get(name);
+		let desc = '';
+		if (meta.descriptions && meta.descriptions.size > 0) {
+			const descs = [];
+			for (const [, d] of meta.descriptions) {
+				if (!descs.includes(d)) descs.push(d);
+			}
+			desc = descs.join(' ');
+		}
+		if (!desc) desc = `${name} attribute`;
+
+		const entry = {
+			name,
+			description: desc
+		};
+
+		if (meta.type === 'marker') {
+			entry.valueSet = 'v';
+		} else if (meta.type === 'boolean') {
+			entry.valueSet = 'b';
+		} else if (meta.type === 'enum' && meta.values && meta.values.size > 0) {
+			const sortedValues = [...meta.values].sort();
+			entry.values = sortedValues.map((v) => ({ name: v }));
+		}
+		globalAttributes.push(entry);
+	}
+
+	const data = {
+		version: 1.1,
+		globalAttributes
+	};
+
+	return JSON.stringify(data, null, '\t') + '\n';
+}
+
+/**
+ * Генерира JetBrains Web-Types формат (web-types.json) за PhpStorm/WebStorm.
+ * @param {Map<string, object>} globalAttrMetadata
+ * @param {string} version
+ * @returns {string}
+ */
+export function generateWebTypes(globalAttrMetadata, version = '1.7.0') {
+	const sortedNames = [...globalAttrMetadata.keys()].sort();
+	const attributes = [];
+
+	for (const name of sortedNames) {
+		const meta = globalAttrMetadata.get(name);
+		let desc = '';
+		if (meta.descriptions && meta.descriptions.size > 0) {
+			const descs = [];
+			for (const [, d] of meta.descriptions) {
+				if (!descs.includes(d)) descs.push(d);
+			}
+			desc = descs.join(' ');
+		}
+		if (!desc) desc = `${name} attribute`;
+
+		const entry = {
+			name,
+			description: desc
+		};
+
+		switch (meta.type) {
+			case 'marker':
+			case 'boolean':
+				entry.value = { type: 'boolean' };
+				break;
+			case 'integer':
+			case 'float':
+				entry.value = { type: 'number' };
+				break;
+			case 'enum':
+				if (meta.values && meta.values.size > 0) {
+					entry.value = {
+						type: 'enum',
+						items: [...meta.values].sort()
+					};
+				} else {
+					entry.value = { type: 'string' };
+				}
+				break;
+			case 'list':
+				entry.value = { type: 'string[]' };
+				break;
+			case 'json':
+				entry.value = { type: 'JSON' };
+				break;
+			case 'trigger':
+			case 'string':
+			default:
+				entry.value = { type: 'string' };
+				break;
+		}
+
+		attributes.push(entry);
+	}
+
+	const data = {
+		$schema: 'https://json.schemastore.org/web-types',
+		name: '@livenetworks/ashlar',
+		version,
+		framework: 'html',
+		contributions: {
+			html: {
+				attributes
+			}
+		}
+	};
+
+	return JSON.stringify(data, null, '\t') + '\n';
+}
+
+/**
+ * Генерира W3C XML Schema Definition (ln-ashlar.xsd).
+ * @param {Map<string, object>} globalAttrMetadata
+ * @returns {string}
+ */
+export function generateXmlSchema(globalAttrMetadata) {
+	const sortedNames = [...globalAttrMetadata.keys()].sort();
+	const lines = [];
+
+	lines.push('<?xml version="1.0" encoding="UTF-8"?>');
+	lines.push('<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"');
+	lines.push('\ttargetNamespace="https://livenetworks.mk/schema/ln-ashlar"');
+	lines.push('\txmlns="https://livenetworks.mk/schema/ln-ashlar"');
+	lines.push('\telementFormDefault="qualified">');
+	lines.push('');
+	lines.push('\t<!-- Global ln-ashlar Attribute Group -->');
+	lines.push('\t<xs:attributeGroup name="lnAshlarAttributes">');
+	for (const name of sortedNames) {
+		lines.push(`\t\t<xs:attribute ref="${name}"/>`);
+	}
+	lines.push('\t</xs:attributeGroup>');
+	lines.push('');
+	lines.push('\t<!-- Individual Attribute Definitions with Types and Restrictions -->');
+
+	for (const name of sortedNames) {
+		const meta = globalAttrMetadata.get(name);
+		let desc = '';
+		if (meta.descriptions && meta.descriptions.size > 0) {
+			const descs = [];
+			for (const [, d] of meta.descriptions) {
+				if (!descs.includes(d)) descs.push(d);
+			}
+			desc = descs.join(' ');
+		}
+		if (!desc) desc = `${name} attribute`;
+
+		const docSnippet = `\t\t<xs:annotation>\n\t\t\t<xs:documentation>${escapeXml(desc)}</xs:documentation>\n\t\t</xs:annotation>`;
+
+		if (meta.type === 'enum' && meta.values && meta.values.size > 0) {
+			const sortedValues = [...meta.values].sort();
+			lines.push(`\t<xs:attribute name="${name}">`);
+			lines.push(docSnippet);
+			lines.push('\t\t<xs:simpleType>');
+			lines.push('\t\t\t<xs:restriction base="xs:string">');
+			for (const v of sortedValues) {
+				lines.push(`\t\t\t\t<xs:enumeration value="${escapeXml(v)}"/>`);
+			}
+			lines.push('\t\t\t</xs:restriction>');
+			lines.push('\t\t</xs:simpleType>');
+			lines.push('\t</xs:attribute>');
+		} else if (meta.type === 'integer') {
+			lines.push(`\t<xs:attribute name="${name}">`);
+			lines.push(docSnippet);
+			lines.push('\t\t<xs:simpleType>');
+			lines.push('\t\t\t<xs:restriction base="xs:integer">');
+			if (meta.min !== null && meta.min !== undefined) {
+				lines.push(`\t\t\t\t<xs:minInclusive value="${meta.min}"/>`);
+			}
+			if (meta.max !== null && meta.max !== undefined) {
+				lines.push(`\t\t\t\t<xs:maxInclusive value="${meta.max}"/>`);
+			}
+			lines.push('\t\t\t</xs:restriction>');
+			lines.push('\t\t</xs:simpleType>');
+			lines.push('\t</xs:attribute>');
+		} else if (meta.type === 'float') {
+			lines.push(`\t<xs:attribute name="${name}">`);
+			lines.push(docSnippet);
+			lines.push('\t\t<xs:simpleType>');
+			lines.push('\t\t\t<xs:restriction base="xs:decimal"/>');
+			lines.push('\t\t</xs:simpleType>');
+			lines.push('\t</xs:attribute>');
+		} else if (meta.type === 'boolean') {
+			lines.push(`\t<xs:attribute name="${name}">`);
+			lines.push(docSnippet);
+			lines.push('\t\t<xs:simpleType>');
+			lines.push('\t\t\t<xs:restriction base="xs:string">');
+			lines.push('\t\t\t\t<xs:enumeration value=""/>');
+			lines.push('\t\t\t\t<xs:enumeration value="true"/>');
+			lines.push('\t\t\t\t<xs:enumeration value="false"/>');
+			lines.push('\t\t\t</xs:restriction>');
+			lines.push('\t\t</xs:simpleType>');
+			lines.push('\t</xs:attribute>');
+		} else {
+			lines.push(`\t<xs:attribute name="${name}" type="xs:string">`);
+			lines.push(docSnippet);
+			lines.push('\t</xs:attribute>');
+		}
+		lines.push('');
+	}
+
+	lines.push('</xs:schema>\n');
+	return lines.join('\n');
+}
+
 /**
  * Резолвирај корени од CLI аргументите.
  * @param {string[]} argv
@@ -551,6 +776,7 @@ function main() {
 	const constructedTokens = new Set();
 	let totalBundlesSkipped = 0;
 	const allComponentAttrs = new Set();
+	const globalAttrMetadata = new Map();
 	const staleAttributesReport = [];
 	const pendingWrites = [];
 
@@ -621,6 +847,48 @@ function main() {
 				max: meta.max !== undefined ? meta.max : null,
 				description: meta.description || null
 			};
+
+			if (!globalAttrMetadata.has(name)) {
+				globalAttrMetadata.set(name, {
+					type: meta.type || null,
+					values: new Set(meta.values || []),
+					fallback: meta.fallback !== undefined ? meta.fallback : null,
+					min: meta.min !== undefined ? meta.min : null,
+					max: meta.max !== undefined ? meta.max : null,
+					descriptions: new Map(),
+					components: new Set()
+				});
+			}
+			const g = globalAttrMetadata.get(name);
+			g.components.add(comp);
+			if (meta.description) {
+				g.descriptions.set(comp, meta.description);
+			}
+			if (meta.values) {
+				for (const v of meta.values) g.values.add(v);
+			}
+			if (meta.type) {
+				if (!g.type) {
+					g.type = meta.type;
+				} else if (g.type !== meta.type) {
+					// Type reconciliation: widen to string if incompatible
+					if ((g.type === 'marker' && meta.type === 'string') || (g.type === 'string' && meta.type === 'marker')) {
+						g.type = 'string';
+					} else {
+						console.warn(`sync-ln-schemas: reconciliation on ${name}: [${[...g.components].join(',')}] has type '${g.type}' vs [${comp}] has type '${meta.type}'. Widening to 'string'.`);
+						g.type = 'string';
+					}
+				}
+			}
+			if (meta.fallback !== undefined && meta.fallback !== null && g.fallback === null) {
+				g.fallback = meta.fallback;
+			}
+			if (meta.min !== undefined && meta.min !== null) {
+				g.min = g.min !== null ? Math.min(g.min, meta.min) : meta.min;
+			}
+			if (meta.max !== undefined && meta.max !== null) {
+				g.max = g.max !== null ? Math.max(g.max, meta.max) : meta.max;
+			}
 		}
 
 		// Прочитај постоечки фајл ако има
@@ -703,6 +971,23 @@ function main() {
 		process.exit(1);
 	}
 
+	// Додади ги несместливите CSS атрибути во globalAttrMetadata ако ги нема
+	for (const u of unplaced) {
+		if (!globalAttrMetadata.has(u.attr)) {
+			const descs = new Map();
+			descs.set('theme', `Visual / CSS styling attribute (${u.sources.join(', ')})`);
+			globalAttrMetadata.set(u.attr, {
+				type: 'marker',
+				values: new Set(),
+				fallback: null,
+				min: null,
+				max: null,
+				descriptions: descs,
+				components: new Set(['theme'])
+			});
+		}
+	}
+
 	// Генерирање на речник за ln-debug (generated-attributes.js)
 	const sortedUniverse = [...totalScanUniverse].sort();
 	const manifestContent = `// This file is generated by scripts/sync-ln-schemas.mjs. Do not edit manually.\nexport const VALID_ATTRIBUTES = new Set([\n${sortedUniverse.map((a) => `\t'${a}'`).join(',\n')}\n]);\n`;
@@ -710,6 +995,36 @@ function main() {
 	let manifestChanged = false;
 	if (!fs.existsSync(manifestPath) || fs.readFileSync(manifestPath, 'utf8') !== manifestContent) {
 		manifestChanged = true;
+	}
+
+	// Генерирање на HTML Custom Data (ln-ashlar.html-data.json)
+	const htmlDataContent = generateHtmlCustomData(globalAttrMetadata);
+	const htmlDataPath = path.resolve(root, 'ln-ashlar.html-data.json');
+	let htmlDataChanged = false;
+	if (!fs.existsSync(htmlDataPath) || fs.readFileSync(htmlDataPath, 'utf8') !== htmlDataContent) {
+		htmlDataChanged = true;
+	}
+
+	// Генерирање на JetBrains Web-Types (web-types.json)
+	let pkgVersion = '1.7.0';
+	try {
+		const pkgJson = JSON.parse(fs.readFileSync(path.resolve(root, 'package.json'), 'utf8'));
+		if (pkgJson.version) pkgVersion = pkgJson.version;
+	} catch (_) {}
+
+	const webTypesContent = generateWebTypes(globalAttrMetadata, pkgVersion);
+	const webTypesPath = path.resolve(root, 'web-types.json');
+	let webTypesChanged = false;
+	if (!fs.existsSync(webTypesPath) || fs.readFileSync(webTypesPath, 'utf8') !== webTypesContent) {
+		webTypesChanged = true;
+	}
+
+	// Генерирање на W3C XML Schema (ln-ashlar.xsd)
+	const xsdContent = generateXmlSchema(globalAttrMetadata);
+	const xsdPath = path.resolve(root, 'ln-ashlar.xsd');
+	let xsdChanged = false;
+	if (!fs.existsSync(xsdPath) || fs.readFileSync(xsdPath, 'utf8') !== xsdContent) {
+		xsdChanged = true;
 	}
 
 	// Печати извештај
@@ -739,6 +1054,8 @@ function main() {
 		}
 	}
 
+	const hasAnyChanges = changedFiles.length > 0 || manifestChanged || htmlDataChanged || webTypesChanged || xsdChanged;
+
 	if (checkOnly) {
 		if (staleAttributesReport.length) {
 			console.error(`\nsync-ln-schemas --check: ${staleAttributesReport.length} застарени атрибути — шемата тврди атрибут што кодот веќе го нема:`);
@@ -749,7 +1066,7 @@ function main() {
 			process.exit(1);
 		}
 
-		if (changedFiles.length > 0 || manifestChanged) {
+		if (hasAnyChanges) {
 			console.error(`\nsync-ln-schemas --check: бара ажурирање:`);
 			for (const f of changedFiles) {
 				console.error(`  - ${path.relative(root, f.schemaPath)}`);
@@ -757,14 +1074,23 @@ function main() {
 			if (manifestChanged) {
 				console.error(`  - ${path.relative(root, manifestPath)}`);
 			}
+			if (htmlDataChanged) {
+				console.error(`  - ${path.relative(root, htmlDataPath)}`);
+			}
+			if (webTypesChanged) {
+				console.error(`  - ${path.relative(root, webTypesPath)}`);
+			}
+			if (xsdChanged) {
+				console.error(`  - ${path.relative(root, xsdPath)}`);
+			}
 			console.error('\nПушти `npm run sync:ln-schemas` за да ги ажурираш.');
 			process.exit(1);
 		}
-		console.log('\nsync-ln-schemas --check: свеж ✓ (сите шеми и речникот се ажурирани)');
+		console.log('\nsync-ln-schemas --check: свеж ✓ (сите шеми, IDE метаподатоци и речникот се ажурирани)');
 		return;
 	}
 
-	if (changedFiles.length === 0 && !manifestChanged) {
+	if (!hasAnyChanges) {
 		console.log('\nsync-ln-schemas: без промени ✓ (сите шеми се синхронизирани)');
 		return;
 	}
@@ -777,8 +1103,26 @@ function main() {
 		fs.writeFileSync(manifestPath, manifestContent, 'utf8');
 		console.log(`  ✓ Генериран ${path.relative(root, manifestPath)}`);
 	}
+	if (htmlDataChanged) {
+		fs.writeFileSync(htmlDataPath, htmlDataContent, 'utf8');
+		console.log(`  ✓ Генериран ${path.relative(root, htmlDataPath)}`);
+	}
+	if (webTypesChanged) {
+		fs.writeFileSync(webTypesPath, webTypesContent, 'utf8');
+		console.log(`  ✓ Генериран ${path.relative(root, webTypesPath)}`);
+	}
+	if (xsdChanged) {
+		fs.writeFileSync(xsdPath, xsdContent, 'utf8');
+		console.log(`  ✓ Генериран ${path.relative(root, xsdPath)}`);
+	}
 
-	console.log(`\nsync-ln-schemas: запишани ${changedFiles.length + (manifestChanged ? 1 : 0)} фајлови.`);
+	const totalWrites = changedFiles.length +
+		(manifestChanged ? 1 : 0) +
+		(htmlDataChanged ? 1 : 0) +
+		(webTypesChanged ? 1 : 0) +
+		(xsdChanged ? 1 : 0);
+
+	console.log(`\nsync-ln-schemas: запишани ${totalWrites} фајлови.`);
 }
 
 main();

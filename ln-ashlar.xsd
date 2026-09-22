@@ -1,0 +1,2584 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="https://livenetworks.mk/schema/ln-ashlar"
+	xmlns="https://livenetworks.mk/schema/ln-ashlar"
+	elementFormDefault="qualified">
+
+	<!-- Global ln-ashlar Attribute Group -->
+	<xs:attributeGroup name="lnAshlarAttributes">
+		<xs:attribute ref="data-ln-accordion"/>
+		<xs:attribute ref="data-ln-ajax"/>
+		<xs:attribute ref="data-ln-api-base-url"/>
+		<xs:attribute ref="data-ln-api-connector"/>
+		<xs:attribute ref="data-ln-api-connector-query-debounce"/>
+		<xs:attribute ref="data-ln-api-headers"/>
+		<xs:attribute ref="data-ln-api-param-limit"/>
+		<xs:attribute ref="data-ln-api-param-offset"/>
+		<xs:attribute ref="data-ln-api-param-search"/>
+		<xs:attribute ref="data-ln-api-param-sort-dir"/>
+		<xs:attribute ref="data-ln-api-param-sort-field"/>
+		<xs:attribute ref="data-ln-api-path"/>
+		<xs:attribute ref="data-ln-api-queue"/>
+		<xs:attribute ref="data-ln-api-queue-online"/>
+		<xs:attribute ref="data-ln-attr"/>
+		<xs:attribute ref="data-ln-autoresize"/>
+		<xs:attribute ref="data-ln-autosave"/>
+		<xs:attribute ref="data-ln-autosave-clear"/>
+		<xs:attribute ref="data-ln-autosave-debounce-input"/>
+		<xs:attribute ref="data-ln-autosave-exclude"/>
+		<xs:attribute ref="data-ln-chart"/>
+		<xs:attribute ref="data-ln-chart-area"/>
+		<xs:attribute ref="data-ln-chart-count"/>
+		<xs:attribute ref="data-ln-chart-empty"/>
+		<xs:attribute ref="data-ln-chart-labels"/>
+		<xs:attribute ref="data-ln-chart-line"/>
+		<xs:attribute ref="data-ln-chart-max"/>
+		<xs:attribute ref="data-ln-chart-min"/>
+		<xs:attribute ref="data-ln-chart-padding"/>
+		<xs:attribute ref="data-ln-chart-plot"/>
+		<xs:attribute ref="data-ln-chart-sort"/>
+		<xs:attribute ref="data-ln-chart-source"/>
+		<xs:attribute ref="data-ln-chart-type"/>
+		<xs:attribute ref="data-ln-chart-x"/>
+		<xs:attribute ref="data-ln-chart-y"/>
+		<xs:attribute ref="data-ln-chart-zero"/>
+		<xs:attribute ref="data-ln-circular-progress"/>
+		<xs:attribute ref="data-ln-circular-progress-label"/>
+		<xs:attribute ref="data-ln-circular-progress-max"/>
+		<xs:attribute ref="data-ln-class"/>
+		<xs:attribute ref="data-ln-col"/>
+		<xs:attribute ref="data-ln-confirm"/>
+		<xs:attribute ref="data-ln-confirm-active"/>
+		<xs:attribute ref="data-ln-confirm-announcer"/>
+		<xs:attribute ref="data-ln-confirm-idle"/>
+		<xs:attribute ref="data-ln-confirm-state"/>
+		<xs:attribute ref="data-ln-confirm-timeout"/>
+		<xs:attribute ref="data-ln-couchdb-auth"/>
+		<xs:attribute ref="data-ln-couchdb-connector"/>
+		<xs:attribute ref="data-ln-couchdb-db"/>
+		<xs:attribute ref="data-ln-couchdb-headers"/>
+		<xs:attribute ref="data-ln-couchdb-url"/>
+		<xs:attribute ref="data-ln-data-coordinator"/>
+		<xs:attribute ref="data-ln-data-coordinator-dict"/>
+		<xs:attribute ref="data-ln-data-coordinator-filters"/>
+		<xs:attribute ref="data-ln-data-coordinator-mapper"/>
+		<xs:attribute ref="data-ln-data-coordinator-no-autosync"/>
+		<xs:attribute ref="data-ln-data-coordinator-scope"/>
+		<xs:attribute ref="data-ln-data-coordinator-search"/>
+		<xs:attribute ref="data-ln-data-coordinator-sort-direction"/>
+		<xs:attribute ref="data-ln-data-coordinator-sort-field"/>
+		<xs:attribute ref="data-ln-data-coordinator-stale"/>
+		<xs:attribute ref="data-ln-data-store"/>
+		<xs:attribute ref="data-ln-data-store-frozen"/>
+		<xs:attribute ref="data-ln-data-store-indexes"/>
+		<xs:attribute ref="data-ln-data-store-no-autosync"/>
+		<xs:attribute ref="data-ln-data-store-no-local-query"/>
+		<xs:attribute ref="data-ln-data-store-search-fields"/>
+		<xs:attribute ref="data-ln-data-store-stale"/>
+		<xs:attribute ref="data-ln-data-store-window"/>
+		<xs:attribute ref="data-ln-data-store-window-page"/>
+		<xs:attribute ref="data-ln-date"/>
+		<xs:attribute ref="data-ln-date-dict"/>
+		<xs:attribute ref="data-ln-date-dict-key"/>
+		<xs:attribute ref="data-ln-date-field"/>
+		<xs:attribute ref="data-ln-date-format"/>
+		<xs:attribute ref="data-ln-date-label"/>
+		<xs:attribute ref="data-ln-date-locale"/>
+		<xs:attribute ref="data-ln-debug"/>
+		<xs:attribute ref="data-ln-dropdown"/>
+		<xs:attribute ref="data-ln-dropdown-menu"/>
+		<xs:attribute ref="data-ln-dropdown-placement"/>
+		<xs:attribute ref="data-ln-dropdown-position"/>
+		<xs:attribute ref="data-ln-editor"/>
+		<xs:attribute ref="data-ln-editor-action"/>
+		<xs:attribute ref="data-ln-editor-source"/>
+		<xs:attribute ref="data-ln-empty"/>
+		<xs:attribute ref="data-ln-empty-state"/>
+		<xs:attribute ref="data-ln-empty-when"/>
+		<xs:attribute ref="data-ln-error"/>
+		<xs:attribute ref="data-ln-external-link"/>
+		<xs:attribute ref="data-ln-field"/>
+		<xs:attribute ref="data-ln-fill-as"/>
+		<xs:attribute ref="data-ln-fill-form"/>
+		<xs:attribute ref="data-ln-fill-id"/>
+		<xs:attribute ref="data-ln-fillable"/>
+		<xs:attribute ref="data-ln-filter"/>
+		<xs:attribute ref="data-ln-filter-col"/>
+		<xs:attribute ref="data-ln-filter-hide"/>
+		<xs:attribute ref="data-ln-filter-key"/>
+		<xs:attribute ref="data-ln-filter-options"/>
+		<xs:attribute ref="data-ln-filter-reset"/>
+		<xs:attribute ref="data-ln-filter-search"/>
+		<xs:attribute ref="data-ln-filter-value"/>
+		<xs:attribute ref="data-ln-filter-values"/>
+		<xs:attribute ref="data-ln-form"/>
+		<xs:attribute ref="data-ln-form-action-edit"/>
+		<xs:attribute ref="data-ln-form-action-method"/>
+		<xs:attribute ref="data-ln-hash"/>
+		<xs:attribute ref="data-ln-include"/>
+		<xs:attribute ref="data-ln-item"/>
+		<xs:attribute ref="data-ln-item-action"/>
+		<xs:attribute ref="data-ln-item-id"/>
+		<xs:attribute ref="data-ln-item-select"/>
+		<xs:attribute ref="data-ln-key"/>
+		<xs:attribute ref="data-ln-key-allow-input"/>
+		<xs:attribute ref="data-ln-key-for"/>
+		<xs:attribute ref="data-ln-key-modifier"/>
+		<xs:attribute ref="data-ln-key-target"/>
+		<xs:attribute ref="data-ln-link"/>
+		<xs:attribute ref="data-ln-list"/>
+		<xs:attribute ref="data-ln-list-body"/>
+		<xs:attribute ref="data-ln-list-count"/>
+		<xs:attribute ref="data-ln-list-empty"/>
+		<xs:attribute ref="data-ln-list-field"/>
+		<xs:attribute ref="data-ln-list-filtered"/>
+		<xs:attribute ref="data-ln-list-select-all"/>
+		<xs:attribute ref="data-ln-list-selectable"/>
+		<xs:attribute ref="data-ln-list-selected"/>
+		<xs:attribute ref="data-ln-list-source"/>
+		<xs:attribute ref="data-ln-list-total"/>
+		<xs:attribute ref="data-ln-list-window"/>
+		<xs:attribute ref="data-ln-list-window-page"/>
+		<xs:attribute ref="data-ln-list-window-threshold"/>
+		<xs:attribute ref="data-ln-mapper"/>
+		<xs:attribute ref="data-ln-modal"/>
+		<xs:attribute ref="data-ln-modal-close"/>
+		<xs:attribute ref="data-ln-modal-for"/>
+		<xs:attribute ref="data-ln-modal-mode"/>
+		<xs:attribute ref="data-ln-modal-when"/>
+		<xs:attribute ref="data-ln-nav"/>
+		<xs:attribute ref="data-ln-nav-exact"/>
+		<xs:attribute ref="data-ln-number"/>
+		<xs:attribute ref="data-ln-number-decimals"/>
+		<xs:attribute ref="data-ln-number-max"/>
+		<xs:attribute ref="data-ln-number-min"/>
+		<xs:attribute ref="data-ln-obfuscator"/>
+		<xs:attribute ref="data-ln-obfuscator-codec"/>
+		<xs:attribute ref="data-ln-obfuscator-key"/>
+		<xs:attribute ref="data-ln-options"/>
+		<xs:attribute ref="data-ln-options-label"/>
+		<xs:attribute ref="data-ln-options-value"/>
+		<xs:attribute ref="data-ln-outlet"/>
+		<xs:attribute ref="data-ln-panel"/>
+		<xs:attribute ref="data-ln-persist"/>
+		<xs:attribute ref="data-ln-persist-scope"/>
+		<xs:attribute ref="data-ln-picklist"/>
+		<xs:attribute ref="data-ln-picklist-list"/>
+		<xs:attribute ref="data-ln-picklist-max"/>
+		<xs:attribute ref="data-ln-popover"/>
+		<xs:attribute ref="data-ln-popover-for"/>
+		<xs:attribute ref="data-ln-popover-placement"/>
+		<xs:attribute ref="data-ln-popover-position"/>
+		<xs:attribute ref="data-ln-progress"/>
+		<xs:attribute ref="data-ln-progress-max"/>
+		<xs:attribute ref="data-ln-render-key"/>
+		<xs:attribute ref="data-ln-route"/>
+		<xs:attribute ref="data-ln-route-keep"/>
+		<xs:attribute ref="data-ln-route-target"/>
+		<xs:attribute ref="data-ln-route-title"/>
+		<xs:attribute ref="data-ln-router-hydrate"/>
+		<xs:attribute ref="data-ln-scroll"/>
+		<xs:attribute ref="data-ln-scroll-behavior"/>
+		<xs:attribute ref="data-ln-scroll-block"/>
+		<xs:attribute ref="data-ln-scroll-delay"/>
+		<xs:attribute ref="data-ln-scroll-focus"/>
+		<xs:attribute ref="data-ln-scroll-set"/>
+		<xs:attribute ref="data-ln-scroll-update-hash"/>
+		<xs:attribute ref="data-ln-search"/>
+		<xs:attribute ref="data-ln-search-clear"/>
+		<xs:attribute ref="data-ln-search-clear-for"/>
+		<xs:attribute ref="data-ln-search-exclude"/>
+		<xs:attribute ref="data-ln-search-fields"/>
+		<xs:attribute ref="data-ln-search-for"/>
+		<xs:attribute ref="data-ln-search-hide"/>
+		<xs:attribute ref="data-ln-search-items"/>
+		<xs:attribute ref="data-ln-show"/>
+		<xs:attribute ref="data-ln-slug-from"/>
+		<xs:attribute ref="data-ln-sort"/>
+		<xs:attribute ref="data-ln-sort-dir"/>
+		<xs:attribute ref="data-ln-sort-exclude"/>
+		<xs:attribute ref="data-ln-sort-field"/>
+		<xs:attribute ref="data-ln-sort-icon"/>
+		<xs:attribute ref="data-ln-sort-items"/>
+		<xs:attribute ref="data-ln-sort-state"/>
+		<xs:attribute ref="data-ln-sortable"/>
+		<xs:attribute ref="data-ln-sortable-handle"/>
+		<xs:attribute ref="data-ln-stat"/>
+		<xs:attribute ref="data-ln-stat-card"/>
+		<xs:attribute ref="data-ln-stat-filter"/>
+		<xs:attribute ref="data-ln-stat-label"/>
+		<xs:attribute ref="data-ln-stat-trend"/>
+		<xs:attribute ref="data-ln-stat-value"/>
+		<xs:attribute ref="data-ln-step"/>
+		<xs:attribute ref="data-ln-step-label"/>
+		<xs:attribute ref="data-ln-stepper"/>
+		<xs:attribute ref="data-ln-store"/>
+		<xs:attribute ref="data-ln-tab"/>
+		<xs:attribute ref="data-ln-table"/>
+		<xs:attribute ref="data-ln-table-body"/>
+		<xs:attribute ref="data-ln-table-cell-attr"/>
+		<xs:attribute ref="data-ln-table-clear"/>
+		<xs:attribute ref="data-ln-table-clear-all"/>
+		<xs:attribute ref="data-ln-table-col"/>
+		<xs:attribute ref="data-ln-table-col-filter"/>
+		<xs:attribute ref="data-ln-table-col-select"/>
+		<xs:attribute ref="data-ln-table-col-sort"/>
+		<xs:attribute ref="data-ln-table-coordinator"/>
+		<xs:attribute ref="data-ln-table-count"/>
+		<xs:attribute ref="data-ln-table-dict"/>
+		<xs:attribute ref="data-ln-table-empty"/>
+		<xs:attribute ref="data-ln-table-empty-when"/>
+		<xs:attribute ref="data-ln-table-filter-col"/>
+		<xs:attribute ref="data-ln-table-filtered"/>
+		<xs:attribute ref="data-ln-table-row"/>
+		<xs:attribute ref="data-ln-table-row-action"/>
+		<xs:attribute ref="data-ln-table-row-id"/>
+		<xs:attribute ref="data-ln-table-row-select"/>
+		<xs:attribute ref="data-ln-table-select-all-label"/>
+		<xs:attribute ref="data-ln-table-selectable"/>
+		<xs:attribute ref="data-ln-table-selected"/>
+		<xs:attribute ref="data-ln-table-sort"/>
+		<xs:attribute ref="data-ln-table-source"/>
+		<xs:attribute ref="data-ln-table-total"/>
+		<xs:attribute ref="data-ln-table-window"/>
+		<xs:attribute ref="data-ln-table-window-page"/>
+		<xs:attribute ref="data-ln-table-window-threshold"/>
+		<xs:attribute ref="data-ln-tabs"/>
+		<xs:attribute ref="data-ln-tabs-active"/>
+		<xs:attribute ref="data-ln-tabs-default"/>
+		<xs:attribute ref="data-ln-tabs-focus"/>
+		<xs:attribute ref="data-ln-tabs-key"/>
+		<xs:attribute ref="data-ln-template"/>
+		<xs:attribute ref="data-ln-time"/>
+		<xs:attribute ref="data-ln-time-locale"/>
+		<xs:attribute ref="data-ln-toast"/>
+		<xs:attribute ref="data-ln-toast-close"/>
+		<xs:attribute ref="data-ln-toast-item"/>
+		<xs:attribute ref="data-ln-toast-max"/>
+		<xs:attribute ref="data-ln-toast-timeout"/>
+		<xs:attribute ref="data-ln-toast-when"/>
+		<xs:attribute ref="data-ln-toggle"/>
+		<xs:attribute ref="data-ln-toggle-action"/>
+		<xs:attribute ref="data-ln-toggle-for"/>
+		<xs:attribute ref="data-ln-tooltip"/>
+		<xs:attribute ref="data-ln-tooltip-enhance"/>
+		<xs:attribute ref="data-ln-tooltip-enhanced"/>
+		<xs:attribute ref="data-ln-tooltip-placement"/>
+		<xs:attribute ref="data-ln-tooltip-position"/>
+		<xs:attribute ref="data-ln-translatable"/>
+		<xs:attribute ref="data-ln-translatable-lang"/>
+		<xs:attribute ref="data-ln-translations"/>
+		<xs:attribute ref="data-ln-translations-active"/>
+		<xs:attribute ref="data-ln-translations-add"/>
+		<xs:attribute ref="data-ln-translations-default"/>
+		<xs:attribute ref="data-ln-translations-lang"/>
+		<xs:attribute ref="data-ln-translations-locales"/>
+		<xs:attribute ref="data-ln-translations-placeholder"/>
+		<xs:attribute ref="data-ln-translations-prefix"/>
+		<xs:attribute ref="data-ln-translations-remove-label"/>
+		<xs:attribute ref="data-ln-ui-coordinator"/>
+		<xs:attribute ref="data-ln-ui-coordinator-dict"/>
+		<xs:attribute ref="data-ln-upload"/>
+		<xs:attribute ref="data-ln-upload-accept"/>
+		<xs:attribute ref="data-ln-upload-action"/>
+		<xs:attribute ref="data-ln-upload-delete"/>
+		<xs:attribute ref="data-ln-upload-dict"/>
+		<xs:attribute ref="data-ln-upload-ext"/>
+		<xs:attribute ref="data-ln-upload-file-field"/>
+		<xs:attribute ref="data-ln-upload-id"/>
+		<xs:attribute ref="data-ln-upload-ids-field"/>
+		<xs:attribute ref="data-ln-upload-item"/>
+		<xs:attribute ref="data-ln-upload-list"/>
+		<xs:attribute ref="data-ln-upload-local-id"/>
+		<xs:attribute ref="data-ln-upload-max-files"/>
+		<xs:attribute ref="data-ln-upload-max-size"/>
+		<xs:attribute ref="data-ln-upload-progress"/>
+		<xs:attribute ref="data-ln-upload-size"/>
+		<xs:attribute ref="data-ln-upload-state"/>
+		<xs:attribute ref="data-ln-upload-zone"/>
+		<xs:attribute ref="data-ln-validate"/>
+		<xs:attribute ref="data-ln-validate-error"/>
+		<xs:attribute ref="data-ln-validate-errors"/>
+		<xs:attribute ref="data-ln-value"/>
+		<xs:attribute ref="data-ln-websocket-connector"/>
+	</xs:attributeGroup>
+
+	<!-- Individual Attribute Definitions with Types and Restrictions -->
+	<xs:attribute name="data-ln-accordion" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Identifies container as an accordion that coordinates single-panel expansion</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-ajax" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Enables AJAX interception of form submissions and anchor clicks within container</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-api-base-url" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Base URL endpoint for API requests</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-api-connector" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Mounts API connector bridging REST backend and ln-ashlar data coordinators</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-api-connector-query-debounce">
+		<xs:annotation>
+			<xs:documentation>Debounce delay in milliseconds before dispatching query requests</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="0"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-api-headers" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Custom HTTP headers in JSON format or semicolon-separated pairs</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-api-param-limit" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Query parameter name for pagination page size</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-api-param-offset" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Query parameter name for pagination offset</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-api-param-search" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Query parameter name for text search filter</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-api-param-sort-dir" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Query parameter name for sort direction</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-api-param-sort-field" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Query parameter name for sort field</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-api-path" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Resource path appended to base URL</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-api-queue" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Mounts offline API synchronization queue backed by IndexedDB</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-api-queue-online">
+		<xs:annotation>
+			<xs:documentation>Network connectivity override (true/false, or auto-detect from navigator.onLine)</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="false"/>
+				<xs:enumeration value="true"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-attr" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-attr attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-autoresize" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Automatically adjusts textarea height to match its scrollable content</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-autosave" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Form autosave storage key identifier</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-autosave-clear" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Designates a button that clears saved form data from localStorage</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-autosave-debounce-input">
+		<xs:annotation>
+			<xs:documentation>Debounce delay in milliseconds before saving on input events</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="0"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-autosave-exclude" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Excludes form control from autosave serialization</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-chart" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Chart instance name or identifier</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-chart-area" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-chart-area attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-chart-count" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-chart-count attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-chart-empty" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-chart-empty attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-chart-labels" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-chart-labels attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-chart-line" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-chart-line attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-chart-max" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-chart-max attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-chart-min" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-chart-min attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-chart-padding">
+		<xs:annotation>
+			<xs:documentation>Internal plot padding in pixels</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="0"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-chart-plot" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-chart-plot attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-chart-sort" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Field name to sort chart series data by</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-chart-source" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Source store or coordinator identifier</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-chart-type">
+		<xs:annotation>
+			<xs:documentation>Visual chart render type</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="area"/>
+				<xs:enumeration value="bar"/>
+				<xs:enumeration value="line"/>
+				<xs:enumeration value="scatter"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-chart-x" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Field name mapping to X axis</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-chart-y" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Field name mapping to Y axis</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-chart-zero">
+		<xs:annotation>
+			<xs:documentation>Forces Y axis scale to start at zero</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value=""/>
+				<xs:enumeration value="true"/>
+				<xs:enumeration value="false"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-circular-progress">
+		<xs:annotation>
+			<xs:documentation>Current circular progress value</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:decimal"/>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-circular-progress-label" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Text label format or template inside circular progress</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-circular-progress-max">
+		<xs:annotation>
+			<xs:documentation>Maximum circular progress scale value</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:decimal"/>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-class" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-class attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-col" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-col attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-confirm" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Prompt text or confirmation action trigger</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-confirm-active" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-confirm-active attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-confirm-announcer" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-confirm-announcer attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-confirm-idle" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-confirm-idle attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-confirm-state">
+		<xs:annotation>
+			<xs:documentation>Active confirmation state marker on button</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value=""/>
+				<xs:enumeration value="true"/>
+				<xs:enumeration value="false"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-confirm-timeout">
+		<xs:annotation>
+			<xs:documentation>Confirmation timeout in seconds before reverting</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:decimal"/>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-couchdb-auth" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Authentication credentials for CouchDB requests</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-couchdb-connector" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Mounts CouchDB/PouchDB connector bridging database and ln-ashlar data coordinators</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-couchdb-db" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Target CouchDB database name</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-couchdb-headers" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Custom HTTP headers in JSON or semicolon-separated format</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-couchdb-url" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>CouchDB server base endpoint URL</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-coordinator" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Coordinator name or identifier for data routing</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-coordinator-dict" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Marks dictionary container for coordinator translatable messages</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-coordinator-filters" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Active encoded filter parameters</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-coordinator-mapper" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Name of the registered data mapper transform</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-coordinator-no-autosync">
+		<xs:annotation>
+			<xs:documentation>Disables automatic synchronization upon state changes</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value=""/>
+				<xs:enumeration value="true"/>
+				<xs:enumeration value="false"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-coordinator-scope" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Excludes form from ln-ajax interception to let data coordinator handle submission Scope name addressing the bound data store and connector</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-coordinator-search" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Active search query term</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-coordinator-sort-direction">
+		<xs:annotation>
+			<xs:documentation>Sort direction</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="asc"/>
+				<xs:enumeration value="desc"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-coordinator-sort-field" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Active sort field property name</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-coordinator-stale" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Flag indicating data needs re-synchronization</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-store" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Identifies the element as a data-store definition container</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-store-frozen" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Applied at runtime to indicate store schema is locked in IndexedDB</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-store-indexes" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Comma-separated index field names for the IndexedDB store</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-store-no-autosync" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-data-store-no-autosync attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-store-no-local-query">
+		<xs:annotation>
+			<xs:documentation>Bypasses local IndexedDB query resolution, forcing remote fetching</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value=""/>
+				<xs:enumeration value="true"/>
+				<xs:enumeration value="false"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-store-search-fields" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Record fields to index for client-side search</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-store-stale">
+		<xs:annotation>
+			<xs:documentation>Cache staleness threshold in seconds, or -1/never</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-store-window">
+		<xs:annotation>
+			<xs:documentation>Virtual scrolling cache window size in records</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="10"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-data-store-window-page">
+		<xs:annotation>
+			<xs:documentation>Virtual scrolling slice page size</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="5"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-date">
+		<xs:annotation>
+			<xs:documentation>Date display style preset or activator</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="full"/>
+				<xs:enumeration value="iso"/>
+				<xs:enumeration value="long"/>
+				<xs:enumeration value="medium"/>
+				<xs:enumeration value="short"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-date-dict" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Container for date translation dictionary</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-date-dict-key" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Dictionary key for relative time or custom date formatting</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-date-field" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Field name mapping for date record binding</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-date-format" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Custom Intl.DateTimeFormat pattern or options</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-date-label" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Accessible label text for the date input</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-date-locale" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>BCP 47 language tag override for date formatting</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-debug" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Enables developer diagnostics overlay, live validation badges, and inspection logging</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-dropdown" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Initializes the dropdown container</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-dropdown-menu" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Dropdown menu element containing items</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-dropdown-placement">
+		<xs:annotation>
+			<xs:documentation>Active calculated placement applied at runtime</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="bottom"/>
+				<xs:enumeration value="bottom-end"/>
+				<xs:enumeration value="bottom-start"/>
+				<xs:enumeration value="left"/>
+				<xs:enumeration value="left-end"/>
+				<xs:enumeration value="left-start"/>
+				<xs:enumeration value="right"/>
+				<xs:enumeration value="right-end"/>
+				<xs:enumeration value="right-start"/>
+				<xs:enumeration value="top"/>
+				<xs:enumeration value="top-end"/>
+				<xs:enumeration value="top-start"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-dropdown-position">
+		<xs:annotation>
+			<xs:documentation>Preferred positioning anchor</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="bottom"/>
+				<xs:enumeration value="bottom-end"/>
+				<xs:enumeration value="bottom-start"/>
+				<xs:enumeration value="left"/>
+				<xs:enumeration value="left-end"/>
+				<xs:enumeration value="left-start"/>
+				<xs:enumeration value="right"/>
+				<xs:enumeration value="right-end"/>
+				<xs:enumeration value="right-start"/>
+				<xs:enumeration value="top"/>
+				<xs:enumeration value="top-end"/>
+				<xs:enumeration value="top-start"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-editor" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Mounts rich text editor instance on container</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-editor-action">
+		<xs:annotation>
+			<xs:documentation>Rich text toolbar formatting action</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="blockquote"/>
+				<xs:enumeration value="bold"/>
+				<xs:enumeration value="cancel-link"/>
+				<xs:enumeration value="clear"/>
+				<xs:enumeration value="code"/>
+				<xs:enumeration value="confirm-link"/>
+				<xs:enumeration value="heading-2"/>
+				<xs:enumeration value="heading-3"/>
+				<xs:enumeration value="heading-4"/>
+				<xs:enumeration value="italic"/>
+				<xs:enumeration value="link"/>
+				<xs:enumeration value="ordered-list"/>
+				<xs:enumeration value="paragraph"/>
+				<xs:enumeration value="strikethrough"/>
+				<xs:enumeration value="underline"/>
+				<xs:enumeration value="unlink"/>
+				<xs:enumeration value="unordered-list"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-editor-source" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Selector or ID of backing textarea synchronized with editor content</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-empty" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-empty attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-empty-state" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-empty-state attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-empty-when" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-empty-when attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-error" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-error attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-external-link">
+		<xs:annotation>
+			<xs:documentation>Marker indicating link was identified and processed as external</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="processed"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-field" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-field attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-fill-as" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-fill-as attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-fill-form" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>ID of target form populated with source element dataset properties</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-fill-id" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Unique identifier of data source element providing fill attributes</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-fillable" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-fillable attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-filter" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Target table or list element ID to filter</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-filter-col" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Column name or index filter specifier</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-filter-hide">
+		<xs:annotation>
+			<xs:documentation>CSS hiding strategy for non-matching rows</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="collapse"/>
+				<xs:enumeration value="none"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-filter-key" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Field key for filter matching</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-filter-options" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Visual / CSS styling attribute (theme/config/mixins/_filter.scss)</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-filter-reset" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Filter reset button or option trigger</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-filter-search" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Visual / CSS styling attribute (theme/config/mixins/_filter.scss)</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-filter-value" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Value to match for this filter input</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-filter-values" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Encoded active filter values</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-form" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Identifies the form element as an enhanced ln-form</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-form-action-edit" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>URL template or endpoint used when editing an existing record</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-form-action-method">
+		<xs:annotation>
+			<xs:documentation>HTTP method used when submitting edit action</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="PATCH"/>
+				<xs:enumeration value="POST"/>
+				<xs:enumeration value="PUT"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-hash" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>URL hash routing key for filter state persistence URL hash routing key for search state persistence URL hash routing key for sort state persistence</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-include" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>URL of external HTML template to fetch and include</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-item" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-item attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-item-action" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-item-action attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-item-id" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-item-id attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-item-select" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-item-select attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-key" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Keyboard shortcut combination (e.g. meta+k, ctrl+s)</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-key-allow-input">
+		<xs:annotation>
+			<xs:documentation>Permits shortcut execution even when focused inside an editable input</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value=""/>
+				<xs:enumeration value="true"/>
+				<xs:enumeration value="false"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-key-for" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Target element ID that this shortcut badge is displayed for</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-key-modifier" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Platform modifier text representation override</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-key-target" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Target element selector or ID to receive synthetic click or focus</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-link" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Makes entire table row or container clickable based on child anchor link</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-list" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>List instance name or identifier</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-list-body" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-list-body attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-list-count">
+		<xs:annotation>
+			<xs:documentation>Total item count override for virtual scrollbar calculation</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="0"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-list-empty" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Container for list empty state</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-list-field" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Field name mapping for list item binding</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-list-filtered" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-list-filtered attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-list-select-all" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-list-select-all attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-list-selectable">
+		<xs:annotation>
+			<xs:documentation>Enables item selection controls</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value=""/>
+				<xs:enumeration value="true"/>
+				<xs:enumeration value="false"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-list-selected" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-list-selected attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-list-source" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Source store or coordinator addressing</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-list-total" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-list-total attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-list-window">
+		<xs:annotation>
+			<xs:documentation>Virtual scrolling window size in items</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="10"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-list-window-page">
+		<xs:annotation>
+			<xs:documentation>Virtual scrolling slice page size</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="5"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-list-window-threshold">
+		<xs:annotation>
+			<xs:documentation>Scroll threshold margin in pixels to trigger page fetch</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="0"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-mapper" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-mapper attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-modal">
+		<xs:annotation>
+			<xs:documentation>Control state of the modal dialog</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="close"/>
+				<xs:enumeration value="open"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-modal-close" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Click dismiss trigger inside the modal</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-modal-for" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-modal-for attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-modal-mode" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-modal-mode attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-modal-when" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-modal-when attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-nav" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>CSS class name applied to active navigation links</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-nav-exact">
+		<xs:annotation>
+			<xs:documentation>Match exact URL pathname instead of prefix matching</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value=""/>
+				<xs:enumeration value="true"/>
+				<xs:enumeration value="false"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-number" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Activates localized number formatting on input or text element</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-number-decimals">
+		<xs:annotation>
+			<xs:documentation>Number of decimal fraction digits</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="0"/>
+				<xs:maxInclusive value="20"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-number-max">
+		<xs:annotation>
+			<xs:documentation>Maximum allowed numeric value</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:decimal"/>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-number-min">
+		<xs:annotation>
+			<xs:documentation>Minimum allowed numeric value</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:decimal"/>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-obfuscator">
+		<xs:annotation>
+			<xs:documentation>Codec used to deobfuscate text or links</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="base64"/>
+				<xs:enumeration value="rot13"/>
+				<xs:enumeration value="xor"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-obfuscator-codec">
+		<xs:annotation>
+			<xs:documentation>Explicit codec override attribute</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="base64"/>
+				<xs:enumeration value="rot13"/>
+				<xs:enumeration value="xor"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-obfuscator-key" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Encryption or masking key for XOR codec</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-options" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Store or coordinator addressing to populate options from</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-options-label" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Field name used for option visible label text</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-options-value" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Field name used for option value attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-outlet" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-outlet attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-panel" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Tab content panel key identifier matching corresponding tab</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-persist" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Storage key identifier for persisting component state in localStorage</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-persist-scope">
+		<xs:annotation>
+			<xs:documentation>Persistence scope namespace (global or per-page path)</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="global"/>
+				<xs:enumeration value="page"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-picklist">
+		<xs:annotation>
+			<xs:documentation>Controls enabled/disabled state of the dual-list picklist</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="disabled"/>
+				<xs:enumeration value="enabled"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-picklist-list">
+		<xs:annotation>
+			<xs:documentation>Role marker for available or selected picklist columns</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="available"/>
+				<xs:enumeration value="selected"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-picklist-max">
+		<xs:annotation>
+			<xs:documentation>Maximum selectable items in the selected list</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="1"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-popover">
+		<xs:annotation>
+			<xs:documentation>Control state of the popover</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="close"/>
+				<xs:enumeration value="open"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-popover-for" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Target element ID that this trigger controls</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-popover-placement">
+		<xs:annotation>
+			<xs:documentation>Active calculated placement applied at runtime</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="bottom"/>
+				<xs:enumeration value="bottom-end"/>
+				<xs:enumeration value="bottom-start"/>
+				<xs:enumeration value="left"/>
+				<xs:enumeration value="left-end"/>
+				<xs:enumeration value="left-start"/>
+				<xs:enumeration value="right"/>
+				<xs:enumeration value="right-end"/>
+				<xs:enumeration value="right-start"/>
+				<xs:enumeration value="top"/>
+				<xs:enumeration value="top-end"/>
+				<xs:enumeration value="top-start"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-popover-position">
+		<xs:annotation>
+			<xs:documentation>Preferred positioning anchor</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="bottom"/>
+				<xs:enumeration value="bottom-end"/>
+				<xs:enumeration value="bottom-start"/>
+				<xs:enumeration value="left"/>
+				<xs:enumeration value="left-end"/>
+				<xs:enumeration value="left-start"/>
+				<xs:enumeration value="right"/>
+				<xs:enumeration value="right-end"/>
+				<xs:enumeration value="right-start"/>
+				<xs:enumeration value="top"/>
+				<xs:enumeration value="top-end"/>
+				<xs:enumeration value="top-start"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-progress">
+		<xs:annotation>
+			<xs:documentation>Current progress value</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:decimal"/>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-progress-max">
+		<xs:annotation>
+			<xs:documentation>Maximum progress scale value</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:decimal"/>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-render-key" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-render-key attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-route" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>URL path pattern matched by this route template</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-route-keep">
+		<xs:annotation>
+			<xs:documentation>Preserve mounted DOM nodes in memory instead of rebuilding</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value=""/>
+				<xs:enumeration value="true"/>
+				<xs:enumeration value="false"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-route-target" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Target outlet element selector where route content is rendered</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-route-title" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Document title template set when route is activated</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-router-hydrate">
+		<xs:annotation>
+			<xs:documentation>Hydrate existing DOM content on initial router boot</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value=""/>
+				<xs:enumeration value="true"/>
+				<xs:enumeration value="false"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-scroll" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Target element ID or CSS selector to scroll into view</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-scroll-behavior">
+		<xs:annotation>
+			<xs:documentation>Scroll animation behavior transition</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="auto"/>
+				<xs:enumeration value="smooth"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-scroll-block">
+		<xs:annotation>
+			<xs:documentation>Vertical alignment positioning of scrolled target</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="center"/>
+				<xs:enumeration value="end"/>
+				<xs:enumeration value="nearest"/>
+				<xs:enumeration value="start"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-scroll-delay">
+		<xs:annotation>
+			<xs:documentation>Delay in milliseconds before initiating scroll</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="0"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-scroll-focus">
+		<xs:annotation>
+			<xs:documentation>Whether to shift keyboard focus to target element after scroll</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value=""/>
+				<xs:enumeration value="true"/>
+				<xs:enumeration value="false"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-scroll-set" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Optional state attribute assignment on target after scroll (e.g. data-ln-toggle=open)</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-scroll-update-hash">
+		<xs:annotation>
+			<xs:documentation>Whether to update URL hash with target ID</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value=""/>
+				<xs:enumeration value="true"/>
+				<xs:enumeration value="false"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-search" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Active search query term on target element or container</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-search-clear" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-search-clear attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-search-clear-for" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Click trigger to clear search input for target</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-search-exclude" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>CSS selector matching child items to exclude from search</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-search-fields" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Comma-separated field names to include in client search</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-search-for" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Target table or list element ID that this input controls</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-search-hide">
+		<xs:annotation>
+			<xs:documentation>CSS hiding strategy for non-matching rows</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="collapse"/>
+				<xs:enumeration value="none"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-search-items" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>CSS selector matching searchable child items</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-show" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-show attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-slug-from" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Name of the source input field to derive URL slug from</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-sort" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Target table or list element ID to sort</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-sort-dir">
+		<xs:annotation>
+			<xs:documentation>Default or requested sort direction</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="asc"/>
+				<xs:enumeration value="desc"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-sort-exclude" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-sort-exclude attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-sort-field" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Field name or column key to sort by</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-sort-icon" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-sort-icon attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-sort-items" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>CSS selector matching sortable child items</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-sort-state">
+		<xs:annotation>
+			<xs:documentation>Active sort state applied to column or control</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="asc"/>
+				<xs:enumeration value="desc"/>
+				<xs:enumeration value="none"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-sortable">
+		<xs:annotation>
+			<xs:documentation>Enables drag-and-drop item reordering or disables when set to disabled</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="disabled"/>
+				<xs:enumeration value="enabled"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-sortable-handle" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Designates an element as the drag handle for its parent sortable item</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-stat" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Store or entity name to count</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-stat-card" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Visual / CSS styling attribute (theme/components/_stat-card.scss)</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-stat-filter" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>JSON or key:value filter criteria for record counting</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-stat-label" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Visual / CSS styling attribute (theme/config/mixins/_stat-card.scss)</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-stat-trend" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Visual / CSS styling attribute (theme/config/mixins/_stat-card.scss)</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-stat-value" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Visual / CSS styling attribute (theme/config/mixins/_stat-card.scss)</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-step" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Visual / CSS styling attribute (theme/config/mixins/_stepper.scss)</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-step-label" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Visual / CSS styling attribute (theme/config/mixins/_stepper.scss)</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-stepper" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Visual / CSS styling attribute (theme/components/_stepper.scss)</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-store" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-store attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-tab" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Tab trigger key identifier</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Table instance name or identifier</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-body" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-table-body attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-cell-attr" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Cell attribute template mapping</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-clear" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-table-clear attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-clear-all" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-table-clear-all attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-col" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Column header identifier or field mapping</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-col-filter" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-table-col-filter attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-col-select" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Header select-all checkbox trigger</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-col-sort" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-table-col-sort attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-coordinator" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Mounts table coordinator mediating between table, search, filter, and pagination</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-count">
+		<xs:annotation>
+			<xs:documentation>Total record count override for virtual scrollbar calculation</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="0"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-dict" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-table-dict attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-empty" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Container for table empty state</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-empty-when" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-table-empty-when attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-filter-col" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-table-filter-col attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-filtered" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-table-filtered attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-row" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Table row template element</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-row-action" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Action trigger inside a table row</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-row-id" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Record identifier on row element</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-row-select" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Row selection checkbox trigger</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-select-all-label" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Accessibility label for select-all header trigger</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-selectable">
+		<xs:annotation>
+			<xs:documentation>Enables row selection check controls</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value=""/>
+				<xs:enumeration value="true"/>
+				<xs:enumeration value="false"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-selected" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-table-selected attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-sort" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-table-sort attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-source" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Source store or coordinator addressing</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-total" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-table-total attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-window">
+		<xs:annotation>
+			<xs:documentation>Virtual scrolling window size in rows</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="10"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-window-page">
+		<xs:annotation>
+			<xs:documentation>Virtual scrolling slice page size</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="5"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-table-window-threshold">
+		<xs:annotation>
+			<xs:documentation>Scroll threshold margin in pixels to trigger page fetch</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="0"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-tabs" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Mounts lnTabs component instance on tabs container</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-tabs-active" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Active tab key identifier</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-tabs-default" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Default fallback tab key when none selected</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-tabs-focus">
+		<xs:annotation>
+			<xs:documentation>Whether to shift focus to newly activated tab panel</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value=""/>
+				<xs:enumeration value="true"/>
+				<xs:enumeration value="false"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-tabs-key" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Hash namespace key for URL hash synchronization</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-template" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-template attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-time">
+		<xs:annotation>
+			<xs:documentation>Time format style preset or activator</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="iso"/>
+				<xs:enumeration value="long"/>
+				<xs:enumeration value="medium"/>
+				<xs:enumeration value="relative"/>
+				<xs:enumeration value="short"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-time-locale" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>BCP 47 language tag override for time formatting</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-toast" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Initializes the toast notifications container</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-toast-close" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Click dismiss trigger inside a toast item</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-toast-item" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Individual toast notification element</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-toast-max">
+		<xs:annotation>
+			<xs:documentation>Maximum visible concurrent toast notifications</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="1"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-toast-timeout">
+		<xs:annotation>
+			<xs:documentation>Default auto-dismiss timeout in ms</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="500"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-toast-when" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-toast-when attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-toggle">
+		<xs:annotation>
+			<xs:documentation>Visibility state of toggleable element</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="close"/>
+				<xs:enumeration value="open"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-toggle-action">
+		<xs:annotation>
+			<xs:documentation>Action performed on target element when trigger is clicked</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="close"/>
+				<xs:enumeration value="open"/>
+				<xs:enumeration value="toggle"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-toggle-for" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Target element ID to toggle on trigger click</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-tooltip" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Tooltip text content to display</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-tooltip-enhance" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Activates enhanced tooltip behavior on element or container</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-tooltip-enhanced" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Runtime marker applied to enhanced tooltip trigger</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-tooltip-placement">
+		<xs:annotation>
+			<xs:documentation>Active calculated placement applied at runtime</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="bottom"/>
+				<xs:enumeration value="bottom-end"/>
+				<xs:enumeration value="bottom-start"/>
+				<xs:enumeration value="left"/>
+				<xs:enumeration value="left-end"/>
+				<xs:enumeration value="left-start"/>
+				<xs:enumeration value="right"/>
+				<xs:enumeration value="right-end"/>
+				<xs:enumeration value="right-start"/>
+				<xs:enumeration value="top"/>
+				<xs:enumeration value="top-end"/>
+				<xs:enumeration value="top-start"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-tooltip-position">
+		<xs:annotation>
+			<xs:documentation>Preferred positioning anchor</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="bottom"/>
+				<xs:enumeration value="bottom-end"/>
+				<xs:enumeration value="bottom-start"/>
+				<xs:enumeration value="left"/>
+				<xs:enumeration value="left-end"/>
+				<xs:enumeration value="left-start"/>
+				<xs:enumeration value="right"/>
+				<xs:enumeration value="right-end"/>
+				<xs:enumeration value="right-start"/>
+				<xs:enumeration value="top"/>
+				<xs:enumeration value="top-end"/>
+				<xs:enumeration value="top-start"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-translatable" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Marks form control as translatable into multiple languages</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-translatable-lang" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Language code assigned to specific translatable input instance</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-translations" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Mounts multi-language translation manager on form container</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-translations-active" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Container holding active language badge tags</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-translations-add" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Trigger button action to add specified language translation fields</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-translations-default" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Default primary language code (e.g. en)</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-translations-lang" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Language code associated with active language badge</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-translations-locales" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>JSON dictionary of supported locale codes and display labels</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-translations-placeholder" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Placeholder label pattern for cloned translation inputs</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-translations-prefix" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Prefix format pattern for cloned translated field names</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-translations-remove-label" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Accessible label template for translation removal buttons</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-ui-coordinator" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Mounts UI coordinator mediating global hash-routing, modals, and toasts</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-ui-coordinator-dict" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Dictionary key prefix mapping for translatable UI coordinator messages</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Endpoint URL for file uploads</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-accept" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Comma-separated list of allowed file extensions or MIME types</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-action">
+		<xs:annotation>
+			<xs:documentation>Action button within upload item</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="remove"/>
+				<xs:enumeration value="retry"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-delete" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Endpoint URL pattern for deleting uploaded files</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-dict" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Dictionary key prefix mapping for translatable upload messages</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-ext" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Normalized file extension</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-file-field" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Form data field name used for file payloads</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-id" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Server-assigned file identifier for completed upload</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-ids-field" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Form field name for submitting uploaded file IDs</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-item" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Container element for an individual file upload item</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-list" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Container element holding rendered upload items</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-local-id" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Client-generated unique ID for tracking file item in DOM</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-max-files">
+		<xs:annotation>
+			<xs:documentation>Maximum number of files allowed in upload queue (0 for unlimited)</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="0"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-max-size">
+		<xs:annotation>
+			<xs:documentation>Maximum allowed file size in bytes (0 for unlimited)</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="0"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-progress" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-upload-progress attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-size">
+		<xs:annotation>
+			<xs:documentation>File size in bytes</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="0"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-state">
+		<xs:annotation>
+			<xs:documentation>Runtime status of dropzone or individual upload item</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="dragover"/>
+				<xs:enumeration value="error"/>
+				<xs:enumeration value="pending"/>
+				<xs:enumeration value="ready"/>
+				<xs:enumeration value="success"/>
+				<xs:enumeration value="uploading"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-upload-zone" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Designates container as dropzone for drag-and-drop file uploads</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-validate" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Activates validation on form input or field</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-validate-error" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Identifies error message template for a specific validation rule</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-validate-errors" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Container element holding validation error message elements</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-value" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Raw ISO date string or timestamp Raw unformatted numeric value</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:attribute name="data-ln-websocket-connector" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>data-ln-websocket-connector attribute</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+</xs:schema>

@@ -1,0 +1,1781 @@
+{
+	"version": 1.1,
+	"globalAttributes": [
+		{
+			"name": "data-ln-accordion",
+			"description": "Identifies container as an accordion that coordinates single-panel expansion",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-ajax",
+			"description": "Enables AJAX interception of form submissions and anchor clicks within container",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-api-base-url",
+			"description": "Base URL endpoint for API requests"
+		},
+		{
+			"name": "data-ln-api-connector",
+			"description": "Mounts API connector bridging REST backend and ln-ashlar data coordinators",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-api-connector-query-debounce",
+			"description": "Debounce delay in milliseconds before dispatching query requests"
+		},
+		{
+			"name": "data-ln-api-headers",
+			"description": "Custom HTTP headers in JSON format or semicolon-separated pairs"
+		},
+		{
+			"name": "data-ln-api-param-limit",
+			"description": "Query parameter name for pagination page size"
+		},
+		{
+			"name": "data-ln-api-param-offset",
+			"description": "Query parameter name for pagination offset"
+		},
+		{
+			"name": "data-ln-api-param-search",
+			"description": "Query parameter name for text search filter"
+		},
+		{
+			"name": "data-ln-api-param-sort-dir",
+			"description": "Query parameter name for sort direction"
+		},
+		{
+			"name": "data-ln-api-param-sort-field",
+			"description": "Query parameter name for sort field"
+		},
+		{
+			"name": "data-ln-api-path",
+			"description": "Resource path appended to base URL"
+		},
+		{
+			"name": "data-ln-api-queue",
+			"description": "Mounts offline API synchronization queue backed by IndexedDB",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-api-queue-online",
+			"description": "Network connectivity override (true/false, or auto-detect from navigator.onLine)",
+			"values": [
+				{
+					"name": "false"
+				},
+				{
+					"name": "true"
+				}
+			]
+		},
+		{
+			"name": "data-ln-attr",
+			"description": "data-ln-attr attribute"
+		},
+		{
+			"name": "data-ln-autoresize",
+			"description": "Automatically adjusts textarea height to match its scrollable content",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-autosave",
+			"description": "Form autosave storage key identifier"
+		},
+		{
+			"name": "data-ln-autosave-clear",
+			"description": "Designates a button that clears saved form data from localStorage",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-autosave-debounce-input",
+			"description": "Debounce delay in milliseconds before saving on input events"
+		},
+		{
+			"name": "data-ln-autosave-exclude",
+			"description": "Excludes form control from autosave serialization",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-chart",
+			"description": "Chart instance name or identifier"
+		},
+		{
+			"name": "data-ln-chart-area",
+			"description": "data-ln-chart-area attribute"
+		},
+		{
+			"name": "data-ln-chart-count",
+			"description": "data-ln-chart-count attribute"
+		},
+		{
+			"name": "data-ln-chart-empty",
+			"description": "data-ln-chart-empty attribute"
+		},
+		{
+			"name": "data-ln-chart-labels",
+			"description": "data-ln-chart-labels attribute"
+		},
+		{
+			"name": "data-ln-chart-line",
+			"description": "data-ln-chart-line attribute"
+		},
+		{
+			"name": "data-ln-chart-max",
+			"description": "data-ln-chart-max attribute"
+		},
+		{
+			"name": "data-ln-chart-min",
+			"description": "data-ln-chart-min attribute"
+		},
+		{
+			"name": "data-ln-chart-padding",
+			"description": "Internal plot padding in pixels"
+		},
+		{
+			"name": "data-ln-chart-plot",
+			"description": "data-ln-chart-plot attribute"
+		},
+		{
+			"name": "data-ln-chart-sort",
+			"description": "Field name to sort chart series data by"
+		},
+		{
+			"name": "data-ln-chart-source",
+			"description": "Source store or coordinator identifier"
+		},
+		{
+			"name": "data-ln-chart-type",
+			"description": "Visual chart render type",
+			"values": [
+				{
+					"name": "area"
+				},
+				{
+					"name": "bar"
+				},
+				{
+					"name": "line"
+				},
+				{
+					"name": "scatter"
+				}
+			]
+		},
+		{
+			"name": "data-ln-chart-x",
+			"description": "Field name mapping to X axis"
+		},
+		{
+			"name": "data-ln-chart-y",
+			"description": "Field name mapping to Y axis"
+		},
+		{
+			"name": "data-ln-chart-zero",
+			"description": "Forces Y axis scale to start at zero",
+			"valueSet": "b"
+		},
+		{
+			"name": "data-ln-circular-progress",
+			"description": "Current circular progress value"
+		},
+		{
+			"name": "data-ln-circular-progress-label",
+			"description": "Text label format or template inside circular progress"
+		},
+		{
+			"name": "data-ln-circular-progress-max",
+			"description": "Maximum circular progress scale value"
+		},
+		{
+			"name": "data-ln-class",
+			"description": "data-ln-class attribute"
+		},
+		{
+			"name": "data-ln-col",
+			"description": "data-ln-col attribute"
+		},
+		{
+			"name": "data-ln-confirm",
+			"description": "Prompt text or confirmation action trigger"
+		},
+		{
+			"name": "data-ln-confirm-active",
+			"description": "data-ln-confirm-active attribute"
+		},
+		{
+			"name": "data-ln-confirm-announcer",
+			"description": "data-ln-confirm-announcer attribute"
+		},
+		{
+			"name": "data-ln-confirm-idle",
+			"description": "data-ln-confirm-idle attribute"
+		},
+		{
+			"name": "data-ln-confirm-state",
+			"description": "Active confirmation state marker on button",
+			"valueSet": "b"
+		},
+		{
+			"name": "data-ln-confirm-timeout",
+			"description": "Confirmation timeout in seconds before reverting"
+		},
+		{
+			"name": "data-ln-couchdb-auth",
+			"description": "Authentication credentials for CouchDB requests"
+		},
+		{
+			"name": "data-ln-couchdb-connector",
+			"description": "Mounts CouchDB/PouchDB connector bridging database and ln-ashlar data coordinators",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-couchdb-db",
+			"description": "Target CouchDB database name"
+		},
+		{
+			"name": "data-ln-couchdb-headers",
+			"description": "Custom HTTP headers in JSON or semicolon-separated format"
+		},
+		{
+			"name": "data-ln-couchdb-url",
+			"description": "CouchDB server base endpoint URL"
+		},
+		{
+			"name": "data-ln-data-coordinator",
+			"description": "Coordinator name or identifier for data routing"
+		},
+		{
+			"name": "data-ln-data-coordinator-dict",
+			"description": "Marks dictionary container for coordinator translatable messages",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-data-coordinator-filters",
+			"description": "Active encoded filter parameters"
+		},
+		{
+			"name": "data-ln-data-coordinator-mapper",
+			"description": "Name of the registered data mapper transform"
+		},
+		{
+			"name": "data-ln-data-coordinator-no-autosync",
+			"description": "Disables automatic synchronization upon state changes",
+			"valueSet": "b"
+		},
+		{
+			"name": "data-ln-data-coordinator-scope",
+			"description": "Excludes form from ln-ajax interception to let data coordinator handle submission Scope name addressing the bound data store and connector"
+		},
+		{
+			"name": "data-ln-data-coordinator-search",
+			"description": "Active search query term"
+		},
+		{
+			"name": "data-ln-data-coordinator-sort-direction",
+			"description": "Sort direction",
+			"values": [
+				{
+					"name": "asc"
+				},
+				{
+					"name": "desc"
+				}
+			]
+		},
+		{
+			"name": "data-ln-data-coordinator-sort-field",
+			"description": "Active sort field property name"
+		},
+		{
+			"name": "data-ln-data-coordinator-stale",
+			"description": "Flag indicating data needs re-synchronization",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-data-store",
+			"description": "Identifies the element as a data-store definition container",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-data-store-frozen",
+			"description": "Applied at runtime to indicate store schema is locked in IndexedDB",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-data-store-indexes",
+			"description": "Comma-separated index field names for the IndexedDB store"
+		},
+		{
+			"name": "data-ln-data-store-no-autosync",
+			"description": "data-ln-data-store-no-autosync attribute"
+		},
+		{
+			"name": "data-ln-data-store-no-local-query",
+			"description": "Bypasses local IndexedDB query resolution, forcing remote fetching",
+			"valueSet": "b"
+		},
+		{
+			"name": "data-ln-data-store-search-fields",
+			"description": "Record fields to index for client-side search"
+		},
+		{
+			"name": "data-ln-data-store-stale",
+			"description": "Cache staleness threshold in seconds, or -1/never"
+		},
+		{
+			"name": "data-ln-data-store-window",
+			"description": "Virtual scrolling cache window size in records"
+		},
+		{
+			"name": "data-ln-data-store-window-page",
+			"description": "Virtual scrolling slice page size"
+		},
+		{
+			"name": "data-ln-date",
+			"description": "Date display style preset or activator",
+			"values": [
+				{
+					"name": "full"
+				},
+				{
+					"name": "iso"
+				},
+				{
+					"name": "long"
+				},
+				{
+					"name": "medium"
+				},
+				{
+					"name": "short"
+				}
+			]
+		},
+		{
+			"name": "data-ln-date-dict",
+			"description": "Container for date translation dictionary",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-date-dict-key",
+			"description": "Dictionary key for relative time or custom date formatting"
+		},
+		{
+			"name": "data-ln-date-field",
+			"description": "Field name mapping for date record binding"
+		},
+		{
+			"name": "data-ln-date-format",
+			"description": "Custom Intl.DateTimeFormat pattern or options"
+		},
+		{
+			"name": "data-ln-date-label",
+			"description": "Accessible label text for the date input"
+		},
+		{
+			"name": "data-ln-date-locale",
+			"description": "BCP 47 language tag override for date formatting"
+		},
+		{
+			"name": "data-ln-debug",
+			"description": "Enables developer diagnostics overlay, live validation badges, and inspection logging",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-dropdown",
+			"description": "Initializes the dropdown container",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-dropdown-menu",
+			"description": "Dropdown menu element containing items",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-dropdown-placement",
+			"description": "Active calculated placement applied at runtime",
+			"values": [
+				{
+					"name": "bottom"
+				},
+				{
+					"name": "bottom-end"
+				},
+				{
+					"name": "bottom-start"
+				},
+				{
+					"name": "left"
+				},
+				{
+					"name": "left-end"
+				},
+				{
+					"name": "left-start"
+				},
+				{
+					"name": "right"
+				},
+				{
+					"name": "right-end"
+				},
+				{
+					"name": "right-start"
+				},
+				{
+					"name": "top"
+				},
+				{
+					"name": "top-end"
+				},
+				{
+					"name": "top-start"
+				}
+			]
+		},
+		{
+			"name": "data-ln-dropdown-position",
+			"description": "Preferred positioning anchor",
+			"values": [
+				{
+					"name": "bottom"
+				},
+				{
+					"name": "bottom-end"
+				},
+				{
+					"name": "bottom-start"
+				},
+				{
+					"name": "left"
+				},
+				{
+					"name": "left-end"
+				},
+				{
+					"name": "left-start"
+				},
+				{
+					"name": "right"
+				},
+				{
+					"name": "right-end"
+				},
+				{
+					"name": "right-start"
+				},
+				{
+					"name": "top"
+				},
+				{
+					"name": "top-end"
+				},
+				{
+					"name": "top-start"
+				}
+			]
+		},
+		{
+			"name": "data-ln-editor",
+			"description": "Mounts rich text editor instance on container",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-editor-action",
+			"description": "Rich text toolbar formatting action",
+			"values": [
+				{
+					"name": "blockquote"
+				},
+				{
+					"name": "bold"
+				},
+				{
+					"name": "cancel-link"
+				},
+				{
+					"name": "clear"
+				},
+				{
+					"name": "code"
+				},
+				{
+					"name": "confirm-link"
+				},
+				{
+					"name": "heading-2"
+				},
+				{
+					"name": "heading-3"
+				},
+				{
+					"name": "heading-4"
+				},
+				{
+					"name": "italic"
+				},
+				{
+					"name": "link"
+				},
+				{
+					"name": "ordered-list"
+				},
+				{
+					"name": "paragraph"
+				},
+				{
+					"name": "strikethrough"
+				},
+				{
+					"name": "underline"
+				},
+				{
+					"name": "unlink"
+				},
+				{
+					"name": "unordered-list"
+				}
+			]
+		},
+		{
+			"name": "data-ln-editor-source",
+			"description": "Selector or ID of backing textarea synchronized with editor content"
+		},
+		{
+			"name": "data-ln-empty",
+			"description": "data-ln-empty attribute"
+		},
+		{
+			"name": "data-ln-empty-state",
+			"description": "data-ln-empty-state attribute"
+		},
+		{
+			"name": "data-ln-empty-when",
+			"description": "data-ln-empty-when attribute"
+		},
+		{
+			"name": "data-ln-error",
+			"description": "data-ln-error attribute"
+		},
+		{
+			"name": "data-ln-external-link",
+			"description": "Marker indicating link was identified and processed as external",
+			"values": [
+				{
+					"name": "processed"
+				}
+			]
+		},
+		{
+			"name": "data-ln-field",
+			"description": "data-ln-field attribute"
+		},
+		{
+			"name": "data-ln-fill-as",
+			"description": "data-ln-fill-as attribute"
+		},
+		{
+			"name": "data-ln-fill-form",
+			"description": "ID of target form populated with source element dataset properties"
+		},
+		{
+			"name": "data-ln-fill-id",
+			"description": "Unique identifier of data source element providing fill attributes"
+		},
+		{
+			"name": "data-ln-fillable",
+			"description": "data-ln-fillable attribute"
+		},
+		{
+			"name": "data-ln-filter",
+			"description": "Target table or list element ID to filter"
+		},
+		{
+			"name": "data-ln-filter-col",
+			"description": "Column name or index filter specifier"
+		},
+		{
+			"name": "data-ln-filter-hide",
+			"description": "CSS hiding strategy for non-matching rows",
+			"values": [
+				{
+					"name": "collapse"
+				},
+				{
+					"name": "none"
+				}
+			]
+		},
+		{
+			"name": "data-ln-filter-key",
+			"description": "Field key for filter matching"
+		},
+		{
+			"name": "data-ln-filter-options",
+			"description": "Visual / CSS styling attribute (theme/config/mixins/_filter.scss)",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-filter-reset",
+			"description": "Filter reset button or option trigger"
+		},
+		{
+			"name": "data-ln-filter-search",
+			"description": "Visual / CSS styling attribute (theme/config/mixins/_filter.scss)",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-filter-value",
+			"description": "Value to match for this filter input"
+		},
+		{
+			"name": "data-ln-filter-values",
+			"description": "Encoded active filter values"
+		},
+		{
+			"name": "data-ln-form",
+			"description": "Identifies the form element as an enhanced ln-form",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-form-action-edit",
+			"description": "URL template or endpoint used when editing an existing record"
+		},
+		{
+			"name": "data-ln-form-action-method",
+			"description": "HTTP method used when submitting edit action",
+			"values": [
+				{
+					"name": "PATCH"
+				},
+				{
+					"name": "POST"
+				},
+				{
+					"name": "PUT"
+				}
+			]
+		},
+		{
+			"name": "data-ln-hash",
+			"description": "URL hash routing key for filter state persistence URL hash routing key for search state persistence URL hash routing key for sort state persistence"
+		},
+		{
+			"name": "data-ln-include",
+			"description": "URL of external HTML template to fetch and include"
+		},
+		{
+			"name": "data-ln-item",
+			"description": "data-ln-item attribute"
+		},
+		{
+			"name": "data-ln-item-action",
+			"description": "data-ln-item-action attribute"
+		},
+		{
+			"name": "data-ln-item-id",
+			"description": "data-ln-item-id attribute"
+		},
+		{
+			"name": "data-ln-item-select",
+			"description": "data-ln-item-select attribute"
+		},
+		{
+			"name": "data-ln-key",
+			"description": "Keyboard shortcut combination (e.g. meta+k, ctrl+s)"
+		},
+		{
+			"name": "data-ln-key-allow-input",
+			"description": "Permits shortcut execution even when focused inside an editable input",
+			"valueSet": "b"
+		},
+		{
+			"name": "data-ln-key-for",
+			"description": "Target element ID that this shortcut badge is displayed for"
+		},
+		{
+			"name": "data-ln-key-modifier",
+			"description": "Platform modifier text representation override"
+		},
+		{
+			"name": "data-ln-key-target",
+			"description": "Target element selector or ID to receive synthetic click or focus"
+		},
+		{
+			"name": "data-ln-link",
+			"description": "Makes entire table row or container clickable based on child anchor link",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-list",
+			"description": "List instance name or identifier"
+		},
+		{
+			"name": "data-ln-list-body",
+			"description": "data-ln-list-body attribute"
+		},
+		{
+			"name": "data-ln-list-count",
+			"description": "Total item count override for virtual scrollbar calculation"
+		},
+		{
+			"name": "data-ln-list-empty",
+			"description": "Container for list empty state",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-list-field",
+			"description": "Field name mapping for list item binding"
+		},
+		{
+			"name": "data-ln-list-filtered",
+			"description": "data-ln-list-filtered attribute"
+		},
+		{
+			"name": "data-ln-list-select-all",
+			"description": "data-ln-list-select-all attribute"
+		},
+		{
+			"name": "data-ln-list-selectable",
+			"description": "Enables item selection controls",
+			"valueSet": "b"
+		},
+		{
+			"name": "data-ln-list-selected",
+			"description": "data-ln-list-selected attribute"
+		},
+		{
+			"name": "data-ln-list-source",
+			"description": "Source store or coordinator addressing"
+		},
+		{
+			"name": "data-ln-list-total",
+			"description": "data-ln-list-total attribute"
+		},
+		{
+			"name": "data-ln-list-window",
+			"description": "Virtual scrolling window size in items"
+		},
+		{
+			"name": "data-ln-list-window-page",
+			"description": "Virtual scrolling slice page size"
+		},
+		{
+			"name": "data-ln-list-window-threshold",
+			"description": "Scroll threshold margin in pixels to trigger page fetch"
+		},
+		{
+			"name": "data-ln-mapper",
+			"description": "data-ln-mapper attribute"
+		},
+		{
+			"name": "data-ln-modal",
+			"description": "Control state of the modal dialog",
+			"values": [
+				{
+					"name": "close"
+				},
+				{
+					"name": "open"
+				}
+			]
+		},
+		{
+			"name": "data-ln-modal-close",
+			"description": "Click dismiss trigger inside the modal"
+		},
+		{
+			"name": "data-ln-modal-for",
+			"description": "data-ln-modal-for attribute"
+		},
+		{
+			"name": "data-ln-modal-mode",
+			"description": "data-ln-modal-mode attribute"
+		},
+		{
+			"name": "data-ln-modal-when",
+			"description": "data-ln-modal-when attribute"
+		},
+		{
+			"name": "data-ln-nav",
+			"description": "CSS class name applied to active navigation links"
+		},
+		{
+			"name": "data-ln-nav-exact",
+			"description": "Match exact URL pathname instead of prefix matching",
+			"valueSet": "b"
+		},
+		{
+			"name": "data-ln-number",
+			"description": "Activates localized number formatting on input or text element",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-number-decimals",
+			"description": "Number of decimal fraction digits"
+		},
+		{
+			"name": "data-ln-number-max",
+			"description": "Maximum allowed numeric value"
+		},
+		{
+			"name": "data-ln-number-min",
+			"description": "Minimum allowed numeric value"
+		},
+		{
+			"name": "data-ln-obfuscator",
+			"description": "Codec used to deobfuscate text or links",
+			"values": [
+				{
+					"name": "base64"
+				},
+				{
+					"name": "rot13"
+				},
+				{
+					"name": "xor"
+				}
+			]
+		},
+		{
+			"name": "data-ln-obfuscator-codec",
+			"description": "Explicit codec override attribute",
+			"values": [
+				{
+					"name": "base64"
+				},
+				{
+					"name": "rot13"
+				},
+				{
+					"name": "xor"
+				}
+			]
+		},
+		{
+			"name": "data-ln-obfuscator-key",
+			"description": "Encryption or masking key for XOR codec"
+		},
+		{
+			"name": "data-ln-options",
+			"description": "Store or coordinator addressing to populate options from"
+		},
+		{
+			"name": "data-ln-options-label",
+			"description": "Field name used for option visible label text"
+		},
+		{
+			"name": "data-ln-options-value",
+			"description": "Field name used for option value attribute"
+		},
+		{
+			"name": "data-ln-outlet",
+			"description": "data-ln-outlet attribute"
+		},
+		{
+			"name": "data-ln-panel",
+			"description": "Tab content panel key identifier matching corresponding tab"
+		},
+		{
+			"name": "data-ln-persist",
+			"description": "Storage key identifier for persisting component state in localStorage"
+		},
+		{
+			"name": "data-ln-persist-scope",
+			"description": "Persistence scope namespace (global or per-page path)",
+			"values": [
+				{
+					"name": "global"
+				},
+				{
+					"name": "page"
+				}
+			]
+		},
+		{
+			"name": "data-ln-picklist",
+			"description": "Controls enabled/disabled state of the dual-list picklist",
+			"values": [
+				{
+					"name": "disabled"
+				},
+				{
+					"name": "enabled"
+				}
+			]
+		},
+		{
+			"name": "data-ln-picklist-list",
+			"description": "Role marker for available or selected picklist columns",
+			"values": [
+				{
+					"name": "available"
+				},
+				{
+					"name": "selected"
+				}
+			]
+		},
+		{
+			"name": "data-ln-picklist-max",
+			"description": "Maximum selectable items in the selected list"
+		},
+		{
+			"name": "data-ln-popover",
+			"description": "Control state of the popover",
+			"values": [
+				{
+					"name": "close"
+				},
+				{
+					"name": "open"
+				}
+			]
+		},
+		{
+			"name": "data-ln-popover-for",
+			"description": "Target element ID that this trigger controls"
+		},
+		{
+			"name": "data-ln-popover-placement",
+			"description": "Active calculated placement applied at runtime",
+			"values": [
+				{
+					"name": "bottom"
+				},
+				{
+					"name": "bottom-end"
+				},
+				{
+					"name": "bottom-start"
+				},
+				{
+					"name": "left"
+				},
+				{
+					"name": "left-end"
+				},
+				{
+					"name": "left-start"
+				},
+				{
+					"name": "right"
+				},
+				{
+					"name": "right-end"
+				},
+				{
+					"name": "right-start"
+				},
+				{
+					"name": "top"
+				},
+				{
+					"name": "top-end"
+				},
+				{
+					"name": "top-start"
+				}
+			]
+		},
+		{
+			"name": "data-ln-popover-position",
+			"description": "Preferred positioning anchor",
+			"values": [
+				{
+					"name": "bottom"
+				},
+				{
+					"name": "bottom-end"
+				},
+				{
+					"name": "bottom-start"
+				},
+				{
+					"name": "left"
+				},
+				{
+					"name": "left-end"
+				},
+				{
+					"name": "left-start"
+				},
+				{
+					"name": "right"
+				},
+				{
+					"name": "right-end"
+				},
+				{
+					"name": "right-start"
+				},
+				{
+					"name": "top"
+				},
+				{
+					"name": "top-end"
+				},
+				{
+					"name": "top-start"
+				}
+			]
+		},
+		{
+			"name": "data-ln-progress",
+			"description": "Current progress value"
+		},
+		{
+			"name": "data-ln-progress-max",
+			"description": "Maximum progress scale value"
+		},
+		{
+			"name": "data-ln-render-key",
+			"description": "data-ln-render-key attribute"
+		},
+		{
+			"name": "data-ln-route",
+			"description": "URL path pattern matched by this route template"
+		},
+		{
+			"name": "data-ln-route-keep",
+			"description": "Preserve mounted DOM nodes in memory instead of rebuilding",
+			"valueSet": "b"
+		},
+		{
+			"name": "data-ln-route-target",
+			"description": "Target outlet element selector where route content is rendered"
+		},
+		{
+			"name": "data-ln-route-title",
+			"description": "Document title template set when route is activated"
+		},
+		{
+			"name": "data-ln-router-hydrate",
+			"description": "Hydrate existing DOM content on initial router boot",
+			"valueSet": "b"
+		},
+		{
+			"name": "data-ln-scroll",
+			"description": "Target element ID or CSS selector to scroll into view"
+		},
+		{
+			"name": "data-ln-scroll-behavior",
+			"description": "Scroll animation behavior transition",
+			"values": [
+				{
+					"name": "auto"
+				},
+				{
+					"name": "smooth"
+				}
+			]
+		},
+		{
+			"name": "data-ln-scroll-block",
+			"description": "Vertical alignment positioning of scrolled target",
+			"values": [
+				{
+					"name": "center"
+				},
+				{
+					"name": "end"
+				},
+				{
+					"name": "nearest"
+				},
+				{
+					"name": "start"
+				}
+			]
+		},
+		{
+			"name": "data-ln-scroll-delay",
+			"description": "Delay in milliseconds before initiating scroll"
+		},
+		{
+			"name": "data-ln-scroll-focus",
+			"description": "Whether to shift keyboard focus to target element after scroll",
+			"valueSet": "b"
+		},
+		{
+			"name": "data-ln-scroll-set",
+			"description": "Optional state attribute assignment on target after scroll (e.g. data-ln-toggle=open)"
+		},
+		{
+			"name": "data-ln-scroll-update-hash",
+			"description": "Whether to update URL hash with target ID",
+			"valueSet": "b"
+		},
+		{
+			"name": "data-ln-search",
+			"description": "Active search query term on target element or container"
+		},
+		{
+			"name": "data-ln-search-clear",
+			"description": "data-ln-search-clear attribute"
+		},
+		{
+			"name": "data-ln-search-clear-for",
+			"description": "Click trigger to clear search input for target"
+		},
+		{
+			"name": "data-ln-search-exclude",
+			"description": "CSS selector matching child items to exclude from search"
+		},
+		{
+			"name": "data-ln-search-fields",
+			"description": "Comma-separated field names to include in client search"
+		},
+		{
+			"name": "data-ln-search-for",
+			"description": "Target table or list element ID that this input controls"
+		},
+		{
+			"name": "data-ln-search-hide",
+			"description": "CSS hiding strategy for non-matching rows",
+			"values": [
+				{
+					"name": "collapse"
+				},
+				{
+					"name": "none"
+				}
+			]
+		},
+		{
+			"name": "data-ln-search-items",
+			"description": "CSS selector matching searchable child items"
+		},
+		{
+			"name": "data-ln-show",
+			"description": "data-ln-show attribute"
+		},
+		{
+			"name": "data-ln-slug-from",
+			"description": "Name of the source input field to derive URL slug from"
+		},
+		{
+			"name": "data-ln-sort",
+			"description": "Target table or list element ID to sort"
+		},
+		{
+			"name": "data-ln-sort-dir",
+			"description": "Default or requested sort direction",
+			"values": [
+				{
+					"name": "asc"
+				},
+				{
+					"name": "desc"
+				}
+			]
+		},
+		{
+			"name": "data-ln-sort-exclude",
+			"description": "data-ln-sort-exclude attribute"
+		},
+		{
+			"name": "data-ln-sort-field",
+			"description": "Field name or column key to sort by"
+		},
+		{
+			"name": "data-ln-sort-icon",
+			"description": "data-ln-sort-icon attribute"
+		},
+		{
+			"name": "data-ln-sort-items",
+			"description": "CSS selector matching sortable child items"
+		},
+		{
+			"name": "data-ln-sort-state",
+			"description": "Active sort state applied to column or control",
+			"values": [
+				{
+					"name": "asc"
+				},
+				{
+					"name": "desc"
+				},
+				{
+					"name": "none"
+				}
+			]
+		},
+		{
+			"name": "data-ln-sortable",
+			"description": "Enables drag-and-drop item reordering or disables when set to disabled",
+			"values": [
+				{
+					"name": "disabled"
+				},
+				{
+					"name": "enabled"
+				}
+			]
+		},
+		{
+			"name": "data-ln-sortable-handle",
+			"description": "Designates an element as the drag handle for its parent sortable item",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-stat",
+			"description": "Store or entity name to count"
+		},
+		{
+			"name": "data-ln-stat-card",
+			"description": "Visual / CSS styling attribute (theme/components/_stat-card.scss)",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-stat-filter",
+			"description": "JSON or key:value filter criteria for record counting"
+		},
+		{
+			"name": "data-ln-stat-label",
+			"description": "Visual / CSS styling attribute (theme/config/mixins/_stat-card.scss)",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-stat-trend",
+			"description": "Visual / CSS styling attribute (theme/config/mixins/_stat-card.scss)",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-stat-value",
+			"description": "Visual / CSS styling attribute (theme/config/mixins/_stat-card.scss)",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-step",
+			"description": "Visual / CSS styling attribute (theme/config/mixins/_stepper.scss)",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-step-label",
+			"description": "Visual / CSS styling attribute (theme/config/mixins/_stepper.scss)",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-stepper",
+			"description": "Visual / CSS styling attribute (theme/components/_stepper.scss)",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-store",
+			"description": "data-ln-store attribute"
+		},
+		{
+			"name": "data-ln-tab",
+			"description": "Tab trigger key identifier"
+		},
+		{
+			"name": "data-ln-table",
+			"description": "Table instance name or identifier"
+		},
+		{
+			"name": "data-ln-table-body",
+			"description": "data-ln-table-body attribute"
+		},
+		{
+			"name": "data-ln-table-cell-attr",
+			"description": "Cell attribute template mapping"
+		},
+		{
+			"name": "data-ln-table-clear",
+			"description": "data-ln-table-clear attribute"
+		},
+		{
+			"name": "data-ln-table-clear-all",
+			"description": "data-ln-table-clear-all attribute"
+		},
+		{
+			"name": "data-ln-table-col",
+			"description": "Column header identifier or field mapping"
+		},
+		{
+			"name": "data-ln-table-col-filter",
+			"description": "data-ln-table-col-filter attribute"
+		},
+		{
+			"name": "data-ln-table-col-select",
+			"description": "Header select-all checkbox trigger"
+		},
+		{
+			"name": "data-ln-table-col-sort",
+			"description": "data-ln-table-col-sort attribute"
+		},
+		{
+			"name": "data-ln-table-coordinator",
+			"description": "Mounts table coordinator mediating between table, search, filter, and pagination",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-table-count",
+			"description": "Total record count override for virtual scrollbar calculation"
+		},
+		{
+			"name": "data-ln-table-dict",
+			"description": "data-ln-table-dict attribute"
+		},
+		{
+			"name": "data-ln-table-empty",
+			"description": "Container for table empty state",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-table-empty-when",
+			"description": "data-ln-table-empty-when attribute"
+		},
+		{
+			"name": "data-ln-table-filter-col",
+			"description": "data-ln-table-filter-col attribute"
+		},
+		{
+			"name": "data-ln-table-filtered",
+			"description": "data-ln-table-filtered attribute"
+		},
+		{
+			"name": "data-ln-table-row",
+			"description": "Table row template element",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-table-row-action",
+			"description": "Action trigger inside a table row"
+		},
+		{
+			"name": "data-ln-table-row-id",
+			"description": "Record identifier on row element"
+		},
+		{
+			"name": "data-ln-table-row-select",
+			"description": "Row selection checkbox trigger"
+		},
+		{
+			"name": "data-ln-table-select-all-label",
+			"description": "Accessibility label for select-all header trigger"
+		},
+		{
+			"name": "data-ln-table-selectable",
+			"description": "Enables row selection check controls",
+			"valueSet": "b"
+		},
+		{
+			"name": "data-ln-table-selected",
+			"description": "data-ln-table-selected attribute"
+		},
+		{
+			"name": "data-ln-table-sort",
+			"description": "data-ln-table-sort attribute"
+		},
+		{
+			"name": "data-ln-table-source",
+			"description": "Source store or coordinator addressing"
+		},
+		{
+			"name": "data-ln-table-total",
+			"description": "data-ln-table-total attribute"
+		},
+		{
+			"name": "data-ln-table-window",
+			"description": "Virtual scrolling window size in rows"
+		},
+		{
+			"name": "data-ln-table-window-page",
+			"description": "Virtual scrolling slice page size"
+		},
+		{
+			"name": "data-ln-table-window-threshold",
+			"description": "Scroll threshold margin in pixels to trigger page fetch"
+		},
+		{
+			"name": "data-ln-tabs",
+			"description": "Mounts lnTabs component instance on tabs container",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-tabs-active",
+			"description": "Active tab key identifier"
+		},
+		{
+			"name": "data-ln-tabs-default",
+			"description": "Default fallback tab key when none selected"
+		},
+		{
+			"name": "data-ln-tabs-focus",
+			"description": "Whether to shift focus to newly activated tab panel",
+			"valueSet": "b"
+		},
+		{
+			"name": "data-ln-tabs-key",
+			"description": "Hash namespace key for URL hash synchronization"
+		},
+		{
+			"name": "data-ln-template",
+			"description": "data-ln-template attribute"
+		},
+		{
+			"name": "data-ln-time",
+			"description": "Time format style preset or activator",
+			"values": [
+				{
+					"name": "iso"
+				},
+				{
+					"name": "long"
+				},
+				{
+					"name": "medium"
+				},
+				{
+					"name": "relative"
+				},
+				{
+					"name": "short"
+				}
+			]
+		},
+		{
+			"name": "data-ln-time-locale",
+			"description": "BCP 47 language tag override for time formatting"
+		},
+		{
+			"name": "data-ln-toast",
+			"description": "Initializes the toast notifications container",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-toast-close",
+			"description": "Click dismiss trigger inside a toast item"
+		},
+		{
+			"name": "data-ln-toast-item",
+			"description": "Individual toast notification element",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-toast-max",
+			"description": "Maximum visible concurrent toast notifications"
+		},
+		{
+			"name": "data-ln-toast-timeout",
+			"description": "Default auto-dismiss timeout in ms"
+		},
+		{
+			"name": "data-ln-toast-when",
+			"description": "data-ln-toast-when attribute"
+		},
+		{
+			"name": "data-ln-toggle",
+			"description": "Visibility state of toggleable element",
+			"values": [
+				{
+					"name": "close"
+				},
+				{
+					"name": "open"
+				}
+			]
+		},
+		{
+			"name": "data-ln-toggle-action",
+			"description": "Action performed on target element when trigger is clicked",
+			"values": [
+				{
+					"name": "close"
+				},
+				{
+					"name": "open"
+				},
+				{
+					"name": "toggle"
+				}
+			]
+		},
+		{
+			"name": "data-ln-toggle-for",
+			"description": "Target element ID to toggle on trigger click"
+		},
+		{
+			"name": "data-ln-tooltip",
+			"description": "Tooltip text content to display"
+		},
+		{
+			"name": "data-ln-tooltip-enhance",
+			"description": "Activates enhanced tooltip behavior on element or container",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-tooltip-enhanced",
+			"description": "Runtime marker applied to enhanced tooltip trigger",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-tooltip-placement",
+			"description": "Active calculated placement applied at runtime",
+			"values": [
+				{
+					"name": "bottom"
+				},
+				{
+					"name": "bottom-end"
+				},
+				{
+					"name": "bottom-start"
+				},
+				{
+					"name": "left"
+				},
+				{
+					"name": "left-end"
+				},
+				{
+					"name": "left-start"
+				},
+				{
+					"name": "right"
+				},
+				{
+					"name": "right-end"
+				},
+				{
+					"name": "right-start"
+				},
+				{
+					"name": "top"
+				},
+				{
+					"name": "top-end"
+				},
+				{
+					"name": "top-start"
+				}
+			]
+		},
+		{
+			"name": "data-ln-tooltip-position",
+			"description": "Preferred positioning anchor",
+			"values": [
+				{
+					"name": "bottom"
+				},
+				{
+					"name": "bottom-end"
+				},
+				{
+					"name": "bottom-start"
+				},
+				{
+					"name": "left"
+				},
+				{
+					"name": "left-end"
+				},
+				{
+					"name": "left-start"
+				},
+				{
+					"name": "right"
+				},
+				{
+					"name": "right-end"
+				},
+				{
+					"name": "right-start"
+				},
+				{
+					"name": "top"
+				},
+				{
+					"name": "top-end"
+				},
+				{
+					"name": "top-start"
+				}
+			]
+		},
+		{
+			"name": "data-ln-translatable",
+			"description": "Marks form control as translatable into multiple languages",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-translatable-lang",
+			"description": "Language code assigned to specific translatable input instance"
+		},
+		{
+			"name": "data-ln-translations",
+			"description": "Mounts multi-language translation manager on form container",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-translations-active",
+			"description": "Container holding active language badge tags",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-translations-add",
+			"description": "Trigger button action to add specified language translation fields"
+		},
+		{
+			"name": "data-ln-translations-default",
+			"description": "Default primary language code (e.g. en)"
+		},
+		{
+			"name": "data-ln-translations-lang",
+			"description": "Language code associated with active language badge"
+		},
+		{
+			"name": "data-ln-translations-locales",
+			"description": "JSON dictionary of supported locale codes and display labels"
+		},
+		{
+			"name": "data-ln-translations-placeholder",
+			"description": "Placeholder label pattern for cloned translation inputs"
+		},
+		{
+			"name": "data-ln-translations-prefix",
+			"description": "Prefix format pattern for cloned translated field names"
+		},
+		{
+			"name": "data-ln-translations-remove-label",
+			"description": "Accessible label template for translation removal buttons"
+		},
+		{
+			"name": "data-ln-ui-coordinator",
+			"description": "Mounts UI coordinator mediating global hash-routing, modals, and toasts",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-ui-coordinator-dict",
+			"description": "Dictionary key prefix mapping for translatable UI coordinator messages"
+		},
+		{
+			"name": "data-ln-upload",
+			"description": "Endpoint URL for file uploads"
+		},
+		{
+			"name": "data-ln-upload-accept",
+			"description": "Comma-separated list of allowed file extensions or MIME types"
+		},
+		{
+			"name": "data-ln-upload-action",
+			"description": "Action button within upload item",
+			"values": [
+				{
+					"name": "remove"
+				},
+				{
+					"name": "retry"
+				}
+			]
+		},
+		{
+			"name": "data-ln-upload-delete",
+			"description": "Endpoint URL pattern for deleting uploaded files"
+		},
+		{
+			"name": "data-ln-upload-dict",
+			"description": "Dictionary key prefix mapping for translatable upload messages"
+		},
+		{
+			"name": "data-ln-upload-ext",
+			"description": "Normalized file extension"
+		},
+		{
+			"name": "data-ln-upload-file-field",
+			"description": "Form data field name used for file payloads"
+		},
+		{
+			"name": "data-ln-upload-id",
+			"description": "Server-assigned file identifier for completed upload"
+		},
+		{
+			"name": "data-ln-upload-ids-field",
+			"description": "Form field name for submitting uploaded file IDs"
+		},
+		{
+			"name": "data-ln-upload-item",
+			"description": "Container element for an individual file upload item",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-upload-list",
+			"description": "Container element holding rendered upload items",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-upload-local-id",
+			"description": "Client-generated unique ID for tracking file item in DOM"
+		},
+		{
+			"name": "data-ln-upload-max-files",
+			"description": "Maximum number of files allowed in upload queue (0 for unlimited)"
+		},
+		{
+			"name": "data-ln-upload-max-size",
+			"description": "Maximum allowed file size in bytes (0 for unlimited)"
+		},
+		{
+			"name": "data-ln-upload-progress",
+			"description": "data-ln-upload-progress attribute"
+		},
+		{
+			"name": "data-ln-upload-size",
+			"description": "File size in bytes"
+		},
+		{
+			"name": "data-ln-upload-state",
+			"description": "Runtime status of dropzone or individual upload item",
+			"values": [
+				{
+					"name": "dragover"
+				},
+				{
+					"name": "error"
+				},
+				{
+					"name": "pending"
+				},
+				{
+					"name": "ready"
+				},
+				{
+					"name": "success"
+				},
+				{
+					"name": "uploading"
+				}
+			]
+		},
+		{
+			"name": "data-ln-upload-zone",
+			"description": "Designates container as dropzone for drag-and-drop file uploads",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-validate",
+			"description": "Activates validation on form input or field",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-validate-error",
+			"description": "Identifies error message template for a specific validation rule"
+		},
+		{
+			"name": "data-ln-validate-errors",
+			"description": "Container element holding validation error message elements",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-value",
+			"description": "Raw ISO date string or timestamp Raw unformatted numeric value"
+		},
+		{
+			"name": "data-ln-websocket-connector",
+			"description": "data-ln-websocket-connector attribute"
+		}
+	]
+}
