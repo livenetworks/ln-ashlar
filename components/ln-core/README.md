@@ -23,6 +23,7 @@ ln-core exposes helpers in these categories:
 - **Progress Math** — clamp and percentage calculations (`progress.js`)
 - **Date Utilities** — flexible date input parsing and ISO formatting (`date.js`)
 - **Number Utilities** — locale-aware separators, number sanitizing, parsing, and formatting (`number.js`)
+- **Attribute Contracts & Parsers** — attribute specs, live getters, typed readers, and dev-time validation (`attrSpec`, `defineAttrs`, `attrStr`, `attrInt`, `attrFloat`, `attrBool`, `attrEnum`, `attrJson`, `validateAttrValue`, `isDevMode`) (`attrs.js`)
 
 Source of truth: modular sub-files in `components/ln-core/`. Import from `'../../ln-core'` (barrel).
 
@@ -1058,3 +1059,48 @@ the server's job: Blade/PHP in SSR mode, or the API payload in data-driven mode.
 - **Data-driven** — the raw value lives in the record field (API payload); the
   rendered element may also carry `data-ln-value`. Sorting runs on the record
   field. Never sort formatted text.
+
+---
+
+## attrs.js
+
+Standardized attribute readers, spec generators, live getter mappers, and dev-time type validation.
+
+### `attrStr(el, name, fallback)`
+Reads a string attribute. Returns `fallback` if attribute is null or empty.
+
+### `attrInt(el, name, fallback)`
+Parses integer from attribute (`parseInt(val, 10)`). Returns `fallback` if parsing results in `NaN`.
+
+### `attrFloat(el, name, fallback)`
+Parses floating point number from attribute (`parseFloat(val)`). Returns `fallback` if parsing results in `NaN`.
+
+### `attrBool(el, name)`
+Evaluates attribute presence (`el.hasAttribute(name)`). Returns boolean `true` or `false`.
+
+### `attrEnum(values, fallback)`
+Higher-order function returning a cached reader function for a set of permitted string enum values.
+```js
+const readState = attrEnum(['open', 'closed'], 'closed');
+const state = readState(el, 'data-ln-modal');
+```
+
+### `attrJson(el, name, fallback)`
+Safely parses JSON string attribute. Returns `fallback` if attribute is missing or contains invalid JSON syntax.
+
+### `attrSpec(spec)`
+Generates an attribute definition spec for `defineAttrs`. Automatically infers the appropriate reader function from `entry.type` if `entry.read` is omitted.
+```js
+const ATTRIBUTES = {
+    'data-ln-modal':       { type: 'enum', values: ['open', 'closed'], fallback: 'closed', effect: _syncAttribute },
+    'data-ln-modal-delay': { prop: 'delay', type: 'integer', fallback: 0 }
+};
+const ATTR_SPEC = attrSpec(ATTRIBUTES);
+```
+
+### `defineAttrs(target, el, spec)`
+Installs live getters on `target` mapping property names to dynamic attribute reads on `el`.
+
+### `validateAttrValue(entry, value, attrName, componentTag)`
+Validates attribute string against entry constraints (`enum`, `integer`, `float`, `boolean`, `min`, `max`, etc.) and outputs descriptive `console.warn` in dev mode.
+

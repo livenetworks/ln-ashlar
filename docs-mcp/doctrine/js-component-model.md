@@ -137,6 +137,37 @@ Using hidden checkboxes (`<input type="checkbox">`) to toggle styling state is s
 ### No Inline Styling from JS
 Consistent with the Attribute Bridge, JS never sets styles directly (`el.style.*`) — it toggles classes/attributes and lets SCSS style the resulting state. (Accepted exception on record: `ln-date`'s hidden native picker.) Dev-misuse warnings surface via a CSS `::after` affordance, not `console.warn`. Recoverable runtime issues use a `[component-name]`-prefixed `console.warn` + bail — never throw across handlers, never `alert`/`confirm`/`prompt`.
 
+### Typed Attribute Contracts & Dev-Time Validation
+
+Every component explicitly defines its public attribute contract via an `ATTRIBUTES` map passed into `attrSpec()` and `registerComponent()`. This establishes a single source of truth for runtime readers, development-time type assertions, and automated schema generation:
+
+```javascript
+const ATTRIBUTES = {
+    'data-ln-modal':       { type: 'enum', values: ['open', 'closed'], fallback: 'closed', effect: _syncAttribute, description: 'Current visibility state of modal dialog' },
+    'data-ln-modal-focus': { prop: 'autoFocus', read: attrBool, type: 'boolean', fallback: true, description: 'Whether to auto-focus first input on open' },
+    'data-ln-modal-delay': { prop: 'delay', read: attrInt, type: 'integer', fallback: 0, min: 0, description: 'Animation transition delay in milliseconds' }
+};
+const ATTR_SPEC = attrSpec(ATTRIBUTES);
+```
+
+#### Closed Type Taxonomy
+Attribute types are strictly restricted to the following closed vocabulary:
+- `'enum'`: Bounded set of allowed strings defined in `values` (e.g. `['open', 'close']`).
+- `'integer'`: Parsed integer string; supports optional `min` and `max` constraints.
+- `'float'`: Parsed decimal/floating-point number.
+- `'boolean'`: HTML presence attribute (`hasAttribute`). If provided with a non-empty value (e.g. `"false"`), dev validation emits a warning that boolean attributes must be valueless.
+- `'string'`: Generic string or identifier.
+- `'list'`: Comma- or space-separated list of tokens.
+- `'json'`: JSON-serialized object or array.
+- `'trigger'`: Interactive trigger element targeting another component.
+- `'marker'`: Valueless mounting or designation hook on a DOM element.
+
+#### Zero Production Overhead
+Validation is guarded by a memoized dev-mode flag (`window.lnDebug` or `[data-ln-debug]` in DOM). In production, `validateAttrValue` checks are completely bypassed with **0ns** runtime overhead.
+
+#### Automated Schema Sync
+All component attribute definitions are synchronized to their respective `.schema.json` files and the centralized attribute catalog via `npm run sync:ln-schemas`. The CI checks synchronization freshness using `npm run sync:ln-schemas:check`.
+
 ### Frozen Attributes
 A **frozen attribute** is a constructor-only attribute — one that physically cannot be re-read at runtime (e.g. an IndexedDB schema fixed at open time). When a frozen attribute is edited after init, the component writes `data-ln-{component}-frozen` on its own host, with the attempted attribute name as the value, and a co-located `*-dev.scss` rule surfaces it through the `dev-dom-error` mixin under `[data-ln-debug]`. Never `console.warn` for this case — it is a CSS-only dev affordance. This convention is binding on every component that acquires a frozen attribute; see `ln-data-store` for the reference implementation (`_markFrozen`, `ln-data-store-dev.scss`).
 

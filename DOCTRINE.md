@@ -65,6 +65,17 @@
   3. **Operational Mechanics (JS Memory):** In-flight promises, `AbortController` handles, `MutationObserver` instances, query generations (`queryGen`), and render batching queues (`createBatcher`) are runtime implementation mechanics managed in JS memory.
 * **Instant DOM Attribute Writes:** Prototype methods and input controls **MUST** write state directly to target DOM attributes via `setAttribute` (e.g. `this.dom.setAttribute('data-ln-toggle', 'open')`, `target.setAttribute('data-ln-search', input.value)`).
 * **Attribute-Reaction Debouncing:** When a component's own reaction to an attribute change performs debounced work (fetches, heavy renders), the debounce lives inside that reaction — declared via `effects` / `onAttrChange` in `registerComponent`, or inside an `observeAttributes` handler for a component that owns its own lifecycle — never in the writer's input event handler. See §8 for the one library-shipped case of input-layer debounce ownership (`ln-api-connector`'s query debounce). Programmatic resets or `0ms` debounces execute instantly, with no artificial delay.
+* **Typed Attribute Contracts & Closed Taxonomy:** Every component MUST explicitly declare its attribute contract via an `ATTRIBUTES` map passed to `registerComponent` and `attrSpec()`. Each entry defines:
+  - `type`: Strict type from the closed taxonomy (`'enum'`, `'integer'`, `'float'`, `'boolean'`, `'string'`, `'list'`, `'json'`, `'trigger'`, `'marker'`).
+  - `values`: Array of permitted string literals for `'enum'` attributes (e.g. `['open', 'close']`).
+  - `fallback`: Default value returned when attribute is absent or malformed.
+  - `min` / `max`: Boundary constraints for numeric types (`'integer'`, `'float'`).
+  - `description`: Clear, human-readable documentation of the attribute's purpose and valid values.
+* **Auto-Inferred Readers (`attrSpec`):** When `read` is omitted in an attribute spec, `attrSpec()` automatically infers the reader parser from `type` (`attrInt`, `attrFloat`, `attrBool`, `attrEnum(entry.values, entry.fallback)`, `attrJson`, `attrStr`).
+* **Dev-Time Type Validation & Zero Production Overhead:**
+  - In development mode (`window.lnDebug` active or `[data-ln-debug]` present in DOM), `validateAttrValue` checks all attribute mutations and initial DOM values against the declared `type` and `values` contract, emitting descriptive console warnings with component tags and expected constraints.
+  - In production mode, validation checks are completely bypassed via memoized `isDevMode()` gate, maintaining **`0ns` runtime overhead**.
+* **Automated Schema Synchronization:** Whenever component attributes are added or modified, run `npm run sync:ln-schemas` to synchronize `.schema.json` files and the centralized attribute catalog. Run `npm run sync:ln-schemas:check` in CI to ensure 100% contract compliance.
 * **Forbidden ("Checkbox Hack"):** Using `<input type="checkbox">` for toggle state is strictly forbidden (breaks `MutationObserver`, teleportation, ARIA semantics, and encapsulation).
 
 ---
