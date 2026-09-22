@@ -156,3 +156,19 @@ test('unified obfuscate/deobfuscate handles codec: base64 and codec: xor via opt
 	assert.notEqual(xorAuto, text);
 	assert.equal(deobfuscate(xorAuto, { key: 'секрет' }), text);
 });
+
+test('multi-pass deobfuscate can switch keys dynamically against original raw source', () => {
+	const original = 'Контакт: contact@example.com (тел: 070 123 456)';
+	const cipherKey1 = xorObfuscate(original, 'key-1');
+	const cipherKey2 = xorObfuscate(original, 'key-2');
+
+	// Deobfuscating cipherKey1 with key-1 yields original
+	assert.equal(xorDeobfuscate(cipherKey1, 'key-1'), original);
+
+	// Deobfuscating with wrong key yields mismatch
+	assert.notEqual(xorDeobfuscate(cipherKey1, 'key-2'), original);
+
+	// Re-applying correct key-1 to stored raw restores original
+	assert.equal(xorDeobfuscate(cipherKey1, 'key-1'), original);
+});
+

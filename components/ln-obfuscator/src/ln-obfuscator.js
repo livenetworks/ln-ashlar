@@ -11,7 +11,6 @@ import {
 (function () {
 	const DOM_SELECTOR = 'data-ln-obfuscator';
 	const DOM_ATTRIBUTE = 'lnObfuscator';
-	const _processed = new WeakSet();
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -33,7 +32,8 @@ import {
 		if (dom[DOM_ATTRIBUTE]) return dom[DOM_ATTRIBUTE];
 		dom[DOM_ATTRIBUTE] = this;
 		this.dom = dom;
-		this._processed = false;
+		this._originalTextNodes = null;
+		this._originalHref = null;
 
 		this.deobfuscate();
 		return this;
@@ -41,8 +41,33 @@ import {
 
 	// ─── Core Deobfuscation Logic ────────────────────────────
 	_component.prototype.deobfuscate = function () {
-		if (this._processed || _processed.has(this.dom)) {
-			return;
+		const isLink = Boolean(this.dom.matches && (this.dom.matches('a') || this.dom.matches('area')));
+
+		// Capture initial raw href before first mutation
+		if (this._originalHref === null && isLink && this.dom.hasAttribute('href')) {
+			this._originalHref = this.dom.getAttribute('href');
+		}
+
+		// Capture initial raw text nodes (or re-capture if child nodes were replaced)
+		const needsRescan = !this._originalTextNodes || this._originalTextNodes.length === 0 || this._originalTextNodes.some(item => !this.dom.contains(item.node));
+		if (needsRescan) {
+			this._originalTextNodes = [];
+			if (typeof document !== 'undefined' && document.createTreeWalker) {
+				const walker = document.createTreeWalker(this.dom, NodeFilter.SHOW_TEXT, {
+					acceptNode: function (node) {
+						if (node.parentElement && node.parentElement.classList && node.parentElement.classList.contains('sr-only')) {
+							return NodeFilter.FILTER_REJECT;
+						}
+						return NodeFilter.FILTER_ACCEPT;
+					}
+				});
+				while (walker.nextNode()) {
+					this._originalTextNodes.push({
+						node: walker.currentNode,
+						raw: walker.currentNode.nodeValue
+					});
+				}
+			}
 		}
 
 		const rawShift = this.dom.getAttribute(DOM_SELECTOR);
@@ -62,8 +87,6 @@ import {
 		const key = rawKey || 'ln-ashlar';
 		const options = { codec, shift, key };
 
-		const isLink = this.dom.matches && (this.dom.matches('a') || this.dom.matches('area'));
-
 		// Reset premature ln-external-links decoration if present
 		if (isLink && this.dom.getAttribute('data-ln-external-link') === 'processed') {
 			const hints = this.dom.querySelectorAll('.sr-only');
@@ -82,41 +105,21 @@ import {
 			}
 		}
 
-		// Walk text nodes, skipping any .sr-only nodes
-		if (typeof document !== 'undefined' && document.createTreeWalker) {
-			const walker = document.createTreeWalker(this.dom, NodeFilter.SHOW_TEXT, {
-				acceptNode: function (node) {
-					if (node.parentElement && node.parentElement.classList && node.parentElement.classList.contains('sr-only')) {
-						return NodeFilter.FILTER_REJECT;
-					}
-					return NodeFilter.FILTER_ACCEPT;
-				}
-			});
-
-			const textNodes = [];
-			while (walker.nextNode()) {
-				textNodes.push(walker.currentNode);
-			}
-
-			for (let i = 0; i < textNodes.length; i++) {
-				const node = textNodes[i];
-				if (node.nodeValue && node.nodeValue.length > 0) {
-					node.nodeValue = deobfuscate(node.nodeValue, options);
+		// Apply deobfuscation to text nodes using the stored original raw text
+		if (this._originalTextNodes) {
+			for (let i = 0; i < this._originalTextNodes.length; i++) {
+				const item = this._originalTextNodes[i];
+				if (item.node && item.raw && item.raw.length > 0) {
+					item.node.nodeValue = deobfuscate(item.raw, options);
 				}
 			}
 		}
 
-		// Deobfuscate href if present on link element
-		if (isLink && this.dom.hasAttribute('href')) {
-			const rawHref = this.dom.getAttribute('href');
-			if (rawHref) {
-				const deobfuscatedHref = deobfuscate(rawHref, options);
-				this.dom.setAttribute('href', deobfuscatedHref);
-			}
+		// Apply deobfuscation to href attribute using stored original raw href
+		if (isLink && this._originalHref) {
+			const deobfuscatedHref = deobfuscate(this._originalHref, options);
+			this.dom.setAttribute('href', deobfuscatedHref);
 		}
-
-		this._processed = true;
-		_processed.add(this.dom);
 
 		dispatch(this.dom, 'ln-obfuscator:deobfuscated', {
 			target: this.dom,
@@ -128,6 +131,17 @@ import {
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
+		if (this._originalTextNodes) {
+			for (let i = 0; i < this._originalTextNodes.length; i++) {
+				const item = this._originalTextNodes[i];
+				if (item.node && item.raw) {
+					item.node.nodeValue = item.raw;
+				}
+			}
+		}
+		if (this._originalHref !== null) {
+			this.dom.setAttribute('href', this._originalHref);
+		}
 		dispatch(this.dom, 'ln-obfuscator:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
