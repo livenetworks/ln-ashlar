@@ -28,14 +28,14 @@ import { browserAlreadyHandles, composeExternalShortcut, eventToShortcut, inferK
 	}
 
 	const ATTRIBUTES = {
-		'data-ln-key':             { effect: _syncKey },
-		'data-ln-key-target':      { effect: _syncKey },
-		'data-ln-key-allow-input': { effect: _syncKey }
+		'data-ln-key':             { type: 'string', effect: _syncKey, description: 'Keyboard shortcut combination (e.g. meta+k, ctrl+s)' },
+		'data-ln-key-target':      { type: 'string', effect: _syncKey, description: 'Target element selector or ID to receive synthetic click or focus' },
+		'data-ln-key-allow-input': { type: 'boolean', effect: _syncKey, description: 'Permits shortcut execution even when focused inside an editable input' }
 	};
 
 	const FOR_ATTRIBUTES = {
-		'data-ln-key-for':      { effect: _syncKeyFor },
-		'data-ln-key-modifier': {}
+		'data-ln-key-for':      { type: 'string', effect: _syncKeyFor, description: 'Target element ID that this shortcut badge is displayed for' },
+		'data-ln-key-modifier': { type: 'string', description: 'Platform modifier text representation override' }
 	};
 
 	const instances = new Set();

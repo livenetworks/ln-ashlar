@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-date",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -8,43 +8,65 @@
 			"sources": [
 				"ln-date-dev.scss",
 				"src/ln-date.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"short",
+				"medium",
+				"long",
+				"full",
+				"iso"
+			],
+			"fallback": "medium",
+			"description": "Date display style preset or activator"
 		},
 		"data-ln-date-dict": {
 			"direction": "author",
 			"sources": [
 				"src/ln-date.js"
-			]
+			],
+			"type": "marker",
+			"description": "Container for date translation dictionary"
 		},
 		"data-ln-date-dict-key": {
 			"direction": null,
 			"sources": [
 				"src/ln-date.js"
-			]
+			],
+			"type": "string",
+			"description": "Dictionary key for relative time or custom date formatting"
 		},
 		"data-ln-date-field": {
 			"direction": "runtime",
 			"sources": [
 				"src/ln-date.js"
-			]
+			],
+			"type": "string",
+			"description": "Field name mapping for date record binding"
 		},
 		"data-ln-date-format": {
 			"direction": "author",
 			"sources": [
 				"src/ln-date.js"
-			]
+			],
+			"type": "string",
+			"description": "Custom Intl.DateTimeFormat pattern or options"
 		},
 		"data-ln-date-label": {
 			"direction": "both",
 			"sources": [
 				"src/ln-date.js"
-			]
+			],
+			"type": "string",
+			"description": "Accessible label text for the date input"
 		},
 		"data-ln-date-locale": {
 			"direction": null,
 			"sources": [
 				"src/ln-date.js"
-			]
+			],
+			"type": "string",
+			"description": "BCP 47 language tag override for date formatting"
 		},
 		"data-ln-debug": {
 			"direction": null,
@@ -62,7 +84,9 @@
 			"direction": "both",
 			"sources": [
 				"src/ln-date.js"
-			]
+			],
+			"type": "string",
+			"description": "Raw ISO date string or timestamp"
 		}
 	}
 }

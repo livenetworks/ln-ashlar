@@ -15,16 +15,16 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 	}
 
 	const ATTRIBUTES = {
-		'data-ln-api-connector':                {},
-		'data-ln-api-base-url':                 { prop: 'baseUrl',    read: attrStr, fallback: '',   effect: _syncAttribute },
-		'data-ln-api-path':                     { prop: 'path',       read: attrStr, fallback: '',   effect: _syncAttribute },
-		'data-ln-api-headers':                  { prop: 'rawHeaders', read: attrStr, fallback: null, effect: _syncAttribute },
-		'data-ln-api-param-offset':             { effect: _syncAttribute },
-		'data-ln-api-param-limit':              { effect: _syncAttribute },
-		'data-ln-api-param-search':             { effect: _syncAttribute },
-		'data-ln-api-param-sort-field':         { effect: _syncAttribute },
-		'data-ln-api-param-sort-dir':           { effect: _syncAttribute },
-		'data-ln-api-connector-query-debounce': { effect: _syncAttribute }
+		'data-ln-api-connector':                { type: 'marker', description: 'Mounts API connector bridging REST backend and ln-ashlar data coordinators' },
+		'data-ln-api-base-url':                 { prop: 'baseUrl',    read: attrStr, type: 'string', fallback: '', effect: _syncAttribute, description: 'Base URL endpoint for API requests' },
+		'data-ln-api-path':                     { prop: 'path',       read: attrStr, type: 'string', fallback: '', effect: _syncAttribute, description: 'Resource path appended to base URL' },
+		'data-ln-api-headers':                  { prop: 'rawHeaders', read: attrStr, type: 'json', fallback: null, effect: _syncAttribute, description: 'Custom HTTP headers in JSON format or semicolon-separated pairs' },
+		'data-ln-api-param-offset':             { effect: _syncAttribute, type: 'string', fallback: 'offset', description: 'Query parameter name for pagination offset' },
+		'data-ln-api-param-limit':              { effect: _syncAttribute, type: 'string', fallback: 'limit', description: 'Query parameter name for pagination page size' },
+		'data-ln-api-param-search':             { effect: _syncAttribute, type: 'string', fallback: 'search', description: 'Query parameter name for text search filter' },
+		'data-ln-api-param-sort-field':         { effect: _syncAttribute, type: 'string', fallback: 'sort_by', description: 'Query parameter name for sort field' },
+		'data-ln-api-param-sort-dir':           { effect: _syncAttribute, type: 'string', fallback: 'sort_dir', description: 'Query parameter name for sort direction' },
+		'data-ln-api-connector-query-debounce': { effect: _syncAttribute, type: 'integer', fallback: 200, min: 0, description: 'Debounce delay in milliseconds before dispatching query requests' }
 	};
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 

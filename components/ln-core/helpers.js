@@ -1,4 +1,20 @@
-import { attrEffects, reactiveNames } from './attrs.js';
+import { attrEffects, reactiveNames, validateAttrValue } from './attrs.js';
+
+export function isDevMode() {
+	if (typeof window === 'undefined') return false;
+	window.lnCore = window.lnCore || {};
+	if (window.lnCore.devMode === undefined) {
+		window.lnCore.devMode = !!(
+			window.lnDebug === true ||
+			(typeof document !== 'undefined' && (
+				(document.documentElement && document.documentElement.hasAttribute('data-ln-debug')) ||
+				(document.body && document.body.hasAttribute('data-ln-debug')) ||
+				document.querySelector('[data-ln-debug]')
+			))
+		);
+	}
+	return window.lnCore.devMode;
+}
 
 // ─── Global Console Warning Interceptor (Production Mode) ──
 if (typeof window !== 'undefined') {
@@ -11,11 +27,7 @@ if (typeof window !== 'undefined') {
 				(args[0].startsWith('[ln-') || args[0].startsWith('[lnCore'));
 
 			if (isLibraryWarning) {
-				const isDebug =
-					document.documentElement.hasAttribute('data-ln-debug') ||
-					(document.body && document.body.hasAttribute('data-ln-debug'));
-
-				if (!isDebug) {
+				if (!isDevMode()) {
 					return;
 				}
 			}
@@ -797,6 +809,17 @@ function _handleAttrMutation(mut) {
 	const registry = _attrRegistry();
 	const entries = registry.byAttr.get(name);
 
+	// Dev-mode runtime attribute validation (validates all declared attributes, including pure getters)
+	if (entries && isDevMode()) {
+		const val = el.getAttribute(name);
+		for (let i = 0; i < entries.length; i++) {
+			const entry = entries[i];
+			if (entry.attributes && entry.attributes[name] && el[entry.attribute]) {
+				validateAttrValue(entry.attributes[name], val, name, entry.componentTag);
+			}
+		}
+	}
+
 	// debug sink — library attribute mutations only: data-ln-* or a name
 	// this registry already reacts to (lang, href, datetime, …). Never
 	// page attributes (class, style, aria-*) — that would flood the console.
@@ -966,6 +989,18 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 	function constructor(domRoot) {
 		const root = domRoot || document.body;
 		findElements(root, selector, attribute, ComponentFn);
+		if (attributes && isDevMode()) {
+			const elements = Array.from(root.querySelectorAll(query));
+			if (root.matches && root.matches(query)) elements.push(root);
+			for (let i = 0; i < elements.length; i++) {
+				const el = elements[i];
+				for (const attrName in attributes) {
+					if (el.hasAttribute(attrName)) {
+						validateAttrValue(attributes[attrName], el.getAttribute(attrName), attrName, componentTag);
+					}
+				}
+			}
+		}
 		if (onInit) onInit(root);
 	}
 
@@ -986,6 +1021,8 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 	_registerAttrEntry({
 		selector: selector,
 		attribute: attribute,
+		componentTag: componentTag,
+		attributes: attributes,
 		ComponentFn: ComponentFn,
 		onInit: onInit,
 		observed: observedAttributes.concat(extraAttributes),

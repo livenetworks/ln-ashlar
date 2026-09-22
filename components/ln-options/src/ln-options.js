@@ -8,9 +8,9 @@ import { registerComponent, dispatch, defineAttrs, attrSpec, attrStr } from '../
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-options':       { prop: '_storeName',  read: attrStr, fallback: '' },
-		'data-ln-options-value': { prop: '_valueField', read: attrStr, fallback: 'id' },
-		'data-ln-options-label': { prop: '_labelField', read: attrStr, fallback: 'name' }
+		'data-ln-options':       { prop: '_storeName', type: 'string', read: attrStr, fallback: '', description: 'Store or coordinator addressing to populate options from' },
+		'data-ln-options-value': { prop: '_valueField', type: 'string', read: attrStr, fallback: 'id', description: 'Field name used for option value attribute' },
+		'data-ln-options-label': { prop: '_labelField', type: 'string', read: attrStr, fallback: 'name', description: 'Field name used for option visible label text' }
 	};
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 

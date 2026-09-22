@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-table",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -28,7 +28,10 @@
 				"ln-table-dev.scss",
 				"ln-table.scss",
 				"src/ln-table.js"
-			]
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "Table instance name or identifier"
 		},
 		"data-ln-table-body": {
 			"direction": "author",
@@ -40,19 +43,25 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-table.js"
-			]
+			],
+			"type": "string",
+			"description": "Cell attribute template mapping"
 		},
 		"data-ln-table-col": {
 			"direction": "author",
 			"sources": [
 				"src/ln-table.js"
-			]
+			],
+			"type": "string",
+			"description": "Column header identifier or field mapping"
 		},
 		"data-ln-table-col-select": {
 			"direction": "author",
 			"sources": [
 				"src/ln-table.js"
-			]
+			],
+			"type": "trigger",
+			"description": "Header select-all checkbox trigger"
 		},
 		"data-ln-table-col-sort": {
 			"direction": null,
@@ -64,7 +73,10 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-table.js"
-			]
+			],
+			"type": "integer",
+			"min": 0,
+			"description": "Total record count override for virtual scrollbar calculation"
 		},
 		"data-ln-table-dict": {
 			"direction": "author",
@@ -76,7 +88,9 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-table.js"
-			]
+			],
+			"type": "marker",
+			"description": "Container for table empty state"
 		},
 		"data-ln-table-empty-when": {
 			"direction": "author",
@@ -94,37 +108,49 @@
 			"direction": "both",
 			"sources": [
 				"src/ln-table.js"
-			]
+			],
+			"type": "marker",
+			"description": "Table row template element"
 		},
 		"data-ln-table-row-action": {
 			"direction": "author",
 			"sources": [
 				"src/ln-table.js"
-			]
+			],
+			"type": "trigger",
+			"description": "Action trigger inside a table row"
 		},
 		"data-ln-table-row-id": {
 			"direction": "both",
 			"sources": [
 				"src/ln-table.js"
-			]
+			],
+			"type": "string",
+			"description": "Record identifier on row element"
 		},
 		"data-ln-table-row-select": {
 			"direction": "both",
 			"sources": [
 				"src/ln-table.js"
-			]
+			],
+			"type": "trigger",
+			"description": "Row selection checkbox trigger"
 		},
 		"data-ln-table-select-all-label": {
 			"direction": "author",
 			"sources": [
 				"src/ln-table.js"
-			]
+			],
+			"type": "string",
+			"description": "Accessibility label for select-all header trigger"
 		},
 		"data-ln-table-selectable": {
 			"direction": null,
 			"sources": [
 				"src/ln-table.js"
-			]
+			],
+			"type": "boolean",
+			"description": "Enables row selection check controls"
 		},
 		"data-ln-table-selected": {
 			"direction": "author",
@@ -142,7 +168,10 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-table.js"
-			]
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "Source store or coordinator addressing"
 		},
 		"data-ln-table-total": {
 			"direction": "author",
@@ -154,19 +183,29 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-table.js"
-			]
+			],
+			"type": "integer",
+			"min": 10,
+			"description": "Virtual scrolling window size in rows"
 		},
 		"data-ln-table-window-page": {
 			"direction": "author",
 			"sources": [
 				"src/ln-table.js"
-			]
+			],
+			"type": "integer",
+			"min": 5,
+			"description": "Virtual scrolling slice page size"
 		},
 		"data-ln-table-window-threshold": {
 			"direction": "author",
 			"sources": [
 				"src/ln-table.js"
-			]
+			],
+			"type": "integer",
+			"fallback": 50,
+			"min": 0,
+			"description": "Scroll threshold margin in pixels to trigger page fetch"
 		}
 	}
 }

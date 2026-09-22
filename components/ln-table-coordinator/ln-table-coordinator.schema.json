@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-table-coordinator",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -73,7 +73,9 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-table-coordinator.js"
-			]
+			],
+			"type": "marker",
+			"description": "Mounts table coordinator mediating between table, search, filter, and pagination"
 		},
 		"data-ln-table-filter-col": {
 			"direction": "author",

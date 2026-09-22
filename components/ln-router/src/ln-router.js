@@ -38,11 +38,11 @@ function _reRegisterRoute(el) {
 }
 
 const ATTRIBUTES = {
-	'data-ln-route':          { effect: _reRegisterRoute },
-	'data-ln-route-target':   { effect: _reRegisterRoute },
-	'data-ln-route-title':    { effect: _reRegisterRoute },
-	'data-ln-route-keep':     {},
-	'data-ln-router-hydrate': {}
+	'data-ln-route':          { effect: _reRegisterRoute, type: 'string', description: 'URL path pattern matched by this route template' },
+	'data-ln-route-target':   { effect: _reRegisterRoute, type: 'string', description: 'Target outlet element selector where route content is rendered' },
+	'data-ln-route-title':    { effect: _reRegisterRoute, type: 'string', description: 'Document title template set when route is activated' },
+	'data-ln-route-keep':     { type: 'boolean', fallback: false, description: 'Preserve mounted DOM nodes in memory instead of rebuilding' },
+	'data-ln-router-hydrate': { type: 'boolean', fallback: false, description: 'Hydrate existing DOM content on initial router boot' }
 };
 
 // Per-region registry: Map<regionKey, { routes: Map<pattern, routeMetadata>, sorted: routeMetadata[] }>

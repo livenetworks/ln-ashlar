@@ -12,9 +12,9 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-picklist':      { effect: _syncEnabled },
-		'data-ln-picklist-max':  { effect: _syncMax },
-		'data-ln-picklist-list': {}
+		'data-ln-picklist':      { type: 'enum', values: ['enabled', 'disabled'], fallback: 'enabled', effect: _syncEnabled, description: 'Controls enabled/disabled state of the dual-list picklist' },
+		'data-ln-picklist-max':  { type: 'integer', fallback: Infinity, min: 1, effect: _syncMax, description: 'Maximum selectable items in the selected list' },
+		'data-ln-picklist-list': { type: 'enum', values: ['available', 'selected'], description: 'Role marker for available or selected picklist columns' }
 	};
 
 	// ─── Component ─────────────────────────────────────────────

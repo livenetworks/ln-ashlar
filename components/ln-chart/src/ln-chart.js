@@ -21,14 +21,14 @@ import { buildChartModel, parseChartSort, parseChartViewBox } from './chart-mode
 	}
 
 	const ATTRIBUTES = {
-		'data-ln-chart':         { prop: 'name', read: attrStr, fallback: '', effect: _renderChart },
-		'data-ln-chart-source':  { effect: _requestData },
-		'data-ln-chart-sort':    { effect: _requestData },
-		'data-ln-chart-type':    { effect: _renderChart },
-		'data-ln-chart-x':       { effect: _renderChart },
-		'data-ln-chart-y':       { effect: _renderChart },
-		'data-ln-chart-padding': { effect: _renderChart },
-		'data-ln-chart-zero':    { effect: _renderChart }
+		'data-ln-chart':         { prop: 'name', type: 'string', read: attrStr, fallback: '', effect: _renderChart, description: 'Chart instance name or identifier' },
+		'data-ln-chart-source':  { type: 'string', effect: _requestData, description: 'Source store or coordinator identifier' },
+		'data-ln-chart-sort':    { type: 'string', effect: _requestData, description: 'Field name to sort chart series data by' },
+		'data-ln-chart-type':    { type: 'enum', values: ['line', 'bar', 'area', 'scatter'], fallback: 'line', effect: _renderChart, description: 'Visual chart render type' },
+		'data-ln-chart-x':       { type: 'string', effect: _renderChart, description: 'Field name mapping to X axis' },
+		'data-ln-chart-y':       { type: 'string', effect: _renderChart, description: 'Field name mapping to Y axis' },
+		'data-ln-chart-padding': { type: 'integer', fallback: 20, min: 0, effect: _renderChart, description: 'Internal plot padding in pixels' },
+		'data-ln-chart-zero':    { type: 'boolean', effect: _renderChart, description: 'Forces Y axis scale to start at zero' }
 	};
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 

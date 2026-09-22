@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-editor",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -14,20 +14,45 @@
 			"sources": [
 				"ln-editor-dev.scss",
 				"src/ln-editor.js"
-			]
+			],
+			"type": "marker",
+			"description": "Mounts rich text editor instance on container"
 		},
 		"data-ln-editor-action": {
 			"direction": "author",
 			"sources": [
 				"ln-editor-dev.scss",
 				"src/ln-editor.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"bold",
+				"italic",
+				"underline",
+				"strikethrough",
+				"heading-2",
+				"heading-3",
+				"heading-4",
+				"blockquote",
+				"code",
+				"paragraph",
+				"ordered-list",
+				"unordered-list",
+				"link",
+				"unlink",
+				"clear",
+				"confirm-link",
+				"cancel-link"
+			],
+			"description": "Rich text toolbar formatting action"
 		},
 		"data-ln-editor-source": {
 			"direction": "runtime",
 			"sources": [
 				"src/ln-editor.js"
-			]
+			],
+			"type": "string",
+			"description": "Selector or ID of backing textarea synchronized with editor content"
 		}
 	}
 }

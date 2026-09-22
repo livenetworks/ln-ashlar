@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-data-coordinator",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -32,61 +32,86 @@
 			"sources": [
 				"ln-data-coordinator-dev.scss",
 				"src/ln-data-coordinator.js"
-			]
+			],
+			"type": "string",
+			"description": "Coordinator name or identifier for data routing"
 		},
 		"data-ln-data-coordinator-dict": {
 			"direction": null,
 			"sources": [
 				"src/ln-data-coordinator.js"
-			]
+			],
+			"type": "marker",
+			"description": "Marks dictionary container for coordinator translatable messages"
 		},
 		"data-ln-data-coordinator-filters": {
 			"direction": "both",
 			"sources": [
 				"src/ln-data-coordinator.js"
-			]
+			],
+			"type": "string",
+			"description": "Active encoded filter parameters"
 		},
 		"data-ln-data-coordinator-mapper": {
 			"direction": "author",
 			"sources": [
 				"src/ln-data-coordinator.js"
-			]
+			],
+			"type": "string",
+			"description": "Name of the registered data mapper transform"
 		},
 		"data-ln-data-coordinator-no-autosync": {
 			"direction": "author",
 			"sources": [
 				"src/ln-data-coordinator.js"
-			]
+			],
+			"type": "boolean",
+			"description": "Disables automatic synchronization upon state changes"
 		},
 		"data-ln-data-coordinator-scope": {
 			"direction": "author",
 			"sources": [
 				"src/ln-data-coordinator.js"
-			]
+			],
+			"type": "string",
+			"description": "Scope name addressing the bound data store and connector"
 		},
 		"data-ln-data-coordinator-search": {
 			"direction": "both",
 			"sources": [
 				"src/ln-data-coordinator.js"
-			]
+			],
+			"type": "string",
+			"description": "Active search query term"
 		},
 		"data-ln-data-coordinator-sort-direction": {
 			"direction": "both",
 			"sources": [
 				"src/ln-data-coordinator.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"asc",
+				"desc"
+			],
+			"fallback": "asc",
+			"description": "Sort direction"
 		},
 		"data-ln-data-coordinator-sort-field": {
 			"direction": "both",
 			"sources": [
 				"src/ln-data-coordinator.js"
-			]
+			],
+			"type": "string",
+			"description": "Active sort field property name"
 		},
 		"data-ln-data-coordinator-stale": {
 			"direction": "author",
 			"sources": [
 				"src/ln-data-coordinator.js"
-			]
+			],
+			"type": "marker",
+			"description": "Flag indicating data needs re-synchronization"
 		},
 		"data-ln-data-store": {
 			"direction": "author",

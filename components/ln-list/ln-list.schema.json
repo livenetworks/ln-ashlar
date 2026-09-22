@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-list",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -56,7 +56,10 @@
 			"sources": [
 				"ln-list-dev.scss",
 				"src/ln-list.js"
-			]
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "List instance name or identifier"
 		},
 		"data-ln-list-body": {
 			"direction": "author",
@@ -69,19 +72,26 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-list.js"
-			]
+			],
+			"type": "integer",
+			"min": 0,
+			"description": "Total item count override for virtual scrollbar calculation"
 		},
 		"data-ln-list-empty": {
 			"direction": "author",
 			"sources": [
 				"src/ln-list.js"
-			]
+			],
+			"type": "marker",
+			"description": "Container for list empty state"
 		},
 		"data-ln-list-field": {
 			"direction": "author",
 			"sources": [
 				"src/ln-list.js"
-			]
+			],
+			"type": "string",
+			"description": "Field name mapping for list item binding"
 		},
 		"data-ln-list-filtered": {
 			"direction": "author",
@@ -99,7 +109,9 @@
 			"direction": null,
 			"sources": [
 				"src/ln-list.js"
-			]
+			],
+			"type": "boolean",
+			"description": "Enables item selection controls"
 		},
 		"data-ln-list-selected": {
 			"direction": "author",
@@ -111,7 +123,10 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-list.js"
-			]
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "Source store or coordinator addressing"
 		},
 		"data-ln-list-total": {
 			"direction": "author",
@@ -123,19 +138,29 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-list.js"
-			]
+			],
+			"type": "integer",
+			"min": 10,
+			"description": "Virtual scrolling window size in items"
 		},
 		"data-ln-list-window-page": {
 			"direction": "author",
 			"sources": [
 				"src/ln-list.js"
-			]
+			],
+			"type": "integer",
+			"min": 5,
+			"description": "Virtual scrolling slice page size"
 		},
 		"data-ln-list-window-threshold": {
 			"direction": "author",
 			"sources": [
 				"src/ln-list.js"
-			]
+			],
+			"type": "integer",
+			"fallback": 50,
+			"min": 0,
+			"description": "Scroll threshold margin in pixels to trigger page fetch"
 		}
 	}
 }

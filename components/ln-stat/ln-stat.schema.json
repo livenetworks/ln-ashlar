@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-stat",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -14,13 +14,19 @@
 			"sources": [
 				"ln-stat-dev.scss",
 				"src/ln-stat.js"
-			]
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "Store or entity name to count"
 		},
 		"data-ln-stat-filter": {
 			"direction": null,
 			"sources": [
 				"src/ln-stat.js"
-			]
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "JSON or key:value filter criteria for record counting"
 		}
 	}
 }

@@ -13,9 +13,9 @@ import { isFieldValid, resolveActiveErrorKeys } from './validate-model.js';
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-validate':        {},
-		'data-ln-validate-errors': {},
-		'data-ln-validate-error':  {}
+		'data-ln-validate':        { type: 'marker', description: 'Activates validation on form input or field' },
+		'data-ln-validate-errors': { type: 'marker', description: 'Container element holding validation error message elements' },
+		'data-ln-validate-error':  { type: 'string', description: 'Identifies error message template for a specific validation rule' }
 	};
 
 	// ─── Component ─────────────────────────────────────────────

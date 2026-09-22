@@ -8,9 +8,9 @@ import { populateForm, dispatch, registerComponent, defineAttrs, attrSpec, attrS
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-form':               {},
-		'data-ln-form-action-edit':   { prop: '_actionEdit',   read: attrStr, fallback: '' },
-		'data-ln-form-action-method': { prop: '_actionMethod', read: attrStr, fallback: 'PUT' }
+		'data-ln-form':               { type: 'marker', description: 'Identifies the form element as an enhanced ln-form' },
+		'data-ln-form-action-edit':   { prop: '_actionEdit', type: 'string', read: attrStr, fallback: '', description: 'URL template or endpoint used when editing an existing record' },
+		'data-ln-form-action-method': { prop: '_actionMethod', type: 'enum', values: ['PUT', 'POST', 'PATCH'], fallback: 'PUT', description: 'HTTP method used when submitting edit action' }
 	};
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 

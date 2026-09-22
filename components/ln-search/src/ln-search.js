@@ -16,14 +16,14 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-search':           { effect: _syncAttribute },
-		'data-ln-hash':             { effect: _syncAttribute },
-		'data-ln-search-for':       { prop: 'targetId', read: attrStr, fallback: null },
-		'data-ln-search-fields':    {},
-		'data-ln-search-items':     {},
-		'data-ln-search-exclude':   {},
-		'data-ln-search-hide':      {},
-		'data-ln-search-clear-for': {}
+		'data-ln-search':           { type: 'string', effect: _syncAttribute, description: 'Active search query term on target element or container' },
+		'data-ln-hash':             { type: 'string', effect: _syncAttribute, description: 'URL hash routing key for search state persistence' },
+		'data-ln-search-for':       { prop: 'targetId', type: 'string', read: attrStr, fallback: null, description: 'Target table or list element ID that this input controls' },
+		'data-ln-search-fields':    { type: 'list', description: 'Comma-separated field names to include in client search' },
+		'data-ln-search-items':     { type: 'string', description: 'CSS selector matching searchable child items' },
+		'data-ln-search-exclude':   { type: 'string', description: 'CSS selector matching child items to exclude from search' },
+		'data-ln-search-hide':      { type: 'enum', values: ['collapse', 'none'], fallback: 'collapse', description: 'CSS hiding strategy for non-matching rows' },
+		'data-ln-search-clear-for': { type: 'trigger', description: 'Click trigger to clear search input for target' }
 	};
 
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);

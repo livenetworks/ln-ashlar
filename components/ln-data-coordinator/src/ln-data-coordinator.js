@@ -30,16 +30,16 @@ import { MutationReceipts } from './mutation-receipts';
 	}
 
 	const ATTRIBUTES = {
-		'data-ln-data-coordinator':                { prop: '_name', read: _readName },
-		'data-ln-data-coordinator-scope':          {},
-		'data-ln-data-coordinator-mapper':         { effect: _applyMapper },
-		'data-ln-data-coordinator-search':         { effect: _applyQuery },
-		'data-ln-data-coordinator-filters':        { effect: _applyQuery },
-		'data-ln-data-coordinator-sort-field':     { effect: _applyQuery },
-		'data-ln-data-coordinator-sort-direction': { effect: _applyQuery },
-		'data-ln-data-coordinator-stale':          {},
-		'data-ln-data-coordinator-no-autosync':    {},
-		'data-ln-data-coordinator-dict':           {}
+		'data-ln-data-coordinator':                { prop: '_name', type: 'string', read: _readName, description: 'Coordinator name or identifier for data routing' },
+		'data-ln-data-coordinator-scope':          { type: 'string', description: 'Scope name addressing the bound data store and connector' },
+		'data-ln-data-coordinator-mapper':         { type: 'string', effect: _applyMapper, description: 'Name of the registered data mapper transform' },
+		'data-ln-data-coordinator-search':         { type: 'string', effect: _applyQuery, description: 'Active search query term' },
+		'data-ln-data-coordinator-filters':        { type: 'string', effect: _applyQuery, description: 'Active encoded filter parameters' },
+		'data-ln-data-coordinator-sort-field':     { type: 'string', effect: _applyQuery, description: 'Active sort field property name' },
+		'data-ln-data-coordinator-sort-direction': { type: 'enum', values: ['asc', 'desc'], fallback: 'asc', effect: _applyQuery, description: 'Sort direction' },
+		'data-ln-data-coordinator-stale':          { type: 'marker', description: 'Flag indicating data needs re-synchronization' },
+		'data-ln-data-coordinator-no-autosync':    { type: 'boolean', description: 'Disables automatic synchronization upon state changes' },
+		'data-ln-data-coordinator-dict':           { type: 'marker', description: 'Marks dictionary container for coordinator translatable messages' }
 	};
 
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);

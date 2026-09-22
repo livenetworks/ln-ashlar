@@ -14,11 +14,11 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders, define
 	}
 
 	const ATTRIBUTES = {
-		'data-ln-couchdb-connector': {},
-		'data-ln-couchdb-url':       { prop: 'url',  read: attrStr, fallback: '', effect: _syncAttribute },
-		'data-ln-couchdb-db':        { prop: 'db',   read: attrStr, fallback: '', effect: _syncAttribute },
-		'data-ln-couchdb-auth':      { prop: 'auth', read: attrStr, fallback: '', effect: _syncAttribute },
-		'data-ln-couchdb-headers':   { effect: _syncAttribute }
+		'data-ln-couchdb-connector': { type: 'marker', description: 'Mounts CouchDB/PouchDB connector bridging database and ln-ashlar data coordinators' },
+		'data-ln-couchdb-url':       { prop: 'url',  read: attrStr, type: 'string', fallback: '', effect: _syncAttribute, description: 'CouchDB server base endpoint URL' },
+		'data-ln-couchdb-db':        { prop: 'db',   read: attrStr, type: 'string', fallback: '', effect: _syncAttribute, description: 'Target CouchDB database name' },
+		'data-ln-couchdb-auth':      { prop: 'auth', read: attrStr, type: 'string', fallback: '', effect: _syncAttribute, description: 'Authentication credentials for CouchDB requests' },
+		'data-ln-couchdb-headers':   { effect: _syncAttribute, type: 'json', fallback: null, description: 'Custom HTTP headers in JSON or semicolon-separated format' }
 	};
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 

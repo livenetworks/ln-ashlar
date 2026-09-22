@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-upload",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -27,88 +27,126 @@
 				"ln-upload-dev.scss",
 				"ln-upload.scss",
 				"src/ln-upload.js"
-			]
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "Endpoint URL for file uploads"
 		},
 		"data-ln-upload-accept": {
 			"direction": "author",
 			"sources": [
 				"src/ln-upload.js"
-			]
+			],
+			"type": "string",
+			"description": "Comma-separated list of allowed file extensions or MIME types"
 		},
 		"data-ln-upload-action": {
 			"direction": "author",
 			"sources": [
 				"src/ln-upload.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"remove",
+				"retry"
+			],
+			"description": "Action button within upload item"
 		},
 		"data-ln-upload-delete": {
 			"direction": null,
 			"sources": [
 				"src/ln-upload.js"
-			]
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "Endpoint URL pattern for deleting uploaded files"
 		},
 		"data-ln-upload-dict": {
 			"direction": null,
 			"sources": [
 				"ln-upload.scss",
 				"src/ln-upload.js"
-			]
+			],
+			"type": "string",
+			"description": "Dictionary key prefix mapping for translatable upload messages"
 		},
 		"data-ln-upload-ext": {
 			"direction": "runtime",
 			"sources": [
 				"src/ln-upload.js"
-			]
+			],
+			"type": "string",
+			"description": "Normalized file extension"
 		},
 		"data-ln-upload-file-field": {
 			"direction": null,
 			"sources": [
 				"src/ln-upload.js"
-			]
+			],
+			"type": "string",
+			"description": "Form data field name used for file payloads"
 		},
 		"data-ln-upload-id": {
 			"direction": "both",
 			"sources": [
 				"src/ln-upload.js"
-			]
+			],
+			"type": "string",
+			"description": "Server-assigned file identifier for completed upload"
 		},
 		"data-ln-upload-ids-field": {
 			"direction": null,
 			"sources": [
 				"src/ln-upload.js"
-			]
+			],
+			"type": "string",
+			"description": "Form field name for submitting uploaded file IDs"
 		},
 		"data-ln-upload-item": {
 			"direction": "both",
 			"sources": [
 				"ln-upload.scss",
 				"src/ln-upload.js"
-			]
+			],
+			"type": "marker",
+			"description": "Container element for an individual file upload item"
 		},
 		"data-ln-upload-list": {
 			"direction": "author",
 			"sources": [
 				"ln-upload-dev.scss",
 				"src/ln-upload.js"
-			]
+			],
+			"type": "marker",
+			"description": "Container element holding rendered upload items"
 		},
 		"data-ln-upload-local-id": {
 			"direction": "both",
 			"sources": [
 				"src/ln-upload.js"
-			]
+			],
+			"type": "string",
+			"description": "Client-generated unique ID for tracking file item in DOM"
 		},
 		"data-ln-upload-max-files": {
 			"direction": null,
 			"sources": [
 				"src/ln-upload.js"
-			]
+			],
+			"type": "integer",
+			"fallback": 0,
+			"min": 0,
+			"description": "Maximum number of files allowed in upload queue (0 for unlimited)"
 		},
 		"data-ln-upload-max-size": {
 			"direction": null,
 			"sources": [
 				"src/ln-upload.js"
-			]
+			],
+			"type": "integer",
+			"fallback": 0,
+			"min": 0,
+			"description": "Maximum allowed file size in bytes (0 for unlimited)"
 		},
 		"data-ln-upload-progress": {
 			"direction": null,
@@ -120,21 +158,36 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-upload.js"
-			]
+			],
+			"type": "integer",
+			"min": 0,
+			"description": "File size in bytes"
 		},
 		"data-ln-upload-state": {
 			"direction": "runtime",
 			"sources": [
 				"ln-upload.scss",
 				"src/ln-upload.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"ready",
+				"dragover",
+				"pending",
+				"uploading",
+				"success",
+				"error"
+			],
+			"description": "Runtime status of dropzone or individual upload item"
 		},
 		"data-ln-upload-zone": {
 			"direction": "author",
 			"sources": [
 				"ln-upload-dev.scss",
 				"src/ln-upload.js"
-			]
+			],
+			"type": "marker",
+			"description": "Designates container as dropzone for drag-and-drop file uploads"
 		}
 	}
 }

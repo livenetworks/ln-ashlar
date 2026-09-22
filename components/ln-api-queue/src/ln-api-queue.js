@@ -17,8 +17,8 @@ import { QueueStorage } from './queue-storage';
 	}
 
 	const ATTRIBUTES = {
-		'data-ln-api-queue':        {},
-		'data-ln-api-queue-online': { effect: _syncOnline }
+		'data-ln-api-queue':        { type: 'marker', description: 'Mounts offline API synchronization queue backed by IndexedDB' },
+		'data-ln-api-queue-online': { effect: _syncOnline, type: 'enum', values: ['true', 'false'], fallback: 'auto', description: 'Network connectivity override (true/false, or auto-detect from navigator.onLine)' }
 	};
 
 	function _uuid() {

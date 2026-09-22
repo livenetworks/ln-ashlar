@@ -9,8 +9,8 @@ import { calculateRelativeTime, resolveDateFormatOptions } from './time-model.js
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-time':        { effect: _onAttributeChange },
-		'data-ln-time-locale': { effect: _onAttributeChange }
+		'data-ln-time':        { type: 'enum', values: ['relative', 'short', 'medium', 'long', 'iso'], fallback: 'relative', effect: _onAttributeChange, description: 'Time format style preset or activator' },
+		'data-ln-time-locale': { type: 'string', effect: _onAttributeChange, description: 'BCP 47 language tag override for time formatting' }
 	};
 
 	// ─── Formatter Cache ──────────────────────────────────────

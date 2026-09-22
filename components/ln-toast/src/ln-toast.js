@@ -10,11 +10,11 @@ import { guardBody, cloneTemplateScoped, fill, registerComponent, dispatch, defi
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-toast':         {},
-		'data-ln-toast-timeout': { prop: 'timeoutDefault', read: attrInt, fallback: 6000 },
-		'data-ln-toast-max':     { prop: 'max',            read: attrInt, fallback: 5 },
-		'data-ln-toast-close':   {},
-		'data-ln-toast-item':    {}
+		'data-ln-toast':         { type: 'marker', description: 'Initializes the toast notifications container' },
+		'data-ln-toast-timeout': { prop: 'timeoutDefault', type: 'integer', read: attrInt, fallback: 6000, min: 500, description: 'Default auto-dismiss timeout in ms' },
+		'data-ln-toast-max':     { prop: 'max', type: 'integer', read: attrInt, fallback: 5, min: 1, description: 'Maximum visible concurrent toast notifications' },
+		'data-ln-toast-close':   { type: 'trigger', description: 'Click dismiss trigger inside a toast item' },
+		'data-ln-toast-item':    { type: 'marker', description: 'Individual toast notification element' }
 	};
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 

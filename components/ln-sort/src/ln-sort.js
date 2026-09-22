@@ -17,12 +17,12 @@ import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortT
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-sort':       { prop: 'targetId',      read: attrStr, fallback: null },
-		'data-ln-sort-field': { prop: 'field',         read: _readOrNull, effect: _syncAttribute },
-		'data-ln-sort-dir':   {},
-		'data-ln-sort-items': { prop: 'itemsSelector', read: _readOrNull },
-		'data-ln-sort-state': { effect: _syncAttribute },
-		'data-ln-hash':       { effect: _syncAttribute }
+		'data-ln-sort':       { prop: 'targetId', type: 'string', read: attrStr, fallback: null, description: 'Target table or list element ID to sort' },
+		'data-ln-sort-field': { prop: 'field', type: 'string', read: _readOrNull, effect: _syncAttribute, description: 'Field name or column key to sort by' },
+		'data-ln-sort-dir':   { type: 'enum', values: ['asc', 'desc'], fallback: 'asc', description: 'Default or requested sort direction' },
+		'data-ln-sort-items': { prop: 'itemsSelector', type: 'string', read: _readOrNull, description: 'CSS selector matching sortable child items' },
+		'data-ln-sort-state': { type: 'enum', values: ['asc', 'desc', 'none'], fallback: 'none', effect: _syncAttribute, description: 'Active sort state applied to column or control' },
+		'data-ln-hash':       { type: 'string', effect: _syncAttribute, description: 'URL hash routing key for sort state persistence' }
 	};
 
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);

@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-number",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -20,31 +20,44 @@
 			"sources": [
 				"ln-number-dev.scss",
 				"src/ln-number.js"
-			]
+			],
+			"type": "marker",
+			"description": "Activates localized number formatting on input or text element"
 		},
 		"data-ln-number-decimals": {
 			"direction": "author",
 			"sources": [
 				"src/ln-number.js"
-			]
+			],
+			"type": "integer",
+			"fallback": 0,
+			"min": 0,
+			"max": 20,
+			"description": "Number of decimal fraction digits"
 		},
 		"data-ln-number-max": {
 			"direction": "author",
 			"sources": [
 				"src/ln-number.js"
-			]
+			],
+			"type": "float",
+			"description": "Maximum allowed numeric value"
 		},
 		"data-ln-number-min": {
 			"direction": null,
 			"sources": [
 				"src/ln-number.js"
-			]
+			],
+			"type": "float",
+			"description": "Minimum allowed numeric value"
 		},
 		"data-ln-value": {
 			"direction": "both",
 			"sources": [
 				"src/ln-number.js"
-			]
+			],
+			"type": "float",
+			"description": "Raw unformatted numeric value"
 		}
 	}
 }

@@ -8,8 +8,8 @@ import { registerComponent, dispatch, dispatchCancelable, defineAttrs, attrSpec,
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-nav':       { effect: _syncAttribute },
-		'data-ln-nav-exact': { prop: 'exact', read: attrBool, effect: _syncAttribute }
+		'data-ln-nav':       { effect: _syncAttribute, type: 'string', fallback: 'active', description: 'CSS class name applied to active navigation links' },
+		'data-ln-nav-exact': { prop: 'exact', read: attrBool, effect: _syncAttribute, type: 'boolean', fallback: false, description: 'Match exact URL pathname instead of prefix matching' }
 	};
 
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);

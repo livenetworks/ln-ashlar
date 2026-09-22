@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-time",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -14,13 +14,25 @@
 			"sources": [
 				"ln-time-dev.scss",
 				"src/ln-time.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"relative",
+				"short",
+				"medium",
+				"long",
+				"iso"
+			],
+			"fallback": "relative",
+			"description": "Time format style preset or activator"
 		},
 		"data-ln-time-locale": {
 			"direction": "author",
 			"sources": [
 				"src/ln-time.js"
-			]
+			],
+			"type": "string",
+			"description": "BCP 47 language tag override for time formatting"
 		}
 	}
 }

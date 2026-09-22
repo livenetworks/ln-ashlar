@@ -11,8 +11,8 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-sortable':         { effect: _syncEnabled },
-		'data-ln-sortable-handle':  {}
+		'data-ln-sortable':        { effect: _syncEnabled, type: 'enum', values: ['enabled', 'disabled'], fallback: 'enabled', description: 'Enables drag-and-drop item reordering or disables when set to disabled' },
+		'data-ln-sortable-handle': { type: 'marker', description: 'Designates an element as the drag handle for its parent sortable item' }
 	};
 
 	// ─── Component ─────────────────────────────────────────────

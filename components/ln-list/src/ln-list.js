@@ -46,15 +46,15 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	}
 
 	const ATTRIBUTES = {
-		'data-ln-list':                  { prop: 'name', read: attrStr, fallback: '' },
-		'data-ln-list-source':           { prop: 'source', read: attrStr, fallback: '' },
-		'data-ln-list-selectable':       { prop: '_selectable', read: attrBool },
-		'data-ln-list-window':           { effect: _applyWindow },
-		'data-ln-list-window-page':      { effect: _applyWindowPage },
-		'data-ln-list-window-threshold': { effect: _applyWindowThreshold },
-		'data-ln-list-count':            { effect: _applyCount },
-		'data-ln-list-empty':            {},
-		'data-ln-list-field':            {}
+		'data-ln-list':                  { prop: 'name', type: 'string', read: attrStr, fallback: '', description: 'List instance name or identifier' },
+		'data-ln-list-source':           { prop: 'source', type: 'string', read: attrStr, fallback: '', description: 'Source store or coordinator addressing' },
+		'data-ln-list-selectable':       { prop: '_selectable', type: 'boolean', read: attrBool, description: 'Enables item selection controls' },
+		'data-ln-list-window':           { type: 'integer', fallback: WINDOW_DEFAULT, min: 10, effect: _applyWindow, description: 'Virtual scrolling window size in items' },
+		'data-ln-list-window-page':      { type: 'integer', fallback: WINDOW_PAGE, min: 5, effect: _applyWindowPage, description: 'Virtual scrolling slice page size' },
+		'data-ln-list-window-threshold': { type: 'integer', fallback: 50, min: 0, effect: _applyWindowThreshold, description: 'Scroll threshold margin in pixels to trigger page fetch' },
+		'data-ln-list-count':            { type: 'integer', min: 0, effect: _applyCount, description: 'Total item count override for virtual scrollbar calculation' },
+		'data-ln-list-empty':            { type: 'marker', description: 'Container for list empty state' },
+		'data-ln-list-field':            { type: 'string', description: 'Field name mapping for list item binding' }
 	};
 
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);

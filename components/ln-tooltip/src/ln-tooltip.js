@@ -11,11 +11,11 @@ import { computePlacement, dispatch, registerComponent } from '../../ln-core';
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-tooltip-enhance':   {},
-		'data-ln-tooltip-enhanced':  {},
-		'data-ln-tooltip':           {},
-		'data-ln-tooltip-position':  {},
-		'data-ln-tooltip-placement': {}
+		'data-ln-tooltip-enhance':   { type: 'marker', description: 'Activates enhanced tooltip behavior on element or container' },
+		'data-ln-tooltip-enhanced':  { type: 'marker', description: 'Runtime marker applied to enhanced tooltip trigger' },
+		'data-ln-tooltip':           { type: 'string', description: 'Tooltip text content to display' },
+		'data-ln-tooltip-position':  { type: 'enum', values: ['top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left', 'left-start', 'left-end', 'right', 'right-start', 'right-end'], fallback: 'top', description: 'Preferred positioning anchor' },
+		'data-ln-tooltip-placement': { type: 'enum', values: ['top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left', 'left-start', 'left-end', 'right', 'right-start', 'right-end'], description: 'Active calculated placement applied at runtime' }
 	};
 
 	let uidCounter = 0;

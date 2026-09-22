@@ -14,8 +14,8 @@ import { resolveProgressMax } from './progress-model.js';
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-progress':     { effect: _syncAttribute },
-		'data-ln-progress-max': { effect: _syncAttribute }
+		'data-ln-progress':     { type: 'float', fallback: 0, min: 0, effect: _syncAttribute, description: 'Current progress value' },
+		'data-ln-progress-max': { type: 'float', fallback: 100, min: 0, effect: _syncAttribute, description: 'Maximum progress scale value' }
 	};
 
 	function _constructor(dom) {

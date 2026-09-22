@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-toast",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -15,31 +15,45 @@
 				"ln-toast-dev.scss",
 				"ln-toast.scss",
 				"src/ln-toast.js"
-			]
+			],
+			"type": "marker",
+			"description": "Initializes the toast notifications container"
 		},
 		"data-ln-toast-close": {
 			"direction": "author",
 			"sources": [
 				"src/ln-toast.js"
-			]
+			],
+			"type": "trigger",
+			"description": "Click dismiss trigger inside a toast item"
 		},
 		"data-ln-toast-item": {
 			"direction": "both",
 			"sources": [
 				"src/ln-toast.js"
-			]
+			],
+			"type": "marker",
+			"description": "Individual toast notification element"
 		},
 		"data-ln-toast-max": {
 			"direction": null,
 			"sources": [
 				"src/ln-toast.js"
-			]
+			],
+			"type": "integer",
+			"fallback": 5,
+			"min": 1,
+			"description": "Maximum visible concurrent toast notifications"
 		},
 		"data-ln-toast-timeout": {
 			"direction": "author",
 			"sources": [
 				"src/ln-toast.js"
-			]
+			],
+			"type": "integer",
+			"fallback": 6000,
+			"min": 500,
+			"description": "Default auto-dismiss timeout in ms"
 		},
 		"data-ln-toast-when": {
 			"direction": null,

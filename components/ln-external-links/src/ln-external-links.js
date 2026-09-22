@@ -5,6 +5,11 @@ import { dispatch, guardBody, observeAttributes } from '../../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-external-link': { type: 'enum', values: ['processed'], description: 'Marker indicating link was identified and processed as external' }
+	};
+
 	function _isExternalLink(link) {
 		return link.hostname && link.hostname !== window.location.hostname;
 	}

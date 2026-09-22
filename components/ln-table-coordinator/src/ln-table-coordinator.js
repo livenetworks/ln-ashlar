@@ -8,7 +8,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-table-coordinator': {}
+		'data-ln-table-coordinator': { type: 'marker', description: 'Mounts table coordinator mediating between table, search, filter, and pagination' }
 	};
 
 	// ─── Keyboard Navigation Search Focus ('/' shortcut) ──

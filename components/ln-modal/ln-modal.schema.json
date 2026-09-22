@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-modal",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -15,13 +15,22 @@
 				"ln-modal-dev.scss",
 				"ln-modal.scss",
 				"src/ln-modal.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"open",
+				"close"
+			],
+			"fallback": "close",
+			"description": "Control state of the modal dialog"
 		},
 		"data-ln-modal-close": {
 			"direction": "author",
 			"sources": [
 				"src/ln-modal.js"
-			]
+			],
+			"type": "trigger",
+			"description": "Click dismiss trigger inside the modal"
 		},
 		"data-ln-modal-for": {
 			"direction": null,

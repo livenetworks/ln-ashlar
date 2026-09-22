@@ -9,7 +9,7 @@ import { generateSlug } from './slug-model.js';
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-slug-from': { prop: 'sourceName', read: attrStr, fallback: '' }
+		'data-ln-slug-from': { prop: 'sourceName', type: 'string', read: attrStr, fallback: '', description: 'Name of the source input field to derive URL slug from' }
 	};
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 

@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-tooltip",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -15,33 +15,72 @@
 				"ln-tooltip-dev.scss",
 				"ln-tooltip.scss",
 				"src/ln-tooltip.js"
-			]
+			],
+			"type": "string",
+			"description": "Tooltip text content to display"
 		},
 		"data-ln-tooltip-enhance": {
 			"direction": null,
 			"sources": [
 				"ln-tooltip.scss",
 				"src/ln-tooltip.js"
-			]
+			],
+			"type": "marker",
+			"description": "Activates enhanced tooltip behavior on element or container"
 		},
 		"data-ln-tooltip-enhanced": {
 			"direction": "both",
 			"sources": [
 				"ln-tooltip.scss",
 				"src/ln-tooltip.js"
-			]
+			],
+			"type": "marker",
+			"description": "Runtime marker applied to enhanced tooltip trigger"
 		},
 		"data-ln-tooltip-placement": {
 			"direction": "runtime",
 			"sources": [
 				"src/ln-tooltip.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"top",
+				"top-start",
+				"top-end",
+				"bottom",
+				"bottom-start",
+				"bottom-end",
+				"left",
+				"left-start",
+				"left-end",
+				"right",
+				"right-start",
+				"right-end"
+			],
+			"description": "Active calculated placement applied at runtime"
 		},
 		"data-ln-tooltip-position": {
 			"direction": "author",
 			"sources": [
 				"src/ln-tooltip.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"top",
+				"top-start",
+				"top-end",
+				"bottom",
+				"bottom-start",
+				"bottom-end",
+				"left",
+				"left-start",
+				"left-end",
+				"right",
+				"right-start",
+				"right-end"
+			],
+			"fallback": "top",
+			"description": "Preferred positioning anchor"
 		}
 	}
 }

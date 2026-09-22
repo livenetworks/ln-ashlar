@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-persist",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -7,13 +7,22 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-persist.js"
-			]
+			],
+			"type": "string",
+			"description": "Storage key identifier for persisting component state in localStorage"
 		},
 		"data-ln-persist-scope": {
 			"direction": "author",
 			"sources": [
 				"src/ln-persist.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"global",
+				"page"
+			],
+			"fallback": "global",
+			"description": "Persistence scope namespace (global or per-page path)"
 		}
 	}
 }

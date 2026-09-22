@@ -8,11 +8,10 @@ import { dispatch, dispatchCancelable, isTargetDisabled, registerComponent, shou
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-toggle':        { effect: _syncAttribute },
-		'data-ln-toggle-for':    {},
-		'data-ln-toggle-action': {}
+		'data-ln-toggle':        { effect: _syncAttribute, type: 'enum', values: ['open', 'close'], fallback: 'close', description: 'Visibility state of toggleable element' },
+		'data-ln-toggle-for':    { type: 'string', description: 'Target element ID to toggle on trigger click' },
+		'data-ln-toggle-action': { type: 'enum', values: ['open', 'close', 'toggle'], fallback: 'toggle', description: 'Action performed on target element when trigger is clicked' }
 	};
 
 	const instances = new Set();

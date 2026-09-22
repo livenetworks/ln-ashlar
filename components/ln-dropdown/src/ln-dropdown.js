@@ -9,10 +9,10 @@ import { dispatch, computePlacement, measureHidden, registerComponent, defineAtt
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-dropdown':           {},
-		'data-ln-dropdown-position':  { prop: 'position', read: attrStr, fallback: DEFAULT_POSITION },
-		'data-ln-dropdown-placement': {},
-		'data-ln-dropdown-menu':      {}
+		'data-ln-dropdown':           { type: 'marker', description: 'Initializes the dropdown container' },
+		'data-ln-dropdown-position':  { prop: 'position', type: 'enum', values: ['top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left', 'left-start', 'left-end', 'right', 'right-start', 'right-end'], fallback: DEFAULT_POSITION, description: 'Preferred positioning anchor' },
+		'data-ln-dropdown-placement': { type: 'enum', values: ['top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left', 'left-start', 'left-end', 'right', 'right-start', 'right-end'], description: 'Active calculated placement applied at runtime' },
+		'data-ln-dropdown-menu':      { type: 'marker', description: 'Dropdown menu element containing items' }
 	};
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 

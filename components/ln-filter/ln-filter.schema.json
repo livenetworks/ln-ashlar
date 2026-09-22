@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-filter",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -38,21 +38,32 @@
 			"sources": [
 				"ln-filter-dev.scss",
 				"src/ln-filter.js"
-			]
+			],
+			"type": "string",
+			"description": "Target table or list element ID to filter"
 		},
 		"data-ln-filter-col": {
 			"direction": "author",
 			"sources": [
 				"src/filter-model.js",
 				"src/ln-filter.js"
-			]
+			],
+			"type": "string",
+			"description": "Column name or index filter specifier"
 		},
 		"data-ln-filter-hide": {
 			"direction": "runtime",
 			"sources": [
 				"ln-filter.scss",
 				"src/ln-filter.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"collapse",
+				"none"
+			],
+			"fallback": "collapse",
+			"description": "CSS hiding strategy for non-matching rows"
 		},
 		"data-ln-filter-key": {
 			"direction": "author",
@@ -60,31 +71,41 @@
 				"ln-filter-dev.scss",
 				"src/filter-model.js",
 				"src/ln-filter.js"
-			]
+			],
+			"type": "string",
+			"description": "Field key for filter matching"
 		},
 		"data-ln-filter-reset": {
 			"direction": "author",
 			"sources": [
 				"src/ln-filter.js"
-			]
+			],
+			"type": "trigger",
+			"description": "Filter reset button or option trigger"
 		},
 		"data-ln-filter-value": {
 			"direction": "author",
 			"sources": [
 				"src/ln-filter.js"
-			]
+			],
+			"type": "string",
+			"description": "Value to match for this filter input"
 		},
 		"data-ln-filter-values": {
 			"direction": "both",
 			"sources": [
 				"src/ln-filter.js"
-			]
+			],
+			"type": "string",
+			"description": "Encoded active filter values"
 		},
 		"data-ln-hash": {
 			"direction": null,
 			"sources": [
 				"src/ln-filter.js"
-			]
+			],
+			"type": "string",
+			"description": "URL hash routing key for filter state persistence"
 		},
 		"data-ln-popover": {
 			"direction": "author",

@@ -6,6 +6,11 @@ import { dispatchCancelable, guardBody, observeAttributes } from '../../ln-core'
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-link': { type: 'marker', description: 'Makes entire table row or container clickable based on child anchor link' }
+	};
+
 	// ─── Status Bar ────────────────────────────────────────────
 
 	let _statusEl = null;

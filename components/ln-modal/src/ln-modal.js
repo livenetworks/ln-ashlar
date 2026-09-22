@@ -8,7 +8,17 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-modal': { effect: _syncAttribute }
+		'data-ln-modal': {
+			type: 'enum',
+			values: ['open', 'close'],
+			fallback: 'close',
+			effect: _syncAttribute,
+			description: 'Control state of the modal dialog'
+		},
+		'data-ln-modal-close': {
+			type: 'trigger',
+			description: 'Click dismiss trigger inside the modal'
+		}
 	};
 
 	// ─── Component Constructor ─────────────────────────────

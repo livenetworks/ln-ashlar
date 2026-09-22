@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-tabs",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -14,14 +14,18 @@
 			"sources": [
 				"ln-tabs.scss",
 				"src/ln-tabs.js"
-			]
+			],
+			"type": "string",
+			"description": "Tab content panel key identifier matching corresponding tab"
 		},
 		"data-ln-tab": {
 			"direction": "author",
 			"sources": [
 				"ln-tabs-dev.scss",
 				"src/ln-tabs.js"
-			]
+			],
+			"type": "string",
+			"description": "Tab trigger key identifier"
 		},
 		"data-ln-tabs": {
 			"direction": null,
@@ -29,32 +33,43 @@
 				"ln-tabs-dev.scss",
 				"ln-tabs.scss",
 				"src/ln-tabs.js"
-			]
+			],
+			"type": "marker",
+			"description": "Mounts lnTabs component instance on tabs container"
 		},
 		"data-ln-tabs-active": {
 			"direction": "both",
 			"sources": [
 				"src/ln-tabs.js"
-			]
+			],
+			"type": "string",
+			"description": "Active tab key identifier"
 		},
 		"data-ln-tabs-default": {
 			"direction": "author",
 			"sources": [
 				"src/ln-tabs.js"
-			]
+			],
+			"type": "string",
+			"description": "Default fallback tab key when none selected"
 		},
 		"data-ln-tabs-focus": {
 			"direction": null,
 			"sources": [
 				"src/ln-tabs.js"
-			]
+			],
+			"type": "boolean",
+			"fallback": true,
+			"description": "Whether to shift focus to newly activated tab panel"
 		},
 		"data-ln-tabs-key": {
 			"direction": "author",
 			"sources": [
 				"ln-tabs-dev.scss",
 				"src/ln-tabs.js"
-			]
+			],
+			"type": "string",
+			"description": "Hash namespace key for URL hash synchronization"
 		}
 	}
 }

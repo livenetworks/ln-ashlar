@@ -19,14 +19,14 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-data-store':                  { effect: _markFrozen },
-		'data-ln-data-store-indexes':          { effect: _markFrozen },
-		'data-ln-data-store-stale':            { prop: '_staleThreshold',  read: _readStale, fallback: 300 },
-		'data-ln-data-store-search-fields':    { prop: '_searchFields',    read: attrList },
-		'data-ln-data-store-no-local-query':   { prop: 'noLocalQuery',     read: attrBool },
-		'data-ln-data-store-window':           { prop: '_windowSize',      read: attrInt, fallback: 1000, effect: _applyWindowSize },
-		'data-ln-data-store-window-page':      { prop: '_windowPageSize',  read: attrInt, fallback: 200,  effect: _applyWindowPageSize },
-		'data-ln-data-store-frozen':           {}
+		'data-ln-data-store':                  { type: 'marker', effect: _markFrozen, description: 'Identifies the element as a data-store definition container' },
+		'data-ln-data-store-indexes':          { type: 'list', effect: _markFrozen, description: 'Comma-separated index field names for the IndexedDB store' },
+		'data-ln-data-store-stale':            { prop: '_staleThreshold', type: 'integer', read: _readStale, fallback: 300, description: 'Cache staleness threshold in seconds, or -1/never' },
+		'data-ln-data-store-search-fields':    { prop: '_searchFields', type: 'list', read: attrList, description: 'Record fields to index for client-side search' },
+		'data-ln-data-store-no-local-query':   { prop: 'noLocalQuery', type: 'boolean', read: attrBool, description: 'Bypasses local IndexedDB query resolution, forcing remote fetching' },
+		'data-ln-data-store-window':           { prop: '_windowSize', type: 'integer', read: attrInt, fallback: 1000, min: 10, effect: _applyWindowSize, description: 'Virtual scrolling cache window size in records' },
+		'data-ln-data-store-window-page':      { prop: '_windowPageSize', type: 'integer', read: attrInt, fallback: 200, min: 5, effect: _applyWindowPageSize, description: 'Virtual scrolling slice page size' },
+		'data-ln-data-store-frozen':           { type: 'marker', description: 'Applied at runtime to indicate store schema is locked in IndexedDB' }
 	};
 
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);

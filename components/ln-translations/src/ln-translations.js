@@ -8,17 +8,17 @@ import { cloneTemplate, dispatch, dispatchCancelable, registerComponent, defineA
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-translations':              {},
-		'data-ln-translations-default':      { prop: 'defaultLang', read: attrStr, fallback: '' },
-		'data-ln-translations-placeholder':  { prop: 'placeholderLabel', read: attrStr, fallback: '{lang} translation' },
-		'data-ln-translations-remove-label': { prop: 'removeLabel', read: attrStr, fallback: 'Remove {lang}' },
-		'data-ln-translations-locales':      { prop: '_localesRaw', read: attrStr, fallback: '' },
-		'data-ln-translations-active':        {},
-		'data-ln-translations-add':           {},
-		'data-ln-translations-lang':          {},
-		'data-ln-translations-prefix':        {},
-		'data-ln-translatable':              {},
-		'data-ln-translatable-lang':         {}
+		'data-ln-translations':              { type: 'marker', description: 'Mounts multi-language translation manager on form container' },
+		'data-ln-translations-default':      { prop: 'defaultLang', read: attrStr, type: 'string', fallback: '', description: 'Default primary language code (e.g. en)' },
+		'data-ln-translations-placeholder':  { prop: 'placeholderLabel', read: attrStr, type: 'string', fallback: '{lang} translation', description: 'Placeholder label pattern for cloned translation inputs' },
+		'data-ln-translations-remove-label': { prop: 'removeLabel', read: attrStr, type: 'string', fallback: 'Remove {lang}', description: 'Accessible label template for translation removal buttons' },
+		'data-ln-translations-locales':      { prop: '_localesRaw', read: attrStr, type: 'json', fallback: '', description: 'JSON dictionary of supported locale codes and display labels' },
+		'data-ln-translations-active':        { type: 'marker', description: 'Container holding active language badge tags' },
+		'data-ln-translations-add':           { type: 'string', description: 'Trigger button action to add specified language translation fields' },
+		'data-ln-translations-lang':          { type: 'string', description: 'Language code associated with active language badge' },
+		'data-ln-translations-prefix':        { type: 'string', description: 'Prefix format pattern for cloned translated field names' },
+		'data-ln-translatable':              { type: 'marker', description: 'Marks form control as translatable into multiple languages' },
+		'data-ln-translatable-lang':         { type: 'string', description: 'Language code assigned to specific translatable input instance' }
 	};
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 

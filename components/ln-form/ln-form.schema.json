@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-form",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -14,19 +14,32 @@
 			"sources": [
 				"ln-form-dev.scss",
 				"src/ln-form.js"
-			]
+			],
+			"type": "marker",
+			"description": "Identifies the form element as an enhanced ln-form"
 		},
 		"data-ln-form-action-edit": {
 			"direction": "author",
 			"sources": [
 				"src/ln-form.js"
-			]
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "URL template or endpoint used when editing an existing record"
 		},
 		"data-ln-form-action-method": {
 			"direction": null,
 			"sources": [
 				"src/ln-form.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"PUT",
+				"POST",
+				"PATCH"
+			],
+			"fallback": "PUT",
+			"description": "HTTP method used when submitting edit action"
 		}
 	}
 }

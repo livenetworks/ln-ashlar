@@ -5,6 +5,12 @@ import { } from '../../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-fill-form': { type: 'string', description: 'ID of target form populated with source element dataset properties' },
+		'data-ln-fill-id':   { type: 'string', description: 'Unique identifier of data source element providing fill attributes' }
+	};
+
 	// data-ln-fill-store is RESERVED for a future store-source seam.
 	// When implemented, the click handler will look up a record from a named
 	// store (e.g. window.lnCore stores) instead of reading flat data-* attributes.

@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-api-connector",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -7,61 +7,90 @@
 			"direction": null,
 			"sources": [
 				"src/ln-api-connector.js"
-			]
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "Base URL endpoint for API requests"
 		},
 		"data-ln-api-connector": {
 			"direction": null,
 			"sources": [
 				"src/ln-api-connector.js"
-			]
+			],
+			"type": "marker",
+			"description": "Mounts API connector bridging REST backend and ln-ashlar data coordinators"
 		},
 		"data-ln-api-connector-query-debounce": {
 			"direction": "author",
 			"sources": [
 				"src/ln-api-connector.js"
-			]
+			],
+			"type": "integer",
+			"fallback": 200,
+			"min": 0,
+			"description": "Debounce delay in milliseconds before dispatching query requests"
 		},
 		"data-ln-api-headers": {
 			"direction": null,
 			"sources": [
 				"src/ln-api-connector.js"
-			]
+			],
+			"type": "json",
+			"description": "Custom HTTP headers in JSON format or semicolon-separated pairs"
 		},
 		"data-ln-api-param-limit": {
 			"direction": "author",
 			"sources": [
 				"src/ln-api-connector.js"
-			]
+			],
+			"type": "string",
+			"fallback": "limit",
+			"description": "Query parameter name for pagination page size"
 		},
 		"data-ln-api-param-offset": {
 			"direction": "author",
 			"sources": [
 				"src/ln-api-connector.js"
-			]
+			],
+			"type": "string",
+			"fallback": "offset",
+			"description": "Query parameter name for pagination offset"
 		},
 		"data-ln-api-param-search": {
 			"direction": "author",
 			"sources": [
 				"src/ln-api-connector.js"
-			]
+			],
+			"type": "string",
+			"fallback": "search",
+			"description": "Query parameter name for text search filter"
 		},
 		"data-ln-api-param-sort-dir": {
 			"direction": "author",
 			"sources": [
 				"src/ln-api-connector.js"
-			]
+			],
+			"type": "string",
+			"fallback": "sort_dir",
+			"description": "Query parameter name for sort direction"
 		},
 		"data-ln-api-param-sort-field": {
 			"direction": "author",
 			"sources": [
 				"src/ln-api-connector.js"
-			]
+			],
+			"type": "string",
+			"fallback": "sort_by",
+			"description": "Query parameter name for sort field"
 		},
 		"data-ln-api-path": {
 			"direction": null,
 			"sources": [
 				"src/ln-api-connector.js"
-			]
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "Resource path appended to base URL"
 		}
 	}
 }

@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-router",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -26,31 +26,43 @@
 			"sources": [
 				"ln-router-dev.scss",
 				"src/ln-router.js"
-			]
+			],
+			"type": "string",
+			"description": "URL path pattern matched by this route template"
 		},
 		"data-ln-route-keep": {
 			"direction": "author",
 			"sources": [
 				"src/ln-router.js"
-			]
+			],
+			"type": "boolean",
+			"fallback": false,
+			"description": "Preserve mounted DOM nodes in memory instead of rebuilding"
 		},
 		"data-ln-route-target": {
 			"direction": "author",
 			"sources": [
 				"src/ln-router.js"
-			]
+			],
+			"type": "string",
+			"description": "Target outlet element selector where route content is rendered"
 		},
 		"data-ln-route-title": {
 			"direction": "author",
 			"sources": [
 				"src/ln-router.js"
-			]
+			],
+			"type": "string",
+			"description": "Document title template set when route is activated"
 		},
 		"data-ln-router-hydrate": {
 			"direction": "author",
 			"sources": [
 				"src/ln-router.js"
-			]
+			],
+			"type": "boolean",
+			"fallback": false,
+			"description": "Hydrate existing DOM content on initial router boot"
 		}
 	}
 }

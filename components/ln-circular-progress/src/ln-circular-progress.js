@@ -13,9 +13,9 @@ import { calculateProgress, dispatch, registerComponent } from '../../ln-core';
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-circular-progress':       { effect: _syncAttribute },
-		'data-ln-circular-progress-max':   { effect: _syncAttribute },
-		'data-ln-circular-progress-label': { effect: _syncAttribute }
+		'data-ln-circular-progress':       { type: 'float', fallback: 0, min: 0, effect: _syncAttribute, description: 'Current circular progress value' },
+		'data-ln-circular-progress-max':   { type: 'float', fallback: 100, min: 0, effect: _syncAttribute, description: 'Maximum circular progress scale value' },
+		'data-ln-circular-progress-label': { type: 'string', effect: _syncAttribute, description: 'Text label format or template inside circular progress' }
 	};
 
 	const SVG_NS = 'http://www.w3.org/2000/svg';

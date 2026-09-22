@@ -36,14 +36,14 @@ import {
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-date':          { effect: _syncAttribute },
-		'data-ln-date-format':   { effect: _syncAttribute },
-		'data-ln-date-locale':   { effect: _syncAttribute },
-		'data-ln-value':         { effect: _syncAttribute },
-		'data-ln-date-dict':     {},
-		'data-ln-date-dict-key': {},
-		'data-ln-date-field':    {},
-		'data-ln-date-label':    {}
+		'data-ln-date':          { type: 'enum', values: ['short', 'medium', 'long', 'full', 'iso'], fallback: 'medium', effect: _syncAttribute, description: 'Date display style preset or activator' },
+		'data-ln-date-format':   { type: 'string', effect: _syncAttribute, description: 'Custom Intl.DateTimeFormat pattern or options' },
+		'data-ln-date-locale':   { type: 'string', effect: _syncAttribute, description: 'BCP 47 language tag override for date formatting' },
+		'data-ln-value':         { type: 'string', effect: _syncAttribute, description: 'Raw ISO date string or timestamp' },
+		'data-ln-date-dict':     { type: 'marker', description: 'Container for date translation dictionary' },
+		'data-ln-date-dict-key': { type: 'string', description: 'Dictionary key for relative time or custom date formatting' },
+		'data-ln-date-field':    { type: 'string', description: 'Field name mapping for date record binding' },
+		'data-ln-date-label':    { type: 'string', description: 'Accessible label text for the date input' }
 	};
 
 	const _inputValueDesc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');

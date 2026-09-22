@@ -8,7 +8,7 @@ import { registerComponent } from '../../ln-core';
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-autoresize': {}
+		'data-ln-autoresize': { type: 'marker', description: 'Automatically adjusts textarea height to match its scrollable content' }
 	};
 
 	// ─── Component ─────────────────────────────────────────────

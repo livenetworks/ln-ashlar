@@ -12,10 +12,10 @@ import { buildAutosaveKey, parseAutosaveDebounce } from './autosave-model.js';
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-autosave':                {},
-		'data-ln-autosave-debounce-input': {},
-		'data-ln-autosave-clear':          {},
-		'data-ln-autosave-exclude':        {}
+		'data-ln-autosave':                { type: 'string', description: 'Form autosave storage key identifier' },
+		'data-ln-autosave-debounce-input': { type: 'integer', fallback: 500, min: 0, description: 'Debounce delay in milliseconds before saving on input events' },
+		'data-ln-autosave-clear':          { type: 'marker', description: 'Designates a button that clears saved form data from localStorage' },
+		'data-ln-autosave-exclude':        { type: 'marker', description: 'Excludes form control from autosave serialization' }
 	};
 
 	function _isFormField(el) {

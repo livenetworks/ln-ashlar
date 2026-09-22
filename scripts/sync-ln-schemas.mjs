@@ -18,7 +18,8 @@ const __dirname = path.dirname(__filename);
 const DEFAULT_REPO_ROOT = path.resolve(__dirname, '..');
 
 const GENERATOR_NAME = 'scripts/sync-ln-schemas.mjs';
-const GENERATOR_COMMENT = 'This file is partly generated. The $comment, component, generator, and each attribute\'s direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.';
+const GENERATOR_COMMENT = 'This file is partly generated. The $comment, component, generator, and each attribute\'s direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.';
+const OWNED_ATTR_KEYS = new Set(['direction', 'sources', 'type', 'values', 'fallback', 'min', 'max', 'description']);
 const ATTR_RE = /data-ln-[a-z0-9-]+/g;
 const ALIAS_RE = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*['"](data-ln-[a-z0-9-]+)['"]/g;
 const METHOD_RE = /\.(setAttribute|removeAttribute|toggleAttribute|getAttribute|hasAttribute|closest|matches|querySelector|querySelectorAll)\s*\(/g;
@@ -215,6 +216,136 @@ function walk(dir, exts, acc = []) {
 }
 
 /**
+ * Екстрахира ATTRIBUTES дефиниции од кодот со brace matching.
+ * Ги фаќа сите `const [A-Za-z0-9_]*ATTRIBUTES = { ... }`
+ * @param {string} cleaned - comment-stripped JS код
+ * @returns {Record<string, { type?: string, values?: string[], fallback?: any, description?: string, min?: number, max?: number }>}
+ */
+export function extractAttributeTables(cleaned) {
+	const result = {};
+	const tableRegex = /\bconst\s+([A-Za-z0-9_$]*ATTRIBUTES)\s*=\s*\{/g;
+	let match;
+
+	while ((match = tableRegex.exec(cleaned)) !== null) {
+		const openBraceIdx = match.index + match[0].length - 1;
+		let depth = 0;
+		let closeBraceIdx = -1;
+		let inSingle = false;
+		let inDouble = false;
+		let inTemplate = false;
+
+		for (let i = openBraceIdx; i < cleaned.length; i++) {
+			const ch = cleaned[i];
+			const next = i + 1 < cleaned.length ? cleaned[i + 1] : '';
+
+			if (inSingle) {
+				if (ch === '\\' && next) i++;
+				else if (ch === "'") inSingle = false;
+			} else if (inDouble) {
+				if (ch === '\\' && next) i++;
+				else if (ch === '"') inDouble = false;
+			} else if (inTemplate) {
+				if (ch === '\\' && next) i++;
+				else if (ch === '`') inTemplate = false;
+			} else {
+				if (ch === "'") inSingle = true;
+				else if (ch === '"') inDouble = true;
+				else if (ch === '`') inTemplate = true;
+				else if (ch === '{') depth++;
+				else if (ch === '}') {
+					depth--;
+					if (depth === 0) {
+						closeBraceIdx = i;
+						break;
+					}
+				}
+			}
+		}
+
+		if (closeBraceIdx === -1) continue;
+
+		const tableBody = cleaned.slice(openBraceIdx + 1, closeBraceIdx);
+		const entryRegex = /['"](data-ln-[a-z0-9-]+)['"]\s*:\s*\{/g;
+		let entryMatch;
+
+		while ((entryMatch = entryRegex.exec(tableBody)) !== null) {
+			const attrName = entryMatch[1];
+			const entryOpenIdx = entryMatch.index + entryMatch[0].length - 1;
+			let eDepth = 0;
+			let eCloseIdx = -1;
+			let sQuote = false;
+			let dQuote = false;
+			let tQuote = false;
+
+			for (let j = entryOpenIdx; j < tableBody.length; j++) {
+				const c = tableBody[j];
+				const n = j + 1 < tableBody.length ? tableBody[j + 1] : '';
+				if (sQuote) {
+					if (c === '\\' && n) j++;
+					else if (c === "'") sQuote = false;
+				} else if (dQuote) {
+					if (c === '\\' && n) j++;
+					else if (c === '"') dQuote = false;
+				} else if (tQuote) {
+					if (c === '\\' && n) j++;
+					else if (c === '`') tQuote = false;
+				} else {
+					if (c === "'") sQuote = true;
+					else if (c === '"') dQuote = true;
+					else if (c === '`') tQuote = true;
+					else if (c === '{') eDepth++;
+					else if (c === '}') {
+						eDepth--;
+						if (eDepth === 0) {
+							eCloseIdx = j;
+							break;
+						}
+					}
+				}
+			}
+
+			if (eCloseIdx === -1) continue;
+			const entryBody = tableBody.slice(entryOpenIdx + 1, eCloseIdx);
+			const meta = {};
+
+			const typeM = entryBody.match(/\btype\s*:\s*['"]([a-z]+)['"]/);
+			if (typeM) meta.type = typeM[1];
+
+			const valuesM = entryBody.match(/\bvalues\s*:\s*\[([^\]]*)\]/);
+			if (valuesM) {
+				const rawVals = valuesM[1];
+				const items = [];
+				const itemRegex = /['"]([^'"]+)['"]/g;
+				let im;
+				while ((im = itemRegex.exec(rawVals)) !== null) {
+					items.push(im[1]);
+				}
+				if (items.length) meta.values = items;
+			}
+
+			const fallbackStrM = entryBody.match(/\bfallback\s*:\s*['"]([^'"]*)['"]/);
+			const fallbackNumM = entryBody.match(/\bfallback\s*:\s*(-?\d+(?:\.\d+)?)/);
+			const fallbackBoolM = entryBody.match(/\bfallback\s*:\s*(true|false)/);
+			if (fallbackStrM) meta.fallback = fallbackStrM[1];
+			else if (fallbackNumM) meta.fallback = Number(fallbackNumM[1]);
+			else if (fallbackBoolM) meta.fallback = fallbackBoolM[1] === 'true';
+
+			const minM = entryBody.match(/\bmin\s*:\s*(-?\d+(?:\.\d+)?)/);
+			if (minM) meta.min = Number(minM[1]);
+			const maxM = entryBody.match(/\bmax\s*:\s*(-?\d+(?:\.\d+)?)/);
+			if (maxM) meta.max = Number(maxM[1]);
+
+			const descM = entryBody.match(/\bdescription\s*:\s*['"]([^'"]*)['"]/);
+			if (descM) meta.description = descM[1];
+
+			result[attrName] = meta;
+		}
+	}
+
+	return result;
+}
+
+/**
  * Анализира поединечен фајл (JS или SCSS) за атрибути, насока и релативна патека.
  * @param {string} filePath
  * @param {string} compDir
@@ -337,8 +468,27 @@ function serializeSchema(compName, newAttrs, existingObj = null) {
 
 		const attrObj = {};
 		if (isScanned) {
-			attrObj.direction = newAttrs[attrName].direction;
-			attrObj.sources = newAttrs[attrName].sources;
+			const scanned = newAttrs[attrName];
+			attrObj.direction = scanned.direction;
+			attrObj.sources = scanned.sources;
+
+			if (scanned.type) attrObj.type = scanned.type;
+			else if (existingAttrObj.type) attrObj.type = existingAttrObj.type;
+
+			if (scanned.values) attrObj.values = scanned.values;
+			else if (existingAttrObj.values) attrObj.values = existingAttrObj.values;
+
+			if (scanned.fallback !== undefined && scanned.fallback !== null) attrObj.fallback = scanned.fallback;
+			else if (existingAttrObj.fallback !== undefined && existingAttrObj.fallback !== null) attrObj.fallback = existingAttrObj.fallback;
+
+			if (scanned.min !== undefined && scanned.min !== null) attrObj.min = scanned.min;
+			else if (existingAttrObj.min !== undefined && existingAttrObj.min !== null) attrObj.min = existingAttrObj.min;
+
+			if (scanned.max !== undefined && scanned.max !== null) attrObj.max = scanned.max;
+			else if (existingAttrObj.max !== undefined && existingAttrObj.max !== null) attrObj.max = existingAttrObj.max;
+
+			if (scanned.description) attrObj.description = scanned.description;
+			else if (existingAttrObj.description) attrObj.description = existingAttrObj.description;
 		} else {
 			// Застарен запис: човечките полиња остануваат, генераторските се ресетираат
 			attrObj.direction = null;
@@ -347,7 +497,7 @@ function serializeSchema(compName, newAttrs, existingObj = null) {
 
 		// Зачувај ги сите други човечки клучеви во нивниот постоечки редослед
 		for (const key of Object.keys(existingAttrObj)) {
-			if (key !== 'direction' && key !== 'sources') {
+			if (!OWNED_ATTR_KEYS.has(key)) {
 				attrObj[key] = existingAttrObj[key];
 			}
 		}
@@ -429,9 +579,15 @@ function main() {
 		totalBundlesSkipped += skippedBundles;
 
 		const compAttrs = new Map(); // attrName -> { read: bool, written: bool, sources: Set<string> }
+		const compAttrMetadata = {};
 
 		for (const file of filesToScan) {
 			const { relPath, fileAttrs } = analyzeFile(file, compPath, constructedTokens);
+			if (file.endsWith('.js')) {
+				const cleaned = stripComments(fs.readFileSync(file, 'utf8'));
+				const tableMeta = extractAttributeTables(cleaned);
+				Object.assign(compAttrMetadata, tableMeta);
+			}
 			for (const [attr, { read, written }] of fileAttrs.entries()) {
 				if (!compAttrs.has(attr)) {
 					compAttrs.set(attr, { read: false, written: false, sources: new Set() });
@@ -454,9 +610,16 @@ function main() {
 			else if (read && !written) direction = 'author';
 			else if (!read && written) direction = 'runtime';
 
+			const meta = compAttrMetadata[name] || {};
 			scannedAttrs[name] = {
 				direction,
-				sources: [...sources].sort()
+				sources: [...sources].sort(),
+				type: meta.type || null,
+				values: meta.values || null,
+				fallback: meta.fallback !== undefined ? meta.fallback : null,
+				min: meta.min !== undefined ? meta.min : null,
+				max: meta.max !== undefined ? meta.max : null,
+				description: meta.description || null
 			};
 		}
 

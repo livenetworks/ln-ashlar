@@ -1,4 +1,4 @@
-export { cloneTemplate, cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, lnFill, fillTemplate, renderList, buildDict, guardBody, findElements, isVisible, shouldIgnoreClick, isTargetDisabled, isUsableTarget, isEditableTarget, serializeForm, populateForm, resolveFormMethod, getLocale, readValue, detectValueType, compareValues, registerComponent, shouldInterceptLink, buildUrl, getHeaders, parseHeaders, registerDataMapper, getDataMapper, interceptValueProperty, registerLocaleFallback, getLocaleFallback, holdInit, releaseInit, pendingCount, queueBoot, ensureLocaleObserver, observeAttributes, setDebugSink, setPersistSink } from './helpers.js';
+export { cloneTemplate, cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, lnFill, fillTemplate, renderList, buildDict, guardBody, findElements, isVisible, shouldIgnoreClick, isTargetDisabled, isUsableTarget, isEditableTarget, serializeForm, populateForm, resolveFormMethod, getLocale, readValue, detectValueType, compareValues, registerComponent, shouldInterceptLink, buildUrl, getHeaders, parseHeaders, registerDataMapper, getDataMapper, interceptValueProperty, registerLocaleFallback, getLocaleFallback, holdInit, releaseInit, pendingCount, queueBoot, ensureLocaleObserver, observeAttributes, setDebugSink, setPersistSink, isDevMode } from './helpers.js';
 export { reactiveState, deepReactive, createBatcher } from './reactive.js';
 export { createWindowCache } from './window-cache.js';
 export { hashParse, hashGet, hashSet, hashLinkClick, resolveHashNamespace, hashSortEncode, hashSortDecode, hashFilterEncode, hashFilterDecode } from './hash.js';
@@ -8,4 +8,4 @@ export { calculateProgress } from './progress.js';
 export { parseDateInput, formatDateToISO } from './date.js';
 export { getSeparators, cleanNumericString, parseNumber, formatNumber } from './number.js';
 export { normalizeSearchTerm, tokenizeSearchQuery, parseSearchFields, matchesSearchTokens, collapseSearchParts, matchesFilterValues } from './matching.js';
-export { attrStr, attrInt, attrBool, attrList, defineAttrs, attrSpec, attrEffects } from './attrs.js';
+export { attrStr, attrInt, attrBool, attrList, attrEnum, attrFloat, attrJson, validateAttrValue, defineAttrs, attrSpec, attrEffects } from './attrs.js';

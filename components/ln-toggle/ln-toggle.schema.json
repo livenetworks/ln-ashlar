@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-toggle",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -15,13 +15,28 @@
 				"ln-toggle-dev.scss",
 				"ln-toggle.scss",
 				"src/ln-toggle.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"open",
+				"close"
+			],
+			"fallback": "close",
+			"description": "Visibility state of toggleable element"
 		},
 		"data-ln-toggle-action": {
 			"direction": "author",
 			"sources": [
 				"src/ln-toggle.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"open",
+				"close",
+				"toggle"
+			],
+			"fallback": "toggle",
+			"description": "Action performed on target element when trigger is clicked"
 		},
 		"data-ln-toggle-for": {
 			"direction": "author",
@@ -29,7 +44,9 @@
 				"ln-toggle-dev.scss",
 				"ln-toggle.scss",
 				"src/ln-toggle.js"
-			]
+			],
+			"type": "string",
+			"description": "Target element ID to toggle on trigger click"
 		}
 	}
 }

@@ -34,9 +34,9 @@ import { registerComponent, dispatch, shouldIgnoreClick, defineAttrs, attrSpec, 
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-confirm':         { prop: 'confirmText', read: _readPrompt,  fallback: 'Confirm?' },
-		'data-ln-confirm-timeout': { prop: 'timeout',     read: _readTimeout, fallback: DEFAULT_TIMEOUT },
-		'data-ln-confirm-state':   { prop: 'confirming',  read: attrBool }
+		'data-ln-confirm':         { prop: 'confirmText', type: 'string', read: _readPrompt, fallback: 'Confirm?', description: 'Prompt text or confirmation action trigger' },
+		'data-ln-confirm-timeout': { prop: 'timeout', type: 'float', read: _readTimeout, fallback: DEFAULT_TIMEOUT, min: 0.1, description: 'Confirmation timeout in seconds before reverting' },
+		'data-ln-confirm-state':   { prop: 'confirming', type: 'boolean', read: attrBool, description: 'Active confirmation state marker on button' }
 	};
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 

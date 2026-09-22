@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-key",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -14,33 +14,43 @@
 			"sources": [
 				"ln-key-dev.scss",
 				"src/ln-key.js"
-			]
+			],
+			"type": "string",
+			"description": "Keyboard shortcut combination (e.g. meta+k, ctrl+s)"
 		},
 		"data-ln-key-allow-input": {
 			"direction": "author",
 			"sources": [
 				"src/ln-key.js"
-			]
+			],
+			"type": "boolean",
+			"description": "Permits shortcut execution even when focused inside an editable input"
 		},
 		"data-ln-key-for": {
 			"direction": "author",
 			"sources": [
 				"ln-key-dev.scss",
 				"src/ln-key.js"
-			]
+			],
+			"type": "string",
+			"description": "Target element ID that this shortcut badge is displayed for"
 		},
 		"data-ln-key-modifier": {
 			"direction": "author",
 			"sources": [
 				"src/ln-key.js"
-			]
+			],
+			"type": "string",
+			"description": "Platform modifier text representation override"
 		},
 		"data-ln-key-target": {
 			"direction": "author",
 			"sources": [
 				"ln-key-dev.scss",
 				"src/ln-key.js"
-			]
+			],
+			"type": "string",
+			"description": "Target element selector or ID to receive synthetic click or focus"
 		}
 	}
 }

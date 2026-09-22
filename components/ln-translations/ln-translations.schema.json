@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-translations",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -26,69 +26,95 @@
 			"sources": [
 				"ln-translations-dev.scss",
 				"src/ln-translations.js"
-			]
+			],
+			"type": "marker",
+			"description": "Marks form control as translatable into multiple languages"
 		},
 		"data-ln-translatable-lang": {
 			"direction": "both",
 			"sources": [
 				"src/ln-translations.js"
-			]
+			],
+			"type": "string",
+			"description": "Language code assigned to specific translatable input instance"
 		},
 		"data-ln-translations": {
 			"direction": null,
 			"sources": [
 				"ln-translations-dev.scss",
 				"src/ln-translations.js"
-			]
+			],
+			"type": "marker",
+			"description": "Mounts multi-language translation manager on form container"
 		},
 		"data-ln-translations-active": {
 			"direction": "author",
 			"sources": [
 				"ln-translations-dev.scss",
 				"src/ln-translations.js"
-			]
+			],
+			"type": "marker",
+			"description": "Container holding active language badge tags"
 		},
 		"data-ln-translations-add": {
 			"direction": "author",
 			"sources": [
 				"src/ln-translations.js"
-			]
+			],
+			"type": "string",
+			"description": "Trigger button action to add specified language translation fields"
 		},
 		"data-ln-translations-default": {
 			"direction": null,
 			"sources": [
 				"src/ln-translations.js"
-			]
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "Default primary language code (e.g. en)"
 		},
 		"data-ln-translations-lang": {
 			"direction": "both",
 			"sources": [
 				"src/ln-translations.js"
-			]
+			],
+			"type": "string",
+			"description": "Language code associated with active language badge"
 		},
 		"data-ln-translations-locales": {
 			"direction": null,
 			"sources": [
 				"src/ln-translations.js"
-			]
+			],
+			"type": "json",
+			"fallback": "",
+			"description": "JSON dictionary of supported locale codes and display labels"
 		},
 		"data-ln-translations-placeholder": {
 			"direction": null,
 			"sources": [
 				"src/ln-translations.js"
-			]
+			],
+			"type": "string",
+			"fallback": "{lang} translation",
+			"description": "Placeholder label pattern for cloned translation inputs"
 		},
 		"data-ln-translations-prefix": {
 			"direction": "author",
 			"sources": [
 				"src/ln-translations.js"
-			]
+			],
+			"type": "string",
+			"description": "Prefix format pattern for cloned translated field names"
 		},
 		"data-ln-translations-remove-label": {
 			"direction": null,
 			"sources": [
 				"src/ln-translations.js"
-			]
+			],
+			"type": "string",
+			"fallback": "Remove {lang}",
+			"description": "Accessible label template for translation removal buttons"
 		}
 	}
 }

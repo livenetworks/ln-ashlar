@@ -8,7 +8,7 @@ import { dispatch, registerComponent, holdInit, releaseInit, defineAttrs, attrSp
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-include': { prop: 'url', read: attrStr, fallback: '' }
+		'data-ln-include': { prop: 'url', read: attrStr, type: 'string', fallback: '', description: 'URL of external HTML template to fetch and include' }
 	};
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 

@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-validate",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -26,19 +26,25 @@
 			"sources": [
 				"ln-validate-dev.scss",
 				"src/ln-validate.js"
-			]
+			],
+			"type": "marker",
+			"description": "Activates validation on form input or field"
 		},
 		"data-ln-validate-error": {
 			"direction": "author",
 			"sources": [
 				"src/ln-validate.js"
-			]
+			],
+			"type": "string",
+			"description": "Identifies error message template for a specific validation rule"
 		},
 		"data-ln-validate-errors": {
 			"direction": "author",
 			"sources": [
 				"src/ln-validate.js"
-			]
+			],
+			"type": "marker",
+			"description": "Container element holding validation error message elements"
 		}
 	}
 }

@@ -18,12 +18,13 @@ import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-tabs':         {},
-		'data-ln-tabs-active':  { effect: _syncActive },
-		'data-ln-tabs-default': {},
-		'data-ln-tabs-focus':   { prop: 'autoFocus', read: _readTabsFocus },
-		'data-ln-tabs-key':     { prop: 'nsKey', read: _readTabsKey },
-		'data-ln-tab':          {}
+		'data-ln-tabs':         { type: 'marker', description: 'Mounts lnTabs component instance on tabs container' },
+		'data-ln-tabs-active':  { effect: _syncActive, type: 'string', description: 'Active tab key identifier' },
+		'data-ln-tabs-default': { type: 'string', description: 'Default fallback tab key when none selected' },
+		'data-ln-tabs-focus':   { prop: 'autoFocus', read: _readTabsFocus, type: 'boolean', fallback: true, description: 'Whether to shift focus to newly activated tab panel' },
+		'data-ln-tabs-key':     { prop: 'nsKey', read: _readTabsKey, type: 'string', description: 'Hash namespace key for URL hash synchronization' },
+		'data-ln-tab':          { type: 'string', description: 'Tab trigger key identifier' },
+		'data-ln-panel':        { type: 'string', description: 'Tab content panel key identifier matching corresponding tab' }
 	};
 
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);

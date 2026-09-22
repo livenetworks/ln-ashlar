@@ -19,11 +19,11 @@ import { calculateCursorPosition } from './number-model.js';
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-number':          { effect: _syncAttribute },
-		'data-ln-value':           { effect: _syncAttribute },
-		'data-ln-number-decimals': { effect: _syncAttribute },
-		'data-ln-number-min':      { effect: _syncAttribute },
-		'data-ln-number-max':      { effect: _syncAttribute }
+		'data-ln-number':          { type: 'marker', effect: _syncAttribute, description: 'Activates localized number formatting on input or text element' },
+		'data-ln-value':           { type: 'float', effect: _syncAttribute, description: 'Raw unformatted numeric value' },
+		'data-ln-number-decimals': { type: 'integer', fallback: 0, min: 0, max: 20, effect: _syncAttribute, description: 'Number of decimal fraction digits' },
+		'data-ln-number-min':      { type: 'float', effect: _syncAttribute, description: 'Minimum allowed numeric value' },
+		'data-ln-number-max':      { type: 'float', effect: _syncAttribute, description: 'Maximum allowed numeric value' }
 	};
 
 	const _inputValueDesc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');

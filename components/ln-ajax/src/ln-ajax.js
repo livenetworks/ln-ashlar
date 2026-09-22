@@ -7,6 +7,12 @@ import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink, observeAt
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-ajax':                  { type: 'marker', description: 'Enables AJAX interception of form submissions and anchor clicks within container' },
+		'data-ln-data-coordinator-scope': { type: 'string', description: 'Excludes form from ln-ajax interception to let data coordinator handle submission' }
+	};
+
 	function _constructor(domRoot) {
 		if (!domRoot.hasAttribute(DOM_SELECTOR)) return;
 		if (domRoot[DOM_ATTRIBUTE]) return;

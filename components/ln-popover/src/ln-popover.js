@@ -10,10 +10,10 @@ import { dispatch, dispatchCancelable, computePlacement, measureHidden, isVisibl
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-popover':           { effect: _syncAttribute },
-		'data-ln-popover-for':       {},
-		'data-ln-popover-position':  {},
-		'data-ln-popover-placement': {}
+		'data-ln-popover':           { type: 'enum', values: ['open', 'close'], fallback: 'close', effect: _syncAttribute, description: 'Control state of the popover' },
+		'data-ln-popover-for':       { type: 'string', description: 'Target element ID that this trigger controls' },
+		'data-ln-popover-position':  { type: 'enum', values: ['top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left', 'left-start', 'left-end', 'right', 'right-start', 'right-end'], fallback: 'bottom', description: 'Preferred positioning anchor' },
+		'data-ln-popover-placement': { type: 'enum', values: ['top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left', 'left-start', 'left-end', 'right', 'right-start', 'right-end'], description: 'Active calculated placement applied at runtime' }
 	};
 
 	// ─── Open-stack (Escape closes top of stack) ───────────────

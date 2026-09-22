@@ -10,7 +10,7 @@ import { ensureDebugGate, refreshDebugHosts } from './gate.js';
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-debug': {}
+		'data-ln-debug': { type: 'marker', description: 'Enables developer diagnostics overlay, live validation badges, and inspection logging' }
 	};
 
 	ensureDebugGate();

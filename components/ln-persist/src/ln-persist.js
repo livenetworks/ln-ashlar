@@ -5,6 +5,12 @@ import { setPersistSink, observeAttributes } from '../../ln-core/index.js';
 	window.lnCore = window.lnCore || {};
 	window.lnCore._persistBound = true;
 
+	// ─── Attribute Contract (SSOT) ──────────────────────────
+	const ATTRIBUTES = {
+		'data-ln-persist':       { type: 'string', description: 'Storage key identifier for persisting component state in localStorage' },
+		'data-ln-persist-scope': { type: 'enum', values: ['global', 'page'], fallback: 'global', description: 'Persistence scope namespace (global or per-page path)' }
+	};
+
 	function _pageKey() {
 		const path = location.pathname.replace(/\/+$/, '').toLowerCase();
 		return path || '/';

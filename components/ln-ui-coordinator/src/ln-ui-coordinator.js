@@ -9,8 +9,8 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-ui-coordinator':      {},
-		'data-ln-ui-coordinator-dict': {}
+		'data-ln-ui-coordinator':      { type: 'marker', description: 'Mounts UI coordinator mediating global hash-routing, modals, and toasts' },
+		'data-ln-ui-coordinator-dict': { type: 'string', description: 'Dictionary key prefix mapping for translatable UI coordinator messages' }
 	};
 
 	// Resolve the active coordinator dictionary for a given event target.

@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-autosave",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -8,25 +8,35 @@
 			"sources": [
 				"ln-autosave-dev.scss",
 				"src/ln-autosave.js"
-			]
+			],
+			"type": "string",
+			"description": "Form autosave storage key identifier"
 		},
 		"data-ln-autosave-clear": {
 			"direction": "author",
 			"sources": [
 				"src/ln-autosave.js"
-			]
+			],
+			"type": "marker",
+			"description": "Designates a button that clears saved form data from localStorage"
 		},
 		"data-ln-autosave-debounce-input": {
 			"direction": "author",
 			"sources": [
 				"src/ln-autosave.js"
-			]
+			],
+			"type": "integer",
+			"fallback": 500,
+			"min": 0,
+			"description": "Debounce delay in milliseconds before saving on input events"
 		},
 		"data-ln-autosave-exclude": {
 			"direction": null,
 			"sources": [
 				"src/ln-autosave.js"
-			]
+			],
+			"type": "marker",
+			"description": "Excludes form control from autosave serialization"
 		},
 		"data-ln-debug": {
 			"direction": null,

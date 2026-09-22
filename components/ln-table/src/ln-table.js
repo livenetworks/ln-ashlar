@@ -48,22 +48,22 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 	}
 
 	const ATTRIBUTES = {
-		'data-ln-table':                  { prop: 'name', read: attrStr, fallback: '' },
-		'data-ln-table-source':           { prop: 'source', read: attrStr, fallback: '' },
-		'data-ln-table-selectable':       { prop: '_selectable', read: attrBool },
-		'data-ln-table-window':           { effect: _applyWindow },
-		'data-ln-table-window-page':      { effect: _applyWindowPage },
-		'data-ln-table-window-threshold': { effect: _applyWindowThreshold },
-		'data-ln-table-count':            { effect: _applyCount },
-		'data-ln-table-row':              {},
-		'data-ln-table-row-id':           {},
-		'data-ln-table-row-action':       {},
-		'data-ln-table-row-select':       {},
-		'data-ln-table-col':              {},
-		'data-ln-table-col-select':       {},
-		'data-ln-table-cell-attr':        {},
-		'data-ln-table-empty':            {},
-		'data-ln-table-select-all-label': {}
+		'data-ln-table':                  { prop: 'name', type: 'string', read: attrStr, fallback: '', description: 'Table instance name or identifier' },
+		'data-ln-table-source':           { prop: 'source', type: 'string', read: attrStr, fallback: '', description: 'Source store or coordinator addressing' },
+		'data-ln-table-selectable':       { prop: '_selectable', type: 'boolean', read: attrBool, description: 'Enables row selection check controls' },
+		'data-ln-table-window':           { type: 'integer', fallback: WINDOW_DEFAULT, min: 10, effect: _applyWindow, description: 'Virtual scrolling window size in rows' },
+		'data-ln-table-window-page':      { type: 'integer', fallback: WINDOW_PAGE, min: 5, effect: _applyWindowPage, description: 'Virtual scrolling slice page size' },
+		'data-ln-table-window-threshold': { type: 'integer', fallback: 50, min: 0, effect: _applyWindowThreshold, description: 'Scroll threshold margin in pixels to trigger page fetch' },
+		'data-ln-table-count':            { type: 'integer', min: 0, effect: _applyCount, description: 'Total record count override for virtual scrollbar calculation' },
+		'data-ln-table-row':              { type: 'marker', description: 'Table row template element' },
+		'data-ln-table-row-id':           { type: 'string', description: 'Record identifier on row element' },
+		'data-ln-table-row-action':       { type: 'trigger', description: 'Action trigger inside a table row' },
+		'data-ln-table-row-select':       { type: 'trigger', description: 'Row selection checkbox trigger' },
+		'data-ln-table-col':              { type: 'string', description: 'Column header identifier or field mapping' },
+		'data-ln-table-col-select':       { type: 'trigger', description: 'Header select-all checkbox trigger' },
+		'data-ln-table-cell-attr':        { type: 'string', description: 'Cell attribute template mapping' },
+		'data-ln-table-empty':            { type: 'marker', description: 'Container for table empty state' },
+		'data-ln-table-select-all-label': { type: 'string', description: 'Accessibility label for select-all header trigger' }
 	};
 
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);

@@ -27,6 +27,116 @@ export function attrList(el, name) {
 	return (el.getAttribute(name) || '').split(',').map(s => s.trim()).filter(Boolean);
 }
 
+const _enumReaderCache = new Map();
+
+/**
+ * Cached reader factory for enum attributes.
+ * @param {string[]} values - allowed values
+ * @param {*} fallback - default value
+ * @returns {function(Element, string): *}
+ */
+export function attrEnum(values, fallback) {
+	const key = (values ? values.join('|') : '') + '::' + fallback;
+	if (_enumReaderCache.has(key)) return _enumReaderCache.get(key);
+	const valSet = new Set(values || []);
+	const reader = function (el, name) {
+		const raw = el.getAttribute(name);
+		return (raw !== null && valSet.has(raw)) ? raw : fallback;
+	};
+	_enumReaderCache.set(key, reader);
+	return reader;
+}
+
+export function attrFloat(el, name, fallback) {
+	const parsed = parseFloat(el.getAttribute(name));
+	return isNaN(parsed) ? fallback : parsed;
+}
+
+export function attrJson(el, name, fallback) {
+	const raw = el.getAttribute(name);
+	if (!raw) return fallback;
+	try {
+		return JSON.parse(raw);
+	} catch (_) {
+		return fallback;
+	}
+}
+
+/**
+ * Validates a DOM attribute value against its declared schema entry.
+ * Logs a console.warn (with [componentTag] prefix) if the value is invalid.
+ *
+ * @param {Object} entry - { type, values, min, max, fallback, ... }
+ * @param {string|null} value - raw DOM attribute value (null if absent)
+ * @param {string} attrName - attribute name (e.g. 'data-ln-modal')
+ * @param {string} componentTag - component tag (e.g. 'ln-modal')
+ * @returns {boolean} true if valid, false if invalid
+ */
+export function validateAttrValue(entry, value, attrName, componentTag) {
+	if (!entry || value === null) return true;
+	const tag = componentTag || 'ln-component';
+	const type = entry.type;
+
+	// valueless / unconstrained types
+	if (type === 'trigger' || type === 'marker' || type === 'string' || type === 'list' || !type) {
+		return true;
+	}
+
+	if (type === 'boolean') {
+		if (value !== '') {
+			console.warn(`[${tag}] Boolean attribute "${attrName}" should be valueless (presence-only). Found: "${value}".`);
+			return false;
+		}
+		return true;
+	}
+
+	if (type === 'enum') {
+		const allowed = entry.values || [];
+		if (!allowed.includes(value)) {
+			console.warn(`[${tag}] Invalid value "${value}" for attribute "${attrName}". Allowed: ${allowed.join(', ')}. Fallback: "${entry.fallback}".`);
+			return false;
+		}
+		return true;
+	}
+
+	if (type === 'integer') {
+		if (!/^-?\d+$/.test(value)) {
+			console.warn(`[${tag}] Invalid integer "${value}" for attribute "${attrName}". Fallback: ${entry.fallback}.`);
+			return false;
+		}
+		const num = parseInt(value, 10);
+		if (entry.min !== undefined && num < entry.min) {
+			console.warn(`[${tag}] Value ${num} for attribute "${attrName}" is less than min (${entry.min}).`);
+			return false;
+		}
+		if (entry.max !== undefined && num > entry.max) {
+			console.warn(`[${tag}] Value ${num} for attribute "${attrName}" is greater than max (${entry.max}).`);
+			return false;
+		}
+		return true;
+	}
+
+	if (type === 'float') {
+		if (isNaN(Number(value))) {
+			console.warn(`[${tag}] Invalid float "${value}" for attribute "${attrName}". Fallback: ${entry.fallback}.`);
+			return false;
+		}
+		return true;
+	}
+
+	if (type === 'json') {
+		try {
+			JSON.parse(value);
+			return true;
+		} catch (err) {
+			console.warn(`[${tag}] Invalid JSON for attribute "${attrName}": ${err.message}. Fallback: ${entry.fallback}.`);
+			return false;
+		}
+	}
+
+	return true;
+}
+
 /**
  * Define live getter-only properties on `instance`, each reading `dom` on
  * every access. Nothing is copied into instance state, so there is no state
@@ -59,7 +169,7 @@ export function defineAttrs(instance, dom, spec) {
  * attribute name.
  *
  * Table entry shape:
- *   'data-ln-x': { prop, read, fallback, effect } — any subset
+ *   'data-ln-x': { prop, read, type, values, fallback, min, max, effect, description } — any subset
  *
  * The scanner constraint at the top of this file applies to table KEYS:
  * literal strings only. A computed key is invisible to
@@ -70,7 +180,35 @@ export function attrSpec(table) {
 	for (const name in table) {
 		const entry = table[name];
 		if (!entry || !entry.prop) continue;
-		spec[entry.prop] = [entry.read, name, entry.fallback];
+		let reader = entry.read;
+		if (!reader && entry.type) {
+			switch (entry.type) {
+				case 'enum':
+					reader = attrEnum(entry.values, entry.fallback);
+					break;
+				case 'integer':
+					reader = attrInt;
+					break;
+				case 'float':
+					reader = attrFloat;
+					break;
+				case 'boolean':
+					reader = attrBool;
+					break;
+				case 'list':
+					reader = attrList;
+					break;
+				case 'json':
+					reader = attrJson;
+					break;
+				case 'string':
+				default:
+					reader = attrStr;
+					break;
+			}
+		}
+		if (!reader) reader = attrStr;
+		spec[entry.prop] = [reader, name, entry.fallback];
 	}
 	return spec;
 }

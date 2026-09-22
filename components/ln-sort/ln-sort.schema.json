@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-sort",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -31,20 +31,31 @@
 			"direction": null,
 			"sources": [
 				"src/ln-sort.js"
-			]
+			],
+			"type": "string",
+			"description": "URL hash routing key for sort state persistence"
 		},
 		"data-ln-sort": {
 			"direction": null,
 			"sources": [
 				"ln-sort-dev.scss",
 				"src/ln-sort.js"
-			]
+			],
+			"type": "string",
+			"description": "Target table or list element ID to sort"
 		},
 		"data-ln-sort-dir": {
 			"direction": "author",
 			"sources": [
 				"src/ln-sort.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"asc",
+				"desc"
+			],
+			"fallback": "asc",
+			"description": "Default or requested sort direction"
 		},
 		"data-ln-sort-exclude": {
 			"direction": "author",
@@ -56,20 +67,32 @@
 			"direction": null,
 			"sources": [
 				"src/ln-sort.js"
-			]
+			],
+			"type": "string",
+			"description": "Field name or column key to sort by"
 		},
 		"data-ln-sort-items": {
 			"direction": "author",
 			"sources": [
 				"src/ln-sort.js",
 				"src/sort-model.js"
-			]
+			],
+			"type": "string",
+			"description": "CSS selector matching sortable child items"
 		},
 		"data-ln-sort-state": {
 			"direction": "both",
 			"sources": [
 				"src/ln-sort.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"asc",
+				"desc",
+				"none"
+			],
+			"fallback": "none",
+			"description": "Active sort state applied to column or control"
 		},
 		"data-ln-table-empty": {
 			"direction": "author",

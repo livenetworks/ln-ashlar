@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-chart",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -8,7 +8,10 @@
 			"sources": [
 				"ln-chart-dev.scss",
 				"src/ln-chart.js"
-			]
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "Chart instance name or identifier"
 		},
 		"data-ln-chart-area": {
 			"direction": "author",
@@ -57,7 +60,11 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-chart.js"
-			]
+			],
+			"type": "integer",
+			"fallback": 20,
+			"min": 0,
+			"description": "Internal plot padding in pixels"
 		},
 		"data-ln-chart-plot": {
 			"direction": "author",
@@ -70,39 +77,58 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-chart.js"
-			]
+			],
+			"type": "string",
+			"description": "Field name to sort chart series data by"
 		},
 		"data-ln-chart-source": {
 			"direction": "author",
 			"sources": [
 				"src/ln-chart.js"
-			]
+			],
+			"type": "string",
+			"description": "Source store or coordinator identifier"
 		},
 		"data-ln-chart-type": {
 			"direction": "author",
 			"sources": [
 				"src/ln-chart.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"line",
+				"bar",
+				"area",
+				"scatter"
+			],
+			"fallback": "line",
+			"description": "Visual chart render type"
 		},
 		"data-ln-chart-x": {
 			"direction": "author",
 			"sources": [
 				"ln-chart-dev.scss",
 				"src/ln-chart.js"
-			]
+			],
+			"type": "string",
+			"description": "Field name mapping to X axis"
 		},
 		"data-ln-chart-y": {
 			"direction": "author",
 			"sources": [
 				"ln-chart-dev.scss",
 				"src/ln-chart.js"
-			]
+			],
+			"type": "string",
+			"description": "Field name mapping to Y axis"
 		},
 		"data-ln-chart-zero": {
 			"direction": "author",
 			"sources": [
 				"src/ln-chart.js"
-			]
+			],
+			"type": "boolean",
+			"description": "Forces Y axis scale to start at zero"
 		},
 		"data-ln-debug": {
 			"direction": null,

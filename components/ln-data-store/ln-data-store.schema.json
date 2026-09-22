@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-data-store",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -8,50 +8,71 @@
 			"sources": [
 				"ln-data-store-dev.scss",
 				"src/ln-data-store.js"
-			]
+			],
+			"type": "marker",
+			"description": "Identifies the element as a data-store definition container"
 		},
 		"data-ln-data-store-frozen": {
 			"direction": "runtime",
 			"sources": [
 				"ln-data-store-dev.scss",
 				"src/ln-data-store.js"
-			]
+			],
+			"type": "marker",
+			"description": "Applied at runtime to indicate store schema is locked in IndexedDB"
 		},
 		"data-ln-data-store-indexes": {
 			"direction": "author",
 			"sources": [
 				"src/ln-data-store.js"
-			]
+			],
+			"type": "list",
+			"description": "Comma-separated index field names for the IndexedDB store"
 		},
 		"data-ln-data-store-no-local-query": {
 			"direction": null,
 			"sources": [
 				"src/ln-data-store.js"
-			]
+			],
+			"type": "boolean",
+			"description": "Bypasses local IndexedDB query resolution, forcing remote fetching"
 		},
 		"data-ln-data-store-search-fields": {
 			"direction": null,
 			"sources": [
 				"src/ln-data-store.js"
-			]
+			],
+			"type": "list",
+			"description": "Record fields to index for client-side search"
 		},
 		"data-ln-data-store-stale": {
 			"direction": null,
 			"sources": [
 				"src/ln-data-store.js"
-			]
+			],
+			"type": "integer",
+			"fallback": 300,
+			"description": "Cache staleness threshold in seconds, or -1/never"
 		},
 		"data-ln-data-store-window": {
 			"direction": "author",
 			"sources": [
 				"src/ln-data-store.js"
-			]
+			],
+			"type": "integer",
+			"fallback": 1000,
+			"min": 10,
+			"description": "Virtual scrolling cache window size in records"
 		},
 		"data-ln-data-store-window-page": {
 			"direction": null,
 			"sources": [
 				"src/ln-data-store.js"
-			]
+			],
+			"type": "integer",
+			"fallback": 200,
+			"min": 5,
+			"description": "Virtual scrolling slice page size"
 		},
 		"data-ln-debug": {
 			"direction": null,

@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-ui-coordinator",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -44,13 +44,17 @@
 			"sources": [
 				"ln-ui-coordinator-dev.scss",
 				"src/ln-ui-coordinator.js"
-			]
+			],
+			"type": "marker",
+			"description": "Mounts UI coordinator mediating global hash-routing, modals, and toasts"
 		},
 		"data-ln-ui-coordinator-dict": {
 			"direction": null,
 			"sources": [
 				"src/ln-ui-coordinator.js"
-			]
+			],
+			"type": "string",
+			"description": "Dictionary key prefix mapping for translatable UI coordinator messages"
 		}
 	}
 }

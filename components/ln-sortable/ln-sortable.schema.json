@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-sortable",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -14,14 +14,23 @@
 			"sources": [
 				"ln-sortable-dev.scss",
 				"src/ln-sortable.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"enabled",
+				"disabled"
+			],
+			"fallback": "enabled",
+			"description": "Enables drag-and-drop item reordering or disables when set to disabled"
 		},
 		"data-ln-sortable-handle": {
 			"direction": "author",
 			"sources": [
 				"ln-sortable-dev.scss",
 				"src/ln-sortable.js"
-			]
+			],
+			"type": "marker",
+			"description": "Designates an element as the drag handle for its parent sortable item"
 		}
 	}
 }

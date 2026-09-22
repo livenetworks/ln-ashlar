@@ -22,9 +22,9 @@ import {
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-obfuscator': { effect: _syncAttribute },
-		'data-ln-obfuscator-codec': { effect: _syncAttribute },
-		'data-ln-obfuscator-key': { effect: _syncAttribute }
+		'data-ln-obfuscator':       { type: 'enum', values: ['rot13', 'base64', 'xor'], fallback: 'rot13', effect: _syncAttribute, description: 'Codec used to deobfuscate text or links' },
+		'data-ln-obfuscator-codec': { type: 'enum', values: ['rot13', 'base64', 'xor'], fallback: 'rot13', effect: _syncAttribute, description: 'Explicit codec override attribute' },
+		'data-ln-obfuscator-key':   { type: 'string', effect: _syncAttribute, description: 'Encryption or masking key for XOR codec' }
 	};
 
 	// ─── Component Constructor ───────────────────────────────

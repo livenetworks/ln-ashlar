@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-search",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -13,7 +13,9 @@
 			"direction": null,
 			"sources": [
 				"src/ln-search.js"
-			]
+			],
+			"type": "string",
+			"description": "URL hash routing key for search state persistence"
 		},
 		"data-ln-list-source": {
 			"direction": "author",
@@ -26,7 +28,9 @@
 			"sources": [
 				"ln-search-dev.scss",
 				"src/ln-search.js"
-			]
+			],
+			"type": "string",
+			"description": "Active search query term on target element or container"
 		},
 		"data-ln-search-clear": {
 			"direction": "author",
@@ -38,39 +42,56 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-search.js"
-			]
+			],
+			"type": "trigger",
+			"description": "Click trigger to clear search input for target"
 		},
 		"data-ln-search-exclude": {
 			"direction": "author",
 			"sources": [
 				"src/ln-search.js"
-			]
+			],
+			"type": "string",
+			"description": "CSS selector matching child items to exclude from search"
 		},
 		"data-ln-search-fields": {
 			"direction": "author",
 			"sources": [
 				"src/ln-search.js"
-			]
+			],
+			"type": "list",
+			"description": "Comma-separated field names to include in client search"
 		},
 		"data-ln-search-for": {
 			"direction": "author",
 			"sources": [
 				"ln-search-dev.scss",
 				"src/ln-search.js"
-			]
+			],
+			"type": "string",
+			"description": "Target table or list element ID that this input controls"
 		},
 		"data-ln-search-hide": {
 			"direction": "runtime",
 			"sources": [
 				"ln-search.scss",
 				"src/ln-search.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"collapse",
+				"none"
+			],
+			"fallback": "collapse",
+			"description": "CSS hiding strategy for non-matching rows"
 		},
 		"data-ln-search-items": {
 			"direction": "author",
 			"sources": [
 				"src/ln-search.js"
-			]
+			],
+			"type": "string",
+			"description": "CSS selector matching searchable child items"
 		},
 		"data-ln-table-source": {
 			"direction": "author",

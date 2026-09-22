@@ -9,8 +9,8 @@ import { formatStatValue, parseStatFilter } from './stat-model.js';
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-stat':        { prop: '_storeName', read: attrStr, fallback: '' },
-		'data-ln-stat-filter': { prop: '_filterRaw', read: attrStr, fallback: '' }
+		'data-ln-stat':        { prop: '_storeName', type: 'string', read: attrStr, fallback: '', description: 'Store or entity name to count' },
+		'data-ln-stat-filter': { prop: '_filterRaw', type: 'string', read: attrStr, fallback: '', description: 'JSON or key:value filter criteria for record counting' }
 	};
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 

@@ -8,9 +8,9 @@ import { dispatch, dispatchCancelable, registerComponent, cloneTemplateScoped } 
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-editor':        {},
-		'data-ln-editor-action': {},
-		'data-ln-editor-source': {}
+		'data-ln-editor':        { type: 'marker', description: 'Mounts rich text editor instance on container' },
+		'data-ln-editor-action': { type: 'enum', values: ['bold', 'italic', 'underline', 'strikethrough', 'heading-2', 'heading-3', 'heading-4', 'blockquote', 'code', 'paragraph', 'ordered-list', 'unordered-list', 'link', 'unlink', 'clear', 'confirm-link', 'cancel-link'], description: 'Rich text toolbar formatting action' },
+		'data-ln-editor-source': { type: 'string', description: 'Selector or ID of backing textarea synchronized with editor content' }
 	};
 
 	// ─── Allowed tags for paste sanitization ───────────────────

@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-confirm",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -9,7 +9,10 @@
 				"ln-confirm-dev.scss",
 				"ln-confirm.scss",
 				"src/ln-confirm.js"
-			]
+			],
+			"type": "string",
+			"fallback": "Confirm?",
+			"description": "Prompt text or confirmation action trigger"
 		},
 		"data-ln-confirm-active": {
 			"direction": "author",
@@ -37,13 +40,18 @@
 			"sources": [
 				"ln-confirm-dev.scss",
 				"src/ln-confirm.js"
-			]
+			],
+			"type": "boolean",
+			"description": "Active confirmation state marker on button"
 		},
 		"data-ln-confirm-timeout": {
 			"direction": null,
 			"sources": [
 				"src/ln-confirm.js"
-			]
+			],
+			"type": "float",
+			"min": 0.1,
+			"description": "Confirmation timeout in seconds before reverting"
 		},
 		"data-ln-debug": {
 			"direction": null,

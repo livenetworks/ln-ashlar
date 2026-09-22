@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-picklist",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -14,20 +14,36 @@
 			"sources": [
 				"ln-picklist-dev.scss",
 				"src/ln-picklist.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"enabled",
+				"disabled"
+			],
+			"fallback": "enabled",
+			"description": "Controls enabled/disabled state of the dual-list picklist"
 		},
 		"data-ln-picklist-list": {
 			"direction": "author",
 			"sources": [
 				"ln-picklist-dev.scss",
 				"src/ln-picklist.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"available",
+				"selected"
+			],
+			"description": "Role marker for available or selected picklist columns"
 		},
 		"data-ln-picklist-max": {
 			"direction": "author",
 			"sources": [
 				"src/ln-picklist.js"
-			]
+			],
+			"type": "integer",
+			"min": 1,
+			"description": "Maximum selectable items in the selected list"
 		}
 	}
 }

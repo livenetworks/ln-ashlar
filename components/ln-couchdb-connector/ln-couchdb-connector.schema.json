@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-couchdb-connector",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -7,31 +7,44 @@
 			"direction": null,
 			"sources": [
 				"src/ln-couchdb-connector.js"
-			]
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "Authentication credentials for CouchDB requests"
 		},
 		"data-ln-couchdb-connector": {
 			"direction": null,
 			"sources": [
 				"src/ln-couchdb-connector.js"
-			]
+			],
+			"type": "marker",
+			"description": "Mounts CouchDB/PouchDB connector bridging database and ln-ashlar data coordinators"
 		},
 		"data-ln-couchdb-db": {
 			"direction": null,
 			"sources": [
 				"src/ln-couchdb-connector.js"
-			]
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "Target CouchDB database name"
 		},
 		"data-ln-couchdb-headers": {
 			"direction": "author",
 			"sources": [
 				"src/ln-couchdb-connector.js"
-			]
+			],
+			"type": "json",
+			"description": "Custom HTTP headers in JSON or semicolon-separated format"
 		},
 		"data-ln-couchdb-url": {
 			"direction": null,
 			"sources": [
 				"src/ln-couchdb-connector.js"
-			]
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "CouchDB server base endpoint URL"
 		}
 	}
 }

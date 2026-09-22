@@ -8,7 +8,7 @@ import { dispatch, registerComponent } from '../../ln-core';
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-accordion': {}
+		'data-ln-accordion': { type: 'marker', description: 'Identifies container as an accordion that coordinates single-panel expansion' }
 	};
 
 	// ─── Component ─────────────────────────────────────────────

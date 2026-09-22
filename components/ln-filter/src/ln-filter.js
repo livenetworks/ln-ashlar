@@ -19,14 +19,14 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-filter':        { prop: 'targetId', read: attrStr, fallback: null },
-		'data-ln-hash':          { effect: _syncAttribute },
-		'data-ln-filter-values': { effect: _syncAttribute },
-		'data-ln-filter-col':    {},
-		'data-ln-filter-key':    {},
-		'data-ln-filter-reset':  {},
-		'data-ln-filter-value':  {},
-		'data-ln-filter-hide':   {}
+		'data-ln-filter':        { prop: 'targetId', type: 'string', read: attrStr, fallback: null, description: 'Target table or list element ID to filter' },
+		'data-ln-hash':          { type: 'string', effect: _syncAttribute, description: 'URL hash routing key for filter state persistence' },
+		'data-ln-filter-values': { type: 'string', effect: _syncAttribute, description: 'Encoded active filter values' },
+		'data-ln-filter-col':    { type: 'string', description: 'Column name or index filter specifier' },
+		'data-ln-filter-key':    { type: 'string', description: 'Field key for filter matching' },
+		'data-ln-filter-reset':  { type: 'trigger', description: 'Filter reset button or option trigger' },
+		'data-ln-filter-value':  { type: 'string', description: 'Value to match for this filter input' },
+		'data-ln-filter-hide':   { type: 'enum', values: ['collapse', 'none'], fallback: 'collapse', description: 'CSS hiding strategy for non-matching rows' }
 	};
 
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);

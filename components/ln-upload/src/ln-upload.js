@@ -11,23 +11,23 @@ import { formatFileSize, getFileExtension, isFileTypeAllowed, parseAcceptExtensi
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-upload':            { prop: 'uploadUrl', read: attrStr, fallback: '' },
-		'data-ln-upload-accept':     {},
-		'data-ln-upload-delete':     { prop: 'deleteUrlPattern', read: attrStr, fallback: '' },
-		'data-ln-upload-max-size':   { prop: 'maxSize', read: attrInt, fallback: 0 },
-		'data-ln-upload-max-files':  { prop: 'maxFiles', read: attrInt, fallback: 0 },
-		'data-ln-upload-file-field': { prop: 'fileFieldName', read: attrStr, fallback: DEFAULT_FILE_FIELD },
-		'data-ln-upload-ids-field':  { prop: 'idsFieldName', read: attrStr, fallback: DEFAULT_IDS_FIELD },
-		'data-ln-upload-dict':       {},
-		'data-ln-upload-zone':       {},
-		'data-ln-upload-list':       {},
-		'data-ln-upload-item':       {},
-		'data-ln-upload-action':     {},
-		'data-ln-upload-state':      {},
-		'data-ln-upload-id':         {},
-		'data-ln-upload-local-id':   {},
-		'data-ln-upload-size':       {},
-		'data-ln-upload-ext':        {}
+		'data-ln-upload':            { prop: 'uploadUrl', read: attrStr, type: 'string', fallback: '', description: 'Endpoint URL for file uploads' },
+		'data-ln-upload-accept':     { type: 'string', description: 'Comma-separated list of allowed file extensions or MIME types' },
+		'data-ln-upload-delete':     { prop: 'deleteUrlPattern', read: attrStr, type: 'string', fallback: '', description: 'Endpoint URL pattern for deleting uploaded files' },
+		'data-ln-upload-max-size':   { prop: 'maxSize', read: attrInt, type: 'integer', fallback: 0, min: 0, description: 'Maximum allowed file size in bytes (0 for unlimited)' },
+		'data-ln-upload-max-files':  { prop: 'maxFiles', read: attrInt, type: 'integer', fallback: 0, min: 0, description: 'Maximum number of files allowed in upload queue (0 for unlimited)' },
+		'data-ln-upload-file-field': { prop: 'fileFieldName', read: attrStr, type: 'string', fallback: DEFAULT_FILE_FIELD, description: 'Form data field name used for file payloads' },
+		'data-ln-upload-ids-field':  { prop: 'idsFieldName', read: attrStr, type: 'string', fallback: DEFAULT_IDS_FIELD, description: 'Form field name for submitting uploaded file IDs' },
+		'data-ln-upload-dict':       { type: 'string', description: 'Dictionary key prefix mapping for translatable upload messages' },
+		'data-ln-upload-zone':       { type: 'marker', description: 'Designates container as dropzone for drag-and-drop file uploads' },
+		'data-ln-upload-list':       { type: 'marker', description: 'Container element holding rendered upload items' },
+		'data-ln-upload-item':       { type: 'marker', description: 'Container element for an individual file upload item' },
+		'data-ln-upload-action':     { type: 'enum', values: ['remove', 'retry'], description: 'Action button within upload item' },
+		'data-ln-upload-state':      { type: 'enum', values: ['ready', 'dragover', 'pending', 'uploading', 'success', 'error'], description: 'Runtime status of dropzone or individual upload item' },
+		'data-ln-upload-id':         { type: 'string', description: 'Server-assigned file identifier for completed upload' },
+		'data-ln-upload-local-id':   { type: 'string', description: 'Client-generated unique ID for tracking file item in DOM' },
+		'data-ln-upload-size':       { type: 'integer', min: 0, description: 'File size in bytes' },
+		'data-ln-upload-ext':        { type: 'string', description: 'Normalized file extension' }
 	};
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 

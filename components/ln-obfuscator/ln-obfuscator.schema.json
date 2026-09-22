@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-obfuscator",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -13,19 +13,37 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-obfuscator.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"rot13",
+				"base64",
+				"xor"
+			],
+			"fallback": "rot13",
+			"description": "Codec used to deobfuscate text or links"
 		},
 		"data-ln-obfuscator-codec": {
 			"direction": "author",
 			"sources": [
 				"src/ln-obfuscator.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"rot13",
+				"base64",
+				"xor"
+			],
+			"fallback": "rot13",
+			"description": "Explicit codec override attribute"
 		},
 		"data-ln-obfuscator-key": {
 			"direction": "author",
 			"sources": [
 				"src/ln-obfuscator.js"
-			]
+			],
+			"type": "string",
+			"description": "Encryption or masking key for XOR codec"
 		}
 	}
 }

@@ -1,5 +1,5 @@
 {
-	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
 	"component": "ln-scroll",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
@@ -7,40 +7,76 @@
 			"direction": "author",
 			"sources": [
 				"src/ln-scroll.js"
-			]
+			],
+			"type": "string",
+			"description": "Target element ID or CSS selector to scroll into view"
 		},
 		"data-ln-scroll-behavior": {
 			"direction": "author",
 			"sources": [
 				"src/ln-scroll.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"smooth",
+				"auto"
+			],
+			"fallback": "smooth",
+			"description": "Scroll animation behavior transition"
 		},
 		"data-ln-scroll-block": {
 			"direction": "author",
 			"sources": [
 				"src/ln-scroll.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"start",
+				"center",
+				"end",
+				"nearest"
+			],
+			"fallback": "start",
+			"description": "Vertical alignment positioning of scrolled target"
 		},
 		"data-ln-scroll-delay": {
 			"direction": "author",
 			"sources": [
 				"src/ln-scroll.js"
-			]
+			],
+			"type": "integer",
+			"fallback": 0,
+			"min": 0,
+			"description": "Delay in milliseconds before initiating scroll"
 		},
 		"data-ln-scroll-focus": {
 			"direction": "author",
 			"sources": [
 				"src/ln-scroll.js"
-			]
+			],
+			"type": "boolean",
+			"fallback": false,
+			"description": "Whether to shift keyboard focus to target element after scroll"
 		},
 		"data-ln-scroll-set": {
 			"direction": "author",
 			"sources": [
 				"src/ln-scroll.js"
-			]
+			],
+			"type": "string",
+			"description": "Optional state attribute assignment on target after scroll (e.g. data-ln-toggle=open)"
 		},
 		"data-ln-scroll-update-hash": {
 			"direction": "author",
+			"sources": [
+				"src/ln-scroll.js"
+			],
+			"type": "boolean",
+			"fallback": true,
+			"description": "Whether to update URL hash with target ID"
+		},
+		"data-ln-toggle": {
+			"direction": null,
 			"sources": [
 				"src/ln-scroll.js"
 			]
