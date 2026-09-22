@@ -17,6 +17,25 @@
 4. 🤖 **AI-Native & Contract-Driven:** AI agents (via MCP, `.agents/`, and `docs-mcp/`) generate declarative, schema-validated HTML contracts rather than complex JavaScript program trees.
 5. 🔌 **The DOM Is the Bus:** Components never import one another. They communicate through bubbling `CustomEvent`s (`ln-{component}:{action}`), so a trigger neither knows nor cares what handles it — and the DOM tree, rather than a global registry, defines the scope. Any backend, template engine, or third-party script can take part by dispatching an event, with no package to install.
 
+### 🎛️ Beyond CRUD: The Project Coordinator Model (`data-ln-*` + `data-{project}-*`)
+
+A frequent misconception is that DOM-First architecture is restricted to standard form-heavy business portals or admin CRUD. In reality, `ln-ashlar` functions as an **orchestration runtime for complex, highly interactive frontend applications** through its **Three-Layer Architecture**:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Layer 2: Project Coordinator / Domain Logic (data-myapp-*) │  ← Audio Decks, Playlists, Medical EHR, POS flows
+├─────────────────────────────────────────────────────────────┤
+│  Layer 1: Ashlar Generic Infrastructure (data-ln-*)         │  ← Modals, Accordions, Sortable, Forms, Toasts
+├─────────────────────────────────────────────────────────────┤
+│  Layer 0: Native W3C DOM & Browser Standards                │  ← The Universal Bus (Events & Attributes)
+└─────────────────────────────────────────────────────────────┘
+```
+
+- **Ashlar Primitives Are Domain-Agnostic:** Generic components (`data-ln-modal`, `data-ln-accordion`, `data-ln-sortable`, `data-ln-form`) manage DOM state, layout mechanics, and ARIA semantics. They neither know nor care what a "DJ deck", "audio track", or "patient chart" is.
+- **Your Project Builds Its Own Language:** Your application implements its own **Project Coordinator** and declarative domain attributes (e.g., `data-mixer-*`, `data-crm-*`, `data-pos-*`). The coordinator mediates between external engines (Web Audio API, specialized libraries, WebSockets), IndexedDB caches, and the DOM.
+- **Real-World Flagship Showcase — `ln-mixer`:**
+  A production-grade, 2-deck DJ audio mixer application featuring real-time audio waveform visualization, drag-and-drop playlist reordering, loop cues, and offline PWA capability. It orchestrates the entire application with `ln-ashlar` and **only one single runtime dependency** ([wavesurfer.js](https://wavesurfer.xyz/)) — with **zero React/Vue, zero Virtual DOM, and zero state-synchronization bloat**.
+
 ---
 
 ## 📊 Architectural Positioning & Trade-offs
@@ -30,7 +49,7 @@
 | **Observability & Inspection** | Requires specialized DevTools extensions to inspect hidden memory state. | **Control plane fully inspectable**: every behavioral state is a visible `data-ln-*` attribute in the native DOM inspector. |
 | **Long-Term Longevity** | Managed via framework LTS cycles and automated refactoring (`ng update`). | Built directly on **permanent W3C browser standards** (`<dialog>`, Popover API, CustomEvent). |
 | **Server & Client Harmony** | Primarily JSON/SPA focused; SSR requires complex hydration pipelines. | **Dual-Core**: Native SSR progressive enhancement (Laravel, Go, Django) & SPA (`ln-router`). |
-| **Optimal Use Cases** | High-frequency continuous client state (collaborative editors, games, canvas). | Enterprise CRUD, Admin Panels, ERPs, long-lived apps with strong backend integration. |
+| **Optimal Use Cases** | High-frequency continuous client state (collaborative editors, games, canvas). | Enterprise CRUD, Admin Panels, ERPs, long-lived apps with strong backend integration, and complex interactive tools via Project Coordinators (e.g. `ln-mixer`). |
 
 ### 🎯 Application Suitability & Workload Breakdown
 
@@ -38,6 +57,7 @@
 | :--- | :---: | :--- |
 | **AI-Generated Applications & Workflows** | ⭐⭐⭐⭐⭐ | Machine-readable HTML contracts (`docs-mcp/`), zero build requirements. |
 | **Admin Panels, CRUD & Form Systems** | ⭐⭐⭐⭐⭐ | DOM-first state, native browser validation, instant IndexedDB caching. |
+| **Complex Interactive Applications (Audio, Media, Tools)** | ⭐⭐⭐⭐⭐ | Orchestrated via Project Coordinators (e.g. `ln-mixer` with wavesurfer.js), zero VDOM overhead. |
 | **Classic Web & Landing Pages** | ⭐⭐⭐⭐⭐ | Instant FCP, native SEO, zero bundle bloat. |
 | **Documentation & Content Systems** | ⭐⭐⭐⭐⭐ | HTML-centric structure, clean semantic mixins, zero JS overhead. |
 | **Enterprise Portals & Internal Tools** | ⭐⭐⭐⭐⭐ | 15+ year browser stability, zero supply-chain security liability. |
