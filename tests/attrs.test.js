@@ -97,6 +97,7 @@ test('attrSpec auto-infers readers from type when read is omitted', () => {
 				'data-ln-status': 'busy',
 				'data-ln-count': '42',
 				'data-ln-ratio': '1.25',
+				'data-ln-active': '',
 				'data-ln-tags': 'one, two, three',
 				'data-ln-config': '{"foo":"bar"}',
 				'data-ln-title': 'Custom Title'
@@ -120,6 +121,30 @@ test('attrSpec auto-infers readers from type when read is omitted', () => {
 	assert.equal(instance.title, 'Custom Title');
 });
 
+test('attrBool handles presence, boolean values, and fallback', () => {
+	const mockEl = {
+		getAttribute(name) {
+			const map = {
+				empty: '',
+				strTrue: 'true',
+				strFalse: 'false',
+				numOne: '1',
+				numZero: '0'
+			};
+			return map[name] !== undefined ? map[name] : null;
+		}
+	};
+
+	assert.equal(attrBool(mockEl, 'empty'), true, 'Bare presence should be true');
+	assert.equal(attrBool(mockEl, 'strTrue'), true, '"true" should be true');
+	assert.equal(attrBool(mockEl, 'numOne'), true, '"1" should be true');
+	assert.equal(attrBool(mockEl, 'strFalse'), false, '"false" should be false');
+	assert.equal(attrBool(mockEl, 'numZero'), false, '"0" should be false');
+	assert.equal(attrBool(mockEl, 'missing'), false, 'Missing with default fallback should be false');
+	assert.equal(attrBool(mockEl, 'missing', true), true, 'Missing with fallback: true should be true');
+	assert.equal(attrBool(mockEl, 'strFalse', true), false, '"false" must override fallback: true');
+});
+
 test('validateAttrValue validates all types and outputs dev warnings on failure', () => {
 	const warnings = [];
 	const origWarn = console.warn;
@@ -135,10 +160,14 @@ test('validateAttrValue validates all types and outputs dev warnings on failure'
 		assert.equal(validateAttrValue({ type: 'string' }, 'any text', 'data-ln-str', 'ln-test'), true);
 		assert.equal(validateAttrValue({ type: 'list' }, 'a,b,c', 'data-ln-list', 'ln-test'), true);
 
-		// Boolean presence
+		// Boolean presence and values ("true", "false", "1", "0", "")
 		assert.equal(validateAttrValue({ type: 'boolean' }, '', 'data-ln-bool', 'ln-test'), true);
-		assert.equal(validateAttrValue({ type: 'boolean' }, 'false', 'data-ln-bool', 'ln-test'), false);
-		assert.ok(warnings.some(w => w.includes('Boolean attribute') && w.includes('should be valueless')));
+		assert.equal(validateAttrValue({ type: 'boolean' }, 'true', 'data-ln-bool', 'ln-test'), true);
+		assert.equal(validateAttrValue({ type: 'boolean' }, 'false', 'data-ln-bool', 'ln-test'), true);
+		assert.equal(validateAttrValue({ type: 'boolean' }, '1', 'data-ln-bool', 'ln-test'), true);
+		assert.equal(validateAttrValue({ type: 'boolean' }, '0', 'data-ln-bool', 'ln-test'), true);
+		assert.equal(validateAttrValue({ type: 'boolean' }, 'invalid', 'data-ln-bool', 'ln-test'), false);
+		assert.ok(warnings.some(w => w.includes('[ln-test]') && w.includes('Invalid value "invalid" for boolean attribute "data-ln-bool"')));
 
 		// Enum
 		warnings.length = 0;
@@ -146,11 +175,16 @@ test('validateAttrValue validates all types and outputs dev warnings on failure'
 		assert.equal(validateAttrValue(enumEntry, 'open', 'data-ln-state', 'ln-modal'), true);
 		assert.equal(validateAttrValue(enumEntry, 'invalid', 'data-ln-state', 'ln-modal'), false);
 		assert.ok(warnings.some(w => w.includes('[ln-modal]') && w.includes('Invalid value "invalid"')));
+		// Bare enum with fallback -> valid (no warning)
+		assert.equal(validateAttrValue(enumEntry, '', 'data-ln-modal', 'ln-modal'), true);
+		// Bare enum without fallback -> invalid
+		assert.equal(validateAttrValue({ type: 'enum', values: ['open', 'close'] }, '', 'data-ln-state', 'ln-modal'), false);
 
 		// Integer with bounds
 		warnings.length = 0;
 		const intEntry = { type: 'integer', fallback: 10, min: 1, max: 100 };
 		assert.equal(validateAttrValue(intEntry, '50', 'data-ln-count', 'ln-test'), true);
+		assert.equal(validateAttrValue(intEntry, '', 'data-ln-count', 'ln-test'), true, 'Bare integer with fallback is valid');
 		assert.equal(validateAttrValue(intEntry, 'abc', 'data-ln-count', 'ln-test'), false);
 		assert.equal(validateAttrValue(intEntry, '0', 'data-ln-count', 'ln-test'), false);
 		assert.equal(validateAttrValue(intEntry, '150', 'data-ln-count', 'ln-test'), false);
@@ -159,6 +193,7 @@ test('validateAttrValue validates all types and outputs dev warnings on failure'
 		warnings.length = 0;
 		const floatEntry = { type: 'float', fallback: 0.0 };
 		assert.equal(validateAttrValue(floatEntry, '3.14', 'data-ln-pi', 'ln-test'), true);
+		assert.equal(validateAttrValue(floatEntry, '', 'data-ln-pi', 'ln-test'), true, 'Bare float with fallback is valid');
 		assert.equal(validateAttrValue(floatEntry, 'bad', 'data-ln-pi', 'ln-test'), false);
 
 		// JSON
@@ -166,6 +201,170 @@ test('validateAttrValue validates all types and outputs dev warnings on failure'
 		const jsonEntry = { type: 'json', fallback: {} };
 		assert.equal(validateAttrValue(jsonEntry, '{"ok":true}', 'data-ln-cfg', 'ln-test'), true);
 		assert.equal(validateAttrValue(jsonEntry, '{unclosed', 'data-ln-cfg', 'ln-test'), false);
+	} finally {
+		console.warn = origWarn;
+	}
+});
+
+test('isDevMode evaluates dynamically without stale memoization and scopes to debug hosts', async () => {
+	const { isDevMode } = await import('../components/ln-core/helpers.js');
+	const origWindow = global.window;
+	const origDocument = global.document;
+
+	try {
+		global.window = {};
+		global.document = {
+			documentElement: { hasAttribute: (a) => a === 'data-ln-debug' },
+			body: { hasAttribute: () => false }
+		};
+		// <html> is explicitly NOT a supported host per gate.js:18-32
+		assert.equal(isDevMode(), false, 'Must reject html[data-ln-debug]');
+
+		// Toggle on via document.body
+		global.document.body.hasAttribute = (a) => a === 'data-ln-debug';
+		assert.equal(isDevMode(), true, 'Must detect body[data-ln-debug] dynamically');
+
+		// Toggle off on body
+		global.document.body.hasAttribute = () => false;
+		assert.equal(isDevMode(), false, 'Must return false when body has no debug attribute');
+
+		// Scoped element check
+		const insideEl = { closest: (sel) => sel === '[data-ln-debug]' ? {} : null };
+		const outsideEl = { closest: () => null };
+		assert.equal(isDevMode(insideEl), true, 'Element contained in debug host must be dev mode');
+		assert.equal(isDevMode(outsideEl), false, 'Element outside debug host must not be dev mode');
+
+		// Global toggle on via window.lnDebug
+		global.window.lnDebug = true;
+		assert.equal(isDevMode(), true, 'Must detect window.lnDebug');
+		assert.equal(isDevMode(outsideEl), true, 'window.lnDebug overrides element scope');
+	} finally {
+		global.window = origWindow;
+		global.document = origDocument;
+	}
+});
+
+test('registerComponent validates each element once without duplicate warnings on nested hosts', async () => {
+	const { registerComponent } = await import('../components/ln-core/helpers.js');
+	const origWindow = global.window;
+	const origDocument = global.document;
+
+	const warnings = [];
+	const origWarn = console.warn;
+	console.warn = (...args) => warnings.push(args.join(' '));
+
+	const origMutationObserver = global.MutationObserver;
+
+	try {
+		global.window = { lnDebug: true };
+		global.MutationObserver = class { observe() {} disconnect() {} };
+
+		// Mock DOM: outer and inner nested elements
+		const innerEl = {
+			tagName: 'DIV',
+			getAttribute(name) { return name === 'data-ln-nest' ? 'bad_val' : null; },
+			hasAttribute(name) { return name === 'data-ln-nest'; },
+			matches(sel) { return sel === '[data-ln-nest]' || sel === 'data-ln-nest'; },
+			querySelectorAll() { return []; }
+		};
+
+		const outerEl = {
+			tagName: 'DIV',
+			getAttribute(name) { return name === 'data-ln-nest' ? 'open' : null; },
+			hasAttribute(name) { return name === 'data-ln-nest'; },
+			matches(sel) { return sel === '[data-ln-nest]' || sel === 'data-ln-nest'; },
+			querySelectorAll(sel) {
+				if (sel === '[data-ln-nest]') return [innerEl];
+				return [];
+			}
+		};
+
+		const mockRoot = {
+			matches() { return false; },
+			querySelectorAll(sel) {
+				if (sel === '[data-ln-nest]' || sel === 'data-ln-nest') return [outerEl, innerEl];
+				return [];
+			}
+		};
+
+		global.document = {
+			body: mockRoot
+		};
+
+		function DummyComp(dom) { this.dom = dom; dom.lnNest = this; }
+
+		registerComponent('data-ln-nest', 'lnNest', DummyComp, 'ln-nest', {
+			attributes: {
+				'data-ln-nest': { type: 'enum', values: ['open', 'close'], fallback: 'close' }
+			}
+		});
+
+		// registerComponent automatically boots on document.body (mockRoot)
+
+		// innerEl had "bad_val" -> should only emit ONE warning, NOT multiple warnings!
+		const badValWarnings = warnings.filter(w => w.includes('Invalid value "bad_val"'));
+		assert.equal(badValWarnings.length, 1, 'Must emit exactly one warning for nested host');
+	} finally {
+		console.warn = origWarn;
+		global.window = origWindow;
+		global.document = origDocument;
+		global.MutationObserver = origMutationObserver;
+	}
+});
+
+test('hasActiveDebug detects debug activation dynamically and bypasses when inactive', async () => {
+	const { hasActiveDebug } = await import('../components/ln-core/helpers.js');
+	const origWindow = global.window;
+	const origDocument = global.document;
+
+	try {
+		global.window = {};
+		global.document = {
+			body: {
+				hasAttribute: () => false,
+				querySelector: () => null
+			}
+		};
+
+		assert.equal(hasActiveDebug(), false, 'Inactive when no debug flags exist');
+
+		// window.lnDebug
+		global.window.lnDebug = true;
+		assert.equal(hasActiveDebug(), true);
+		global.window.lnDebug = false;
+
+		// body attribute
+		global.document.body.hasAttribute = (a) => a === 'data-ln-debug';
+		assert.equal(hasActiveDebug(), true);
+		global.document.body.hasAttribute = () => false;
+
+		// nested debug host in DOM
+		global.document.body.querySelector = (s) => s === '[data-ln-debug]' ? {} : null;
+		assert.equal(hasActiveDebug(), true);
+		global.document.body.querySelector = () => null;
+
+		// _debugSink active
+		global.window.lnCore = { _debugSink: () => {} };
+		assert.equal(hasActiveDebug(), true);
+	} finally {
+		global.window = origWindow;
+		global.document = origDocument;
+	}
+});
+
+test('ln-confirm state enum accepts "confirming" without warnings', () => {
+	const warnings = [];
+	const origWarn = console.warn;
+	console.warn = (...args) => warnings.push(args.join(' '));
+
+	try {
+		const confirmStateEntry = { type: 'enum', values: ['confirming'] };
+		assert.equal(validateAttrValue(confirmStateEntry, 'confirming', 'data-ln-confirm-state', 'ln-confirm'), true);
+		assert.equal(warnings.length, 0, 'Must not warn on valid "confirming" state');
+
+		// Invalid value still warns
+		assert.equal(validateAttrValue(confirmStateEntry, 'invalid', 'data-ln-confirm-state', 'ln-confirm'), false);
+		assert.equal(warnings.length, 1);
 	} finally {
 		console.warn = origWarn;
 	}

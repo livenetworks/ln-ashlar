@@ -213,8 +213,12 @@
 		},
 		{
 			"name": "data-ln-confirm-state",
-			"description": "Active confirmation state marker on button",
-			"valueSet": "b"
+			"description": "Active confirmation state marker on button (",
+			"values": [
+				{
+					"name": "confirming"
+				}
+			]
 		},
 		{
 			"name": "data-ln-confirm-timeout",
@@ -1091,12 +1095,11 @@
 		},
 		{
 			"name": "data-ln-scroll-delay",
-			"description": "Delay in milliseconds before initiating scroll"
+			"description": "Delay in milliseconds before shifting keyboard focus"
 		},
 		{
 			"name": "data-ln-scroll-focus",
-			"description": "Whether to shift keyboard focus to target element after scroll",
-			"valueSet": "b"
+			"description": "CSS selector of element to focus after scroll, or "
 		},
 		{
 			"name": "data-ln-scroll-set",

@@ -134,25 +134,34 @@ Using hidden checkboxes (`<input type="checkbox">`) to toggle styling state is s
 2. It breaks encapsulation by exposing internal inputs to external controllers.
 3. It violates semantic accessibility (ARIA) standards.
 
-### No Inline Styling from JS
-Consistent with the Attribute Bridge, JS never sets styles directly (`el.style.*`) — it toggles classes/attributes and lets SCSS style the resulting state. (Accepted exception on record: `ln-date`'s hidden native picker.) Dev-misuse warnings surface via a CSS `::after` affordance, not `console.warn`. Recoverable runtime issues use a `[component-name]`-prefixed `console.warn` + bail — never throw across handlers, never `alert`/`confirm`/`prompt`.
+### Visual Diagnostics vs. Runtime Warnings
+Consistent with the Attribute Bridge, JS never sets styles directly (`el.style.*`) — it toggles classes/attributes and lets SCSS style the resulting state. (Accepted exception on record: `ln-date`'s hidden native picker.)
+- **Structural HTML Diagnostics**: Static DOM errors (missing IDs, invalid nesting, empty targets) surface visually via a CSS `::after` affordance (`*-dev.scss` / `dev-dom-error`) under `[data-ln-debug]`.
+- **Runtime Type Contract Validation**: Dynamic attribute violations (unrecognized enum values, out-of-bounds numbers, malformed JSON) emit a `[component-name]`-prefixed `console.warn` in dev mode and fall back safely to declared defaults — never throw across handlers, never `alert`/`confirm`/`prompt`.
 
 ### Typed Attribute Contracts & Dev-Time Validation
 
-Every component explicitly defines its public attribute contract via an `ATTRIBUTES` map passed into `attrSpec()` and `registerComponent()`. This establishes a single source of truth for runtime readers, development-time type assertions, and automated schema generation:
+Every component explicitly defines its public attribute contract via an `ATTRIBUTES` map passed into `attrSpec()` and `registerComponent()`. This establishes a single source of truth for runtime readers, development-time type assertions, and automated schema generation. See concrete contracts in [components/ln-modal/src/ln-modal.js](../../components/ln-modal/src/ln-modal.js) and [components/ln-scroll/src/ln-scroll.js](../../components/ln-scroll/src/ln-scroll.js):
 
 ```javascript
-const ATTRIBUTES = {
-    'data-ln-modal':       { type: 'enum', values: ['open', 'closed'], fallback: 'closed', effect: _syncAttribute, description: 'Current visibility state of modal dialog' },
-    'data-ln-modal-focus': { prop: 'autoFocus', read: attrBool, type: 'boolean', fallback: true, description: 'Whether to auto-focus first input on open' },
-    'data-ln-modal-delay': { prop: 'delay', read: attrInt, type: 'integer', fallback: 0, min: 0, description: 'Animation transition delay in milliseconds' }
+// Illustrated from ln-modal (enum + trigger):
+const MODAL_ATTRIBUTES = {
+    'data-ln-modal':       { type: 'enum', values: ['open', 'close'], fallback: 'close', effect: _syncAttribute, description: 'Control state of modal dialog' },
+    'data-ln-modal-close': { type: 'trigger', description: 'Click dismiss trigger inside modal' }
 };
-const ATTR_SPEC = attrSpec(ATTRIBUTES);
+
+// Illustrated from ln-scroll (string + enum + integer):
+const SCROLL_ATTRIBUTES = {
+    'data-ln-scroll':          { type: 'string', description: 'Target element ID or CSS selector to scroll into view' },
+    'data-ln-scroll-behavior': { type: 'enum', values: ['smooth', 'auto'], fallback: 'smooth', description: 'Scroll animation behavior transition' },
+    'data-ln-scroll-delay':    { type: 'integer', fallback: 450, min: 0, description: 'Delay in milliseconds before shifting keyboard focus' }
+};
+const ATTR_SPEC = attrSpec(MODAL_ATTRIBUTES);
 ```
 
 #### Closed Type Taxonomy
 Attribute types are strictly restricted to the following closed vocabulary:
-- `'enum'`: Bounded set of allowed strings defined in `values` (e.g. `['open', 'close']`).
+- `'enum'`: Bounded set of allowed strings defined in `values` (e.g. `['open', 'close']`). Bare attributes (`value === ''`) with a declared `fallback` are accepted as the default/idle state.
 - `'integer'`: Parsed integer string; supports optional `min` and `max` constraints.
 - `'float'`: Parsed decimal/floating-point number.
 - `'boolean'`: HTML presence attribute (`hasAttribute`). If provided with a non-empty value (e.g. `"false"`), dev validation emits a warning that boolean attributes must be valueless.
@@ -162,8 +171,8 @@ Attribute types are strictly restricted to the following closed vocabulary:
 - `'trigger'`: Interactive trigger element targeting another component.
 - `'marker'`: Valueless mounting or designation hook on a DOM element.
 
-#### Zero Production Overhead
-Validation is guarded by a memoized dev-mode flag (`window.lnDebug` or `[data-ln-debug]` in DOM). In production, `validateAttrValue` checks are completely bypassed with **0ns** runtime overhead.
+#### Dev-Mode Guarding
+Validation is dynamically guarded by dev mode (`window.lnDebug === true`, or `data-ln-debug` present on `<html>` or `<body>`). In production environments without dev mode active, `validateAttrValue` checks are bypassed immediately.
 
 #### Automated Schema Sync
 All component attribute definitions are synchronized to their respective `.schema.json` files and the centralized attribute catalog via `npm run sync:ln-schemas`. The CI checks synchronization freshness using `npm run sync:ln-schemas:check`.

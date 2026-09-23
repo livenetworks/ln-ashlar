@@ -70,32 +70,3 @@ test('schemas: web-types.json is valid and conforms to JetBrains Web-Types speci
 	assert.ok(modalAttr.value.items.includes('open') && modalAttr.value.items.includes('close'));
 });
 
-test('schemas: ln-ashlar.xsd is well-formed XML and contains valid XSD schema elements', () => {
-	const filePath = path.join(root, 'ln-ashlar.xsd');
-	assert.ok(fs.existsSync(filePath), 'ln-ashlar.xsd must exist');
-
-	const content = fs.readFileSync(filePath, 'utf8');
-
-	assert.ok(content.startsWith('<?xml version="1.0" encoding="UTF-8"?>'), 'Must start with XML declaration');
-	assert.ok(content.includes('<xs:schema'), 'Must declare xs:schema root');
-	assert.ok(content.endsWith('</xs:schema>\n') || content.endsWith('</xs:schema>'), 'Must terminate with </xs:schema>');
-	assert.ok(content.includes('targetNamespace="https://livenetworks.mk/schema/ln-ashlar"'));
-	assert.ok(content.includes('<xs:attributeGroup name="lnAshlarAttributes">'));
-
-	// Check tag balance for basic XML well-formedness
-	const openMatches = content.match(/<xs:([a-zA-Z]+)(?=[ >/])/g) || [];
-	const closeMatches = content.match(/<\/xs:([a-zA-Z]+)>/g) || [];
-	const selfCloseMatches = content.match(/<xs:([a-zA-Z]+)[^>]*\/>/g) || [];
-
-	const openTags = openMatches.length;
-	const closeTags = closeMatches.length;
-	const selfCloseTags = selfCloseMatches.length;
-
-	assert.equal(openTags, closeTags + selfCloseTags, 'Opening and closing XML tags must balance');
-
-	// Verify all attributes are referenced in attributeGroup and defined as global attributes
-	for (const expected of VALID_ATTRIBUTES) {
-		assert.ok(content.includes(`<xs:attribute ref="${expected}"/>`), `AttributeGroup must reference ${expected}`);
-		assert.ok(content.includes(`<xs:attribute name="${expected}"`), `Global attribute must define ${expected}`);
-	}
-});

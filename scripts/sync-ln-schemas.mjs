@@ -517,15 +517,6 @@ function serializeSchema(compName, newAttrs, existingObj = null) {
 	return JSON.stringify(result, null, '\t') + '\n';
 }
 
-function escapeXml(str) {
-	return String(str || '')
-		.replace(/&/g, '&amp;')
-		.replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;')
-		.replace(/"/g, '&quot;')
-		.replace(/'/g, '&apos;');
-}
-
 /**
  * Генерира VS Code / W3C HTML Custom Data формат (ln-ashlar.html-data.json).
  * @param {Map<string, object>} globalAttrMetadata
@@ -646,100 +637,6 @@ export function generateWebTypes(globalAttrMetadata, version = '1.7.0') {
 	};
 
 	return JSON.stringify(data, null, '\t') + '\n';
-}
-
-/**
- * Генерира W3C XML Schema Definition (ln-ashlar.xsd).
- * @param {Map<string, object>} globalAttrMetadata
- * @returns {string}
- */
-export function generateXmlSchema(globalAttrMetadata) {
-	const sortedNames = [...globalAttrMetadata.keys()].sort();
-	const lines = [];
-
-	lines.push('<?xml version="1.0" encoding="UTF-8"?>');
-	lines.push('<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"');
-	lines.push('\ttargetNamespace="https://livenetworks.mk/schema/ln-ashlar"');
-	lines.push('\txmlns="https://livenetworks.mk/schema/ln-ashlar"');
-	lines.push('\telementFormDefault="qualified">');
-	lines.push('');
-	lines.push('\t<!-- Global ln-ashlar Attribute Group -->');
-	lines.push('\t<xs:attributeGroup name="lnAshlarAttributes">');
-	for (const name of sortedNames) {
-		lines.push(`\t\t<xs:attribute ref="${name}"/>`);
-	}
-	lines.push('\t</xs:attributeGroup>');
-	lines.push('');
-	lines.push('\t<!-- Individual Attribute Definitions with Types and Restrictions -->');
-
-	for (const name of sortedNames) {
-		const meta = globalAttrMetadata.get(name);
-		let desc = '';
-		if (meta.descriptions && meta.descriptions.size > 0) {
-			const descs = [];
-			for (const [, d] of meta.descriptions) {
-				if (!descs.includes(d)) descs.push(d);
-			}
-			desc = descs.join(' ');
-		}
-		if (!desc) desc = `${name} attribute`;
-
-		const docSnippet = `\t\t<xs:annotation>\n\t\t\t<xs:documentation>${escapeXml(desc)}</xs:documentation>\n\t\t</xs:annotation>`;
-
-		if (meta.type === 'enum' && meta.values && meta.values.size > 0) {
-			const sortedValues = [...meta.values].sort();
-			lines.push(`\t<xs:attribute name="${name}">`);
-			lines.push(docSnippet);
-			lines.push('\t\t<xs:simpleType>');
-			lines.push('\t\t\t<xs:restriction base="xs:string">');
-			for (const v of sortedValues) {
-				lines.push(`\t\t\t\t<xs:enumeration value="${escapeXml(v)}"/>`);
-			}
-			lines.push('\t\t\t</xs:restriction>');
-			lines.push('\t\t</xs:simpleType>');
-			lines.push('\t</xs:attribute>');
-		} else if (meta.type === 'integer') {
-			lines.push(`\t<xs:attribute name="${name}">`);
-			lines.push(docSnippet);
-			lines.push('\t\t<xs:simpleType>');
-			lines.push('\t\t\t<xs:restriction base="xs:integer">');
-			if (meta.min !== null && meta.min !== undefined) {
-				lines.push(`\t\t\t\t<xs:minInclusive value="${meta.min}"/>`);
-			}
-			if (meta.max !== null && meta.max !== undefined) {
-				lines.push(`\t\t\t\t<xs:maxInclusive value="${meta.max}"/>`);
-			}
-			lines.push('\t\t\t</xs:restriction>');
-			lines.push('\t\t</xs:simpleType>');
-			lines.push('\t</xs:attribute>');
-		} else if (meta.type === 'float') {
-			lines.push(`\t<xs:attribute name="${name}">`);
-			lines.push(docSnippet);
-			lines.push('\t\t<xs:simpleType>');
-			lines.push('\t\t\t<xs:restriction base="xs:decimal"/>');
-			lines.push('\t\t</xs:simpleType>');
-			lines.push('\t</xs:attribute>');
-		} else if (meta.type === 'boolean') {
-			lines.push(`\t<xs:attribute name="${name}">`);
-			lines.push(docSnippet);
-			lines.push('\t\t<xs:simpleType>');
-			lines.push('\t\t\t<xs:restriction base="xs:string">');
-			lines.push('\t\t\t\t<xs:enumeration value=""/>');
-			lines.push('\t\t\t\t<xs:enumeration value="true"/>');
-			lines.push('\t\t\t\t<xs:enumeration value="false"/>');
-			lines.push('\t\t\t</xs:restriction>');
-			lines.push('\t\t</xs:simpleType>');
-			lines.push('\t</xs:attribute>');
-		} else {
-			lines.push(`\t<xs:attribute name="${name}" type="xs:string">`);
-			lines.push(docSnippet);
-			lines.push('\t</xs:attribute>');
-		}
-		lines.push('');
-	}
-
-	lines.push('</xs:schema>\n');
-	return lines.join('\n');
 }
 
 /**
@@ -1019,14 +916,6 @@ function main() {
 		webTypesChanged = true;
 	}
 
-	// Генерирање на W3C XML Schema (ln-ashlar.xsd)
-	const xsdContent = generateXmlSchema(globalAttrMetadata);
-	const xsdPath = path.resolve(root, 'ln-ashlar.xsd');
-	let xsdChanged = false;
-	if (!fs.existsSync(xsdPath) || fs.readFileSync(xsdPath, 'utf8') !== xsdContent) {
-		xsdChanged = true;
-	}
-
 	// Печати извештај
 	const changedFiles = pendingWrites.filter((p) => p.changed);
 	console.log(`sync-ln-schemas: root: ${root}`);
@@ -1054,7 +943,7 @@ function main() {
 		}
 	}
 
-	const hasAnyChanges = changedFiles.length > 0 || manifestChanged || htmlDataChanged || webTypesChanged || xsdChanged;
+	const hasAnyChanges = changedFiles.length > 0 || manifestChanged || htmlDataChanged || webTypesChanged;
 
 	if (checkOnly) {
 		if (staleAttributesReport.length) {
@@ -1079,9 +968,6 @@ function main() {
 			}
 			if (webTypesChanged) {
 				console.error(`  - ${path.relative(root, webTypesPath)}`);
-			}
-			if (xsdChanged) {
-				console.error(`  - ${path.relative(root, xsdPath)}`);
 			}
 			console.error('\nПушти `npm run sync:ln-schemas` за да ги ажурираш.');
 			process.exit(1);
@@ -1111,16 +997,11 @@ function main() {
 		fs.writeFileSync(webTypesPath, webTypesContent, 'utf8');
 		console.log(`  ✓ Генериран ${path.relative(root, webTypesPath)}`);
 	}
-	if (xsdChanged) {
-		fs.writeFileSync(xsdPath, xsdContent, 'utf8');
-		console.log(`  ✓ Генериран ${path.relative(root, xsdPath)}`);
-	}
 
 	const totalWrites = changedFiles.length +
 		(manifestChanged ? 1 : 0) +
 		(htmlDataChanged ? 1 : 0) +
-		(webTypesChanged ? 1 : 0) +
-		(xsdChanged ? 1 : 0);
+		(webTypesChanged ? 1 : 0);
 
 	console.log(`\nsync-ln-schemas: запишани ${totalWrites} фајлови.`);
 }

@@ -1,19 +1,33 @@
 import { attrEffects, reactiveNames, validateAttrValue } from './attrs.js';
 
-export function isDevMode() {
+export function hasActiveDebug() {
 	if (typeof window === 'undefined') return false;
-	window.lnCore = window.lnCore || {};
-	if (window.lnCore.devMode === undefined) {
-		window.lnCore.devMode = !!(
-			window.lnDebug === true ||
-			(typeof document !== 'undefined' && (
-				(document.documentElement && document.documentElement.hasAttribute('data-ln-debug')) ||
-				(document.body && document.body.hasAttribute('data-ln-debug')) ||
-				document.querySelector('[data-ln-debug]')
-			))
-		);
+	if (window.lnDebug === true) return true;
+	if (window.lnCore && window.lnCore._debugSink) return true;
+	if (typeof document !== 'undefined' && document.body) {
+		return document.body.hasAttribute('data-ln-debug') || document.body.querySelector('[data-ln-debug]') !== null;
 	}
-	return window.lnCore.devMode;
+	return false;
+}
+
+export function isDevMode(el) {
+	if (typeof window === 'undefined') return false;
+	if (window.lnDebug === true) return true;
+
+	// Authoritative gate check when ln-debug is active
+	if (window.lnCore && window.lnCore._debugIsContained) {
+		if (el) return window.lnCore._debugIsContained(el);
+		return window.lnCore._debugSink !== null;
+	}
+
+	// Direct DOM containment fallback (e.g. standalone tests or before gate boots)
+	if (el && el.closest) {
+		return !!el.closest('[data-ln-debug]');
+	}
+	if (typeof document !== 'undefined' && document.body) {
+		return document.body.hasAttribute('data-ln-debug');
+	}
+	return false;
 }
 
 // ─── Global Console Warning Interceptor (Production Mode) ──
@@ -27,7 +41,14 @@ if (typeof window !== 'undefined') {
 				(args[0].startsWith('[ln-') || args[0].startsWith('[lnCore'));
 
 			if (isLibraryWarning) {
-				if (!isDevMode()) {
+				let el = null;
+				for (let i = 1; i < args.length; i++) {
+					if (args[i] && args[i].nodeType === 1) {
+						el = args[i];
+						break;
+					}
+				}
+				if (!isDevMode(el)) {
 					return;
 				}
 			}
@@ -62,9 +83,10 @@ export function cloneTemplate(name, componentTag) {
 // ln-core that ever touches it. window.lnCore is guaranteed already
 // initialized by the module-load-time block below (Loader Gate State),
 // so the hot-path read needs no defensive "window.lnCore &&" guard.
-export function setDebugSink(sink) {
+export function setDebugSink(sink, isContained) {
 	window.lnCore = window.lnCore || {};
 	window.lnCore._debugSink = sink;
+	window.lnCore._debugIsContained = isContained || null;
 }
 
 // Nullable persist restore/save sink. Installed/removed only by ln-persist
@@ -759,6 +781,19 @@ function _registerAttrEntry(entry) {
 		if (!registry.byAttr.has(name)) registry.byAttr.set(name, []);
 		registry.byAttr.get(name).push(entry);
 	}
+	registry.byDeclaredAttr = registry.byDeclaredAttr || new Map();
+	if (entry.attributes) {
+		for (const attrName in entry.attributes) {
+			if (!registry.byDeclaredAttr.has(attrName)) registry.byDeclaredAttr.set(attrName, []);
+			const list = registry.byDeclaredAttr.get(attrName);
+			if (!list.some(item => item.componentTag === entry.componentTag)) {
+				list.push({
+					spec: entry.attributes[attrName],
+					componentTag: entry.componentTag
+				});
+			}
+		}
+	}
 	if (entry.onAttrChange || entry.effects) {
 		// Kept: window.lnCore._attrRegistry is a surface other code reads.
 		// It is simply no longer walked on the hot path.
@@ -809,14 +844,12 @@ function _handleAttrMutation(mut) {
 	const registry = _attrRegistry();
 	const entries = registry.byAttr.get(name);
 
-	// Dev-mode runtime attribute validation (validates all declared attributes, including pure getters)
-	if (entries && isDevMode()) {
+	// Dev-mode runtime attribute validation (validates all declared attributes on host or child)
+	if (hasActiveDebug() && registry.byDeclaredAttr && registry.byDeclaredAttr.has(name) && isDevMode(el)) {
+		const declared = registry.byDeclaredAttr.get(name);
 		const val = el.getAttribute(name);
-		for (let i = 0; i < entries.length; i++) {
-			const entry = entries[i];
-			if (entry.attributes && entry.attributes[name] && el[entry.attribute]) {
-				validateAttrValue(entry.attributes[name], val, name, entry.componentTag);
-			}
+		for (let i = 0; i < declared.length; i++) {
+			validateAttrValue(declared[i].spec, val, name, declared[i].componentTag, el);
 		}
 	}
 
@@ -989,14 +1022,15 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 	function constructor(domRoot) {
 		const root = domRoot || document.body;
 		findElements(root, selector, attribute, ComponentFn);
-		if (attributes && isDevMode()) {
-			const elements = Array.from(root.querySelectorAll(query));
-			if (root.matches && root.matches(query)) elements.push(root);
-			for (let i = 0; i < elements.length; i++) {
-				const el = elements[i];
-				for (const attrName in attributes) {
-					if (el.hasAttribute(attrName)) {
-						validateAttrValue(attributes[attrName], el.getAttribute(attrName), attrName, componentTag);
+		if (attributes && hasActiveDebug()) {
+			for (const attrName in attributes) {
+				const spec = attributes[attrName];
+				const nodes = Array.from(root.querySelectorAll('[' + attrName + ']'));
+				if (root.matches && root.matches('[' + attrName + ']')) nodes.push(root);
+				for (let n = 0; n < nodes.length; n++) {
+					const node = nodes[n];
+					if (isDevMode(node)) {
+						validateAttrValue(spec, node.getAttribute(attrName), attrName, componentTag, node);
 					}
 				}
 			}

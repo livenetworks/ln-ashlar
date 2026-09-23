@@ -1,5 +1,5 @@
 /* Live Networks - lnTabs (hash-aware tabs — supports <button> and <a href="#nsKey:key"> triggers) */
-import { dispatch, dispatchCancelable, hashGet, hashLinkClick, hashSet, registerComponent, attrSpec, defineAttrs } from '../../ln-core';
+import { dispatch, dispatchCancelable, hashGet, hashLinkClick, hashSet, registerComponent, attrSpec, defineAttrs, attrBool } from '../../ln-core';
 import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './tabs-model.js';
 
 (function () {
@@ -14,14 +14,13 @@ import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './
 	}
 
 	function _readTabsKey(el, name)     { return (el.getAttribute(name) || el.id || '').toLowerCase().trim(); }
-	function _readTabsFocus(el, name)   { return (el.getAttribute(name) || 'true').toLowerCase() !== 'false'; }
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
 		'data-ln-tabs':         { type: 'marker', description: 'Mounts lnTabs component instance on tabs container' },
 		'data-ln-tabs-active':  { effect: _syncActive, type: 'string', description: 'Active tab key identifier' },
 		'data-ln-tabs-default': { type: 'string', description: 'Default fallback tab key when none selected' },
-		'data-ln-tabs-focus':   { prop: 'autoFocus', read: _readTabsFocus, type: 'boolean', fallback: true, description: 'Whether to shift focus to newly activated tab panel' },
+		'data-ln-tabs-focus':   { prop: 'autoFocus', read: attrBool, type: 'boolean', fallback: true, description: 'Whether to shift focus to newly activated tab panel' },
 		'data-ln-tabs-key':     { prop: 'nsKey', read: _readTabsKey, type: 'string', description: 'Hash namespace key for URL hash synchronization' },
 		'data-ln-tab':          { type: 'string', description: 'Tab trigger key identifier' },
 		'data-ln-panel':        { type: 'string', description: 'Tab content panel key identifier matching corresponding tab' }

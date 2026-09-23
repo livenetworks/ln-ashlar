@@ -1079,9 +1079,9 @@ Parses floating point number from attribute (`parseFloat(val)`). Returns `fallba
 Evaluates attribute presence (`el.hasAttribute(name)`). Returns boolean `true` or `false`.
 
 ### `attrEnum(values, fallback)`
-Higher-order function returning a cached reader function for a set of permitted string enum values.
+Higher-order function returning a cached reader function for a set of permitted string enum values. (Illustrative usage; authoritative contracts are defined in each component's documentation, e.g. [`ln-modal`](../../docs-mcp/components/ln-modal.md)):
 ```js
-const readState = attrEnum(['open', 'closed'], 'closed');
+const readState = attrEnum(['open', 'close'], 'close');
 const state = readState(el, 'data-ln-modal');
 ```
 
@@ -1089,11 +1089,12 @@ const state = readState(el, 'data-ln-modal');
 Safely parses JSON string attribute. Returns `fallback` if attribute is missing or contains invalid JSON syntax.
 
 ### `attrSpec(spec)`
-Generates an attribute definition spec for `defineAttrs`. Automatically infers the appropriate reader function from `entry.type` if `entry.read` is omitted.
+Generates an attribute definition spec for `defineAttrs`. Automatically infers the appropriate reader function from `entry.type` if `entry.read` is omitted. For full component specifications, see individual component docs and schemas:
 ```js
+// Illustrative attribute table combining host enum and typed options:
 const ATTRIBUTES = {
-    'data-ln-modal':       { type: 'enum', values: ['open', 'closed'], fallback: 'closed', effect: _syncAttribute },
-    'data-ln-modal-delay': { prop: 'delay', type: 'integer', fallback: 0 }
+    'data-ln-modal':        { type: 'enum', values: ['open', 'close'], fallback: 'close', effect: _syncAttribute },
+    'data-ln-scroll-delay': { prop: 'delay', type: 'integer', fallback: 450 }
 };
 const ATTR_SPEC = attrSpec(ATTRIBUTES);
 ```

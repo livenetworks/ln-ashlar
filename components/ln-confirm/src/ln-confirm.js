@@ -1,4 +1,4 @@
-import { registerComponent, dispatch, shouldIgnoreClick, defineAttrs, attrSpec, attrBool } from '../../ln-core';
+import { registerComponent, dispatch, shouldIgnoreClick, defineAttrs, attrSpec } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-confirm';
@@ -36,7 +36,7 @@ import { registerComponent, dispatch, shouldIgnoreClick, defineAttrs, attrSpec, 
 	const ATTRIBUTES = {
 		'data-ln-confirm':         { prop: 'confirmText', type: 'string', read: _readPrompt, fallback: 'Confirm?', description: 'Prompt text or confirmation action trigger' },
 		'data-ln-confirm-timeout': { prop: 'timeout', type: 'float', read: _readTimeout, fallback: DEFAULT_TIMEOUT, min: 0.1, description: 'Confirmation timeout in seconds before reverting' },
-		'data-ln-confirm-state':   { prop: 'confirming', type: 'boolean', read: attrBool, description: 'Active confirmation state marker on button' }
+		'data-ln-confirm-state':   { prop: 'confirming', type: 'enum', values: ['confirming'], read: (el, name) => el.getAttribute(name) === 'confirming', description: 'Active confirmation state marker on button ("confirming")' }
 	};
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
 

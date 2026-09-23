@@ -30,8 +30,7 @@
     "theme/",
     "components/",
     "ln-ashlar.html-data.json",
-    "web-types.json",
-    "ln-ashlar.xsd"
+    "web-types.json"
   ],
   "exports": {
     ".": {

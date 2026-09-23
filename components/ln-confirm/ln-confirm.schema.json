@@ -41,8 +41,11 @@
 				"ln-confirm-dev.scss",
 				"src/ln-confirm.js"
 			],
-			"type": "boolean",
-			"description": "Active confirmation state marker on button"
+			"type": "enum",
+			"values": [
+				"confirming"
+			],
+			"description": "Active confirmation state marker on button ("
 		},
 		"data-ln-confirm-timeout": {
 			"direction": null,

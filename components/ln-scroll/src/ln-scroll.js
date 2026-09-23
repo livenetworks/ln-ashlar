@@ -1,4 +1,4 @@
-import { dispatch, dispatchCancelable, registerComponent } from '../../ln-core';
+import { dispatch, dispatchCancelable, registerComponent, attrBool } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-scroll';
@@ -12,9 +12,9 @@ import { dispatch, dispatchCancelable, registerComponent } from '../../ln-core';
 		'data-ln-scroll-behavior':    { effect: null, type: 'enum', values: ['smooth', 'auto'], fallback: 'smooth', description: 'Scroll animation behavior transition' },
 		'data-ln-scroll-block':       { effect: null, type: 'enum', values: ['start', 'center', 'end', 'nearest'], fallback: 'start', description: 'Vertical alignment positioning of scrolled target' },
 		'data-ln-scroll-set':         { effect: null, type: 'string', description: 'Optional state attribute assignment on target after scroll (e.g. data-ln-toggle=open)' },
-		'data-ln-scroll-focus':       { effect: null, type: 'boolean', fallback: false, description: 'Whether to shift keyboard focus to target element after scroll' },
-		'data-ln-scroll-delay':       { effect: null, type: 'integer', fallback: 0, min: 0, description: 'Delay in milliseconds before initiating scroll' },
-		'data-ln-scroll-update-hash': { effect: null, type: 'boolean', fallback: true, description: 'Whether to update URL hash with target ID' }
+		'data-ln-scroll-focus':       { effect: null, type: 'string', description: 'CSS selector of element to focus after scroll, or "false" to disable' },
+		'data-ln-scroll-delay':       { effect: null, type: 'integer', fallback: 450, min: 0, description: 'Delay in milliseconds before shifting keyboard focus' },
+		'data-ln-scroll-update-hash': { effect: null, type: 'boolean', fallback: false, description: 'Whether to update URL hash with target ID' }
 	};
 
 	// ─── Component Constructor ───────────────────────────────
@@ -95,8 +95,8 @@ import { dispatch, dispatchCancelable, registerComponent } from '../../ln-core';
 		targetEl.scrollIntoView({ behavior: behavior, block: block });
 
 		// Optional URL hash update
-		const updateHash = this.dom.getAttribute('data-ln-scroll-update-hash');
-		if (updateHash === 'true' || updateHash === '1') {
+		const updateHash = attrBool(this.dom, 'data-ln-scroll-update-hash', false);
+		if (updateHash) {
 			try {
 				if (window.history && window.history.pushState) {
 					window.history.pushState(null, '', targetSelector);
@@ -106,13 +106,13 @@ import { dispatch, dispatchCancelable, registerComponent } from '../../ln-core';
 
 		// Shift focus after scrolling to preserve keyboard flow
 		const focusTargetAttr = this.dom.getAttribute('data-ln-scroll-focus');
-		if (focusTargetAttr !== 'false') {
+		if (focusTargetAttr !== 'false' && focusTargetAttr !== '0') {
 			const rawDelay = parseInt(this.dom.getAttribute('data-ln-scroll-delay'), 10);
 			const delay = isNaN(rawDelay) ? 450 : rawDelay;
 
 			window.setTimeout(function () {
 				let focusEl = null;
-				if (focusTargetAttr && focusTargetAttr !== 'true') {
+				if (focusTargetAttr && focusTargetAttr !== 'true' && focusTargetAttr !== '1') {
 					try {
 						focusEl = document.querySelector(focusTargetAttr);
 					} catch (_) {}

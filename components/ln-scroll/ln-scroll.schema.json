@@ -45,18 +45,18 @@
 				"src/ln-scroll.js"
 			],
 			"type": "integer",
-			"fallback": 0,
+			"fallback": 450,
 			"min": 0,
-			"description": "Delay in milliseconds before initiating scroll"
+			"description": "Delay in milliseconds before shifting keyboard focus"
 		},
 		"data-ln-scroll-focus": {
 			"direction": "author",
 			"sources": [
 				"src/ln-scroll.js"
 			],
-			"type": "boolean",
-			"fallback": false,
-			"description": "Whether to shift keyboard focus to target element after scroll"
+			"type": "string",
+			"fallback": true,
+			"description": "CSS selector of element to focus after scroll, or "
 		},
 		"data-ln-scroll-set": {
 			"direction": "author",
@@ -67,12 +67,12 @@
 			"description": "Optional state attribute assignment on target after scroll (e.g. data-ln-toggle=open)"
 		},
 		"data-ln-scroll-update-hash": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-scroll.js"
 			],
 			"type": "boolean",
-			"fallback": true,
+			"fallback": false,
 			"description": "Whether to update URL hash with target ID"
 		},
 		"data-ln-toggle": {

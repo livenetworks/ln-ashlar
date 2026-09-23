@@ -100,7 +100,7 @@ For compact layouts and table rows. Replaces the SVG icon path with `#ln-icon-ch
 |---|---|---|---|---|
 | `data-ln-confirm` | Trigger | `String` | — | Initializes the component. Contains the confirmation text. Left empty for Two-Element Mode. |
 | `data-ln-confirm-timeout` | Trigger | `Number` | `3` | Time in seconds before returning to the idle state. |
-| `data-ln-confirm-state` | Trigger | `Boolean` (auto) | — | Added dynamically as `"true"` while waiting for confirmation. Used for CSS styling. |
+| `data-ln-confirm-state` | Trigger | `"confirming"` (enum) | — | Added dynamically as `"confirming"` while waiting for confirmation. Used for CSS styling. |
 | `data-ln-confirm-announcer` | injected `<span>` | Marker (auto) | — | Marks the transient `role="alert"` node appended in icon-only mode. |
 | `data-ln-confirm-idle` | Child | Element | — | Target visible in the idle state. |
 | `data-ln-confirm-active` | Child | Element | — | Target visible in the active confirming state. |

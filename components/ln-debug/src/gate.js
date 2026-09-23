@@ -44,6 +44,9 @@ function _refreshHosts() {
 }
 
 function _isContained(target) {
+	if (target === window || target === document) {
+		return _hosts.indexOf(document.body) !== -1;
+	}
 	for (let i = 0; i < _hosts.length; i++) {
 		if (_hosts[i].contains(target)) return true;
 	}
@@ -51,16 +54,6 @@ function _isContained(target) {
 }
 
 function _scopedSink(kind, name, element, payload) {
-	if (element === window || element === document) {
-		// Reads the cache, not a live DOM property — consistent with the
-		// per-element path below, and correct: _hosts already only ever
-		// contains document.body when it carries the attribute (see
-		// _refreshHosts above).
-		if (_hosts.indexOf(document.body) !== -1) {
-			consoleSink(kind, name, element, payload);
-		}
-		return;
-	}
 	if (_isContained(element)) {
 		consoleSink(kind, name, element, payload);
 	}
@@ -68,7 +61,7 @@ function _scopedSink(kind, name, element, payload) {
 
 function _syncSink() {
 	_refreshHosts();
-	setDebugSink(_hosts.length > 0 ? _scopedSink : null);
+	setDebugSink(_hosts.length > 0 ? _scopedSink : null, _hosts.length > 0 ? _isContained : null);
 }
 
 /**

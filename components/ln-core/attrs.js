@@ -18,8 +18,12 @@ export function attrInt(el, name, fallback) {
 	return isNaN(parsed) ? fallback : parsed;
 }
 
-export function attrBool(el, name) {
-	return el.hasAttribute(name);
+export function attrBool(el, name, fallback = false) {
+	const raw = el.getAttribute(name);
+	if (raw === null) return !!fallback;
+	const val = raw.trim().toLowerCase();
+	if (val === 'false' || val === '0') return false;
+	return true;
 }
 
 // Allocates a new array per read — do not call inside a per-row loop.
@@ -70,9 +74,10 @@ export function attrJson(el, name, fallback) {
  * @param {string|null} value - raw DOM attribute value (null if absent)
  * @param {string} attrName - attribute name (e.g. 'data-ln-modal')
  * @param {string} componentTag - component tag (e.g. 'ln-modal')
+ * @param {Element} [el] - optional DOM element carrying the attribute
  * @returns {boolean} true if valid, false if invalid
  */
-export function validateAttrValue(entry, value, attrName, componentTag) {
+export function validateAttrValue(entry, value, attrName, componentTag, el) {
 	if (!entry || value === null) return true;
 	const tag = componentTag || 'ln-component';
 	const type = entry.type;
@@ -82,9 +87,20 @@ export function validateAttrValue(entry, value, attrName, componentTag) {
 		return true;
 	}
 
+	// Bare attributes (presence-only in HTML) with a declared fallback resolve to fallback in readers
+	if (value === '' && entry.fallback !== undefined) {
+		return true;
+	}
+
+	const logWarn = (msg) => {
+		if (el) console.warn(msg, el);
+		else console.warn(msg);
+	};
+
 	if (type === 'boolean') {
-		if (value !== '') {
-			console.warn(`[${tag}] Boolean attribute "${attrName}" should be valueless (presence-only). Found: "${value}".`);
+		const lower = value.trim().toLowerCase();
+		if (lower !== '' && lower !== 'true' && lower !== 'false' && lower !== '1' && lower !== '0') {
+			logWarn(`[${tag}] Invalid value "${value}" for boolean attribute "${attrName}". Allowed: "true", "false", or presence-only.`);
 			return false;
 		}
 		return true;
@@ -93,7 +109,7 @@ export function validateAttrValue(entry, value, attrName, componentTag) {
 	if (type === 'enum') {
 		const allowed = entry.values || [];
 		if (!allowed.includes(value)) {
-			console.warn(`[${tag}] Invalid value "${value}" for attribute "${attrName}". Allowed: ${allowed.join(', ')}. Fallback: "${entry.fallback}".`);
+			logWarn(`[${tag}] Invalid value "${value}" for attribute "${attrName}". Allowed: ${allowed.join(', ')}. Fallback: "${entry.fallback}".`);
 			return false;
 		}
 		return true;
@@ -101,16 +117,16 @@ export function validateAttrValue(entry, value, attrName, componentTag) {
 
 	if (type === 'integer') {
 		if (!/^-?\d+$/.test(value)) {
-			console.warn(`[${tag}] Invalid integer "${value}" for attribute "${attrName}". Fallback: ${entry.fallback}.`);
+			logWarn(`[${tag}] Invalid integer "${value}" for attribute "${attrName}". Fallback: ${entry.fallback}.`);
 			return false;
 		}
 		const num = parseInt(value, 10);
 		if (entry.min !== undefined && num < entry.min) {
-			console.warn(`[${tag}] Value ${num} for attribute "${attrName}" is less than min (${entry.min}).`);
+			logWarn(`[${tag}] Value ${num} for attribute "${attrName}" is less than min (${entry.min}).`);
 			return false;
 		}
 		if (entry.max !== undefined && num > entry.max) {
-			console.warn(`[${tag}] Value ${num} for attribute "${attrName}" is greater than max (${entry.max}).`);
+			logWarn(`[${tag}] Value ${num} for attribute "${attrName}" is greater than max (${entry.max}).`);
 			return false;
 		}
 		return true;
@@ -118,7 +134,7 @@ export function validateAttrValue(entry, value, attrName, componentTag) {
 
 	if (type === 'float') {
 		if (isNaN(Number(value))) {
-			console.warn(`[${tag}] Invalid float "${value}" for attribute "${attrName}". Fallback: ${entry.fallback}.`);
+			logWarn(`[${tag}] Invalid float "${value}" for attribute "${attrName}". Fallback: ${entry.fallback}.`);
 			return false;
 		}
 		return true;
@@ -129,7 +145,7 @@ export function validateAttrValue(entry, value, attrName, componentTag) {
 			JSON.parse(value);
 			return true;
 		} catch (err) {
-			console.warn(`[${tag}] Invalid JSON for attribute "${attrName}": ${err.message}. Fallback: ${entry.fallback}.`);
+			logWarn(`[${tag}] Invalid JSON for attribute "${attrName}": ${err.message}. Fallback: ${entry.fallback}.`);
 			return false;
 		}
 	}
