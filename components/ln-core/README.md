@@ -1075,8 +1075,8 @@ Parses integer from attribute (`parseInt(val, 10)`). Returns `fallback` if parsi
 ### `attrFloat(el, name, fallback)`
 Parses floating point number from attribute (`parseFloat(val)`). Returns `fallback` if parsing results in `NaN`.
 
-### `attrBool(el, name)`
-Evaluates attribute presence (`el.hasAttribute(name)`). Returns boolean `true` or `false`.
+### `attrBool(el, name, fallback = false)`
+Evaluates boolean attribute presence and values. Returns `fallback` if attribute is absent. If present, returns `false` when value is `'false'` or `'0'`, and `true` otherwise (`""`, `'true'`, `'1'`).
 
 ### `attrEnum(values, fallback)`
 Higher-order function returning a cached reader function for a set of permitted string enum values. (Illustrative usage; authoritative contracts are defined in each component's documentation, e.g. [`ln-modal`](../../docs-mcp/components/ln-modal.md)):

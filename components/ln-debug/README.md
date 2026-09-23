@@ -1,6 +1,6 @@
 # ln-debug
 
-> Activated via the `data-ln-debug` attribute on `<html>` or `<body>`. It gates library console warnings (`[ln-`), listens to DOM mutations and `ln-*` CustomEvents, verifies cross-references (`data-ln-*-for`, `data-ln-*-source`), and flags misspelled library attributes against the schema manifest using Levenshtein distance. It introduces zero production overhead, remaining dormant or excluded outside development mode without modifying DOM structure.
+> Activated via the `data-ln-debug` attribute on `<body>` (or an element inside `<body>`). It gates library console warnings (`[ln-`), listens to DOM mutations and `ln-*` CustomEvents, verifies cross-references (`data-ln-*-for`, `data-ln-*-source`), and flags misspelled library attributes against the schema manifest using Levenshtein distance. It introduces zero production overhead, remaining dormant or excluded outside development mode without modifying DOM structure.
 
 ---
 
@@ -40,10 +40,10 @@ subtree should be observed:
 </html>
 ```
 
-The console warning filter (§1) reads `data-ln-debug` from `<html>` or
-`<body>`. The cross-reference verifier (§3) and the console observation
-layer (§6) activate only on elements inside `<body>`'s subtree — see §6 for
-the observation layer's host-containment rule.
+The console warning filter (§1), the cross-reference verifier (§3), and
+the console observation layer (§6) activate on elements inside `<body>`'s
+subtree — see §6 for the observation layer's host-containment rule.
+Placing `data-ln-debug` on `<html>` is unsupported and ignored.
 
 ---
 

@@ -11,7 +11,7 @@ tags: [debug, diagnostics, verifier, contracts, linter, dev-tooling]
 # 🛠️ ln-debug
 
 > **Classification:** 🟢 Simple Component / Service (Layer 1 - Developer Tooling & Contract Verifier)  
-> Activated via the `data-ln-debug` attribute on `<html>` or `<body>`. It gates library console warnings (`[ln-`), listens to DOM mutations and `ln-*` CustomEvents, verifies cross-references (`data-ln-*-for`, `data-ln-*-source`), and flags misspelled library attributes against the schema manifest using Levenshtein distance. It introduces zero production overhead, remaining dormant or excluded outside development mode without modifying DOM structure.
+> Activated via the `data-ln-debug` attribute on `<body>` (or an element inside `<body>`). It gates library console warnings (`[ln-`), listens to DOM mutations and `ln-*` CustomEvents, verifies cross-references (`data-ln-*-for`, `data-ln-*-source`), and flags misspelled library attributes against the schema manifest using Levenshtein distance. It introduces zero production overhead, remaining dormant or excluded outside development mode without modifying DOM structure.
 
 ---
 
@@ -19,7 +19,7 @@ tags: [debug, diagnostics, verifier, contracts, linter, dev-tooling]
 
 `ln-debug` provides runtime developer diagnostics, cross-element contract verification, and visual HTML linting for `ln-ashlar`. It fulfills four primary functions:
 
-1. **Global Warning Suppressor / Filter:** Intercepts console warnings prefixed with `[ln-` or `[lnCore`. By default, these warnings are suppressed to keep production browser logs clean. When `data-ln-debug` is placed on `<html>` or `<body>`, warnings are logged to the console.
+1. **Global Warning Suppressor / Filter:** Intercepts console warnings prefixed with `[ln-` or `[lnCore`. By default, these warnings are suppressed to keep production browser logs clean. When `data-ln-debug` is placed on `<body>`, warnings are logged to the console. When placed on a nested container, warnings and event logs are strictly scoped to that container's subtree.
 2. **Generic Cross-Reference Contract Verifier:**
    - **ID References (`*-for`):** Scans all `data-ln-*-for` attributes (e.g. `data-ln-toggle-for`, `data-ln-modal-for`, `data-ln-tabs-for`, `data-ln-search-for`, `data-ln-popover-for`) and verifies that the referenced element `id` exists in the document.
    - **Store References (`*-source`, `*-store`):** Scans consumer store attributes (e.g. `data-ln-table-source`, `data-ln-list-source`, `data-ln-chart-source`, `data-ln-editor-source`) and verifies that a matching `[data-ln-data-store="NAME"]` exists.
@@ -32,7 +32,7 @@ JavaScript source: [`ln-debug.js`](../../components/ln-debug/src/ln-debug.js) an
 
 > [!IMPORTANT]
 > **Zero Production Overhead Guarantee:**
-> - **Production Mode:** When `data-ln-debug` is omitted from `<html>` and `<body>`, the verifier remains dormant and console warnings are silenced.
+> - **Production Mode:** When `data-ln-debug` is omitted and `window.lnDebug` is falsy, the `hasActiveDebug()` gate bypasses attribute collection and validation immediately, keeping overhead at 0ns.
 > - **Standalone Dev Bundle:** The verifier is compiled into `dist/ln-ashlar-dev.js` and `demo/dist/ln-ashlar-dev.js`, maintaining 0 bytes in pure production bundles.
 
 ---
@@ -41,16 +41,16 @@ JavaScript source: [`ln-debug.js`](../../components/ln-debug/src/ln-debug.js) an
 
 ### Base HTML Markup
 
-Place `data-ln-debug` on `<html>` or `<body>`:
+Place `data-ln-debug` on `<body>` (or any container whose subtree you wish to debug):
 
 ```html
 <!DOCTYPE html>
-<html lang="en" data-ln-debug>
+<html lang="en">
 <head>
   <link rel="stylesheet" href="dist/ln-ashlar-dev.css" />
   <script src="dist/ln-ashlar.iife.js" defer></script>
 </head>
-<body>
+<body data-ln-debug>
   <!-- Valid connection -->
   <button data-ln-toggle-for="user-menu">Toggle Menu</button>
   <div id="user-menu">Menu Content</div>

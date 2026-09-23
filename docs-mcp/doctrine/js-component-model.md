@@ -164,7 +164,7 @@ Attribute types are strictly restricted to the following closed vocabulary:
 - `'enum'`: Bounded set of allowed strings defined in `values` (e.g. `['open', 'close']`). Bare attributes (`value === ''`) with a declared `fallback` are accepted as the default/idle state.
 - `'integer'`: Parsed integer string; supports optional `min` and `max` constraints.
 - `'float'`: Parsed decimal/floating-point number.
-- `'boolean'`: HTML presence attribute (`hasAttribute`). If provided with a non-empty value (e.g. `"false"`), dev validation emits a warning that boolean attributes must be valueless.
+- `'boolean'`: Boolean presence or flag attribute. Evaluates presence and recognizes explicit values: `""` (bare attribute), `"true"`, and `"1"` as `true`; `"false"` and `"0"` as `false`. In dev mode, `validateAttrValue` emits a warning on unrecognized arbitrary strings.
 - `'string'`: Generic string or identifier.
 - `'list'`: Comma- or space-separated list of tokens.
 - `'json'`: JSON-serialized object or array.
@@ -172,7 +172,7 @@ Attribute types are strictly restricted to the following closed vocabulary:
 - `'marker'`: Valueless mounting or designation hook on a DOM element.
 
 #### Dev-Mode Guarding
-Validation is dynamically guarded by dev mode (`window.lnDebug === true`, or `data-ln-debug` present on `<html>` or `<body>`). In production environments without dev mode active, `validateAttrValue` checks are bypassed immediately.
+Validation is dynamically guarded by dev mode (`window.lnDebug === true`, or `data-ln-debug` present on `<body>` or an observed container inside `<body>`, scoping dev validation to that container's subtree). Note that `<html>` is outside the observed subtree and is not a valid debug host. In production environments where debug mode is inactive, the `hasActiveDebug()` fast-path gate immediately bypasses attribute collection and validation loops with **`0ns` runtime overhead**.
 
 #### Automated Schema Sync
 All component attribute definitions are synchronized to their respective `.schema.json` files and the centralized attribute catalog via `npm run sync:ln-schemas`. The CI checks synchronization freshness using `npm run sync:ln-schemas:check`.
