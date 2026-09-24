@@ -231,8 +231,10 @@ test('isDevMode evaluates dynamically without stale memoization and scopes to de
 		// Scoped element check
 		const insideEl = { closest: (sel) => sel === '[data-ln-debug]' ? {} : null };
 		const outsideEl = { closest: () => null };
+		const htmlScopedEl = { closest: (sel) => sel === '[data-ln-debug]' ? global.document.documentElement : null };
 		assert.equal(isDevMode(insideEl), true, 'Element contained in debug host must be dev mode');
 		assert.equal(isDevMode(outsideEl), false, 'Element outside debug host must not be dev mode');
+		assert.equal(isDevMode(htmlScopedEl), false, 'Element whose closest debug host is html must be rejected');
 
 		// Global toggle on via window.lnDebug
 		global.window.lnDebug = true;

@@ -476,7 +476,7 @@ registerComponent('data-ln-example', 'lnExample', _component, 'ln-example', {
   `0` — unlike the common `parseInt(attr, 10) || fallback` idiom, which maps
   `"0"` to `fallback`. Check call sites relying on that idiom before swapping
   them to `attrInt`.
-- `attrBool` — `el.hasAttribute(name)`.
+- `attrBool` — `(el, name, fallback)`: returns `fallback` when the attribute is absent, `false` when `"false"` or `"0"`, and `true` otherwise (`""`, `"true"`, `"1"`).
 - `attrList` — `(el.getAttribute(name) || '').split(',').map(trim).filter(Boolean)`.
   Allocates a new array per read — do not call inside a per-row loop.
 - `reader` can be any function of that `(el, name, fallback)` shape, so a

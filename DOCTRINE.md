@@ -74,7 +74,7 @@
 * **Auto-Inferred Readers (`attrSpec`):** When `read` is omitted in an attribute spec, `attrSpec()` automatically infers the reader parser from `type` (`attrInt`, `attrFloat`, `attrBool`, `attrEnum(entry.values, entry.fallback)`, `attrJson`, `attrStr`).
 * **Dev-Time Type Validation & Zero Production Overhead:**
   - In development mode (`window.lnDebug` active or `[data-ln-debug]` present in DOM), `validateAttrValue` checks all attribute mutations and initial DOM values against the declared `type` and `values` contract, emitting descriptive console warnings with component tags and expected constraints.
-  - In production mode, attribute iteration and validation checks are completely bypassed via the `hasActiveDebug()` fast-path gate, maintaining **`0ns` runtime overhead**.
+  - In production mode, attribute iteration and validation checks are completely bypassed via the `hasActiveDebug()` fast-path gate.
 * **Automated Schema Synchronization:** Whenever component attributes are added or modified, run `npm run sync:ln-schemas` to synchronize `.schema.json` files and the centralized attribute catalog. Run `npm run sync:ln-schemas:check` in CI to ensure 100% contract compliance.
 * **Forbidden ("Checkbox Hack"):** Using `<input type="checkbox">` for toggle state is strictly forbidden (breaks `MutationObserver`, teleportation, ARIA semantics, and encapsulation).
 

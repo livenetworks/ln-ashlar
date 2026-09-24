@@ -172,7 +172,7 @@ Attribute types are strictly restricted to the following closed vocabulary:
 - `'marker'`: Valueless mounting or designation hook on a DOM element.
 
 #### Dev-Mode Guarding
-Validation is dynamically guarded by dev mode (`window.lnDebug === true`, or `data-ln-debug` present on `<body>` or an observed container inside `<body>`, scoping dev validation to that container's subtree). Note that `<html>` is outside the observed subtree and is not a valid debug host. In production environments where debug mode is inactive, the `hasActiveDebug()` fast-path gate immediately bypasses attribute collection and validation loops with **`0ns` runtime overhead**.
+Validation is dynamically guarded by dev mode (`window.lnDebug === true`, or `data-ln-debug` present on `<body>` or an observed container inside `<body>`, scoping dev validation to that container's subtree). Note that `<html>` is outside the observed subtree and is not a valid debug host. In production environments where debug mode is inactive, the `hasActiveDebug()` fast-path gate immediately bypasses attribute collection and validation loops.
 
 #### Automated Schema Sync
 All component attribute definitions are synchronized to their respective `.schema.json` files and the centralized attribute catalog via `npm run sync:ln-schemas`. The CI checks synchronization freshness using `npm run sync:ln-schemas:check`.

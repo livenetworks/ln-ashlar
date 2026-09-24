@@ -22,7 +22,11 @@ export function isDevMode(el) {
 
 	// Direct DOM containment fallback (e.g. standalone tests or before gate boots)
 	if (el && el.closest) {
-		return !!el.closest('[data-ln-debug]');
+		const host = el.closest('[data-ln-debug]');
+		if (!host || (typeof document !== 'undefined' && host === document.documentElement)) {
+			return false;
+		}
+		return true;
 	}
 	if (typeof document !== 'undefined' && document.body) {
 		return document.body.hasAttribute('data-ln-debug');

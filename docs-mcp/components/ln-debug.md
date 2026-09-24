@@ -32,7 +32,7 @@ JavaScript source: [`ln-debug.js`](../../components/ln-debug/src/ln-debug.js) an
 
 > [!IMPORTANT]
 > **Zero Production Overhead Guarantee:**
-> - **Production Mode:** When `data-ln-debug` is omitted and `window.lnDebug` is falsy, the `hasActiveDebug()` gate bypasses attribute collection and validation immediately, keeping overhead at 0ns.
+> - **Production Mode:** When `data-ln-debug` is omitted and `window.lnDebug` is falsy, the `hasActiveDebug()` gate bypasses attribute collection and validation immediately.
 > - **Standalone Dev Bundle:** The verifier is compiled into `dist/ln-ashlar-dev.js` and `demo/dist/ln-ashlar-dev.js`, maintaining 0 bytes in pure production bundles.
 
 ---
