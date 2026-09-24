@@ -13,3 +13,11 @@
 .header-right     { @include app-header-right; }
 .header-actions   { @include app-header-actions; }
 .header-avatar    { @include header-avatar; }
+
+// Lock root scroll exclusively for administrative shells
+html:has(.app-wrapper),
+body:has(.app-wrapper),
+.app-shell {
+	height: 100%;
+	overflow: hidden;
+}
