@@ -274,6 +274,27 @@ import {
 		};
 		btn.addEventListener('click', this._onBtnClick);
 
+		// Handle form reset
+		const form = dom.form;
+		if (form) {
+			this._form = form;
+			this._onFormReset = function () {
+				setTimeout(function () {
+					const val = self.dom.value;
+					if (val) {
+						const date = parseDateInput(val) || parseTypedDate(val);
+						if (date) {
+							const iso = formatDateToISO(date);
+							_updateState(self, iso, date);
+							return;
+						}
+					}
+					_clearState(self);
+				}, 0);
+			};
+			form.addEventListener('reset', this._onFormReset);
+		}
+
 		// Handle initial pre-filled value
 		if (initialValue && initialValue !== '') {
 			const date = parseDateInput(initialValue);
@@ -431,6 +452,9 @@ import {
 			dispatch(this.dom, 'ln-date:destroyed', { target: this.dom });
 			delete this.dom[DOM_ATTRIBUTE];
 			return;
+		}
+		if (this._form && this._onFormReset) {
+			this._form.removeEventListener('reset', this._onFormReset);
 		}
 		this._picker.removeEventListener('change', this._onPickerChange);
 		this.dom.removeEventListener('blur', this._onBlur);
