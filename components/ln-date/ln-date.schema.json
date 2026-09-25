@@ -86,7 +86,7 @@
 				"src/ln-date.js"
 			],
 			"type": "string",
-			"description": "Raw ISO date string or timestamp"
+			"description": "Raw ISO date string or timestamp for non-time elements (td, span)"
 		}
 	}
 }

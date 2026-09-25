@@ -62,7 +62,9 @@ The hidden input holds the ISO date string (YYYY-MM-DD) for form submission.
 
 | Attribute | On | Description |
 |-----------|-----|-------------|
-| `data-ln-date` | `<input>` | Enables date formatting. Value = format (keyword or pattern). Default: `medium` |
+| `data-ln-date` | `<input>`, `<time>`, `<td>` | Enables date formatting. Value = format (keyword or pattern). Default: `medium` |
+| `datetime` | `<time>` | Native machine-readable date attribute; primary observable SSOT on `<time>` elements. |
+| `data-ln-value` | `<td>`, `<span>`, `<input>` | Raw ISO date string or timestamp; acts as raw machine value for non-`<time>` elements. |
 | `data-ln-date-label` | `<input>` | Optional. Translated `aria-label` for the injected calendar button. Default: `Open date picker` (dev fallback only). |
 
 ### Format Keywords (locale-aware via Intl.DateTimeFormat)
@@ -149,6 +151,12 @@ Locale is detected by walking up the DOM tree to find the nearest `[lang]` attri
     <label for="hired">Hire Date</label>
     <input type="date" id="hired" name="hired" value="2024-03-15" data-ln-date>
 </div>
+
+<!-- Semantic HTML5 time element (observable datetime SSOT, no data-ln-value needed) -->
+<time datetime="2026-07-25" data-ln-date="medium">2026-07-25</time>
+
+<!-- Table cell with explicit raw machine value -->
+<td data-ln-value="2026-07-25" data-ln-date="dd.MM.yyyy">2026-07-25</td>
 ```
 
 ## Integration with ln-form

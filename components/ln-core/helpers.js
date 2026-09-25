@@ -669,9 +669,16 @@ export function ensureLocaleObserver() {
  * Single read path for value-based sort/filter across components.
  */
 export function readValue(el) {
-	return el.hasAttribute('data-ln-value')
-		? el.getAttribute('data-ln-value')
-		: el.textContent.trim();
+	if (el.hasAttribute('data-ln-value')) {
+		return el.getAttribute('data-ln-value');
+	}
+	if (el.tagName === 'TIME' && el.hasAttribute('datetime')) {
+		return el.getAttribute('datetime');
+	}
+	if (el.tagName === 'DATA' && el.hasAttribute('value')) {
+		return el.getAttribute('value');
+	}
+	return el.textContent.trim();
 }
 
 // ─── Value Property Interception ───────────────────────────

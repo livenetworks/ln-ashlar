@@ -644,9 +644,9 @@
 		},
 		"ln-date": {
 			"element": {
-				"recommended_tag": "time, input",
+				"recommended_tag": "time, input, td",
 				"tag_enforced": false,
-				"note": "Date formatting component for <time datetime='...'> elements or form <input type='date'> fields."
+				"note": "Date formatting component for <time datetime='...'> elements, <td> table cells, or form <input type='date'> fields."
 			},
 			"attributes": {
 				"data-ln-date": {
@@ -710,6 +710,13 @@
 					"consumed_by": "js",
 					"role": "input",
 					"description": "Locale tag override (e.g. 'mk', 'en-US')."
+				},
+				"data-ln-value": {
+					"type": "string",
+					"read_by": "ln-date",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Raw ISO date string or timestamp for non-time elements (td, span)."
 				}
 			}
 		},

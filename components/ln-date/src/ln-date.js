@@ -39,7 +39,7 @@ import {
 		'data-ln-date':          { type: 'enum', values: ['short', 'medium', 'long', 'full', 'iso'], fallback: 'medium', effect: _syncAttribute, description: 'Date display style preset or activator' },
 		'data-ln-date-format':   { type: 'string', effect: _syncAttribute, description: 'Custom Intl.DateTimeFormat pattern or options' },
 		'data-ln-date-locale':   { type: 'string', effect: _syncAttribute, description: 'BCP 47 language tag override for date formatting' },
-		'data-ln-value':         { type: 'string', effect: _syncAttribute, description: 'Raw ISO date string or timestamp' },
+		'data-ln-value':         { type: 'string', effect: _syncAttribute, description: 'Raw ISO date string or timestamp for non-time elements (td, span)' },
 		'data-ln-date-dict':     { type: 'marker', description: 'Container for date translation dictionary' },
 		'data-ln-date-dict-key': { type: 'string', description: 'Dictionary key for relative time or custom date formatting' },
 		'data-ln-date-field':    { type: 'string', description: 'Field name mapping for date record binding' },
@@ -290,7 +290,9 @@ import {
 		const datetimeAttr = dom.getAttribute('datetime');
 
 		let candidate = null;
-		if (valAttr !== null && valAttr !== '') {
+		if (dom.tagName === 'TIME' && datetimeAttr !== null && datetimeAttr !== '') {
+			candidate = datetimeAttr;
+		} else if (valAttr !== null && valAttr !== '') {
 			candidate = valAttr;
 		} else if (datetimeAttr !== null && datetimeAttr !== '') {
 			candidate = datetimeAttr;
@@ -304,7 +306,7 @@ import {
 		if (date && !isNaN(date.getTime())) {
 			const iso = formatDateToISO(date);
 			this._rawValue = iso;
-			if (!dom.hasAttribute('data-ln-value')) {
+			if (dom.tagName !== 'TIME' && !dom.hasAttribute('data-ln-value')) {
 				dom.setAttribute('data-ln-value', iso);
 			}
 			this._formatTextContent();
@@ -371,6 +373,9 @@ import {
 				if (!isoStr || isoStr === '') {
 					this._rawValue = null;
 					this.dom.removeAttribute('data-ln-value');
+					if (this.dom.tagName === 'TIME') {
+						this.dom.removeAttribute('datetime');
+					}
 					this.dom.textContent = '';
 					return;
 				}
@@ -378,7 +383,11 @@ import {
 				if (!date) return;
 				const iso = formatDateToISO(date);
 				this._rawValue = iso;
-				this.dom.setAttribute('data-ln-value', iso);
+				if (this.dom.tagName === 'TIME') {
+					this.dom.setAttribute('datetime', iso);
+				} else {
+					this.dom.setAttribute('data-ln-value', iso);
+				}
 				this._formatTextContent();
 				return;
 			}

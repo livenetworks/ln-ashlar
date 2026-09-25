@@ -330,11 +330,13 @@ Read the raw machine value behind a formatted cell/item display. The single
 read path for value-based sort/filter across components.
 
 ```js
-const raw = readValue(td); // '1250.50' from data-ln-value, else trimmed text
+const raw = readValue(td); // '1250.50' from data-ln-value, datetime on <time>, value on <data>, else trimmed text
 ```
 
 - Returns `data-ln-value` attribute value if the element has it.
-- Otherwise returns `el.textContent.trim()`.
+- Returns `datetime` attribute if the element is `<time>` and has it.
+- Returns `value` attribute if the element is `<data>` and has it.
+- Otherwise falls back to `el.textContent.trim()`.
 - Used by `ln-table` for sort/filter.
 
 ### registerComponent(selector, attribute, ComponentFn, componentTag, options)
@@ -1035,7 +1037,8 @@ Sort coerces with `parseFloat(raw) || 0`. Formatted display text breaks it:
 
 ### The split
 
-- `data-ln-value` — the VALUE. Universal. Read by `ln-core.readValue`.
+- `data-ln-value` — the VALUE. Universal raw attribute. Read by `ln-core.readValue`.
+- `datetime` / `value` — native HTML5 machine values on `<time>` and `<data>` elements, also read directly by `ln-core.readValue`.
 - **Type is inferred, not declared.** `ln-core.detectValueType` scans the current value set once
   per sort operation — no `data-ln-*-sort` type attribute exists anymore. All non-empty values
   finite numbers → numeric compare; otherwise `ln-core.compareValues` + `Intl.Collator` string

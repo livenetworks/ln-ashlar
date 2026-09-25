@@ -10,7 +10,8 @@ import {
 	isUsableTarget,
 	shouldIgnoreClick,
 	registerComponent,
-	findElements
+	findElements,
+	readValue
 } from '../components/ln-core/index.js';
 
 test('shouldIgnoreClick detects modified clicks and non-primary mouse buttons', () => {
@@ -76,6 +77,44 @@ test('compareValues performs type-sensitive comparisons', () => {
 	assert.equal(compareValues('apple', 'banana', 'string'), -1);
 	assert.equal(compareValues('banana', 'apple', 'string'), 1);
 	assert.equal(compareValues('apple', 'apple', 'string'), 0);
+});
+
+test('readValue prioritizes data-ln-value, then datetime on <time>, then value on <data>, then textContent', () => {
+	// 1. data-ln-value on td or any element
+	const tdWithValue = {
+		tagName: 'TD',
+		hasAttribute: (name) => name === 'data-ln-value',
+		getAttribute: (name) => name === 'data-ln-value' ? '1250.50' : null,
+		textContent: ' $1,250.50 '
+	};
+	assert.equal(readValue(tdWithValue), '1250.50');
+
+	// 2. <time> with datetime attribute
+	const timeEl = {
+		tagName: 'TIME',
+		hasAttribute: (name) => name === 'datetime',
+		getAttribute: (name) => name === 'datetime' ? '2026-07-25' : null,
+		textContent: ' 25.07.2026 '
+	};
+	assert.equal(readValue(timeEl), '2026-07-25');
+
+	// 3. <data> with value attribute
+	const dataEl = {
+		tagName: 'DATA',
+		hasAttribute: (name) => name === 'value',
+		getAttribute: (name) => name === 'value' ? '42' : null,
+		textContent: ' 42 units '
+	};
+	assert.equal(readValue(dataEl), '42');
+
+	// 4. plain fallback to trimmed textContent
+	const plainEl = {
+		tagName: 'SPAN',
+		hasAttribute: () => false,
+		getAttribute: () => null,
+		textContent: '  Hello Ashlar  '
+	};
+	assert.equal(readValue(plainEl), 'Hello Ashlar');
 });
 
 test('calculateProgress computes accurate percentages and clamps properly', () => {
