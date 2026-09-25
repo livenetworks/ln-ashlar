@@ -106,7 +106,6 @@ import { registerComponent, dispatch, dispatchCancelable, defineAttrs, attrSpec,
 		if (idx !== -1) {
 			history._lnNavCallbacks.splice(idx, 1);
 		}
-		dispatch(this.dom, 'ln-nav:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

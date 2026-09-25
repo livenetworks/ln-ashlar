@@ -283,7 +283,6 @@ import { dispatch, computePlacement, measureHidden, registerComponent, defineAtt
 			this.toggleEl.removeEventListener('ln-toggle:open', this._onToggleOpen);
 			this.toggleEl.removeEventListener('ln-toggle:close', this._onToggleClose);
 		}
-		dispatch(this.dom, 'ln-dropdown:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

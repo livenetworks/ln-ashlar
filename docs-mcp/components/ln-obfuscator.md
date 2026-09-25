@@ -96,7 +96,6 @@ The `ln-obfuscator` component is an automated anti-crawler utility that prevents
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-obfuscator:deobfuscated` | Emits | No | Dispatched on the target element immediately after deobfuscation. | `{ target: HTMLElement, codec: string, shift: number, key: string \| null }` |
-| `ln-obfuscator:destroyed` | Emits | No | Dispatched when `el.lnObfuscator.destroy()` is called. | `{ target: HTMLElement }` |
 
 ---
 

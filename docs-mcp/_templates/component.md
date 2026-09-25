@@ -72,8 +72,7 @@ Short explanation of when to use it.
 <!-- If the component has no custom events, replace this table with the canonical none-declaration sentence — see README §Normative Tables. -->
 
 <!-- The Events table is a full protocol inventory: every event the component
-     emits or listens to — including lifecycle events (`:destroyed`,
-     `:config-changed`) and inter-component wiring — must have a row. -->
+     emits or listens to — including lifecycle events (`:config-changed`) and inter-component wiring — must have a row. -->
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|

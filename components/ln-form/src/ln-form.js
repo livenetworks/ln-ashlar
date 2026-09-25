@@ -1,4 +1,4 @@
-import { populateForm, dispatch, registerComponent, defineAttrs, attrSpec, attrStr } from '../../ln-core';
+import { populateForm, registerComponent, defineAttrs, attrSpec, attrStr } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-form';
@@ -96,7 +96,6 @@ import { populateForm, dispatch, registerComponent, defineAttrs, attrSpec, attrS
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this.dom.removeEventListener('ln-fill', this._onLnFill);
 		this.dom.removeEventListener('reset', this._onReset);
-		dispatch(this.dom, 'ln-form:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

@@ -244,10 +244,6 @@ import { dispatch, dispatchCancelable, computePlacement, measureHidden, isVisibl
 		this.dom.removeEventListener('ln-popover:request-toggle', this._onRequestToggle);
 		if (this.isOpen) this._applyClose();
 		delete this.dom[DOM_ATTRIBUTE];
-		dispatch(this.dom, 'ln-popover:destroyed', {
-			popoverId: this.dom.id,
-			target: this.dom
-		});
 	};
 
 	// ─── Trigger Component ─────────────────────────────────────

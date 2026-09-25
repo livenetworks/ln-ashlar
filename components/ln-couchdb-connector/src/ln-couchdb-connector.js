@@ -383,8 +383,6 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders, define
 			self._handlers = null;
 		}
 
-		dispatch(this.dom, 'ln-couchdb-connector:destroyed', { target: this.dom });
-
 		delete this.dom[DOM_ATTRIBUTE];
 		delete this.dom[DOM_ALIAS];
 	};

@@ -264,7 +264,7 @@ textarea.ln-validate-valid {
 input.lnValidate.validate();   // Force-validate now — returns Boolean
 input.lnValidate.reset();      // Clear _touched, hide all errors, remove classes
 input.lnValidate.isValid;      // Live getter — checkValidity() && _customErrors.size === 0
-input.lnValidate.destroy();    // Detach listeners, dispatch :destroyed</code></pre>
+input.lnValidate.destroy();    // Detach listeners</code></pre>
 						</main>
 					</section>
 
@@ -298,7 +298,6 @@ input.lnValidate.destroy();    // Detach listeners, dispatch :destroyed</code></
 								<tbody>
 									<tr><td><code>ln-validate:valid</code></td><td>no</td><td><code>{ target, field }</code></td><td>After <code>validate()</code> determines the field is valid (native + no custom errors).</td></tr>
 									<tr><td><code>ln-validate:invalid</code></td><td>no</td><td><code>{ target, field }</code></td><td>After <code>validate()</code> determines the field is invalid.</td></tr>
-									<tr><td><code>ln-validate:destroyed</code></td><td>no</td><td><code>{ target }</code></td><td>After <code>destroy()</code> detaches listeners and removes the instance reference.</td></tr>
 								</tbody>
 							</table>
 							</div>

@@ -186,7 +186,6 @@ import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './
 		if (this.hashEnabled) {
 			window.removeEventListener("hashchange", this._hashHandler);
 		}
-		dispatch(this.dom, 'ln-tabs:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

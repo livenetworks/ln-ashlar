@@ -439,8 +439,6 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 			self._handlers = null;
 		}
 
-		dispatch(this.dom, 'ln-api-connector:destroyed', { target: this.dom });
-
 		delete this.dom[DOM_ATTRIBUTE];
 		delete this.dom[DOM_ALIAS];
 	};

@@ -99,9 +99,7 @@ When combining `data-ln-tooltip` with a native `title`, the engine automatically
 
 ### Events API
 
-| Event | Direction | Cancelable | Description | `detail` Object |
-|---|---|---|---|---|
-| `ln-tooltip:destroyed` | Emits | No | Dispatched when the trigger component instance is destroyed. | `{ trigger: HTMLElement }` |
+This component emits and listens to no custom ln-* events.
 
 ---
 

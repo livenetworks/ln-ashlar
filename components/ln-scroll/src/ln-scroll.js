@@ -140,7 +140,6 @@ import { dispatch, dispatchCancelable, registerComponent, attrBool } from '../..
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this.dom.removeEventListener('click', this._handleClick);
-		dispatch(this.dom, 'ln-scroll:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

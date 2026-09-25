@@ -641,7 +641,6 @@ import { formatFileSize, getFileExtension, isFileTypeAllowed, parseAcceptExtensi
 		this.uploadedFiles.clear();
 		this.dict = {};
 
-		dispatch(this.dom, 'ln-upload:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

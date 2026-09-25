@@ -71,7 +71,6 @@ Opt in while the user is editing:
 |---|---|---|---|---|
 | `ln-key:before-trigger` | Emits | Yes | Dispatched before trigger action executes; cancelable to abort. | `{ source, target, action, key, event }` |
 | `ln-key:trigger` | Emits | No | Dispatched when shortcut trigger successfully executes. | `{ source, target, action, key, event }` |
-| `ln-key:destroyed` | Emits | No | Dispatched when shortcut binding is destroyed. | `{ target }` |
 
 ## 4. CSS Styling & Behavioral Concept
 

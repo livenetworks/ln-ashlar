@@ -100,7 +100,6 @@ All events bubble. The dispatch target is the wrapper element.
 | **`ln-tabs:request-select`** | Listens | No | `{ key }` | Command event sent by coordinators or external triggers to select a tab. |
 | **`ln-tabs:before-change`** | Emits | **Yes** | `{ key, previousKey, tab, panel, target }` | Dispatched before active tab changes. Calling `event.preventDefault()` cancels the switch and reverts attribute/hash state. |
 | **`ln-tabs:change`** | Emits | No | `{ key, previousKey, tab, panel, target }` | After the active panel is swapped, ARIA synced, focus moved (if enabled), and localStorage updated. |
-| **`ln-tabs:destroyed`** | Emits | No | `{ target }` | Inside `destroy()`, after removing click and hashchange listeners. |
 
 ```js
 // Example: Prevent tab change if unsaved changes exist
@@ -221,7 +220,7 @@ A non-empty `data-ln-tab` value wins if present; otherwise the `href` is split o
 
 ### Destroy
 
-Idempotent. Detaches every click handler and clears their double-attach guards, detaches `hashchange` only if hash-enabled, dispatches `ln-tabs:destroyed`, deletes `dom.lnTabs`. Does NOT reset visual state (`data-active`/`aria-selected` survive), clear `localStorage`, or remove `data-ln-tabs-active` — a future re-init resumes from whatever is left.
+Idempotent. Detaches every click handler and clears their double-attach guards, detaches `hashchange` only if hash-enabled, deletes `dom.lnTabs`. Does NOT reset visual state (`data-active`/`aria-selected` survive), clear `localStorage`, or remove `data-ln-tabs-active` — a future re-init resumes from whatever is left.
 
 ### Failure modes
 

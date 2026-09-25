@@ -137,7 +137,6 @@ Exposed on the root element via `el.lnDataStore`:
 | `ln-data-store:updated` | Emits | No | Emitted after optimistic update/rekey is done. | `{ store: String, record: Object, previous: Object }` |
 | `ln-data-store:deleted` | Emits | No | Emitted after optimistic deletion is done. | `{ store: String, id: ID }` \| `{ store: String, ids: Array }` |
 | `ln-data-store:synced` | Emits | No | Emitted after subsequent delta sync completes. | `{ store: String, added: Number, deleted: Number, changed: Boolean }` |
-| `ln-data-store:destroyed` | Emits | No | Emitted when the store instance is destroyed. | `{ store: String }` |
 | `ln-data-store:quota-exceeded` | Emits | No | Emitted on `document` if database storage runs out of quota. | `{ error: Error }` |
 
 ---

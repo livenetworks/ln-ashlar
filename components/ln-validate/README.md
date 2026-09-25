@@ -107,7 +107,6 @@ input.lnValidate.destroy();
 | :--- | :--- | :--- | :--- |
 | `ln-validate:valid` | Yes | `{ target, field }` | Dispatched after every validation pass that succeeds. |
 | `ln-validate:invalid` | Yes | `{ target, field }` | Dispatched after every validation pass that fails. |
-| `ln-validate:destroyed` | Yes | `{ target }` | Dispatched when the validation instance is torn down. |
 
 ### Received
 
@@ -172,7 +171,7 @@ Pure read (`dom.checkValidity() && _customErrors.size === 0`) — no side effect
 
 `reset()`: `_touched = false`, clears `_customErrors`, removes valid/invalid classes, hides every `[data-ln-validate-error]` (native and custom alike). Does NOT dispatch `:valid`/`:invalid` (the field is "untouched," not "newly valid") and does NOT touch `dom.value` — the form element owns that; `ln-form.reset()` calls the native `dom.reset()` first, then dispatches synthetic `input`/`change` per field, then calls `instance.reset()`.
 
-`destroy()` removes the four listeners (`input`, `change`, `set-custom`, `clear-custom`), removes the CSS classes (but leaves error `<li>` visibility as-is — a different intent than `reset()`), dispatches `:destroyed`, deletes the instance. Idempotent via a `DOM_ATTRIBUTE` guard.
+`destroy()` removes the four listeners (`input`, `change`, `set-custom`, `clear-custom`), removes the CSS classes (but leaves error `<li>` visibility as-is — a different intent than `reset()`), deletes the instance. Idempotent via a `DOM_ATTRIBUTE` guard.
 
 ### MutationObserver
 

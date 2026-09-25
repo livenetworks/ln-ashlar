@@ -161,4 +161,4 @@ Outside-click tests `self.dom.contains(e.target)`, so a click inside A's subtree
 
 Two separate `registerComponent` calls wire popover elements (`el.lnPopover`) and trigger elements (`el.lnPopoverTrigger`) independently — `registerComponent` handles DOM discovery and lifecycle. On attribute mutations to `data-ln-popover`, `registerComponent`'s `onAttributeChange` callback evaluates open/closed transitions and dispatches `before-open` / `before-close` events. Trigger init sets `aria-haspopup="dialog"`, `aria-expanded="false"`, and `aria-controls` once on attach.
 
-`destroy()` on a popover instance closes it if open, removes its listeners, splices it from `openStack`, and dispatches `ln-popover:destroyed`. Trigger `destroy` is independent and only removes the trigger's click handler.
+`destroy()` on a popover instance closes it if open, removes its listeners, and splices it from `openStack`. Trigger `destroy` is independent and only removes the trigger's click handler.

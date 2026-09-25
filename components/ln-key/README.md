@@ -111,7 +111,6 @@ For an external map, the override can be placed on one item or inherited from th
 |---|---:|---|---|
 | `ln-key:before-trigger` | Yes | After a usable target is resolved, before browser behavior is prevented | `{ source, target, action, key, event }` |
 | `ln-key:trigger` | No | After `click()` or `focus()` | `{ source, target, action, key, event }` |
-| `ln-key:destroyed` | No | When a declaration or its registration attribute is removed | `{ target }` |
 
 Canceling `ln-key:before-trigger` leaves the original keyboard event untouched.
 

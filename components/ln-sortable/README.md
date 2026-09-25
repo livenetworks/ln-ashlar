@@ -90,10 +90,6 @@ Fired when an item drop successfully changes the DOM index order.
 Fired when `data-ln-sortable` toggles between enabled and `"disabled"` — written directly on the host and picked up by the shared `MutationObserver`.
 - **Payload (`detail`)**: `{ target: HTMLElement }`
 
-### `ln-sortable:destroyed`
-Fired inside `destroy()`, after the `pointerdown` listener is removed.
-- **Payload (`detail`)**: `{ target: HTMLElement }`
-
 ---
 
 ## ⚠️ Common Pitfalls

@@ -117,8 +117,6 @@ import { dispatch, dispatchCancelable, isTargetDisabled, registerComponent, shou
 		instances.delete(this);
 		delete this.dom[DOM_ATTRIBUTE];
 		_maybeRemoveClickListener();
-
-		dispatch(this.dom, 'ln-toggle:destroyed', { target: this.dom });
 	};
 
 	// ─── Attribute Sync ────────────────────────────────────────

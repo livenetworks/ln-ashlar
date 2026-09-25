@@ -42,7 +42,6 @@
 ## Events API
 
 - `ln-obfuscator:deobfuscated`: Dispatched on the target element with `{ target, codec, shift, key }` upon deobfuscation.
-- `ln-obfuscator:destroyed`: Dispatched when `el.lnObfuscator.destroy()` is called.
 
 ## JavaScript API
 

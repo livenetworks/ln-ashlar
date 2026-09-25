@@ -124,4 +124,4 @@ Per-form instance (`form.lnAutosave`): `dom`, `key` (resolved once at constructi
 
 ### Destroy
 
-Removes all five listeners (plus `input` and its pending timer if debounce was active), dispatches `:destroyed`, deletes the instance. Does **not** call `_clear()` — the draft persists after destroy; destroy means "stop autosaving," not "discard the draft."
+Removes all five listeners (plus `input` and its pending timer if debounce was active), deletes the instance. Does **not** call `_clear()` — the draft persists after destroy; destroy means "stop autosaving," not "discard the draft."

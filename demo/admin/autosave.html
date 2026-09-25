@@ -375,7 +375,6 @@
 									<tr><td><code>ln-autosave:restored</code></td><td>no</td><td><code>{ target, data }</code></td><td>After <code>populateForm()</code> has written values AND after synthetic <code>input</code> + <code>change</code> have been dispatched on every restored field. ln-validate / ln-autoresize have already re-reacted by this point.</td></tr>
 									<tr><td><code>ln-autosave:saved</code></td><td>no</td><td><code>{ target, data }</code></td><td>After <code>localStorage.setItem</code> succeeds. If the write throws (quota exceeded, localStorage disabled), the <code>try/catch</code> swallows silently and NO event fires — there is no <code>:save-failed</code> event.</td></tr>
 									<tr><td><code>ln-autosave:cleared</code></td><td>no</td><td><code>{ target }</code></td><td>After <code>localStorage.removeItem</code> runs. Idempotent — fires even if there was nothing in localStorage to remove.</td></tr>
-									<tr><td><code>ln-autosave:destroyed</code></td><td>no</td><td><code>{ target }</code></td><td>Last action of <code>destroy()</code>, after listeners are removed but before <code>el.lnAutosave</code> is deleted.</td></tr>
 								</tbody>
 							</table>
 							</div>
@@ -400,7 +399,7 @@ form.lnAutosave.key;     // the resolved storage key string
                          // e.g. "ln-autosave:/admin/autosave.html:edit-user"
 
 form.lnAutosave.destroy();   // remove all listeners + pending debounce timer,
-                             // dispatch :destroyed, delete back-reference.
+                             // delete back-reference.
                              // Does NOT clear localStorage.
 
 // To inspect the draft without applying it:

@@ -43,4 +43,3 @@
 
 - `ln-scroll:before-scroll`: Dispatched before scrolling. Cancelable via `e.preventDefault()`. Detail: `{ target, link, href }`.
 - `ln-scroll:scrolled`: Dispatched immediately upon initiating scroll. Detail: `{ target, link, href }`.
-- `ln-scroll:destroyed`: Dispatched when `el.lnScroll.destroy()` is called.

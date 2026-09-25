@@ -195,7 +195,6 @@ All events bubble from the parent container (`this.dom`):
 | `ln-sortable:reordered` | Emits | No | Dispatched upon pointer release ONLY if the DOM index changed. | `{ item: HTMLElement, oldIndex: number, newIndex: number }` |
 | `ln-sortable:enabled` | Emits | No | Dispatched when transitioning from `"disabled"` to active. | `{ target: HTMLElement }` |
 | `ln-sortable:disabled` | Emits | No | Dispatched when `data-ln-sortable` changes to `"disabled"`. | `{ target: HTMLElement }` |
-| `ln-sortable:destroyed` | Emits | No | Dispatched when the instance is destroyed. | `{ target: HTMLElement }` |
 
 ---
 

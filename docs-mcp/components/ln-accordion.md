@@ -155,7 +155,7 @@ The initialized coordinator instance is exposed on the wrapper element via the p
 | Property / Method | Type | Description |
 |---|---|---|
 | `dom.lnAccordion` | `Object` | The coordinator component instance attached to the DOM element. |
-| `dom.lnAccordion.destroy()` | `Function` | Cleans up the event listener, dispatches `ln-accordion:destroyed`, and deletes the instance reference. |
+| `dom.lnAccordion.destroy()` | `Function` | Cleans up the event listener and deletes the instance reference. |
 
 ### Events API
 
@@ -165,7 +165,6 @@ All events bubble up from the accordion wrapper element.
 |---|---|---|---|---|
 | `ln-toggle:open` | Listens | No | Bubbles up from an internal `ln-toggle` panel when opened. Triggers the coordinator to close siblings. | `{ target: HTMLElement }` |
 | `ln-accordion:change` | Emits | No | Fires from the wrapper after the coordinator has closed other sibling panels. | `{ target: HTMLElement }` |
-| `ln-accordion:destroyed` | Emits | No | Fires from the wrapper when the component's `destroy()` method is invoked. | `{ target: HTMLElement }` |
 
 #### Listening to Accordion Changes:
 ```javascript

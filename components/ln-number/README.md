@@ -54,7 +54,6 @@ To load `ln-number` as a standalone component, include its compiled IIFE under t
 | Event | Bubbles | Cancelable | Detail |
 |-------|---------|------------|--------|
 | `ln-number:input` | yes | no | `{ value: Number, formatted: String }` |
-| `ln-number:destroyed` | yes | no | `{ target: Element }` |
 
 ## API
 

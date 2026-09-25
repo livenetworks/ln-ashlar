@@ -87,7 +87,6 @@ tags: [network, database, couchdb, sync]
 | `ln-couchdb-connector:bulk-deleted` | Emits | No | Dispatched upon successful bulk deletion. | `{ response: Object, ids: Array, message: String, meta: Object }` |
 | `ln-couchdb-connector:error` | Emits | No | Dispatched upon HTTP or network errors. | `{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }` |
 | `ln-couchdb-connector:config-changed` | Emits | No | Dispatched whenever `refreshConfig()` reloads URL, headers, and credentials (including on init). | `{ url: String, db: String, auth: String, headers: Object }` |
-| `ln-couchdb-connector:destroyed` | Emits | No | Dispatched when the component is destroyed. | `{ target: HTMLElement }` |
 
 ---
 

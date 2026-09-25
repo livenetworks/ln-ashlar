@@ -58,7 +58,7 @@ function _maybeRemoveListener() {
 - **Pre-fact Event:** `dispatchCancelable(el, 'ln-{component}:before-{action}', detail)`
 - **Native Action Execution:** Call target method or update DOM attribute.
 - **Post-fact Event:** `dispatch(el, 'ln-{component}:{action}', detail)`
-- **Destruction Cleanup:** Emit `ln-{component}:destroyed`, remove from `instances Set`, and attempt listener teardown.
+- **Destruction Cleanup:** Remove from `instances Set` and attempt listener teardown.
 
 ---
 

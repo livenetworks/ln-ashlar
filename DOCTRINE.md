@@ -118,6 +118,7 @@
 * **Async Lifecycle & Cancellation Protocol:**
   Any component performing asynchronous operations (`fetch`, IndexedDB transactions, streaming, network queues, debounced timers) MUST adhere to the **Destroyed Component Invariant**:
   - **Zero Post-Destroy Side Effects:** A destroyed component MUST NOT mutate the DOM, MUST NOT dispatch state updates or CustomEvents, and MUST NOT commit asynchronous results.
+  - **No `:destroyed` Event:** Components do not emit a `ln-{component}:destroyed` lifecycle event. A teardown signal, if one is ever needed, is published by whoever tears down (router/coordinator), never by the dying component.
   - **Explicit Cancellation on Teardown:** The component MUST manage an active `AbortController` (or equivalent cancellation handle). When `destroy()` is called:
     1. In-flight network requests MUST be aborted immediately (`this._abortController.abort()`).
     2. Active timers/intervals MUST be cleared (`clearTimeout` / `clearInterval`).

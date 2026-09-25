@@ -187,7 +187,7 @@ Key: `ln:{id}:data-ln-toggle` (global by default), or `ln:{id}:{pagePath}:data-l
 
 ### Destroy
 
-Guards double-destroy, removes request listeners (`ln-toggle:request-open/close/toggle`), removes the instance from the module-level `instances` Set, unbinds the delegated `document` click listener if no instances remain (`_maybeRemoveClickListener`), deletes `el.lnToggle`, and dispatches `ln-toggle:destroyed`. Does **not** remove `data-ln-toggle` or the `.open` class — only the JS coupling is severed; the consumer removes markup state separately if a full teardown is wanted.
+Guards double-destroy, removes request listeners (`ln-toggle:request-open/close/toggle`), removes the instance from the module-level `instances` Set, unbinds the delegated `document` click listener if no instances remain (`_maybeRemoveClickListener`), and deletes `el.lnToggle`. Does **not** remove `data-ln-toggle` or the `.open` class — only the JS coupling is severed; the consumer removes markup state separately if a full teardown is wanted.
 
 ### What it deliberately does not do
 

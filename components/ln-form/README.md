@@ -86,9 +86,7 @@ form.lnForm.destroy();
 
 ### Emitted
 
-| Event | Bubbles | Payload | Description |
-| :--- | :--- | :--- | :--- |
-| `ln-form:destroyed` | Yes | `{ target: HTMLElement }` | Dispatched when the coordinator is torn down. |
+`ln-form` emits no custom events.
 
 ### Received
 

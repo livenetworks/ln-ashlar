@@ -140,7 +140,6 @@ All events bubble up (`bubbles: true`).
 | `ln-popover:open` | Emits | No | Fires once the popover is visible in the top layer, positioned, and focus set. | `{ popoverId: String, target: HTMLElement, trigger: HTMLElement? }` |
 | `ln-popover:before-close` | Emits | **Yes** | Fires before close, letting the app prevent closing via `e.preventDefault()`. | `{ popoverId: String, target: HTMLElement, trigger: HTMLElement? }` |
 | `ln-popover:close` | Emits | No | Fires after popover is hidden, inline styles cleared, and focus restored. | `{ popoverId: String, target: HTMLElement, trigger: HTMLElement? }` |
-| `ln-popover:destroyed` | Emits | No | Fires when the popover instance is destroyed. | `{ popoverId: String, target: HTMLElement }` |
 
 ---
 

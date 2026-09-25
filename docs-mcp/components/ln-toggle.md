@@ -120,7 +120,6 @@ All events bubble up from the target panel element.
 | `ln-toggle:open` | Emits | No | Fires after the panel has fully opened and classes are updated. | `{ target: HTMLElement }` |
 | `ln-toggle:before-close` | Emits | **Yes** | Fires when the state is about to switch to `"close"`. Prevent default to block the close sequence. | `{ target: HTMLElement }` |
 | `ln-toggle:close` | Emits | No | Fires after the panel has fully closed. | `{ target: HTMLElement }` |
-| `ln-toggle:destroyed` | Emits | No | Fires when the component instance is torn down. | `{ target: HTMLElement }` |
 
 ---
 

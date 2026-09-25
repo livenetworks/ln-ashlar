@@ -118,7 +118,6 @@ All events bubble from the parent container (`this.dom`):
 | `ln-editor:changed` | Emits | No | Dispatched upon user keypress or markup updates. | `{ html: String, target: Node }` |
 | `ln-editor:focus` | Emits | No | Dispatched when the contenteditable workspace gains focus. | `{ target: Node }` |
 | `ln-editor:blur` | Emits | No | Dispatched when focus leaves the contenteditable workspace. | `{ target: Node }` |
-| `ln-editor:destroyed` | Emits | No | Dispatched when the rich text instance is destroyed. | `{ target: Node }` |
 
 ---
 

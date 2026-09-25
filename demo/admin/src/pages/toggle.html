@@ -75,7 +75,7 @@
 el.setAttribute('data-ln-toggle', 'open');
 el.setAttribute('data-ln-toggle', 'close');
 el.lnToggle.isOpen;       // boolean — read-only
-el.lnToggle.destroy();    // detach listeners, dispatch :destroyed</code></pre>
+el.lnToggle.destroy();    // detach listeners</code></pre>
 							<p>Trigger click, sibling component, external script, DevTools — all write the attribute. The <code>MutationObserver</code> runs the same pipeline regardless of caller: <code>.open</code> class addition, <code>aria-expanded</code> sync on every matching trigger, <code>:open</code> event dispatch, <code>localStorage</code> write. One channel. One audited path.</p>
 						</main>
 					</section>
@@ -113,7 +113,6 @@ el.lnToggle.destroy();    // detach listeners, dispatch :destroyed</code></pre>
 									<tr><td><code>ln-toggle:open</code></td><td>no</td><td><code>{ target }</code></td><td>After <code>.open</code> class added, after <code>aria-expanded</code> synced, before persist write.</td></tr>
 									<tr><td><code>ln-toggle:before-close</code></td><td><strong>yes</strong></td><td><code>{ target }</code></td><td>After attribute flips to <code>"close"</code>, before <code>.open</code> class is removed. <code>preventDefault()</code> reverts to <code>"open"</code>.</td></tr>
 									<tr><td><code>ln-toggle:close</code></td><td>no</td><td><code>{ target }</code></td><td>After <code>.open</code> class removed, after <code>aria-expanded</code> synced, before persist write.</td></tr>
-									<tr><td><code>ln-toggle:destroyed</code></td><td>no</td><td><code>{ target }</code></td><td>First action inside <code>destroy()</code>.</td></tr>
 								</tbody>
 							</table>
 							</div>

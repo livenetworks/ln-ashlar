@@ -121,7 +121,6 @@ Access the persistence instance directly via the `lnAutosave` property on the fo
 | `ln-autosave:restored` | Emits | No | Dispatched after filling the form and triggering synthetic events. | `{ target: HTMLFormElement, data: Object }` |
 | `ln-autosave:saved` | Emits | No | Dispatched after successfully writing the serialized form state to localStorage. | `{ target: HTMLFormElement, data: Object }` |
 | `ln-autosave:cleared` | Emits | No | Dispatched after the form's draft entry is removed from localStorage. | `{ target: HTMLFormElement }` |
-| `ln-autosave:destroyed` | Emits | No | Dispatched when the component is torn down via `.destroy()`. | `{ target: HTMLFormElement }` |
 
 ---
 

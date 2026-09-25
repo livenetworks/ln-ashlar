@@ -160,7 +160,6 @@ All events bubble from the component root (`{ bubbles: true }`):
 | `ln-picklist:move` | Emits | No | Dispatched after an item has been re-parented into the target list. | `{ item: HTMLElement, from: HTMLElement, to: HTMLElement, checkbox: HTMLInputElement }` |
 | `ln-picklist:enabled` | Emits | No | Dispatched when root attribute transitions away from `"disabled"`. | `{ target: HTMLElement }` |
 | `ln-picklist:disabled` | Emits | No | Dispatched when root attribute transitions to `"disabled"`. | `{ target: HTMLElement }` |
-| `ln-picklist:destroyed` | Emits | No | Dispatched when the instance is destroyed. | `{ target: HTMLElement }` |
 
 ---
 
