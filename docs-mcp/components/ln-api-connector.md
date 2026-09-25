@@ -94,7 +94,6 @@ tags: [network, REST, sync, fetch, debounce]
 | `ln-api-connector:bulk-deleted` | Emits | No | Dispatched upon successful bulk deletion. | `{ response: Object, ids: Array, message: String, meta: Object }` |
 | `ln-api-connector:error` | Emits | No | Dispatched upon HTTP or network errors (silent on AbortError). | `{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }` |
 | `ln-api-connector:config-changed` | Emits | No | Dispatched whenever `refreshConfig()` reloads URL, path, and header configuration (including on init). | `{ baseUrl: String, path: String, headers: Object, paramKeys: Object }` |
-| `ln-api-connector:destroyed` | Emits | No | Dispatched when the component is destroyed. | `{ target: HTMLElement }` |
 
 ---
 

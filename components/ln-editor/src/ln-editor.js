@@ -378,7 +378,6 @@ import { dispatch, dispatchCancelable, registerComponent, cloneTemplateScoped } 
 			if (popover) popover.remove();
 		}
 
-		dispatch(this.dom, 'ln-editor:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

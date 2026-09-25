@@ -162,10 +162,6 @@ Fire when the root attribute crosses the `disabled` boundary.
 
 `detail`: `{ target }`
 
-### `ln-picklist:destroyed`
-
-`detail`: `{ target }`
-
 ---
 
 ## ⚠️ Common Pitfalls

@@ -14,16 +14,6 @@
 			"detail": "{ target: HTMLElement }",
 			"source": "static"
 		},
-		"ln-accordion:destroyed": {
-			"emitted_by": [
-				"ln-accordion"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Fires from the wrapper when the component's `destroy()` method is invoked.",
-			"detail": "{ target: HTMLElement }",
-			"source": "static"
-		},
 		"ln-ajax:before-start": {
 			"emitted_by": [
 				"ln-ajax"
@@ -123,16 +113,6 @@
 			"description": "Dispatched upon successful document deletion.",
 			"detail": "{ response: Object, id: ID, message: String, meta: Object }",
 			"source": "mixed"
-		},
-		"ln-api-connector:destroyed": {
-			"emitted_by": [
-				"ln-api-connector"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when the component is destroyed.",
-			"detail": "{ target: HTMLElement }",
-			"source": "static"
 		},
 		"ln-api-connector:error": {
 			"emitted_by": [
@@ -276,16 +256,6 @@
 			"cancelable": false,
 			"description": "Dispatched when auth pause occurs.",
 			"detail": "{ entryId: ID, chainKey: String }",
-			"source": "static"
-		},
-		"ln-api-queue:destroyed": {
-			"emitted_by": [
-				"ln-api-queue"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when the instance is torn down.",
-			"detail": "{ scope: String }",
 			"source": "static"
 		},
 		"ln-api-queue:drained": {
@@ -478,16 +448,6 @@
 			"detail": "{ target: HTMLFormElement }",
 			"source": "static"
 		},
-		"ln-autosave:destroyed": {
-			"emitted_by": [
-				"ln-autosave"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when the component is torn down via `.destroy()`.",
-			"detail": "{ target: HTMLFormElement }",
-			"source": "static"
-		},
 		"ln-autosave:restored": {
 			"emitted_by": [
 				"ln-autosave"
@@ -574,16 +534,6 @@
 			"detail": "{ target: HTMLElement, value: Number, max: Number, percentage: Number }",
 			"source": "static"
 		},
-		"ln-confirm:destroyed": {
-			"emitted_by": [
-				"ln-confirm"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "",
-			"detail": "",
-			"source": "static"
-		},
 		"ln-confirm:waiting": {
 			"emitted_by": [
 				"ln-confirm"
@@ -653,16 +603,6 @@
 			"description": "Dispatched upon successful document deletion.",
 			"detail": "{ response: Object, id: ID, message: String, meta: Object }",
 			"source": "mixed"
-		},
-		"ln-couchdb-connector:destroyed": {
-			"emitted_by": [
-				"ln-couchdb-connector"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when the component is destroyed.",
-			"detail": "{ target: HTMLElement }",
-			"source": "static"
 		},
 		"ln-couchdb-connector:error": {
 			"emitted_by": [
@@ -852,16 +792,6 @@
 			"cancelable": false,
 			"description": "Emitted after optimistic deletion is done.",
 			"detail": "{ store: String, id: ID }` | `{ store: String, ids: Array }",
-			"source": "static"
-		},
-		"ln-data-store:destroyed": {
-			"emitted_by": [
-				"ln-data-store"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Emitted when the store instance is destroyed.",
-			"detail": "{ store: String }",
 			"source": "static"
 		},
 		"ln-data-store:initialization-error": {
@@ -1070,16 +1000,6 @@
 			"detail": "{ value: String, formatted: String, date: Date }",
 			"source": "static"
 		},
-		"ln-date:destroyed": {
-			"emitted_by": [
-				"ln-date"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when the date picker instance is destroyed.",
-			"detail": "{ target: HTMLElement }",
-			"source": "static"
-		},
 		"ln-dropdown:close": {
 			"emitted_by": [
 				"ln-dropdown"
@@ -1087,16 +1007,6 @@
 			"listened_by": [],
 			"cancelable": false,
 			"description": "Fires after the menu is closed, exits the top layer, and listeners cleaned.",
-			"detail": "{ target: HTMLElement }",
-			"source": "static"
-		},
-		"ln-dropdown:destroyed": {
-			"emitted_by": [
-				"ln-dropdown"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Fires when the coordinator's `destroy()` method is executed.",
 			"detail": "{ target: HTMLElement }",
 			"source": "static"
 		},
@@ -1168,16 +1078,6 @@
 			"cancelable": false,
 			"description": "Dispatched upon user keypress or markup updates.",
 			"detail": "{ html: String, target: Node }",
-			"source": "static"
-		},
-		"ln-editor:destroyed": {
-			"emitted_by": [
-				"ln-editor"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when the rich text instance is destroyed.",
-			"detail": "{ target: Node }",
 			"source": "static"
 		},
 		"ln-editor:focus": {
@@ -1258,16 +1158,6 @@
 			"detail": "{ targetId: String }",
 			"source": "static"
 		},
-		"ln-form:destroyed": {
-			"emitted_by": [
-				"ln-form"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when the form instance is destroyed.",
-			"detail": "{ target: HTMLFormElement }",
-			"source": "static"
-		},
 		"ln-http:cancel": {
 			"emitted_by": [],
 			"listened_by": [
@@ -1336,16 +1226,6 @@
 			"cancelable": true,
 			"description": "Dispatched before trigger action executes; cancelable to abort.",
 			"detail": "{ source, target, action, key, event }",
-			"source": "static"
-		},
-		"ln-key:destroyed": {
-			"emitted_by": [
-				"ln-key"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when shortcut binding is destroyed.",
-			"detail": "{ target }",
 			"source": "static"
 		},
 		"ln-key:trigger": {
@@ -1604,16 +1484,6 @@
 			"detail": "{ modalId: String, target: HTMLElement }",
 			"source": "static"
 		},
-		"ln-modal:destroyed": {
-			"emitted_by": [
-				"ln-modal"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when the component instance is destroyed.",
-			"detail": "{ modalId: String, target: HTMLElement }",
-			"source": "static"
-		},
 		"ln-modal:open": {
 			"emitted_by": [
 				"ln-modal"
@@ -1661,16 +1531,6 @@
 			"detail": "{ target: HTMLElement }",
 			"source": "static"
 		},
-		"ln-nav:destroyed": {
-			"emitted_by": [
-				"ln-nav"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when `destroy()` is called on the component instance.",
-			"detail": "{ target: HTMLElement }",
-			"source": "static"
-		},
 		"ln-nav:update": {
 			"emitted_by": [
 				"ln-nav"
@@ -1679,16 +1539,6 @@
 			"cancelable": false,
 			"description": "Dispatched after active link states have been evaluated and CSS classes applied.",
 			"detail": "{ activeLinks: Array, target: HTMLElement }",
-			"source": "static"
-		},
-		"ln-number:destroyed": {
-			"emitted_by": [
-				"ln-number"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when the component is destroyed.",
-			"detail": "{ target: HTMLElement }",
 			"source": "static"
 		},
 		"ln-number:input": {
@@ -1709,16 +1559,6 @@
 			"cancelable": false,
 			"description": "Dispatched on the target element immediately after deobfuscation.",
 			"detail": "{ target: HTMLElement, codec: string, shift: number, key: string | null }",
-			"source": "static"
-		},
-		"ln-obfuscator:destroyed": {
-			"emitted_by": [
-				"ln-obfuscator"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when `el.lnObfuscator.destroy()` is called.",
-			"detail": "{ target: HTMLElement }",
 			"source": "static"
 		},
 		"ln-options:request-data": {
@@ -1753,16 +1593,6 @@
 			"cancelable": true,
 			"description": "Dispatched before an item is re-parented. Calling `preventDefault()` cancels the move and reverts the checkbox.",
 			"detail": "{ item: HTMLElement, from: HTMLElement, to: HTMLElement, checkbox: HTMLInputElement }",
-			"source": "static"
-		},
-		"ln-picklist:destroyed": {
-			"emitted_by": [
-				"ln-picklist"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when the instance is destroyed.",
-			"detail": "{ target: HTMLElement }",
 			"source": "static"
 		},
 		"ln-picklist:disabled": {
@@ -1833,16 +1663,6 @@
 			"cancelable": false,
 			"description": "Fires after popover is hidden, inline styles cleared, and focus restored.",
 			"detail": "{ popoverId: String, target: HTMLElement, trigger: HTMLElement? }",
-			"source": "static"
-		},
-		"ln-popover:destroyed": {
-			"emitted_by": [
-				"ln-popover"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Fires when the popover instance is destroyed.",
-			"detail": "{ popoverId: String, target: HTMLElement }",
 			"source": "static"
 		},
 		"ln-popover:open": {
@@ -1935,16 +1755,6 @@
 			"detail": "{ target: HTMLElement, link: HTMLElement, href: string }",
 			"source": "static"
 		},
-		"ln-scroll:destroyed": {
-			"emitted_by": [
-				"ln-scroll"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when `el.lnScroll.destroy()` is invoked.",
-			"detail": "{ target: HTMLElement }",
-			"source": "static"
-		},
 		"ln-scroll:scrolled": {
 			"emitted_by": [
 				"ln-scroll"
@@ -1994,16 +1804,6 @@
 			"cancelable": true,
 			"description": "Dispatched on `pointerdown` before starting a drag. If canceled, dragging is aborted.",
 			"detail": "{ item: HTMLElement, index: number }",
-			"source": "static"
-		},
-		"ln-sortable:destroyed": {
-			"emitted_by": [
-				"ln-sortable"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when the instance is destroyed.",
-			"detail": "{ target: HTMLElement }",
 			"source": "static"
 		},
 		"ln-sortable:disabled": {
@@ -2294,16 +2094,6 @@
 			"detail": "{ key: String, previousKey: String, tab: HTMLElement, panel: HTMLElement, target: HTMLElement }",
 			"source": "static"
 		},
-		"ln-tabs:destroyed": {
-			"emitted_by": [
-				"ln-tabs"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when `destroy()` is called on the instance.",
-			"detail": "{ target: HTMLElement }",
-			"source": "static"
-		},
 		"ln-tabs:request-select": {
 			"emitted_by": [],
 			"listened_by": [
@@ -2322,16 +2112,6 @@
 			"cancelable": false,
 			"description": "Clears all active toast notifications (optionally filtered by container).",
 			"detail": "{ container }",
-			"source": "static"
-		},
-		"ln-toast:destroyed": {
-			"emitted_by": [
-				"ln-toast"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when `destroy()` is called on the container instance.",
-			"detail": "{ target: HTMLElement }",
 			"source": "static"
 		},
 		"ln-toast:enqueue": {
@@ -2379,16 +2159,6 @@
 			"detail": "{ target: HTMLElement }",
 			"source": "static"
 		},
-		"ln-toggle:destroyed": {
-			"emitted_by": [
-				"ln-toggle"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Fires when the component instance is torn down.",
-			"detail": "{ target: HTMLElement }",
-			"source": "static"
-		},
 		"ln-toggle:open": {
 			"emitted_by": [
 				"ln-toggle"
@@ -2430,16 +2200,6 @@
 			"cancelable": false,
 			"description": "",
 			"detail": "",
-			"source": "static"
-		},
-		"ln-tooltip:destroyed": {
-			"emitted_by": [
-				"ln-tooltip"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when the trigger component instance is destroyed.",
-			"detail": "{ trigger: HTMLElement }",
 			"source": "static"
 		},
 		"ln-translations:added": {
@@ -2542,16 +2302,6 @@
 			"detail": "{}",
 			"source": "static"
 		},
-		"ln-upload:destroyed": {
-			"emitted_by": [
-				"ln-upload"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Fires when component instance is torn down.",
-			"detail": "{ target: HTMLElement }",
-			"source": "static"
-		},
 		"ln-upload:error": {
 			"emitted_by": [
 				"ln-upload"
@@ -2644,16 +2394,6 @@
 			"cancelable": false,
 			"description": "Clears a custom error key.",
 			"detail": "{ error?: String }",
-			"source": "static"
-		},
-		"ln-validate:destroyed": {
-			"emitted_by": [
-				"ln-validate"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched when the component is destroyed.",
-			"detail": "{ target: HTMLElement }",
 			"source": "static"
 		},
 		"ln-validate:invalid": {

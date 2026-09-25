@@ -135,14 +135,13 @@ Instance interfaces accessed via `element.lnDate`:
 | `element.lnDate.date` | `Date` | Getter/Setter | Accesses or sets the active date as a JavaScript `Date` object. |
 | `element.lnDate.formatted` | `String` | Getter | Gets the formatted text display value currently shown in the input. |
 | `element.lnDate.reset` | `()` | `void` | Resets value, hidden fields, and restores initial/empty state. |
-| `element.lnDate.destroy` | `()` | `void` | Tears down wrapper, inputs, buttons, restores native element states, and fires `ln-date:destroyed`. |
+| `element.lnDate.destroy` | `()` | `void` | Tears down wrapper, inputs, buttons, and restores native element states. |
 
 ### Events API
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-date:change` | Emits | No | Dispatched on value change (via calendar selection, text blur, or programmatically). | `{ value: String, formatted: String, date: Date }` |
-| `ln-date:destroyed` | Emits | No | Dispatched when the date picker instance is destroyed. | `{ target: HTMLElement }` |
 
 ---
 

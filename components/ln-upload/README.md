@@ -101,7 +101,6 @@ el.lnUpload.destroy();      // Clean up listeners and abort in-flight uploads
 | `ln-upload:invalid` | Notification | `{ file, reason }` |
 | `ln-upload:error` | Notification | `{ file, message, status, error }` |
 | `ln-upload:cleared` | Notification | `{}` |
-| `ln-upload:destroyed` | Notification | `{ target }` |
 
 ---
 
@@ -131,4 +130,4 @@ During `_hydrate()`, `ln-upload` scans `[data-ln-upload-list] [data-ln-upload-it
 - **`clear()`**: Checks `ln-upload:before-clear` once. Aborts all active uploads, issues background DELETE requests for existing server files, clears `uploadedFiles`, empties the list container, syncs hidden inputs, and immediately emits `ln-upload:cleared`.
 
 ### Teardown
-`destroy()` aborts all pending XHRs, removes event listeners (drag/drop, input change, removal clicks, command listeners), clears internal state and dictionary, and emits `ln-upload:destroyed`.
+`destroy()` aborts all pending XHRs, removes event listeners (drag/drop, input change, removal clicks, command listeners), and clears internal state and dictionary.

@@ -330,7 +330,6 @@ import { QueueStorage } from './queue-storage';
 		self._timers.forEach(timer => clearTimeout(timer));
 		self._timers.clear();
 
-		dispatch(self.dom, 'ln-api-queue:destroyed', { scope: self.scope });
 		delete self.dom[DOM_ATTRIBUTE];
 	};
 

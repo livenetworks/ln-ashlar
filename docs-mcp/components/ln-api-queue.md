@@ -86,7 +86,6 @@ tags: [network, database, offline, queue]
 | `ln-api-queue:auth-required` | Emits | No | Dispatched when auth pause occurs. | `{ entryId: ID, chainKey: String }` |
 | `ln-api-queue:paused` | Emits | No | Dispatched when draining pauses for a scope (e.g. after an `auth` nack or manual request-pause). | `{ reason: "auth" \| "manual", restored?: Boolean }` |
 | `ln-api-queue:resumed` | Emits | No | Dispatched when draining resumes for a scope. | `{}` |
-| `ln-api-queue:destroyed` | Emits | No | Dispatched when the instance is torn down. | `{ scope: String }` |
 
 ---
 

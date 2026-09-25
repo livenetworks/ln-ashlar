@@ -143,7 +143,6 @@ import { buildAutosaveKey, parseAutosaveDebounce } from './autosave-model.js';
 			const t = this._getInputTimer();
 			if (t !== null) clearTimeout(t);
 		}
-		dispatch(this.dom, 'ln-autosave:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

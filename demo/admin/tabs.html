@@ -590,7 +590,6 @@ location.hash = 'user-tabs:settings&project-tabs:members';</code></pre>
 								<thead><tr><th>Event</th><th>Cancelable</th><th><code>detail</code></th><th>Dispatched when</th></tr></thead>
 								<tbody>
 									<tr><td><code>ln-tabs:change</code></td><td>no</td><td><code>{ key, tab, panel }</code></td><td>After the active panel is swapped, ARIA synced, focus moved, and <code>localStorage</code> written.</td></tr>
-									<tr><td><code>ln-tabs:destroyed</code></td><td>no</td><td><code>{ target }</code></td><td>After <code>destroy()</code> removes listeners and deletes the instance.</td></tr>
 								</tbody>
 							</table>
 							<p>There is no <code>:before-change</code> — the activation pipeline has no cancelable side-effects worth gating. If you need a "block this navigation" hook (unsaved form changes), wire it on the click side: listen on <code>[data-ln-tab]</code> clicks, check whether the current panel is dirty, and call <code>event.preventDefault()</code> before the click bubbles.</p>

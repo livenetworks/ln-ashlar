@@ -1,5 +1,5 @@
 /* Live Networks — ln-toast (side-accent with icons) */
-import { guardBody, cloneTemplateScoped, fill, registerComponent, dispatch, defineAttrs, attrSpec, attrInt } from '../../ln-core';
+import { guardBody, cloneTemplateScoped, fill, registerComponent, defineAttrs, attrSpec, attrInt } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = "data-ln-toast";
@@ -77,7 +77,6 @@ import { guardBody, cloneTemplateScoped, fill, registerComponent, dispatch, defi
 			_dismiss(li);
 		}
 		_demoteTopLayerIfEmpty(this.dom);
-		dispatch(this.dom, 'ln-toast:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

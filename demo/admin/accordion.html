@@ -541,13 +541,12 @@ import 'ln-ashlar/dist/ln-ashlar.css';</code></pre>
 					<section class="section-card">
 						<header><h3>Events</h3></header>
 						<main>
-							<p>The accordion dispatches one event per panel-open and one on destroy. Both bubble; both are non-cancelable; <code>detail.target</code> is the panel for <code>:change</code> and the wrapper for <code>:destroyed</code>.</p>
+							<p>The accordion dispatches one event per panel-open. It bubbles, is non-cancelable, and <code>detail.target</code> is the panel.</p>
 							<div class="table-container">
 							<table>
 								<thead><tr><th>Event</th><th>Bubbles</th><th>Cancelable</th><th>Detail</th><th>Dispatched when</th></tr></thead>
 								<tbody>
 									<tr><td><code>ln-accordion:change</code></td><td>yes</td><td>no</td><td><code>{ target: HTMLElement }</code></td><td>After every <code>ln-toggle:open</code> is processed (siblings closed; <code>:change</code> dispatched even when nothing needed closing)</td></tr>
-									<tr><td><code>ln-accordion:destroyed</code></td><td>yes</td><td>no</td><td><code>{ target: HTMLElement }</code></td><td>Inside <code>destroy()</code></td></tr>
 								</tbody>
 							</table>
 							</div>
@@ -568,7 +567,7 @@ document.getElementById('panel2').setAttribute('data-ln-toggle', 'open');
 
 // Tear down the coordinator (children remain intact)
 const acc = document.querySelector('[data-ln-accordion]');
-acc.lnAccordion.destroy();   // dispatches ln-accordion:destroyed</code></pre>
+acc.lnAccordion.destroy();</code></pre>
 						</main>
 					</section>
 

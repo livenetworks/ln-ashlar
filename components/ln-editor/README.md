@@ -136,7 +136,6 @@ This authored-markup design keeps the popover structure fully customizable and a
 | `ln-editor:focus` | Notification | `{ target }` | Editing surface focused |
 | `ln-editor:blur` | Notification | `{ target }` | Editing surface blurred |
 | `ln-editor:set-content` | Request | `{ html }` | Set content programmatically — also emits `ln-editor:changed` |
-| `ln-editor:destroyed` | Notification | `{ target }` | Instance destroyed |
 
 ## API
 
@@ -270,7 +269,7 @@ Requires a page-authored `<template data-ln-template="ln-editor-link-popover">` 
 
 ### Destroy
 
-Removes all surface, toolbar, textarea, document, and form listeners, removes the surface node, restores textarea visibility (removes `data-ln-editor-source`), dismisses any active link popover, and dispatches `ln-editor:destroyed`.
+Removes all surface, toolbar, textarea, document, and form listeners, removes the surface node, restores textarea visibility (removes `data-ln-editor-source`), and dismisses any active link popover.
 
 ### Permanent constraints
 

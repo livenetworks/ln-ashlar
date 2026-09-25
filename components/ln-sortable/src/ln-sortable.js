@@ -40,7 +40,6 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this.dom.removeEventListener('pointerdown', this._onPointerDown);
-		dispatch(this.dom, 'ln-sortable:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

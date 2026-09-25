@@ -172,7 +172,6 @@ All events bubble up (`bubbles: true`).
 | `ln-upload:error` | Emits | No | Fires when an upload or delete request fails. | `{ file, message, status, error }` |
 | `ln-upload:removed` | Emits | No | Fires after a file is deleted from server and removed from DOM. | `{ localId, serverId }` |
 | `ln-upload:cleared` | Emits | No | Fires after `clear()` wipes all file instances. | `{}` |
-| `ln-upload:destroyed` | Emits | No | Fires when component instance is torn down. | `{ target: HTMLElement }` |
 
 ---
 

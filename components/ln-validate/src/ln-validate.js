@@ -191,7 +191,6 @@ import { hasInitialValue, isFieldValid, resolveActiveErrorKeys } from './validat
 
 		this.dom.classList.remove(CSS_VALID, CSS_INVALID);
 		this.dom.removeAttribute('aria-invalid');
-		dispatch(this.dom, 'ln-validate:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

@@ -37,7 +37,7 @@ test('static extraction finds all expected events without unclassified literals'
 	const { componentEvents, staticUniqueEvents, unclassifiedLiterals } = extractStaticEvents(filesToScan, compDirs);
 
 	assert.equal(unclassifiedLiterals.length, 0, 'There should be 0 unclassified event literals');
-	assert.ok(staticUniqueEvents.size >= 236, `Static unique events count (${staticUniqueEvents.size}) must be >= 236`);
+	assert.ok(staticUniqueEvents.size >= 210, `Static unique events count (${staticUniqueEvents.size}) must be >= 210`);
 
 	// Verify indirection pass for ln-validate
 	const validateEmits = componentEvents.get('ln-validate').emits;
@@ -62,7 +62,7 @@ test('generated catalogs have strict schemas, shape preservation, and accurate p
 
 	// Verify all entries in flat index
 	const eventNames = Object.keys(index.events);
-	assert.equal(eventNames.length, 253, 'Flat index event count must be exactly 253');
+	assert.equal(eventNames.length, 227, 'Flat index event count must be exactly 227');
 
 	const validIndexSources = new Set(['static', 'dynamic-allowlist', 'mixed']);
 	const validByCompSources = new Set(['static', 'dynamic-allowlist']);
@@ -116,7 +116,7 @@ test('generated catalogs have strict schemas, shape preservation, and accurate p
 
 	// 41 allowlist entries across by-component (12 dc emits + 12 dc listens + 5 ds listens + 12 couch listens)
 	assert.equal(dynamicAllowlistCount, 41, 'by-component dynamic-allowlist entries count must be exactly 41');
-	assert.equal(staticCount, 305, 'by-component static entries count must be exactly 305');
+	assert.equal(staticCount, 279, 'by-component static entries count must be exactly 279');
 
 	// Acceptance criteria 1, 2, 3: ln-table:set-data
 	const dcEmits = byComponent.components['ln-data-coordinator'].emits;

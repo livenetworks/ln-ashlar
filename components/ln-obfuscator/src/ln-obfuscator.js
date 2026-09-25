@@ -142,7 +142,6 @@ import {
 		if (this._originalHref !== null) {
 			this.dom.setAttribute('href', this._originalHref);
 		}
-		dispatch(this.dom, 'ln-obfuscator:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

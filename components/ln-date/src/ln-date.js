@@ -449,7 +449,6 @@ import {
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		if (this.isTextElement) {
-			dispatch(this.dom, 'ln-date:destroyed', { target: this.dom });
 			delete this.dom[DOM_ATTRIBUTE];
 			return;
 		}
@@ -474,7 +473,6 @@ import {
 		if (this._onLocaleChange) {
 			document.removeEventListener('ln-core:locale-change', this._onLocaleChange);
 		}
-		dispatch(this.dom, 'ln-date:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

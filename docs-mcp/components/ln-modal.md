@@ -113,7 +113,6 @@ All events bubble (`bubbles: true`) and contain target details in `event.detail`
 | `ln-modal:open` | Emits | No | Dispatched once modal is natively open, body scroll locked, and initial focus set. | `{ modalId: String, target: HTMLElement, hashNs: String?, param: String? }` |
 | `ln-modal:before-close` | Emits | **Yes** | Dispatched upon request to close; calling `preventDefault()` cancels closing. | `{ modalId: String, target: HTMLElement }` |
 | `ln-modal:close` | Emits | No | Dispatched after modal closes, before focus restoration. | `{ modalId: String, target: HTMLElement }` |
-| `ln-modal:destroyed` | Emits | No | Dispatched when the component instance is destroyed. | `{ modalId: String, target: HTMLElement }` |
 
 ---
 

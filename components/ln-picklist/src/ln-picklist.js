@@ -69,7 +69,6 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 		this._destroyed = true;
 		if (this._onChange) this.dom.removeEventListener('change', this._onChange);
 		if (this._form) this._form.removeEventListener('reset', this._onFormReset);
-		dispatch(this.dom, 'ln-picklist:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

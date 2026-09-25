@@ -106,7 +106,6 @@ const queue = queueEl.lnApiQueue;
 | `ln-api-queue:failed` | `{ entryId, chainKey, attempts }` | Retries exhausted (see backoff below); the entry is retained (not deleted) for a manual `request-drain`. |
 | `ln-api-queue:drained` | `{ scope }` | The outbox for this scope is empty. |
 | `ln-api-queue:error` | `{ operation, entryId?, error }` | IndexedDB or queue orchestration failed without silently discarding the entry. |
-| `ln-api-queue:destroyed` | `{ scope }` | The instance was torn down. |
 
 ---
 

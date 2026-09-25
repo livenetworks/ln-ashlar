@@ -1,4 +1,4 @@
-import { computePlacement, dispatch, registerComponent } from '../../ln-core';
+import { computePlacement, registerComponent } from '../../ln-core';
 
 (function () {
 	const TRIGGER_SELECTOR = 'data-ln-tooltip-enhance';
@@ -202,7 +202,6 @@ import { computePlacement, dispatch, registerComponent } from '../../ln-core';
 		}
 		delete el[DOM_ATTRIBUTE];
 		delete el[DOM_ATTRIBUTE + 'Uid'];
-		dispatch(el, 'ln-tooltip:destroyed', { trigger: el });
 	};
 
 	// ─── Registration ──────────────────────────────────────────

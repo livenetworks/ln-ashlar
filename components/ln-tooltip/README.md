@@ -61,7 +61,7 @@ Add `data-ln-tooltip-enhance` to activate advanced positioning and accessibility
 
 ## 🔧 Internals
 
-Source: `components/ln-tooltip/ln-tooltip.js`. Tooltips are mechanically inert from the data layer's perspective — no coordinator wiring, the only event dispatched is `ln-tooltip:destroyed`.
+Source: `components/ln-tooltip/ln-tooltip.js`. Tooltips are mechanically inert from the data layer's perspective — no coordinator wiring, no events dispatched.
 
 ### Two render strategies, one attribute
 
@@ -92,4 +92,4 @@ Module-level `activeTrigger`/`activeTooltipNode` enforce a hard single-tooltip i
 
 `registerComponent` wires a `MutationObserver` watching for `[data-ln-tooltip-enhance], [data-ln-tooltip][title]`. On init, four listeners attach to the trigger: `mouseenter`/`focus` → `_show(el)`; `mouseleave`/`blur` → `_hide()` guarded by `activeTrigger === el` (so one trigger can't hide another's tooltip). `focus`/`blur` use the capture phase so events from focusable descendants reach the trigger reliably.
 
-The component never auto-destroys on element removal — listeners are garbage-collected with the element. `destroy()` exists for the rarer case of unwiring without removing the element: removes all four listeners, `_hide()`s if this trigger is currently active, deletes the instance properties, dispatches `ln-tooltip:destroyed`.
+The component never auto-destroys on element removal — listeners are garbage-collected with the element. `destroy()` exists for the rarer case of unwiring without removing the element: removes all four listeners, `_hide()`s if this trigger is currently active, deletes the instance properties.

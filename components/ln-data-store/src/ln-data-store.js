@@ -909,7 +909,6 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 		delete _stores[this._name];
 
 		delete this.dom[DOM_ATTRIBUTE];
-		dispatch(this.dom, 'ln-data-store:destroyed', { store: this._name });
 	};
 
 	// ─── clearAll (global) ─────────────────────────────────

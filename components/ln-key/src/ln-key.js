@@ -137,7 +137,6 @@ import { browserAlreadyHandles, composeExternalShortcut, eventToShortcut, inferK
 		instances.delete(this);
 		delete this.dom[DOM_ATTRIBUTE];
 		_maybeRemoveKeydownListener();
-		dispatch(this.dom, 'ln-key:destroyed', { target: this.dom });
 	};
 
 	function _externalComponent(dom) {
@@ -176,7 +175,6 @@ import { browserAlreadyHandles, composeExternalShortcut, eventToShortcut, inferK
 		instances.delete(this);
 		delete this.dom[FOR_DOM_ATTRIBUTE];
 		_maybeRemoveKeydownListener();
-		dispatch(this.dom, 'ln-key:destroyed', { target: this.dom });
 	};
 
 	function _resolveTarget(selector, attribute) {

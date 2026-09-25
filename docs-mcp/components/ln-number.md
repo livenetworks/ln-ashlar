@@ -178,7 +178,6 @@ All events bubble from the parent container (`this.dom`):
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-number:input` | Emits | No | Dispatched upon user input or programmatic value changes. | `{ value: Number, formatted: String }` |
-| `ln-number:destroyed` | Emits | No | Dispatched when the component is destroyed. | `{ target: HTMLElement }` |
 
 ---
 

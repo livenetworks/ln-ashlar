@@ -103,7 +103,6 @@ All events bubble (`bubbles: true`). The dispatch target is the overlay element.
 | **`ln-modal:open`** | Emits | No | Dispatched after modal is active, body scroll locked, and initial focus set. |
 | **`ln-modal:before-close`** | Emits | **Yes** | Dispatched before closing. Calling `event.preventDefault()` cancels the close transition. |
 | **`ln-modal:close`** | Emits | No | Dispatched after modal is closed, scroll locks released, and focus restored. |
-| **`ln-modal:destroyed`** | Emits | No | Dispatched when the component instance is destroyed. |
 
 ```js
 // Example: Block close transition if form has unsaved changes
@@ -186,4 +185,4 @@ The instance listens for `ln-modal:request-open`/`request-close` on the modal el
 
 ### Destroy
 
-Removes the four listeners (`request-open`, `request-close`, `cancel`, `click`), releases the body scroll-lock class if this was the last open modal, dispatches `:destroyed`, deletes the instance.
+Removes the four listeners (`request-open`, `request-close`, `cancel`, `click`), releases the body scroll-lock class if this was the last open modal, deletes the instance.

@@ -169,7 +169,7 @@ The accordion is reactive, not a gate: cancelable toggle events are the toggle's
 
 ### Destroy
 
-Guards double-destroy, removes the `ln-toggle:open` listener, dispatches `ln-accordion:destroyed` (`detail.target` = the wrapper), deletes the instance reference. Child `ln-toggle` instances are untouched and keep working independently.
+Guards double-destroy, removes the `ln-toggle:open` listener, deletes the instance reference. Child `ln-toggle` instances are untouched and keep working independently.
 
 ### Event lifecycle
 
@@ -177,7 +177,6 @@ Guards double-destroy, removes the `ln-toggle:open` listener, dispatches `ln-acc
 |---|---|---|---|
 | `ln-toggle:open` | in (bubble) | — | Only inbound event; `ln-toggle:close` is not listened to |
 | `ln-accordion:change` | out | `{ target }` = opened panel | Fires on every open, even if no sibling needed closing |
-| `ln-accordion:destroyed` | out | `{ target }` = wrapper | Inside `destroy()` |
 
 ### Nested accordions
 

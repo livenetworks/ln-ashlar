@@ -99,7 +99,6 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 			}
 		}
 
-		dispatch(this.dom, 'ln-modal:destroyed', { modalId: this.dom.id, target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

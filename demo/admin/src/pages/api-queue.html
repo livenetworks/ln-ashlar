@@ -167,7 +167,7 @@
 
 	const queueEvents = [
 		'send', 'enqueued', 'pending-count', 'auth-required', 'paused',
-		'resumed', 'failed', 'drained', 'destroyed'
+		'resumed', 'failed', 'drained'
 	];
 	queueEvents.forEach(function (evName) {
 		queueEl.addEventListener('ln-api-queue:' + evName, function (e) {

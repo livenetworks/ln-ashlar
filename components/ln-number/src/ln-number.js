@@ -387,7 +387,6 @@ import { calculateCursorPosition } from './number-model.js';
 			this.dom.type = 'number';
 			this.dom.removeAttribute('inputmode');
 		}
-		dispatch(this.dom, 'ln-number:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

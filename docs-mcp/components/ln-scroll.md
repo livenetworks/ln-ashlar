@@ -77,7 +77,6 @@ The `ln-scroll` component provides progressive enhancement for anchor navigation
 |---|---|---|---|---|
 | `ln-scroll:before-scroll` | Emits | Yes | Dispatched on link/button before scrolling begins. Calling `e.preventDefault()` halts scroll. | `{ target: HTMLElement, link: HTMLElement, href: string }` |
 | `ln-scroll:scrolled` | Emits | No | Dispatched immediately after `scrollIntoView` is triggered. | `{ target: HTMLElement, link: HTMLElement, href: string }` |
-| `ln-scroll:destroyed` | Emits | No | Dispatched when `el.lnScroll.destroy()` is invoked. | `{ target: HTMLElement }` |
 
 ---
 

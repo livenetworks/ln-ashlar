@@ -122,7 +122,7 @@ The initialized container instance is exposed on the host element via `dom.lnToa
 | `dom.lnToast` | `Object` | The toast container service instance attached to the DOM element. |
 | `dom.lnToast.enqueue(opts)` | `Function` | Programmatically constructs and appends a toast item to this container. |
 | `dom.lnToast.clear()` | `Function` | Dismisses all active toast notifications inside this container. |
-| `dom.lnToast.destroy()` | `Function` | Dismisses active cards, demotes top-layer, dispatches `ln-toast:destroyed`, and destroys instance. |
+| `dom.lnToast.destroy()` | `Function` | Dismisses active cards, demotes top-layer, and destroys instance. |
 
 ### Events API
 
@@ -130,7 +130,6 @@ The initialized container instance is exposed on the host element via `dom.lnToa
 |---|:---:|:---:|---|---|
 | `ln-toast:enqueue` | Listens | No | Dispatches a request to construct and append a new toast notification. | `{ type, title, message, data, timeout, container }` |
 | `ln-toast:clear` | Listens | No | Clears all active toast notifications (optionally filtered by container). | `{ container }` |
-| `ln-toast:destroyed` | Emits | No | Dispatched when `destroy()` is called on the container instance. | `{ target: HTMLElement }` |
 
 ---
 

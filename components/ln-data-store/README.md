@@ -193,7 +193,6 @@ These events bubble up and can be listened to by coordinators or rendering views
 | `ln-data-store:deleted` | `{ store, id \| ids, requestId? }` | Emitted after optimistic delete or bulk delete. |
 | `ln-data-store:synced` | `{ store, added, deleted, changed }` | Emitted after subsequent delta sync merges. |
 | `ln-data-store:sync-error` | `{ store, error, status }` | A connector sync failed; `isSyncing` has been cleared so online/visibility retry can proceed. |
-| `ln-data-store:destroyed` | `{ store }` | Emitted when the store instance is destroyed. |
 | `ln-data-store:mutation-error` | `{ store, action, requestId, error }` | A serialized local mutation failed. `requestId` lets a coordinator correlate reconciliation failures. |
 
 ### Global System Events

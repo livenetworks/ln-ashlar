@@ -99,7 +99,6 @@ The hidden input holds the ISO date string (YYYY-MM-DD) for form submission.
 | Event | Bubbles | Cancelable | Detail |
 |-------|---------|------------|--------|
 | `ln-date:change` | yes | no | `{ value: String (ISO), formatted: String, date: Date }` |
-| `ln-date:destroyed` | yes | no | `{ target: Element }` |
 
 ## API
 

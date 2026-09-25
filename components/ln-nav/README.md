@@ -81,7 +81,6 @@ All events bubble from the `<nav>` element.
 |---|---|---|---|
 | `ln-nav:before-update` | Yes | `{ target }` | Fires at the start of every `update()` pass. Call `e.preventDefault()` to skip the highlight recalculation. |
 | `ln-nav:update` | No | `{ target, activeLinks }` | Fires after active classes / `aria-current` have been applied to matching links. |
-| `ln-nav:destroyed` | No | `{ target }` | Fires inside `destroy()`, after listeners/observer are torn down. |
 
 ---
 
@@ -111,4 +110,4 @@ Dispatches cancelable `ln-nav:before-update` (a listener calling `preventDefault
 
 ### Teardown
 
-`destroy()` disconnects the local observer, removes the `popstate` listener, splices `updateHandler` out of the global `_pushStateCallbacks` array, and dispatches `ln-nav:destroyed`.
+`destroy()` disconnects the local observer, removes the `popstate` listener, and splices `updateHandler` out of the global `_pushStateCallbacks` array.

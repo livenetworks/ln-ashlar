@@ -74,13 +74,12 @@ wrapper.lnDropdown.destroy();
 
 ## 4. Transition Events
 
-All events bubble. The dispatch target is the inner menu element (except `:destroyed` which dispatches on the wrapper).
+All events bubble. The dispatch target is the inner menu element.
 
 | Event | Bubbles | Detail | Dispatched When |
 |---|---|---|---|
 | **`ln-dropdown:open`** | Yes | `{ target: menuElement }` | After top-layer promotion and positioning are complete. |
 | **`ln-dropdown:close`** | Yes | `{ target: menuElement }` | After menu is closed, exits the top layer, and outside listeners removed. |
-| **`ln-dropdown:destroyed`** | Yes | `{ target: wrapperElement }` | Inside `destroy()`, after removing listeners. |
 
 *Note*: Open/close state is managed by `ln-toggle`. Use `ln-toggle:before-open` / `ln-toggle:before-close` to cancel transitions.
 

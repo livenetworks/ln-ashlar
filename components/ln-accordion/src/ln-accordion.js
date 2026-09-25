@@ -36,7 +36,6 @@ import { dispatch, registerComponent } from '../../ln-core';
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this.dom.removeEventListener('ln-toggle:open', this._onToggleOpen);
-		dispatch(this.dom, 'ln-accordion:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

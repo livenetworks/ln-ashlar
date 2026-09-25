@@ -170,7 +170,6 @@ import { registerComponent, dispatch, shouldIgnoreClick, defineAttrs, attrSpec }
 		if (this.confirming) this._reset();
 		this.dom.removeEventListener('click', this._onClick);
 		delete this.dom[DOM_ATTRIBUTE];
-		dispatch(this.dom, 'ln-confirm:destroyed', { target: this.dom });
 	};
 
 	// ─── Init ──────────────────────────────────────────────────

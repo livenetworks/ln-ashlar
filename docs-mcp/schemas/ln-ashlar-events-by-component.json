@@ -12,13 +12,6 @@
 					"description": "Fires from the wrapper after the coordinator has closed other sibling panels.",
 					"detail": "{ target: HTMLElement }",
 					"source": "static"
-				},
-				{
-					"name": "ln-accordion:destroyed",
-					"cancelable": false,
-					"description": "Fires from the wrapper when the component's `destroy()` method is invoked.",
-					"detail": "{ target: HTMLElement }",
-					"source": "static"
 				}
 			],
 			"listens": [
@@ -99,13 +92,6 @@
 					"cancelable": false,
 					"description": "Dispatched upon successful document deletion.",
 					"detail": "{ response: Object, id: ID, message: String, meta: Object }",
-					"source": "static"
-				},
-				{
-					"name": "ln-api-connector:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when the component is destroyed.",
-					"detail": "{ target: HTMLElement }",
 					"source": "static"
 				},
 				{
@@ -196,13 +182,6 @@
 					"cancelable": false,
 					"description": "Dispatched when auth pause occurs.",
 					"detail": "{ entryId: ID, chainKey: String }",
-					"source": "static"
-				},
-				{
-					"name": "ln-api-queue:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when the instance is torn down.",
-					"detail": "{ scope: String }",
 					"source": "static"
 				},
 				{
@@ -349,13 +328,6 @@
 					"source": "static"
 				},
 				{
-					"name": "ln-autosave:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when the component is torn down via `.destroy()`.",
-					"detail": "{ target: HTMLFormElement }",
-					"source": "static"
-				},
-				{
 					"name": "ln-autosave:restored",
 					"cancelable": false,
 					"description": "Dispatched after filling the form and triggering synthetic events.",
@@ -428,13 +400,6 @@
 		"ln-confirm": {
 			"emits": [
 				{
-					"name": "ln-confirm:destroyed",
-					"cancelable": false,
-					"description": "",
-					"detail": "",
-					"source": "static"
-				},
-				{
 					"name": "ln-confirm:waiting",
 					"cancelable": false,
 					"description": "Dispatched upon the first click when confirming begins.",
@@ -484,13 +449,6 @@
 					"cancelable": false,
 					"description": "Dispatched upon successful document deletion.",
 					"detail": "{ response: Object, id: ID, message: String, meta: Object }",
-					"source": "static"
-				},
-				{
-					"name": "ln-couchdb-connector:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when the component is destroyed.",
-					"detail": "{ target: HTMLElement }",
 					"source": "static"
 				},
 				{
@@ -1066,13 +1024,6 @@
 					"source": "static"
 				},
 				{
-					"name": "ln-data-store:destroyed",
-					"cancelable": false,
-					"description": "Emitted when the store instance is destroyed.",
-					"detail": "{ store: String }",
-					"source": "static"
-				},
-				{
 					"name": "ln-data-store:initialization-error",
 					"cancelable": false,
 					"description": "",
@@ -1224,13 +1175,6 @@
 					"description": "Dispatched on value change (via calendar selection, text blur, or programmatically).",
 					"detail": "{ value: String, formatted: String, date: Date }",
 					"source": "static"
-				},
-				{
-					"name": "ln-date:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when the date picker instance is destroyed.",
-					"detail": "{ target: HTMLElement }",
-					"source": "static"
 				}
 			],
 			"listens": [
@@ -1253,13 +1197,6 @@
 					"name": "ln-dropdown:close",
 					"cancelable": false,
 					"description": "Fires after the menu is closed, exits the top layer, and listeners cleaned.",
-					"detail": "{ target: HTMLElement }",
-					"source": "static"
-				},
-				{
-					"name": "ln-dropdown:destroyed",
-					"cancelable": false,
-					"description": "Fires when the coordinator's `destroy()` method is executed.",
 					"detail": "{ target: HTMLElement }",
 					"source": "static"
 				},
@@ -1333,13 +1270,6 @@
 					"source": "static"
 				},
 				{
-					"name": "ln-editor:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when the rich text instance is destroyed.",
-					"detail": "{ target: Node }",
-					"source": "static"
-				},
-				{
 					"name": "ln-editor:focus",
 					"cancelable": false,
 					"description": "Dispatched when the contenteditable workspace gains focus.",
@@ -1408,15 +1338,7 @@
 			"listens": []
 		},
 		"ln-form": {
-			"emits": [
-				{
-					"name": "ln-form:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when the form instance is destroyed.",
-					"detail": "{ target: HTMLFormElement }",
-					"source": "static"
-				}
-			],
+			"emits": [],
 			"listens": []
 		},
 		"ln-http": {
@@ -1483,13 +1405,6 @@
 					"cancelable": true,
 					"description": "Dispatched before trigger action executes; cancelable to abort.",
 					"detail": "{ source, target, action, key, event }",
-					"source": "static"
-				},
-				{
-					"name": "ln-key:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when shortcut binding is destroyed.",
-					"detail": "{ target }",
 					"source": "static"
 				},
 				{
@@ -1698,13 +1613,6 @@
 					"source": "static"
 				},
 				{
-					"name": "ln-modal:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when the component instance is destroyed.",
-					"detail": "{ modalId: String, target: HTMLElement }",
-					"source": "static"
-				},
-				{
 					"name": "ln-modal:open",
 					"cancelable": false,
 					"description": "Dispatched once modal is natively open, body scroll locked, and initial focus set.",
@@ -1739,13 +1647,6 @@
 					"source": "static"
 				},
 				{
-					"name": "ln-nav:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when `destroy()` is called on the component instance.",
-					"detail": "{ target: HTMLElement }",
-					"source": "static"
-				},
-				{
 					"name": "ln-nav:update",
 					"cancelable": false,
 					"description": "Dispatched after active link states have been evaluated and CSS classes applied.",
@@ -1757,13 +1658,6 @@
 		},
 		"ln-number": {
 			"emits": [
-				{
-					"name": "ln-number:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when the component is destroyed.",
-					"detail": "{ target: HTMLElement }",
-					"source": "static"
-				},
 				{
 					"name": "ln-number:input",
 					"cancelable": false,
@@ -1789,13 +1683,6 @@
 					"cancelable": false,
 					"description": "Dispatched on the target element immediately after deobfuscation.",
 					"detail": "{ target: HTMLElement, codec: string, shift: number, key: string | null }",
-					"source": "static"
-				},
-				{
-					"name": "ln-obfuscator:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when `el.lnObfuscator.destroy()` is called.",
-					"detail": "{ target: HTMLElement }",
 					"source": "static"
 				}
 			],
@@ -1832,13 +1719,6 @@
 					"cancelable": true,
 					"description": "Dispatched before an item is re-parented. Calling `preventDefault()` cancels the move and reverts the checkbox.",
 					"detail": "{ item: HTMLElement, from: HTMLElement, to: HTMLElement, checkbox: HTMLInputElement }",
-					"source": "static"
-				},
-				{
-					"name": "ln-picklist:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when the instance is destroyed.",
-					"detail": "{ target: HTMLElement }",
 					"source": "static"
 				},
 				{
@@ -1893,13 +1773,6 @@
 					"cancelable": false,
 					"description": "Fires after popover is hidden, inline styles cleared, and focus restored.",
 					"detail": "{ popoverId: String, target: HTMLElement, trigger: HTMLElement? }",
-					"source": "static"
-				},
-				{
-					"name": "ln-popover:destroyed",
-					"cancelable": false,
-					"description": "Fires when the popover instance is destroyed.",
-					"detail": "{ popoverId: String, target: HTMLElement }",
 					"source": "static"
 				},
 				{
@@ -1982,13 +1855,6 @@
 					"source": "static"
 				},
 				{
-					"name": "ln-scroll:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when `el.lnScroll.destroy()` is invoked.",
-					"detail": "{ target: HTMLElement }",
-					"source": "static"
-				},
-				{
 					"name": "ln-scroll:scrolled",
 					"cancelable": false,
 					"description": "Dispatched immediately after `scrollIntoView` is triggered.",
@@ -2041,13 +1907,6 @@
 					"cancelable": true,
 					"description": "Dispatched on `pointerdown` before starting a drag. If canceled, dragging is aborted.",
 					"detail": "{ item: HTMLElement, index: number }",
-					"source": "static"
-				},
-				{
-					"name": "ln-sortable:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when the instance is destroyed.",
-					"detail": "{ target: HTMLElement }",
 					"source": "static"
 				},
 				{
@@ -2296,13 +2155,6 @@
 					"description": "Dispatched after panel visibility, ARIA attributes, focus, and persistence updates complete.",
 					"detail": "{ key: String, previousKey: String, tab: HTMLElement, panel: HTMLElement, target: HTMLElement }",
 					"source": "static"
-				},
-				{
-					"name": "ln-tabs:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when `destroy()` is called on the instance.",
-					"detail": "{ target: HTMLElement }",
-					"source": "static"
 				}
 			],
 			"listens": [
@@ -2328,15 +2180,7 @@
 			]
 		},
 		"ln-toast": {
-			"emits": [
-				{
-					"name": "ln-toast:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when `destroy()` is called on the container instance.",
-					"detail": "{ target: HTMLElement }",
-					"source": "static"
-				}
-			],
+			"emits": [],
 			"listens": [
 				{
 					"name": "ln-modal:open",
@@ -2385,13 +2229,6 @@
 					"source": "static"
 				},
 				{
-					"name": "ln-toggle:destroyed",
-					"cancelable": false,
-					"description": "Fires when the component instance is torn down.",
-					"detail": "{ target: HTMLElement }",
-					"source": "static"
-				},
-				{
 					"name": "ln-toggle:open",
 					"cancelable": false,
 					"description": "Fires after the panel has fully opened and classes are updated.",
@@ -2424,15 +2261,7 @@
 			]
 		},
 		"ln-tooltip": {
-			"emits": [
-				{
-					"name": "ln-tooltip:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when the trigger component instance is destroyed.",
-					"detail": "{ trigger: HTMLElement }",
-					"source": "static"
-				}
-			],
+			"emits": [],
 			"listens": []
 		},
 		"ln-translations": {
@@ -2597,13 +2426,6 @@
 					"source": "static"
 				},
 				{
-					"name": "ln-upload:destroyed",
-					"cancelable": false,
-					"description": "Fires when component instance is torn down.",
-					"detail": "{ target: HTMLElement }",
-					"source": "static"
-				},
-				{
 					"name": "ln-upload:error",
 					"cancelable": false,
 					"description": "Fires when an upload or delete request fails.",
@@ -2665,13 +2487,6 @@
 		},
 		"ln-validate": {
 			"emits": [
-				{
-					"name": "ln-validate:destroyed",
-					"cancelable": false,
-					"description": "Dispatched when the component is destroyed.",
-					"detail": "{ target: HTMLElement }",
-					"source": "static"
-				},
 				{
 					"name": "ln-validate:invalid",
 					"cancelable": false,
