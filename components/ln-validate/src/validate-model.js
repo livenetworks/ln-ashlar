@@ -20,6 +20,18 @@ export function isFieldValid(validityState, customErrorsCount = 0) {
 }
 
 /**
+ * Whether a field already holds a value at init, so it is validated up front.
+ * A checkbox or radio always carries a `value` ("on" by default) — only its
+ * `checked` state says whether anything was chosen.
+ * @param {{ type?: string, value?: string, checked?: boolean }} field
+ * @returns {boolean}
+ */
+export function hasInitialValue(field) {
+	if (field.type === 'checkbox' || field.type === 'radio') return Boolean(field.checked);
+	return Boolean(field.value && field.value.trim() !== '');
+}
+
+/**
  * Resolves all active error keys for a given validity state and custom errors set.
  * @param {Record<string, boolean>} validityState
  * @param {Set<string>|Array<string>} [customErrors]

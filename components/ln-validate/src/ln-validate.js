@@ -1,5 +1,5 @@
 import { dispatch, registerComponent } from '../../ln-core';
-import { isFieldValid, resolveActiveErrorKeys } from './validate-model.js';
+import { hasInitialValue, isFieldValid, resolveActiveErrorKeys } from './validate-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-validate';
@@ -119,8 +119,7 @@ import { isFieldValid, resolveActiveErrorKeys } from './validate-model.js';
 			}
 		}
 
-		const hasInitialValue = (dom.value && dom.value.trim() !== '') || dom.checked;
-		if (hasInitialValue) {
+		if (hasInitialValue(dom)) {
 			this._touched = true;
 			this.validate();
 		}

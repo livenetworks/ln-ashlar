@@ -2,9 +2,24 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+	hasInitialValue,
 	isFieldValid,
 	resolveActiveErrorKeys
 } from '../components/ln-validate/src/validate-model.js';
+
+test('hasInitialValue reads checked for checkboxes and radios, value for everything else', () => {
+	// A radio or checkbox always has a value — it must not count as filled.
+	assert.equal(hasInitialValue({ type: 'radio', value: '7', checked: false }), false);
+	assert.equal(hasInitialValue({ type: 'radio', value: '7', checked: true }), true);
+	assert.equal(hasInitialValue({ type: 'checkbox', value: 'on', checked: false }), false);
+	assert.equal(hasInitialValue({ type: 'checkbox', value: 'on', checked: true }), true);
+
+	assert.equal(hasInitialValue({ type: 'text', value: '' }), false);
+	assert.equal(hasInitialValue({ type: 'text', value: '   ' }), false);
+	assert.equal(hasInitialValue({ type: 'text', value: 'x' }), true);
+	assert.equal(hasInitialValue({ type: 'select-one', value: '' }), false);
+	assert.equal(hasInitialValue({ type: 'select-one', value: '3' }), true);
+});
 
 test('isFieldValid evaluates overall validity based on validity state and custom errors', () => {
 	assert.equal(isFieldValid({ valid: true }, 0), true);
