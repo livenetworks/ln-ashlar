@@ -86,8 +86,8 @@
 // ---------------------------------------------------------------------------
 @mixin glass-panel {
 	background-color: color-mix(in srgb, var(--bg-elevated) 72%, transparent);
-	backdrop-filter: blur(16px);
 	-webkit-backdrop-filter: blur(16px);
+	backdrop-filter: blur(16px);
 	border: var(--border-width) solid color-mix(in srgb, var(--color-border) 65%, transparent);
 	border-radius: var(--radius-lg);
 	box-shadow: var(--shadow-sm);

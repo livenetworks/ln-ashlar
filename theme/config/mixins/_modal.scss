@@ -28,8 +28,8 @@
 
 	&::backdrop {
 		background-color: var(--color-scrim);
-		backdrop-filter: blur(4px);
 		-webkit-backdrop-filter: blur(4px);
+		backdrop-filter: blur(4px);
 		opacity: 1;
 
 		@include motion-safe {
@@ -138,8 +138,8 @@
 			--btn-bg-hover:     hsl(var(--color-error) / 0.16);
 			--btn-fg-hover:     hsl(var(--color-error));
 			--btn-border-hover: hsl(var(--color-error));
-			backdrop-filter: blur(4px);
 			-webkit-backdrop-filter: blur(4px);
+			backdrop-filter: blur(4px);
 		}
 	}
 }

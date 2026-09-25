@@ -338,8 +338,8 @@
 // ─── Frosted Glass ──────────────────────────────────────
 @mixin frosted-glass($opacity: 0.85, $blur: 12px) {
 	background-color: color-mix(in srgb, var(--color-bg) calc(#{$opacity} * 100%), transparent);
-	backdrop-filter: blur(#{$blur});
 	-webkit-backdrop-filter: blur(#{$blur});
+	backdrop-filter: blur(#{$blur});
 }
 
 // ─── Floating panel ────────────────────────────────────

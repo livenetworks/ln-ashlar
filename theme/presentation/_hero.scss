@@ -71,8 +71,8 @@
 
 	&.btn-outline {
 		background: color-mix(in srgb, var(--bg-elevated) 70%, transparent);
-		backdrop-filter: blur(12px);
 		-webkit-backdrop-filter: blur(12px);
+		backdrop-filter: blur(12px);
 		border-color: color-mix(in srgb, hsl(var(--color-primary)) 25%, var(--color-border));
 		color: var(--color-fg);
 		box-shadow: var(--shadow-sm);
