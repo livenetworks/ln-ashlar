@@ -2290,7 +2290,18 @@
 				},
 				{
 					"name": "data-ln-websocket-connector",
-					"description": "data-ln-websocket-connector attribute",
+					"description": "Connection command set from outside: connect or disconnect",
+					"value": {
+						"type": "enum",
+						"items": [
+							"connect",
+							"disconnect"
+						]
+					}
+				},
+				{
+					"name": "data-ln-websocket-connector-url",
+					"description": "WebSocket endpoint URL (ws:// or wss://)",
 					"value": {
 						"type": "string"
 					}

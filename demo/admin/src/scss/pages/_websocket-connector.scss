@@ -1,0 +1,40 @@
+@use '../../../../../theme/config/mixins' as *;
+
+// ─── WebSocket connector demo ─────────────────────────────
+.ws-example > main {
+	@include flex-col;
+	gap: var(--size-md);
+}
+
+.ws-controls {
+	@include flex-row;
+	@include flex-wrap;
+	@include items-center;
+	gap: var(--size-xs);
+}
+
+// Status chip — page-owned data-status, written from the connector's events.
+.ws-status {
+	@include badge;
+	--color-primary: var(--color-error);
+
+	&[data-status="connecting"] {
+		--color-primary: var(--color-warning);
+		@include badge-live;
+	}
+	&[data-status="connected"] { --color-primary: var(--color-success); }
+
+	// One label per status, all authored in the markup.
+	[data-when] { display: none; }
+	&[data-status="connecting"] [data-when="connecting"],
+	&[data-status="connected"] [data-when="connected"],
+	&[data-status="disconnected"] [data-when="disconnected"] { display: inline; }
+}
+
+.ws-add {
+	@include flex-row;
+	@include items-end;
+	gap: var(--size-sm);
+
+	.form-element { @include flex-1; }
+}

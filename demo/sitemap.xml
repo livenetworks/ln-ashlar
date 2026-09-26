@@ -344,6 +344,11 @@
 		<priority>0.6</priority>
 	</url>
 	<url>
+		<loc>admin/websocket-connector.html</loc>
+		<changefreq>monthly</changefreq>
+		<priority>0.6</priority>
+	</url>
+	<url>
 		<loc>admin/write-workflow.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>

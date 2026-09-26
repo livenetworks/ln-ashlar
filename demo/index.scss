@@ -27,6 +27,20 @@ body {
 
 header {
 	@include mb(3rem);
+
+	.brand-logo-wrap {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		margin-bottom: 1.25rem;
+
+		img {
+			border-radius: var(--radius-lg, 0.75rem);
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+			border: 1px solid var(--border-subtle);
+			display: block;
+		}
+	}
 }
 
 h1 {

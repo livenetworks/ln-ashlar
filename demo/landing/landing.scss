@@ -56,3 +56,34 @@
 	margin-inline: auto;
 }
 
+// ─── Brand Logo Adaptation ────────────────────────────────────────────────
+.brand-logo {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+
+	img {
+		border-radius: var(--radius-sm, 4px);
+		display: block;
+	}
+
+	.brand-logo-dark {
+		display: block;
+	}
+
+	.brand-logo-light {
+		display: none;
+	}
+}
+
+:root[data-mode="light"] .brand-logo {
+	.brand-logo-dark {
+		display: none;
+	}
+
+	.brand-logo-light {
+		display: block;
+	}
+}
+
+

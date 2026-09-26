@@ -1,0 +1,29 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-websocket-connector",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-websocket-connector": {
+			"direction": null,
+			"sources": [
+				"src/ln-websocket-connector.js"
+			],
+			"type": "enum",
+			"values": [
+				"connect",
+				"disconnect"
+			],
+			"fallback": "connect",
+			"description": "Connection command set from outside: connect or disconnect"
+		},
+		"data-ln-websocket-connector-url": {
+			"direction": null,
+			"sources": [
+				"src/ln-websocket-connector.js"
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "WebSocket endpoint URL (ws:// or wss://)"
+		}
+	}
+}

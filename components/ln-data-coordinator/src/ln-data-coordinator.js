@@ -111,8 +111,10 @@ import { MutationReceipts } from './mutation-receipts';
 	}
 
 	// Connector response namespaces — generalized so writes work whether the
-	// paired connector is ln-api-connector or ln-couchdb-connector.
-	const CONNECTOR_RESPONSE_NAMESPACES = ['ln-api-connector', 'ln-couchdb-connector'];
+	// paired connector is ln-api-connector, ln-couchdb-connector or
+	// ln-websocket-connector. A socket beside a REST connector only pushes;
+	// its :fetched still arrives here.
+	const CONNECTOR_RESPONSE_NAMESPACES = ['ln-api-connector', 'ln-couchdb-connector', 'ln-websocket-connector'];
 
 	function _connectorNamespace(connectorEl) {
 		if (!connectorEl) return 'ln-api-connector';
@@ -259,7 +261,10 @@ import { MutationReceipts } from './mutation-receipts';
 
 	_component.prototype.findChildren = function () {
 		const storeEl = this.dom.querySelector('[data-ln-data-store]');
-		const connectorEl = this.dom.querySelector('[data-ln-api-connector], [data-ln-couchdb-connector], [data-ln-websocket-connector]');
+		// Requests go to a REST/CouchDB connector when there is one; a socket
+		// takes them only when it is the sole transport.
+		const connectorEl = this.dom.querySelector('[data-ln-api-connector], [data-ln-couchdb-connector]')
+			|| this.dom.querySelector('[data-ln-websocket-connector]');
 		const queueEl = this.dom.querySelector('[data-ln-api-queue]');
 
 		return {
@@ -267,7 +272,7 @@ import { MutationReceipts } from './mutation-receipts';
 			connectorEl: connectorEl,
 			queueEl: queueEl,
 			store: storeEl ? storeEl.lnDataStore : null,
-			connector: connectorEl ? (connectorEl.lnApiConnector || connectorEl.lnCouchDbConnector) : null,
+			connector: connectorEl ? (connectorEl.lnApiConnector || connectorEl.lnCouchDbConnector || connectorEl.lnWebsocketConnector) : null,
 			queue: queueEl ? queueEl.lnApiQueue : null
 		};
 	};
@@ -781,6 +786,15 @@ import { MutationReceipts } from './mutation-receipts';
 				}
 			},
 
+			// A (re)opened socket may have missed pushes — catch up with a delta
+			// sync over whichever connector takes requests.
+			socketConnected: function () {
+				const children = self.findChildren();
+				const store = children.store;
+				if (!store || store.initializationError || !children.connector || self._noAutosync || !store.isInitialized || store.isSyncing) return;
+				store.forceSync();
+			},
+
 			// ─── View Binder Handlers ─────────────────────────────
 			reqTableData: function (e) { self._serveData(e, 'table'); },
 			reqListData: function (e) { self._serveData(e, 'list'); },
@@ -862,6 +876,7 @@ import { MutationReceipts } from './mutation-receipts';
 
 		// Sync ownership — store initialization
 		self.dom.addEventListener('ln-data-store:initialized', self._handlers.storeInitialized);
+		self.dom.addEventListener('ln-websocket-connector:connected', self._handlers.socketConnected);
 
 		// Form write intake — native submit, document-level, bubble phase (never
 		// capture: ln-validate's own submit gate on the form must run first)
@@ -1229,6 +1244,7 @@ import { MutationReceipts } from './mutation-receipts';
 			self.dom.removeEventListener('ln-api-queue:send', self._handlers.queueSend);
 			self.dom.removeEventListener('ln-api-queue:failed', self._handlers.queueFailed);
 			self.dom.removeEventListener('ln-data-store:initialized', self._handlers.storeInitialized);
+			self.dom.removeEventListener('ln-websocket-connector:connected', self._handlers.socketConnected);
 
 			document.removeEventListener('submit', self._handlers.formSubmit);
 

@@ -1,0 +1,129 @@
+<!-- ln-page: title="WebSocket Connector — ln-ashlar" h1="WebSocket Connector" -->
+
+<section class="section-card">
+	<header><h3>Overview</h3></header>
+	<main>
+		<p><code>data-ln-websocket-connector</code> opens a WebSocket inside a <code>ln-data-coordinator</code>. Server pushes land in the store, and every bound table refreshes. Beside a REST connector it only delivers live changes; on its own it carries reads, writes and pushes.</p>
+		<p>Both examples talk to one local mock. Start it, then reload this page:</p>
+		<pre><code>php demo/websocket/ws-mock.php</code></pre>
+		<p>It listens on port 8090, changes a random task every few seconds, and pushes every write to every open socket — a task added in one example appears in the other.</p>
+		<p>Connection status is not an attribute. The connector announces it with <code>:connecting</code>, <code>:connected</code> and <code>:disconnected</code>; this page listens and colours the chip.</p>
+	</main>
+</section>
+
+<section class="section-card ws-example">
+	<header><h3>1. REST reads and writes, socket pushes</h3></header>
+	<main>
+		<ul data-ln-data-coordinator="ws-rest" hidden>
+			<li data-ln-data-store="ws-rest" id="ws-rest"></li>
+			<li data-ln-api-connector data-ln-api-base-url="http://localhost:8090" data-ln-api-path="tasks"></li>
+			<li data-ln-websocket-connector data-ln-websocket-connector-url="ws://localhost:8090" id="ws-rest-socket"></li>
+		</ul>
+
+		<ul class="ws-controls">
+			<li>
+				<output class="ws-status" data-ws-status-for="ws-rest-socket" data-status="disconnected" aria-live="polite">
+					<span data-when="connecting">Connecting…</span>
+					<span data-when="connected">Connected</span>
+					<span data-when="disconnected">Disconnected</span>
+				</output>
+			</li>
+			<li><button type="button" data-ws-command="connect" data-ws-for="ws-rest-socket">Connect</button></li>
+			<li><button type="button" data-ws-command="disconnect" data-ws-for="ws-rest-socket">Disconnect</button></li>
+		</ul>
+
+		<form method="post" class="ws-add" data-ln-data-coordinator-scope="ws-rest">
+			<div class="form-element">
+				<label for="ws-rest-title">New task (sent over REST)</label>
+				<input type="text" id="ws-rest-title" name="title" required>
+			</div>
+			<button type="submit">Add task</button>
+		</form>
+
+		<section data-ln-table="ws-rest-list" data-ln-table-source="ws-rest" id="ws-rest-table">
+			<table>
+				<thead>
+					<tr>
+						<th scope="col">#</th>
+						<th scope="col">Task</th>
+						<th scope="col">Status</th>
+						<th scope="col">Priority</th>
+						<th scope="col">Assignee</th>
+					</tr>
+				</thead>
+				<tbody data-ln-table-body></tbody>
+			</table>
+			<template data-ln-template="ws-rest-list-row">
+				<tr data-ln-table-row>
+					<td>{{ id }}</td>
+					<td>{{ title }}</td>
+					<td>{{ status }}</td>
+					<td>{{ priority }}</td>
+					<td>{{ assignee }}</td>
+				</tr>
+			</template>
+			<template data-ln-template="ws-rest-list-empty">
+				<p>No tasks yet — is the mock running?</p>
+			</template>
+		</section>
+	</main>
+</section>
+
+<section class="section-card ws-example">
+	<header><h3>2. Socket alone — reads, writes and pushes</h3></header>
+	<main>
+		<ul data-ln-data-coordinator="ws-socket" hidden>
+			<li data-ln-data-store="ws-socket" id="ws-socket"></li>
+			<li data-ln-websocket-connector data-ln-websocket-connector-url="ws://localhost:8090" id="ws-socket-socket"></li>
+		</ul>
+
+		<ul class="ws-controls">
+			<li>
+				<output class="ws-status" data-ws-status-for="ws-socket-socket" data-status="disconnected" aria-live="polite">
+					<span data-when="connecting">Connecting…</span>
+					<span data-when="connected">Connected</span>
+					<span data-when="disconnected">Disconnected</span>
+				</output>
+			</li>
+			<li><button type="button" data-ws-command="connect" data-ws-for="ws-socket-socket">Connect</button></li>
+			<li><button type="button" data-ws-command="disconnect" data-ws-for="ws-socket-socket">Disconnect</button></li>
+		</ul>
+
+		<form method="post" class="ws-add" data-ln-data-coordinator-scope="ws-socket">
+			<div class="form-element">
+				<label for="ws-socket-title">New task (sent over the socket)</label>
+				<input type="text" id="ws-socket-title" name="title" required>
+			</div>
+			<button type="submit">Add task</button>
+		</form>
+
+		<section data-ln-table="ws-socket-list" data-ln-table-source="ws-socket" id="ws-socket-table">
+			<table>
+				<thead>
+					<tr>
+						<th scope="col">#</th>
+						<th scope="col">Task</th>
+						<th scope="col">Status</th>
+						<th scope="col">Priority</th>
+						<th scope="col">Assignee</th>
+					</tr>
+				</thead>
+				<tbody data-ln-table-body></tbody>
+			</table>
+			<template data-ln-template="ws-socket-list-row">
+				<tr data-ln-table-row>
+					<td>{{ id }}</td>
+					<td>{{ title }}</td>
+					<td>{{ status }}</td>
+					<td>{{ priority }}</td>
+					<td>{{ assignee }}</td>
+				</tr>
+			</template>
+			<template data-ln-template="ws-socket-list-empty">
+				<p>No tasks yet — is the mock running?</p>
+			</template>
+		</section>
+	</main>
+</section>
+
+<script src="dist/websocket-demo.js" defer></script>

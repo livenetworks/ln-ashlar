@@ -626,6 +626,7 @@ const HEADLESS_COMPONENTS = new Set([
 	'ln-api-connector',
 	'ln-http',
 	'ln-couchdb-connector',
+	'ln-websocket-connector',
 	'ln-data-store',
 	'ln-data-coordinator',
 	'ln-slug',

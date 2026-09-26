@@ -68,7 +68,7 @@ ln-ashlar makes deliberate trade-offs, and its wins and costs are not the ones a
 **Why:** Single source of truth for appearance. Design token changes propagate automatically. Inspector shows clean semantic markup. Changing a color means editing one token, not hunting JS files.
 
 **Concrete example:**
-`ln-upload` writes `data-ln-upload-state="dragover"` on the drop zone. `theme/components/_upload.scss` styles `[data-ln-upload-zone][data-ln-upload-state="dragover"]` via `@mixin upload-zone-dragover` in `theme/config/mixins/_upload.scss`. JS decides the state; SCSS owns what that looks like.
+`ln-sort` keeps the active direction in `data-ln-sort-state="asc|desc|none"` — authored in markup, settable from outside, updated on click. `theme/components/_sort.scss` styles `[data-ln-sort][data-ln-sort-state="asc"]` via `@mixin sort-active` in `theme/config/mixins/_sort.scss`. JS decides the state; SCSS owns what that looks like.
 
 ---
 
