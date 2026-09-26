@@ -784,7 +784,7 @@
 				{
 					"name": "ln-api-connector:fetched",
 					"cancelable": false,
-					"description": "Connector response handling (also namespaced under `ln-couchdb-connector:...` — generalized across concrete connector implementations). Reconciles the store, fires toasts, and drives queue ack/nack.",
+					"description": "Connector response handling (also namespaced under `ln-couchdb-connector:...` and `ln-websocket-connector:...` — generalized across concrete connector implementations). Reconciles the store, fires toasts, and drives queue ack/nack. A socket beside a REST connector delivers its pushes here as `:fetched`.",
 					"detail": "*(shape per response — see [`ln-api-connector.md`](./ln-api-connector.md) Events API)*",
 					"source": "dynamic-allowlist"
 				},
@@ -1004,6 +1004,55 @@
 					"description": "Query from a table to fetch items.",
 					"detail": "{ target: HTMLElement }",
 					"source": "static"
+				},
+				{
+					"name": "ln-websocket-connector:bulk-deleted",
+					"cancelable": false,
+					"description": "Bulk delete confirmed.",
+					"detail": "{ response, ids, message, meta }",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-websocket-connector:connected",
+					"cancelable": false,
+					"description": "Catch-up after a (re)opened socket: runs `store.forceSync()`, a delta since `lastSyncedAt` over the request connector.",
+					"detail": "{ url: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-websocket-connector:created",
+					"cancelable": false,
+					"description": "Create confirmed.",
+					"detail": "{ record, tempId, message, meta }",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-websocket-connector:deleted",
+					"cancelable": false,
+					"description": "Delete confirmed.",
+					"detail": "{ response, id, message, meta }",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-websocket-connector:error",
+					"cancelable": false,
+					"description": "A rejected request, or one that could not be delivered (`status: 0`).",
+					"detail": "{ action, error, status, data, conflictData, meta }",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-websocket-connector:fetched",
+					"cancelable": false,
+					"description": "A sync reply, a query page, or a server push (`meta: null`).",
+					"detail": "{ data, since, meta }` / `{ data, total, filtered, offset, queryGen, meta }",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-websocket-connector:updated",
+					"cancelable": false,
+					"description": "Update confirmed.",
+					"detail": "{ record, id, message, meta }",
+					"source": "dynamic-allowlist"
 				}
 			]
 		},
@@ -2529,6 +2578,117 @@
 					"cancelable": false,
 					"description": "Sets a manual custom error key on the input.",
 					"detail": "{ error: String }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-websocket-connector": {
+			"emits": [
+				{
+					"name": "ln-websocket-connector:bulk-deleted",
+					"cancelable": false,
+					"description": "Bulk delete confirmed.",
+					"detail": "{ response, ids, message, meta }",
+					"source": "static"
+				},
+				{
+					"name": "ln-websocket-connector:connected",
+					"cancelable": false,
+					"description": "The socket is open.",
+					"detail": "{ url: String }",
+					"source": "static"
+				},
+				{
+					"name": "ln-websocket-connector:connecting",
+					"cancelable": false,
+					"description": "A connection attempt starts.",
+					"detail": "{ url: String, attempt: Number }",
+					"source": "static"
+				},
+				{
+					"name": "ln-websocket-connector:created",
+					"cancelable": false,
+					"description": "Create confirmed.",
+					"detail": "{ record, tempId, message, meta }",
+					"source": "static"
+				},
+				{
+					"name": "ln-websocket-connector:deleted",
+					"cancelable": false,
+					"description": "Delete confirmed.",
+					"detail": "{ response, id, message, meta }",
+					"source": "static"
+				},
+				{
+					"name": "ln-websocket-connector:disconnected",
+					"cancelable": false,
+					"description": "The socket closed, or a pending reconnect was cancelled.",
+					"detail": "{ url: String, code: Number, reason: String, willReconnect: Boolean }",
+					"source": "static"
+				},
+				{
+					"name": "ln-websocket-connector:error",
+					"cancelable": false,
+					"description": "A rejected request, or one that could not be delivered (`status: 0`).",
+					"detail": "{ action, error, status, data, conflictData, meta }",
+					"source": "static"
+				},
+				{
+					"name": "ln-websocket-connector:fetched",
+					"cancelable": false,
+					"description": "A sync reply, a query page, or a server push (`meta: null`).",
+					"detail": "{ data, since, meta }` / `{ data, total, filtered, offset, queryGen, meta }",
+					"source": "static"
+				},
+				{
+					"name": "ln-websocket-connector:updated",
+					"cancelable": false,
+					"description": "Update confirmed.",
+					"detail": "{ record, id, message, meta }",
+					"source": "static"
+				}
+			],
+			"listens": [
+				{
+					"name": "ln-websocket-connector:request-bulk-delete",
+					"cancelable": false,
+					"description": "Delete several records.",
+					"detail": "{ ids, idempotencyKey?, meta? }",
+					"source": "static"
+				},
+				{
+					"name": "ln-websocket-connector:request-create",
+					"cancelable": false,
+					"description": "Create a record.",
+					"detail": "{ data, tempId?, idempotencyKey?, meta? }",
+					"source": "static"
+				},
+				{
+					"name": "ln-websocket-connector:request-delete",
+					"cancelable": false,
+					"description": "Delete a record.",
+					"detail": "{ id, idempotencyKey?, meta? }",
+					"source": "static"
+				},
+				{
+					"name": "ln-websocket-connector:request-query",
+					"cancelable": false,
+					"description": "One page of a query.",
+					"detail": "{ query, meta? }",
+					"source": "static"
+				},
+				{
+					"name": "ln-websocket-connector:request-sync",
+					"cancelable": false,
+					"description": "Delta sync since a token.",
+					"detail": "{ since, meta? }",
+					"source": "static"
+				},
+				{
+					"name": "ln-websocket-connector:request-update",
+					"cancelable": false,
+					"description": "Update a record.",
+					"detail": "{ id, data, expected_version?, idempotencyKey?, meta? }",
 					"source": "static"
 				}
 			]

@@ -61,7 +61,13 @@ export const DYNAMIC_ALLOWLIST = [
 			'ln-couchdb-connector:updated',
 			'ln-couchdb-connector:deleted',
 			'ln-couchdb-connector:bulk-deleted',
-			'ln-couchdb-connector:error'
+			'ln-couchdb-connector:error',
+			'ln-websocket-connector:fetched',
+			'ln-websocket-connector:created',
+			'ln-websocket-connector:updated',
+			'ln-websocket-connector:deleted',
+			'ln-websocket-connector:bulk-deleted',
+			'ln-websocket-connector:error'
 		]
 	},
 	{

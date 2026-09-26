@@ -22,3 +22,41 @@
 		}
 	}
 }
+
+.app-sidebar header {
+	.logo {
+		border-radius: var(--radius-sm, 4px);
+	}
+
+	.logo-dark {
+		display: none;
+	}
+
+	.logo-light {
+		display: inline-block;
+	}
+}
+
+:root[data-mode="dark"] .app-sidebar header,
+html[data-mode="dark"] .app-sidebar header {
+	.logo-dark {
+		display: inline-block;
+	}
+
+	.logo-light {
+		display: none;
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-mode="light"]) .app-sidebar header {
+		.logo-dark {
+			display: inline-block;
+		}
+
+		.logo-light {
+			display: none;
+		}
+	}
+}
+

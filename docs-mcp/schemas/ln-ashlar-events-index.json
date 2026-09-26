@@ -2437,6 +2437,170 @@
 			"description": "Dispatched when the field transitions to a valid state.",
 			"detail": "{ target: HTMLElement, field: String }",
 			"source": "static"
+		},
+		"ln-websocket-connector:bulk-deleted": {
+			"emitted_by": [
+				"ln-websocket-connector"
+			],
+			"listened_by": [
+				"ln-data-coordinator"
+			],
+			"cancelable": false,
+			"description": "Bulk delete confirmed.",
+			"detail": "{ response, ids, message, meta }",
+			"source": "mixed"
+		},
+		"ln-websocket-connector:connected": {
+			"emitted_by": [
+				"ln-websocket-connector"
+			],
+			"listened_by": [
+				"ln-data-coordinator"
+			],
+			"cancelable": false,
+			"description": "The socket is open.",
+			"detail": "{ url: String }",
+			"source": "static"
+		},
+		"ln-websocket-connector:connecting": {
+			"emitted_by": [
+				"ln-websocket-connector"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "A connection attempt starts.",
+			"detail": "{ url: String, attempt: Number }",
+			"source": "static"
+		},
+		"ln-websocket-connector:created": {
+			"emitted_by": [
+				"ln-websocket-connector"
+			],
+			"listened_by": [
+				"ln-data-coordinator"
+			],
+			"cancelable": false,
+			"description": "Create confirmed.",
+			"detail": "{ record, tempId, message, meta }",
+			"source": "mixed"
+		},
+		"ln-websocket-connector:deleted": {
+			"emitted_by": [
+				"ln-websocket-connector"
+			],
+			"listened_by": [
+				"ln-data-coordinator"
+			],
+			"cancelable": false,
+			"description": "Delete confirmed.",
+			"detail": "{ response, id, message, meta }",
+			"source": "mixed"
+		},
+		"ln-websocket-connector:disconnected": {
+			"emitted_by": [
+				"ln-websocket-connector"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "The socket closed, or a pending reconnect was cancelled.",
+			"detail": "{ url: String, code: Number, reason: String, willReconnect: Boolean }",
+			"source": "static"
+		},
+		"ln-websocket-connector:error": {
+			"emitted_by": [
+				"ln-websocket-connector"
+			],
+			"listened_by": [
+				"ln-data-coordinator"
+			],
+			"cancelable": false,
+			"description": "A rejected request, or one that could not be delivered (`status: 0`).",
+			"detail": "{ action, error, status, data, conflictData, meta }",
+			"source": "mixed"
+		},
+		"ln-websocket-connector:fetched": {
+			"emitted_by": [
+				"ln-websocket-connector"
+			],
+			"listened_by": [
+				"ln-data-coordinator"
+			],
+			"cancelable": false,
+			"description": "A sync reply, a query page, or a server push (`meta: null`).",
+			"detail": "{ data, since, meta }` / `{ data, total, filtered, offset, queryGen, meta }",
+			"source": "mixed"
+		},
+		"ln-websocket-connector:request-bulk-delete": {
+			"emitted_by": [],
+			"listened_by": [
+				"ln-websocket-connector"
+			],
+			"cancelable": false,
+			"description": "Delete several records.",
+			"detail": "{ ids, idempotencyKey?, meta? }",
+			"source": "static"
+		},
+		"ln-websocket-connector:request-create": {
+			"emitted_by": [],
+			"listened_by": [
+				"ln-websocket-connector"
+			],
+			"cancelable": false,
+			"description": "Create a record.",
+			"detail": "{ data, tempId?, idempotencyKey?, meta? }",
+			"source": "static"
+		},
+		"ln-websocket-connector:request-delete": {
+			"emitted_by": [],
+			"listened_by": [
+				"ln-websocket-connector"
+			],
+			"cancelable": false,
+			"description": "Delete a record.",
+			"detail": "{ id, idempotencyKey?, meta? }",
+			"source": "static"
+		},
+		"ln-websocket-connector:request-query": {
+			"emitted_by": [],
+			"listened_by": [
+				"ln-websocket-connector"
+			],
+			"cancelable": false,
+			"description": "One page of a query.",
+			"detail": "{ query, meta? }",
+			"source": "static"
+		},
+		"ln-websocket-connector:request-sync": {
+			"emitted_by": [],
+			"listened_by": [
+				"ln-websocket-connector"
+			],
+			"cancelable": false,
+			"description": "Delta sync since a token.",
+			"detail": "{ since, meta? }",
+			"source": "static"
+		},
+		"ln-websocket-connector:request-update": {
+			"emitted_by": [],
+			"listened_by": [
+				"ln-websocket-connector"
+			],
+			"cancelable": false,
+			"description": "Update a record.",
+			"detail": "{ id, data, expected_version?, idempotencyKey?, meta? }",
+			"source": "static"
+		},
+		"ln-websocket-connector:updated": {
+			"emitted_by": [
+				"ln-websocket-connector"
+			],
+			"listened_by": [
+				"ln-data-coordinator"
+			],
+			"cancelable": false,
+			"description": "Update confirmed.",
+			"detail": "{ record, id, message, meta }",
+			"source": "mixed"
 		}
 	}
 }

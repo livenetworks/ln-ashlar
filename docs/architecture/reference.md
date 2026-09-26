@@ -195,11 +195,12 @@ The co-located SCSS should be minimal or empty.
 Ashlar styles them through tokens:
 
 ```scss
-[data-ln-upload-zone] { @include upload-zone; }
-[data-ln-upload-zone][data-ln-upload-state="dragover"] { @include upload-zone-dragover; }
+[data-ln-sort] { @include sort; }
+[data-ln-sort][data-ln-sort-state="asc"] { @include sort-active; }
 ```
 
-Component state lives only in `data-ln-*` attributes, never in classes
+State that can be set from outside lives only in `data-ln-*` attributes, never
+in classes; runtime status stays private and is announced by events
 (DOCTRINE.md §3). Project CSS may override any of it freely. App state must not
 enter the `data-ln-*` namespace — it uses app-owned `data-*` attributes.
 

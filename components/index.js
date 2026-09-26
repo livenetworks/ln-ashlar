@@ -71,6 +71,7 @@ import './ln-time/src/ln-time.js';
 import './ln-data-store/src/ln-data-store.js';
 import './ln-api-connector/src/ln-api-connector.js';
 import './ln-couchdb-connector/src/ln-couchdb-connector.js';
+import './ln-websocket-connector/src/ln-websocket-connector.js';
 import './ln-data-coordinator/src/ln-data-coordinator.js';
 import './ln-api-queue/src/ln-api-queue.js';
 import './ln-chart/src/ln-chart.js';

@@ -294,5 +294,6 @@ export const VALID_ATTRIBUTES = new Set([
 	'data-ln-validate-error',
 	'data-ln-validate-errors',
 	'data-ln-value',
-	'data-ln-websocket-connector'
+	'data-ln-websocket-connector',
+	'data-ln-websocket-connector-url'
 ]);

@@ -835,7 +835,8 @@ const T = /* @__PURE__ */ new Set([
   "data-ln-validate-error",
   "data-ln-validate-errors",
   "data-ln-value",
-  "data-ln-websocket-connector"
+  "data-ln-websocket-connector",
+  "data-ln-websocket-connector-url"
 ]);
 function kt(t, e) {
   if (t === e) return 0;

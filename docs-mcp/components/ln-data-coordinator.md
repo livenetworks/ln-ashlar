@@ -159,7 +159,8 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 | `ln-api-connector:request-sync` | Emits | No | Dispatched to the connector on `ln-data-store:request-remote-sync`, to trigger the delta fetch. | `{ since: String, meta: Object }` |
 | `ln-api-queue:request-remap` | Emits | No | Re-keys a queued chain from a temp ID to the server-issued ID once a create resolves. | `{ oldKey: String, newId: ID }` |
 | `ln-api-queue:failed` | Listens | No | Terminal retry-exhaustion notification from the queue — surfaces a `network` toast via the dict. | `{ entryId: ID, chainKey: String, attempts: Number }` |
-| `ln-api-connector:fetched` / `:created` / `:updated` / `:deleted` / `:bulk-deleted` / `:error` | Listens | No | Connector response handling (also namespaced under `ln-couchdb-connector:...` — generalized across concrete connector implementations). Reconciles the store, fires toasts, and drives queue ack/nack. | *(shape per response — see [`ln-api-connector.md`](./ln-api-connector.md) Events API)* |
+| `ln-api-connector:fetched` / `:created` / `:updated` / `:deleted` / `:bulk-deleted` / `:error` | Listens | No | Connector response handling (also namespaced under `ln-couchdb-connector:...` and `ln-websocket-connector:...` — generalized across concrete connector implementations). Reconciles the store, fires toasts, and drives queue ack/nack. A socket beside a REST connector delivers its pushes here as `:fetched`. | *(shape per response — see [`ln-api-connector.md`](./ln-api-connector.md) Events API)* |
+| `ln-websocket-connector:connected` | Listens | No | Catch-up after a (re)opened socket: runs `store.forceSync()`, a delta since `lastSyncedAt` over the request connector. | `{ url: String }` |
 
 **The two-phase answer**
 
@@ -276,4 +277,5 @@ sequenceDiagram
 - [`ln-api-queue.md`](./ln-api-queue.md) — Manages the offline mutation queue.
 - [`ln-api-connector.md`](./ln-api-connector.md) — Executes standard RESTful endpoints requests.
 - [`ln-couchdb-connector.md`](./ln-couchdb-connector.md) — Alternative CouchDB-specific connection driver.
+- [`ln-websocket-connector.md`](./ln-websocket-connector.md) — Push transport; beside a REST connector it only delivers live changes, alone it takes every request.
 - [`ln-table.md`](./ln-table.md) — Consumes data queries provided by this coordinator.

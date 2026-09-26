@@ -533,6 +533,33 @@
 				}
 			}
 		},
+		"ln-websocket-connector": {
+			"element": {
+				"recommended_tag": "li",
+				"tag_enforced": false,
+				"note": "WebSocket push transport child element under ln-data-coordinator."
+			},
+			"attributes": {
+				"data-ln-websocket-connector": {
+					"type": "string",
+					"enum": [
+						"connect",
+						"disconnect"
+					],
+					"read_by": "ln-websocket-connector",
+					"consumed_by": "js",
+					"role": "state",
+					"description": "Connection command set from outside: connect opens the socket, disconnect closes it. Connection status is not an attribute; it is announced by events."
+				},
+				"data-ln-websocket-connector-url": {
+					"type": "string",
+					"read_by": "ln-websocket-connector",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "WebSocket endpoint URL (ws:// or wss://). Changing it while connected reopens on the new URL."
+				}
+			}
+		},
 		"ln-data-coordinator": {
 			"element": {
 				"recommended_tag": "ul",

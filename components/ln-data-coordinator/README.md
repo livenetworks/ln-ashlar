@@ -150,7 +150,8 @@ The coordinator is built to be highly dynamic, reacting to runtime modifications
 
 1. **Child Discovery**: The coordinator automatically locates its child components by querying its DOM subtree:
    * **Store Cache**: Looks for `[data-ln-data-store]` and accesses `el.lnDataStore`.
-   * **Transport Connector**: Looks for any connector selector (`[data-ln-api-connector]`, `[data-ln-couchdb-connector]`, `[data-ln-websocket-connector]`) and accesses the matching instance (`el.lnApiConnector` or `el.lnCouchDbConnector`). The response event namespace (`ln-api-connector:*` or `ln-couchdb-connector:*`) is derived from whichever selector matched, not hardcoded.
+   * **Transport Connector**: The request connector is `[data-ln-api-connector]` or `[data-ln-couchdb-connector]` when present, otherwise `[data-ln-websocket-connector]`; the coordinator accesses the matching instance (`el.lnApiConnector`, `el.lnCouchDbConnector` or `el.lnWebsocketConnector`). The request event namespace (`ln-api-connector:*`, `ln-couchdb-connector:*` or `ln-websocket-connector:*`) is derived from whichever selector matched, not hardcoded. Responses are heard from all three namespaces, so a socket beside a REST connector still delivers its pushes (`:fetched`) to the store.
+   * **Live Socket Catch-up**: On every `ln-websocket-connector:connected` the coordinator runs `store.forceSync()` — a delta since `lastSyncedAt` over the request connector — so changes missed while the socket was down are fetched.
    * **Offline Outbox (optional Child 3)**: Looks for `[data-ln-api-queue]` and accesses `el.lnApiQueue`. When present, write routing (below) enqueues instead of calling the connector directly. When absent, behavior is byte-for-byte the direct-connector path described in this document.
 
 2. **Mapper Resolution**: The coordinator resolves mapping functions securely using the registry:
