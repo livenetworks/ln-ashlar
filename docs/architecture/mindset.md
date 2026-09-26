@@ -63,12 +63,12 @@ ln-ashlar makes deliberate trade-offs, and its wins and costs are not the ones a
 
 **Mainstream way:** JS toggles `style=""` for show/hide, inline transforms for animation, class names encode visual variants (`.btn--danger`, `.modal--large`).
 
-**Ashlar way:** JS only toggles `.ln-*` state classes or semantic attributes. CSS translates those to visual output. Zero inline styles. `data-ln-*` hooks are behavior wiring — never CSS styling selectors.
+**Ashlar way:** JS only writes state to `data-ln-*` or native attributes (`hidden`, `aria-*`) — never a class, never `style=""`. CSS translates those attributes to visual output through tokens.
 
 **Why:** Single source of truth for appearance. Design token changes propagate automatically. Inspector shows clean semantic markup. Changing a color means editing one token, not hunting JS files.
 
 **Concrete example:**
-`.ln-filter-active` on the filter button → `@mixin table-filter-active` in `theme/config/mixins/_table.scss` renders the accent dot and color change. JS does `btn.classList.toggle('ln-filter-active', ...)`. SCSS owns what that looks like. The `[data-ln-table-col-filter]` attribute is a JS id hook for finding the button — it is never a CSS selector.
+`ln-upload` writes `data-ln-upload-state="dragover"` on the drop zone. `theme/components/_upload.scss` styles `[data-ln-upload-zone][data-ln-upload-state="dragover"]` via `@mixin upload-zone-dragover` in `theme/config/mixins/_upload.scss`. JS decides the state; SCSS owns what that looks like.
 
 ---
 

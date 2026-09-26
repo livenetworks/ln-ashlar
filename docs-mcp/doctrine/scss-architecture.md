@@ -89,7 +89,7 @@ Each functional JavaScript component folder (e.g., `components/ln-toggle/`, see 
 - **Global Mixins/Components (Visual chrome):** All visual design details (padding, font sizes, borders, colors, shadow values) must live under the main SCSS directories (`theme/config/mixins/` or `theme/components/`), compiled into `ln-ashlar-theme.css`.
 
 ### Helper-Class Convention
-Unprefixed helper classes are thin mixin bindings (`.pills { @include pills; }`) — visual, static presentation. The `ln-` prefix is reserved for JS-state classes exclusively; never mix the two roles on the same class.
+Unprefixed helper classes are thin mixin bindings (`.pills { @include pills; }`) — visual, static presentation. Component state is never a class — it lives in `data-ln-*` attributes (DOCTRINE.md §3).
 
 ---
 

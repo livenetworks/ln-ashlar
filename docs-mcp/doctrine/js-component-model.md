@@ -51,7 +51,7 @@ This document describes the JavaScript component architecture of `ln-ashlar`. It
 - **Window-Level Scope Boundary:** A window-level coordinator (like `ln-ui-coordinator`) is strictly reserved for shared, window-wide UI services (hash routing for modals `#modal-id`, toast dispatching, global AJAX success/error toast mediation, upload notifications). It **must never** couple with, inspect, or manage the internal validation/submission state of local forms or multi-instance components. Anything that can be multi-instantiated belongs to its own local wrapper/form lifecycle.
 
 ### Overlay Exception
-Overlay components (modal, dropdown, popover, tooltip) get exactly three document-level touchpoints, paired to the open/close lifecycle: dismissal listeners (Escape/outside-click), focus management, and one `.ln-*` body state class. Listeners attach on open, detach on close — they remain sensors that funnel into the component's own attribute state machine, never actuators on foreign DOM. Prefer native top-layer primitives (`<dialog>.showModal()`, Popover API) over hand-rolled stacking.
+Overlay components (modal, dropdown, popover, tooltip) get exactly three document-level touchpoints, paired to the open/close lifecycle: dismissal listeners (Escape/outside-click), focus management, and one `data-ln-*` state attribute on `<body>`. Listeners attach on open, detach on close — they remain sensors that funnel into the component's own attribute state machine, never actuators on foreign DOM. Prefer native top-layer primitives (`<dialog>.showModal()`, Popover API) over hand-rolled stacking.
 
 ---
 
