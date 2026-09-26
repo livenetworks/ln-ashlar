@@ -64,6 +64,12 @@
   2. **Application Data Layer (`ln-data-store` + IndexedDB):** Row caches, record sets, sync queues, and conflict metadata live in Layer 3 storage, never serialized as DOM attribute strings.
   3. **Operational Mechanics (JS Memory):** In-flight promises, `AbortController` handles, `MutationObserver` instances, query generations (`queryGen`), and render batching queues (`createBatcher`) are runtime implementation mechanics managed in JS memory.
 * **Instant DOM Attribute Writes:** Prototype methods and input controls **MUST** write state directly to target DOM attributes via `setAttribute` (e.g. `this.dom.setAttribute('data-ln-toggle', 'open')`, `target.setAttribute('data-ln-search', input.value)`).
+* **State Lives in Attributes, Never in Classes:** A component writes its state to `data-ln-*` attributes only — never to a CSS class. Classes belong to the replaceable visual layer (theme, Tailwind); a class set admits impossible combinations (`loading` and `empty` at once); and the core observer reacts to attribute names, not classes. Two forms, as in the platform:
+  - mutually exclusive values → valued attribute: `data-ln-{name}-state="loading"`
+  - independent boolean → bare attribute: `data-ln-{name}-{flag}`
+
+  Page-level state on `<body>` (scroll lock and similar) follows the same rule. Hiding uses the native `hidden` attribute, never a class.
+  - *Transient-class exception:* a class is allowed only when the same code adds and removes it within one animation cycle (`requestAnimationFrame`, or right before the node is removed) **and** nothing reads it back (`classList.contains`). The one library case is `ln-toast`'s `.ln-enter` / `.ln-out`. Anything that lasts as long as an operation (loading, dragging, selection) is state, not a transition.
 * **Attribute-Reaction Debouncing:** When a component's own reaction to an attribute change performs debounced work (fetches, heavy renders), the debounce lives inside that reaction — declared via `effects` / `onAttrChange` in `registerComponent`, or inside an `observeAttributes` handler for a component that owns its own lifecycle — never in the writer's input event handler. See §8 for the one library-shipped case of input-layer debounce ownership (`ln-api-connector`'s query debounce). Programmatic resets or `0ms` debounces execute instantly, with no artificial delay.
 * **Typed Attribute Contracts & Closed Taxonomy:** Every component MUST explicitly declare its attribute contract via an `ATTRIBUTES` map passed to `registerComponent` and `attrSpec()`. Each entry defines:
   - `type`: Strict type from the closed taxonomy (`'enum'`, `'integer'`, `'float'`, `'boolean'`, `'string'`, `'list'`, `'json'`, `'trigger'`, `'marker'`).
@@ -124,6 +130,8 @@
     2. Active timers/intervals MUST be cleared (`clearTimeout` / `clearInterval`).
     3. Outstanding pending receipts/promises MUST be rejected or safely discarded.
   - **Generation Tracking (`queryGen`):** Data-consuming components (`ln-table`, `ln-list`, `ln-data-store`, `createWindowIndex`) MUST track request generation counters (`queryGen` / `requestId`) to silently drop stale asynchronous responses that arrive after a subsequent reset or query transition.
+* **`destroy()` Removes Every Trace:** Teardown removes everything the component made. The test: *would this exist if the component had never run?* If not, it goes — ARIA it set (`aria-busy`, `aria-expanded`), attributes and classes it added, DOM nodes it created, listeners, timers, observers, in-flight requests. This includes traces on **foreign** elements: `aria-expanded` left on external `[data-ln-toggle-for]` triggers after the panel is destroyed is an accessibility bug.
+  - *Authored attribute edge:* an attribute the author wrote (e.g. `data-ln-toggle`) stays, with its current value. The component stops managing it; it neither deletes it nor restores the authored value.
 
 ---
 
@@ -146,6 +154,7 @@
 ## 🎨 8. Visual Layer vs. Functional Layer Separation & Search Rules
 
 * **Separation of Concerns:** Clearly separate visual styling (HTML chrome/wrappers and CSS classes, e.g. `.pills`, `.collapsible`) from functional JS triggers (`data-ln-*` attributes). Visual markup classes are recommended globally as design standards even if JS logic is absent.
+* **Styling `data-ln-*` Attributes:** `data-ln-*` attributes — hooks and state alike — are ordinary styling targets. Ashlar styles them through tokens (e.g. `[data-ln-upload-zone][data-ln-upload-state="dragover"]` in `theme/components/_upload.scss`). Project CSS may override any of it freely.
 * **Search Debounce:** Debounce is owned by `ln-api-connector` via `data-ln-api-connector-query-debounce` — see `components/ln-api-connector/README.md` for the full contract.
 
 ---

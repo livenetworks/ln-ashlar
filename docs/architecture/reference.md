@@ -189,18 +189,19 @@ ALWAYS belongs in the two-layer architecture:
 If a JS component needs visual styling, extract it into a mixin + component.
 The co-located SCSS should be minimal or empty.
 
-### CSS/JS Hook Boundary
+### Styling `data-ln-*` Attributes
 
-Three tiers:
+`data-ln-*` attributes — hooks and state alike — are ordinary styling targets.
+Ashlar styles them through tokens:
 
-1. **Decorating via a hook's bare presence is forbidden.**
-   `[data-ln-modal] { padding: ... }` — the attribute is a JS init target, not a CSS selector.
+```scss
+[data-ln-upload-zone] { @include upload-zone; }
+[data-ln-upload-zone][data-ln-upload-state="dragover"] { @include upload-zone-dragover; }
+```
 
-2. **A component styling its OWN state expressed as `data-ln-icon-x="value"` in its OWN co-located `components/ln-icon-x/ln-icon-x.scss` is sanctioned** — the dominant library pattern. The component owns both sides of the contract. Examples: `[data-ln-modal="open"] { display: flex }`, `[data-ln-popover="open"] { display: block }`, `[data-ln-filter-hide="true"] { display: none }`. These are attribute-value selectors (state encoded in the value), not presence selectors.
-
-3. **Consumer/app/cross-component CSS reaching through a foreign `data-ln-*` hook is forbidden.** Use a `.ln-*` state class (JS toggles, SCSS styles) or a plain app-owned `data-*`. App state must not enter the `data-ln-*` namespace.
-
-Practical test: *who owns this state, and where does the rule live?* Component's own state → `data-ln-icon-x="value"` styled in co-located SCSS. App/coordinator state → app-owned `data-*` or `.ln-*` class, styled in app SCSS.
+Component state lives only in `data-ln-*` attributes, never in classes
+(DOCTRINE.md §3). Project CSS may override any of it freely. App state must not
+enter the `data-ln-*` namespace — it uses app-owned `data-*` attributes.
 
 ---
 
@@ -788,7 +789,7 @@ See [components/ln-core/README.md](../../components/ln-core/README.md) for the r
 ```html
 <!-- th: data-ln-table-filter-col maps the filter key to this column         -->
 <!-- button: data-ln-popover-for opens the popover                           -->
-<!--         data-ln-table-col-filter is a JS id hook — never a CSS selector -->
+<!--         data-ln-table-col-filter is the JS hook                         -->
 <!-- .ln-filter-active on button = filter is active (JS-toggled; SCSS dot)   -->
 <th data-ln-table-filter-col="department">
 	Department
