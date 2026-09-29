@@ -331,4 +331,78 @@ test('registerComponent lifecycle: single shared observer, destroy cleanup with 
 	}
 });
 
+test('findElements isolates component instantiation failures without breaking subsequent elements', () => {
+	const savedWindow = globalThis.window;
+	const savedConsoleError = console.error;
+	let loggedErrors = [];
+
+	try {
+		globalThis.window = { lnCore: {} };
+		console.error = (...args) => {
+			loggedErrors.push(args);
+		};
+
+		const elFailing = { nodeType: 1, hasAttribute: () => false };
+		const elWorking = { nodeType: 1, hasAttribute: () => false };
+		const mockRoot = {
+			nodeType: 1,
+			matches: () => false,
+			querySelectorAll: () => [elFailing, elWorking]
+		};
+
+		let callCount = 0;
+		class MixedComponent {
+			constructor(el) {
+				callCount++;
+				if (el === elFailing) {
+					throw new Error('First item failure');
+				}
+				this.ok = true;
+			}
+		}
+
+		findElements(mockRoot, 'test-sel', 'testMixed', MixedComponent);
+
+		assert.equal(callCount, 2);
+		assert.equal(elFailing.testMixed, undefined);
+		assert.equal(elWorking.testMixed.ok, true);
+		assert.equal(loggedErrors.length, 1);
+		assert.match(loggedErrors[0][0], /\[testMixed\] init failed/);
+		assert.equal(loggedErrors[0][1], elFailing);
+	} finally {
+		globalThis.window = savedWindow;
+		console.error = savedConsoleError;
+	}
+});
+
+test('helpers.js barrel file exports all 44 symbols and initializes module side effects', async () => {
+	const helpers = await import('../components/ln-core/helpers.js');
+
+	const expectedSymbols = [
+		'dispatch', 'dispatchCancelable', 'requestData', 'setDebugSink', 'setPersistSink', 'hasActiveDebug', 'isDevMode',
+		'guardBody', 'isVisible', 'shouldIgnoreClick', 'isEditableTarget', 'isTargetDisabled', 'isUsableTarget', 'shouldInterceptLink', 'readValue',
+		'resolveFormMethod', 'serializeForm', 'populateForm', 'interceptValueProperty',
+		'buildUrl', 'getHeaders', 'parseHeaders', 'registerDataMapper', 'getDataMapper',
+		'getLocale', 'ensureLocaleObserver', 'registerLocaleFallback', 'getLocaleFallback',
+		'cloneTemplate', 'cloneTemplateScoped', 'fill', 'lnFill', 'fillTemplate', 'renderList', 'buildDict',
+		'findElements', 'holdInit', 'releaseInit', 'pendingCount', 'queueBoot', 'observeAttributes', 'registerComponent',
+		'compareValues', 'detectValueType'
+	];
+
+	assert.equal(expectedSymbols.length, 44);
+	for (const sym of expectedSymbols) {
+		assert.equal(typeof helpers[sym] !== 'undefined', true, `Symbol ${sym} must be exported by helpers.js`);
+	}
+
+	// Assert locale fallback registry functions work cleanly without hardcoded defaults
+	assert.equal(helpers.getLocaleFallback('xx'), null);
+	helpers.registerLocaleFallback('xx', { test: true });
+	assert.deepEqual(helpers.getLocaleFallback('xx'), { test: true });
+	if (typeof globalThis.window !== 'undefined' && globalThis.window.lnCore) {
+		assert.equal(typeof globalThis.window.lnCore.fill, 'function');
+	}
+});
+
+
+
 

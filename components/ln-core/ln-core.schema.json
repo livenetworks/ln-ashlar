@@ -6,37 +6,37 @@
 		"data-ln-attr": {
 			"direction": "author",
 			"sources": [
-				"helpers.js"
+				"template.js"
 			]
 		},
 		"data-ln-class": {
 			"direction": "author",
 			"sources": [
-				"helpers.js"
+				"template.js"
 			]
 		},
 		"data-ln-debug": {
 			"direction": "author",
 			"sources": [
-				"helpers.js"
+				"events.js"
 			]
 		},
 		"data-ln-field": {
 			"direction": "author",
 			"sources": [
-				"helpers.js"
+				"template.js"
 			]
 		},
 		"data-ln-fill-as": {
 			"direction": "author",
 			"sources": [
-				"helpers.js"
+				"form.js"
 			]
 		},
 		"data-ln-fillable": {
 			"direction": "author",
 			"sources": [
-				"helpers.js"
+				"template.js"
 			]
 		},
 		"data-ln-filter": {
@@ -48,7 +48,7 @@
 		"data-ln-form": {
 			"direction": "author",
 			"sources": [
-				"helpers.js"
+				"template.js"
 			]
 		},
 		"data-ln-hash": {
@@ -60,13 +60,13 @@
 		"data-ln-persist": {
 			"direction": "author",
 			"sources": [
-				"helpers.js"
+				"lifecycle.js"
 			]
 		},
 		"data-ln-render-key": {
 			"direction": "both",
 			"sources": [
-				"helpers.js"
+				"template.js"
 			]
 		},
 		"data-ln-search": {
@@ -84,7 +84,7 @@
 		"data-ln-show": {
 			"direction": "author",
 			"sources": [
-				"helpers.js"
+				"template.js"
 			]
 		},
 		"data-ln-sort": {
@@ -96,13 +96,13 @@
 		"data-ln-template": {
 			"direction": "author",
 			"sources": [
-				"helpers.js"
+				"template.js"
 			]
 		},
 		"data-ln-value": {
 			"direction": "author",
 			"sources": [
-				"helpers.js"
+				"dom.js"
 			]
 		}
 	}

@@ -76,7 +76,7 @@ import { calculateRelativeTime, resolveDateFormatOptions } from './time-model.js
 			const year = date.getFullYear();
 			const hours = String(date.getHours()).padStart(2, '0');
 			const mins = String(date.getMinutes()).padStart(2, '0');
-			return `${day} ${month} ${year} во ${hours}:${mins}`;
+			return `${day} ${month} ${year}, ${hours}:${mins}`;
 		}
 		return formatter.format(date);
 	}
