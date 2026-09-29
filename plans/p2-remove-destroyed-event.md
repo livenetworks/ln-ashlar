@@ -7,7 +7,7 @@ component that emits it and is not added to any component that lacks it.
 `addEventListener('ln-*:destroyed'`). The contract is inverted: the event reaches listeners only on
 paths where the listener already knows teardown is happening (router subtree swap, attribute removal,
 manual `destroy()`). It stays silent on the one path a destroyed-event exists for: `helpers.js`
-`removedNodes` (`components/ln-core/helpers.js:974`) fires `destroy()` only when the node is already
+`removedNodes` (`components/ln-core/lifecycle.js`) fires `destroy()` only when the node is already
 detached (`!document.contains(item)`), so a bubbling event never
 reaches a document listener. It also sits on the edge of `DOCTRINE.md:120` ("A destroyed component
 MUST NOT … dispatch … CustomEvents").

@@ -190,7 +190,7 @@ No markup or API change — this is an internal implementation improvement.
 
 ## 🔧 Internals
 
-Source: `components/ln-tabs/ln-tabs.js`. Zero cross-component imports — only `ln-core/helpers.js` (`registerComponent`, `dispatch`) and `ln-core/persist.js`.
+Source: `components/ln-tabs/ln-tabs.js`. Zero cross-component imports — only `ln-core` (`registerComponent`, `dispatch`).
 
 ### State
 

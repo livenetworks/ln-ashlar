@@ -103,7 +103,7 @@ Structurally closest existing precedent: `components/ln-debug/src/gate.js`
 
 ### The sink
 
-`ln-core/helpers.js` exposes a nullable `setPersistSink(sink)`, mirroring
+`ln-core` exposes a nullable `setPersistSink(sink)`, mirroring
 `setDebugSink` exactly. `findElements` — the single funnel every component
 instance in the library is constructed through (boot sweep, each
 component's own `childList` observer, and the shared observer's legacy
@@ -118,7 +118,7 @@ with `setAttribute`, synchronously, before the owner's constructor runs.
 ### Ordering — no boot gate
 
 `_registerAttrEntry(...)` always runs before that same component's own
-`boot()` — see `helpers.js`'s `registerComponent`. So by the time any
+`boot()` — see `ln-core`'s `registerComponent`. So by the time any
 owner's `findElements` call reaches the sink, that owner's own `persist:`
 declaration is already in `registry.persist`, regardless of what order the
 other four owners import in. `ln-persist` only needs to precede the *first*

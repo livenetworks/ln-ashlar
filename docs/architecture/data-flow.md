@@ -463,7 +463,7 @@ never *"text or element?"* — it is:
 
 ### 5.1 `{{ field }}` — one-shot text stamp at clone time
 
-Processed by `fillTemplate(clone, data)` (`ln-core/helpers.js`). Walks text
+Processed by `fillTemplate(clone, data)` (`ln-core/template.js`). Walks text
 nodes, replaces `{{ field }}` with `record[field]`, and **consumes the
 placeholder** — the element can never re-update from data afterwards. Runs at
 clone time inside renderer pipelines (`ln-table` rows, `renderList`'s clone
@@ -551,7 +551,7 @@ window.lnCore.lnFill(container, record)
 // record = null → fillables reset/clear themselves.
 ```
 
-Source: `components/ln-core/helpers.js` L159–172.
+Source: `components/ln-core/template.js` (`lnFill`).
 
 #### Event
 
@@ -570,7 +570,7 @@ self-handle; nothing else needs to listen.
 `lnFill(formEl, record)` also dispatches `ln-fill` at `formEl` itself when it
 matches `[data-ln-form]` or `[data-ln-fillable]`. This means passing the form
 element directly (as `ln-fill` declarative trigger does) works correctly — the
-form's own `ln-fill` handler fires. Source: `components/ln-core/helpers.js` L164–165.
+form's own `ln-fill` handler fires. Source: `components/ln-core/template.js` (`lnFill`).
 
 #### Guard rule (important for future fillable authors)
 

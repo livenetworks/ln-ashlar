@@ -151,7 +151,7 @@ sequenceDiagram
   - [`debug-verifier.js` (Verification Engine)](../../components/ln-debug/src/debug-verifier.js)
   - [`generated-attributes.js` (Attribute Manifest)](../../components/ln-debug/src/generated-attributes.js)
 - **Coordinators & Core:**
-  - [`ln-core/helpers.js` (queueBoot, pendingCount)](../../components/ln-core/helpers.js)
+  - [`ln-core/lifecycle.js` (queueBoot, pendingCount)](../../components/ln-core/lifecycle.js)
   - [`ln-ui-coordinator.js`](../../components/ln-ui-coordinator/src/ln-ui-coordinator.js)
 - **Modular Component Dev Styles:**
   - [ln-table-dev.scss](../../components/ln-table/ln-table-dev.scss)

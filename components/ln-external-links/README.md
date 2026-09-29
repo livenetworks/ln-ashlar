@@ -349,7 +349,7 @@ The single test: truthy `link.hostname` AND `link.hostname !== window.location.h
 
 ### Script-load lifecycle
 
-Both the click delegate and the observer are wrapped in `guardBody` (`ln-core/helpers.js`): if `document.body` is `null` at script eval (e.g. loaded in `<head>` without `defer`), setup re-schedules itself for `DOMContentLoaded`. The initial `_processLinks()` scan follows the same `readyState === 'loading'` check. A `window.lnExternalLinks` sentinel guards against double-execution if the script loads twice.
+Both the click delegate and the observer are wrapped in `guardBody` (`ln-core`): if `document.body` is `null` at script eval (e.g. loaded in `<head>` without `defer`), setup re-schedules itself for `DOMContentLoaded`. The initial `_processLinks()` scan follows the same `readyState === 'loading'` check. A `window.lnExternalLinks` sentinel guards against double-execution if the script loads twice.
 
 ### Processing pipeline
 
@@ -379,4 +379,4 @@ The sr-only hint has no i18n hook — the string is hard-coded English. Projects
 
 ### Cross-component coordination
 
-Imports only `dispatch` and `guardBody` from `ln-core/helpers.js`. Does not listen for any `ln-*` event and is not signaled by `ln-ajax`/data-loading components when they inject markup — decoration is purely insertion-driven via the shared observer.
+Imports only `dispatch` and `guardBody` from `ln-core`. Does not listen for any `ln-*` event and is not signaled by `ln-ajax`/data-loading components when they inject markup — decoration is purely insertion-driven via the shared observer.

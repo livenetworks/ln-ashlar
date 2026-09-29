@@ -142,7 +142,7 @@ Combine the alert card with `data-ln-persist` so that once the user closes the a
 
 ## 🔧 Internals
 
-Source: `components/ln-toggle/ln-toggle.js`. Imports `registerComponent`, `dispatch`, `dispatchCancelable` from `ln-core/helpers.js` — no other library component. Persistence is declared, not imported: `registerComponent(...)` is passed `persist: { attr: DOM_SELECTOR, hashActive: null }`, and `ln-persist` (a separate component) does the restoring/saving from outside.
+Source: `components/ln-toggle/ln-toggle.js`. Imports `registerComponent`, `dispatch`, `dispatchCancelable` from `ln-core` — no other library component. Persistence is declared, not imported: `registerComponent(...)` is passed `persist: { attr: DOM_SELECTOR, hashActive: null }`, and `ln-persist` (a separate component) does the restoring/saving from outside.
 
 ### Instance state
 

@@ -18,7 +18,7 @@ tags: [helpers, dom, forms, templates, serialization, registration, service]
 
 `ln-helpers` implements the core DOM utility functions, component registration pipeline, form processing tools, and template engines used across all `ln-ashlar` components and project coordinators.
 
-The JavaScript source is located at [helpers.js](../../components/ln-core/helpers.js).
+The JavaScript source is located at [helpers.js](../../components/ln-core/helpers.js) (named barrel re-exporting modular domain sub-files: `events.js`, `dom.js`, `form.js`, `http.js`, `locale.js`, `template.js`, `lifecycle.js`).
 
 Key responsibilities include:
 - **Component Lifecycle Registration (`registerComponent`):** Registers component classes with MutationObserver-based lifecycle management — a per-registration `childList` observer for auto-instantiation and teardown, plus a single shared attribute observer (installed once on `document.body`, no per-name filter, exported standalone as `observeAttributes` for components with their own lifecycle) that dispatches attribute mutations to each component's declared reaction (`effects` / `onAttrChange`, or the earlier `onAttributeChange` / `extraAttributes`, both still supported).
@@ -26,7 +26,7 @@ Key responsibilities include:
 - **Form Data Pipeline (`serializeForm`, `populateForm`, `resolveFormMethod`, `interceptValueProperty`, `readValue`):** Extracts typed JavaScript objects from HTML forms, populates forms back from records, intercepts input value getters/setters, and reads raw machine values.
 - **Template Operations (`cloneTemplate`, `cloneTemplateScoped`, `fillTemplate`, `renderList`):** Clones `<template>` elements and interpolates text nodes and attribute placeholders (`{{ prop }}`).
 - **Network, Headers & URL Helpers (`shouldInterceptLink`, `buildUrl`, `getHeaders`, `parseHeaders`):** Provides URL path joining, link interception for SPA routers, header compilation, and header parsing.
-- **Data Mapper & Locale Fallback Registries (`registerDataMapper`, `getDataMapper`, `registerLocaleFallback`, `getLocaleFallback`):** Manages data translation mappers and Macedonian/regional date-month dictionaries.
+- **Data Mapper & Locale Fallback Registries (`registerDataMapper`, `getDataMapper`, `registerLocaleFallback`, `getLocaleFallback`):** Manages data translation mappers and dynamic locale date-month fallback registries.
 
 > [!IMPORTANT]
 > **What the module does NOT do (Orthogonality Doctrine):**

@@ -99,7 +99,7 @@ When `lnCore.lnFill` populates a `[data-ln-fillable]` container — or a compone
 | `data-ln-show` | Display node | `el.classList.toggle('hidden', !data[prop])` | Shows the node when the bound property is truthy. |
 | `data-ln-class` | Display node | `el.classList.toggle(cls, !!data[prop])` | Comma-separated `cls:prop` pairs, e.g. `active:isSelected`. |
 
-All four skip `null`/`undefined` values, preserving existing content. Source: `components/ln-core/helpers.js` (`fill`).
+All four skip `null`/`undefined` values, preserving existing content. Source: `components/ln-core/template.js` (`fill`).
 
 ### Programmatic JS API
 

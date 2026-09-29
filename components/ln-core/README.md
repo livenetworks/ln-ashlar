@@ -27,9 +27,18 @@ ln-core exposes helpers in these categories:
 
 Source of truth: modular sub-files in `components/ln-core/`. Import from `'../../ln-core'` (barrel).
 
----
+## Core Helpers & Submodules (`helpers.js`)
 
-## helpers.js
+`helpers.js` serves as the centralized, backward-compatible named barrel re-exporting the specialized domain submodules:
+- `template.js` — template cloning, declarative DOM binding (`fill`, `lnFill`, `fillTemplate`, `renderList`, `buildDict`).
+- `events.js` — CustomEvent dispatchers (`dispatch`, `dispatchCancelable`, `requestData`), debug sinks and dev mode checks.
+- `dom.js` — DOM guard and interactive target predicates (`guardBody`, `isVisible`, `shouldIgnoreClick`, `isUsableTarget`, etc.).
+- `form.js` — form method resolution, serialization, population, and `interceptValueProperty`.
+- `http.js` — URL assembly, HTTP headers compilation/parsing, and data mapper registry.
+- `locale.js` — locale detection (`getLocale`), observer, and locale fallback registry.
+- `lifecycle.js` — component registration (`registerComponent`), element scanning (`findElements`), and shared MutationObservers.
+
+---
 
 ### cloneTemplate(name, componentTag)
 
@@ -118,7 +127,7 @@ window.lnCore.lnFill(modalEl, record);   // record → fill; null → reset/clea
 
 - Also dispatches `ln-fill` at `container` itself when it matches
   `[data-ln-form]` or `[data-ln-fillable]` — so `lnFill(formEl, record)` works
-  when called directly on a form element. Source: `components/ln-core/helpers.js` L164–165.
+  when called directly on a form element. Source: `components/ln-core/template.js` (`lnFill`).
 - `container` — any element; scans its entire subtree.
 - `record` — plain object or `null`.
 - Dispatches `ln-fill` (`bubbles: true`, `detail = record ?? null`) at each target.
@@ -147,7 +156,7 @@ fillTemplate(frag, { text: 'Engineering' });
   root element itself when it is an `Element`, since `querySelectorAll` does not include
   root). For each attribute whose value contains `{{`, replaces tokens via
   `el.setAttribute(attr.name, resolved)`. Uses `setAttribute` — never `innerHTML` —
-  so injection risk is the same as `data-ln-attr`. Source: `components/ln-core/helpers.js` L197–233.
+  so injection risk is the same as `data-ln-attr`. Source: `components/ln-core/template.js` (`fillTemplate`).
 - Missing keys produce empty string in both passes
 - No-op in either pass when no `{{` is present
 - Returns `clone` for chaining
@@ -299,12 +308,12 @@ populated.forEach(function (el) { dispatch(el, 'input'); });
 - **Decoupled fill key (`data-ln-fill-as`)** — match key for the fill direction is
   `el.getAttribute('data-ln-fill-as') || el.name`. When `data-ln-fill-as` is set,
   the record key is the fill-as value and `name` stays as the form submission key.
-  Source: `populateForm` in `components/ln-core/helpers.js`.
+  Source: `populateForm` in `components/ln-core/form.js`.
 - **Checkbox string coercion** — a single checkbox (one element with that `name` in
   the form) whose fill value is a string is coerced via `_coerceBool`: `"false"`,
   `"0"`, `""`, `"off"`, `"no"` (case-insensitive, trimmed) → unchecked; anything
   else → checked. This handles `data-ln-fill-*` values which always arrive as
-  strings. Source: `_coerceBool` + `populateForm` in `components/ln-core/helpers.js`.
+  strings. Source: `_coerceBool` + `populateForm` in `components/ln-core/form.js`.
 - Checkbox + array → `checked` if `el.value` is in the array.
 - Checkbox group (same `name`, 2+ elements) + scalar → treated as comma-separated list (`"admin,editor"` → membership check).
 - Single checkbox + scalar → boolean coercion: `"false"/"0"/"off"/"no"/""` → unchecked; anything else → checked.
@@ -416,7 +425,7 @@ observeAttributes(['href'], function (el, name, oldValue) {
 - Two standing exceptions keep their own private observer instead of using
   this: `ln-progress` (observes an attribute on its **parent**, outside the
   host-only boundary the shared observer covers) and `ln-icon` (the only
-  component in the library that imports nothing — pulling in `helpers.js`'s
+  component in the library that imports nothing — pulling in `ln-core`'s
   module-level side effects would roughly quadruple its standalone bundle
   size). Neither is an oversight; do not migrate them.
 
@@ -946,7 +955,7 @@ Formats a numeric value using `Intl.NumberFormat` with cached formatters. Suppor
 
 ---
 
-## Target & Event Predicates (helpers.js)
+## Target & Event Predicates (`dom.js`)
 
 ### shouldIgnoreClick(event)
 
