@@ -1,0 +1,144 @@
+# ln-ashlar
+
+> LiveNetworks unified frontend library — DOM-First, zero-build-required vanilla JS components and SCSS design system. Eliminates virtual DOM and synthetic state trees by using semantic HTML5, MutationObserver-driven state reactivity in data-ln-* attributes, and local-first architecture.
+
+ln-ashlar provides a robust, production-proven foundation for web applications. It supports both Progressive Enhancement (Server-Rendered HTML in Laravel, Go, Rails, Django) and Client-Side Single Page Applications (SPAs consuming REST/JSON APIs).
+
+### Core Architectural Invariants:
+- **Rule Zero**: Read the source before you write. Never invent component names, attributes, mixins, or tokens. Query the live documentation first.
+- **Three-Layer Architecture**: Layer 1 (Autonomous Components managing own DOM), Layer 2 (Coordinators orchestrating cross-component state and UI triggers), Layer 3 (ln-core primitives, storage, and helpers).
+- **Command & Query Separation (CQS)**: Coordinators NEVER call prototype mutation methods directly. They ALWAYS dispatch request events (`ln-{name}:request-{action}`) or write `setAttribute()`. State properties are read directly.
+- **DOM as Public Control Plane**: State lives strictly in observable `data-ln-*` attributes. Private runtime status is communicated through CustomEvents. Zero state mirrors in JS memory.
+- **Zero Virtual DOM & Zero Initialization**: The platform handles lifecycles. Components self-mount via a single shared `MutationObserver` on `document.body`. Never instantiate via `new LnComponent()`.
+- **HTML-First Templates & Zero JS Display Text**: Template DOM lives in `<template data-ln-template="...">` in HTML. Display text belongs in HTML `<ul hidden><li data-{component}-dict="key">...</li></ul>` or browser `Intl`. Zero hardcoded UI strings in JS.
+- **Semantic HTML5 & Accessibility**: Lists/groups MUST use `<ul>/<li>`. Semantic elements (`<dialog>`, `<nav>`, `<form>`, `<section>`, `<article>`, `<time>`) are mandatory.
+- **Confirmation Gating**: Two-click in-place `ln-confirm` is strictly for single-element, low-impact actions. Multi-item, bulk, or destructive actions MUST use an `ln-modal`.
+- **Anti-Harvesting Protection**: Contact emails (`mailto:`) and phones (`tel:`) in HTML shells MUST be protected via `ln-obfuscator` (`data-ln-obfuscator`).
+- **Async Invariants & Destroyed Protocol**: Async components maintain an `AbortController`. Teardown via `destroy()` aborts in-flight network requests, clears timers, drops stale responses (`queryGen`), and cleans all DOM traces.
+
+## Complete Reference
+
+- [llms-full.txt](llms-full.txt): Complete, consolidated single-file reference for AI agents containing the full doctrine, component catalog, canonical markup snippets, API contracts, and SCSS guide.
+
+## Core Architecture & Doctrines
+
+- [DOCTRINE.md](DOCTRINE.md): Mandatory engineering doctrines, 3-layer architecture, CQS, observable attribute state, and lifecycle rules.
+- [PRESENTATION-DOCTRINE.md](PRESENTATION-DOCTRINE.md): Guidelines for public presentation and marketing websites (fluid typography, bento grids, semantic rules).
+- [Component Router](docs-mcp/component-router.md): Authoritative component selection matrix ("Use for / Don't use for").
+- [Mindset & Philosophy](docs-mcp/doctrine/mindset.md): Architectural mindset behind Ashlar's DOM-First, local-first, zero-virtual-DOM design.
+- [HTML Markup Rules](docs-mcp/doctrine/html-markup-rules.md): Semantic HTML5 rules, list groupings, template cloning, and anti-harvesting specs.
+- [Data Flow Architecture](docs-mcp/doctrine/data-flow.md): Event propagation, request-event dispatching, cancellation protocol, and detail guards.
+- [Data Layer Doctrine](docs-mcp/doctrine/data-layer.md): IndexedDB local stores, offline sync queues, and HTTP connector contracts.
+- [JS Component Model](docs-mcp/doctrine/js-component-model.md): Two-tier component archetype, Proxy traps, and destroyed component invariant.
+- [SCSS Architecture Doctrine](docs-mcp/doctrine/scss-architecture.md): Two-layer SCSS system, token flow (Brand -> Scale -> Vocabulary -> Primitives), and mixins.
+- [Accessibility (ARIA)](docs-mcp/doctrine/accessibility.md): Accessibility standards, native dialog focus trapping, and screen-reader contracts.
+
+## Overlays & Dialogs
+
+- [ln-modal](docs-mcp/components/ln-modal.md): A native dialog modal component that manages overlay panels, native focus trapping, scroll locking, and cancel event synchronization.
+- [ln-popover](docs-mcp/components/ln-popover.md): A lightweight popover overlay component that leverages the native Popover API for top-layer promotion and placement positioning.
+- [ln-tooltip](docs-mcp/components/ln-tooltip.md): A progressive enhancement tooltip component that utilizes CSS for local elements and JavaScript with popover="manual" portals for clipping-free top-layer tooltips.
+- [ln-confirm](docs-mcp/components/ln-confirm.md): A two-click interaction gate primitive for protecting destructive actions in-place.
+
+## Data Display & Tables
+
+- [ln-table](docs-mcp/components/ln-table.md): A high-performance table component supporting server-side rendering (SSR), data-driven templates, virtual scrolling, sorting, and row selection.
+- [ln-list](docs-mcp/components/ln-list.md): A high-performance presenter component for rendering lists, cards, or grids with virtual scrolling, client-side sorting, filtering, searching, and selection.
+- [ln-chart](docs-mcp/components/ln-chart.md): Zero-dependency SVG line/area renderer bound to ln-data-coordinator datasets.
+- [ln-progress](docs-mcp/components/ln-progress.md): A passive linear progress bar component that reactively updates width percentage and native ARIA progressbar state via MutationObserver.
+- [ln-circular-progress](docs-mcp/components/ln-circular-progress.md): A visual component that displays progress or statistical percentages as a dynamic SVG circle.
+- [ln-stat](docs-mcp/components/ln-stat.md): A metric display element that resolves record counts from data coordinators using custom events.
+
+## Forms, Inputs & Validation
+
+- [ln-form](docs-mcp/components/ln-form.md): Automates form data population and handles RESTful method spoofing.
+- [ln-validate](docs-mcp/components/ln-validate.md): A validation wrapper that adapts browser ValidityState and gates form submission.
+- [ln-upload](docs-mcp/components/ln-upload.md): A file upload component featuring drag-and-drop zones, progress tracking via ln-progress, file extension and size validation, SSR hydration, and automatic hidden input generation for form submits.
+- [ln-autosave](docs-mcp/components/ln-autosave.md): Saves draft form states in localStorage on field boundaries, restoring them on load and clearing them on submit or reset.
+- [ln-autoresize](docs-mcp/components/ln-autoresize.md): Automatically adjusts textarea height based on content size to prevent scroll bars.
+- [ln-picklist](docs-mcp/components/ln-picklist.md): A dual-list selection primitive where checking a checkbox transfers the <li> into the selected list, and unchecking returns it to available. Supports declarative selection capping via data-ln-picklist-max.
+- [ln-options](docs-mcp/components/ln-options.md): Dynamically populates HTML select controls with option elements from data stores while preserving state.
+- [ln-date](docs-mcp/components/ln-date.md): Locale-aware date formatter with native calendar picker and manual input parsing support.
+- [ln-number](docs-mcp/components/ln-number.md): Formats number inputs in real time based on active locales, syncing clean numeric data using hidden fields.
+- [ln-editor](docs-mcp/components/ln-editor.md): A visual rich text editor component that progressively enhances standard textareas.
+- [ln-slug](docs-mcp/components/ln-slug.md): Automatically generates URL-friendly slugs from source fields in real time until manual override.
+
+## Navigation & State
+
+- [ln-nav](docs-mcp/components/ln-nav.md): Dynamically highlights active navigation links matching current URL location pathname with SPA history patch and ARIA aria-current attributes.
+- [ln-tabs](docs-mcp/components/ln-tabs.md): A declarative tab manager supporting N-way exclusive panel selection, URL hash deep-linking, localStorage persistence, and reactive ARIA attributes.
+- [ln-router](docs-mcp/components/ln-router.md): SPA router engine managing declarative template routes, path specificity ranking, multi-region outlets, View Transitions, and teardown lifecycles.
+- [ln-scroll](docs-mcp/components/ln-scroll.md): Smooth anchor scrolling component applied to links and buttons, navigating to the target specified by data-ln-scroll or href with optional form presets and focus management.
+- [ln-link](docs-mcp/components/ln-link.md): A navigation helper component that turns entire DOM blocks into clickable areas while preserving HTML link semantics and accessibility.
+- [ln-external-links](docs-mcp/components/ln-external-links.md): Automatically detects outbound links to apply security attributes (target="_blank", rel="noopener noreferrer"), accessibility hints, and telemetry events.
+
+## Feedback & Notifications
+
+- [ln-toast](docs-mcp/components/ln-toast.md): A viewport notification service that renders non-blocking status toasts via global CustomEvent bus and HTML template hydration.
+
+## State & UI Primitives
+
+- [ln-toggle](docs-mcp/components/ln-toggle.md): A lightweight binary state toggler for collapsibles, drawers, and banners in the DOM.
+- [ln-accordion](docs-mcp/components/ln-accordion.md): A DOM coordinator that enforces mutual exclusivity (single-open behavior) among a group of ln-toggle panels.
+- [ln-dropdown](docs-mcp/components/ln-dropdown.md): A DOM coordinator that manages positioning, top-layer promotion, accessibility, and dismissal of dropdown overlay menus.
+- [ln-sortable](docs-mcp/components/ln-sortable.md): A touch-friendly drag-and-drop reordering primitive using Pointer Events.
+- [ln-key](docs-mcp/components/ln-key.md): Declaratively binds keyboard shortcuts to native click or focus behavior on an existing DOM target.
+
+## Data Flow, Storage & Connectors
+
+- [ln-data-coordinator](docs-mcp/components/ln-data-coordinator.md): Orchestrates local IndexedDB cache sync with remote database drivers and queues.
+- [ln-data-store](docs-mcp/components/ln-data-store.md): Zero-dependency local-first database cache store backed by browser IndexedDB.
+- [ln-table-coordinator](docs-mcp/components/ln-table-coordinator.md): A wrapper coordinator component that encapsulates and coordinates child search, filter popovers, and table primitives on the page without requiring named scopes or explicit target IDs.
+- [ln-ui-coordinator](docs-mcp/components/ln-ui-coordinator.md): A Layer 2 Coordinator that mediates user triggers, modals, AJAX operations, uploads, form submissions, URL hash navigation, data filling, and toast notifications.
+- [ln-ajax](docs-mcp/components/ln-ajax.md): An HTML-over-the-wire network orchestration component that converts navigation links and form submissions into AJAX calls.
+- [ln-include](docs-mcp/components/ln-include.md): External partial loader for `<template>` elements, with built-in boot gating to avoid race conditions.
+- [ln-api-connector](docs-mcp/components/ln-api-connector.md): A stateless RESTful API network connection driver.
+- [ln-api-queue](docs-mcp/components/ln-api-queue.md): A FIFO transactional outbox queue in IndexedDB for reliable offline-first writes.
+- [ln-couchdb-connector](docs-mcp/components/ln-couchdb-connector.md): A network client connector adapting CouchDB revision protocols and changes feeds.
+- [ln-websocket-connector](docs-mcp/components/ln-websocket-connector.md): A WebSocket push transport — delivers live server changes beside a REST connector, or carries reads, writes and pushes on its own.
+- [ln-filter](docs-mcp/components/ln-filter.md): A zero-dependency, event-driven generic list and table filter primitive that manages item visibility states through checkbox controls.
+- [ln-search](docs-mcp/components/ln-search.md): Two-host search primitive that drives target state attributes and coordinates list filtering and remote queries.
+- [ln-sort](docs-mcp/components/ln-sort.md): A view-agnostic sort control primitive that dispatches a cancelable sort intent on a target element, letting tables, lists, or custom integrations intercept it or fall back to a built-in DOM-reorder default.
+
+## Utilities & Core Services
+
+- [ln-core](docs-mcp/components/ln-core.md): Shared utility primitives, DOM binding engines, template cloning, and component initialization helpers for ln-ashlar.
+- [ln-helpers](docs-mcp/components/ln-helpers.md): Direct DOM manipulation, declarative attribute binding, template interpolation, form serialization, link interception, and component registration helpers.
+- [ln-http](docs-mcp/components/ln-http.md): A transparent fetch wrapper and explicit-key network request deduplicator.
+- [ln-icon](docs-mcp/components/ln-icon.md): An on-demand SVG sprite loader and localStorage caching service.
+- [ln-time](docs-mcp/components/ln-time.md): Formats Unix timestamps on native time elements into localized dates or auto-refreshing relative time strings.
+- [ln-obfuscator](docs-mcp/components/ln-obfuscator.md): Autonomous component for anti-crawler obfuscation and deobfuscation of plain text, emails, telephone numbers, and links using reversible ROT, Base64, and XOR ciphers.
+- [ln-crypto](docs-mcp/components/ln-crypto.md): A client-side encryption and decryption utility wrapper around the Web Crypto API.
+- [ln-hash](docs-mcp/components/ln-hash.md): A namespaced URL fragment state serialization codec.
+- [ln-reactive](docs-mcp/components/ln-reactive.md): Lightweight Proxy-based reactive state wrappers and microtask render batcher primitives.
+- [ln-translations](docs-mcp/components/ln-translations.md): A zero-dependency form translation coordinator that clones translatable fields per language, synchronizing a locale-picker dropdown and active-language badges.
+- [ln-persist](docs-mcp/components/ln-persist.md): Registry-driven, no-instance component that restores and saves an owning component's state attribute to localStorage.
+- [ln-debug](docs-mcp/components/ln-debug.md): Development diagnostics and contract verifier providing console log suppression, generic cross-reference validation (*-for, *-source), typo detection, and CSS visual linter integration.
+- [positioning](docs-mcp/components/positioning.md): Viewport-aware mathematical and measurement positioning utilities for floating UI components.
+- [window-cache](docs-mcp/components/window-cache.md): DOM-agnostic sliding-window data engine for server-side virtualization — sparse cache, LRU eviction, and stale-response guarding shared by ln-table and ln-list windowed modes.
+
+## CSS Architecture & Design Tokens
+
+- [Design Tokens](docs-mcp/css/tokens.md): Layered design token architecture (Brand, Scale, Vocabulary, Primitives).
+- [SCSS Mixins](docs-mcp/css/mixins.md): Master index and reference for SCSS mixins covering layout, cards, buttons, forms, and typography.
+- [Theming & Modes](docs-mcp/css/theming.md): Dark mode, light mode, brand colors, presets, and scoped theme islands.
+- [Layout Primitives](docs-mcp/css/layout.md): Grid, stack, row, and responsive layout primitives in SCSS.
+- [Responsive Breakpoints](docs-mcp/css/breakpoints.md): Breakpoint tokens and responsive media query mixins.
+- [Density Modes](docs-mcp/css/density.md): Compact vs. spacious density scaling through `[data-density]`.
+- [App Shell](docs-mcp/css/app-shell.md): Responsive multi-pane application layout structure with sidebar.
+
+## Application Patterns & Workflows
+
+- [Modal CRUD Pattern](docs-mcp/patterns/modal-crud.md): Complete create, edit, prefill, and delete workflow connecting tables, modals, and coordinators.
+- [Data Table Sync Pattern](docs-mcp/patterns/data-table-sync.md): Synchronizing search filters, sorting, column popovers, and sliding-window tables.
+- [SPA Routing Guide](docs-mcp/guides/spa-routing.md): Client-side Single Page Application architecture, template routes, and View Transitions.
+- [Component Authoring Guide](docs-mcp/guides/component-authoring.md): Step-by-step guide to authoring new Layer 1 components conforming to doctrine.
+- [Coordinator Authoring Guide](docs-mcp/guides/coordinator-authoring.md): Wiring UI triggers, bridging attributes, and orchestrating components.
+- [Write Workflow](docs-mcp/guides/write-workflow.md): Local-first write pipeline with optimistic mutations and offline queueing.
+
+## Optional
+
+- [SPA Starter Kit](spa-starter/README.md): Production-ready single page application starter with Vite and ashlar.
+- [JSON Attribute Schemas](components/): Machine-readable schema definitions (`*.schema.json`) for dev-time attribute contract enforcement.
+- [HTML Custom Data](ln-ashlar.html-data.json): VS Code custom data provider for autocomplete and attribute hints.
+- [JetBrains Web-Types](web-types.json): Web-Types schema for JetBrains IDE integration.

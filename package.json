@@ -69,7 +69,9 @@
     "sync:css-tokens:check": "node scripts/sync-css-tokens.mjs --check",
     "manifest": "node scripts/extract-manifest.mjs",
     "manifest:check": "node scripts/extract-manifest.mjs --check --target=theme/tailwind",
-    "manifest:file": "node scripts/extract-manifest.mjs --output=docs/manifest.txt"
+    "manifest:file": "node scripts/extract-manifest.mjs --output=docs/manifest.txt",
+    "generate:llms": "node scripts/generate-llms.mjs",
+    "generate:llms:check": "node scripts/generate-llms.mjs --check"
   },
   "devDependencies": {
     "@tabler/icons": "^3.41.1",
