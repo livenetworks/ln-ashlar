@@ -11,7 +11,7 @@
 In `ln-ashlar`, the core design principle is **orthogonality**. Rather than creating heavy components that mix state, visual presentation, and layout, we separate them into isolated concerns:
 
 1. **The State Machine (JavaScript)**: The `ln-toggle` component (145 lines) only manages binary `open` / `close` state in the DOM and synchronizes ARIA accessibility. It does not own animations or visual geometries.
-2. **The Visual Presentation (CSS)**: Visual transitions are handled in Vanilla CSS. The component simply toggles the `.open` class on the panel. CSS reads this class and runs transitions (e.g. height collapse or sliding drawers).
+2. **The Visual Presentation (CSS)**: Visual transitions are handled in Vanilla CSS. The component synchronizes the `.open` class and `[data-ln-toggle="open"]` on the panel. CSS reads these selectors and runs transitions (e.g. height collapse or sliding drawers).
 3. **Decoupled Binding (HTML)**: Triggers and panels are matched purely by ID. They can live anywhere in the DOM. Multiple triggers pointing to a single panel are supported natively, and all triggers stay perfectly synchronized.
 
 ---
@@ -55,7 +55,7 @@ panel.setAttribute('data-ln-toggle', 'open');
 // Close the panel
 panel.setAttribute('data-ln-toggle', 'close');
 
-// Read-only state query
+// Read-only state query (committed state tracker)
 panel.lnToggle.isOpen; // Returns true/false
 ```
 

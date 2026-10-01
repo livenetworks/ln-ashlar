@@ -159,26 +159,37 @@ test('_warnBound prevents multiple monkey-patchings of console.warn across stand
 	}
 });
 
-test('registerComponent lifecycle: single shared observer, destroy cleanup with delete item[attribute], and clean re-attachment', () => {
+test('registerComponent lifecycle: single shared observer, destroy cleanup with delete item[attribute], clean re-attachment, and attribute removal preservation', () => {
 	const savedWindow = globalThis.window;
 	const savedDoc = globalThis.document;
 	const savedMO = globalThis.MutationObserver;
+	const savedConsoleError = console.error;
 
 	try {
-		let registeredObserverCallback = null;
+		let registeredLifecycleCallback = null;
+		let registeredAttrCallback = null;
 		class MockMutationObserver {
 			constructor(callback) {
-				registeredObserverCallback = callback;
+				this.callback = callback;
 			}
-			observe() {}
+			observe(target, options) {
+				if (options && options.attributes) {
+					registeredAttrCallback = this.callback;
+				} else if (options && options.childList) {
+					registeredLifecycleCallback = this.callback;
+				}
+			}
 			disconnect() {}
 		}
+		const registeredObserverCallback = (records) => registeredLifecycleCallback(records);
 
 		globalThis.MutationObserver = MockMutationObserver;
 		const docBody = {
 			nodeType: 1,
 			querySelectorAll: () => [],
-			matches: () => false
+			matches: () => false,
+			hasAttribute: () => false,
+			querySelector: () => null
 		};
 		globalThis.window = {
 			MutationObserver: MockMutationObserver,
@@ -224,7 +235,7 @@ test('registerComponent lifecycle: single shared observer, destroy cleanup with 
 		// 1. Verify single observer bound
 		assert.equal(globalThis.window.lnCore._lifecycleObserverBound, true);
 		assert.equal(globalThis.window.lnCore._lifecycleRegistry.length, 2);
-		assert.ok(registeredObserverCallback, 'shared lifecycle observer callback must be registered');
+		assert.ok(registeredLifecycleCallback, 'shared lifecycle observer callback must be registered');
 
 		// 2. Add element to DOM
 		const testEl = {
@@ -324,10 +335,40 @@ test('registerComponent lifecycle: single shared observer, destroy cleanup with 
 
 		assert.equal(subtreeCallCount, 1, 'onSubtreeChange must trigger for text-node target fallback');
 		assert.equal(subtreeHost, parentHost, 'host must resolve to parentElement.closest');
+
+		// 7. Test attribute removal does NOT destroy component instance (bound to DOM presence)
+		assert.ok(testEl.lnTestComp, 'testEl has active component instance');
+		const instBeforeAttrChange = testEl.lnTestComp;
+		const destroyCountBefore = destroyedCount;
+
+		// Attribute removed while element remains in document (_inDoc: true)
+		testEl.getAttribute = (name) => null;
+		testEl.hasAttribute = (name) => false;
+		testEl.matches = (q) => false;
+
+		const loggedErrors = [];
+		console.error = (...args) => {
+			loggedErrors.push(args);
+		};
+
+		assert.ok(registeredAttrCallback, 'attribute observer callback must be registered');
+		registeredAttrCallback([
+			{
+				type: 'attributes',
+				target: testEl,
+				attributeName: 'data-ln-test-comp',
+				oldValue: ''
+			}
+		]);
+
+		assert.equal(loggedErrors.length, 0, 'attribute mutation handler must not throw or log errors');
+		assert.equal(destroyedCount, destroyCountBefore, 'attribute removal must NOT invoke destroy()');
+		assert.equal(testEl.lnTestComp, instBeforeAttrChange, 'instance remains bound to DOM element');
 	} finally {
 		globalThis.window = savedWindow;
 		globalThis.document = savedDoc;
 		globalThis.MutationObserver = savedMO;
+		console.error = savedConsoleError;
 	}
 });
 

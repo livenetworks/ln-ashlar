@@ -24,10 +24,11 @@ The `ln-toggle` component serves as the smallest reactive state machine in `ln-a
 The JavaScript source is located at [ln-toggle.js](../../components/ln-toggle/src/ln-toggle.js).
 
 Key responsibilities include:
-- **Binary State Management:** Toggling the value of the `data-ln-toggle` attribute on panel elements and synchronizing a visual `.open` CSS class.
+- **Binary State Management:** Toggling the value of the `data-ln-toggle` attribute on panel elements and synchronizing a visual `.open` CSS class (retained for CSS transitions and dependent consumers such as `ln-dropdown`).
 - **Trigger Linking:** Listening to global document clicks, intercepting triggers referencing the panel via `data-ln-toggle-for`, and resolving actions.
 - **ARIA Expansion Sync:** Automatically updating the `aria-expanded` attribute on all triggers pointing to the target panel.
 - **State Persistence:** Restoring and saving panel states in browser `localStorage` when opted-in.
+- **Committed State Query & Loop Protection:** Exposing `el.lnToggle.isOpen` as a read-only query tracker while preventing re-entrant attribute synchronization loops during cancelable `before-*` event flows.
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
@@ -136,7 +137,7 @@ All events bubble up from the target panel element.
 
 The visual expansion transition is powered by CSS Grid track sizing. The panel is styled using two key mixins defined in [theme/config/mixins/_collapsible.scss](../../theme/config/mixins/_collapsible.scss):
 
-- `@mixin collapsible` — Applied to the panel container. It defaults to `grid-template-rows: 0fr` and transitions to `1fr` when `.open` is added.
+- `@mixin collapsible` — Applied to the panel container. It defaults to `grid-template-rows: 0fr` and transitions to `1fr` when `.open` or `[data-ln-toggle="open"]` is active.
 - `@mixin collapsible-content` — Applied to the direct child container. It enforces `overflow: hidden` and `min-height: 0` so the track can collapse to exactly `0px`.
 
 ### SCSS Style Binding:

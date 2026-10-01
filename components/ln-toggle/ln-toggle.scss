@@ -5,7 +5,9 @@
 .collapsible {
 	display: grid;
 	grid-template-rows: 0fr;
-	transition: grid-template-rows 200ms ease;
+	@media (prefers-reduced-motion: no-preference) {
+		transition: grid-template-rows 200ms ease;
+	}
 
 	&.open,
 	&[data-ln-toggle="open"] {
@@ -25,7 +27,9 @@
 
 [data-ln-toggle-for] .ln-chevron {
 	flex-shrink: 0;
-	transition: transform 200ms ease;
+	@media (prefers-reduced-motion: no-preference) {
+		transition: transform 200ms ease;
+	}
 }
 
 [data-ln-toggle-for][aria-expanded="true"] .ln-chevron {

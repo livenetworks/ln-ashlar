@@ -81,8 +81,13 @@ import { dispatch, dispatchCancelable, isTargetDisabled, registerComponent, shou
 		this.dom.addEventListener('ln-toggle:request-close', this._onRequestClose);
 		this.dom.addEventListener('ln-toggle:request-toggle', this._onRequestToggle);
 
+		// Committed state tracker — acts as the read-only query surface (el.lnToggle.isOpen),
+		// prevents re-entrant attribute sync loops, and ensures cancelable `before-*` event
+		// handlers observe the pre-transition state.
 		this.isOpen = dom.getAttribute(DOM_SELECTOR) === 'open';
 
+		// Visual convenience class synchronized for CSS transitions (@mixin collapsible)
+		// and consumer components (e.g., ln-dropdown menu visibility).
 		if (this.isOpen) {
 			dom.classList.add('open');
 		}

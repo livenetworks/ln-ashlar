@@ -14,7 +14,8 @@
 		transition: grid-template-rows var(--transition-base);
 	}
 
-	&.open {
+	&.open,
+	&[data-ln-toggle="open"] {
 		grid-template-rows: 1fr;
 	}
 }
