@@ -132,6 +132,8 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 | `ln-api-queue:request-enqueue` | Emits | No | Enqueues a transaction if offline. | `{ chainKey: String, op: String, payload: Object }` |
 | `ln-api-queue:ack` / `nack` | Emits | No | Confirms or rejects a queue message. | `{ entryId: ID, reason?: String }` |
 | `ln-toast:enqueue` | Emits | No | Dispatched to `window` for success/error alerts. | `{ message: String, type: String }` |
+| `ln-data-coordinator:error` | Emits | No | A reconciliation step or a view query failed. | `{ operation: String, error, meta: Object\|null }` \| `{ operation: 'query', kind: String, store: String, target: HTMLElement, error }` |
+| `ln-data-coordinator:online` / `ln-data-coordinator:offline` | Emits | No | Dispatched on `document` once per browser `online` / `offline` event; `online` also runs a sync check on every coordinator. | `{}` |
 
 **View-Binder Contract**
 
@@ -145,6 +147,7 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 | `ln-{kind}:set-loading` | Emits | No | Pattern row — `{kind}` is `table`, `list`, or `chart`. Dispatched instead of `set-data` while the store hasn't finished loading yet. | `{ loading: Boolean }` |
 | `ln-{kind}:page-failed` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Reports that a windowed page query failed, so the view can release that offset for a later retry. | `{ offset: Number }` |
 | `ln-{kind}:request-revalidate` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Sent to a windowed view on a store change in place of `set-data`: the view refreshes through its own window cache rather than being served store rows. | *(no payload)* |
+| `ln-{kind}:request-invalidate` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Sent to a windowed view when the coordinator's query changes: the view drops its window and restarts from page 0. | *(no payload)* |
 | `ln-options:set-data` | Emits | No | Delivers all records to a bound options binder. | `{ data: Array }` |
 | `ln-stat:set-count` | Emits | No | Delivers the resolved count to a bound stat binder. | `{ count: Number }` |
 | `ln-data-store:ready` / `:loaded` / `:created` / `:updated` / `:deleted` | Listens | No | Store change notifications — on any of these, re-queries and re-serves all non-windowed bound view elements using their last cached query. Windowed views (carrying `data-ln-table-window` / `data-ln-list-window`) instead receive `ln-{kind}:request-revalidate` and refresh through their own window cache, since a partial store cannot answer an offset-based slice. | *(handler-internal; no detail consumed)* |
@@ -157,7 +160,11 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 | `ln-data-store:request-create` / `:request-update` / `:request-delete` / `:request-bulk-delete` | Emits | No | Dispatched to the store child as the local-write half of the parallel fan-out. | `{ tempId?, id?, ids?, data? }` (shape per op) |
 | `ln-api-connector:request-create` / `:request-update` / `:request-delete` / `:request-bulk-delete` | Emits | No | Dispatched to the connector child — direct path (no queue) or the queued-transport path via `ln-api-queue:send`. | `{ data?, id?, ids?, url?, meta: Object }` |
 | `ln-api-connector:request-sync` | Emits | No | Dispatched to the connector on `ln-data-store:request-remote-sync`, to trigger the delta fetch. | `{ since: String, meta: Object }` |
+| `ln-data-store:request-sync-failed` | Emits | No | Dispatched to the store when the connector's sync fails. | `{ error: String, status: Number }` |
 | `ln-api-queue:request-remap` | Emits | No | Re-keys a queued chain from a temp ID to the server-issued ID once a create resolves. | `{ oldKey: String, newId: ID }` |
+| `ln-api-queue:resolve-create` | Emits | No | A queued create was confirmed by the server — the queue deletes the entry and remaps its siblings in one transaction. | `{ entryId: ID, oldKey: String, newId: ID }` |
+| `ln-data-store:request-page` | Listens | No | Windowed store residency: forwards the missing page to the connector as `request-query`. | `{ store: String, offset: Number, limit: Number, query: Object, queryGen: Number }` |
+| `ln-data-store:mutation-error` | Listens | No | Rejects the pending store-mutation receipt matched by `requestId`. | `{ store: String, action: String, requestId: String, error: Error }` |
 | `ln-api-queue:failed` | Listens | No | Terminal retry-exhaustion notification from the queue — surfaces a `network` toast via the dict. | `{ entryId: ID, chainKey: String, attempts: Number }` |
 | `ln-api-connector:fetched` / `:created` / `:updated` / `:deleted` / `:bulk-deleted` / `:error` | Listens | No | Connector response handling (also namespaced under `ln-couchdb-connector:...` and `ln-websocket-connector:...` — generalized across concrete connector implementations). Reconciles the store, fires toasts, and drives queue ack/nack. A socket beside a REST connector delivers its pushes here as `:fetched`. | *(shape per response — see [`ln-api-connector.md`](./ln-api-connector.md) Events API)* |
 | `ln-websocket-connector:connected` | Listens | No | Catch-up after a (re)opened socket: runs `store.forceSync()`, a delta since `lastSyncedAt` over the request connector. | `{ url: String }` |

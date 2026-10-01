@@ -158,6 +158,9 @@ All coordinator events are dispatched from the **main wrapper element (`[data-ln
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
+| `ln-dropdown:request-open` | Listens | No | Command request event sent to open the menu (sets the inner `[data-ln-toggle]` to `open`). | `{}` |
+| `ln-dropdown:request-close` | Listens | No | Command request event sent to close the menu. | `{}` |
+| `ln-dropdown:request-toggle` | Listens | No | Command request event sent to flip the menu between open and closed. | `{}` |
 | `ln-dropdown:open` | Emits | No | Fires after the menu is promoted to the top layer, positioned, and visually opened. | `{ target: HTMLElement }` |
 | `ln-dropdown:close` | Emits | No | Fires after the menu is closed, exits the top layer, and listeners cleaned. | `{ target: HTMLElement }` |
 | `ln-toggle:open` | Listens | No | Triggers top-layer promotion (`showPopover()`), placement calculations, ARIA updates, and window event listeners binding. | — |

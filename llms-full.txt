@@ -513,7 +513,7 @@ Excludes specific nested elements (links/forms) from being intercepted inside an
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-api-connector:request-sync` / `ln-api-connector:request-fetch` | Listens | No | Triggers delta updates query. | `{ since?: String, meta?: Object }` |
+| `ln-api-connector:request-sync` | Listens | No | Triggers delta updates query. | `{ since?: String, meta?: Object }` |
 | `ln-api-connector:request-query` | Listens | No | Triggers structured query/pagination fetch. | `{ query?: Object, meta?: Object }` |
 | `ln-api-connector:request-cancel` | Listens | No | Aborts in-flight fetch or query for the target element/key. | `{ targetEl?: Element, key?: String, meta?: Object }` |
 | `ln-api-connector:request-create` | Listens | No | Triggers document create request. | `{ data: Object, tempId: String, url?: String, idempotencyKey?: String, meta?: Object }` |
@@ -584,6 +584,7 @@ Excludes specific nested elements (links/forms) from being intercepted inside an
 | `ln-api-queue:request-pause` | Listens | No | Manually pauses queue drainage for this scope. | `{}` |
 | `ln-api-queue:request-drain` | Listens | No | Manually triggers a drain attempt — the canonical way to retry `failed` entries (e.g. a UI "retry failed" action). | `{}` |
 | `ln-api-queue:request-clear` | Listens | No | Empties the queue local store. | `{}` |
+| `ln-api-queue:resolve-create` | Listens | No | A queued create was confirmed by the server: deletes the entry and remaps queued siblings from the temp key to the server ID. | `{ entryId: ID, oldKey: String, newId: ID }` |
 | `ln-api-queue:send` | Emits | No | Dispatched to coordinator to execute request. | `{ entryId: ID, chainKey: String, op: String, payload: Object }` |
 | `ln-api-queue:enqueued` | Emits | No | Dispatched when a task is written. | `{ entryId: ID, chainKey: String, count: Number }` |
 | `ln-api-queue:pending-count` | Emits | No | Emits pending count updates for UI widgets. | `{ count: Number, scope: String }` |
@@ -592,6 +593,7 @@ Excludes specific nested elements (links/forms) from being intercepted inside an
 | `ln-api-queue:auth-required` | Emits | No | Dispatched when auth pause occurs. | `{ entryId: ID, chainKey: String }` |
 | `ln-api-queue:paused` | Emits | No | Dispatched when draining pauses for a scope (e.g. after an `auth` nack or manual request-pause). | `{ reason: "auth" \| "manual", restored?: Boolean }` |
 | `ln-api-queue:resumed` | Emits | No | Dispatched when draining resumes for a scope. | `{}` |
+| `ln-api-queue:error` | Emits | No | A queue storage operation failed. `operation` names it (`initialize`, `enqueue`, `ack`, `nack`, `remap`, `resolve-create`, `drain`, …). | `{ operation: String, entryId?: ID, error: Error }` |
 
 ---
 
@@ -806,6 +808,7 @@ Access the persistence instance directly via the `lnAutosave` property on the fo
 | `ln-chart:request-data` | Emits | No | Renderer asks data coordinator for records. | `{ chart, source, sort, filters, search }` |
 | `ln-chart:set-data` | Listens | No | Coordinator delivers records to chart. | `{ data, total?, filtered? }` |
 | `ln-chart:set-loading` | Listens | No | Coordinator controls busy / loading state. | `{ loading }` |
+| `ln-chart:request-refresh` | Listens | No | Asks the chart to issue its data query again. | `{}` |
 | `ln-chart:rendered` | Emits | No | Rendering notification emitted after SVG geometry updates. | `{ chart, count, min, max }` |
 
 ---
@@ -1057,6 +1060,7 @@ This service module exposes no declarative HTML attributes directly on itself.
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-fill` | Emits | No | Dispatched by `lnFill` to trigger data population or reset across fillable containers. | `Object` (record data) \| `null` (reset signal) |
+| `ln-core:locale-change` | Emits | No | Dispatched on `document` whenever a `lang` attribute changes anywhere in the page; `ln-date`, `ln-number` and `ln-time` re-format on it. The language is switched by setting `lang` — never by dispatching this event. | `{}` |
 
 ---
 
@@ -1067,7 +1071,7 @@ This service module exposes no declarative HTML attributes directly on itself.
 - **Summary:** A network client connector adapting CouchDB revision protocols and changes feeds.
 
 > **Classification:** 🌐 Simple component / Remote DB Connection Driver  
-> Applied to a gateway element (`<div data-ln-couchdb-connector data-ln-couchdb-url="..." data-ln-couchdb-db="...">`) inside a coordinator. It listens for database request CustomEvents (`ln-couchdb-connector:request-query`, `create`, `update`, `delete`), queries CouchDB `_changes` feeds with sequence tokens for delta sync, and maps `id` to `_id`/`_rev` on mutations via REST `fetch()`. Upon resolution, it emits `ln-couchdb-connector:data` or mutation response events to the parent coordinator.
+> Applied to a gateway element (`<div data-ln-couchdb-connector data-ln-couchdb-url="..." data-ln-couchdb-db="...">`) inside a coordinator. It listens for database request CustomEvents (`ln-couchdb-connector:request-sync`, `create`, `update`, `delete`, `bulk-delete`), queries CouchDB `_changes` feeds with sequence tokens for delta sync, and maps `id` to `_id`/`_rev` on mutations via REST `fetch()`. Upon resolution, it emits `ln-couchdb-connector:fetched` or mutation response events to the parent coordinator.
 
 #### Minimal HTML Markup & Usage:
 ### Base HTML Markup
@@ -1107,15 +1111,13 @@ This service module exposes no declarative HTML attributes directly on itself.
 
 ### Events API
 
-*Responds to events under `ln-couchdb-connector:...` and `ln-api-connector:...` namespaces for drop-in compatibility.*
-
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `:request-sync` / `:request-fetch` | Listens | No | Triggers delta changes feed updates query. | `{ since?: String, meta?: Object }` |
-| `:request-create` | Listens | No | Triggers document create request. | `{ data: Object, tempId: String, meta?: Object }` |
-| `:request-update` | Listens | No | Triggers document PUT edit. | `{ id: ID, data: Object, expected_version?: String, meta?: Object }` |
-| `:request-delete` | Listens | No | Triggers document DELETE. | `{ id: ID, rev?: String, meta?: Object }` |
-| `:request-bulk-delete` | Listens | No | Triggers bulk document deletes. | `{ ids: Array, meta?: Object }` |
+| `ln-couchdb-connector:request-sync` | Listens | No | Triggers delta changes feed updates query. | `{ since?: String, meta?: Object }` |
+| `ln-couchdb-connector:request-create` | Listens | No | Triggers document create request. | `{ data: Object, tempId: String, meta?: Object }` |
+| `ln-couchdb-connector:request-update` | Listens | No | Triggers document PUT edit. | `{ id: ID, data: Object, expected_version?: String, meta?: Object }` |
+| `ln-couchdb-connector:request-delete` | Listens | No | Triggers document DELETE. | `{ id: ID, rev?: String, meta?: Object }` |
+| `ln-couchdb-connector:request-bulk-delete` | Listens | No | Triggers bulk document deletes. | `{ ids: Array, meta?: Object }` |
 | `ln-couchdb-connector:fetched` | Emits | No | Dispatched upon delta sync responses. | `{ data: Array, since: String, meta: Object }` |
 | `ln-couchdb-connector:created` | Emits | No | Dispatched upon successful document creation. | `{ record: Object, tempId: String, message: String, meta: Object }` |
 | `ln-couchdb-connector:updated` | Emits | No | Dispatched upon successful document edit. | `{ record: Object, id: ID, message: String, meta: Object }` |
@@ -1282,6 +1284,8 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 | `ln-api-queue:request-enqueue` | Emits | No | Enqueues a transaction if offline. | `{ chainKey: String, op: String, payload: Object }` |
 | `ln-api-queue:ack` / `nack` | Emits | No | Confirms or rejects a queue message. | `{ entryId: ID, reason?: String }` |
 | `ln-toast:enqueue` | Emits | No | Dispatched to `window` for success/error alerts. | `{ message: String, type: String }` |
+| `ln-data-coordinator:error` | Emits | No | A reconciliation step or a view query failed. | `{ operation: String, error, meta: Object\|null }` \| `{ operation: 'query', kind: String, store: String, target: HTMLElement, error }` |
+| `ln-data-coordinator:online` / `ln-data-coordinator:offline` | Emits | No | Dispatched on `document` once per browser `online` / `offline` event; `online` also runs a sync check on every coordinator. | `{}` |
 
 **View-Binder Contract**
 
@@ -1295,6 +1299,7 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 | `ln-{kind}:set-loading` | Emits | No | Pattern row — `{kind}` is `table`, `list`, or `chart`. Dispatched instead of `set-data` while the store hasn't finished loading yet. | `{ loading: Boolean }` |
 | `ln-{kind}:page-failed` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Reports that a windowed page query failed, so the view can release that offset for a later retry. | `{ offset: Number }` |
 | `ln-{kind}:request-revalidate` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Sent to a windowed view on a store change in place of `set-data`: the view refreshes through its own window cache rather than being served store rows. | *(no payload)* |
+| `ln-{kind}:request-invalidate` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Sent to a windowed view when the coordinator's query changes: the view drops its window and restarts from page 0. | *(no payload)* |
 | `ln-options:set-data` | Emits | No | Delivers all records to a bound options binder. | `{ data: Array }` |
 | `ln-stat:set-count` | Emits | No | Delivers the resolved count to a bound stat binder. | `{ count: Number }` |
 | `ln-data-store:ready` / `:loaded` / `:created` / `:updated` / `:deleted` | Listens | No | Store change notifications — on any of these, re-queries and re-serves all non-windowed bound view elements using their last cached query. Windowed views (carrying `data-ln-table-window` / `data-ln-list-window`) instead receive `ln-{kind}:request-revalidate` and refresh through their own window cache, since a partial store cannot answer an offset-based slice. | *(handler-internal; no detail consumed)* |
@@ -1307,7 +1312,11 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 | `ln-data-store:request-create` / `:request-update` / `:request-delete` / `:request-bulk-delete` | Emits | No | Dispatched to the store child as the local-write half of the parallel fan-out. | `{ tempId?, id?, ids?, data? }` (shape per op) |
 | `ln-api-connector:request-create` / `:request-update` / `:request-delete` / `:request-bulk-delete` | Emits | No | Dispatched to the connector child — direct path (no queue) or the queued-transport path via `ln-api-queue:send`. | `{ data?, id?, ids?, url?, meta: Object }` |
 | `ln-api-connector:request-sync` | Emits | No | Dispatched to the connector on `ln-data-store:request-remote-sync`, to trigger the delta fetch. | `{ since: String, meta: Object }` |
+| `ln-data-store:request-sync-failed` | Emits | No | Dispatched to the store when the connector's sync fails. | `{ error: String, status: Number }` |
 | `ln-api-queue:request-remap` | Emits | No | Re-keys a queued chain from a temp ID to the server-issued ID once a create resolves. | `{ oldKey: String, newId: ID }` |
+| `ln-api-queue:resolve-create` | Emits | No | A queued create was confirmed by the server — the queue deletes the entry and remaps its siblings in one transaction. | `{ entryId: ID, oldKey: String, newId: ID }` |
+| `ln-data-store:request-page` | Listens | No | Windowed store residency: forwards the missing page to the connector as `request-query`. | `{ store: String, offset: Number, limit: Number, query: Object, queryGen: Number }` |
+| `ln-data-store:mutation-error` | Listens | No | Rejects the pending store-mutation receipt matched by `requestId`. | `{ store: String, action: String, requestId: String, error: Error }` |
 | `ln-api-queue:failed` | Listens | No | Terminal retry-exhaustion notification from the queue — surfaces a `network` toast via the dict. | `{ entryId: ID, chainKey: String, attempts: Number }` |
 | `ln-api-connector:fetched` / `:created` / `:updated` / `:deleted` / `:bulk-deleted` / `:error` | Listens | No | Connector response handling (also namespaced under `ln-couchdb-connector:...` and `ln-websocket-connector:...` — generalized across concrete connector implementations). Reconciles the store, fires toasts, and drives queue ack/nack. A socket beside a REST connector delivers its pushes here as `:fetched`. | *(shape per response — see [`ln-api-connector.md`](./ln-api-connector.md) Events API)* |
 | `ln-websocket-connector:connected` | Listens | No | Catch-up after a (re)opened socket: runs `store.forceSync()`, a delta since `lastSyncedAt` over the request connector. | `{ url: String }` |
@@ -1435,6 +1444,7 @@ Exposed on the root element via `el.lnDataStore`:
 | `ln-data-store:request-update` | Listens | No | Optimistically updates a record or rekeys ID. | `{ id: ID, data: Object }` |
 | `ln-data-store:request-delete` | Listens | No | Optimistically deletes a record. | `{ id: ID }` |
 | `ln-data-store:request-bulk-delete` | Listens | No | Optimistically deletes multiple records. | `{ ids: Array }` |
+| `ln-data-store:request-sync-failed` | Listens | No | The coordinator reports a failed connector sync. Clears `isSyncing` and re-emits it as `ln-data-store:sync-error`. | `{ error: String, status: Number }` |
 | `ln-search:change` | Listens | Yes (`preventDefault`) | Updates `query.search` and dispatches `ln-data-store:query-changed`. | `{ term: String }` |
 | `ln-filter:change` | Listens | Yes (`preventDefault`) | Updates `query.filters[key]` and dispatches `ln-data-store:query-changed`. | `{ key: String, values: Array, targetId: String }` |
 | `ln-sort:change` | Listens | Yes (`preventDefault`) | Updates `query.sort` and dispatches `ln-data-store:query-changed`. | `{ field: String, direction: String }` |
@@ -1448,6 +1458,10 @@ Exposed on the root element via `el.lnDataStore`:
 | `ln-data-store:deleted` | Emits | No | Emitted after optimistic deletion is done. | `{ store: String, id: ID }` \| `{ store: String, ids: Array }` |
 | `ln-data-store:synced` | Emits | No | Emitted after subsequent delta sync completes. | `{ store: String, added: Number, deleted: Number, changed: Boolean }` |
 | `ln-data-store:quota-exceeded` | Emits | No | Emitted on `document` if database storage runs out of quota. | `{ error: Error }` |
+| `ln-data-store:initialization-error` | Emits | No | IndexedDB could not be opened. `ready` still resolves, so a coordinator routes reads to its connector. | `{ store: String, error: Error }` |
+| `ln-data-store:sync-error` | Emits | No | A connector sync failed; `isSyncing` is cleared so a later retry can run. | `{ store: String, error: String, status: Number }` |
+| `ln-data-store:mutation-error` | Emits | No | A local mutation failed. `requestId` correlates it with the coordinator's request. | `{ store: String, action: String, requestId: String, error: Error }` |
+| `ln-data-store:request-page` | Emits | No | Windowed residency: pages inside the sliding window are missing and must be fetched from the server. | `{ store: String, offset: Number, limit: Number, query: Object, queryGen: Number }` |
 
 ---
 
@@ -1773,6 +1787,9 @@ All coordinator events are dispatched from the **main wrapper element (`[data-ln
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
+| `ln-dropdown:request-open` | Listens | No | Command request event sent to open the menu (sets the inner `[data-ln-toggle]` to `open`). | `{}` |
+| `ln-dropdown:request-close` | Listens | No | Command request event sent to close the menu. | `{}` |
+| `ln-dropdown:request-toggle` | Listens | No | Command request event sent to flip the menu between open and closed. | `{}` |
 | `ln-dropdown:open` | Emits | No | Fires after the menu is promoted to the top layer, positioned, and visually opened. | `{ target: HTMLElement }` |
 | `ln-dropdown:close` | Emits | No | Fires after the menu is closed, exits the top layer, and listeners cleaned. | `{ target: HTMLElement }` |
 | `ln-toggle:open` | Listens | No | Triggers top-layer promotion (`showPopover()`), placement calculations, ARIA updates, and window event listeners binding. | — |
@@ -2016,7 +2033,7 @@ When `lnCore.lnFill` populates a `[data-ln-fillable]` container — or a compone
 | `data-ln-show` | Display node | `el.classList.toggle('hidden', !data[prop])` | Shows the node when the bound property is truthy. |
 | `data-ln-class` | Display node | `el.classList.toggle(cls, !!data[prop])` | Comma-separated `cls:prop` pairs, e.g. `active:isSelected`. |
 
-All four skip `null`/`undefined` values, preserving existing content. Source: `components/ln-core/helpers.js` (`fill`).
+All four skip `null`/`undefined` values, preserving existing content. Source: `components/ln-core/template.js` (`fill`).
 
 ### Programmatic JS API
 
@@ -2271,7 +2288,7 @@ Configured for both creation and modification. Uses dynamic action path template
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-fill` | Listens | No | Populates form elements with data or resets them if `null`. | `{ record: Object \| null }` |
+| `ln-fill` | Listens | No | Populates form elements with data or resets them if `null`. | `Object` (record) \| `null` |
 
 ---
 
@@ -2946,6 +2963,7 @@ In Data-Driven mode, the list requests data via coordinator events and populates
 | `ln-list:page-failed` | Listens | No | Windowed mode (`data-ln-list-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry. | `{ offset: Number }` |
 | `ln-list:request-revalidate` | Listens | No | Windowed mode (`data-ln-list-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives. | *(no payload)* |
 | `ln-list:request-invalidate` | Listens | No | Windowed mode (`data-ln-list-window`): invalidates the window cache and resets to page 0. | *(no payload)* |
+| `ln-list:set-search` | Listens | No | Applies a search term. Data-Driven mode emits `ln-list:search` and requests fresh data; SSR mode filters in memory and emits `ln-list:filter`. | `{ query: String }` (`term` is read when `query` is absent) |
 | `ln-list:request-clear-filters` | Listens | No | Resets all active filters and search term. In Data-Driven mode, dispatches `ln-list:clear-filters` and requests fresh data; in SSR mode, re-evaluates in-memory filters. | *(no payload)* |
 | `ln-search:change` | Listens | Yes | In SSR mode, filters in-memory records by search tokens and updates the virtual view. In Data-Driven mode, `ln-search` targets the Store directly. | `{ term: String, targetId: String }` |
 | `ln-filter:change` | Listens | Yes | In SSR mode, filters in-memory records by key/values and updates the virtual view. In Data-Driven mode, `ln-filter` targets the Store directly. | `{ key: String, values: Array, targetId: String }` |
@@ -2954,6 +2972,7 @@ In Data-Driven mode, the list requests data via coordinator events and populates
 | `ln-list:ready` | Emits | No | Dispatched after hydration or initial SSR item parsing completes. | `{ total: Number }` |
 | `ln-list:rendered` | Emits | No | Dispatched after items are appended/redrawn in the DOM. | `{ list: String, total: Number, visible: Number }` |
 | `ln-list:filter` | Emits | No | Dispatched in SSR mode when search/filter narrows visible items. | `{ term: String, matched: Number, total: Number }` |
+| `ln-list:search` | Emits | No | Emitted when receiving an `ln-list:set-search` command, before requesting fresh data (Data-Driven mode). | `{ list: String, query: String }` |
 | `ln-list:sorted` | Emits | No | Dispatched in SSR mode when items are sorted. | `{ field: String, direction: String, matched: Number, total: Number }` |
 | `ln-list:item-click` | Emits | No | Dispatched on item click (ignoring action button, checkbox, and link clicks). | `{ list: String, id: String, record: Object }` |
 | `ln-list:item-action` | Emits | No | Dispatched when clicking a button marked with `data-ln-item-action`. | `{ list: String, id: String, action: String, record: Object }` |
@@ -3707,6 +3726,9 @@ All events bubble up (`bubbles: true`).
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
+| `ln-popover:request-open` | Listens | No | Command request event sent to open the popover, anchored to `trigger` when given. | `{ trigger?: HTMLElement }` |
+| `ln-popover:request-close` | Listens | No | Command request event sent to close the popover. | `{}` |
+| `ln-popover:request-toggle` | Listens | No | Command request event sent to flip the popover between open and closed. | `{ trigger?: HTMLElement }` |
 | `ln-popover:before-open` | Emits | **Yes** | Fires after attribute changes to `"open"`, before top-layer promotion or placement calculations. | `{ popoverId: String, target: HTMLElement, trigger: HTMLElement? }` |
 | `ln-popover:open` | Emits | No | Fires once the popover is visible in the top layer, positioned, and focus set. | `{ popoverId: String, target: HTMLElement, trigger: HTMLElement? }` |
 | `ln-popover:before-close` | Emits | **Yes** | Fires before close, letting the app prevent closing via `e.preventDefault()`. | `{ popoverId: String, target: HTMLElement, trigger: HTMLElement? }` |
@@ -4924,6 +4946,8 @@ Use when the table queries a store and connects through a coordinator rather tha
 | `ln-table:set-loading` | Listens | No | Toggles the `.ln-table--loading` class (Data-Driven mode). | `{ loading: Boolean }` |
 | `ln-table:page-failed` | Listens | No | Windowed mode (`data-ln-table-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry. | `{ offset: Number }` |
 | `ln-table:request-revalidate` | Listens | No | Windowed mode (`data-ln-table-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives. | *(no payload)* |
+| `ln-table:request-invalidate` | Listens | No | Windowed mode (`data-ln-table-window`): invalidates the window cache and resets to page 0. | *(no payload)* |
+| `ln-table:set-search` | Listens | No | Applies a search term. Data-Driven mode emits `ln-table:search` and requests fresh data; SSR mode filters in memory and emits `ln-table:filter`. | `{ query: String }` (`term` is read when `query` is absent) |
 | `ln-search:change` | Listens | Yes (`preventDefault`) | Consumed directly on itself in SSR mode only, triggering local in-memory search matching. In Data-Driven mode `ln-table-coordinator` intercepts this event on the search input's target and dispatches `ln-table:set-search` instead. | `{ term: String }` |
 | `ln-filter:change` | Listens | Yes (`preventDefault`) | Consumed directly on itself in SSR mode only (`!this.isDataDriven`), applying column filters to the in-memory `_data` cache. | `{ key: String, values: Array, targetId: String }` |
 | `ln-sort:change` | Listens | No | Column sort intent from [`ln-sort`](./ln-sort.md). SSR mode re-orders in-memory rows locally and dispatches `ln-table:sorted`; Data-Driven mode sets `currentSort` and dispatches a fresh `ln-table:request-data`. `ln-table` always calls `preventDefault()`, superseding `ln-sort`'s own default DOM-reorder fallback. | `{ field: String\|null, column: Number\|null, direction: 'asc'\|'desc'\|'none', targetId: String }` |
@@ -5352,6 +5376,9 @@ All events bubble up from the target panel element.
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
+| `ln-toggle:request-open` | Listens | No | Command request event sent to open the panel. | `{}` |
+| `ln-toggle:request-close` | Listens | No | Command request event sent to close the panel. | `{}` |
+| `ln-toggle:request-toggle` | Listens | No | Command request event sent to flip the panel between open and closed. | `{}` |
 | `ln-toggle:before-open` | Emits | **Yes** | Fires when the state is about to switch to `"open"`. Prevent default to block the open sequence. | `{ target: HTMLElement }` |
 | `ln-toggle:open` | Emits | No | Fires after the panel has fully opened and classes are updated. | `{ target: HTMLElement }` |
 | `ln-toggle:before-close` | Emits | **Yes** | Fires when the state is about to switch to `"close"`. Prevent default to block the close sequence. | `{ target: HTMLElement }` |

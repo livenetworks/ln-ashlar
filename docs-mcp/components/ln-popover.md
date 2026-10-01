@@ -136,6 +136,9 @@ All events bubble up (`bubbles: true`).
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
+| `ln-popover:request-open` | Listens | No | Command request event sent to open the popover, anchored to `trigger` when given. | `{ trigger?: HTMLElement }` |
+| `ln-popover:request-close` | Listens | No | Command request event sent to close the popover. | `{}` |
+| `ln-popover:request-toggle` | Listens | No | Command request event sent to flip the popover between open and closed. | `{ trigger?: HTMLElement }` |
 | `ln-popover:before-open` | Emits | **Yes** | Fires after attribute changes to `"open"`, before top-layer promotion or placement calculations. | `{ popoverId: String, target: HTMLElement, trigger: HTMLElement? }` |
 | `ln-popover:open` | Emits | No | Fires once the popover is visible in the top layer, positioned, and focus set. | `{ popoverId: String, target: HTMLElement, trigger: HTMLElement? }` |
 | `ln-popover:before-close` | Emits | **Yes** | Fires before close, letting the app prevent closing via `e.preventDefault()`. | `{ popoverId: String, target: HTMLElement, trigger: HTMLElement? }` |

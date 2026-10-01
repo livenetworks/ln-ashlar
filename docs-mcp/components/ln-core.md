@@ -136,6 +136,7 @@ This service module exposes no declarative HTML attributes directly on itself.
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-fill` | Emits | No | Dispatched by `lnFill` to trigger data population or reset across fillable containers. | `Object` (record data) \| `null` (reset signal) |
+| `ln-core:locale-change` | Emits | No | Dispatched on `document` whenever a `lang` attribute changes anywhere in the page; `ln-date`, `ln-number` and `ln-time` re-format on it. The language is switched by setting `lang` — never by dispatching this event. | `{}` |
 
 ---
 

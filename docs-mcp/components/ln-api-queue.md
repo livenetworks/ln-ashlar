@@ -78,6 +78,7 @@ tags: [network, database, offline, queue]
 | `ln-api-queue:request-pause` | Listens | No | Manually pauses queue drainage for this scope. | `{}` |
 | `ln-api-queue:request-drain` | Listens | No | Manually triggers a drain attempt — the canonical way to retry `failed` entries (e.g. a UI "retry failed" action). | `{}` |
 | `ln-api-queue:request-clear` | Listens | No | Empties the queue local store. | `{}` |
+| `ln-api-queue:resolve-create` | Listens | No | A queued create was confirmed by the server: deletes the entry and remaps queued siblings from the temp key to the server ID. | `{ entryId: ID, oldKey: String, newId: ID }` |
 | `ln-api-queue:send` | Emits | No | Dispatched to coordinator to execute request. | `{ entryId: ID, chainKey: String, op: String, payload: Object }` |
 | `ln-api-queue:enqueued` | Emits | No | Dispatched when a task is written. | `{ entryId: ID, chainKey: String, count: Number }` |
 | `ln-api-queue:pending-count` | Emits | No | Emits pending count updates for UI widgets. | `{ count: Number, scope: String }` |
@@ -86,6 +87,7 @@ tags: [network, database, offline, queue]
 | `ln-api-queue:auth-required` | Emits | No | Dispatched when auth pause occurs. | `{ entryId: ID, chainKey: String }` |
 | `ln-api-queue:paused` | Emits | No | Dispatched when draining pauses for a scope (e.g. after an `auth` nack or manual request-pause). | `{ reason: "auth" \| "manual", restored?: Boolean }` |
 | `ln-api-queue:resumed` | Emits | No | Dispatched when draining resumes for a scope. | `{}` |
+| `ln-api-queue:error` | Emits | No | A queue storage operation failed. `operation` names it (`initialize`, `enqueue`, `ack`, `nack`, `remap`, `resolve-create`, `drain`, …). | `{ operation: String, entryId?: ID, error: Error }` |
 
 ---
 

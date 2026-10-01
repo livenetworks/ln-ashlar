@@ -28,7 +28,7 @@ Add these attributes to view elements to bind them to this coordinator's child s
 
 Use `setPresenters` for fields like `updated_display`, `size_display`, `status_label`. The binder delivers them as-is.
 
-The coordinator listens on `this.dom` for `ln-data-store:ready`, `loaded`, `created`, `updated`, `deleted`, `synced` (only when `changed`), `ln-data-store:query-changed`, and `ln-data-store:request-page`. On request-page, it converts page offsets into a `request-query` call on the paired connector's namespace (`ln-api-connector:request-query` or `ln-couchdb-connector:request-query`, depending on which connector is present). On other store-change events, `_refreshAll()` re-queries all bound view elements using their last cached query parameters.
+The coordinator listens on `this.dom` for `ln-data-store:ready`, `loaded`, `created`, `updated`, `deleted`, `synced` (only when `changed`), `ln-data-store:query-changed`, and `ln-data-store:request-page`. On request-page, it converts page offsets into a `request-query` call on the paired connector's namespace (`ln-api-connector:request-query` or `ln-websocket-connector:request-query`, depending on which connector is present). On other store-change events, `_refreshAll()` re-queries all bound view elements using their last cached query parameters.
 
 ### Zero-JS Example
 

@@ -11,7 +11,7 @@ tags: [network, database, couchdb, sync]
 # 🔗 ln-couchdb-connector
 
 > **Classification:** 🌐 Simple component / Remote DB Connection Driver  
-> Applied to a gateway element (`<div data-ln-couchdb-connector data-ln-couchdb-url="..." data-ln-couchdb-db="...">`) inside a coordinator. It listens for database request CustomEvents (`ln-couchdb-connector:request-query`, `create`, `update`, `delete`), queries CouchDB `_changes` feeds with sequence tokens for delta sync, and maps `id` to `_id`/`_rev` on mutations via REST `fetch()`. Upon resolution, it emits `ln-couchdb-connector:data` or mutation response events to the parent coordinator.
+> Applied to a gateway element (`<div data-ln-couchdb-connector data-ln-couchdb-url="..." data-ln-couchdb-db="...">`) inside a coordinator. It listens for database request CustomEvents (`ln-couchdb-connector:request-sync`, `create`, `update`, `delete`, `bulk-delete`), queries CouchDB `_changes` feeds with sequence tokens for delta sync, and maps `id` to `_id`/`_rev` on mutations via REST `fetch()`. Upon resolution, it emits `ln-couchdb-connector:fetched` or mutation response events to the parent coordinator.
 
 ---
 
@@ -71,15 +71,13 @@ tags: [network, database, couchdb, sync]
 
 ### Events API
 
-*Responds to events under `ln-couchdb-connector:...` and `ln-api-connector:...` namespaces for drop-in compatibility.*
-
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `:request-sync` / `:request-fetch` | Listens | No | Triggers delta changes feed updates query. | `{ since?: String, meta?: Object }` |
-| `:request-create` | Listens | No | Triggers document create request. | `{ data: Object, tempId: String, meta?: Object }` |
-| `:request-update` | Listens | No | Triggers document PUT edit. | `{ id: ID, data: Object, expected_version?: String, meta?: Object }` |
-| `:request-delete` | Listens | No | Triggers document DELETE. | `{ id: ID, rev?: String, meta?: Object }` |
-| `:request-bulk-delete` | Listens | No | Triggers bulk document deletes. | `{ ids: Array, meta?: Object }` |
+| `ln-couchdb-connector:request-sync` | Listens | No | Triggers delta changes feed updates query. | `{ since?: String, meta?: Object }` |
+| `ln-couchdb-connector:request-create` | Listens | No | Triggers document create request. | `{ data: Object, tempId: String, meta?: Object }` |
+| `ln-couchdb-connector:request-update` | Listens | No | Triggers document PUT edit. | `{ id: ID, data: Object, expected_version?: String, meta?: Object }` |
+| `ln-couchdb-connector:request-delete` | Listens | No | Triggers document DELETE. | `{ id: ID, rev?: String, meta?: Object }` |
+| `ln-couchdb-connector:request-bulk-delete` | Listens | No | Triggers bulk document deletes. | `{ ids: Array, meta?: Object }` |
 | `ln-couchdb-connector:fetched` | Emits | No | Dispatched upon delta sync responses. | `{ data: Array, since: String, meta: Object }` |
 | `ln-couchdb-connector:created` | Emits | No | Dispatched upon successful document creation. | `{ record: Object, tempId: String, message: String, meta: Object }` |
 | `ln-couchdb-connector:updated` | Emits | No | Dispatched upon successful document edit. | `{ record: Object, id: ID, message: String, meta: Object }` |
@@ -124,7 +122,7 @@ sequenceDiagram
     participant Fetch as window.fetch
     participant CouchDB as CouchDB Server
 
-    Coordinator->>Connector: dispatch ln-api-connector:request-update { id: 'doc_abc', data: { name: 'New Name' } }
+    Coordinator->>Connector: dispatch ln-couchdb-connector:request-update { id: 'doc_abc', data: { name: 'New Name' } }
     Note over Connector: Check if _rev exists. If missing:
     
     Connector->>Fetch: Call GET /db/doc_abc
@@ -138,11 +136,11 @@ sequenceDiagram
     alt HTTP Success (201 Created)
         CouchDB-->>Fetch: Return { ok: true, rev: "2-def" }
         Fetch-->>Connector: Resolve
-        Connector->>Coordinator: dispatch ln-api-connector:updated { id: 'doc_abc', record: { _rev: "2-def", ... } }
+        Connector->>Coordinator: dispatch ln-couchdb-connector:updated { id: 'doc_abc', record: { _rev: "2-def", ... } }
     else HTTP Conflict (409 Conflict)
         CouchDB-->>Fetch: Return conflict error (Document write collision)
         Fetch-->>Connector: Reject
-        Connector->>Coordinator: dispatch ln-api-connector:error { action: 'update', status: 409, conflictData }
+        Connector->>Coordinator: dispatch ln-couchdb-connector:error { action: 'update', status: 409, conflictData }
     end
 ```
 

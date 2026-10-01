@@ -47,7 +47,24 @@ export const DYNAMIC_ALLOWLIST = [
 			'ln-data-store:request-create',
 			'ln-data-store:request-update',
 			'ln-data-store:request-delete',
-			'ln-data-store:request-bulk-delete'
+			'ln-data-store:request-bulk-delete',
+			'ln-api-connector:request-sync',
+			'ln-api-connector:request-query',
+			'ln-api-connector:request-create',
+			'ln-api-connector:request-update',
+			'ln-api-connector:request-delete',
+			'ln-api-connector:request-bulk-delete',
+			'ln-couchdb-connector:request-sync',
+			'ln-couchdb-connector:request-create',
+			'ln-couchdb-connector:request-update',
+			'ln-couchdb-connector:request-delete',
+			'ln-couchdb-connector:request-bulk-delete',
+			'ln-websocket-connector:request-sync',
+			'ln-websocket-connector:request-query',
+			'ln-websocket-connector:request-create',
+			'ln-websocket-connector:request-update',
+			'ln-websocket-connector:request-delete',
+			'ln-websocket-connector:request-bulk-delete'
 		],
 		listens: [
 			'ln-api-connector:fetched',
@@ -80,24 +97,23 @@ export const DYNAMIC_ALLOWLIST = [
 			'ln-data-store:request-bulk-delete',
 			'ln-data-store:request-sync-failed'
 		]
+	}
+];
+
+/**
+ * Static events EVENT_REGEX cannot see (no ':' action segment).
+ * Kept out of DYNAMIC_ALLOWLIST so these files stay under the dynamic guard.
+ */
+export const COLONLESS_ALLOWLIST = [
+	{
+		file: 'components/ln-core/template.js',
+		emits: ['ln-fill'],
+		listens: ['ln-fill']
 	},
 	{
-		file: 'components/ln-couchdb-connector/src/ln-couchdb-connector.js',
+		file: 'components/ln-form/src/ln-form.js',
 		emits: [],
-		listens: [
-			'ln-couchdb-connector:request-sync',
-			'ln-couchdb-connector:request-fetch',
-			'ln-couchdb-connector:request-create',
-			'ln-couchdb-connector:request-update',
-			'ln-couchdb-connector:request-delete',
-			'ln-couchdb-connector:request-bulk-delete',
-			'ln-api-connector:request-sync',
-			'ln-api-connector:request-fetch',
-			'ln-api-connector:request-create',
-			'ln-api-connector:request-update',
-			'ln-api-connector:request-delete',
-			'ln-api-connector:request-bulk-delete'
-		]
+		listens: ['ln-fill']
 	}
 ];
 
@@ -823,8 +839,8 @@ export function main() {
 	// 2. Extract static events
 	const { componentEvents, staticUniqueEvents, unclassifiedLiterals } = extractStaticEvents(filesToScan, compDirs);
 
-	// 3. Merge Dynamic Allowlist
-	for (const entry of DYNAMIC_ALLOWLIST) {
+	// 3. Merge Dynamic + Colonless Allowlists
+	for (const entry of [...DYNAMIC_ALLOWLIST, ...COLONLESS_ALLOWLIST]) {
 		const relFile = entry.file.replace(/\\/g, '/');
 		const compMatch = relFile.match(/^components\/([^/]+)/);
 		const comp = compMatch ? compMatch[1] : null;
@@ -866,7 +882,13 @@ export function main() {
 
 	const phantoms = [];
 	for (const [ev, entries] of docEventsGlobal.entries()) {
-		if (!allEvents.has(ev)) phantoms.push({ name: ev, docs: entries.map(e => e.comp) });
+		if (allEvents.has(ev)) continue;
+		// Pattern row (`ln-{kind}:set-data`) — covered when any concrete expansion exists
+		if (ev.includes('{')) {
+			const re = new RegExp('^' + ev.split(/\{[a-z]+\}/).map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('[a-z0-9-]+') + '$');
+			if ([...allEvents.keys()].some(name => re.test(name))) continue;
+		}
+		phantoms.push({ name: ev, docs: entries.map(e => e.comp) });
 	}
 
 	// Output paths

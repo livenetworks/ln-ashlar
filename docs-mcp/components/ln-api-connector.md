@@ -80,7 +80,7 @@ tags: [network, REST, sync, fetch, debounce]
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-api-connector:request-sync` / `ln-api-connector:request-fetch` | Listens | No | Triggers delta updates query. | `{ since?: String, meta?: Object }` |
+| `ln-api-connector:request-sync` | Listens | No | Triggers delta updates query. | `{ since?: String, meta?: Object }` |
 | `ln-api-connector:request-query` | Listens | No | Triggers structured query/pagination fetch. | `{ query?: Object, meta?: Object }` |
 | `ln-api-connector:request-cancel` | Listens | No | Aborts in-flight fetch or query for the target element/key. | `{ targetEl?: Element, key?: String, meta?: Object }` |
 | `ln-api-connector:request-create` | Listens | No | Triggers document create request. | `{ data: Object, tempId: String, url?: String, idempotencyKey?: String, meta?: Object }` |

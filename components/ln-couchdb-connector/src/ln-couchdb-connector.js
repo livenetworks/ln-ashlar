@@ -354,16 +354,11 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders, define
 			}
 		};
 
-		// Bind events for CouchDB namespaces and also API connector namespaces for 3-tier compatibility
-		const namespaces = ['ln-couchdb-connector', 'ln-api-connector'];
-		namespaces.forEach(function (ns) {
-			self.dom.addEventListener(ns + ':request-sync', self._handlers.sync);
-			self.dom.addEventListener(ns + ':request-fetch', self._handlers.sync);
-			self.dom.addEventListener(ns + ':request-create', self._handlers.create);
-			self.dom.addEventListener(ns + ':request-update', self._handlers.update);
-			self.dom.addEventListener(ns + ':request-delete', self._handlers.delete);
-			self.dom.addEventListener(ns + ':request-bulk-delete', self._handlers.bulkDelete);
-		});
+		self.dom.addEventListener('ln-couchdb-connector:request-sync', self._handlers.sync);
+		self.dom.addEventListener('ln-couchdb-connector:request-create', self._handlers.create);
+		self.dom.addEventListener('ln-couchdb-connector:request-update', self._handlers.update);
+		self.dom.addEventListener('ln-couchdb-connector:request-delete', self._handlers.delete);
+		self.dom.addEventListener('ln-couchdb-connector:request-bulk-delete', self._handlers.bulkDelete);
 	}
 
 	_component.prototype.destroy = function () {
@@ -371,15 +366,11 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders, define
 
 		const self = this;
 		if (self._handlers) {
-			const namespaces = ['ln-couchdb-connector', 'ln-api-connector'];
-			namespaces.forEach(function (ns) {
-				self.dom.removeEventListener(ns + ':request-sync', self._handlers.sync);
-				self.dom.removeEventListener(ns + ':request-fetch', self._handlers.sync);
-				self.dom.removeEventListener(ns + ':request-create', self._handlers.create);
-				self.dom.removeEventListener(ns + ':request-update', self._handlers.update);
-				self.dom.removeEventListener(ns + ':request-delete', self._handlers.delete);
-				self.dom.removeEventListener(ns + ':request-bulk-delete', self._handlers.bulkDelete);
-			});
+			self.dom.removeEventListener('ln-couchdb-connector:request-sync', self._handlers.sync);
+			self.dom.removeEventListener('ln-couchdb-connector:request-create', self._handlers.create);
+			self.dom.removeEventListener('ln-couchdb-connector:request-update', self._handlers.update);
+			self.dom.removeEventListener('ln-couchdb-connector:request-delete', self._handlers.delete);
+			self.dom.removeEventListener('ln-couchdb-connector:request-bulk-delete', self._handlers.bulkDelete);
 			self._handlers = null;
 		}
 

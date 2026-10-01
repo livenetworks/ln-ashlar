@@ -101,7 +101,7 @@ Configured for both creation and modification. Uses dynamic action path template
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-fill` | Listens | No | Populates form elements with data or resets them if `null`. | `{ record: Object \| null }` |
+| `ln-fill` | Listens | No | Populates form elements with data or resets them if `null`. | `Object` (record) \| `null` |
 
 ---
 
