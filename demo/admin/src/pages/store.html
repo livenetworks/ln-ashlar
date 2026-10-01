@@ -1,14 +1,12 @@
 <!-- ln-page: title="Store — ln-ashlar" h1="Store" -->
 
-<h1>Store</h1>
-
 					<!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>In traditional web applications, the network is treated as a blocking dependency. Clicking a save button displays a spinner while blocking the UI, waiting for a round-trip network payload. If the connection is unstable, operations timeout, data is lost, and the user is blocked.</p>
+							<p><strong><code>ln-data-store</code></strong> is applied to a hidden element via <code>data-ln-data-store id="name"</code> to provide client-side IndexedDB persistence with automatic schema indexing and optional AES-GCM encryption. It is completely decoupled from the network: responding to request events (<code>ln-data-store:request-query</code>, <code>request-save</code>, <code>request-delete</code>) against local records and broadcasting <code>ln-data-store:stale</code> when cached data expires, allowing applications to function offline and render cached data instantly.</p>
 
-							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-store</code>, a highly-optimized, zero-dependency **Local-First Sync Layer**. It acts as a client-side database (backed by standard browser IndexedDB) that decouples user interactions from network transport speeds. The application renders data directly from local storage, handles writes optimistically in real-time, and synchronizes data with the server in the background using a lightweight delta protocol.</p>
+							<p>In <code>ln-ashlar</code>, this local-first cache layer decouples UI responsiveness from network latency, treating IndexedDB as the immediate source of truth for presentation components.</p>
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

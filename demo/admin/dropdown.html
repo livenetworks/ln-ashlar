@@ -229,9 +229,9 @@
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>A dropdown menu is one of the most common layout controls in web applications. While simple on the surface, a premium dropdown menu requires robust engineering: it must close when the user clicks outside, close on viewport resizes, promote to the browser's top layer to escape parent stacking contexts (preventing <code>overflow: hidden</code> clippings), provide full ARIA APG keyboard roving navigation, and position itself dynamically to fit the viewport.</p>
+							<p><strong><code>ln-dropdown</code></strong> is applied to a container via <code>&lt;div data-ln-dropdown&gt;</code> enclosing a trigger button and a <code>&lt;ul data-ln-toggle&gt;</code> menu. When the menu emits <code>ln-toggle:open</code>, it promotes the menu to the browser's top layer using the native Popover API (<code>popover="manual"</code>) and computes floating alignment coordinates to avoid clipping from parent containers. On outside clicks or pressing <kbd>Escape</kbd>, it writes <code>data-ln-toggle="close"</code> back to the menu attribute, maintaining strict separation between binary state and top-layer positioning.</p>
 
-							<p>In <code>ln-ashlar</code>, we solve this elegantly. <strong><code>ln-dropdown</code> is a coordinator wrapper</strong> that layers this menu-grade behavior on top of a standard <strong><code>ln-toggle</code></strong> instance. The dropdown component does not re-implement state; it delegates 100% of its open/closed state management to the underlying toggle primitive, adding top-layer popover promotion, keyboard roving focus, click-outside listeners, and positioning math on top.</p>
+							<p>In <code>ln-ashlar</code>, <strong><code>ln-dropdown</code> is a coordinator wrapper</strong> that layers menu-grade behavior on top of a standard <strong><code>ln-toggle</code></strong> instance with full keyboard roving navigation and boundary collision avoidance.</p>
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

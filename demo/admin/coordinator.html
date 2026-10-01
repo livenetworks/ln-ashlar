@@ -225,13 +225,11 @@
 		<!-- Content -->
 		<section>
 			<div class="app-content-wrapper">
-<h1>Data Coordinator</h1>
-
 <!-- Overview / philosophy -->
 <section class="section-card">
 	<header><h3>Overview &amp; Decoupled Architecture</h3></header>
 	<main>
-		<p>The <strong>Data Coordinator</strong> (<code>data-ln-data-coordinator</code>) acts as the parent orchestrator of the decoupled 3-Tier Local-First architecture in <code>ln-ashlar</code>. It encapsulates two completely blind sibling concerns—local database cache storage and transport networking gateway—and wires them together using event-driven bubbling and Promise chains.</p>
+		<p><strong><code>ln-data-coordinator</code></strong> is applied to a parent container (e.g. <code>&lt;ul data-ln-data-coordinator hidden&gt;</code>) enclosing an <code>ln-data-store</code> and a data transport connector (<code>ln-api-connector</code>, <code>ln-couchdb-connector</code>, or <code>ln-websocket-connector</code>). It catches store staleness and query requests to dispatch fetch events to the connector, delivering responses back to the store. On store mutations, it computes local queries and routes structured <code>set-data</code> events directly to bound presentation components (such as <code>ln-table</code>, <code>ln-list</code>, or <code>ln-stat</code>) without custom glue code.</p>
 
 		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 			<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

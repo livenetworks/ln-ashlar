@@ -227,9 +227,10 @@
 			<div class="app-content-wrapper">
 <!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Overview &amp; Architecture</h3></header>
+						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>For datasets too large to cache entirely client-side, <code>ln-list</code> provides a high-performance **SSR Hydration &amp; Windowed Sync** pipeline matching the <code>ln-table</code> synchronization protocol: an instant paint from server-rendered items, followed by a bounded sliding-window cache that fetches pages from the server as the user scrolls.</p>
+							<p>Applied to a list or grid container via <code>data-ln-list="name"</code>, <code>ln-list</code> renders and manages repeating item collections. In SSR mode, it coordinates direct DOM search, filter, and sort interactions on its child items. In data-driven mode (<code>data-ln-list-source="store"</code>), it listens for <code>ln-data-store:data</code> CustomEvents, clones <code>&lt;template data-ln-template="name-row"&gt;</code>, populates fields via <code>fill()</code>, and mounts rendered items into <code>[data-ln-list-body]</code> with optional virtual scroll windowing.</p>
+							<p>For datasets too large to cache entirely client-side, <code>ln-list</code> provides a high-performance <strong>SSR Hydration &amp; Windowed Sync</strong> pipeline matching the <code>ln-table</code> synchronization protocol: an instant paint from server-rendered items, followed by a bounded sliding-window cache that fetches pages from the server as the user scrolls.</p>
 
 							<div class="alert" role="alert">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg>

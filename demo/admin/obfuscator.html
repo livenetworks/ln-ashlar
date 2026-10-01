@@ -268,8 +268,8 @@
 <section class="section-card">
 	<header><h3>Overview</h3></header>
 	<main>
-		<p>The <code>ln-obfuscator</code> component is an autonomous anti-crawler utility. It prevents automated email harvesters, telephone scrapers, and bot crawlers from extracting raw contact info and proprietary text from static HTML responses.</p>
-		<p>It can be placed on <strong>any HTML element</strong> — plain text spans, paragraphs, table cells, or anchor tags (<code>&lt;a&gt;</code>). Upon boot, it traverses all child text nodes and automatically deobfuscates them in place. For links, it simultaneously deobfuscates the <code>href</code> attribute (e.g. <code>mailto:</code> or <code>tel:</code> targets).</p>
+		<p><strong><code>ln-obfuscator</code></strong> binds to any DOM element carrying <code>data-ln-obfuscator</code> (<code>&lt;span&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;a&gt;</code>, table cells) and automatically deobfuscates its text nodes and <code>href</code> attributes at runtime. It operates with zero configuration using ROT13 as default, and supports universal Base64 and XOR ciphers via optional attributes for international scripts while maintaining an internal idempotency guard without DOM pollution.</p>
+		<p>It prevents automated email harvesters, telephone scrapers, and bot crawlers from extracting raw contact info and proprietary text from static HTML responses.</p>
 		<div class="table-container">
 			<table>
 				<thead><tr><th>Attribute</th><th>Element</th><th>Default</th><th>Description</th></tr></thead>

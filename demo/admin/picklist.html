@@ -225,13 +225,11 @@
 		<!-- Content -->
 		<section>
 			<div class="app-content-wrapper">
-<h1>Picklist</h1>
-
-				<!-- Overview / philosophy -->
+<!-- Overview / philosophy -->
 				<section class="section-card">
 					<header><h3>Overview &amp; Philosophy</h3></header>
 					<main>
-						<p>One parent element — the root — is what the component is applied to. It listens for the <code>change</code> event: on select it moves the item to the other list, on uncheck it returns it. That simple.</p>
+						<p><strong><code>ln-picklist</code></strong> is applied to a dual-pane container via <code>data-ln-picklist</code> wrapping an available list (<code>data-ln-picklist-list="available"</code>) and a selected list (<code>data-ln-picklist-list="selected"</code>). It listens for native <code>change</code> events on child checkboxes: checking an item moves its <code>&lt;li&gt;</code> into the selected list, while unchecking returns it to available. The native checkboxes directly govern DOM position and standard form submission (<code>name</code>/<code>value</code>) with zero hidden inputs, synthetic arrays, or state mirroring.</p>
 
 						<p>Why it is worth having at all: <code>&lt;select multiple&gt;</code> is hostile — it demands ctrl-clicking, gives no room to see what you picked, and loses the selection the moment the scroll position surprises you. A picklist puts the pool on the left and the choices on the right, both fully visible.</p>
 

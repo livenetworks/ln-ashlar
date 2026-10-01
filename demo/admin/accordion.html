@@ -229,9 +229,9 @@
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>In traditional frontend libraries, an accordion is a heavy, monolithic component that owns everything: click events, height transitions, keyboard accessibility (ARIA), active-panel state, and storage persistence. If you want a multi-open variant or different persistence, you have to pass complex configuration flags.</p>
+							<p><strong><code>ln-accordion</code></strong> is applied to a parent container via <code>data-ln-accordion</code> wrapping multiple independent <code>ln-toggle</code> panels. It carries zero internal state and listens solely for bubbling <code>ln-toggle:open</code> events from its children. When one panel opens, it enforces mutual exclusivity by setting <code>data-ln-toggle="close"</code> on all open siblings—leaving all ARIA management, click handling, and smooth CSS transitions entirely to <code>ln-toggle</code>.</p>
 
-							<p>In <code>ln-ashlar</code>, an accordion is fundamentally different: <strong>it is a "Coordinator"</strong>. A coordinator is a lightweight, stateless ruleset that mediates between independent, highly-specialized primitives. The <code>ln-accordion</code> component is only 38 lines of JavaScript, and it possesses no state of its own. It simply sits back, listens to the DOM, and coordinates two other completely independent players: <code>ln-toggle</code> (which manages binary state and ARIA) and the CSS <code>.collapsible</code> mixin (which manages transitions).</p>
+							<p>In <code>ln-ashlar</code>, an accordion is a pure <strong>Coordinator</strong>: a lightweight, stateless ruleset (only 38 lines of JavaScript) that sits back, listens to the DOM, and mediates between independent, highly-specialized primitives.</p>
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

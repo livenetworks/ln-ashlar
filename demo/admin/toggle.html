@@ -229,9 +229,9 @@
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>Every complex open/close user interface element in a modern web application—whether it is a sidebar drawer, a dropdown menu, a collapsible section, a dismissible alert, or a single-open accordion—shares a common heart. They all require a reliable state machine to transition between "open" and "closed".</p>
+							<p><strong><code>ln-toggle</code></strong> is applied to any collapsible panel element via <code>data-ln-toggle</code>, with trigger buttons bound from anywhere in the DOM via <code>data-ln-toggle-for="id"</code>. It listens for trigger clicks and reacts to direct attribute mutations to toggle binary <code>open</code> / <code>close</code> state. The <code>data-ln-toggle</code> DOM attribute is the single source of truth—automatically keeping <code>aria-expanded</code> and the <code>.open</code> CSS class in sync with zero JavaScript height calculations or private shadow state.</p>
 
-							<p>In <code>ln-ashlar</code>, this state machine is encapsulated in <strong><code>ln-toggle</code></strong>, the library's smallest and most fundamental reactive primitive. By isolating binary state into a single, high-fidelity primitive, we ensure that higher-level components do not have to reinvent the state wheel. In fact, advanced components like <code>ln-accordion</code> and <code>ln-dropdown</code> are simply lightweight coordinators sitting on top of <code>ln-toggle</code>.</p>
+							<p>Every complex open/close user interface element in a modern web application—whether a sidebar drawer, a dropdown menu, a collapsible section, a dismissible alert, or an accordion—shares this common state machine.</p>
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

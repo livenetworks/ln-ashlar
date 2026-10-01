@@ -4,9 +4,9 @@
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>Validation in modern web projects is often over-engineered, relying on heavy client-side JavaScript schema engines. This introduces significant lag, delays keystroke rendering, and completely ignores the high-performance validation engine already built into every modern web browser.</p>
+							<p><strong><code>ln-validate</code></strong> is applied to form controls (<code>&lt;input data-ln-validate&gt;</code>, <code>&lt;select&gt;</code>, <code>&lt;textarea&gt;</code>) inside a <code>.form-element</code> wrapper. On initialization, it automatically sets <code>novalidate</code> on the host form to take control of validation messaging. On field blur or input (after touched), it evaluates the browser's native C++ <code>ValidityState</code> API, dynamically unhiding matching error messages (<code>[data-ln-validate-error="rule"]</code>) and updating <code>aria-invalid</code>. If validation errors exist on form submit, it cancels submission and automatically focuses the first invalid input.</p>
 
-							<p>In <code>ln-ashlar</code>, validation is handled by <code>ln-validate</code>, which functions as a pure **Validity Primitive**. It is a lightweight, high-performance module (~160 lines of JavaScript) that does not define or execute validation rules itself. Instead, it wraps the browser's native, highly-optimized <code>ValidityState</code> API and acts as a bridge: managing exactly <em>when</em> to show errors, <em>how</em> to surface them visually, and <em>what</em> events to dispatch so external form coordinators can react.</p>
+							<p>In <code>ln-ashlar</code>, validation is handled as a pure validity primitive (~160 lines of JavaScript) that wraps native browser APIs instead of relying on heavy client-side schema engines.</p>
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

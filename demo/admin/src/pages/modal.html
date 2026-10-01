@@ -4,9 +4,9 @@
 <section class="section-card">
 	<header><h3>Overview &amp; Philosophy</h3></header>
 	<main>
-		<p>When an action requires immediate user attention, data input, or a high-context confirmation, displaying a modal window is the standard UX pattern. However, a premium modal is more than just a centered dialog box; it requires strict accessibility, focus traps, and scrolling behavior controls.</p>
+		<p><strong><code>ln-modal</code></strong> is applied to a native <code>&lt;dialog data-ln-modal id="..."&gt;</code> element, paired with trigger buttons (<code>data-ln-modal-for="..."</code>) and dismiss controls (<code>data-ln-modal-close</code>). When triggered, it sets <code>data-ln-modal="open"</code>, invokes <code>dialog.showModal()</code> for native focus trapping, and locks background scrolling via <code>.ln-modal-open</code> on <code>&lt;body&gt;</code>. On dismiss clicks, backdrop clicks, or pressing <kbd>Escape</kbd>, it cleanly closes the dialog, restores keyboard focus, and clears the scroll lock.</p>
 
-		<p>In <code>ln-ashlar</code>, this follows the <strong>Three-Layer Architecture</strong>: <strong><code>ln-modal</code></strong> is a Layer 1 Simple Component that manages the native <code>&lt;dialog&gt;</code> overlay state, scroll locking, and accessibility, while <strong><code>ln-ui-coordinator</code></strong> is the Layer 2 Coordinator that handles triggers (<code>data-ln-modal-for</code>), hash navigation (<code>#modalId</code>), data populating (<code>ln-fill</code>), AJAX lifecycle, and form auto-closing (<code>ln-ajax:success</code>).</p>
+		<p>In <code>ln-ashlar</code>, this follows the <strong>Three-Layer Architecture</strong>: <code>ln-modal</code> is a Layer 1 Simple Component that manages the native overlay state and accessibility, while <code>ln-ui-coordinator</code> is the Layer 2 Coordinator that handles triggers, hash navigation (<code>#modalId</code>), record filling (<code>ln-fill</code>), and auto-closing on AJAX success.</p>
 
 		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 			<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

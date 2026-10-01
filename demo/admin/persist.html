@@ -225,9 +225,15 @@
 		<!-- Content -->
 		<section>
 			<div class="app-content-wrapper">
-<h1>Persist</h1>
-				<p>localStorage persistence for UI component states. Opt-in via <code>data-ln-persist</code>. State is global by default — the same <code>id</code> or key resolves to the same storage entry everywhere it appears. Add the independent <code>data-ln-persist-scope="page"</code> attribute to scope a key to the current URL pathname instead.</p>
-				<p><strong>How to test:</strong> Change any state below, then refresh the page — the state should be restored exactly as you left it.</p>
+<!-- Overview -->
+<section class="section-card">
+	<header><h3>Overview &amp; How It Works</h3></header>
+	<main>
+		<p>The <code>ln-persist</code> component is a declarative state persistence decorator applied to elements via <code>data-ln-persist</code>. On page boot, it automatically reads the persisted state from <code>localStorage</code> and applies it directly to the host element's state attribute via <code>setAttribute</code>, immediately restoring user preferences (such as open accordions, active tabs, sort orders, or search queries).</p>
+		<p>An internal <code>MutationObserver</code> observes the component's state attribute in the DOM: whenever user interaction or code changes that attribute, <code>ln-persist</code> synchronizes the updated value back to <code>localStorage</code> in real-time. By default, keys are global by element ID; adding <code>data-ln-persist-scope="page"</code> automatically scopes persistence to the current URL pathname.</p>
+	</main>
+</section>
+
 
 				<!-- ─── Section 1: Toggle ─────────────────────────────── -->
 				<section class="section-card" data-demo-html>

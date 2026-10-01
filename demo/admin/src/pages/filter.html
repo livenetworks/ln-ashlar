@@ -1,14 +1,12 @@
 <!-- ln-page: title="Filter — ln-ashlar" h1="Filter" -->
 
-<h1>Filter</h1>
-
 				<!-- Overview / philosophy -->
 				<section class="section-card">
 					<header><h3>Overview &amp; Philosophy</h3></header>
 					<main>
-						<p>Navigational and tabular layout filtering in web dashboards often requires heavy JavaScript frameworks to manage checkbox states, coordinate multiple column parameters, and update the view dynamically. Writing custom state management code for every filter bar increases development cost and introduces UI bugs.</p>
+						<p><strong><code>ln-filter</code></strong> is applied to a filter control via <code>&lt;nav data-ln-filter="targetId"&gt;</code> containing standard checkbox inputs (<code>data-ln-filter-value="..."</code>) and an "All" reset sentinel (<code>data-ln-filter-reset</code>). On checkbox <code>change</code> events, it updates active filter criteria and maintains sentinel synchronization automatically. It evaluates target items or table rows by dataset attributes or column text, applies <code>data-ln-filter-hide</code> and <code>.hidden</code> to non-matching elements, and dispatches cancelable <code>ln-filter:change</code> CustomEvents for active coordinators to claim.</p>
 
-						<p>In <code>ln-ashlar</code>, this is solved by <code>ln-filter</code>, a zero-dependency **Generic List &amp; Table Filter Primitive**. Operating as an event-driven layer, it upgrades standard HTML checkboxes. It monitors checklist changes natively, filters list items by dataset attributes or table rows by cell columns, synchronizes active states automatically, and can persist filters in local browser storage across page refreshes.</p>
+						<p>In <code>ln-ashlar</code>, this zero-dependency primitive operates as an event-driven layer upgrading standard HTML checkboxes into reactive multi-column and list filter controls.</p>
 
 						<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 							<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

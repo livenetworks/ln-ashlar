@@ -67,7 +67,9 @@ try {
 	// Generate demo sitemap.xml
 	const sitemapEntries = [
 		'\t<!-- Main Demos -->',
-		'\t<url>\n\t\t<loc>index.html</loc>\n\t\t<changefreq>weekly</changefreq>\n\t\t<priority>1.0</priority>\n\t</url>',
+		'\t<url>\n\t\t<loc></loc>\n\t\t<changefreq>weekly</changefreq>\n\t\t<priority>1.0</priority>\n\t</url>',
+		'\t<url>\n\t\t<loc>corporate/index.html</loc>\n\t\t<changefreq>weekly</changefreq>\n\t\t<priority>0.9</priority>\n\t</url>',
+		'\t<url>\n\t\t<loc>landing/index.html</loc>\n\t\t<changefreq>weekly</changefreq>\n\t\t<priority>0.9</priority>\n\t</url>',
 		'\t<url>\n\t\t<loc>admin/index.html</loc>\n\t\t<changefreq>weekly</changefreq>\n\t\t<priority>0.9</priority>\n\t</url>',
 		'\t<url>\n\t\t<loc>spa/index.html</loc>\n\t\t<changefreq>weekly</changefreq>\n\t\t<priority>0.8</priority>\n\t</url>',
 		'\t<url>\n\t\t<loc>docuflow/index.html</loc>\n\t\t<changefreq>weekly</changefreq>\n\t\t<priority>0.7</priority>\n\t</url>',

@@ -1,14 +1,12 @@
 <!-- ln-page: title="Table — ln-ashlar" h1="Table" -->
 
-<h1>Table</h1>
-
 					<!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>In web application design, data grids can often be pre-rendered completely on the server. In these scenarios, introducing a heavy client-side JSON-to-HTML template rendering pipeline (such as <code>ln-table</code>) is unnecessary overhead. The DOM already contains the correct HTML rows on initial load.</p>
-
-							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-table</code>, a highly-optimized **Server-Rendered Table Primitive**. Instead of generating rows dynamically, it parses existing DOM rows directly on paint. It layers ultra-fast, in-memory client-side sorting, column filtering, text searches, and virtual scroll on top of standard pre-rendered HTML, providing a fluid desktop-grid experience with zero database fetching overhead.</p>
+							<p>Applied to a table container via <code>&lt;div data-ln-table id="..."&gt;</code> or <code>&lt;table&gt;</code>, <code>ln-table</code> operates in two distinct modes. In SSR mode, it indexes server-rendered <code>&lt;tbody&gt;</code> rows, intercepting <code>ln-search</code>, <code>ln-filter</code>, and <code>ln-sort</code> CustomEvents to toggle <code>.hidden</code> on <code>&lt;tr&gt;</code> elements or reorder rows in the DOM. In data-driven mode (<code>data-ln-table-source="store"</code>), it listens for <code>ln-data-store:data</code> events, clones <code>&lt;template data-ln-table-row&gt;</code>, populates cells via <code>fill()</code>, and mounts rendered rows into <code>&lt;tbody&gt;</code> with sliding-window virtual scrolling.</p>
+							<p>In web application design, data grids can often be pre-rendered completely on the server. In these scenarios, introducing a heavy client-side JSON-to-HTML template rendering pipeline is unnecessary overhead. The DOM already contains the correct HTML rows on initial load.</p>
+							<p>Instead of generating rows dynamically, <code>ln-table</code> parses existing DOM rows directly on paint. It layers ultra-fast, in-memory client-side sorting, column filtering, text searches, and virtual scroll on top of standard pre-rendered HTML, providing a fluid desktop-grid experience with zero database fetching overhead.</p>
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

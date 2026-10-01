@@ -225,8 +225,15 @@
 		<!-- Content -->
 		<section>
 			<div class="app-content-wrapper">
-<h1>Table Filter</h1>
-				<p>Complete table filtering pattern — global search, per-column filters (popover), and sort. Combines <code>ln-filter</code>, <code>ln-popover</code>, and <code>ln-sort</code>.</p>
+<!-- Overview -->
+<section class="section-card">
+	<header><h3>Overview &amp; How It Works</h3></header>
+	<main>
+		<p>The <code>ln-table-coordinator</code> component is applied to a container element via <code>&lt;section data-ln-table-coordinator&gt;</code> enclosing an <code>ln-table</code>, search controls, and filter popovers. It acts as a Layer 2 mediator: listening for bubbling <code>ln-filter:change</code> events to toggle active indicator classes (<code>.ln-filter-active</code>) on column header buttons, and capturing the page <kbd>/</kbd> hotkey to instantly focus the search input.</p>
+		<p>When a user clicks a clear action (<code>[data-ln-table-clear]</code>), the coordinator resets search fields and unchecks active filter checkboxes in one coordinated step. It never manipulates or renders table rows directly, leaving data indexing to <code>ln-table</code> and filter logic to <code>ln-filter</code>.</p>
+	</main>
+</section>
+
 
 				<!-- Employee table demo -->
 				<section class="section-card" data-demo-html data-ln-table-coordinator>

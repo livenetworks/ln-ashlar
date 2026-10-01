@@ -1,13 +1,13 @@
 <!-- ln-page: title="WebSocket Connector — ln-ashlar" h1="WebSocket Connector" -->
 
 <section class="section-card">
-	<header><h3>Overview</h3></header>
+	<header><h3>Overview &amp; Philosophy</h3></header>
 	<main>
-		<p><code>data-ln-websocket-connector</code> opens a WebSocket inside a <code>ln-data-coordinator</code>. Server pushes land in the store, and every bound table refreshes. Beside a REST connector it only delivers live changes; on its own it carries reads, writes and pushes.</p>
-		<p>Both examples talk to one local mock. Start it, then reload this page:</p>
+		<p>Applied to an element via <code>data-ln-websocket-connector</code> inside a <code>ln-data-coordinator</code> tree, this component opens a WebSocket connection, turns server pushes into <code>ln-websocket-connector:fetched</code>, and answers the same request events as <code>ln-api-connector</code> and <code>ln-couchdb-connector</code>. Connection status is private state announced by events (<code>:connecting</code>, <code>:connected</code>, <code>:disconnected</code>) &mdash; never mirrored as a DOM attribute.</p>
+		<p>As a zero-dependency push transport, it can run beside a REST connector to deliver live backend changes into local stores, or run standalone to carry reads, writes, and real-time pushes over a single duplex socket.</p>
+		<p>Both examples below talk to one local mock. Start it, then reload this page:</p>
 		<pre><code>php demo/websocket/ws-mock.php</code></pre>
-		<p>It listens on port 8090, changes a random task every few seconds, and pushes every write to every open socket — a task added in one example appears in the other.</p>
-		<p>Connection status is not an attribute. The connector announces it with <code>:connecting</code>, <code>:connected</code> and <code>:disconnected</code>; this page listens and colours the chip.</p>
+		<p>It listens on port 8090, changes a random task every few seconds, and pushes every write to every open socket &mdash; a task added in one example appears in the other.</p>
 	</main>
 </section>
 

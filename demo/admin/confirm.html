@@ -229,9 +229,9 @@
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>Confirming dangerous or destructive actions (like deleting a user or clearing a database) is a critical requirement in modern admin interfaces. Traditionally, libraries solve this by blocking interaction with heavy modals or using browser-native <code>window.confirm()</code> dialogues, which freeze thread execution, look unstyled, and disrupt developer flows.</p>
+							<p><strong><code>ln-confirm</code></strong> is applied directly to action controls via <code>&lt;button data-ln-confirm&gt;</code> or <code>&lt;a data-ln-confirm&gt;</code>. On the first click, it intercepts the event via <code>e.preventDefault()</code>, transitions the control to <code>data-ln-confirm-state="confirming"</code>, reveals the armed confirmation prompt (or activates <code>[data-ln-confirm-active]</code>), and starts an auto-revert timer. If the user clicks a second time before timeout, it releases the native platform event—allowing the form to submit, link to navigate, or AJAX handler to execute naturally—while reverting to idle if the timer expires.</p>
 
-							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-confirm</code>, an ultra-lightweight **Interaction Gate Primitive** (~109 lines of JavaScript). Instead of popping up disruptive separate overlays, it turns the target button itself into a self-contained, two-click confirmation gate. It swallows the first click, morphs in-place to reveal the confirmation prompt, and releases the second click directly to the platform's native event processors.</p>
+							<p>In <code>ln-ashlar</code>, this serves as an in-place interaction gate for single-element, low-impact actions, avoiding disruptive modals or blocking browser dialogue windows.</p>
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

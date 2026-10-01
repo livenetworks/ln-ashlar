@@ -237,7 +237,13 @@
 		border: 1px solid var(--border-muted);
 		line-height: 1.6;
 	}
-</style><section class="section-card">	<header><h3>Overview & Architecture</h3></header>	<main>		<p>This page demonstrates <strong>SSR hydration with a local cache &amp; remote sync layer</strong>: the server prints the first 100 rows into <code>&lt;tbody&gt;</code>, and <code>ln-table</code> hydrates them into the cache, then performs virtual windowed scrolling to fetch further pages on demand from a remote API.</p>
+</style>
+
+<section class="section-card">
+	<header><h3>Overview &amp; Philosophy</h3></header>
+	<main>
+		<p>Applied to a table container via <code>&lt;div data-ln-table id="..."&gt;</code> or <code>&lt;table&gt;</code>, <code>ln-table</code> bridges server-rendered DOM elements with dynamic client-side datasets. In SSR mode, it indexes server-rendered rows directly from <code>&lt;tbody&gt;</code>, while in data-driven mode (<code>data-ln-table-source="store"</code>), it listens for <code>ln-data-store:data</code> events, clones row templates, and mounts rendered rows using sliding-window virtual scrolling.</p>
+		<p>This page demonstrates <strong>SSR hydration with a local cache &amp; remote sync layer</strong>: the server prints the first 100 rows into <code>&lt;tbody&gt;</code>, and <code>ln-table</code> hydrates them into the cache, then performs virtual windowed scrolling to fetch further pages on demand from a remote API.</p>
 
 <section class="alert-box">
 	<h4>

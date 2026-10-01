@@ -1,14 +1,19 @@
 <!-- ln-page: title="Diagnostics & Linter — ln-ashlar" h1="Diagnostics (DOM Linter)" -->
 
-<h1>Diagnostics &amp; DOM Linter</h1>
-<p>Visual, CSS-based linter that runs only during local development. It flags integration mistakes, missing attributes, and DOM layout errors instantly in the browser without any runtime performance overhead.</p>
+<!-- Overview -->
+<section class="section-card">
+	<header><h3>Overview &amp; How It Works</h3></header>
+	<main>
+		<p>The <code>ln-debug</code> diagnostic engine is activated by placing <code>data-ln-debug</code> on the <code>&lt;body&gt;</code> element. It acts as a comprehensive runtime and DOM linter during development: monitoring DOM mutations and custom events, verifying that cross-referencing IDs (like <code>data-ln-toggle-for</code> or <code>data-ln-modal-for</code>) point to existing elements, and ensuring data consumers resolve to registered stores.</p>
+		<p>It also checks all <code>data-ln-*</code> attributes against the library's formal schema catalog, immediately warning in the console about typos using Levenshtein string distance. In production builds, diagnostic checks remain completely dormant or are excluded via stylesheet stripping, ensuring zero runtime overhead.</p>
 
-<div class="alert warning">
-	<h5>Development-Only Warning</h5>
-	<p>These warnings are powered by the <code>ln-ashlar-dev.css</code> stylesheet. In production environments, this stylesheet is excluded, guaranteeing zero layout overrides and zero performance penalty.</p>
-</div>
+		<div class="alert warning" style="margin-block-start: var(--size-md);">
+			<h5>Development-Only Warning</h5>
+			<p>These warnings are powered by the <code>ln-ashlar-dev.css</code> stylesheet. In production environments, this stylesheet is excluded, guaranteeing zero layout overrides and zero performance penalty.</p>
+		</div>
+	</main>
+</section>
 
-<hr class="my-lg">
 
 <!-- Case 2: Missing Wrapper ID Warning -->
 <section class="section-card" data-demo-html>

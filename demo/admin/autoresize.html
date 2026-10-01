@@ -240,9 +240,9 @@
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>Almost every modern web application features dynamic comment composers, chat inputs, or feedback fields that grow seamlessly with their content. Typically, developers either resort to heavy, complex JavaScript third-party wrapper components, or write naive resize scripts that flicker, jump, or completely fail to shrink when text is deleted.</p>
+							<p><strong><code>ln-autoresize</code></strong> is applied directly to multi-line input fields via <code>&lt;textarea data-ln-autoresize rows="1"&gt;</code>. It listens for native browser <code>input</code> events: on each keystroke, it resets <code>height = 'auto'</code>, measures <code>scrollHeight</code>, and immediately assigns the calculated pixel height to the style attribute. It maintains zero internal state and introduces no heavy observers, executing a clean, synchronous layout calculation that smoothly expands and collapses textareas without visual flicker.</p>
 
-							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-autoresize</code>, a highly-optimized, zero-dependency **UX Helper Primitive** (~47 lines of JavaScript). Instead of introducing heavy observers or layouts, it hooks directly into the browser's high-performance layout rendering cycle. It watches standard <code>input</code> events, reads the element's dynamic scroll height, and updates the inline CSS size instantaneously.</p>
+							<p>In <code>ln-ashlar</code>, this is solved by an ultra-lightweight UX helper primitive (~47 lines of JavaScript) hooking directly into the browser's native layout cycle.</p>
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

@@ -1,14 +1,12 @@
 <!-- ln-page: title="Localization (Date & Number) — ln-ashlar" h1="Localization (Date & Number)" -->
 
-<h1>Localization (Date &amp; Number)</h1>
-
 <!-- Overview / philosophy -->
 <section class="section-card">
 	<header><h2>Overview &amp; Philosophy</h2></header>
 	<main>
-		<p>Formatting numbers, currencies, and dates across global enterprise applications is traditionally fraught with heavy, bloated third-party JavaScript dependencies. These often introduce slow parse times, bundle inflation, and conflicting client/server date parsing logic.</p>
+		<p><strong><code>ln-date</code></strong> and <strong><code>ln-number</code></strong> provide localized date and numeric input masks. <code>ln-date</code> (applied via <code>&lt;input type="date" data-ln-date&gt;</code>) wraps date inputs into a visible locale-formatted text input while synchronizing with a hidden native calendar picker and an ISO-formatted hidden input for clean form submissions. <code>ln-number</code> (applied via <code>data-ln-number</code>) parses digits in real time, formats currency and thousand separators using native <code>Intl.NumberFormat</code> while preserving cursor position, and serializes the raw numeric value for the backend.</p>
 
-		<p>In <code>ln-ashlar</code>, this is resolved by <code>ln-number</code> and <code>ln-date</code> — two zero-dependency, high-performance form input enhancers. Operating on standard HTML inputs, they provide real-time, locale-aware presentation formatting while preserving pristine, raw machine-readable data payloads (numbers and ISO 8601 strings) for backend form submissions via automatically managed hidden inputs.</p>
+		<p>In <code>ln-ashlar</code>, these zero-dependency enhancers operate directly on standard HTML inputs without heavy date/math libraries.</p>
 
 		<div class="alert-box">
 			<h4>

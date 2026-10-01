@@ -1,14 +1,12 @@
 <!-- ln-page: title="Forms &amp; Buttons — ln-ashlar" h1="Forms &amp; Buttons" -->
 
-<h1>Forms &amp; Buttons</h1>
-
 				<!-- Overview / philosophy -->
 				<section class="section-card">
 					<header><h3>Overview &amp; Philosophy</h3></header>
 					<main>
-						<p>In traditional frontend development, forms are notoriously complex. Libraries either force you into a heavy, reactive JavaScript state container (which controls every keystroke and delays rendering), or they leave you to write brittle, manual validation loops that bypass native browser capabilities.</p>
+						<p><strong><code>ln-form</code></strong> is applied to standard HTML forms via <code>&lt;form data-ln-form action="..." method="..."&gt;</code>. It listens for <code>ln-fill</code> events carrying record payloads to populate matching controls (<code>[name="key"]</code>) and dispatches synthetic <code>input</code> and <code>change</code> events so reactive components (like <code>ln-validate</code> and <code>ln-autoresize</code>) update in sync. In edit workflows, it automatically ensures an <code>&lt;input type="hidden" name="_method" value="PUT"&gt;</code> exists for RESTful method spoofing, without intercepting native form submission.</p>
 
-						<p>In <code>ln-ashlar</code>, forms are built on a strict, platform-first **Coordinator &amp; Primitive** doctrine. Instead of inventing a custom JS state engine, we upgrade native HTML forms. Under this architecture, a form is split into three decoupled layers that communicate seamlessly using standard DOM events and attributes:</p>
+						<p>In <code>ln-ashlar</code>, forms are built on a strict, platform-first **Coordinator &amp; Primitive** doctrine: upgrading native HTML forms instead of inventing a custom JavaScript state engine.</p>
 
 						<div class="alert-box">
 							<h4>
