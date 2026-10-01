@@ -6,6 +6,8 @@ const __dir = fileURLToPath(new URL('.', import.meta.url));
 const pagesDir = join(__dir, 'pages');
 const shellPath = join(__dir, 'shell.html');
 const outDir = join(__dir, '..');
+// Sitemap <loc> values must be absolute URLs — Google rejects relative ones.
+const siteUrl = 'https://ashlar.live.net.mk/';
 
 
 function escapeRegex(str) {
@@ -79,7 +81,7 @@ try {
 		sitemapEntries.push(`\t<url>\n\t\t<loc>admin/${file}</loc>\n\t\t<changefreq>monthly</changefreq>\n\t\t<priority>0.6</priority>\n\t</url>`);
 	}
 
-	const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapEntries.join('\n')}\n</urlset>\n`;
+	const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapEntries.join('\n').replaceAll('<loc>', `<loc>${siteUrl}`)}\n</urlset>\n`;
 	await writeFile(join(__dir, '..', '..', 'sitemap.xml'), sitemapXml, 'utf8');
 	console.log('  updated sitemap.xml');
 } catch (err) {
