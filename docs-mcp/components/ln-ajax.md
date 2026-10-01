@@ -115,6 +115,9 @@ Excludes specific nested elements (links/forms) from being intercepted inside an
 | `ln-ajax:success` | Emits | No | Fires upon receiving a successful response (HTTP 2xx). | `{ method: String, url: String, data: Object }` |
 | `ln-ajax:error` | Emits | No | Fires when the request fails (network error or HTTP error codes). | `{ method: String, url: String, status: Number, data: Object\|null, error: Error\|null }` |
 | `ln-ajax:complete` | Emits | No | Fires after clean-up actions have completed. | `{ method: String, url: String }` |
+| `ln-ajax:aborted` | Emits | No | Fires when a newer GET supersedes this in-flight GET (its response writes document-wide: title, ids, history). Ends the lifecycle in place of `success`/`error`/`complete`. Non-GET requests are never aborted. | `{ method: String, url: String }` |
+
+Every `ln-ajax:start` is followed by exactly one of `ln-ajax:complete` or `ln-ajax:aborted`.
 
 *Notification Integration:* Toast notifications upon AJAX success or failure are handled by Layer 2 coordinators (e.g., [`ln-ui-coordinator`](./ln-ui-coordinator.md)), which listen for `ln-ajax:success` and `ln-ajax:error` and dispatch `ln-toast:enqueue`.
 

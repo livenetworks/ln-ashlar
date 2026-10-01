@@ -14,6 +14,16 @@
 			"detail": "{ target: HTMLElement }",
 			"source": "static"
 		},
+		"ln-ajax:aborted": {
+			"emitted_by": [
+				"ln-ajax"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "Fires when a newer GET supersedes this in-flight GET (its response writes document-wide: title, ids, history). Ends the lifecycle in place of `success`/`error`/`complete`. Non-GET requests are never aborted.",
+			"detail": "{ method: String, url: String }",
+			"source": "static"
+		},
 		"ln-ajax:before-start": {
 			"emitted_by": [
 				"ln-ajax"

@@ -927,6 +927,8 @@ Pure date input parsing and ISO formatting.
 
 Parses Date objects, ISO strings (`YYYY-MM-DD` or `YYYY-MM-DDTHH:mm:ssZ`), and Unix seconds/milliseconds timestamps into a valid `Date` instance (or `null` if invalid).
 
+A date-only `YYYY-MM-DD` string is read as local midnight of that calendar day, not UTC midnight (the native `Date` reading), so it round-trips through `formatDateToISO` unchanged in every timezone. A non-existent calendar date (`2026-02-31`) returns `null`.
+
 ### formatDateToISO(date)
 
 Converts a `Date` instance to standard `YYYY-MM-DD` string representation.

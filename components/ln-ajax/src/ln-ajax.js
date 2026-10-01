@@ -7,6 +7,10 @@ import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink, observeAt
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// A GET response writes document-wide (title, ids, history), so a newer GET
+	// supersedes the in-flight one wherever it started. Other methods are never aborted.
+	let abortInflightGet = null;
+
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
 		'data-ln-ajax':                  { type: 'marker', description: 'Enables AJAX interception of form submissions and anchor clicks within container' },
@@ -107,6 +111,8 @@ import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink, observeAt
 		const before = dispatchCancelable(element, 'ln-ajax:before-start', { method: method, url: url });
 		if (before.defaultPrevented) return;
 
+		if (method === 'GET' && abortInflightGet) abortInflightGet();
+
 		dispatch(element, 'ln-ajax:start', { method: method, url: url });
 
 		element.classList.add('ln-ajax--loading');
@@ -149,6 +155,19 @@ import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink, observeAt
 			options.body = data;
 		}
 
+		let abort = null;
+		if (method === 'GET') {
+			const controller = new AbortController();
+			options.signal = controller.signal;
+			abort = function () {
+				abortInflightGet = null;
+				controller.abort();
+				_cleanup();
+				dispatch(element, 'ln-ajax:aborted', { method: method, url: finalUrl });
+			};
+			abortInflightGet = abort;
+		}
+
 		fetch(finalUrl, options)
 			.then(function (response) {
 				const ok = response.ok;
@@ -167,6 +186,7 @@ import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink, observeAt
 				});
 			})
 			.then(function (result) {
+				if (abort && abortInflightGet === abort) abortInflightGet = null;
 				const status = result.status;
 				const data = result.data;
 				const parseError = result.parseError;
@@ -205,14 +225,17 @@ import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink, observeAt
 					});
 				}
 
-				dispatch(element, 'ln-ajax:complete', { method: method, url: finalUrl });
 				_cleanup();
+				dispatch(element, 'ln-ajax:complete', { method: method, url: finalUrl });
 			})
 			.catch(function (error) {
-				// True network failure / DNS / offline / abort (fetch itself threw)
+				// Superseded: abort() already cleaned up and emitted ln-ajax:aborted
+				if (error && error.name === 'AbortError') return;
+				if (abort && abortInflightGet === abort) abortInflightGet = null;
+				// True network failure / DNS / offline (fetch itself threw)
 				dispatch(element, 'ln-ajax:error', { method: method, url: finalUrl, status: 0, data: null, error: error });
-				dispatch(element, 'ln-ajax:complete', { method: method, url: finalUrl });
 				_cleanup();
+				dispatch(element, 'ln-ajax:complete', { method: method, url: finalUrl });
 			});
 	}
 

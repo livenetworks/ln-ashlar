@@ -34,6 +34,18 @@ test('parseDateInput parses ISO strings, timestamps, and Date objects', () => {
 	assert.equal(parseDateInput(new Date(NaN)), null);
 });
 
+test('parseDateInput keeps date-only ISO on the same calendar day west of UTC', () => {
+	const prevTZ = process.env.TZ;
+	process.env.TZ = 'America/New_York';
+	try {
+		assert.equal(formatDateToISO(parseDateInput('2026-10-01')), '2026-10-01');
+		assert.equal(parseDateInput('2026-02-31'), null);
+	} finally {
+		if (prevTZ === undefined) delete process.env.TZ;
+		else process.env.TZ = prevTZ;
+	}
+});
+
 test('formatDateToISO formats Date objects to YYYY-MM-DD', () => {
 	const d = new Date(2026, 6, 25);
 	assert.equal(formatDateToISO(d), '2026-07-25');

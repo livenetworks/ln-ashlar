@@ -49,7 +49,7 @@ Standard static time element. Displays using the default `"short"` style:
 
 > [!NOTE]
 > **Unix Timestamp Format:**
-> `ln-time` expects Unix timestamps in **seconds** (10-digit integers, e.g., `1736952600`), NOT milliseconds (13-digit integers). Divide JavaScript `Date.now()` values by `1000` before outputting.
+> `ln-time` expects Unix timestamps in **seconds** (10-digit integers, e.g., `1736952600`). Milliseconds and ISO 8601 strings are also read through `ln-core`'s `parseDateInput`: a value ≥ 10¹¹ is read as milliseconds, and a date-only ISO value (`2025-01-15`) is local midnight of that day.
 
 ---
 
@@ -116,7 +116,7 @@ Defines custom localization targets using `data-ln-time-locale`:
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-time` | `<time>` | `"short"` \| `"relative"` \| `"full"` \| `"date"` \| `"time"` | `"short"` | Sets the display format. If empty or invalid, falls back to `"short"`. |
-| `datetime` | `<time>` | `String` / `Number` | — | Target Unix timestamp in **seconds**. If omitted or invalid, text contents are left unchanged. |
+| `datetime` | `<time>` | `String` / `Number` | — | Target Unix timestamp in **seconds** (milliseconds and ISO 8601 strings are also read). If omitted or invalid, text contents are left unchanged. |
 | `data-ln-time-locale` | `<time>` | `String` | — | BCP 47 language code override (e.g., `"en-US"`, `"mk"`). Default resolves from `<html lang>` or browser defaults. |
 
 ### Programmatic JS API
@@ -169,11 +169,7 @@ time[data-ln-time] {
 ### Common Pitfalls & Anti-patterns
 
 > [!CAUTION]
-> 1. **Passing Milliseconds to Datetime:**
->    Providing `datetime="1736952600000"` (13 digits) causes `ln-time` to project the date into the far future (year 57000+). Always verify timestamps are stored and output in seconds (10 digits).
-> 2. **ISO 8601 String Formats:**
->    Using formats like `datetime="2025-01-15T14:30:00Z"` results in `NaN` parsing errors. Convert raw strings to Unix seconds before setting the attribute.
-> 3. **Indefinite 1-Second Precision Expectation:**
+> 1. **Indefinite 1-Second Precision Expectation:**
 >    The shared relative scheduler loop updates once every **60 seconds** to preserve mobile battery life and minimize CPU consumption.
 
 ---

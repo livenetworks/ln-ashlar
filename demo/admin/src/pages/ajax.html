@@ -202,7 +202,8 @@ window.lnAjax(document.getElementById('new-container'));</code></pre>
 										<tr><td><code>ln-ajax:start</code></td><td>After adding spinner, before fetch</td><td><code>{ method, url }</code></td></tr>
 										<tr><td><code>ln-ajax:success</code></td><td>After successful response</td><td><code>{ method, url, data }</code></td></tr>
 										<tr><td><code>ln-ajax:error</code></td><td>After fetch error</td><td><code>{ method, url, status, data, error }</code></td></tr>
-										<tr><td><code>ln-ajax:complete</code></td><td>After completion (always)</td><td><code>{ method, url }</code></td></tr>
+										<tr><td><code>ln-ajax:complete</code></td><td>After completion (success or error)</td><td><code>{ method, url }</code></td></tr>
+										<tr><td><code>ln-ajax:aborted</code></td><td>A newer GET superseded this in-flight GET (instead of success/error/complete)</td><td><code>{ method, url }</code></td></tr>
 									</tbody>
 								</table>
 								</div>
