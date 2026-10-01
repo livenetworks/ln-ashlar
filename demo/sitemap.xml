@@ -2,354 +2,354 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<!-- Main Demos -->
 	<url>
-		<loc>index.html</loc>
+		<loc>https://ashlar.live.net.mk/index.html</loc>
 		<changefreq>weekly</changefreq>
 		<priority>1.0</priority>
 	</url>
 	<url>
-		<loc>admin/index.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/index.html</loc>
 		<changefreq>weekly</changefreq>
 		<priority>0.9</priority>
 	</url>
 	<url>
-		<loc>spa/index.html</loc>
+		<loc>https://ashlar.live.net.mk/spa/index.html</loc>
 		<changefreq>weekly</changefreq>
 		<priority>0.8</priority>
 	</url>
 	<url>
-		<loc>docuflow/index.html</loc>
+		<loc>https://ashlar.live.net.mk/docuflow/index.html</loc>
 		<changefreq>weekly</changefreq>
 		<priority>0.7</priority>
 	</url>
 	<url>
-		<loc>scoped-theme.html</loc>
+		<loc>https://ashlar.live.net.mk/scoped-theme.html</loc>
 		<changefreq>weekly</changefreq>
 		<priority>0.7</priority>
 	</url>
 
 	<!-- Admin Demo Pages -->
 	<url>
-		<loc>admin/accordion.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/accordion.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/ajax.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/ajax.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/api-connector.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/api-connector.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/api-queue.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/api-queue.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/autoresize.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/autoresize.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/autosave.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/autosave.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/cards.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/cards.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/chip.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/chip.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/circular-progress.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/circular-progress.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/confirm.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/confirm.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/coordinator.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/coordinator.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/couchdb-connector.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/couchdb-connector.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/density.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/density.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/diagnostics.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/diagnostics.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/dropdown.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/dropdown.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/editor.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/editor.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/empty-state.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/empty-state.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/external-links.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/external-links.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/filter.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/filter.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/forms.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/forms.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/http.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/http.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/icons.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/icons.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/include.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/include.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/kbd.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/kbd.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/layout.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/layout.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/link.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/link.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/list.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/list.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/localization.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/localization.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/mixins.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/mixins.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/modal.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/modal.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/nav.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/nav.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/obfuscator.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/obfuscator.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/page-header.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/page-header.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/persist.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/persist.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/picklist.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/picklist.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/popover.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/popover.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/progress.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/progress.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/prose.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/prose.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/router.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/router.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/search.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/search.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/sections.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/sections.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/slug.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/slug.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/sortable.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/sortable.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/stat-card.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/stat-card.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/status-badge.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/status-badge.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/stepper.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/stepper.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/store-usecase.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/store-usecase.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/store.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/store.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/table-filter.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/table-filter.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/table-sync.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/table-sync.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/table.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/table.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/tables.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/tables.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/tabs.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/tabs.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/time.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/time.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/timeline.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/timeline.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/toast.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/toast.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/toggle.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/toggle.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/tooltip.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/tooltip.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/translations.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/translations.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/typography.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/typography.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/upload.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/upload.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/utilities.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/utilities.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/validate.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/validate.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/websocket-connector.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/websocket-connector.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>admin/write-workflow.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/write-workflow.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
