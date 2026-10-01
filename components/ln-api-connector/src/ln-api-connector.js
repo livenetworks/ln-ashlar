@@ -401,7 +401,6 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 
 		self.dom.addEventListener('ln-api-connector:request-sync', self._handlers.sync);
 		self.dom.addEventListener('ln-api-connector:request-query', self._handlers.query);
-		self.dom.addEventListener('ln-api-connector:request-fetch', self._handlers.query);
 		self.dom.addEventListener('ln-api-connector:request-cancel', self._handlers.cancel);
 		self.dom.addEventListener('ln-api-connector:request-create', self._handlers.create);
 		self.dom.addEventListener('ln-api-connector:request-update', self._handlers.update);
@@ -430,7 +429,6 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 		if (this._handlers) {
 			self.dom.removeEventListener('ln-api-connector:request-sync', self._handlers.sync);
 			self.dom.removeEventListener('ln-api-connector:request-query', self._handlers.query);
-			self.dom.removeEventListener('ln-api-connector:request-fetch', self._handlers.query);
 			self.dom.removeEventListener('ln-api-connector:request-cancel', self._handlers.cancel);
 			self.dom.removeEventListener('ln-api-connector:request-create', self._handlers.create);
 			self.dom.removeEventListener('ln-api-connector:request-update', self._handlers.update);

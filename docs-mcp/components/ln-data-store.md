@@ -125,6 +125,7 @@ Exposed on the root element via `el.lnDataStore`:
 | `ln-data-store:request-update` | Listens | No | Optimistically updates a record or rekeys ID. | `{ id: ID, data: Object }` |
 | `ln-data-store:request-delete` | Listens | No | Optimistically deletes a record. | `{ id: ID }` |
 | `ln-data-store:request-bulk-delete` | Listens | No | Optimistically deletes multiple records. | `{ ids: Array }` |
+| `ln-data-store:request-sync-failed` | Listens | No | The coordinator reports a failed connector sync. Clears `isSyncing` and re-emits it as `ln-data-store:sync-error`. | `{ error: String, status: Number }` |
 | `ln-search:change` | Listens | Yes (`preventDefault`) | Updates `query.search` and dispatches `ln-data-store:query-changed`. | `{ term: String }` |
 | `ln-filter:change` | Listens | Yes (`preventDefault`) | Updates `query.filters[key]` and dispatches `ln-data-store:query-changed`. | `{ key: String, values: Array, targetId: String }` |
 | `ln-sort:change` | Listens | Yes (`preventDefault`) | Updates `query.sort` and dispatches `ln-data-store:query-changed`. | `{ field: String, direction: String }` |
@@ -138,6 +139,10 @@ Exposed on the root element via `el.lnDataStore`:
 | `ln-data-store:deleted` | Emits | No | Emitted after optimistic deletion is done. | `{ store: String, id: ID }` \| `{ store: String, ids: Array }` |
 | `ln-data-store:synced` | Emits | No | Emitted after subsequent delta sync completes. | `{ store: String, added: Number, deleted: Number, changed: Boolean }` |
 | `ln-data-store:quota-exceeded` | Emits | No | Emitted on `document` if database storage runs out of quota. | `{ error: Error }` |
+| `ln-data-store:initialization-error` | Emits | No | IndexedDB could not be opened. `ready` still resolves, so a coordinator routes reads to its connector. | `{ store: String, error: Error }` |
+| `ln-data-store:sync-error` | Emits | No | A connector sync failed; `isSyncing` is cleared so a later retry can run. | `{ store: String, error: String, status: Number }` |
+| `ln-data-store:mutation-error` | Emits | No | A local mutation failed. `requestId` correlates it with the coordinator's request. | `{ store: String, action: String, requestId: String, error: Error }` |
+| `ln-data-store:request-page` | Emits | No | Windowed residency: pages inside the sliding window are missing and must be fetched from the server. | `{ store: String, offset: Number, limit: Number, query: Object, queryGen: Number }` |
 
 ---
 

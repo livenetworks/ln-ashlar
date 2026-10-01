@@ -146,13 +146,6 @@
 					"source": "static"
 				},
 				{
-					"name": "ln-api-connector:request-fetch",
-					"cancelable": false,
-					"description": "Triggers delta updates query.",
-					"detail": "{ since?: String, meta?: Object }",
-					"source": "static"
-				},
-				{
 					"name": "ln-api-connector:request-query",
 					"cancelable": false,
 					"description": "Triggers structured query/pagination fetch.",
@@ -201,8 +194,8 @@
 				{
 					"name": "ln-api-queue:error",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "A queue storage operation failed. `operation` names it (`initialize`, `enqueue`, `ack`, `nack`, `remap`, `resolve-create`, `drain`, …).",
+					"detail": "{ operation: String, entryId?: ID, error: Error }",
 					"source": "static"
 				},
 				{
@@ -301,8 +294,8 @@
 				{
 					"name": "ln-api-queue:resolve-create",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "A queued create was confirmed by the server: deletes the entry and remaps queued siblings from the temp key to the server ID.",
+					"detail": "{ entryId: ID, oldKey: String, newId: ID }",
 					"source": "static"
 				}
 			]
@@ -365,8 +358,8 @@
 				{
 					"name": "ln-chart:request-refresh",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Asks the chart to issue its data query again.",
+					"detail": "{}",
 					"source": "static"
 				},
 				{
@@ -414,12 +407,27 @@
 				{
 					"name": "ln-core:locale-change",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Dispatched on `document` whenever a `lang` attribute changes anywhere in the page; `ln-date`, `ln-number` and `ln-time` re-format on it. The language is switched by setting `lang` — never by dispatching this event.",
+					"detail": "{}",
 					"source": "static"
+				},
+				{
+					"name": "ln-fill",
+					"cancelable": false,
+					"description": "Dispatched by `lnFill` to trigger data population or reset across fillable containers.",
+					"detail": "Object` (record data) | `null` (reset signal)",
+					"source": "dynamic-allowlist"
 				}
 			],
-			"listens": []
+			"listens": [
+				{
+					"name": "ln-fill",
+					"cancelable": false,
+					"description": "Dispatched by `lnFill` to trigger data population or reset across fillable containers.",
+					"detail": "Object` (record data) | `null` (reset signal)",
+					"source": "dynamic-allowlist"
+				}
+			]
 		},
 		"ln-couchdb-connector": {
 			"emits": [
@@ -475,6 +483,45 @@
 			],
 			"listens": [
 				{
+					"name": "ln-couchdb-connector:request-bulk-delete",
+					"cancelable": false,
+					"description": "Triggers bulk document deletes.",
+					"detail": "{ ids: Array, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:request-create",
+					"cancelable": false,
+					"description": "Triggers document create request.",
+					"detail": "{ data: Object, tempId: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:request-delete",
+					"cancelable": false,
+					"description": "Triggers document DELETE.",
+					"detail": "{ id: ID, rev?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:request-sync",
+					"cancelable": false,
+					"description": "Triggers delta changes feed updates query.",
+					"detail": "{ since?: String, meta?: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-couchdb-connector:request-update",
+					"cancelable": false,
+					"description": "Triggers document PUT edit.",
+					"detail": "{ id: ID, data: Object, expected_version?: String, meta?: Object }",
+					"source": "static"
+				}
+			]
+		},
+		"ln-data-coordinator": {
+			"emits": [
+				{
 					"name": "ln-api-connector:request-bulk-delete",
 					"cancelable": false,
 					"description": "Triggers bulk document deletes.",
@@ -484,8 +531,8 @@
 				{
 					"name": "ln-api-connector:request-create",
 					"cancelable": false,
-					"description": "Triggers document create request.",
-					"detail": "{ data: Object, tempId: String, url?: String, idempotencyKey?: String, meta?: Object }",
+					"description": "Dispatched to the connector child — direct path (no queue) or the queued-transport path via `ln-api-queue:send`.",
+					"detail": "{ data?, id?, ids?, url?, meta: Object }",
 					"source": "dynamic-allowlist"
 				},
 				{
@@ -496,17 +543,17 @@
 					"source": "dynamic-allowlist"
 				},
 				{
-					"name": "ln-api-connector:request-fetch",
+					"name": "ln-api-connector:request-query",
 					"cancelable": false,
-					"description": "Triggers delta updates query.",
-					"detail": "{ since?: String, meta?: Object }",
+					"description": "Triggers structured query/pagination fetch.",
+					"detail": "{ query?: Object, meta?: Object }",
 					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-api-connector:request-sync",
 					"cancelable": false,
-					"description": "Triggers delta updates query.",
-					"detail": "{ since?: String, meta?: Object }",
+					"description": "Dispatched to the connector on `ln-data-store:request-remote-sync`, to trigger the delta fetch.",
+					"detail": "{ since: String, meta: Object }",
 					"source": "dynamic-allowlist"
 				},
 				{
@@ -516,52 +563,6 @@
 					"detail": "{ id: ID, data: Object, expected_version?: Int, url?: String, idempotencyKey?: String, meta?: Object }",
 					"source": "dynamic-allowlist"
 				},
-				{
-					"name": "ln-couchdb-connector:request-bulk-delete",
-					"cancelable": false,
-					"description": "",
-					"detail": "",
-					"source": "dynamic-allowlist"
-				},
-				{
-					"name": "ln-couchdb-connector:request-create",
-					"cancelable": false,
-					"description": "",
-					"detail": "",
-					"source": "dynamic-allowlist"
-				},
-				{
-					"name": "ln-couchdb-connector:request-delete",
-					"cancelable": false,
-					"description": "",
-					"detail": "",
-					"source": "dynamic-allowlist"
-				},
-				{
-					"name": "ln-couchdb-connector:request-fetch",
-					"cancelable": false,
-					"description": "",
-					"detail": "",
-					"source": "dynamic-allowlist"
-				},
-				{
-					"name": "ln-couchdb-connector:request-sync",
-					"cancelable": false,
-					"description": "",
-					"detail": "",
-					"source": "dynamic-allowlist"
-				},
-				{
-					"name": "ln-couchdb-connector:request-update",
-					"cancelable": false,
-					"description": "",
-					"detail": "",
-					"source": "dynamic-allowlist"
-				}
-			]
-		},
-		"ln-data-coordinator": {
-			"emits": [
 				{
 					"name": "ln-api-queue:ack",
 					"cancelable": false,
@@ -586,8 +587,8 @@
 				{
 					"name": "ln-api-queue:resolve-create",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "A queued create was confirmed by the server — the queue deletes the entry and remaps its siblings in one transaction.",
+					"detail": "{ entryId: ID, oldKey: String, newId: ID }",
 					"source": "static"
 				},
 				{
@@ -605,24 +606,59 @@
 					"source": "dynamic-allowlist"
 				},
 				{
+					"name": "ln-couchdb-connector:request-bulk-delete",
+					"cancelable": false,
+					"description": "Triggers bulk document deletes.",
+					"detail": "{ ids: Array, meta?: Object }",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-couchdb-connector:request-create",
+					"cancelable": false,
+					"description": "Triggers document create request.",
+					"detail": "{ data: Object, tempId: String, meta?: Object }",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-couchdb-connector:request-delete",
+					"cancelable": false,
+					"description": "Triggers document DELETE.",
+					"detail": "{ id: ID, rev?: String, meta?: Object }",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-couchdb-connector:request-sync",
+					"cancelable": false,
+					"description": "Triggers delta changes feed updates query.",
+					"detail": "{ since?: String, meta?: Object }",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-couchdb-connector:request-update",
+					"cancelable": false,
+					"description": "Triggers document PUT edit.",
+					"detail": "{ id: ID, data: Object, expected_version?: String, meta?: Object }",
+					"source": "dynamic-allowlist"
+				},
+				{
 					"name": "ln-data-coordinator:error",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "A reconciliation step or a view query failed.",
+					"detail": "{ operation: String, error, meta: Object|null }` | `{ operation: 'query', kind: String, store: String, target: HTMLElement, error }",
 					"source": "static"
 				},
 				{
 					"name": "ln-data-coordinator:offline",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Dispatched on `document` once per browser `online` / `offline` event; `online` also runs a sync check on every coordinator.",
+					"detail": "{}",
 					"source": "static"
 				},
 				{
 					"name": "ln-data-coordinator:online",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Dispatched on `document` once per browser `online` / `offline` event; `online` also runs a sync check on every coordinator.",
+					"detail": "{}",
 					"source": "static"
 				},
 				{
@@ -649,8 +685,8 @@
 				{
 					"name": "ln-data-store:request-sync-failed",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Dispatched to the store when the connector's sync fails.",
+					"detail": "{ error: String, status: Number }",
 					"source": "static"
 				},
 				{
@@ -719,8 +755,8 @@
 				{
 					"name": "ln-table:request-invalidate",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Windowed mode (`data-ln-table-window`): invalidates the window cache and resets to page 0.",
+					"detail": "*(no payload)*",
 					"source": "dynamic-allowlist"
 				},
 				{
@@ -750,6 +786,48 @@
 					"description": "Dispatched to `window` for success/error alerts.",
 					"detail": "{ message: String, type: String }",
 					"source": "static"
+				},
+				{
+					"name": "ln-websocket-connector:request-bulk-delete",
+					"cancelable": false,
+					"description": "Delete several records.",
+					"detail": "{ ids, idempotencyKey?, meta? }",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-websocket-connector:request-create",
+					"cancelable": false,
+					"description": "Create a record.",
+					"detail": "{ data, tempId?, idempotencyKey?, meta? }",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-websocket-connector:request-delete",
+					"cancelable": false,
+					"description": "Delete a record.",
+					"detail": "{ id, idempotencyKey?, meta? }",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-websocket-connector:request-query",
+					"cancelable": false,
+					"description": "One page of a query.",
+					"detail": "{ query, meta? }",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-websocket-connector:request-sync",
+					"cancelable": false,
+					"description": "Delta sync since a token.",
+					"detail": "{ since, meta? }",
+					"source": "dynamic-allowlist"
+				},
+				{
+					"name": "ln-websocket-connector:request-update",
+					"cancelable": false,
+					"description": "Update a record.",
+					"detail": "{ id, data, expected_version?, idempotencyKey?, meta? }",
+					"source": "dynamic-allowlist"
 				}
 			],
 			"listens": [
@@ -910,8 +988,8 @@
 				{
 					"name": "ln-data-store:mutation-error",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Rejects the pending store-mutation receipt matched by `requestId`.",
+					"detail": "{ store: String, action: String, requestId: String, error: Error }",
 					"source": "static"
 				},
 				{
@@ -931,8 +1009,8 @@
 				{
 					"name": "ln-data-store:request-page",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Windowed store residency: forwards the missing page to the connector as `request-query`.",
+					"detail": "{ store: String, offset: Number, limit: Number, query: Object, queryGen: Number }",
 					"source": "static"
 				},
 				{
@@ -1075,8 +1153,8 @@
 				{
 					"name": "ln-data-store:initialization-error",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "IndexedDB could not be opened. `ready` still resolves, so a coordinator routes reads to its connector.",
+					"detail": "{ store: String, error: Error }",
 					"source": "static"
 				},
 				{
@@ -1096,8 +1174,8 @@
 				{
 					"name": "ln-data-store:mutation-error",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "A local mutation failed. `requestId` correlates it with the coordinator's request.",
+					"detail": "{ store: String, action: String, requestId: String, error: Error }",
 					"source": "static"
 				},
 				{
@@ -1124,8 +1202,8 @@
 				{
 					"name": "ln-data-store:request-page",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Windowed residency: pages inside the sliding window are missing and must be fetched from the server.",
+					"detail": "{ store: String, offset: Number, limit: Number, query: Object, queryGen: Number }",
 					"source": "static"
 				},
 				{
@@ -1138,8 +1216,8 @@
 				{
 					"name": "ln-data-store:sync-error",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "A connector sync failed; `isSyncing` is cleared so a later retry can run.",
+					"detail": "{ store: String, error: String, status: Number }",
 					"source": "static"
 				},
 				{
@@ -1182,8 +1260,8 @@
 				{
 					"name": "ln-data-store:request-sync-failed",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "The coordinator reports a failed connector sync. Clears `isSyncing` and re-emits it as `ln-data-store:sync-error`.",
+					"detail": "{ error: String, status: Number }",
 					"source": "dynamic-allowlist"
 				},
 				{
@@ -1230,8 +1308,8 @@
 				{
 					"name": "ln-core:locale-change",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Dispatched on `document` whenever a `lang` attribute changes anywhere in the page; `ln-date`, `ln-number` and `ln-time` re-format on it. The language is switched by setting `lang` — never by dispatching this event.",
+					"detail": "{}",
 					"source": "static"
 				}
 			]
@@ -1261,22 +1339,22 @@
 				{
 					"name": "ln-dropdown:request-close",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Command request event sent to close the menu.",
+					"detail": "{}",
 					"source": "static"
 				},
 				{
 					"name": "ln-dropdown:request-open",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Command request event sent to open the menu (sets the inner `[data-ln-toggle]` to `open`).",
+					"detail": "{}",
 					"source": "static"
 				},
 				{
 					"name": "ln-dropdown:request-toggle",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Command request event sent to flip the menu between open and closed.",
+					"detail": "{}",
 					"source": "static"
 				},
 				{
@@ -1388,7 +1466,15 @@
 		},
 		"ln-form": {
 			"emits": [],
-			"listens": []
+			"listens": [
+				{
+					"name": "ln-fill",
+					"cancelable": false,
+					"description": "Populates form elements with data or resets them if `null`.",
+					"detail": "Object` (record) | `null",
+					"source": "dynamic-allowlist"
+				}
+			]
 		},
 		"ln-http": {
 			"emits": [
@@ -1539,8 +1625,8 @@
 				{
 					"name": "ln-list:search",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Emitted when receiving an `ln-list:set-search` command, before requesting fresh data (Data-Driven mode).",
+					"detail": "{ list: String, query: String }",
 					"source": "static"
 				},
 				{
@@ -1618,8 +1704,8 @@
 				{
 					"name": "ln-list:set-search",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Applies a search term. Data-Driven mode emits `ln-list:search` and requests fresh data; SSR mode filters in memory and emits `ln-list:filter`.",
+					"detail": "{ query: String }` (`term` is read when `query` is absent)",
 					"source": "static"
 				},
 				{
@@ -1719,8 +1805,8 @@
 				{
 					"name": "ln-core:locale-change",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Dispatched on `document` whenever a `lang` attribute changes anywhere in the page; `ln-date`, `ln-number` and `ln-time` re-format on it. The language is switched by setting `lang` — never by dispatching this event.",
+					"detail": "{}",
 					"source": "static"
 				}
 			]
@@ -1836,22 +1922,22 @@
 				{
 					"name": "ln-popover:request-close",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Command request event sent to close the popover.",
+					"detail": "{}",
 					"source": "static"
 				},
 				{
 					"name": "ln-popover:request-open",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Command request event sent to open the popover, anchored to `trigger` when given.",
+					"detail": "{ trigger?: HTMLElement }",
 					"source": "static"
 				},
 				{
 					"name": "ln-popover:request-toggle",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Command request event sent to flip the popover between open and closed.",
+					"detail": "{ trigger?: HTMLElement }",
 					"source": "static"
 				}
 			]
@@ -2135,8 +2221,8 @@
 				{
 					"name": "ln-table:request-invalidate",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Windowed mode (`data-ln-table-window`): invalidates the window cache and resets to page 0.",
+					"detail": "*(no payload)*",
 					"source": "static"
 				},
 				{
@@ -2163,8 +2249,8 @@
 				{
 					"name": "ln-table:set-search",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Applies a search term. Data-Driven mode emits `ln-table:search` and requests fresh data; SSR mode filters in memory and emits `ln-table:filter`.",
+					"detail": "{ query: String }` (`term` is read when `query` is absent)",
 					"source": "static"
 				}
 			]
@@ -2222,8 +2308,8 @@
 				{
 					"name": "ln-core:locale-change",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Dispatched on `document` whenever a `lang` attribute changes anywhere in the page; `ln-date`, `ln-number` and `ln-time` re-format on it. The language is switched by setting `lang` — never by dispatching this event.",
+					"detail": "{}",
 					"source": "static"
 				}
 			]
@@ -2289,22 +2375,22 @@
 				{
 					"name": "ln-toggle:request-close",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Command request event sent to close the panel.",
+					"detail": "{}",
 					"source": "static"
 				},
 				{
 					"name": "ln-toggle:request-open",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Command request event sent to open the panel.",
+					"detail": "{}",
 					"source": "static"
 				},
 				{
 					"name": "ln-toggle:request-toggle",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Command request event sent to flip the panel between open and closed.",
+					"detail": "{}",
 					"source": "static"
 				}
 			]

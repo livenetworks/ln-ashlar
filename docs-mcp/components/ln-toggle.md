@@ -117,6 +117,9 @@ All events bubble up from the target panel element.
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
+| `ln-toggle:request-open` | Listens | No | Command request event sent to open the panel. | `{}` |
+| `ln-toggle:request-close` | Listens | No | Command request event sent to close the panel. | `{}` |
+| `ln-toggle:request-toggle` | Listens | No | Command request event sent to flip the panel between open and closed. | `{}` |
 | `ln-toggle:before-open` | Emits | **Yes** | Fires when the state is about to switch to `"open"`. Prevent default to block the open sequence. | `{ target: HTMLElement }` |
 | `ln-toggle:open` | Emits | No | Fires after the panel has fully opened and classes are updated. | `{ target: HTMLElement }` |
 | `ln-toggle:before-close` | Emits | **Yes** | Fires when the state is about to switch to `"close"`. Prevent default to block the close sequence. | `{ target: HTMLElement }` |

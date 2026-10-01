@@ -84,6 +84,7 @@ Source: [`ln-chart.js`](../../components/ln-chart/src/ln-chart.js).
 | `ln-chart:request-data` | Emits | No | Renderer asks data coordinator for records. | `{ chart, source, sort, filters, search }` |
 | `ln-chart:set-data` | Listens | No | Coordinator delivers records to chart. | `{ data, total?, filtered? }` |
 | `ln-chart:set-loading` | Listens | No | Coordinator controls busy / loading state. | `{ loading }` |
+| `ln-chart:request-refresh` | Listens | No | Asks the chart to issue its data query again. | `{}` |
 | `ln-chart:rendered` | Emits | No | Rendering notification emitted after SVG geometry updates. | `{ chart, count, min, max }` |
 
 ---

@@ -234,6 +234,7 @@ In Data-Driven mode, the list requests data via coordinator events and populates
 | `ln-list:page-failed` | Listens | No | Windowed mode (`data-ln-list-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry. | `{ offset: Number }` |
 | `ln-list:request-revalidate` | Listens | No | Windowed mode (`data-ln-list-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives. | *(no payload)* |
 | `ln-list:request-invalidate` | Listens | No | Windowed mode (`data-ln-list-window`): invalidates the window cache and resets to page 0. | *(no payload)* |
+| `ln-list:set-search` | Listens | No | Applies a search term. Data-Driven mode emits `ln-list:search` and requests fresh data; SSR mode filters in memory and emits `ln-list:filter`. | `{ query: String }` (`term` is read when `query` is absent) |
 | `ln-list:request-clear-filters` | Listens | No | Resets all active filters and search term. In Data-Driven mode, dispatches `ln-list:clear-filters` and requests fresh data; in SSR mode, re-evaluates in-memory filters. | *(no payload)* |
 | `ln-search:change` | Listens | Yes | In SSR mode, filters in-memory records by search tokens and updates the virtual view. In Data-Driven mode, `ln-search` targets the Store directly. | `{ term: String, targetId: String }` |
 | `ln-filter:change` | Listens | Yes | In SSR mode, filters in-memory records by key/values and updates the virtual view. In Data-Driven mode, `ln-filter` targets the Store directly. | `{ key: String, values: Array, targetId: String }` |
@@ -242,6 +243,7 @@ In Data-Driven mode, the list requests data via coordinator events and populates
 | `ln-list:ready` | Emits | No | Dispatched after hydration or initial SSR item parsing completes. | `{ total: Number }` |
 | `ln-list:rendered` | Emits | No | Dispatched after items are appended/redrawn in the DOM. | `{ list: String, total: Number, visible: Number }` |
 | `ln-list:filter` | Emits | No | Dispatched in SSR mode when search/filter narrows visible items. | `{ term: String, matched: Number, total: Number }` |
+| `ln-list:search` | Emits | No | Emitted when receiving an `ln-list:set-search` command, before requesting fresh data (Data-Driven mode). | `{ list: String, query: String }` |
 | `ln-list:sorted` | Emits | No | Dispatched in SSR mode when items are sorted. | `{ field: String, direction: String, matched: Number, total: Number }` |
 | `ln-list:item-click` | Emits | No | Dispatched on item click (ignoring action button, checkbox, and link clicks). | `{ list: String, id: String, record: Object }` |
 | `ln-list:item-action` | Emits | No | Dispatched when clicking a button marked with `data-ln-item-action`. | `{ list: String, id: String, action: String, record: Object }` |
