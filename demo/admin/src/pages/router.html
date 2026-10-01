@@ -57,8 +57,8 @@
 	</div>
 </template>
 
-<!-- Sidebar templates — target: demo-sidebar -->
-<template data-ln-route="/users/:id" data-ln-route-target="demo-sidebar">
+<!-- Sidebar templates — target: router-sidebar -->
+<template data-ln-route="/users/:id" data-ln-route-target="router-sidebar">
 	<section>
 		<h5>Sidebar — User <strong>{{id}}</strong></h5>
 		<p style="font-size: var(--font-size-sm); color: var(--text-color-muted);">Type something — this input survives param-only changes:</p>
@@ -67,14 +67,14 @@
 	</section>
 </template>
 
-<template data-ln-route="/profile" data-ln-route-target="demo-sidebar">
+<template data-ln-route="/profile" data-ln-route-target="router-sidebar">
 	<section>
 		<h5>Sidebar — Profile Mode</h5>
 		<p style="font-size: var(--font-size-sm); color: var(--text-color-muted);">This is a DIFFERENT sidebar template. The sidebar was swapped (keep-region template-change).</p>
 	</section>
 </template>
 
-<template data-ln-route="*" data-ln-route-target="demo-sidebar">
+<template data-ln-route="*" data-ln-route-target="router-sidebar">
 	<section>
 		<h5>Sidebar — Default</h5>
 		<p style="font-size: var(--font-size-sm); color: var(--text-color-muted);">No user selected. Navigate to /users/:id to see the persistent sidebar.</p>
@@ -145,7 +145,7 @@
 				</div>
 
 				<h4>Persistent Sidebar Region (<code>data-ln-route-keep</code>)</h4>
-				<aside id="demo-sidebar" data-ln-route-keep style="padding: var(--size-sm); border: 2px dashed var(--color-primary); border-radius: var(--radius-sm); min-height: 100px; background: var(--bg-sunken); margin-bottom: var(--size-md);">
+				<aside id="router-sidebar" data-ln-route-keep style="padding: var(--size-sm); border: 2px dashed var(--color-primary); border-radius: var(--radius-sm); min-height: 100px; background: var(--bg-sunken); margin-bottom: var(--size-md);">
 					<p style="color: var(--text-color-muted); text-align: center; margin: 0;">Sidebar region — will render on first navigation.</p>
 				</aside>
 
@@ -237,7 +237,7 @@
 			}
 
 			// Sidebar region data binding — runs only when the sidebar actually swapped
-			if (detail.region === 'demo-sidebar' && detail.params.id) {
+			if (detail.region === 'router-sidebar' && detail.params.id) {
 				window.lnCore.fillTemplate(detail.target, { id: detail.params.id });
 			}
 		});
