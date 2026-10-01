@@ -255,7 +255,7 @@ document.querySelectorAll('.demo-split').forEach(function(split) {
 					</button>
 				</div>
 				<div class="demo-code-body">
-					<pre id="${container.id}:html" data-ln-panel="html" style="white-space: pre-wrap; word-break: break-word;"><code>${escapeHtml(cleanHTML)}</code></pre>
+					<pre${container.id ? ` id="${container.id}:html"` : ''} data-ln-panel="html" style="white-space: pre-wrap; word-break: break-word;"><code>${escapeHtml(cleanHTML)}</code></pre>
 					${cleanSCSS ? `<pre id="${container.id}:scss" data-ln-panel="scss" class="hidden" style="white-space: pre-wrap; word-break: break-word;"><code>${escapeHtml(cleanSCSS)}</code></pre>` : ''}
 				</div>
 			`;
