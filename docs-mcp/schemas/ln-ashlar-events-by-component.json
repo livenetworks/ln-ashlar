@@ -27,6 +27,13 @@
 		"ln-ajax": {
 			"emits": [
 				{
+					"name": "ln-ajax:aborted",
+					"cancelable": false,
+					"description": "Fires when a newer GET supersedes this in-flight GET (its response writes document-wide: title, ids, history). Ends the lifecycle in place of `success`/`error`/`complete`. Non-GET requests are never aborted.",
+					"detail": "{ method: String, url: String }",
+					"source": "static"
+				},
+				{
 					"name": "ln-ajax:before-start",
 					"cancelable": true,
 					"description": "Fires before sending the request. Calling `e.preventDefault()` cancels the fetch.",

@@ -113,7 +113,7 @@ This service module exposes no declarative HTML attributes directly on itself.
 | `releaseInit` | `()` | `void` | Decrements the global boot holds counter, draining the boot queue when it reaches zero. |
 | `pendingCount` | `()` | `Number` | Returns the current active boot hold count. |
 | `calculateProgress` | `(rawValue: unknown, rawMax?: unknown, min?: Number)` | `Object` | Computes `{ value, min, max, clampedValue, percentage }` with numerical clamping. |
-| `parseDateInput` | `(raw: unknown)` | `Date\|null` | Parses ISO strings, Unix timestamps (seconds or ms), or Date objects into a valid `Date` or `null`. |
+| `parseDateInput` | `(raw: unknown)` | `Date\|null` | Parses ISO strings, Unix timestamps (seconds or ms), or Date objects into a valid `Date` or `null`. A date-only `YYYY-MM-DD` is local midnight of that day (not UTC), so it round-trips through `formatDateToISO` in every timezone; a non-existent calendar date returns `null`. |
 | `formatDateToISO` | `(date: Date)` | `String` | Formats a Date object to standard `YYYY-MM-DD` string. |
 | `getSeparators` | `(locale?: String)` | `Object` | Extracts localized grouping and decimal separators (`{ groupSep, decimalSep, fmt }`). |
 | `cleanNumericString` | `(raw: String, groupSep: String, decimalSep: String)` | `String` | Normalizes localized user numeric input by stripping currency/whitespace and standardizing decimal separator to `.`. |

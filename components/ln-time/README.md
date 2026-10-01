@@ -46,7 +46,7 @@ Provide a Unix timestamp (in seconds) via `datetime` and specify the formatting 
 | Attribute | Elements | Description |
 | :--- | :--- | :--- |
 | `data-ln-time` | `<time>` | Format mode: `relative`, `short`, `full`, `date`, `time`. |
-| `datetime` | `<time>` | **Required**. Unix timestamp in **seconds** (not milliseconds). |
+| `datetime` | `<time>` | **Required**. Unix timestamp in **seconds**. Milliseconds and ISO 8601 strings are also read (via `ln-core`'s `parseDateInput`). |
 | `data-ln-time-locale`| `<time>` | Opt-in. Force-overrides translation locale (e.g. `"de"`, `"mk"`). |
 
 ### Format Modes
@@ -77,8 +77,8 @@ Provide a Unix timestamp (in seconds) via `datetime` and specify the formatting 
 
 ## ⚠️ Common Pitfalls
 
-- **Passing Millisecond Timestamps:** Standard database fields and JS date objects often return milliseconds (13 digits). `ln-time` maps strictly to Unix seconds (10 digits). Divide milliseconds by `1000` before rendering.
-- **Using ISO Strings:** `datetime="2025-01-15T14:30:00Z"` is not parsed. The component skips non-numeric values, leaving the original fallback text.
+- **Seconds vs milliseconds is decided by magnitude:** a value ≥ 10¹¹ is read as milliseconds, smaller as seconds, so `1736952600` and `1736952600000` render the same instant.
+- **Date-only ISO is local:** `datetime="2025-01-15"` is local midnight of that day; a full timestamp (`2025-01-15T14:30:00Z`) is that exact instant.
 - **Empty `datetime` Attributes:** If the `datetime` attribute is omitted or empty, the component will skip formatting to preserve server fallback strings.
 
 ---

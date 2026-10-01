@@ -21,6 +21,14 @@ export function parseDateInput(raw) {
 	if (typeof raw === 'string') {
 		const str = raw.trim();
 		if (!str) return null;
+		// Date-only ISO parses as UTC midnight, which reads back as the previous day west of UTC.
+		const ymd = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str);
+		if (ymd) {
+			const year = +ymd[1], month = +ymd[2], day = +ymd[3];
+			const local = new Date(year, month - 1, day);
+			if (local.getFullYear() !== year || local.getMonth() !== month - 1 || local.getDate() !== day) return null;
+			return local;
+		}
 		const d = new Date(str);
 		return isNaN(d.getTime()) ? null : d;
 	}
