@@ -1,10 +1,15 @@
 <!-- ln-page: title="Include — ln-ashlar" h1="Include" -->
 <script class="mock-related" src="dist/mock-store-usecase.js" defer></script>
 
-<h1>Include</h1>
-<p>
-	The <code>ln-include</code> component allows template contents (like row structures or empty states) to be loaded asynchronously from external URLs. It uses central boot gating to block page initialization until all initial templates have loaded, preventing empty-render flickering.
-</p>
+<!-- Overview -->
+<section class="section-card">
+	<header><h3>Overview &amp; How It Works</h3></header>
+	<main>
+		<p>The <code>ln-include</code> component is applied to any HTML template element via <code>&lt;template data-ln-include="/path.html"&gt;</code> to load template contents asynchronously from external files. During the initial application boot, it automatically delays page-wide component sweeps until all declared templates have finished loading, preventing empty-state and layout flicker.</p>
+		<p>Multiple templates pointing to the same external URL automatically share a single fetch promise to eliminate redundant network requests. Once retrieved, the HTML is injected into the template's <code>.content</code> document fragment and an <code>ln-include:loaded</code> event is dispatched, allowing external templates (such as table rows or empty states) to be reused across pages with zero client-side view logic.</p>
+	</main>
+</section>
+
 
 <!-- Declarative 3-Tier Data Layer -->
 <div data-ln-data-coordinator="documents" id="documents-coordinator" hidden>

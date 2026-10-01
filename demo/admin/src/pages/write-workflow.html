@@ -1,13 +1,11 @@
 <!-- ln-page: title="Write Workflow — ln-ashlar" h1="Write Workflow" -->
 
-<h1>Write Workflow</h1>
-
 <!-- Overview -->
 <section class="section-card">
-	<header><h3>Overview — the form as the universal write-entry</h3></header>
+	<header><h3>Overview &amp; Philosophy</h3></header>
 	<main>
-		<p>This page demonstrates the declarative <strong>form → data-layer write pipeline</strong>: a single <code>&lt;form data-ln-form data-ln-data-coordinator-scope&gt;</code> is the only write-entry point. No application JavaScript builds <code>ln-data-store:request-create</code>/<code>request-update</code> events by hand — a valid submit is left native, and <code>ln-data-coordinator</code> claims it (<code>preventDefault()</code> on a document-level <code>submit</code> listener), serializing it itself; here the form carries a <em>named</em> scope (<code>data-ln-data-coordinator-scope="wwf-documents"</code>) that is matched against the coordinator by name rather than DOM containment, interprets the effective HTTP method (<code>POST</code> → create, <code>PUT</code>/<code>PATCH</code> → update), and routes it through the existing store → connector pipeline. An empty <code>data-ln-data-coordinator-scope</code> would instead fall back to nearest-ancestor containment.</p>
-		<p class="text-sm text-sunken">The scoped form still carries a real <code>action</code> + <code>method="post"</code> and the <code>data-ln-form-action-edit</code> fallback — without JavaScript, the exact same markup degrades to a native HTML submit.</p>
+		<p>This page demonstrates the declarative <strong>form &rarr; data-layer write pipeline</strong> in <code>ln-ashlar</code>: a standard <code>&lt;form data-ln-form data-ln-data-coordinator-scope&gt;</code> serves as the single universal write-entry point. No application JavaScript constructs manual mutation events &mdash; a valid submit is left native, and <code>ln-data-coordinator</code> intercepts it at the document level, serializing input values, determining the effective HTTP method (<code>POST</code> &rarr; create, <code>PUT</code>/<code>PATCH</code> &rarr; update), and routing the mutation through the store &rarr; connector pipeline.</p>
+		<p class="text-sm text-sunken">Here the form carries a named scope (<code>data-ln-data-coordinator-scope="wwf-documents"</code>) matched against the coordinator by name. The scoped form still carries real HTML <code>action</code> and <code>method</code> attributes along with <code>data-ln-form-action-edit</code>, providing seamless progressive enhancement and native HTML fallback if JavaScript is disabled.</p>
 	</main>
 </section>
 

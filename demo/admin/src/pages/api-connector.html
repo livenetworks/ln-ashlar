@@ -3,7 +3,8 @@
 <section class="section-card">
 	<header><h3>Overview &amp; Architecture</h3></header>
 	<main>
-		<p>In the decoupled 3-tier data lifecycle of <code>ln-ashlar</code>, the <strong>Transport Gateway</strong> (<code>data-ln-api-connector</code>) owns all credentials, base URLs, resource paths, and headers. It is completely blind to database caches and schemas. UI widgets and Cache stores talk to it solely via CustomEvent channels or JS-level promise APIs.</p>
+		<p>Applied to a gateway element via <code>data-ln-api-connector</code> inside a coordinator tree, <code>ln-api-connector</code> encapsulates all connection parameters (base URLs, auth tokens, headers, and paths). It listens for request CustomEvents (<code>ln-api-connector:request-query</code>, <code>create</code>, <code>update</code>, <code>delete</code>), attaches a forced <code>X-LN-Response: data</code> header, and issues RESTful <code>fetch()</code> calls. Upon resolution, it parses JSON payloads and emits <code>ln-api-connector:data</code> or mutation response events to the parent coordinator.</p>
+		<p>In the decoupled 3-tier data lifecycle of <code>ln-ashlar</code>, the <strong>Transport Gateway</strong> owns all networking credentials and endpoints, remaining completely blind to database caches and schemas while keeping cache stores and UI presenters strictly network-agnostic.</p>
 
 		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 			<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

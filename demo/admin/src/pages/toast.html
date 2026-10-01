@@ -14,9 +14,9 @@
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>When an asynchronous event completes, or a background system action finishes—such as saving a record, encountering a network error, or warning the user about a quota threshold—we need to notify the user. However, a modal dialog is too disruptive. We need a non-blocking, temporary notification card that slides into view at the corner of the screen.</p>
+							<p><strong><code>ln-toast</code></strong> is applied to a <code>&lt;ul data-ln-toast&gt;</code> live region container. It listens globally on <code>window</code> for <code>ln-toast:enqueue</code> CustomEvents: upon receiving an event, it clones the toast template (<code>&lt;template data-ln-template="ln-toast-item"&gt;</code>), appends the notification item to the container, and initiates an automatic dismiss countdown. On timeout or dismiss button click, it animates out with <code>.closing</code> and removes the element from the DOM upon animation completion.</p>
 
-							<p>In <code>ln-ashlar</code>, this is managed by <strong><code>ln-toast</code></strong>. It is a service-style, zero-markup component that handles a dynamic queue of alert cards. It exposes a single, global event listener, builds notification cards from templates dynamically, manages auto-dismiss timers, supports rich layouts (including bulleted validation error maps), and cleans up DOM elements after exit transitions.</p>
+							<p>It is a service-style, zero-markup component that handles a dynamic queue of alert cards without requiring components to import or know about toast internals.</p>
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

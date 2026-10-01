@@ -1,13 +1,10 @@
 <!-- ln-page: title="ln-slug — ln-ashlar" h1="ln-slug" -->
 
-<h1>ln-slug</h1>
-				<p>Auto-slug micro-component — mirrors a slugified version of a source field into a slug field while the slug is pristine. Stops when the user types directly into the slug field; resumes if cleared.</p>
-
 				<!-- Overview -->
 				<section class="section-card">
-					<header><h3>Overview</h3></header>
+					<header><h3>Overview &amp; How It Works</h3></header>
 					<main>
-						<p>Add <code>data-ln-slug-from="sourceName"</code> to a slug <code>&lt;input&gt;</code> inside a <code>&lt;form&gt;</code>. The component watches the source field and mirrors <code>slugify(source.value)</code> into the slug field as long as it is pristine (empty or not yet edited by the user).</p>
+						<p><strong><code>ln-slug</code></strong> is applied to an <code>&lt;input name="slug" data-ln-slug-from="sourceName"&gt;</code> within a <code>&lt;form&gt;</code>. It queries the source field by name and listens for its native <code>input</code> events: while the slug input remains pristine, it computes the slugified string and sets <code>slug.value</code> in real-time. If the user types directly into the slug field, it marks it as dirty and halts mirroring until cleared.</p>
 						<div class="table-container">
 						<table>
 							<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>

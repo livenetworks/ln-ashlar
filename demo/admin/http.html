@@ -233,15 +233,13 @@
 -->
 <script class="mock-related" src="dist/mock-http.js"></script>
 
-<h1>HTTP</h1>
-
 					<!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>In modern asynchronous web applications, managing network concurrency is highly complex. Rapid keystrokes inside search fields, quick clicks on list reordering controls, or multi-modal submissions often trigger overlapping HTTP requests. Without strict controls, these requests finish out-of-order, corrupting the UI with stale data ("race conditions") or executing duplicate transactions on the database.</p>
+							<p><strong><code>ln-http</code></strong> is a window-level HTTP concurrency supervisor (<code>window.lnHttp</code>). It transparently intercepts browser <code>fetch()</code> requests to automatically abort superseded in-flight GET/HEAD queries targeting the exact same URL via <code>AbortController.abort()</code>. It also provides an event-driven channel listening for <code>ln-http:request</code> CustomEvents with unique keys, instantly canceling stale requests with matching keys before executing the network call and broadcasting <code>ln-http:response</code> or <code>ln-http:error</code>.</p>
 
-							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-http</code>, a lightweight, zero-dependency **HTTP Concurrency Coordinator**. Instead of requiring developers to pass manual <code>AbortController</code> signals inside every fetch, `ln-http` operates globally. It coordinates in-flight requests on two parallel channels (Path A and Path B) to handle transparent URL-keyed de-duplication and explicit key-based cancellations.</p>
+							<p>In <code>ln-ashlar</code>, this coordinator prevents race conditions and stale UI states by handling socket cancellations automatically on two parallel channels.</p>
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

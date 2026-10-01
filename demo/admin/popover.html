@@ -229,9 +229,9 @@
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>When presenting rich, structured, or interactive contextual information—such as user account actions, setting forms, help text, or nested detail lists—a standard tooltip is too restrictive. You need a modal-like dialog, but displayed inline relative to the trigger element.</p>
+							<p><strong><code>ln-popover</code></strong> is applied to a popup container via <code>data-ln-popover id="..."</code>, paired with trigger buttons anywhere in the DOM via <code>data-ln-popover-for="..."</code>. When triggered, it sets <code>popover="manual"</code>, invokes <code>showPopover()</code> to elevate into the browser's top layer without clipping or z-index issues, calculates boundary-aware anchor coordinates, and writes <code>data-ln-popover="open"</code>. On outside clicks or pressing <kbd>Escape</kbd>, it calls <code>hidePopover()</code>, writes <code>data-ln-popover="closed"</code>, and restores keyboard focus to the trigger.</p>
 
-							<p>In <code>ln-ashlar</code>, this is managed by <strong><code>ln-popover</code></strong>. It is a highly-specialized JS component that coordinates click-triggered rich-content overlays. It is designed to be fully viewport-aware, ensuring overlays never spill outside the screen boundaries. It also handles automatic keyboard LIFO (Last-In, First-Out) ESC dismissal stacks and deep focus transitions out of the box.</p>
+							<p>It provides viewport-aware positioning, automatic boundary flip placement, and full LIFO (Last-In, First-Out) keyboard dismissal for rich contextual cards, action menus, and filter flyouts.</p>
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

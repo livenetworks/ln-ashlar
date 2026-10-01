@@ -4,9 +4,9 @@
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>When presenting structured, contextual content that needs to fit into a single viewport section, a tabbed interface is the standard UI paradigm. It enables users to switch between multiple alternative panels (an N-way exclusive view) without cluttering the screen or loading separate pages.</p>
+							<p><strong><code>ln-tabs</code></strong> is applied to a wrapper element via <code>&lt;section data-ln-tabs&gt;</code> enclosing trigger buttons (<code>data-ln-tab="key"</code>) and content panels (<code>data-ln-panel="key"</code>). When a user clicks a tab, it sets <code>data-ln-tabs-active="key"</code> on the wrapper. A <code>MutationObserver</code> instantly synchronizes the DOM: toggling <code>.hidden</code> and <code>aria-hidden</code> on panels and updating <code>aria-selected</code> on tab controls. When configured with an <code>id</code> and anchor triggers (<code>&lt;a href="#id:key"&gt;</code>), it synchronizes tab state with the URL hash for effortless deep-linking and browser back/forward history navigation.</p>
 
-							<p>In <code>ln-ashlar</code>, this paradigm is managed by <strong><code>ln-tabs</code></strong>, a lightweight state container (145 lines of JavaScript) that handles three responsibilities concurrently: managing the active tab key, synchronizing URL hashes for deep-linking, and ensuring full ARIA accessibility state is reflected in the DOM.</p>
+							<p>In <code>ln-ashlar</code>, this paradigm provides an N-way exclusive view without cluttering the screen or loading separate pages, keeping state, ARIA, and visual styles strictly orthogonal.</p>
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

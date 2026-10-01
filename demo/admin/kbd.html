@@ -225,8 +225,15 @@
 		<!-- Content -->
 		<section>
 			<div class="app-content-wrapper">
-<h1>ln-key (Keyboard Shortcuts)</h1>
-<p>Declaratively binds keyboard shortcuts to native <code>click()</code> or <code>focus()</code> behavior on target DOM elements. Supports modifier combinations (<kbd>Ctrl</kbd>, <kbd>Alt</kbd>, <kbd>Shift</kbd>, <kbd>Meta</kbd>), target redirection, input protection, and declarative shortcut mapping via <code>data-ln-key-for</code>.</p>
+<!-- Overview -->
+<section class="section-card">
+	<header><h3>Overview &amp; How It Works</h3></header>
+	<main>
+		<p>The <code>ln-key</code> component binds global keyboard shortcuts directly to target DOM elements using declarative attributes such as <code>data-ln-key="Ctrl+S"</code> or external key maps with <code>data-ln-key-for="targetId"</code>. It listens for global <code>keydown</code> events, normalizes modifier combinations (<kbd>Ctrl</kbd>, <kbd>Alt</kbd>, <kbd>Shift</kbd>, <kbd>Meta</kbd>), and triggers native actions without storing synthetic shortcut state.</p>
+		<p>When a declared key combination matches, buttons and links are activated via native <code>.click()</code>, while search boxes, text inputs, and textareas receive <code>.focus()</code>. Shortcut handling automatically protects input fields so typing inside text inputs won't accidentally trigger single-letter hotkeys, maintaining strict decoupling from other components.</p>
+	</main>
+</section>
+
 
 <!-- Live Event Logger & Status -->
 <section class="section-card">

@@ -225,8 +225,15 @@
 		<!-- Content -->
 		<section>
 			<div class="app-content-wrapper">
-<h1>Stat Card / KPI Card</h1>
-				<p>Dashboard KPI tile. Large numeric value, small uppercase label, and optional trend indicator.</p>
+<!-- Overview -->
+<section class="section-card">
+	<header><h3>Overview &amp; How It Works</h3></header>
+	<main>
+		<p>Stat and KPI cards display high-impact metrics, indicators, and trends across dashboards using <code>[data-ln-stat-card]</code>. When connected to reactive data, inline numbers carry <code>data-ln-stat="storeName"</code> (with optional criteria such as <code>data-ln-stat-filter="status:active"</code>). On boot, the element dispatches an <code>ln-stat:request-count</code> event that bubbles to the nearest <code>ln-data-coordinator</code>.</p>
+		<p>When the coordinator resolves or updates the record count in the bound store, it emits <code>ln-stat:set-count</code>, updating the card's <code>textContent</code> and clearing any loading states. The stat element holds zero internal cache, staying perfectly in sync with the underlying data store through standard DOM events.</p>
+	</main>
+</section>
+
 
 				<!-- 4-across grid — all 3 trend variants -->
 				<section class="section-card" data-demo-html>

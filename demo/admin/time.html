@@ -225,15 +225,13 @@
 		<!-- Content -->
 		<section>
 			<div class="app-content-wrapper">
-<h1>Time</h1>
+<!-- Overview / philosophy -->
+				<section class="section-card">
+					<header><h3>Overview &amp; Philosophy</h3></header>
+					<main>
+						<p><strong><code>ln-time</code></strong> is applied to semantic HTML5 <code>&lt;time data-ln-time="..." datetime="..."&gt;</code> elements, where <code>datetime</code> contains a Unix timestamp in seconds. On boot and whenever attributes change, it formats the timestamp into a localized string using native browser <code>Intl.DateTimeFormat</code> or <code>Intl.RelativeTimeFormat</code> APIs without external date libraries. When configured for relative display (e.g. <code>data-ln-time="relative"</code>), a shared, single-interval timer periodically updates visible text in place without polling the server.</p>
 
-					<!-- Overview / philosophy -->
-					<section class="section-card">
-						<header><h3>Overview &amp; Philosophy</h3></header>
-						<main>
-							<p>Displaying dates, times, and relative periods (e.g. "3 hours ago") in multi-regional web portals is surprisingly complex. Server-side rendering often binds timestamps to a single static timezone, leaving international users to do timezone math in their heads. At the same time, loading massive, multi-kilobyte datetime formatting libraries in the browser compromises initial page loading speeds.</p>
-
-							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-time</code>, a zero-dependency **Timezone-Aware Timestamp Formatter**. Operating as a progressive enhancement layer, it upgrades native HTML <code>&lt;time&gt;</code> elements. Server engines render a clean UTC date or relative string fallback. On script boot, the component parses the Unix timestamp, formats the output based on the user's local timezone and browser language using high-performance standard APIs, and schedules a single background interval to update relative timestamps live.</p>
+						<p>In <code>ln-ashlar</code>, this zero-dependency progressive enhancement layer upgrades native HTML <code>&lt;time&gt;</code> elements into timezone-aware, localized date displays.</p>
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

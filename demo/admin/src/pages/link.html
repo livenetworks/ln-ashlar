@@ -1,7 +1,15 @@
 <!-- ln-page: title="Link — ln-ashlar" h1="Link" -->
 
-<h1>Link</h1>
-					<p>Clickable containers — the entire row/element responds to a click, finding the first <code>&lt;a&gt;</code> inside. Compatible with ln-ajax.</p>					<!-- Table -->
+<!-- Overview -->
+<section class="section-card">
+	<header><h3>Overview &amp; How It Works</h3></header>
+	<main>
+		<p>The <code>ln-link</code> component is applied to table rows, lists, or card containers via <code>data-ln-link</code> to make entire container elements clickable. It listens for click interactions on the container, resolves the first anchor tag (<code>&lt;a&gt;</code>) in document order, and delegates the native <code>.click()</code> to that link, leaving navigation entirely to the browser platform or SPA router.</p>
+		<p>Clicks originating from nested interactive controls—such as buttons, checkboxes, inputs, or secondary links—are automatically bypassed, keeping them fully functional. When hovering over clickable containers, <code>ln-link</code> displays a subtle bottom status bar mirroring the target URL, providing users with the familiar native browser link preview experience.</p>
+	</main>
+</section>
+
+<!-- Table -->
 					<section class="section-card" data-demo-html>
 						<header><h3>Table with clickable rows</h3></header>
 						<main>

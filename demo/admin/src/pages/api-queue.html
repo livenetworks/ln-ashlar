@@ -3,7 +3,8 @@
 <section class="section-card">
 	<header><h3>Overview &amp; Architecture</h3></header>
 	<main>
-		<p>The <strong>API Queue</strong> (<code>data-ln-api-queue</code>) is a connector- and id-blind offline outbox that sits between the <strong>Data Coordinator</strong> and the <strong>API Connector</strong>. It persists prepared write requests to its own IndexedDB database, replays them FIFO per record-chain with exponential backoff once connectivity returns, pauses on auth failure, and hands temp-id remapping back to the coordinator on a successful create.</p>
+		<p>Applied to an outbox element via <code>data-ln-api-queue</code> nested inside a <code>data-ln-data-coordinator</code>, this component listens for <code>ln-api-queue:request-enqueue</code> from the coordinator, persists mutations to an internal IndexedDB outbox (<code>ln_api_queue</code>) with monotonic per-scope sequence counters, and emits <code>ln-api-queue:send</code> CustomEvents for FIFO dispatch. It never initiates network requests directly, updating retry attempts with exponential backoff until acknowledged via <code>ack</code> or <code>nack</code>.</p>
+		<p>The <strong>API Queue</strong> is a connector- and id-blind offline outbox that sits between the Data Coordinator and the Transport Gateway. It replays writes FIFO per record-chain once connectivity returns, pauses safely on authentication errors, and hands temporary-to-permanent ID remappings back to the coordinator on successful creation.</p>
 
 		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 			<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

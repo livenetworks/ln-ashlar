@@ -1,11 +1,9 @@
 <!-- ln-page: title="Router — ln-ashlar" h1="Router" -->
 
-<h1>Router</h1>
-
 <section class="section-card">
 	<header><h3>Overview &amp; Philosophy</h3></header>
 	<main>
-		<p>The <code>ln-router</code> component is a zero-dependency, **template-only** client-side router for <code>ln-ashlar</code>. It maps the URL to a <code>&lt;template data-ln-route="..."&gt;</code>, clones it into a target element, and lets existing component MutationObservers auto-initialize the injected DOM.</p>
+		<p><strong><code>ln-router</code></strong> is declared globally with route definitions in <code>&lt;template data-ln-route="..."&gt;</code> elements rendering into <code>&lt;main data-ln-outlet&gt;</code> or auxiliary targets. It intercepts clicks on same-origin <code>&lt;a&gt;</code> tags and listens for <code>popstate</code>, matches the URL against specificity-ranked route patterns, and clones templates into designated outlets with View Transitions support. It unmounts old views by calling <code>.destroy()</code> on child components, leaving data fetching and view filling to route coordinators.</p>
 
 		<p>In accordance with project doctrine, the router does **not** fetch data, sanitise templates, or run data-binding logic. Instead, the router mounts the view, and the **page coordinator** listens for navigation events to populate the templates using the static text interpolation helper <code>fillTemplate</code>.</p>
 

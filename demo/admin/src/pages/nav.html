@@ -1,7 +1,14 @@
 <!-- ln-page: title="Nav — ln-ashlar" h1="Nav" -->
 
-<h1>Nav</h1>
-					<p>Active link highlighter — automatically marks the active link in navigation based on the current URL. Works with pushState (AJAX) and popstate (browser back/forward).</p>
+<!-- Overview -->
+<section class="section-card">
+	<header><h3>Overview &amp; How It Works</h3></header>
+	<main>
+		<p>The <code>ln-nav</code> component is applied to navigation containers via <code>&lt;nav data-ln-nav="active"&gt;</code> to manage active link highlighting automatically. On initialization and whenever browser navigation occurs (via <code>popstate</code> or <code>pushState</code> AJAX requests), it scans all child <code>&lt;a&gt;</code> tags and compares their <code>href</code> attributes with the current <code>window.location.pathname</code>.</p>
+		<p>The link matching the active route automatically receives the specified CSS class (e.g. <code>.active</code>) and the accessibility attribute <code>aria-current="page"</code>, while inactive sibling links are cleaned up. It operates completely autonomously with zero configuration or manual route-highlighting code.</p>
+	</main>
+</section>
+
 
 					<!-- Basics -->
 					<section class="section-card">

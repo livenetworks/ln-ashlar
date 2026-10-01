@@ -225,15 +225,13 @@
 		<!-- Content -->
 		<section>
 			<div class="app-content-wrapper">
-<h1>AJAX</h1>
-
-					<!-- Overview / philosophy -->
+<!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>Single Page Applications (SPAs) often come with massive architectural overhead: requiring developers to ship megabytes of client-side routing bundles, re-implement layout structures in JavaScript templates, and manage heavy state synchronization pipelines simply to update a view when clicking a link.</p>
+							<p><strong><code>ln-ajax</code></strong> is applied to containers, links, or forms via <code>data-ln-ajax</code>. It intercepts same-origin anchor clicks and form submissions via <code>e.preventDefault()</code> and issues asynchronous requests with <code>X-Requested-With: XMLHttpRequest</code> headers. When the server responds with targeted HTML fragments (such as <code>{ content: { "#target": "&lt;html&gt;" } }</code>), <code>ln-ajax</code> replaces those DOM regions in-place and updates the browser history via <code>history.pushState()</code>, enabling SPA-speed page transitions while preserving server-rendered markup.</p>
 
-							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-ajax</code>, a zero-dependency **Navigation &amp; Swapping Primitive**. Instead of building a complex client-side router, it upgrades standard HTML links and forms. It intercepts clicks and form submissions, requests server-side JSON representations of target pages, and swaps pre-compiled HTML fragments directly into the DOM while updating the browser's address history.</p>
+							<p>In <code>ln-ashlar</code>, this navigation and swapping primitive avoids client-side template bloat by letting the server remain the authoritative source for markup.</p>
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

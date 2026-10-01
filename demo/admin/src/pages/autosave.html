@@ -4,9 +4,9 @@
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>Losing filled-out form data due to an accidental tab close, network interruption, or browser crash is one of the most frustrating experiences in web applications. While most developers attempt to solve this by continuously streaming drafts to server-side endpoints, this approach introduces heavy network overhead, concurrency conflicts, and race conditions.</p>
+							<p><strong><code>ln-autosave</code></strong> is applied to forms via <code>&lt;form id="..." data-ln-autosave&gt;</code> to protect form drafts against accidental reloads or tab closures. On initialization, it reads stored draft JSON from <code>localStorage</code> and restores field values, dispatching synthetic <code>input</code> and <code>change</code> events so dependent primitives (like <code>ln-validate</code> and <code>ln-autoresize</code>) update in sync. On field <code>focusout</code> or <code>change</code>, it serializes non-sensitive fields—strictly excluding passwords and excluded inputs—and saves the draft, automatically purging storage when the form is submitted or reset.</p>
 
-							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-autosave</code>, a zero-dependency **Draft Buffer Primitive** that handles data persistence entirely on the client. It intercepts standard DOM events on forms, serializes states, and saves drafts directly to <code>localStorage</code>. It is visual-silent, extremely fast, and completely decoupled from network transport layers.</p>
+							<p>In <code>ln-ashlar</code>, this draft buffer primitive handles data persistence entirely on the client without heavy network streaming or concurrency conflicts.</p>
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">

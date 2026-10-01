@@ -60,7 +60,7 @@ test('theme cascade (§6.4/§6.5): scoped-theme demo page is valid and linked fr
 
 	const sitemapPath = path.join(REPO_ROOT, 'demo/sitemap.xml');
 	const sitemap = fs.readFileSync(sitemapPath, 'utf8');
-	assert.match(sitemap, /<loc>scoped-theme\.html<\/loc>/, 'sitemap.xml must list scoped-theme.html');
+	assert.match(sitemap, /<loc>(?:https?:\/\/[^/]+\/)?scoped-theme\.html<\/loc>/, 'sitemap.xml must list scoped-theme.html');
 
 	const demoIndexPath = path.join(REPO_ROOT, 'demo/index.html');
 	const demoIndex = fs.readFileSync(demoIndexPath, 'utf8');

@@ -254,7 +254,9 @@
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>In <code>ln-ashlar</code>, search is implemented using the <strong>Two-Host / Attribute Bridge Architecture</strong>. It splits the search workflow into two decoupled roles:</p>
+							<p><strong><code>ln-search</code></strong> is applied using a decoupled two-host bridge: an input control (<code>&lt;input type="search" data-ln-search-for="targetId"&gt;</code>) drives a target container (<code>data-ln-search id="targetId"</code>). Keystrokes on the input write directly to the target's DOM attribute (<code>target.setAttribute('data-ln-search', value)</code>), which acts as the Single Source of Truth. A <code>MutationObserver</code> on the target detects changes, performs order-independent tokenized AND matching against child items, and applies <code>data-ln-search-hide</code> and <code>.hidden</code> to non-matching elements, while clear triggers reset the query instantaneously.</p>
+
+							<p>In <code>ln-ashlar</code>, this <strong>Two-Host / Attribute Bridge Architecture</strong> splits search into two cleanly decoupled roles:</p>
 							<ul>
 								<li><strong>The Control (<code>data-ln-search-for="targetId"</code>):</strong> Sits on the input element or wrapper. It manages keystroke capture, clear-button interactions, and writes the search term into the target's attribute.</li>
 								<li><strong>The State Host (<code>data-ln-search="term"</code>):</strong> Sits on the target container (list, table, section). It owns the search term as the Single Source of Truth, detects attribute changes via <code>MutationObserver</code>, performs reverse synchronization to controls, dispatches <code>ln-search:change</code>, and runs tokenized AND matching.</li>

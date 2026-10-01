@@ -1,7 +1,14 @@
 <!-- ln-page: title="Upload — ln-ashlar" h1="Upload" -->
 
-<h1>Upload</h1>
-<p>File upload with drag-drop, progress bar, file type validation, and SSR hydration.</p>
+<!-- Overview -->
+<section class="section-card">
+	<header><h3>Overview &amp; How It Works</h3></header>
+	<main>
+		<p>The <code>ln-upload</code> component is applied to a container element via <code>data-ln-upload="URL"</code> enclosing an <code>&lt;input type="file" hidden&gt;</code> and a drop zone (<code>[data-ln-upload-zone]</code>). It listens for drag-and-drop actions and native file picker changes, validates client-side file constraints (types, sizes), clones item markup from <code>&lt;template data-ln-template="ln-upload-item"&gt;</code>, and uploads files asynchronously via <code>fetch(FormData)</code> with real-time progress tracking.</p>
+		<p>Upon successful upload, it automatically injects hidden form inputs (<code>&lt;input type="hidden" name="file_ids[]" value="..."&gt;</code>) into the DOM, allowing uploaded file IDs to be submitted cleanly through standard HTML form submissions without custom JavaScript glue code.</p>
+	</main>
+</section>
+
 
 <!-- Upload zone -->
 <section class="section-card" data-demo-html>

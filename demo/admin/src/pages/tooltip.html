@@ -1,14 +1,12 @@
 <!-- ln-page: title="Tooltip — ln-ashlar" h1="Tooltip" -->
 
-<h1>Tooltip</h1>
-
 				<!-- Overview / philosophy -->
 				<section class="section-card">
 					<header><h3>Overview &amp; Philosophy</h3></header>
 					<main>
-						<p>Sighted users require brief, high-impact labels when interacting with icon-only buttons or complex technical abbreviations. However, loading heavy JavaScript positioning libraries for simple tooltips introduces unnecessary runtime overhead, while using standard native browser <code>title</code> attributes results in laggy, non-stylable, and uncooperative tooltips.</p>
+						<p><strong><code>ln-tooltip</code></strong> is applied to any HTML element via <code>data-ln-tooltip="text"</code>. In its baseline CSS-first mode, tooltips display instantly on <code>:hover</code> and <code>:focus</code> via styled <code>::after</code> pseudo-elements with zero JavaScript overhead. Adding <code>data-ln-tooltip-enhance</code> activates the JS top-layer engine: on mouse enter or keyboard focus, it mounts a tooltip bubble into a shared portal (<code>#ln-tooltip-portal</code>), promotes it via the native Popover API (<code>popover="manual"</code>) to escape ancestor overflow clipping, and calculates viewport boundary-aware coordinates.</p>
 
-						<p>In <code>ln-ashlar</code>, this is solved by <code>ln-tooltip</code>, a zero-dependency <strong>Dual-Layer Tooltip Primitive</strong>. It is engineered on a progressive enhancement architectural model. By default, it ships a pure <strong>CSS baseline</strong> (zero JS footprint) that styles and positions a tooltip bubble using standard <code>::after</code> pseudo-elements. For advanced requirements, developers can opt into the <strong>JS enhancement layer</strong> to enable viewport-aware auto-flipping, text wrapping, and clean accessibility portals.</p>
+						<p>It is engineered on a progressive enhancement model, allowing simple tooltips to remain 100% CSS-driven while complex layouts upgrade to top-layer collision avoidance on demand.</p>
 
 						<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 							<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
