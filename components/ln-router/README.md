@@ -80,6 +80,38 @@ Route templates and outlets are declared in HTML. Triggers are plain same-origin
 </template>
 ```
 
+### Base URL & Subdirectory Deployment (`<base href="...">` / `data-ln-router-base`)
+
+When deploying an SPA inside a subdirectory or virtual path (e.g. `https://example.com/spa/`, `https://example.com/admin/`), client-side routing should remain clean and decoupled from server path prefixes.
+
+You declare the base URL using standard HTML in `<head>`:
+
+```html
+<head>
+    <base href="/spa/">
+</head>
+```
+
+Or declaratively via `data-ln-router-base` on the outlet:
+
+```html
+<main data-ln-outlet data-ln-router-base="/spa"></main>
+```
+
+#### How Base URL Resolution Works:
+1. **Relative Route Authoring**: Route templates declare relative patterns without repeating the base prefix:
+   ```html
+   <template data-ln-route="/">...</template>
+   <template data-ln-route="/packages">...</template>
+   <template data-ln-route="/tenants/:id">...</template>
+   ```
+2. **Path Matching**: When matching the browser URL (`/spa/packages`), `ln-router` strips the base URL (`/spa`), matching cleanly against `/packages`.
+3. **Absolute History URLs**: When navigating (`router.navigate('/packages')` or clicking `<a href="/packages">` / `<a href="packages">`), `ln-router` automatically prepends the base URL, pushing the absolute `/spa/packages` path to the browser history (`history.pushState`).
+4. **Anchor Interception**: Both relative links (`<a href="packages">`, `<a href="/packages">`) and pre-prefixed links (`<a href="/spa/packages">`) are intercepted and resolved against the base URL.
+5. **Programmatic API**:
+   - `router.base()` returns the active normalized base URL (e.g. `"/spa"` or `""`).
+   - `router.toUrl(relPath)` converts a relative route path to its full absolute URL with base prefix (e.g. `router.toUrl('/packages')` → `"/spa/packages"`).
+
 ---
 
 ## 3. The Declarative API & State Contract
@@ -131,6 +163,7 @@ If the **primary** outlet cannot be resolved, the router logs a `console.warn` a
 - `data-ln-route-target="id"`: Sets an explicit element ID to render this route into. Templates with no `data-ln-route-target` belong to the **primary region** (default outlet).
 - `data-ln-route-title="text"`: Sets `document.title` on successful navigation (primary region only).
 - `data-ln-outlet`: Marks the default outlet element (falls back to the first `<main>` element if omitted).
+- `data-ln-router-base="path"`: Declares a base URL prefix for subdirectory hosting (e.g. `"/spa"`). Can also be declared via `<base href="/spa/">` in `<head>`.
 - `data-ln-router-hydrate`: Placed on the outlet element to signal that initial SSR (Server-Side Rendered) content is already present, letting the router skip the initial clone and register events cleanly.
 - `data-ln-route-keep`: Placed on a **target element** (not a template). When present, the router skips teardown and DOM swap for that region if the matched template is the same as the one currently mounted — surviving param-only URL changes while preserving DOM state (inputs, scroll, open panels). When the matched template changes, teardown and swap proceed normally. `data-ln-route-keep` also opts an auxiliary region out of auto-clear: without it, a region left unmatched by the current URL is emptied automatically; with it, unmatched content is left in place. Ignored on the primary outlet (the primary always re-renders).
 

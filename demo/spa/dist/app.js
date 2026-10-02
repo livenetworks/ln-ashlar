@@ -59,10 +59,10 @@
 		}
 	}
 
-	// Route navigation: when navigating to '/spa', refresh dashboard usage
+	// Route navigation: when navigating to '/', refresh dashboard usage
 	document.addEventListener('ln-router:navigated', function (e) {
 		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
-		if (pattern === '/spa') {
+		if (pattern === '/') {
 			refreshDashboardUsageIfMounted();
 		}
 	});
@@ -283,7 +283,7 @@
 
 	document.addEventListener('ln-router:navigated', function (e) {
 		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
-		if (pattern === '/spa/packages') {
+		if (pattern === '/packages') {
 			const viewEl = e.detail.target || document.getElementById('packages-view');
 			mount(viewEl);
 		} else {
@@ -292,14 +292,18 @@
 	});
 
 	// If page was loaded directly on this route
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
+	function checkInitialMount() {
+		const cur = window.lnRouter && window.lnRouter.current();
+		if (cur && cur.route && cur.route.pattern === '/packages') {
 			const viewEl = document.getElementById('packages-view');
 			if (viewEl && !activeCoordinator) mount(viewEl);
-		});
+		}
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', checkInitialMount);
 	} else {
-		const viewEl = document.getElementById('packages-view');
-		if (viewEl && !activeCoordinator) mount(viewEl);
+		checkInitialMount();
 	}
 })();
 
@@ -335,7 +339,7 @@
 		document.addEventListener('click', function (e) {
 			const btn = e.target.closest('#reset-demo');
 			if (!btn) return;
-			fetch('/docuflow/api/reset').then(function (r) {
+			fetch('../docuflow/api/reset').then(function (r) {
 				if (!r.ok) throw new Error('HTTP ' + r.status);
 				forceSyncBoth();
 				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
@@ -415,7 +419,7 @@
 	// Route navigation to tenant editor: populate form with store record
 	document.addEventListener('ln-router:navigated', function (e) {
 		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
-		if (pattern !== '/spa/tenants/:id') return;
+		if (pattern !== '/tenants/:id') return;
 
 		const id = e.detail.params && e.detail.params.id;
 		if (id) {
@@ -429,7 +433,7 @@
 		if (tenantsStoreEl) {
 			tenantsStoreEl.addEventListener('ln-data-store:loaded', function () {
 				const cur = window.lnRouter && window.lnRouter.current();
-				if (cur && cur.route && cur.route.pattern === '/spa/tenants/:id' && cur.params && cur.params.id) {
+				if (cur && cur.route && cur.route.pattern === '/tenants/:id' && cur.params && cur.params.id) {
 					fillTenantEditor(cur.params.id);
 				}
 			});
@@ -440,7 +444,7 @@
 	// #tenant-form) — react to the store outcome instead of a form-level event.
 	document.addEventListener('ln-data-store:updated', function (e) {
 		if (e.detail.store !== 'tenants') return;
-		window.lnRouter.navigate('/spa/tenants');
+		window.lnRouter.navigate('/tenants');
 	});
 })();
 
@@ -565,7 +569,7 @@
 
 	document.addEventListener('ln-router:navigated', function (e) {
 		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
-		if (pattern === '/spa/tenants') {
+		if (pattern === '/tenants') {
 			const viewEl = e.detail.target || document.getElementById('tenants-view');
 			mount(viewEl);
 		} else {
@@ -574,13 +578,17 @@
 	});
 
 	// If page was loaded directly on this route
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
+	function checkInitialMount() {
+		const cur = window.lnRouter && window.lnRouter.current();
+		if (cur && cur.route && cur.route.pattern === '/tenants') {
 			const viewEl = document.getElementById('tenants-view');
 			if (viewEl && !activeCoordinator) mount(viewEl);
-		});
+		}
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', checkInitialMount);
 	} else {
-		const viewEl = document.getElementById('tenants-view');
-		if (viewEl && !activeCoordinator) mount(viewEl);
+		checkInitialMount();
 	}
 })();

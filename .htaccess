@@ -1,0 +1,24 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 1. Stop if this request has already been internally rewritten
+    RewriteCond %{ENV:REDIRECT_STATUS} !^$
+    RewriteRule ^ - [L]
+
+    # 2. External redirect: Strip /demo/ from browser URL if explicitly requested
+    RewriteCond %{THE_REQUEST} \s/+([^\s?]*)/demo/([^\s?]*) [NC]
+    RewriteRule ^demo/(.*)$ /%1/%2 [R=302,L,NE]
+
+    RewriteCond %{THE_REQUEST} \s/+([^\s?]*)/demo(?:\s|\?) [NC]
+    RewriteRule ^demo/?$ /%1/ [R=302,L]
+
+    RewriteCond %{THE_REQUEST} \s/+demo/([^\s?]*) [NC]
+    RewriteRule ^demo/(.*)$ /$1 [R=302,L,NE]
+
+    RewriteCond %{THE_REQUEST} \s/+demo(?:\s|\?) [NC]
+    RewriteRule ^demo/?$ / [R=302,L]
+
+    # 3. Internally rewrite all other requests to demo/
+    RewriteCond %{REQUEST_URI} !^.*/demo/
+    RewriteRule ^(.*)$ demo/$1 [L]
+</IfModule>

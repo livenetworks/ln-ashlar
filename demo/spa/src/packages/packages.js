@@ -109,7 +109,7 @@
 
 	document.addEventListener('ln-router:navigated', function (e) {
 		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
-		if (pattern === '/spa/packages') {
+		if (pattern === '/packages') {
 			const viewEl = e.detail.target || document.getElementById('packages-view');
 			mount(viewEl);
 		} else {
@@ -118,13 +118,17 @@
 	});
 
 	// If page was loaded directly on this route
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
+	function checkInitialMount() {
+		const cur = window.lnRouter && window.lnRouter.current();
+		if (cur && cur.route && cur.route.pattern === '/packages') {
 			const viewEl = document.getElementById('packages-view');
 			if (viewEl && !activeCoordinator) mount(viewEl);
-		});
+		}
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', checkInitialMount);
 	} else {
-		const viewEl = document.getElementById('packages-view');
-		if (viewEl && !activeCoordinator) mount(viewEl);
+		checkInitialMount();
 	}
 })();

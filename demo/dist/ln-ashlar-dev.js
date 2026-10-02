@@ -687,6 +687,7 @@ const T = /* @__PURE__ */ new Set([
   "data-ln-route-keep",
   "data-ln-route-target",
   "data-ln-route-title",
+  "data-ln-router-base",
   "data-ln-router-hydrate",
   "data-ln-scroll",
   "data-ln-scroll-behavior",

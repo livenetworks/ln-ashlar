@@ -27,7 +27,7 @@
 	// Route navigation to tenant editor: populate form with store record
 	document.addEventListener('ln-router:navigated', function (e) {
 		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
-		if (pattern !== '/spa/tenants/:id') return;
+		if (pattern !== '/tenants/:id') return;
 
 		const id = e.detail.params && e.detail.params.id;
 		if (id) {
@@ -41,7 +41,7 @@
 		if (tenantsStoreEl) {
 			tenantsStoreEl.addEventListener('ln-data-store:loaded', function () {
 				const cur = window.lnRouter && window.lnRouter.current();
-				if (cur && cur.route && cur.route.pattern === '/spa/tenants/:id' && cur.params && cur.params.id) {
+				if (cur && cur.route && cur.route.pattern === '/tenants/:id' && cur.params && cur.params.id) {
 					fillTenantEditor(cur.params.id);
 				}
 			});
@@ -52,6 +52,6 @@
 	// #tenant-form) — react to the store outcome instead of a form-level event.
 	document.addEventListener('ln-data-store:updated', function (e) {
 		if (e.detail.store !== 'tenants') return;
-		window.lnRouter.navigate('/spa/tenants');
+		window.lnRouter.navigate('/tenants');
 	});
 })();

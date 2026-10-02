@@ -55,6 +55,14 @@
 			"type": "string",
 			"description": "Document title template set when route is activated"
 		},
+		"data-ln-router-base": {
+			"direction": "author",
+			"sources": [
+				"src/ln-router.js"
+			],
+			"type": "string",
+			"description": "Base URL prefix for subdirectory routing (e.g. "
+		},
 		"data-ln-router-hydrate": {
 			"direction": "author",
 			"sources": [

@@ -150,7 +150,23 @@ in a view route listener.
 
 ---
 
-## 5. Data binding helpers (public globals)
+## 5. Base URL & Relative Routing
+
+When serving the SPA from a subpath (e.g. `/spa/` or `https://ashlar.live.net.mk/spa/`), `<head>` declares the standard HTML base element:
+
+```html
+<base href="/spa/">
+```
+
+Because `ln-router` natively supports `<base href="...">`, you do **not** hardcode `/spa/` inside route templates, anchor links, or coordinators:
+- Route templates use clean relative paths: `data-ln-route="/"`, `data-ln-route="/packages"`, `data-ln-route="/tenants"`, `data-ln-route="/tenants/:id"`.
+- Navigation links use clean relative paths: `<a href="/packages">` or `<a href="packages">`.
+- Coordinators check clean relative patterns: `if (pattern === '/packages')`.
+- `ln-router` handles mapping between the browser's absolute URL (`/spa/packages`) and the route's relative pattern (`/packages`).
+
+---
+
+## 6. Data binding helpers (public globals)
 
 `window.lnCore` exposes the safe binders — never use `innerHTML` for
 URL/user data:
@@ -161,18 +177,18 @@ URL/user data:
 | `lnCore.fillTemplate(clone, data)` | Replace `{{ key }}` text placeholders (XSS-safe). |
 | `lnCore.renderList(container, items, tmplName, keyFn, fillFn, tag)` | Keyed list reconciliation from a `<template data-ln-template>`. |
 
-`window.lnRouter` exposes `navigate(path)`, `replace(path)`, `current()`.
+`window.lnRouter` exposes `navigate(path)`, `replace(path)`, `current()`, `base()`, `toUrl(relPath)`.
 
 ---
 
-## 6. Add a module
+## 7. Add a module
 
 1. `mkdir src/reports`
 2. `src/reports/reports.html`
 
    ```html
    <!-- @zone routes -->
-   <template data-ln-route="/spa/reports" data-ln-route-title="Reports">
+   <template data-ln-route="/reports" data-ln-route-title="Reports">
      <section id="reports"><h1>Reports</h1><ul data-list></ul></section>
    </template>
    ```
@@ -184,7 +200,7 @@ URL/user data:
 
      document.addEventListener('ln-router:navigated', function (e) {
        var pattern = e.detail && e.detail.route && e.detail.route.pattern;
-       if (pattern !== '/spa/reports') return;
+       if (pattern !== '/reports') return;
 
        // fetch data + lnCore.renderList(...)
      });

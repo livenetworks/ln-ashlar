@@ -4,25 +4,31 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>DocuFlow</title>
-	<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
-	<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-dark-32x32.png" media="(prefers-color-scheme: dark)">
-	<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-dark-16x16.png" media="(prefers-color-scheme: dark)">
-	<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-light-32x32.png" media="(prefers-color-scheme: light)">
-	<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-light-16x16.png" media="(prefers-color-scheme: light)">
-	<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
-	<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
-	<link rel="manifest" href="/site.webmanifest">
-	<link rel="shortcut icon" href="/favicon.ico">
+	<base href="/demo/spa/">
+	<script>
+		if (window.location.pathname.startsWith('/spa')) {
+			document.querySelector('base').setAttribute('href', '/spa/');
+		}
+	</script>
+	<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+	<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-dark-32x32.png" media="(prefers-color-scheme: dark)">
+	<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-dark-16x16.png" media="(prefers-color-scheme: dark)">
+	<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-light-32x32.png" media="(prefers-color-scheme: light)">
+	<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-light-16x16.png" media="(prefers-color-scheme: light)">
+	<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
+	<link rel="manifest" href="../site.webmanifest">
+	<link rel="shortcut icon" href="../favicon.ico">
 
 	<!-- App styles: compiled framework + modules SCSS -->
-	<link rel="stylesheet" href="/spa/dist/app.css">
+	<link rel="stylesheet" href="dist/app.css">
 
 	<!-- ln-ashlar components bundle -->
-	<script src="/dist/ln-ashlar.iife.js" defer></script>
+	<script src="../dist/ln-ashlar.iife.js" defer></script>
 
 	<!-- The concatenated application coordinators (modules JS) -->
-	<script src="/spa/dist/app.js" defer></script>
+	<script src="dist/app.js" defer></script>
 </head>
 <body>
 	<!-- Persistent app chrome: header, sidebar, and the routing outlet. -->

@@ -1055,6 +1055,10 @@
 			"description": "Document title template set when route is activated"
 		},
 		{
+			"name": "data-ln-router-base",
+			"description": "Base URL prefix for subdirectory routing (e.g. "
+		},
+		{
 			"name": "data-ln-router-hydrate",
 			"description": "Hydrate existing DOM content on initial router boot",
 			"valueSet": "b"

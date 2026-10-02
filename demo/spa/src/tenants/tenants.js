@@ -118,7 +118,7 @@
 
 	document.addEventListener('ln-router:navigated', function (e) {
 		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
-		if (pattern === '/spa/tenants') {
+		if (pattern === '/tenants') {
 			const viewEl = e.detail.target || document.getElementById('tenants-view');
 			mount(viewEl);
 		} else {
@@ -127,13 +127,17 @@
 	});
 
 	// If page was loaded directly on this route
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
+	function checkInitialMount() {
+		const cur = window.lnRouter && window.lnRouter.current();
+		if (cur && cur.route && cur.route.pattern === '/tenants') {
 			const viewEl = document.getElementById('tenants-view');
 			if (viewEl && !activeCoordinator) mount(viewEl);
-		});
+		}
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', checkInitialMount);
 	} else {
-		const viewEl = document.getElementById('tenants-view');
-		if (viewEl && !activeCoordinator) mount(viewEl);
+		checkInitialMount();
 	}
 })();
