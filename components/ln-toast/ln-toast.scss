@@ -3,9 +3,13 @@
 // ==========================================================================
 
 [data-ln-toast] {
+	position: fixed;
+	z-index: var(--z-toast, 50);
+	inset: auto;
+	right: var(--size-lg, 1.5rem);
+	bottom: var(--size-lg, 1.5rem);
 	border: none;
 	background: transparent;
-	inset: auto;
 	list-style: none;
 	padding: 0;
 	margin: 0;
