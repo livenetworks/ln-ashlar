@@ -69,7 +69,7 @@ What `build.mjs` does:
 | `dist/app.css` | Generates a `@use` list of all module `.scss`, then compiles `app.scss` (framework + modules) with Dart Sass. |
 
 Serve the repo over a server with an SPA fallback (an `.htaccess` is included
-for Apache) and open `/demo/spa`.
+for Apache) and open `/spa`.
 
 ---
 

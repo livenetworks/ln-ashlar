@@ -58,10 +58,10 @@
 		}
 	}
 
-	// Route navigation: when navigating to '/demo/spa', refresh dashboard usage
+	// Route navigation: when navigating to '/spa', refresh dashboard usage
 	document.addEventListener('ln-router:navigated', function (e) {
 		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
-		if (pattern === '/demo/spa') {
+		if (pattern === '/spa') {
 			refreshDashboardUsageIfMounted();
 		}
 	});

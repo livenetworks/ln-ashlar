@@ -4,25 +4,25 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>DocuFlow</title>
-	<link rel="icon" type="image/svg+xml" href="/demo/assets/favicon.svg">
-	<link rel="icon" type="image/png" sizes="32x32" href="/demo/assets/favicon-dark-32x32.png" media="(prefers-color-scheme: dark)">
-	<link rel="icon" type="image/png" sizes="16x16" href="/demo/assets/favicon-dark-16x16.png" media="(prefers-color-scheme: dark)">
-	<link rel="icon" type="image/png" sizes="32x32" href="/demo/assets/favicon-light-32x32.png" media="(prefers-color-scheme: light)">
-	<link rel="icon" type="image/png" sizes="16x16" href="/demo/assets/favicon-light-16x16.png" media="(prefers-color-scheme: light)">
-	<link rel="icon" type="image/png" sizes="32x32" href="/demo/assets/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="/demo/assets/favicon-16x16.png">
-	<link rel="apple-touch-icon" sizes="180x180" href="/demo/assets/apple-touch-icon.png">
-	<link rel="manifest" href="/demo/site.webmanifest">
-	<link rel="shortcut icon" href="/demo/favicon.ico">
+	<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+	<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-dark-32x32.png" media="(prefers-color-scheme: dark)">
+	<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-dark-16x16.png" media="(prefers-color-scheme: dark)">
+	<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-light-32x32.png" media="(prefers-color-scheme: light)">
+	<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-light-16x16.png" media="(prefers-color-scheme: light)">
+	<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="shortcut icon" href="/favicon.ico">
 
 	<!-- App styles: compiled framework + modules SCSS -->
-	<link rel="stylesheet" href="/demo/spa/dist/app.css">
+	<link rel="stylesheet" href="/spa/dist/app.css">
 
 	<!-- ln-ashlar components bundle -->
-	<script src="/demo/dist/ln-ashlar.iife.js" defer></script>
+	<script src="/dist/ln-ashlar.iife.js" defer></script>
 
 	<!-- The concatenated application coordinators (modules JS) -->
-	<script src="/demo/spa/dist/app.js" defer></script>
+	<script src="/spa/dist/app.js" defer></script>
 </head>
 <body>
 	<!-- Persistent app chrome: header, sidebar, and the routing outlet. -->
@@ -34,11 +34,11 @@
 			<button type="button" class="menu-toggle" data-ln-toggle-for="app-sidebar" aria-label="Open menu">
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
 			</button>
-			<a class="app-brand" href="/demo/spa">
+			<a class="app-brand" href="/spa">
 				<picture>
-					<source srcset="/demo/assets/ln-ashlar-emblem-dark-64.png" media="(prefers-color-scheme: dark)">
-					<source srcset="/demo/assets/ln-ashlar-emblem-light-64.png" media="(prefers-color-scheme: light)">
-					<img src="/demo/assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px);">
+					<source srcset="/assets/ln-ashlar-emblem-dark-64.png" media="(prefers-color-scheme: dark)">
+					<source srcset="/assets/ln-ashlar-emblem-light-64.png" media="(prefers-color-scheme: light)">
+					<img src="/assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px);">
 				</picture>
 				<span>DocuFlow</span>
 			</a>
@@ -48,9 +48,9 @@
 		<aside class="app-sidebar" id="app-sidebar" data-ln-toggle="open">
 			<header>
 				<picture>
-					<source srcset="/demo/assets/ln-ashlar-emblem-dark-64.png" media="(prefers-color-scheme: dark)">
-					<source srcset="/demo/assets/ln-ashlar-emblem-light-64.png" media="(prefers-color-scheme: light)">
-					<img src="/demo/assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px);">
+					<source srcset="/assets/ln-ashlar-emblem-dark-64.png" media="(prefers-color-scheme: dark)">
+					<source srcset="/assets/ln-ashlar-emblem-light-64.png" media="(prefers-color-scheme: light)">
+					<img src="/assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px);">
 				</picture>
 				<span class="app-name">DocuFlow</span>
 				<button type="button" data-ln-toggle-for="app-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar">
@@ -61,19 +61,19 @@
 				<nav aria-label="Main navigation" data-ln-nav="active">
 					<ul>
 						<li>
-							<a href="/demo/spa">
+							<a href="/spa">
 								<svg class="ln-icon nav-icon" aria-hidden="true"><use href="#ln-icon-layout-dashboard"></use></svg>
 								<span class="nav-label">Dashboard</span>
 							</a>
 						</li>
 						<li>
-							<a href="/demo/spa/packages">
+							<a href="/spa/packages">
 								<svg class="ln-icon nav-icon" aria-hidden="true"><use href="#ln-icon-package"></use></svg>
 								<span class="nav-label">Packages</span>
 							</a>
 						</li>
 						<li>
-							<a href="/demo/spa/tenants">
+							<a href="/spa/tenants">
 								<svg class="ln-icon nav-icon" aria-hidden="true"><use href="#ln-icon-building"></use></svg>
 								<span class="nav-label">Tenants</span>
 							</a>
@@ -98,7 +98,7 @@
 	
 		<!-- data/data.html -->
 		<!-- Packages data layer -->
-<div data-ln-data-coordinator="packages" data-ln-data-mapper="packages" id="packages-coordinator" hidden>
+<div data-ln-data-coordinator="packages" data-ln-data-coordinator-mapper="packages" id="packages-coordinator" hidden>
 	<div data-ln-data-store
 	     data-ln-data-store-stale="-1"
 	     data-ln-data-store-indexes="active"
@@ -106,12 +106,12 @@
 	     data-ln-search=""
 	     id="packages"></div>
 	<div data-ln-api-connector
-	     data-ln-api-base-url="/demo/docuflow/api"
+	     data-ln-api-base-url="/docuflow/api"
 	     data-ln-api-path="/packages"></div>
 </div>
 
 <!-- Tenants data layer -->
-<div data-ln-data-coordinator="tenants" data-ln-data-mapper="tenants" id="tenants-coordinator" hidden>
+<div data-ln-data-coordinator="tenants" data-ln-data-coordinator-mapper="tenants" id="tenants-coordinator" hidden>
 	<div data-ln-data-store
 	     data-ln-data-store-stale="-1"
 	     data-ln-data-store-indexes="package_id,auth_method,active"
@@ -119,7 +119,7 @@
 	     data-ln-search=""
 	     id="tenants"></div>
 	<div data-ln-api-connector
-	     data-ln-api-base-url="/demo/docuflow/api"
+	     data-ln-api-base-url="/docuflow/api"
 	     data-ln-api-path="/tenants"></div>
 </div>
 
@@ -325,7 +325,7 @@
 	<!-- Route templates, swapped into the outlet by ln-router. -->
 	
 		<!-- dashboard/dashboard.html -->
-		<template data-ln-route="/demo/spa" data-ln-route-title="Dashboard — DocuFlow">
+		<template data-ln-route="/spa" data-ln-route-title="Dashboard — DocuFlow">
 	<section id="dashboard" class="is-loading">
 		<header class="page-header">
 			<div class="page-title">
@@ -335,25 +335,25 @@
 		</header>
 		<ul class="stat-grid">
 			<li>
-				<a href="/demo/spa/packages">
+				<a href="/spa/packages">
 					<span data-ln-stat-label>Packages</span>
 					<strong data-ln-stat-value data-ln-stat="packages" class="is-loading">—</strong>
 				</a>
 			</li>
 			<li>
-				<a href="/demo/spa/tenants">
+				<a href="/spa/tenants">
 					<span data-ln-stat-label>Tenants</span>
 					<strong data-ln-stat-value data-ln-stat="tenants" class="is-loading">—</strong>
 				</a>
 			</li>
 			<li>
-				<a href="/demo/spa/tenants">
+				<a href="/spa/tenants">
 					<span data-ln-stat-label>Active tenants</span>
 					<strong data-ln-stat-value data-ln-stat="tenants" data-ln-stat-filter="active:true" class="is-loading">—</strong>
 				</a>
 			</li>
 			<li>
-				<a href="/demo/spa/packages">
+				<a href="/spa/packages">
 					<span data-ln-stat-label>Active packages</span>
 					<strong data-ln-stat-value data-ln-stat="packages" data-ln-stat-filter="active:true" class="is-loading">—</strong>
 				</a>
@@ -365,7 +365,7 @@
 				<ul data-pkg-usage></ul>
 				<template data-ln-template="pkg-usage-item">
 					<li>
-						<a href="/demo/spa/tenants">
+						<a href="/spa/tenants">
 							<span class="pkg-usage-name" data-pkg-usage-name></span>
 							<span class="pkg-usage-count" data-pkg-usage-count></span>
 							<span class="progress"><span data-ln-progress="0"></span></span>
@@ -384,19 +384,19 @@
 </template>
 
 		<!-- not-found/not-found.html -->
-		<template data-ln-route="/demo/spa/*" data-ln-route-title="Not found — DocuFlow">
+		<template data-ln-route="/spa/*" data-ln-route-title="Not found — DocuFlow">
 	<section id="not-found">
 		<article class="not-found-state">
 			<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-error-404"></use></svg>
 			<h1>Page not found</h1>
 			<p>The page you are looking for does not exist.</p>
-			<a href="/demo/spa" class="btn">Back to dashboard</a>
+			<a href="/spa" class="btn">Back to dashboard</a>
 		</article>
 	</section>
 </template>
 
 		<!-- packages/packages.html -->
-		<template data-ln-route="/demo/spa/packages" data-ln-route-title="Packages — DocuFlow">
+		<template data-ln-route="/spa/packages" data-ln-route-title="Packages — DocuFlow">
 	<section id="packages-view">
 		<header class="page-header">
 			<div class="page-title">
@@ -530,12 +530,12 @@
 </template>
 
 		<!-- tenant-editor/tenant-editor.html -->
-		<template data-ln-route="/demo/spa/tenants/:id" data-ln-route-title="Tenant — DocuFlow">
+		<template data-ln-route="/spa/tenants/:id" data-ln-route-title="Tenant — DocuFlow">
 	<section id="tenant-editor">
 		<header class="page-header">
 			<nav aria-label="Breadcrumb">
 				<ol>
-					<li><a href="/demo/spa/tenants">Tenants</a></li>
+					<li><a href="/spa/tenants">Tenants</a></li>
 					<li aria-current="page">Tenant</li>
 				</ol>
 			</nav>
@@ -641,7 +641,7 @@
 						</div>
 					</fieldset>
 					<footer class="form-actions">
-						<a href="/demo/spa/tenants" class="btn-outline">Cancel</a>
+						<a href="/spa/tenants" class="btn-outline">Cancel</a>
 						<button type="submit" class="btn">Save</button>
 					</footer>
 				</form>
@@ -651,7 +651,7 @@
 </template>
 
 		<!-- tenants/tenants.html -->
-		<template data-ln-route="/demo/spa/tenants" data-ln-route-title="Tenants — DocuFlow">
+		<template data-ln-route="/spa/tenants" data-ln-route-title="Tenants — DocuFlow">
 	<section id="tenants-view">
 		<header class="page-header">
 			<div class="page-title">
@@ -726,7 +726,7 @@
 					<td><span data-ln-table-cell-attr="status_class:class">{{ status_display }}</span></td>
 					<td>
 						<ul class="row-actions">
-							<li><a href="/demo/spa/tenants/{{ id }}"
+							<li><a href="/spa/tenants/{{ id }}"
 								data-ln-fill-form="tenant-form"
 								data-ln-fill-id="{{ id }}"
 								data-ln-fill-name="{{ name }}"
