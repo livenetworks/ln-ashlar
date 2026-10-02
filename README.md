@@ -44,24 +44,12 @@ A frequent misconception is that DOM-First architecture is restricted to standar
 | :--- | :--- | :--- |
 | **Primary State Surface** | In-memory JS component tree & reactive state. | **Direct W3C DOM** (`data-ln-*` attribute surface). |
 | **Primary Code Artifact** | JavaScript program (JSX, hooks, signals, state closures). | **Declarative Semantic HTML Contract**. |
-| **AI Agent Suitability** | Must generate full program logic, state handlers & reactivity trees. | Resolves intent directly to **declarative markup contracts** (⭐⭐⭐⭐⭐). |
+| **AI Agent Suitability** | Must generate full program logic, state handlers & reactivity trees. | Resolves intent directly to **declarative markup contracts**. |
 | **Runtime Dependencies** | Framework core + extensive npm package ecosystem. | **Zero runtime npm dependencies** (pure native Web APIs). |
 | **Observability & Inspection** | Requires specialized DevTools extensions to inspect hidden memory state. | **Control plane fully inspectable**: every behavioral state is a visible `data-ln-*` attribute in the native DOM inspector. |
 | **Long-Term Longevity** | Managed via framework LTS cycles and automated refactoring (`ng update`). | Built directly on **permanent W3C browser standards** (`<dialog>`, Popover API, CustomEvent). |
 | **Server & Client Harmony** | Primarily JSON/SPA focused; SSR requires complex hydration pipelines. | **Dual-Core**: Native SSR progressive enhancement (Laravel, Go, Django) & SPA (`ln-router`). |
 | **Optimal Use Cases** | High-frequency continuous client state (collaborative editors, games, canvas). | Enterprise CRUD, Admin Panels, ERPs, long-lived apps with strong backend integration, and complex interactive tools via Project Coordinators (e.g. `ln-mixer`). |
-
-### 🎯 Application Suitability & Workload Breakdown
-
-| Application Workload | **Ashlar Suitability** | Why Ashlar Wins |
-| :--- | :---: | :--- |
-| **AI-Generated Applications & Workflows** | ⭐⭐⭐⭐⭐ | Machine-readable HTML contracts (`docs-mcp/`), zero build requirements. |
-| **Admin Panels, CRUD & Form Systems** | ⭐⭐⭐⭐⭐ | DOM-first state, native browser validation, instant IndexedDB caching. |
-| **Complex Interactive Applications (Audio, Media, Tools)** | ⭐⭐⭐⭐⭐ | Orchestrated via Project Coordinators (e.g. `ln-mixer` with wavesurfer.js), zero VDOM overhead. |
-| **Classic Web & Landing Pages** | ⭐⭐⭐⭐⭐ | Instant FCP, native SEO, zero bundle bloat. |
-| **Documentation & Content Systems** | ⭐⭐⭐⭐⭐ | HTML-centric structure, clean semantic mixins, zero JS overhead. |
-| **Enterprise Portals & Internal Tools** | ⭐⭐⭐⭐⭐ | 15+ year browser stability, zero supply-chain security liability. |
-| **Real-Time Dashboards & High-Freq Canvas** | ⭐⭐⭐ | Optimal with `ln-data-store` local caches; VDOM better for Figma-like canvas apps. |
 
 *For the complete 17-category breakdown and CTO decision matrix, see our [Architecture Philosophy](docs/architecture/philosophy.md#4-comprehensive-architectural-comparison-matrix-ashlar-vs-mainstream).*
 
