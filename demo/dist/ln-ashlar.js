@@ -6912,7 +6912,7 @@ function en(t, e, i) {
           v.preventDefault(), v.stopImmediatePropagation(), d._enterConfirm();
         else {
           if (d._submitted) return;
-          d._submitted = !0, v.stopPropagation(), d._reset();
+          d._submitted = !0, d._reset();
         }
     }, u.addEventListener("click", this._onClick), this;
   }

@@ -68,9 +68,7 @@ import { registerComponent, dispatch, shouldIgnoreClick, defineAttrs, attrSpec }
 				if (self._submitted) return;
 				self._submitted = true;
 				// Second click — the gate opens for THIS button's own default
-				// action (submit / href), but the click still must not reach
-				// an ancestor click surface.
-				e.stopPropagation();
+				// action (submit / href) and delegated listeners.
 				self._reset();
 			}
 		};

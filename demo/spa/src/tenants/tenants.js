@@ -14,10 +14,12 @@
 	document.addEventListener('ln-table:row-action', function (e) {
 		const d = e.detail;
 		if (d.table === 'tenants' && d.action === 'delete') {
+			const targetId = Number(d.id || (d.record && d.record.id));
+			if (!targetId) return;
 			const tenantsCoordEl = document.querySelector('[data-ln-data-coordinator="tenants"]');
 			if (!tenantsCoordEl) return;
 			tenantsCoordEl.dispatchEvent(new CustomEvent('ln-data-coordinator:request-delete', {
-				detail: { id: Number(d.record.id) }
+				detail: { id: targetId }
 			}));
 		}
 	});
