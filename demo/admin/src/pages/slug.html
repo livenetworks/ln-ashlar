@@ -21,7 +21,7 @@
 					<header><h3>Example — Live mirroring (empty slug = pristine)</h3></header>
 					<main>
 						<p>Type in the <strong>Name</strong> field. The <strong>Slug</strong> updates automatically. Type directly into <strong>Slug</strong> to stop mirroring; clear it to resume.</p>
-						<form id="slug-demo-form" data-ln-form onsubmit="return false;">
+						<form id="slug-demo-form" data-ln-form action="#" method="post" onsubmit="return false;">
 							<div class="form-element">
 								<label for="slug-name">Name</label>
 								<input type="text" id="slug-name" name="name" placeholder="e.g. My Article Title">
@@ -39,7 +39,7 @@
 					<header><h3>Example — Pre-filled slug is NOT overwritten</h3></header>
 					<main>
 						<p>When the slug field already has a value at page load (e.g. from a server-rendered edit form), it starts NON-pristine. Typing in the name field does NOT overwrite the existing slug.</p>
-						<form id="slug-prefill-form" data-ln-form onsubmit="return false;">
+						<form id="slug-prefill-form" data-ln-form action="#" method="post" onsubmit="return false;">
 							<div class="form-element">
 								<label for="slug-pf-name">Name</label>
 								<input type="text" id="slug-pf-name" name="name" value="My Article Title">

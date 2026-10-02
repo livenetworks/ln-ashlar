@@ -107,7 +107,7 @@
 				<section class="section-card" data-demo-html>
 					<header><h3>Live demo — ln-validate + ln-form</h3></header>
 					<main>
-						<form id="demo-form-grid" data-ln-form>
+						<form id="demo-form-grid" data-ln-form action="#" method="post">
 							<div class="form-element">
 								<label for="demo-fname">First Name</label>
 								<input type="text" id="demo-fname" name="fname" required placeholder="John" data-ln-validate>
@@ -772,7 +772,7 @@ document.addEventListener('ln-data-store:created', function (e) {
 					<header><h3>focus-ring — outer glow (default)</h3></header>
 					<main>
 						<p class="demo-note">Safe, universally readable. No layout shift. Tailwind / Vercel convention.</p>
-						<form id="demo-focus-ring">
+						<form id="demo-focus-ring" action="#" method="post">
 							<div class="form-element">
 								<label for="fr-name">Name</label>
 								<input type="text" id="fr-name" placeholder="John Smith">
@@ -811,7 +811,7 @@ input:focus-visible {
 					<header><h3>focus-border-thicken — structural outline</h3></header>
 					<main>
 						<p class="demo-note">Sharp, structural. No glow. Enterprise / business UI. Material Design style.</p>
-						<form id="demo-focus-border-thicken">
+						<form id="demo-focus-border-thicken" action="#" method="post">
 							<div class="form-element">
 								<label for="fbt-name">Name</label>
 								<input type="text" id="fbt-name" placeholder="John Smith">
@@ -850,7 +850,7 @@ input:focus-visible {
 					<header><h3>focus-combination — border + ring</h3></header>
 					<main>
 						<p class="demo-note">Border color + outer ring. Maximum signal strength. Accessibility-first.</p>
-						<form id="demo-focus-combination">
+						<form id="demo-focus-combination" action="#" method="post">
 							<div class="form-element">
 								<label for="fc-name">Name</label>
 								<input type="text" id="fc-name" placeholder="John Smith">
@@ -889,7 +889,7 @@ input:focus-visible {
 					<header><h3>focus-background-shift — minimal tint</h3></header>
 					<main>
 						<p class="demo-note">Very light primary tint. No border change. Focus is felt, not announced.</p>
-						<form id="demo-focus-background-shift">
+						<form id="demo-focus-background-shift" action="#" method="post">
 							<div class="form-element">
 								<label for="fbs-name">Name</label>
 								<input type="text" id="fbs-name" placeholder="John Smith">
@@ -928,7 +928,7 @@ input:focus-visible {
 					<header><h3>focus-accent-line — bottom border only</h3></header>
 					<main>
 						<p class="demo-note">Bottom border only changes. Subtle. Good inside bordered containers.</p>
-						<form id="demo-focus-accent-line">
+						<form id="demo-focus-accent-line" action="#" method="post">
 							<div class="form-element">
 								<label for="fal-name">Name</label>
 								<input type="text" id="fal-name" placeholder="John Smith">
@@ -967,7 +967,7 @@ input:focus-visible {
 					<header><h3>focus-inset-shadow — tactile sink</h3></header>
 					<main>
 						<p class="demo-note">Inner shadow — field visually sinks. Tactile, three-dimensional feel.</p>
-						<form id="demo-focus-inset-shadow">
+						<form id="demo-focus-inset-shadow" action="#" method="post">
 							<div class="form-element">
 								<label for="fis-name">Name</label>
 								<input type="text" id="fis-name" placeholder="John Smith">
@@ -1033,6 +1033,12 @@ input:focus-visible {
 			appendLog(liveLog, '[' + ts() + '] submit  data=' + json);
 		});
 	}
+
+	document.querySelectorAll('form[id^="demo-focus-"]').forEach(function (form) {
+		form.addEventListener('submit', function (e) {
+			e.preventDefault();
+		});
+	});
 
 	// ─── 1C — Fill demo ────────────────────────────────────────
 	const sampleData = {
@@ -1190,6 +1196,7 @@ input:focus-visible {
 	<form id="demo-rest-form"
 	      data-ln-form
 	      data-ln-ajax
+	      method="post"
 	      action="/api/packages"
 	      data-ln-form-action-edit="/api/packages/:id"
 	      data-ln-form-action-method="PUT">

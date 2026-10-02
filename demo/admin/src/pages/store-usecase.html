@@ -273,7 +273,8 @@
 
 <!-- 5. Confirm-delete modal -->
 <dialog class="ln-modal" data-ln-modal id="confirm-delete-modal">
-	<form id="confirm-delete-form">
+	<form id="confirm-delete-form" method="post" action="/api/documents">
+		<input type="hidden" name="_method" value="DELETE">
 		<header>
 			<h3>Delete document?</h3>
 			<button type="button" aria-label="Close" data-ln-modal-close>

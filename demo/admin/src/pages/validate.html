@@ -228,7 +228,7 @@ textarea.ln-validate-valid {
 						<header><h3>Demo — Custom validation (password confirmation)</h3></header>
 						<main>
 							<p>Custom errors that native HTML cannot express. The coordinator compares values cross-field and dispatches <code>ln-validate:set-custom</code> when they mismatch, <code>ln-validate:clear-custom</code> when they match. The <code>passwordMismatch</code> key is NOT in <code>ERROR_MAP</code> — its <code>&lt;li&gt;</code> is invisible to the native validation loop and only toggles via the event handlers.</p>
-							<form id="demo-custom-form">
+							<form id="demo-custom-form" action="#" method="post">
 								<div class="form-element">
 									<label for="demo-pass">Password</label>
 									<input type="password" id="demo-pass" name="password" required minlength="8" data-ln-validate placeholder="Min 8 characters">

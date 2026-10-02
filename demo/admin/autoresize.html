@@ -402,7 +402,7 @@ textarea[data-ln-autoresize] {
 						<main>
 							<p>Type a long reply, then click <strong>Reset (lnForm)</strong>. The textarea clears AND shrinks back to one row in the same operation. <code>lnForm.reset()</code> dispatches synthetic <code>input</code> on every field after the native reset, which <code>ln-autoresize</code> catches and uses to re-measure. No coordinator workaround needed.</p>
 							<p>For comparison, the second button is a bare <code>&lt;button type="reset"&gt;</code> — it fires the platform <code>reset</code> event but <em>not</em> through the <code>lnForm</code> API path. Native reset on its own does NOT dispatch <code>input</code>, so the textarea clears but the height stays tall. This is the case you must work around manually if you cannot use the <code>lnForm.reset()</code> API — see the autoresize README "Common mistakes" item 4.</p>
-							<form id="demo-reset-form" data-ln-form>
+							<form id="demo-reset-form" data-ln-form action="#" method="post">
 								<div class="form-element">
 									<label for="demo-reset">Reply</label>
 									<textarea id="demo-reset" data-ln-autoresize rows="1" placeholder="Type a long reply, then reset…"></textarea>

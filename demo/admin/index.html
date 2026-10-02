@@ -294,8 +294,8 @@
 							<button data-ln-modal-for="demo-form" class="btn">Form Modal</button>
 						</nav>
 
-						<dialog class="ln-modal" data-ln-modal id="demo-basic">
-							<form>
+						<dialog class="ln-modal" data-ln-modal data-ln-ui-coordinator id="demo-basic">
+							<form action="#">
 								<header>
 									<h3>Basic Modal</h3>
 									<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
@@ -310,8 +310,9 @@
 							</form>
 						</dialog>
 
-						<dialog class="ln-modal" data-ln-modal id="demo-form">
-							<form id="demo-form-el" data-ln-form>
+						<dialog class="ln-modal" data-ln-modal data-ln-ui-coordinator id="demo-form">
+							<form id="demo-form-el" action="/api/users" method="post" data-ln-form data-ln-form-action-edit="/api/users/:id">
+								<input type="hidden" name="_method" value="">
 								<header>
 									<span class="icon">
 										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-user"></use></svg>
@@ -526,6 +527,55 @@ import 'ln-ashlar';
 import 'ln-ashlar/dist/ln-ashlar.css';</code></pre>
 					</main>
 				</section>
+
+<script>
+(function () {
+	const demoForm = document.getElementById('demo-form-el');
+	if (!demoForm) return;
+
+	demoForm.addEventListener('submit', function (e) {
+		e.preventDefault();
+		const nameInput = demoForm.querySelector('[name="name"]');
+		const name = nameInput && nameInput.value ? nameInput.value : 'User';
+
+		demoForm.dispatchEvent(new CustomEvent('ln-ajax:success', {
+			bubbles: true,
+			detail: {
+				method: 'POST',
+				url: '#',
+				data: {
+					message: {
+						type: 'success',
+						title: 'User Saved',
+						body: 'User "' + name + '" was saved successfully.'
+					}
+				}
+			}
+		}));
+	});
+
+	const deleteBtn = demoForm.querySelector('.delete-action');
+	if (deleteBtn) {
+		deleteBtn.addEventListener('click', function (e) {
+			e.preventDefault();
+			demoForm.dispatchEvent(new CustomEvent('ln-ajax:success', {
+				bubbles: true,
+				detail: {
+					method: 'DELETE',
+					url: '#',
+					data: {
+						message: {
+							type: 'success',
+							title: 'User Deleted',
+							body: 'User record was permanently removed.'
+						}
+					}
+				}
+			}));
+		});
+	}
+})();
+</script>
 			</div>
 		</section>
 

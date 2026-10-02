@@ -2,61 +2,98 @@
 
 <!-- Overview / philosophy -->
 <section class="section-card">
-	<header><h3>Overview &amp; Philosophy</h3></header>
+	<header>
+		<h3>Overview &amp; Philosophy</h3>
+	</header>
 	<main>
-		<p><strong><code>ln-modal</code></strong> is applied to a native <code>&lt;dialog data-ln-modal id="..."&gt;</code> element, paired with trigger buttons (<code>data-ln-modal-for="..."</code>) and dismiss controls (<code>data-ln-modal-close</code>). When triggered, it sets <code>data-ln-modal="open"</code>, invokes <code>dialog.showModal()</code> for native focus trapping, and locks background scrolling via <code>.ln-modal-open</code> on <code>&lt;body&gt;</code>. On dismiss clicks, backdrop clicks, or pressing <kbd>Escape</kbd>, it cleanly closes the dialog, restores keyboard focus, and clears the scroll lock.</p>
+		<p><strong><code>ln-modal</code></strong> is applied to a native
+			<code>&lt;dialog data-ln-modal id="..."&gt;</code> element, paired with trigger buttons
+			(<code>data-ln-modal-for="..."</code>) and dismiss controls (<code>data-ln-modal-close</code>). When
+			triggered, it sets <code>data-ln-modal="open"</code>, invokes <code>dialog.showModal()</code> for native
+			focus trapping, and locks background scrolling via <code>.ln-modal-open</code> on <code>&lt;body&gt;</code>.
+			On dismiss clicks, backdrop clicks, or pressing <kbd>Escape</kbd>, it cleanly closes the dialog, restores
+			keyboard focus, and clears the scroll lock.
+		</p>
 
-		<p>In <code>ln-ashlar</code>, this follows the <strong>Three-Layer Architecture</strong>: <code>ln-modal</code> is a Layer 1 Simple Component that manages the native overlay state and accessibility, while <code>ln-ui-coordinator</code> is the Layer 2 Coordinator that handles triggers, hash navigation (<code>#modalId</code>), record filling (<code>ln-fill</code>), and auto-closing on AJAX success.</p>
+		<p>In <code>ln-ashlar</code>, this follows the <strong>Three-Layer Architecture</strong>: <code>ln-modal</code>
+			is a Layer 1 Simple Component that manages the native overlay state and accessibility, while
+			<code>ln-ui-coordinator</code> is the Layer 2 Coordinator that handles triggers, hash navigation
+			(<code>#modalId</code>), record filling (<code>ln-fill</code>), and auto-closing on AJAX success.
+		</p>
 
-		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
-			<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
-				<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-icon-info-circle"></use></svg>
+		<div class="alert-box"
+			style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+			<h4
+				style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+				<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;">
+					<use href="#ln-icon-info-circle"></use>
+				</svg>
 				The Modal &amp; UI Coordinator Doctrine
 			</h4>
 			<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
-				The contract is absolute: <code>ln-modal</code> (on <code>&lt;dialog data-ln-modal&gt;</code>) manages ONLY the binary overlay state. <code>ln-ui-coordinator</code> (placed on <code>&lt;dialog data-ln-ui-coordinator&gt;</code> or container) acts as the Layer 2 Coordinator, orchestrating inner forms (<code>&lt;form data-ln-form&gt;</code>), triggers (<code>data-ln-modal-for</code>), deep links (<code>#modalId:param</code>), toasts, and auto-closing on <code>ln-ajax:success</code>.
+				The contract is absolute: <code>ln-modal</code> (on <code>&lt;dialog data-ln-modal&gt;</code>) manages
+				ONLY the binary overlay state. <code>ln-ui-coordinator</code> (placed on
+				<code>&lt;dialog data-ln-ui-coordinator&gt;</code> or container) acts as the Layer 2 Coordinator,
+				orchestrating inner forms (<code>&lt;form data-ln-form&gt;</code>), triggers
+				(<code>data-ln-modal-for</code>), deep links (<code>#modalId:param</code>), toasts, and auto-closing on
+				<code>ln-ajax:success</code>.
 			</p>
 		</div>
 
 		<h4>Focus Trapping &amp; Accessibility (WAI-ARIA)</h4>
 		<ul style="margin-bottom: var(--size-md); line-height: 1.7;">
-			<li><strong>Native Focus Trap:</strong> Tabbing cycles keyboard focus strictly inside the native <code>&lt;dialog&gt;</code> when opened via <code>showModal()</code>.</li>
-			<li><strong>Background Scroll Lock:</strong> Opening a modal suppresses background scrolling by applying the <code>ln-modal-open</code> class to <code>&lt;body&gt;</code>.</li>
-			<li><strong>Escape Key Dismissal:</strong> Pressing <code>ESC</code> routes through the attribute synchronizer to ensure <code>before-close</code> lifecycle validation always runs.</li>
-			<li><strong>Focus Return:</strong> When closed, keyboard focus returns precisely to the trigger element that launched it.</li>
+			<li><strong>Native Focus Trap:</strong> Tabbing cycles keyboard focus strictly inside the native
+				<code>&lt;dialog&gt;</code> when opened via <code>showModal()</code>.
+			</li>
+			<li><strong>Background Scroll Lock:</strong> Opening a modal suppresses background scrolling by applying the
+				<code>ln-modal-open</code> class to <code>&lt;body&gt;</code>.
+			</li>
+			<li><strong>Escape Key Dismissal:</strong> Pressing <code>ESC</code> routes through the attribute
+				synchronizer to ensure <code>before-close</code> lifecycle validation always runs.</li>
+			<li><strong>Focus Return:</strong> When closed, keyboard focus returns precisely to the trigger element that
+				launched it.</li>
 		</ul>
 
-		<p>For the complete developer reference, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-modal/README.md"><code>ln-modal</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs-mcp/components/ln-ui-coordinator.md"><code>ln-ui-coordinator</code> spec</a>.</p>
+		<p>For the complete developer reference, see the <a
+				href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-modal/README.md"><code>ln-modal</code>
+				README</a> and the <a
+				href="https://github.com/livenetworks/ln-ashlar/blob/main/docs-mcp/components/ln-ui-coordinator.md"><code>ln-ui-coordinator</code>
+				spec</a>.</p>
 	</main>
 </section>
 
 <!-- Examples -->
 <section class="section-card" data-demo-html>
-	<header><h3>Examples</h3></header>
+	<header>
+		<h3>Examples</h3>
+	</header>
 	<main>
 		<nav class="demo-actions">
 			<button type="button" data-ln-modal-for="demo-basic" class="btn">Basic Modal</button>
 			<button type="button" data-ln-modal-for="demo-form" class="btn">Form Modal (New)</button>
-			<button type="button" data-ln-modal-for="demo-form"
-			        data-ln-fill-form="demo-form-el"
-			        data-ln-fill-name="Dalibor Sojic"
-			        data-ln-fill-email="dalibor@example.com"
-			        data-ln-fill-role="Administrator"
-			        data-ln-modal-title="Dalibor Sojic"
-			        class="btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg> Form Modal (Edit - Prefilled)</button>
+			<button type="button" data-ln-modal-for="demo-form" data-ln-fill-form="demo-form-el"
+				data-ln-fill-name="Dalibor Sojic" data-ln-fill-email="dalibor@example.com"
+				data-ln-fill-role="Administrator" data-ln-modal-title="Dalibor Sojic" class="btn"><svg class="ln-icon"
+					aria-hidden="true">
+					<use href="#ln-icon-edit"></use>
+				</svg> Form Modal (Edit - Prefilled)</button>
 			<button type="button" data-ln-modal-for="demo-large" class="btn">Large Modal</button>
 			<button type="button" data-ln-modal-for="demo-tall" class="btn">Tall Content (scroll test)</button>
 		</nav>
 
 		<!-- Basic Modal -->
 		<dialog class="ln-modal" data-ln-modal data-ln-ui-coordinator id="demo-basic">
-			<form>
+			<form action="#">
 				<header>
 					<h3>Basic Modal</h3>
-					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon"
+							aria-hidden="true">
+							<use href="#ln-icon-x"></use>
+						</svg></button>
 				</header>
 				<main>
-					<p>This is a standard basic modal overlay. It traps focus natively, locks background scrolling, and closes on Escape key or backdrop click.</p>
+					<p>This is a standard basic modal overlay. It traps focus natively, locks background scrolling, and
+						closes on Escape key or backdrop click.</p>
 				</main>
 				<footer>
 					<button type="button" class="btn" data-ln-modal-close>Close</button>
@@ -66,18 +103,24 @@
 
 		<!-- Form Modal (New / Edit) -->
 		<dialog class="ln-modal" data-ln-modal data-ln-ui-coordinator data-ln-modal-mode="new" id="demo-form">
-			<form id="demo-form-el" data-ln-form>
+			<form id="demo-form-el" action="/api/users" method="post" data-ln-form
+				data-ln-form-action-edit="/api/users/:id">
+				<input type="hidden" name="_method" value="">
 				<header>
 					<h3 data-ln-fillable>
 						<span data-ln-modal-when="new">New User</span>
 						<span data-ln-modal-when="edit">Edit User — <span data-ln-field="name"></span></span>
 					</h3>
-					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon"
+							aria-hidden="true">
+							<use href="#ln-icon-x"></use>
+						</svg></button>
 				</header>
 				<main>
 					<div class="form-element">
 						<label for="modal-user-name">Full Name</label>
-						<input type="text" id="modal-user-name" name="name" required placeholder="Enter user name" autofocus>
+						<input type="text" id="modal-user-name" name="name" required placeholder="Enter user name"
+							autofocus>
 					</div>
 					<div class="form-element">
 						<label for="modal-user-email">Email Address</label>
@@ -101,22 +144,43 @@
 
 		<!-- Large Modal -->
 		<dialog class="ln-modal" data-ln-modal data-ln-ui-coordinator id="demo-large">
-			<form>
+			<form action="#">
 				<header>
 					<h3>Large Modal</h3>
-					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon"
+							aria-hidden="true">
+							<use href="#ln-icon-x"></use>
+						</svg></button>
 				</header>
 				<main>
 					<p>A larger modal for more content. Size set via <code>@include modal-lg</code> in SCSS.</p>
 					<div class="table-container">
-					<table>
-						<thead><tr><th>Name</th><th>Status</th><th>Points</th></tr></thead>
-						<tbody>
-							<tr><td data-label="Attribute">Marko</td><td data-label="On element"><span class="badge success">OK</span></td><td data-label="Description" class="numeric">95</td></tr>
-							<tr><td data-label="Attribute">Ana</td><td data-label="On element"><span class="badge success">OK</span></td><td data-label="Description" class="numeric">88</td></tr>
-							<tr><td data-label="Attribute">Ivan</td><td data-label="On element"><span class="badge error">Error</span></td><td data-label="Description" class="numeric">42</td></tr>
-						</tbody>
-					</table>
+						<table>
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>Status</th>
+									<th>Points</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td data-label="Attribute">Marko</td>
+									<td data-label="On element"><span class="badge success">OK</span></td>
+									<td data-label="Description" class="numeric">95</td>
+								</tr>
+								<tr>
+									<td data-label="Attribute">Ana</td>
+									<td data-label="On element"><span class="badge success">OK</span></td>
+									<td data-label="Description" class="numeric">88</td>
+								</tr>
+								<tr>
+									<td data-label="Attribute">Ivan</td>
+									<td data-label="On element"><span class="badge error">Error</span></td>
+									<td data-label="Description" class="numeric">42</td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 				</main>
 				<footer>
@@ -127,13 +191,17 @@
 
 		<!-- Tall Content (scroll test) -->
 		<dialog class="ln-modal" data-ln-modal data-ln-ui-coordinator id="demo-tall">
-			<form>
+			<form id="demo-tall-form" action="/api/profiles" method="post">
 				<header>
 					<h3>Tall Content — Scroll Test</h3>
-					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon"
+							aria-hidden="true">
+							<use href="#ln-icon-x"></use>
+						</svg></button>
 				</header>
 				<main>
-					<p>This modal has more content than fits in the viewport. Only <code>main</code> should scroll — the header and footer stay sticky.</p>
+					<p>This modal has more content than fits in the viewport. Only <code>main</code> should scroll — the
+						header and footer stay sticky.</p>
 					<div class="form-element">
 						<label for="tall-name">Full name</label>
 						<input type="text" id="tall-name" placeholder="Enter name...">
@@ -198,20 +266,27 @@
 
 <!-- Destructive Confirm -->
 <section class="section-card" data-demo-html>
-	<header><h3>Destructive Confirm</h3></header>
+	<header>
+		<h3>Destructive Confirm</h3>
+	</header>
 	<main>
 		<nav class="demo-actions">
 			<button type="button" data-ln-modal-for="demo-destructive" class="btn">Delete Membership</button>
 		</nav>
 
 		<dialog class="ln-modal" data-ln-modal data-ln-ui-coordinator id="demo-destructive">
-			<form>
+			<form id="demo-destructive-form" action="/api/memberships/42" method="post">
+				<input type="hidden" name="_method" value="DELETE">
 				<header>
 					<h3>Delete membership record</h3>
-					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon"
+							aria-hidden="true">
+							<use href="#ln-icon-x"></use>
+						</svg></button>
 				</header>
 				<main>
-					<p>The membership record and all associated data will be permanently removed. This action cannot be undone.</p>
+					<p>The membership record and all associated data will be permanently removed. This action cannot be
+						undone.</p>
 				</main>
 				<footer>
 					<button type="button" class="btn btn-secondary" data-ln-modal-close autofocus>Cancel</button>
@@ -231,15 +306,27 @@
 
 <!-- Hash addressing & coexistence -->
 <section class="section-card">
-	<header><h3>Hash addressing &amp; coexistence</h3></header>
+	<header>
+		<h3>Hash addressing &amp; coexistence</h3>
+	</header>
 	<main>
-		<p>Demonstrates codec isolation: <code>ln-tabs</code> and <code>ln-modal</code> share the same URL hash using the <code>ln-core</code> hash codec. Each component reads and writes ONLY its own namespace segment — foreign segments are preserved on every write. The modal's namespace is its <code>id</code> (<code>demo-hash-modal</code>).</p>
+		<p>Demonstrates codec isolation: <code>ln-tabs</code> and <code>ln-modal</code> share the same URL hash using
+			the <code>ln-core</code> hash codec. Each component reads and writes ONLY its own namespace segment —
+			foreign segments are preserved on every write. The modal's namespace is its <code>id</code>
+			(<code>demo-hash-modal</code>).</p>
 
 		<p><strong>Manual tests:</strong></p>
 		<ol>
-			<li>Click <em>Edit #5</em>, switch to the <em>Members</em> tab. The URL becomes <code>#demo-hash-modal:5&amp;demo-tab:members</code>, the modal STAYS open, and the <strong>Title</strong> field is filled by the <code>ln-ui-coordinator</code>.</li>
-			<li><strong>Reverse order (regression direction):</strong> switch to the <em>Members</em> tab FIRST, then click <em>Edit #5</em>. The URL becomes <code>#demo-tab:members&amp;demo-hash-modal:5</code> and the tab STAYS on <em>Members</em> — the modal anchor click MERGES its segment instead of replacing the whole fragment.</li>
-			<li>Reload with <code>#demo-tab:members&amp;demo-hash-modal:42</code> in the URL. The <em>Members</em> tab should be active AND the modal open with Title "Internal audit log" filled.</li>
+			<li>Click <em>Edit #5</em>, switch to the <em>Members</em> tab. The URL becomes
+				<code>#demo-hash-modal:5&amp;demo-tab:members</code>, the modal STAYS open, and the
+				<strong>Title</strong> field is filled by the <code>ln-ui-coordinator</code>.
+			</li>
+			<li><strong>Reverse order (regression direction):</strong> switch to the <em>Members</em> tab FIRST, then
+				click <em>Edit #5</em>. The URL becomes <code>#demo-tab:members&amp;demo-hash-modal:5</code> and the tab
+				STAYS on <em>Members</em> — the modal anchor click MERGES its segment instead of replacing the whole
+				fragment.</li>
+			<li>Reload with <code>#demo-tab:members&amp;demo-hash-modal:42</code> in the URL. The <em>Members</em> tab
+				should be active AND the modal open with Title "Internal audit log" filled.</li>
 			<li>With the modal open, press Back → modal closes, tab state intact.</li>
 		</ol>
 
@@ -260,12 +347,10 @@
 		<!-- Hash-bound modal triggers -->
 		<nav class="demo-actions" style="margin-top: var(--size-md);">
 			<a class="btn" href="#demo-hash-modal" data-ln-fill-form="demo-hash-form">New (no param)</a>
-			<a class="btn" href="#demo-hash-modal:5"
-			   data-ln-fill-id="5" data-ln-fill-form="demo-hash-form"
-			   data-ln-fill-title="Annual ISO report">Edit #5</a>
-			<a class="btn" href="#demo-hash-modal:42"
-			   data-ln-fill-id="42" data-ln-fill-form="demo-hash-form"
-			   data-ln-fill-title="Internal audit log">Edit #42</a>
+			<a class="btn" href="#demo-hash-modal:5" data-ln-fill-id="5" data-ln-fill-form="demo-hash-form"
+				data-ln-fill-title="Annual ISO report">Edit #5</a>
+			<a class="btn" href="#demo-hash-modal:42" data-ln-fill-id="42" data-ln-fill-form="demo-hash-form"
+				data-ln-fill-title="Internal audit log">Edit #42</a>
 		</nav>
 
 		<!-- Hash event log -->
@@ -273,14 +358,18 @@
 
 		<!-- Hash-bound modal inside coordinator -->
 		<dialog class="ln-modal" data-ln-modal data-ln-ui-coordinator data-ln-modal-mode="new" id="demo-hash-modal">
-			<form id="demo-hash-form" data-ln-form>
+			<form id="demo-hash-form" action="/api/records" method="post" data-ln-form
+				data-ln-form-action-edit="/api/records/:id">
+				<input type="hidden" name="_method" value="">
 				<header>
 					<h3 data-ln-fillable>
 						<span data-ln-modal-when="new">New record</span>
 						<span data-ln-modal-when="edit">Edit record #<span data-ln-field="id"></span></span>
 					</h3>
 					<button type="button" data-ln-modal-close aria-label="Close">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+						<svg class="ln-icon" aria-hidden="true">
+							<use href="#ln-icon-x"></use>
+						</svg>
 					</button>
 				</header>
 				<main>
@@ -299,47 +388,78 @@
 </section>
 
 <script>
-(function () {
-	const modal = document.getElementById('demo-hash-modal');
-	const log = document.getElementById('hash-demo-log');
-	if (!modal || !log) return;
+	(function () {
+		const modal = document.getElementById('demo-hash-modal');
+		const log = document.getElementById('hash-demo-log');
+		if (!modal || !log) return;
 
-	const events = [];
-	function record(msg) {
-		events.push(msg);
-		if (events.length > 8) events.splice(0, events.length - 8);
-		log.textContent = events.join('\n');
-	}
+		const events = [];
+		function record(msg) {
+			events.push(msg);
+			if (events.length > 8) events.splice(0, events.length - 8);
+			log.textContent = events.join('\n');
+		}
 
-	modal.addEventListener('ln-modal:open', function (e) {
-		const param = e.detail && e.detail.param != null ? e.detail.param : null;
-		record('open  param=' + (param !== null ? param : '(none)') + '  hash=' + location.hash);
-	});
-	modal.addEventListener('ln-modal:close', function () {
-		record('close  hash=' + location.hash);
-	});
-	window.addEventListener('hashchange', function () {
-		record('hashchange → ' + location.hash);
-	});
-})();
+		modal.addEventListener('ln-modal:open', function (e) {
+			const param = e.detail && e.detail.param != null ? e.detail.param : null;
+			record('open  param=' + (param !== null ? param : '(none)') + '  hash=' + location.hash);
+		});
+		modal.addEventListener('ln-modal:close', function () {
+			record('close  hash=' + location.hash);
+		});
+		window.addEventListener('hashchange', function () {
+			record('hashchange → ' + location.hash);
+		});
+	})();
 </script>
 
 <!-- Events -->
 <section class="section-card">
-	<header><h3>Events &amp; Lifecycle</h3></header>
+	<header>
+		<h3>Events &amp; Lifecycle</h3>
+	</header>
 	<main>
 		<article>
 			<h4>Lifecycle Events</h4>
 			<div class="table-container">
-			<table>
-				<thead><tr><th>Event</th><th>Cancelable</th><th>When</th><th><code>detail</code></th></tr></thead>
-				<tbody>
-					<tr><td><code>ln-modal:before-open</code></td><td>✅</td><td>Before opening</td><td><code>{ modalId, target }</code></td></tr>
-					<tr><td><code>ln-modal:open</code></td><td>❌</td><td>Modal opened</td><td><code>{ modalId, target, hashNs, param }</code> (id modal) / <code>{ modalId, target }</code> (no-id modal)</td></tr>
-					<tr><td><code>ln-modal:before-close</code></td><td>✅</td><td>Before closing</td><td><code>{ modalId, target }</code></td></tr>
-					<tr><td><code>ln-modal:close</code></td><td>❌</td><td>Modal closed</td><td><code>{ modalId, target }</code></td></tr>
-				</tbody>
-			</table>
+				<table>
+					<thead>
+						<tr>
+							<th>Event</th>
+							<th>Cancelable</th>
+							<th>When</th>
+							<th><code>detail</code></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>ln-modal:before-open</code></td>
+							<td>✅</td>
+							<td>Before opening</td>
+							<td><code>{ modalId, target }</code></td>
+						</tr>
+						<tr>
+							<td><code>ln-modal:open</code></td>
+							<td>❌</td>
+							<td>Modal opened</td>
+							<td><code>{ modalId, target, hashNs, param }</code> (id modal) /
+								<code>{ modalId, target }</code> (no-id modal)
+							</td>
+						</tr>
+						<tr>
+							<td><code>ln-modal:before-close</code></td>
+							<td>✅</td>
+							<td>Before closing</td>
+							<td><code>{ modalId, target }</code></td>
+						</tr>
+						<tr>
+							<td><code>ln-modal:close</code></td>
+							<td>❌</td>
+							<td>Modal closed</td>
+							<td><code>{ modalId, target }</code></td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 		</article>
 		<article>
@@ -352,13 +472,18 @@
 
 		<!-- Events demo modal -->
 		<dialog class="ln-modal" data-ln-modal data-ln-ui-coordinator id="demo-events">
-			<form>
+			<form action="#">
 				<header>
 					<h3>Events Demo</h3>
-					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon"
+							aria-hidden="true">
+							<use href="#ln-icon-x"></use>
+						</svg></button>
 				</header>
 				<main>
-					<p>Opening and closing this modal dispatches <code>ln-modal:open</code> and <code>ln-modal:close</code> events.</p>
+					<p>Opening and closing this modal dispatches <code>ln-modal:open</code> and
+						<code>ln-modal:close</code> events.
+					</p>
 				</main>
 				<footer>
 					<button type="button" class="btn" data-ln-modal-close>Close</button>
@@ -369,53 +494,105 @@
 </section>
 
 <script>
-(function () {
-	const log = document.getElementById('modal-event-log');
-	if (!log) return;
-	const events = [];
-	const TARGET_ID = 'demo-events';
-	const NAMES = ['ln-modal:before-open', 'ln-modal:open', 'ln-modal:before-close', 'ln-modal:close'];
-	function pad(n) { return n < 10 ? '0' + n : '' + n; }
-	function stamp() {
-		const d = new Date();
-		return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
-	}
-	function record(eventName) {
-		events.push('[' + stamp() + '] ' + eventName);
-		if (events.length > 5) events.splice(0, events.length - 5);
-		log.textContent = events.join('\n');
-	}
-	NAMES.forEach(function (name) {
-		document.addEventListener(name, function (e) {
-			if (!e.detail || e.detail.modalId !== TARGET_ID) return;
-			record(name);
+	(function () {
+		const log = document.getElementById('modal-event-log');
+		if (!log) return;
+		const events = [];
+		const TARGET_ID = 'demo-events';
+		const NAMES = ['ln-modal:before-open', 'ln-modal:open', 'ln-modal:before-close', 'ln-modal:close'];
+		function pad(n) { return n < 10 ? '0' + n : '' + n; }
+		function stamp() {
+			const d = new Date();
+			return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+		}
+		function record(eventName) {
+			events.push('[' + stamp() + '] ' + eventName);
+			if (events.length > 5) events.splice(0, events.length - 5);
+			log.textContent = events.join('\n');
+		}
+		NAMES.forEach(function (name) {
+			document.addEventListener(name, function (e) {
+				if (!e.detail || e.detail.modalId !== TARGET_ID) return;
+				record(name);
+			});
 		});
-	});
 
-	// Handle demo-form submit to simulate success + toast + auto-close via ln-ui-coordinator
-	const demoForm = document.getElementById('demo-form-el');
-	if (demoForm) {
-		demoForm.addEventListener('submit', function (e) {
-			e.preventDefault();
-			const formData = new FormData(demoForm);
-			const name = formData.get('name') || 'User';
+		// Handle demo-form submit to simulate success + toast + auto-close via ln-ui-coordinator
+		const demoForm = document.getElementById('demo-form-el');
+		if (demoForm) {
+			demoForm.addEventListener('submit', function (e) {
+				e.preventDefault();
+				const formData = new FormData(demoForm);
+				const name = formData.get('name') || 'User';
+				const methodInput = demoForm.querySelector('input[name="_method"]');
+				const method = (methodInput && methodInput.value) || demoForm.method;
+				const action = demoForm.getAttribute('action');
 
-			// Bubble ln-ajax:success event for ln-ui-coordinator to auto-toast, auto-close & reset
-			demoForm.dispatchEvent(new CustomEvent('ln-ajax:success', {
-				bubbles: true,
-				detail: {
-					method: 'POST',
-					url: '#',
-					data: {
-						message: {
-							type: 'success',
-							title: 'User Saved',
-							body: 'User "' + name + '" was saved successfully.'
+				// Bubble ln-ajax:success event for ln-ui-coordinator to auto-toast, auto-close & reset
+				demoForm.dispatchEvent(new CustomEvent('ln-ajax:success', {
+					bubbles: true,
+					detail: {
+						method: method,
+						url: action,
+						data: {
+							message: {
+								type: 'success',
+								title: 'User Saved',
+								body: 'User "' + name + '" was saved successfully.'
+							}
 						}
 					}
-				}
-			}));
-		});
-	}
-})();
+				}));
+			});
+		}
+
+		// Handle demo-destructive submit to simulate delete + toast + auto-close via ln-ui-coordinator
+		const destructiveForm = document.getElementById('demo-destructive-form');
+		if (destructiveForm) {
+			destructiveForm.addEventListener('submit', function (e) {
+				e.preventDefault();
+				const methodInput = destructiveForm.querySelector('input[name="_method"]');
+				const method = (methodInput && methodInput.value) || destructiveForm.method;
+				const action = destructiveForm.getAttribute('action');
+
+				// Bubble ln-ajax:success event for ln-ui-coordinator to auto-toast, auto-close & reset
+				destructiveForm.dispatchEvent(new CustomEvent('ln-ajax:success', {
+					bubbles: true,
+					detail: {
+						method: method,
+						url: action,
+						data: {
+							message: {
+								type: 'success',
+								title: 'Record Deleted',
+								body: 'Membership record was permanently removed.'
+							}
+						}
+					}
+				}));
+			});
+		}
+
+		// Handle demo-tall submit to prevent native submit and auto-close
+		const tallForm = document.querySelector('#demo-tall form');
+		if (tallForm) {
+			tallForm.addEventListener('submit', function (e) {
+				e.preventDefault();
+				tallForm.dispatchEvent(new CustomEvent('ln-ajax:success', {
+					bubbles: true,
+					detail: {
+						method: tallForm.method,
+						url: tallForm.getAttribute('action'),
+						data: {
+							message: {
+								type: 'success',
+								title: 'Changes Saved',
+								body: 'Tall content form saved successfully.'
+							}
+						}
+					}
+				}));
+			});
+		}
+	})();
 </script>
