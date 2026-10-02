@@ -4,9 +4,15 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>DocuFlow Admin</title>
+	<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+	<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-dark-32x32.png" media="(prefers-color-scheme: dark)">
+	<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-dark-16x16.png" media="(prefers-color-scheme: dark)">
+	<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-light-32x32.png" media="(prefers-color-scheme: light)">
+	<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-light-16x16.png" media="(prefers-color-scheme: light)">
 	<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
 	<link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
+	<link rel="manifest" href="../site.webmanifest">
 	<link rel="shortcut icon" href="../favicon.ico">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,7 +25,11 @@
 	<div id="app">
 		<header id="app-header">
 			<a href="/" id="app-brand">
-				<img src="../assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px); vertical-align: middle;">
+				<picture>
+					<source srcset="../assets/ln-ashlar-emblem-dark-64.png" media="(prefers-color-scheme: dark)">
+					<source srcset="../assets/ln-ashlar-emblem-light-64.png" media="(prefers-color-scheme: light)">
+					<img src="../assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px); vertical-align: middle;">
+				</picture>
 				<span>DocuFlow Admin</span>
 			</a>
 			<label id="app-search">

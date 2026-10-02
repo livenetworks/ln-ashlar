@@ -19,3 +19,9 @@ docs-mcp/_incoming/
 # Knowledge graph output. Derived from the source tree by `graphify update`,
 # and it churns on every code change — regenerate locally, never commit.
 graphify-out/
+
+# IDE agent plugins/skills cache
+.agents/ln-ashlar/
+.agents/plugins/
+.agents/skills/
+

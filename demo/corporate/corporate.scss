@@ -1080,3 +1080,12 @@ body {
 	}
 }
 
+@media (prefers-color-scheme: light) {
+	:root:not([data-mode="dark"]) {
+		.brand .brand-mark {
+			.brand-mark-dark { display: none; }
+			.brand-mark-light { display: block; }
+		}
+	}
+}
+
