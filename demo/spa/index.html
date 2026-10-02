@@ -4,25 +4,31 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>DocuFlow</title>
-	<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
-	<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-dark-32x32.png" media="(prefers-color-scheme: dark)">
-	<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-dark-16x16.png" media="(prefers-color-scheme: dark)">
-	<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-light-32x32.png" media="(prefers-color-scheme: light)">
-	<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-light-16x16.png" media="(prefers-color-scheme: light)">
-	<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
-	<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
-	<link rel="manifest" href="/site.webmanifest">
-	<link rel="shortcut icon" href="/favicon.ico">
+	<base href="/demo/spa/">
+	<script>
+		if (window.location.pathname.startsWith('/spa')) {
+			document.querySelector('base').setAttribute('href', '/spa/');
+		}
+	</script>
+	<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+	<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-dark-32x32.png" media="(prefers-color-scheme: dark)">
+	<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-dark-16x16.png" media="(prefers-color-scheme: dark)">
+	<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-light-32x32.png" media="(prefers-color-scheme: light)">
+	<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-light-16x16.png" media="(prefers-color-scheme: light)">
+	<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
+	<link rel="manifest" href="../site.webmanifest">
+	<link rel="shortcut icon" href="../favicon.ico">
 
 	<!-- App styles: compiled framework + modules SCSS -->
-	<link rel="stylesheet" href="/spa/dist/app.css">
+	<link rel="stylesheet" href="dist/app.css">
 
 	<!-- ln-ashlar components bundle -->
-	<script src="/dist/ln-ashlar.iife.js" defer></script>
+	<script src="../dist/ln-ashlar.iife.js" defer></script>
 
 	<!-- The concatenated application coordinators (modules JS) -->
-	<script src="/spa/dist/app.js" defer></script>
+	<script src="dist/app.js" defer></script>
 </head>
 <body>
 	<!-- Persistent app chrome: header, sidebar, and the routing outlet. -->
@@ -34,11 +40,11 @@
 			<button type="button" class="menu-toggle" data-ln-toggle-for="app-sidebar" aria-label="Open menu">
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
 			</button>
-			<a class="app-brand" href="/spa">
+			<a class="app-brand" href="./">
 				<picture>
-					<source srcset="/assets/ln-ashlar-emblem-dark-64.png" media="(prefers-color-scheme: dark)">
-					<source srcset="/assets/ln-ashlar-emblem-light-64.png" media="(prefers-color-scheme: light)">
-					<img src="/assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px);">
+					<source srcset="../assets/ln-ashlar-emblem-dark-64.png" media="(prefers-color-scheme: dark)">
+					<source srcset="../assets/ln-ashlar-emblem-light-64.png" media="(prefers-color-scheme: light)">
+					<img src="../assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px);">
 				</picture>
 				<span>DocuFlow</span>
 			</a>
@@ -48,9 +54,9 @@
 		<aside class="app-sidebar" id="app-sidebar" data-ln-toggle="open">
 			<header>
 				<picture>
-					<source srcset="/assets/ln-ashlar-emblem-dark-64.png" media="(prefers-color-scheme: dark)">
-					<source srcset="/assets/ln-ashlar-emblem-light-64.png" media="(prefers-color-scheme: light)">
-					<img src="/assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px);">
+					<source srcset="../assets/ln-ashlar-emblem-dark-64.png" media="(prefers-color-scheme: dark)">
+					<source srcset="../assets/ln-ashlar-emblem-light-64.png" media="(prefers-color-scheme: light)">
+					<img src="../assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px);">
 				</picture>
 				<span class="app-name">DocuFlow</span>
 				<button type="button" data-ln-toggle-for="app-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar">
@@ -61,19 +67,19 @@
 				<nav aria-label="Main navigation" data-ln-nav="active">
 					<ul>
 						<li>
-							<a href="/spa">
+							<a href="./">
 								<svg class="ln-icon nav-icon" aria-hidden="true"><use href="#ln-icon-layout-dashboard"></use></svg>
 								<span class="nav-label">Dashboard</span>
 							</a>
 						</li>
 						<li>
-							<a href="/spa/packages">
+							<a href="packages">
 								<svg class="ln-icon nav-icon" aria-hidden="true"><use href="#ln-icon-package"></use></svg>
 								<span class="nav-label">Packages</span>
 							</a>
 						</li>
 						<li>
-							<a href="/spa/tenants">
+							<a href="tenants">
 								<svg class="ln-icon nav-icon" aria-hidden="true"><use href="#ln-icon-building"></use></svg>
 								<span class="nav-label">Tenants</span>
 							</a>
@@ -106,7 +112,7 @@
 	     data-ln-search=""
 	     id="packages"></div>
 	<div data-ln-api-connector
-	     data-ln-api-base-url="/docuflow/api"
+	     data-ln-api-base-url="../docuflow/api"
 	     data-ln-api-path="/packages"></div>
 </div>
 
@@ -119,7 +125,7 @@
 	     data-ln-search=""
 	     id="tenants"></div>
 	<div data-ln-api-connector
-	     data-ln-api-base-url="/docuflow/api"
+	     data-ln-api-base-url="../docuflow/api"
 	     data-ln-api-path="/tenants"></div>
 </div>
 
@@ -325,7 +331,7 @@
 	<!-- Route templates, swapped into the outlet by ln-router. -->
 	
 		<!-- dashboard/dashboard.html -->
-		<template data-ln-route="/spa" data-ln-route-title="Dashboard — DocuFlow">
+		<template data-ln-route="/" data-ln-route-title="Dashboard — DocuFlow">
 	<section id="dashboard" class="is-loading">
 		<header class="page-header">
 			<div class="page-title">
@@ -335,25 +341,25 @@
 		</header>
 		<ul class="stat-grid">
 			<li>
-				<a href="/spa/packages">
+				<a href="packages">
 					<span data-ln-stat-label>Packages</span>
 					<strong data-ln-stat-value data-ln-stat="packages" class="is-loading">—</strong>
 				</a>
 			</li>
 			<li>
-				<a href="/spa/tenants">
+				<a href="tenants">
 					<span data-ln-stat-label>Tenants</span>
 					<strong data-ln-stat-value data-ln-stat="tenants" class="is-loading">—</strong>
 				</a>
 			</li>
 			<li>
-				<a href="/spa/tenants">
+				<a href="tenants">
 					<span data-ln-stat-label>Active tenants</span>
 					<strong data-ln-stat-value data-ln-stat="tenants" data-ln-stat-filter="active:true" class="is-loading">—</strong>
 				</a>
 			</li>
 			<li>
-				<a href="/spa/packages">
+				<a href="packages">
 					<span data-ln-stat-label>Active packages</span>
 					<strong data-ln-stat-value data-ln-stat="packages" data-ln-stat-filter="active:true" class="is-loading">—</strong>
 				</a>
@@ -365,7 +371,7 @@
 				<ul data-pkg-usage></ul>
 				<template data-ln-template="pkg-usage-item">
 					<li>
-						<a href="/spa/tenants">
+						<a href="tenants">
 							<span class="pkg-usage-name" data-pkg-usage-name></span>
 							<span class="pkg-usage-count" data-pkg-usage-count></span>
 							<span class="progress"><span data-ln-progress="0"></span></span>
@@ -384,19 +390,19 @@
 </template>
 
 		<!-- not-found/not-found.html -->
-		<template data-ln-route="/spa/*" data-ln-route-title="Not found — DocuFlow">
+		<template data-ln-route="*" data-ln-route-title="Not found — DocuFlow">
 	<section id="not-found">
 		<article class="not-found-state">
 			<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-error-404"></use></svg>
 			<h1>Page not found</h1>
 			<p>The page you are looking for does not exist.</p>
-			<a href="/spa" class="btn">Back to dashboard</a>
+			<a href="./" class="btn">Back to dashboard</a>
 		</article>
 	</section>
 </template>
 
 		<!-- packages/packages.html -->
-		<template data-ln-route="/spa/packages" data-ln-route-title="Packages — DocuFlow">
+		<template data-ln-route="/packages" data-ln-route-title="Packages — DocuFlow">
 	<section id="packages-view" data-packages-coordinator>
 		<header class="page-header">
 			<div class="page-title">
@@ -530,12 +536,12 @@
 </template>
 
 		<!-- tenant-editor/tenant-editor.html -->
-		<template data-ln-route="/spa/tenants/:id" data-ln-route-title="Tenant — DocuFlow">
+		<template data-ln-route="/tenants/:id" data-ln-route-title="Tenant — DocuFlow">
 	<section id="tenant-editor">
 		<header class="page-header">
 			<nav aria-label="Breadcrumb">
 				<ol>
-					<li><a href="/spa/tenants">Tenants</a></li>
+					<li><a href="tenants">Tenants</a></li>
 					<li aria-current="page">Tenant</li>
 				</ol>
 			</nav>
@@ -641,7 +647,7 @@
 						</div>
 					</fieldset>
 					<footer class="form-actions">
-						<a href="/spa/tenants" class="btn-outline">Cancel</a>
+						<a href="tenants" class="btn-outline">Cancel</a>
 						<button type="submit" class="btn">Save</button>
 					</footer>
 				</form>
@@ -651,7 +657,7 @@
 </template>
 
 		<!-- tenants/tenants.html -->
-		<template data-ln-route="/spa/tenants" data-ln-route-title="Tenants — DocuFlow">
+		<template data-ln-route="/tenants" data-ln-route-title="Tenants — DocuFlow">
 	<section id="tenants-view" data-tenants-coordinator>
 		<header class="page-header">
 			<div class="page-title">
@@ -726,7 +732,7 @@
 					<td><span data-ln-table-cell-attr="status_class:class">{{ status_display }}</span></td>
 					<td>
 						<ul class="row-actions">
-							<li><a href="/spa/tenants/{{ id }}"
+							<li><a href="tenants/{{ id }}"
 								data-ln-fill-form="tenant-form"
 								data-ln-fill-id="{{ id }}"
 								data-ln-fill-name="{{ name }}"

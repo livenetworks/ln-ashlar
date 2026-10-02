@@ -1,7 +1,25 @@
 import {
 	registerComponent, dispatch, dispatchCancelable, guardBody, findElements, shouldInterceptLink
 } from '../../ln-core';
-import { planRegions } from './router-model.js';
+import { planRegions, normalizeBase, stripBase, toAbsoluteUrl } from './router-model.js';
+
+function _getBase() {
+	if (typeof document === 'undefined') return '';
+	const outlet = document.querySelector('[data-ln-outlet]') || document.querySelector('[data-ln-router-base]');
+	if (outlet && outlet.hasAttribute('data-ln-router-base')) {
+		return normalizeBase(outlet.getAttribute('data-ln-router-base'));
+	}
+	const baseEl = document.querySelector('base[href]');
+	if (baseEl) {
+		try {
+			const u = new URL(baseEl.getAttribute('href'), window.location.origin);
+			return normalizeBase(u.pathname);
+		} catch (e) {
+			return normalizeBase(baseEl.getAttribute('href'));
+		}
+	}
+	return '';
+}
 
 // Singleton router implementation
 export const router = {
@@ -11,10 +29,18 @@ export const router = {
 	replace: function (fullPath) {
 		_navigate(fullPath, { historyAction: 'replace' });
 	},
+	base: function () {
+		return _getBase();
+	},
+	toUrl: function (relPath) {
+		return toAbsoluteUrl(relPath, _getBase());
+	},
 	current: function () {
 		if (currentPath === null) return null;
 		return {
 			path: currentPath,
+			fullPath: currentFullPath,
+			base: currentBase,
 			params: currentParams,
 			query: currentQuery,
 			route: currentRoute,
@@ -42,6 +68,7 @@ const ATTRIBUTES = {
 	'data-ln-route-target':   { effect: _reRegisterRoute, type: 'string', description: 'Target outlet element selector where route content is rendered' },
 	'data-ln-route-title':    { effect: _reRegisterRoute, type: 'string', description: 'Document title template set when route is activated' },
 	'data-ln-route-keep':     { type: 'boolean', fallback: false, description: 'Preserve mounted DOM nodes in memory instead of rebuilding' },
+	'data-ln-router-base':    { type: 'string', description: 'Base URL prefix for subdirectory routing (e.g. "/spa")' },
 	'data-ln-router-hydrate': { type: 'boolean', fallback: false, description: 'Hydrate existing DOM content on initial router boot' }
 };
 
@@ -57,6 +84,8 @@ let currentRegions = new Map();
 
 let booted = false;
 let currentPath = null;
+let currentFullPath = null;
+let currentBase = '';
 let currentParams = {};
 let currentQuery = {};
 let currentRoute = null;
@@ -77,7 +106,7 @@ function _dispatchMaybeDeferred(target, name, detail) {
 }
 
 /**
- * Normalize path: collapse trailing slash, strip query/hash, parse query.
+ * Normalize path: collapse trailing slash, strip query/hash, parse query, strip base.
  */
 function _normalizePath(fullPath) {
 	// Absolute same-origin URLs (route() helpers, anchor.href) → reduce to
@@ -90,7 +119,7 @@ function _normalizePath(fullPath) {
 	} catch (e) { /* not a parseable URL — use fullPath as-is */ }
 
 	let [pathAndQuery] = fullPath.split('#');
-	let [path, queryString] = pathAndQuery.split('?');
+	let [rawPath, queryString] = pathAndQuery.split('?');
 
 	const query = {};
 	if (queryString) {
@@ -100,12 +129,10 @@ function _normalizePath(fullPath) {
 		}
 	}
 
-	path = path.replace(/\/+$/, '');
-	if (path === '') {
-		path = '/';
-	}
+	const base = _getBase();
+	const path = stripBase(rawPath, base);
 
-	return { path, query };
+	return { path, query, base };
 }
 
 /**
@@ -261,7 +288,8 @@ function _teardownOutlet(target) {
  * swaps all regions that need it inside a single view transition.
  */
 function _navigate(fullPath, opts = {}) {
-	const { path, query } = _normalizePath(fullPath);
+	const { path, query, base } = _normalizePath(fullPath);
+	const historyPath = toAbsoluteUrl(fullPath, base);
 
 	// 1. Per-region match
 	const regionMatches = new Map();
@@ -329,7 +357,8 @@ function _navigate(fullPath, opts = {}) {
 	//    one match, regardless of whether the primary is among them.
 	const beforeEvent = dispatchCancelable(primaryTarget || document.body, 'ln-router:before-navigate', {
 		from: currentPath,
-		to: fullPath,
+		to: historyPath,
+		path: path,
 		params: primaryMatch ? primaryMatch.params : {},
 		query
 	});
@@ -337,9 +366,9 @@ function _navigate(fullPath, opts = {}) {
 
 	// 7. History update (once per navigation)
 	if (opts.historyAction === 'push') {
-		window.history.pushState(null, '', fullPath);
+		window.history.pushState(null, '', historyPath);
 	} else if (opts.historyAction === 'replace') {
-		window.history.replaceState(null, '', fullPath);
+		window.history.replaceState(null, '', historyPath);
 	}
 
 	// 8. Atomic swap — one view transition wraps every region clear/mount.
@@ -395,7 +424,9 @@ function _navigate(fullPath, opts = {}) {
 			}
 
 			_dispatchMaybeDeferred(d.targetEl, 'ln-router:navigated', {
-				path: fullPath,
+				path: path,
+				fullPath: historyPath,
+				base: base,
 				params: d.match.params,
 				query,
 				route: d.match.route,
@@ -406,10 +437,12 @@ function _navigate(fullPath, opts = {}) {
 
 		// State is read off the primary match — currentRoute is null on an
 		// aux-only navigation, which is what current() === null now hinges on.
-		currentPath  = fullPath;
-		currentQuery = query;
-		currentRoute  = primaryMatch ? primaryMatch.route  : null;
-		currentParams = primaryMatch ? primaryMatch.params : {};
+		currentPath     = path;
+		currentFullPath = historyPath;
+		currentBase     = base;
+		currentQuery    = query;
+		currentRoute    = primaryMatch ? primaryMatch.route  : null;
+		currentParams   = primaryMatch ? primaryMatch.params : {};
 
 		// currentRegions reflects every region's match (null when unmatched).
 		// Built from regionMatches — never from the loop variable `match`.
@@ -455,20 +488,10 @@ function _queryEqual(a, b) {
 
 function _onPopState() {
 	const fullPath = window.location.pathname + window.location.search;
-	// Fragment-only popstate guard: when Back/Forward changes ONLY the hash
-	// (path + query identical to the current SPA state), skip navigation so the
-	// primary outlet is not torn down and re-cloned. Hash-bound components
-	// (e.g. ln-modal) react to the accompanying hashchange independently.
-	//
-	// cur.query is the authoritative already-parsed query for the active route
-	// (currentQuery), so compare target.query against it directly. cur.path is
-	// the raw fullPath (retains the query string), so normalize it for the
-	// pathname comparison only — do NOT re-parse it for the query.
 	const cur = router.current();
 	if (cur && cur.path != null) {
 		const target = _normalizePath(fullPath);
-		const currentPathNorm = _normalizePath(cur.path).path;
-		if (currentPathNorm === target.path && _queryEqual(cur.query, target.query)) {
+		if (cur.path === target.path && _queryEqual(cur.query, target.query)) {
 			return;
 		}
 	}

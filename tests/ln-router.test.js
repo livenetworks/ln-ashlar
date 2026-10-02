@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { planRegions } from '../components/ln-router/src/router-model.js';
+import { planRegions, normalizeBase, stripBase, toAbsoluteUrl } from '../components/ln-router/src/router-model.js';
 
 function makeMatch(templateNode) {
 	return { route: { templateNode }, params: {} };
@@ -115,4 +115,39 @@ test('planRegions: hydration + hasHydrate + hasChildren skips mount without clea
 	assert.deepEqual(plan.clears, []);
 	assert.equal(plan.swaps.length, 1);
 	assert.equal(plan.swaps[0].skipMount, true);
+});
+
+test('normalizeBase: handles trailing slash, leading slash, empty, root', () => {
+	assert.equal(normalizeBase(''), '');
+	assert.equal(normalizeBase(null), '');
+	assert.equal(normalizeBase('/'), '');
+	assert.equal(normalizeBase('/spa/'), '/spa');
+	assert.equal(normalizeBase('/spa'), '/spa');
+	assert.equal(normalizeBase('spa/'), '/spa');
+	assert.equal(normalizeBase('spa'), '/spa');
+	assert.equal(normalizeBase('/my/sub/app/'), '/my/sub/app');
+});
+
+test('stripBase: strips base prefix from pathname to relative route', () => {
+	assert.equal(stripBase('/spa/packages', '/spa'), '/packages');
+	assert.equal(stripBase('/spa/packages/', '/spa'), '/packages');
+	assert.equal(stripBase('/spa', '/spa'), '/');
+	assert.equal(stripBase('/spa/', '/spa'), '/');
+	assert.equal(stripBase('/packages', '/spa'), '/packages');
+	assert.equal(stripBase('/', '/spa'), '/');
+	assert.equal(stripBase('/packages', ''), '/packages');
+	assert.equal(stripBase('/packages', null), '/packages');
+	assert.equal(stripBase('/my/sub/app/tenants/42', '/my/sub/app'), '/tenants/42');
+});
+
+test('toAbsoluteUrl: prepends base URL preserving query and hash', () => {
+	assert.equal(toAbsoluteUrl('/packages', '/spa'), '/spa/packages');
+	assert.equal(toAbsoluteUrl('packages', '/spa'), '/spa/packages');
+	assert.equal(toAbsoluteUrl('/', '/spa'), '/spa/');
+	assert.equal(toAbsoluteUrl('', '/spa'), '/spa/');
+	assert.equal(toAbsoluteUrl('/spa/packages', '/spa'), '/spa/packages');
+	assert.equal(toAbsoluteUrl('/spa/', '/spa'), '/spa/');
+	assert.equal(toAbsoluteUrl('/packages?sort=name#modal', '/spa'), '/spa/packages?sort=name#modal');
+	assert.equal(toAbsoluteUrl('/packages?sort=name', ''), '/packages?sort=name');
+	assert.equal(toAbsoluteUrl('/packages', ''), '/packages');
 });

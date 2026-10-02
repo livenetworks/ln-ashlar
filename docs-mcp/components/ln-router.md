@@ -25,6 +25,7 @@ The `ln-router` component is the client-side SPA routing engine of `ln-ashlar`. 
     2. Dynamic parameter segments (`:param`) have secondary priority.
     3. Wildcards (`*`) have lowest priority and act as catch-all or 404 routes.
 *   **Multi-Region Support (Auxiliary Outlets):** Supports rendering into multiple independent, equally-authoritative target containers simultaneously. Beyond the primary outlet (`__primary__` mapping to `[data-ln-outlet]` or `<main>`), auxiliary regions render via `data-ln-route-target="id"`. A region with no match for the current URL auto-clears unless it carries `data-ln-route-keep`.
+*   **Base URL & Subdirectory Deployment (`<base href="...">` / `data-ln-router-base`):** Automatically detects `<base href="...">` in `<head>` or `data-ln-router-base` on the outlet. Strips the base prefix when matching routes (enabling clean relative patterns like `/`, `/packages`), and automatically prepends the base prefix when creating absolute URLs for `history.pushState` and link navigation.
 *   **Teardown & Garbage Collection Pipeline:** When a route target is unmounted, `ln-router` recursively invokes `.destroy()` on all active component instances within the outlet to prevent memory leaks.
 *   **Keep-Region State Survival:** Regions marked with `data-ln-route-keep` skip DOM replacement if the newly matched template node is identical, preserving internal DOM state (form values, scroll position, focus); `data-ln-route-keep` also opts a region out of auto-clear when the current URL has no match for it.
 *   **View Transitions API:** Integrates with native `document.startViewTransition()` for hardware-accelerated page transitions.
@@ -103,15 +104,18 @@ The `ln-router` component is the client-side SPA routing engine of `ln-ashlar`. 
 | `data-ln-route-title` | `<template>` | String | — | Document title to apply on route match (`document.title`). |
 | `data-ln-route-keep` | Outlet Container | Flag | — | Skips DOM re-rendering when the matched template node has not changed, and opts the region out of auto-clear when the current URL has no match for it. |
 | `data-ln-outlet` | `<main>` / `<div>` | Flag | — | Identifies the primary outlet container for main routes. |
+| `data-ln-router-base` | Outlet Container | String | — | Base URL prefix for subdirectory routing (e.g. `/spa`). Also inferred from `<base href="...">` in `<head>`. |
 | `data-ln-router-hydrate` | Outlet Container | Flag | — | Prevents cloning initial template during server-side pre-rendered hydration. |
 
 ### Programmatic JS API (`window.lnRouter` / `router`)
 
 | Method | Parameters | Return | Description |
 |---|---|---|---|
-| `window.lnRouter.navigate` | `(fullPath: String)` | `void` | Triggers client SPA navigation with history push (`history.pushState`). |
-| `window.lnRouter.replace` | `(fullPath: String)` | `void` | Triggers client SPA navigation replacing current history entry (`history.replaceState`). |
+| `window.lnRouter.navigate` | `(fullPath: String)` | `void` | Triggers client SPA navigation with history push (`history.pushState`), automatically resolving against the base URL. |
+| `window.lnRouter.replace` | `(fullPath: String)` | `void` | Triggers client SPA navigation replacing current history entry (`history.replaceState`), automatically resolving against the base URL. |
 | `window.lnRouter.current` | `()` | `Object` | Returns active route state `{ path, params, query, route, regions }`. |
+| `window.lnRouter.base` | `()` | `String` | Returns the active normalized base URL prefix (e.g. `"/spa"` or `""`). |
+| `window.lnRouter.toUrl` | `(relPath: String)` | `String` | Converts a relative route path to a full absolute URL prefixed with the base URL (e.g. `"/spa/packages"`). |
 
 ### Events API
 

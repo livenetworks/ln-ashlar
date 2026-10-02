@@ -48,3 +48,88 @@ export function planRegions(descriptors, { isHydration = false, hasPrimaryRegion
 
 	return { notFound, clears, swaps, owner };
 }
+
+/**
+ * Normalizes a base URL string:
+ * - ensures leading slash
+ * - strips trailing slash
+ * - returns empty string if root '/' or empty
+ * e.g. '/spa/' -> '/spa', 'spa' -> '/spa', '/' -> '', '' -> ''
+ *
+ * @param {string|null|undefined} base
+ * @returns {string}
+ */
+export function normalizeBase(base) {
+	if (!base || typeof base !== 'string') return '';
+	let b = base.trim().replace(/\/+$/, '');
+	if (!b || b === '/') return '';
+	return b.startsWith('/') ? b : '/' + b;
+}
+
+/**
+ * Strips the base URL prefix from a pathname, returning the clean relative path.
+ * e.g. with base '/spa':
+ * '/spa/packages' -> '/packages'
+ * '/spa' -> '/'
+ * '/spa/' -> '/'
+ * '/packages' -> '/packages' (already relative)
+ * '/' -> '/'
+ *
+ * @param {string} path
+ * @param {string} [base]
+ * @returns {string}
+ */
+export function stripBase(path, base) {
+	const b = normalizeBase(base);
+	if (!b) return (path && path.replace(/\/+$/, '')) || '/';
+
+	const normalizedPath = (path || '/').replace(/\/+$/, '') || '/';
+
+	if (normalizedPath === b) {
+		return '/';
+	}
+	if (normalizedPath.startsWith(b + '/')) {
+		const rel = normalizedPath.slice(b.length);
+		return rel.replace(/\/+$/, '') || '/';
+	}
+	return normalizedPath;
+}
+
+/**
+ * Converts a relative path into an absolute path prefixed with base.
+ * Preserves query strings and hashes.
+ * e.g. with base '/spa':
+ * '/packages' -> '/spa/packages'
+ * '/' -> '/spa/'
+ * 'packages' -> '/spa/packages'
+ * '/spa/packages' -> '/spa/packages' (already prefixed)
+ *
+ * @param {string} relPath
+ * @param {string} [base]
+ * @returns {string}
+ */
+export function toAbsoluteUrl(relPath, base) {
+	const b = normalizeBase(base);
+	if (!b) return relPath || '/';
+
+	const str = relPath || '/';
+	const hashIdx = str.indexOf('#');
+	const pathAndQuery = hashIdx !== -1 ? str.slice(0, hashIdx) : str;
+	const hash = hashIdx !== -1 ? str.slice(hashIdx) : '';
+
+	const queryIdx = pathAndQuery.indexOf('?');
+	const pathname = queryIdx !== -1 ? pathAndQuery.slice(0, queryIdx) : pathAndQuery;
+	const queryString = queryIdx !== -1 ? pathAndQuery.slice(queryIdx) : '';
+
+	let absPath;
+	if (pathname === b) {
+		absPath = b + '/';
+	} else if (pathname.startsWith(b + '/')) {
+		absPath = pathname;
+	} else {
+		const cleanRel = pathname.startsWith('/') ? pathname : '/' + pathname;
+		absPath = cleanRel === '/' ? b + '/' : b + cleanRel;
+	}
+
+	return absPath + queryString + hash;
+}
