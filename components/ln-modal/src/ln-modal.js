@@ -62,6 +62,7 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 		if (this.isOpen) {
 			if (typeof this.dom.showModal === 'function') this.dom.showModal();
 			document.body.classList.add('ln-modal-open');
+			dispatch(this.dom, 'ln-modal:open', { modalId: this.dom.id, target: this.dom });
 		}
 
 		return this;

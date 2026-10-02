@@ -218,7 +218,7 @@ import { guardBody, cloneTemplateScoped, fill, registerComponent, defineAttrs, a
 		window.addEventListener('ln-toast:enqueue', _onEnqueue);
 		window.addEventListener('ln-toast:clear', _onClear);
 		window.addEventListener('ln-modal:open', function () {
-			const containers = document.querySelectorAll("[" + DOM_SELECTOR + "]");
+			const containers = document.querySelectorAll("[" + DOM_SELECTOR + "], #ln-toast-container");
 			for (const container of Array.from(containers)) {
 				if (container.querySelectorAll("[data-ln-toast-item]").length > 0) {
 					_promoteTopLayer(container);

@@ -2035,7 +2035,7 @@ j(Oe, Un, Jn, "ln-router", {
     }, this._onClickClose = function(s) {
       const c = s.target.closest("[data-ln-modal-close]");
       c && r.dom.contains(c) && (s.preventDefault(), r.dom.setAttribute(t, "close"));
-    }, this.dom.addEventListener("ln-modal:request-open", this._onRequestOpen), this.dom.addEventListener("ln-modal:request-close", this._onRequestClose), this.dom.addEventListener("cancel", this._onCancel), this.dom.addEventListener("click", this._onClickClose), this.isOpen && (typeof this.dom.showModal == "function" && this.dom.showModal(), document.body.classList.add("ln-modal-open")), this;
+    }, this.dom.addEventListener("ln-modal:request-open", this._onRequestOpen), this.dom.addEventListener("ln-modal:request-close", this._onRequestClose), this.dom.addEventListener("cancel", this._onCancel), this.dom.addEventListener("click", this._onClickClose), this.isOpen && (typeof this.dom.showModal == "function" && this.dom.showModal(), document.body.classList.add("ln-modal-open"), L(this.dom, "ln-modal:open", { modalId: this.dom.id, target: this.dom })), this;
   }
   a.prototype.open = function() {
     this.dom.setAttribute(t, "open");
@@ -3639,7 +3639,7 @@ function Je(t, e, i) {
   }
   gt(function() {
     window.addEventListener("ln-toast:enqueue", v), window.addEventListener("ln-toast:clear", E), window.addEventListener("ln-modal:open", function() {
-      const S = document.querySelectorAll("[" + t + "]");
+      const S = document.querySelectorAll("[" + t + "], #ln-toast-container");
       for (const f of Array.from(S))
         f.querySelectorAll("[data-ln-toast-item]").length > 0 && m(f);
     });
