@@ -32,7 +32,7 @@
 			<li><button type="button" data-ws-command="disconnect" data-ws-for="ws-rest-socket">Disconnect</button></li>
 		</ul>
 
-		<form method="post" class="ws-add" data-ln-data-coordinator-scope="ws-rest">
+		<form method="post" action="http://localhost:8090/tasks" class="ws-add" data-ln-data-coordinator-scope="ws-rest">
 			<div class="form-element">
 				<label for="ws-rest-title">New task (sent over REST)</label>
 				<input type="text" id="ws-rest-title" name="title" required>
@@ -89,7 +89,7 @@
 			<li><button type="button" data-ws-command="disconnect" data-ws-for="ws-socket-socket">Disconnect</button></li>
 		</ul>
 
-		<form method="post" class="ws-add" data-ln-data-coordinator-scope="ws-socket">
+		<form method="post" action="/tasks" class="ws-add" data-ln-data-coordinator-scope="ws-socket">
 			<div class="form-element">
 				<label for="ws-socket-title">New task (sent over the socket)</label>
 				<input type="text" id="ws-socket-title" name="title" required>

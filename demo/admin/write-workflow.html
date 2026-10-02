@@ -376,6 +376,8 @@
 <script class="demo-wiring">
 (function () {
 	const coordEl = document.getElementById('wwf-coordinator');
+	const storeEl = document.getElementById('wwf-documents');
+	const modalEl = document.getElementById('wwf-modal');
 
 	document.addEventListener('ln-table:row-action', function (e) {
 		if (e.detail.table !== 'wwf-documents') return;
@@ -385,6 +387,15 @@
 			}));
 		}
 	});
+
+	// Close modal on successful create or update in store
+	if (storeEl && modalEl) {
+		['ln-data-store:created', 'ln-data-store:updated'].forEach(function (ev) {
+			storeEl.addEventListener(ev, function () {
+				modalEl.setAttribute('data-ln-modal', 'close');
+			});
+		});
+	}
 })();
 </script>
 			</div>

@@ -365,7 +365,7 @@
 	<main>
 		<p>Test the client-side codec API (<code>window.lnObfuscator.obfuscate</code> / <code>window.lnObfuscator.deobfuscate</code>) across ROT, Base64, and XOR, and verify dynamic DOM injection via <code>MutationObserver</code>:</p>
 
-		<form id="obf-playground-form" onsubmit="return false;" class="stack gap-sm">
+		<form id="obf-playground-form" action="#" method="post" onsubmit="return false;" class="stack gap-sm">
 			<div class="form-element">
 				<label for="obf-input-text">Text to Obfuscate / Deobfuscate (Supports Latin, Cyrillic, CJK, etc.)</label>
 				<input type="text" id="obf-input-text" value="Контакт: contact@example.com (тел: 070 123 456)" placeholder="Enter text here...">

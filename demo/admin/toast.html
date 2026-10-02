@@ -276,10 +276,10 @@
 						<main>
 							<p>To display a notification programmatically, dispatch a custom event to the window object: <code>window.dispatchEvent(new CustomEvent('ln-toast:enqueue', { detail: { type: 'success', title: 'Title', message: 'Message' } }))</code>.</p>
 							<nav class="demo-actions">
-								<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'success', title:'Success', message:'The record has been saved.'}}))" class="btn">Success</button>
-								<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'error', title:'Error', message:'Something went wrong.'}}))" class="btn error">Error</button>
-								<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'warn', title:'Warning', message:'Please check the data.'}}))" class="btn warning">Warning</button>
-								<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'A new version is available.'}}))" class="btn info">Info</button>
+								<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'success', title:'Success', message:'The record has been saved.'}}))" class="btn">Success</button>
+								<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'error', title:'Error', message:'Something went wrong.'}}))" class="btn error">Error</button>
+								<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'warn', title:'Warning', message:'Please check the data.'}}))" class="btn warning">Warning</button>
+								<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'A new version is available.'}}))" class="btn info">Info</button>
 							</nav>
 						</main>
 						<script type="text/plain" data-demo-scss>
@@ -310,7 +310,7 @@
 						<header><h3>Error with a list of errors</h3></header>
 						<main>
 							<p>Toasts support an array of strings in <code>message</code> to render a bulleted list of errors: <code>message: ['Error 1', 'Error 2']</code>.</p>
-							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'error', title:'Validation', message:['Name is required','Email format is incorrect','Password is too short']}}))" class="btn error">Show validation errors</button>
+							<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'error', title:'Validation', message:['Name is required','Email format is incorrect','Password is too short']}}))" class="btn error">Show validation errors</button>
 						</main>
 						<script type="text/plain" data-demo-scss>
 // The body styles automatically adjust for nested bulleted lists:

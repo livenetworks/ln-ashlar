@@ -143,12 +143,12 @@
 						</nav>
 
 						<div data-ln-popover id="demo-form-popover">
-							<form>
+							<form action="#" method="post">
 								<label for="invite-email">Email address</label>
 								<input id="invite-email" type="email" placeholder="colleague@example.com" autocomplete="off">
 								<div class="demo-row-spaced">
 									<button type="submit">Send invite</button>
-									<button type="button" onclick="document.getElementById('demo-form-popover').lnPopover.close()">Cancel</button>
+									<button type="button" id="demo-form-popover-cancel">Cancel</button>
 								</div>
 							</form>
 						</div>
@@ -222,6 +222,14 @@
 						formPopover.lnPopover.close();
 					}
 				});
+				const cancelBtn = document.getElementById('demo-form-popover-cancel');
+				if (cancelBtn) {
+					cancelBtn.addEventListener('click', function () {
+						if (formPopover.lnPopover && typeof formPopover.lnPopover.close === 'function') {
+							formPopover.lnPopover.close();
+						}
+					});
+				}
 			}
 		}
 	})();

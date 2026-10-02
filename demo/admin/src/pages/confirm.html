@@ -187,7 +187,8 @@ button[data-ln-confirm-timeout] {
 						<main>
 							<p>The destructive flow that <code>ln-confirm</code> exists for. First click arms the button. Second click within timeout — <code>_reset</code> runs synchronously, the click continues through the platform's default action processor, the form's <code>submit</code> event fires (because nothing called <code>preventDefault</code>), and the form submits via its native <code>action</code> / <code>method</code>. No JS rewiring; <code>type="submit"</code> is the contract.</p>
 							<p>This demo intercepts the <code>submit</code> event with a toast just to keep the page from navigating — production code would let the platform POST run.</p>
-							<form id="demo-form-submit">
+							<form id="demo-form-submit" action="/api/records/1" method="post">
+								<input type="hidden" name="_method" value="DELETE">
 								<div class="form-actions">
 									<button type="submit" data-ln-confirm="Submit and Delete?">Submit destructive action</button>
 								</div>
@@ -396,8 +397,11 @@ window.lnConfirm(root);         // re-run init scan over `root`. Only needed for
 		if (form) {
 			form.addEventListener('submit', function (e) {
 				e.preventDefault();
+				const action = form.getAttribute('action');
+				const methodInput = form.querySelector('input[name="_method"]');
+				const method = methodInput ? methodInput.value : form.method;
 				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-					detail: { type: 'success', title: 'Submitted', message: 'Form submit fired (the platform default action ran on the second click).' }
+					detail: { type: 'success', title: 'Submitted', message: 'Form submit fired (' + method.toUpperCase() + ' ' + action + ').' }
 				}));
 			});
 		}
