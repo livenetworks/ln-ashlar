@@ -6,7 +6,11 @@
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
 			</button>
 			<a class="app-brand" href="/demo/spa">
-				<img src="/demo/assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px);">
+				<picture>
+					<source srcset="/demo/assets/ln-ashlar-emblem-dark-64.png" media="(prefers-color-scheme: dark)">
+					<source srcset="/demo/assets/ln-ashlar-emblem-light-64.png" media="(prefers-color-scheme: light)">
+					<img src="/demo/assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px);">
+				</picture>
 				<span>DocuFlow</span>
 			</a>
 		</div>
@@ -14,7 +18,11 @@
 	<main class="app-main">
 		<aside class="app-sidebar" id="app-sidebar" data-ln-toggle="open">
 			<header>
-				<img src="/demo/assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px);">
+				<picture>
+					<source srcset="/demo/assets/ln-ashlar-emblem-dark-64.png" media="(prefers-color-scheme: dark)">
+					<source srcset="/demo/assets/ln-ashlar-emblem-light-64.png" media="(prefers-color-scheme: light)">
+					<img src="/demo/assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px);">
+				</picture>
 				<span class="app-name">DocuFlow</span>
 				<button type="button" data-ln-toggle-for="app-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>

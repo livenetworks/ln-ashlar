@@ -4,9 +4,15 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>DocuFlow</title>
+	<link rel="icon" type="image/svg+xml" href="/demo/assets/favicon.svg">
+	<link rel="icon" type="image/png" sizes="32x32" href="/demo/assets/favicon-dark-32x32.png" media="(prefers-color-scheme: dark)">
+	<link rel="icon" type="image/png" sizes="16x16" href="/demo/assets/favicon-dark-16x16.png" media="(prefers-color-scheme: dark)">
+	<link rel="icon" type="image/png" sizes="32x32" href="/demo/assets/favicon-light-32x32.png" media="(prefers-color-scheme: light)">
+	<link rel="icon" type="image/png" sizes="16x16" href="/demo/assets/favicon-light-16x16.png" media="(prefers-color-scheme: light)">
 	<link rel="icon" type="image/png" sizes="32x32" href="/demo/assets/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="/demo/assets/favicon-16x16.png">
 	<link rel="apple-touch-icon" sizes="180x180" href="/demo/assets/apple-touch-icon.png">
+	<link rel="manifest" href="/demo/site.webmanifest">
 	<link rel="shortcut icon" href="/demo/favicon.ico">
 
 	<!-- App styles: compiled framework + modules SCSS -->
@@ -29,7 +35,11 @@
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
 			</button>
 			<a class="app-brand" href="/demo/spa">
-				<img src="/demo/assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px);">
+				<picture>
+					<source srcset="/demo/assets/ln-ashlar-emblem-dark-64.png" media="(prefers-color-scheme: dark)">
+					<source srcset="/demo/assets/ln-ashlar-emblem-light-64.png" media="(prefers-color-scheme: light)">
+					<img src="/demo/assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px);">
+				</picture>
 				<span>DocuFlow</span>
 			</a>
 		</div>
@@ -37,7 +47,11 @@
 	<main class="app-main">
 		<aside class="app-sidebar" id="app-sidebar" data-ln-toggle="open">
 			<header>
-				<img src="/demo/assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px);">
+				<picture>
+					<source srcset="/demo/assets/ln-ashlar-emblem-dark-64.png" media="(prefers-color-scheme: dark)">
+					<source srcset="/demo/assets/ln-ashlar-emblem-light-64.png" media="(prefers-color-scheme: light)">
+					<img src="/demo/assets/ln-ashlar-emblem-dark-64.png" alt="DocuFlow" width="24" height="24" style="border-radius: var(--radius-sm, 4px);">
+				</picture>
 				<span class="app-name">DocuFlow</span>
 				<button type="button" data-ln-toggle-for="app-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
