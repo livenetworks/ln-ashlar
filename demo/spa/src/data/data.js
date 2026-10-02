@@ -2,6 +2,13 @@
 	'use strict';
 
 	function initData() {
+		// Identity mappers for packages and tenants
+		if (window.lnCore && typeof window.lnCore.registerDataMapper === 'function') {
+			const identity = { ingress: function (r) { return r; }, egress: function (r) { return r; } };
+			window.lnCore.registerDataMapper('packages', identity);
+			window.lnCore.registerDataMapper('tenants', identity);
+		}
+
 		const packagesStoreEl = document.getElementById('packages');
 		const tenantsStoreEl = document.getElementById('tenants');
 

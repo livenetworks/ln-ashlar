@@ -1,5 +1,5 @@
 <!-- @zone routes -->
-<template data-ln-route="/demo/spa" data-ln-route-title="Dashboard — DocuFlow">
+<template data-ln-route="/spa" data-ln-route-title="Dashboard — DocuFlow">
 	<section id="dashboard" class="is-loading">
 		<header class="page-header">
 			<div class="page-title">
@@ -9,25 +9,25 @@
 		</header>
 		<ul class="stat-grid">
 			<li>
-				<a href="/demo/spa/packages">
+				<a href="/spa/packages">
 					<span data-ln-stat-label>Packages</span>
 					<strong data-ln-stat-value data-ln-stat="packages" class="is-loading">—</strong>
 				</a>
 			</li>
 			<li>
-				<a href="/demo/spa/tenants">
+				<a href="/spa/tenants">
 					<span data-ln-stat-label>Tenants</span>
 					<strong data-ln-stat-value data-ln-stat="tenants" class="is-loading">—</strong>
 				</a>
 			</li>
 			<li>
-				<a href="/demo/spa/tenants">
+				<a href="/spa/tenants">
 					<span data-ln-stat-label>Active tenants</span>
 					<strong data-ln-stat-value data-ln-stat="tenants" data-ln-stat-filter="active:true" class="is-loading">—</strong>
 				</a>
 			</li>
 			<li>
-				<a href="/demo/spa/packages">
+				<a href="/spa/packages">
 					<span data-ln-stat-label>Active packages</span>
 					<strong data-ln-stat-value data-ln-stat="packages" data-ln-stat-filter="active:true" class="is-loading">—</strong>
 				</a>
@@ -39,7 +39,7 @@
 				<ul data-pkg-usage></ul>
 				<template data-ln-template="pkg-usage-item">
 					<li>
-						<a href="/demo/spa/tenants">
+						<a href="/spa/tenants">
 							<span class="pkg-usage-name" data-pkg-usage-name></span>
 							<span class="pkg-usage-count" data-pkg-usage-count></span>
 							<span class="progress"><span data-ln-progress="0"></span></span>
