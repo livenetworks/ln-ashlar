@@ -89,7 +89,7 @@ ln-ashlar provides a robust, production-proven foundation for web applications. 
 - [ln-data-coordinator](docs-mcp/components/ln-data-coordinator.md): Orchestrates local IndexedDB cache sync with remote database drivers and queues.
 - [ln-data-store](docs-mcp/components/ln-data-store.md): Zero-dependency local-first database cache store backed by browser IndexedDB.
 - [ln-table-coordinator](docs-mcp/components/ln-table-coordinator.md): A wrapper coordinator component that encapsulates and coordinates child search, filter popovers, and table primitives on the page without requiring named scopes or explicit target IDs.
-- [ln-ui-coordinator](docs-mcp/components/ln-ui-coordinator.md): A Layer 2 Coordinator that mediates user triggers, modals, AJAX operations, uploads, form submissions, URL hash navigation, data filling, and toast notifications.
+- [ln-ui-coordinator](docs-mcp/components/ln-ui-coordinator.md): A Layer 2 Coordinator that mediates URL hash navigation, modal lifecycle, and server toast notifications.
 - [ln-ajax](docs-mcp/components/ln-ajax.md): An HTML-over-the-wire network orchestration component that converts navigation links and form submissions into AJAX calls.
 - [ln-include](docs-mcp/components/ln-include.md): External partial loader for `<template>` elements, with built-in boot gating to avoid race conditions.
 - [ln-api-connector](docs-mcp/components/ln-api-connector.md): A stateless RESTful API network connection driver.

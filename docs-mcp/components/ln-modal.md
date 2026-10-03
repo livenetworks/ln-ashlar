@@ -13,7 +13,7 @@ tags: [modal, dialog, overlay, simple-component]
 > **Classification:** 🟢 Simple Component  
 > Applied to a `<dialog data-ln-modal id="...">`, paired with a `<button data-ln-modal-for="...">` and dismiss buttons (`data-ln-modal-close`).
 > On trigger `click`, it sets `data-ln-modal="open"`, calls `dialog.showModal()`, and adds `.ln-modal-open` to `document.body`.
-> On dismiss `click`, backdrop click, or native `Escape`, it sets `data-ln-modal="close"`, calls `dialog.close()`, and removes `.ln-modal-open`.
+> On dismiss `click` or native `Escape`, it sets `data-ln-modal="close"`, calls `dialog.close()`, and removes `.ln-modal-open`.
 
 ---
 
@@ -223,7 +223,7 @@ sequenceDiagram
 
 ## 7. Related Components
 
-- [`ln-ui-coordinator`](./ln-ui-coordinator.md) — Layer 2 Coordinator that handles triggers, hash addressing, data filling, and form auto-closing.
+- [`ln-ui-coordinator`](./ln-ui-coordinator.md) — Layer 2 Coordinator that handles URL hash addressing, data filling, and AJAX form auto-closing.
 - [`ln-fill`](./ln-fill.md) — Fills form and display elements from data records.
 - [`ln-form`](./ln-form.md) — Manages form submission pipelines.
 

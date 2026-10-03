@@ -98,23 +98,19 @@ sequenceDiagram
   3. It measures the trigger and places the menu right-aligned beneath it.
   4. It listens for viewport resizes and outside clicks to safely write `data-ln-toggle="close"` back to the menu when needed.
 
-#### 3. `ln-ui-coordinator` (Bridging Triggers, Hash Navigation, Fill, AJAX, and Submit)
-* **Children:** acts on targets across the page with dictionary scoped to `[data-ln-ui-coordinator]`; see [Sanctioned Exceptions](#sanctioned-exceptions) above for why global trigger delegation is a deliberate exception to Rule 4.
+#### 3. `ln-ui-coordinator` (Bridging Hash Navigation, Fill, AJAX, and Submit)
+* **Children:** acts on targets across the page with dictionary scoped to `[data-ln-ui-coordinator]`.
 * **The Rule:** a modal must open, get its form filled, auto-close on
   successful AJAX submit, and toast response messages — without `ln-modal`,
   `ln-fill`, `ln-ajax`, or `ln-toast` knowing about each other.
 * **Flow:**
-  1. A trigger (`[data-ln-modal-for]` button or `<a href="#modalId:42">` hash
-     anchor) is clicked; the coordinator intercepts it, updates the URL hash
-     via `hashSet` (preserving foreign segments), and determines mode
-     (`new` vs `edit`) from the presence of a hash param.
-  2. It extracts `data-ln-modal-*` / `data-ln-fill-*` payload attributes from
-     the trigger, calls `lnFill` to populate the form, and
-     dispatches `ln-modal:request-open` to the target `ln-modal`.
-  3. On `ln-ajax:success` bubbling from the form, it
-     dispatches `ln-toast:enqueue` if a response message is present, cleans the hash,
+  1. A modal is opened autonomously via its `[data-ln-modal-for]` trigger or via an `<a href="#modalId:42">` hash
+     anchor. When `ln-modal:open` bubbles, the coordinator syncs the URL hash
+     via `hashSet` (preserving foreign segments) and dispatches `ln-fill:request` if a parameterized segment is present.
+  2. On `ln-ajax:success` bubbling from the form, it
+     dispatches `ln-toast:enqueue` if a response message is present, cleans the URL hash (`hashSet(modal.id, null)` so the modal never reopens on reload),
      dispatches `ln-modal:request-close`, and resets modal forms.
-  4. On `ln-ajax:error`, it dispatches error toast notifications and keeps the
+  3. On `ln-ajax:error`, it dispatches error toast notifications and keeps the
      modal open so inline validation errors remain visible.
 
 See also: [Hash-state doctrine](hash-state.md) — the cross-cutting rules for namespace ownership, foreign-segment preservation, and anchor interception that make hash-param coordinators like `ln-ui-coordinator` safe to compose.

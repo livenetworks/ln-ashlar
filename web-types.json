@@ -1,7 +1,7 @@
 {
 	"$schema": "https://json.schemastore.org/web-types",
 	"name": "@livenetworks/ashlar",
-	"version": "2.0.4",
+	"version": "2.0.5",
 	"framework": "html",
 	"contributions": {
 		"html": {
@@ -1054,7 +1054,7 @@
 				},
 				{
 					"name": "data-ln-modal-for",
-					"description": "data-ln-modal-for attribute",
+					"description": "Target modal ID to open on trigger click",
 					"value": {
 						"type": "string"
 					}
@@ -2120,13 +2120,6 @@
 					"description": "Mounts UI coordinator mediating global hash-routing, modals, and toasts",
 					"value": {
 						"type": "boolean"
-					}
-				},
-				{
-					"name": "data-ln-ui-coordinator-dict",
-					"description": "Dictionary key prefix mapping for translatable UI coordinator messages",
-					"value": {
-						"type": "string"
 					}
 				},
 				{

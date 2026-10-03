@@ -33,15 +33,19 @@
 			"description": "Click dismiss trigger inside the modal"
 		},
 		"data-ln-modal-for": {
-			"direction": null,
+			"direction": "author",
 			"sources": [
-				"ln-modal-dev.scss"
-			]
+				"ln-modal-dev.scss",
+				"src/ln-modal.js"
+			],
+			"type": "string",
+			"description": "Target modal ID to open on trigger click"
 		},
 		"data-ln-modal-mode": {
-			"direction": null,
+			"direction": "both",
 			"sources": [
-				"ln-modal.scss"
+				"ln-modal.scss",
+				"src/ln-modal.js"
 			]
 		},
 		"data-ln-modal-when": {
