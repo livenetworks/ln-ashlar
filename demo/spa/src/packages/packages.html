@@ -8,6 +8,8 @@
 			</div>
 			<div class="page-actions">
 				<a href="#package-modal" id="new-package" class="btn"
+					data-ln-modal-for="package-modal"
+					data-ln-modal-mode="new"
 					data-ln-fill-form="package-form">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
 					New package
@@ -72,6 +74,8 @@
 					<td>
 						<ul class="row-actions">
 							<li><a href="#package-modal:{{ id }}" aria-label="Edit package" data-ln-tooltip="Edit"
+								data-ln-modal-for="package-modal"
+								data-ln-modal-mode="edit"
 								data-ln-fill-form="package-form"
 								data-ln-fill-id="{{ id }}"
 								data-ln-fill-name="{{ name }}"
@@ -95,6 +99,8 @@
 					<h3>No packages yet</h3>
 					<p>Create your first package to define tenant limits.</p>
 					<a href="#package-modal" class="btn" data-spa-empty-new
+						data-ln-modal-for="package-modal"
+						data-ln-modal-mode="new"
 						data-ln-fill-form="package-form">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
 						New package

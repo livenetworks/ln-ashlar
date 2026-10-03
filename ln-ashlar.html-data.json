@@ -795,7 +795,15 @@
 		},
 		{
 			"name": "data-ln-modal-mode",
-			"description": "data-ln-modal-mode attribute"
+			"description": "Operational mode of the modal (new vs edit)",
+			"values": [
+				{
+					"name": "edit"
+				},
+				{
+					"name": "new"
+				}
+			]
 		},
 		{
 			"name": "data-ln-modal-when",

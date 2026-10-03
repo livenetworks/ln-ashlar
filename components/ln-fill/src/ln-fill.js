@@ -50,12 +50,6 @@ import { } from '../../ln-core';
 		const trigger = e.target.closest('[data-ln-fill-form]');
 		if (!trigger) return;
 
-		// Prevent double fill: if this trigger is a hash-bound anchor (e.g. href="#user-modal:142"),
-		// we skip the click-based fill. The resulting hash change will trigger ln-modal:open,
-		// and the ln-ui-coordinator will request the fill via ln-fill:request.
-		const href = trigger.getAttribute('href');
-		if (href && href.indexOf('#') !== -1) return;
-
 		// No e.preventDefault() — the same click may also be handled by
 		// [data-ln-modal-for] listener in ln-modal. Leave it alone.
 

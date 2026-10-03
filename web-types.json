@@ -1061,9 +1061,13 @@
 				},
 				{
 					"name": "data-ln-modal-mode",
-					"description": "data-ln-modal-mode attribute",
+					"description": "Operational mode of the modal (new vs edit)",
 					"value": {
-						"type": "string"
+						"type": "enum",
+						"items": [
+							"edit",
+							"new"
+						]
 					}
 				},
 				{

@@ -21,6 +21,12 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible, shouldIgnor
 			type: 'string',
 			description: 'Target modal ID to open on trigger click'
 		},
+		'data-ln-modal-mode': {
+			type: 'enum',
+			values: ['new', 'edit'],
+			fallback: 'new',
+			description: 'Operational mode of the modal (new vs edit)'
+		},
 		'data-ln-modal-close': {
 			type: 'trigger',
 			description: 'Click dismiss trigger inside the modal'
@@ -47,6 +53,8 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible, shouldIgnor
 			e.preventDefault();
 			if (trigger.hasAttribute('data-ln-modal-mode')) {
 				target.setAttribute('data-ln-modal-mode', trigger.getAttribute('data-ln-modal-mode'));
+			} else if (target.hasAttribute('data-ln-modal-mode')) {
+				target.setAttribute('data-ln-modal-mode', 'new');
 			}
 			target.setAttribute(DOM_SELECTOR, 'open');
 		};
@@ -191,6 +199,9 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible, shouldIgnor
 				return;
 			}
 			instance.isOpen = false;
+			if (el.hasAttribute('data-ln-modal-mode')) {
+				el.setAttribute('data-ln-modal-mode', 'new');
+			}
 			dispatch(el, 'ln-modal:close', { modalId: el.id, target: el });
 
 			if (typeof el.close === 'function') el.close();
