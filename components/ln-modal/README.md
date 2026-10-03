@@ -87,6 +87,7 @@ const isOpen = modal.lnModal.isOpen; // Returns true/false
 ### Attributes
 - `data-ln-modal`: Placed on the overlay element. Value `"open"` = open; `"close"` = closed.
 - `data-ln-modal-for="id"`: Placed on trigger elements referencing the modal ID.
+- `data-ln-modal-mode="new|edit"`: Placed on trigger elements or modal dialog to specify mode (toggles `[data-ln-modal-when="new|edit"]` child elements).
 - `data-ln-modal-close`: Placed on any close trigger inside the modal.
 
 ---

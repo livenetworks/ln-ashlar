@@ -2022,6 +2022,12 @@ j(Me, Un, Jn, "ln-router", {
       type: "string",
       description: "Target modal ID to open on trigger click"
     },
+    "data-ln-modal-mode": {
+      type: "enum",
+      values: ["new", "edit"],
+      fallback: "new",
+      description: "Operational mode of the modal (new vs edit)"
+    },
     "data-ln-modal-close": {
       type: "trigger",
       description: "Click dismiss trigger inside the modal"
@@ -2036,7 +2042,7 @@ j(Me, Un, Jn, "ln-router", {
       const w = u.getAttribute(i);
       if (!w) return;
       const y = document.getElementById(w) || document.querySelector("[" + t + '="' + w + '"]');
-      !y || !y[e] || (c.preventDefault(), u.hasAttribute("data-ln-modal-mode") && y.setAttribute("data-ln-modal-mode", u.getAttribute("data-ln-modal-mode")), y.setAttribute(t, "open"));
+      !y || !y[e] || (c.preventDefault(), u.hasAttribute("data-ln-modal-mode") ? y.setAttribute("data-ln-modal-mode", u.getAttribute("data-ln-modal-mode")) : y.hasAttribute("data-ln-modal-mode") && y.setAttribute("data-ln-modal-mode", "new"), y.setAttribute(t, "open"));
     }, document.addEventListener("click", r));
   }
   function a() {
@@ -2105,7 +2111,7 @@ j(Me, Un, Jn, "ln-router", {
           c.setAttribute(t, "open");
           return;
         }
-        u.isOpen = !1, L(c, "ln-modal:close", { modalId: c.id, target: c }), typeof c.close == "function" && c.close(), document.querySelector("[" + t + '="open"]') || document.body.classList.remove("ln-modal-open");
+        u.isOpen = !1, c.hasAttribute("data-ln-modal-mode") && c.setAttribute("data-ln-modal-mode", "new"), L(c, "ln-modal:close", { modalId: c.id, target: c }), typeof c.close == "function" && c.close(), document.querySelector("[" + t + '="open"]') || document.body.classList.remove("ln-modal-open");
       }
   }
   j(t, e, n, "ln-modal", {
@@ -7505,12 +7511,10 @@ function Or(t, e = Dr) {
     if (f.ctrlKey || f.metaKey || f.button === 1) return;
     const h = f.target.closest("[data-ln-fill-form]");
     if (!h) return;
-    const r = h.getAttribute("href");
-    if (r && r.indexOf("#") !== -1) return;
-    const s = h.getAttribute("data-ln-fill-form"), a = document.getElementById(s);
-    if (!a) return;
-    const n = i(h), o = Object.keys(n).length > 0;
-    window.lnCore.lnFill(a, o ? n : null);
+    const r = h.getAttribute("data-ln-fill-form"), s = document.getElementById(r);
+    if (!s) return;
+    const a = i(h), n = Object.keys(a).length > 0;
+    window.lnCore.lnFill(s, n ? a : null);
   }), document.addEventListener("ln-fill:request", function(f) {
     const h = f.detail;
     if (!h) return;

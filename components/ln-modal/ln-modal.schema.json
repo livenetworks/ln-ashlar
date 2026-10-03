@@ -46,7 +46,14 @@
 			"sources": [
 				"ln-modal.scss",
 				"src/ln-modal.js"
-			]
+			],
+			"type": "enum",
+			"values": [
+				"new",
+				"edit"
+			],
+			"fallback": "new",
+			"description": "Operational mode of the modal (new vs edit)"
 		},
 		"data-ln-modal-when": {
 			"direction": null,
