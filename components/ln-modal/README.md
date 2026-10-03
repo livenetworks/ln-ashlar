@@ -2,7 +2,7 @@
 
 > Applied to a `<dialog data-ln-modal id="...">`, paired with a `<button data-ln-modal-for="...">` and dismiss buttons (`data-ln-modal-close`).
 > On trigger `click`, it sets `data-ln-modal="open"`, calls `dialog.showModal()`, and adds `.ln-modal-open` to `document.body`.
-> On dismiss `click`, backdrop click, or native `Escape`, it sets `data-ln-modal="close"`, calls `dialog.close()`, and removes `.ln-modal-open`.
+> On dismiss `click` or native `Escape`, it sets `data-ln-modal="close"`, calls `dialog.close()`, and removes `.ln-modal-open`.
 
 ---
 
@@ -163,11 +163,11 @@ Coordinators (such as `ln-ui-coordinator`) intercept hash changes and coordinate
 
 ## 🔧 Internals
 
-Source: `components/ln-modal/src/ln-modal.js` (~137 lines, native `<dialog>`-backed). Trigger delegation (`data-ln-modal-for`), hash-addressing, and form-fill on open are NOT implemented here — they live in `components/ln-ui-coordinator/src/ln-ui-coordinator.js` (a Layer 2 coordinator per §1.4). This section covers `ln-modal.js` only.
+Source: `components/ln-modal/src/ln-modal.js` (native `<dialog>`-backed). `ln-modal` operates autonomously: trigger buttons (`data-ln-modal-for`), dismiss buttons (`data-ln-modal-close`), and backdrop dismissals are handled directly by the component without requiring external coordinators. Hash-addressing and form-fill orchestration remain optional enhancements handled when `components/ln-ui-coordinator/src/ln-ui-coordinator.js` is present.
 
 ### Single source of truth
 
-`data-ln-modal` is the only state. `_syncAttribute(el)` (wired via `registerComponent`'s `onAttributeChange`) is the sole place open/close side effects happen — there is no imperative `open()`/`close()` method on the instance. Cancellation is attribute-revert: if `ln-modal:before-open`/`before-close` is prevented, the handler writes the attribute back to its prior value, which the same no-op guard (`shouldBeOpen === instance.isOpen`) swallows on the resulting mutation.
+`data-ln-modal` is the only state. `_syncAttribute(el)` (wired via `registerComponent`'s `onAttributeChange`) is the sole place open/close side effects happen — instance methods like `open()`, `close()`, and `toggle()` set the attribute directly. Cancellation is attribute-revert: if `ln-modal:before-open`/`before-close` is prevented, the handler writes the attribute back to its prior value, which the same no-op guard (`shouldBeOpen === instance.isOpen`) swallows on the resulting mutation.
 
 ### Open / close
 
@@ -181,8 +181,8 @@ Not a custom keydown listener — the native `<dialog>` fires its own `cancel` e
 
 ### Trigger/close wiring
 
-The instance listens for `ln-modal:request-open`/`request-close` on the modal element itself (writes the attribute) and a `click` listener on the modal for `[data-ln-modal-close]` descendants. `data-ln-modal-for` trigger buttons are resolved by the coordinator's document-level delegated click listener, which looks up the modal by id and dispatches the request event — this file never sees the trigger element.
+`ln-modal` registers delegated document click handling for `[data-ln-modal-for="id"]` triggers, opening the target modal autonomously. Inside the modal, dismiss clicks (`[data-ln-modal-close]`) set `data-ln-modal="close"`. The instance also listens for `ln-modal:request-open`/`request-close` on the modal element itself.
 
 ### Destroy
 
-Removes the four listeners (`request-open`, `request-close`, `cancel`, `click`), releases the body scroll-lock class if this was the last open modal, deletes the instance.
+Removes command listeners (`request-open`, `request-close`, `cancel`, `click`), unregisters the global trigger listener when all instances are removed, releases the body scroll-lock class if this was the last open modal, and deletes the instance.

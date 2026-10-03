@@ -2327,8 +2327,8 @@
 				{
 					"name": "ln-modal:open",
 					"cancelable": false,
-					"description": "Adopts hash parameter and emits `ln-fill:request` for `\"edit\"` mode.",
-					"detail": "{ modalId, target, hashNs, param }",
+					"description": "Dispatched once modal is natively open, body scroll locked, and initial focus set.",
+					"detail": "{ modalId: String, target: HTMLElement, hashNs: String?, param: String? }",
 					"source": "static"
 				},
 				{
@@ -2457,30 +2457,23 @@
 		"ln-ui-coordinator": {
 			"emits": [
 				{
-					"name": "ln-fill:request",
-					"cancelable": false,
-					"description": "Sent to form layer to fill fields with record data upon open.",
-					"detail": "{ id: String }",
-					"source": "static"
-				},
-				{
 					"name": "ln-modal:request-close",
 					"cancelable": false,
-					"description": "Sent to target `ln-modal` to request panel closing.",
+					"description": "Sent to target `ln-modal` upon AJAX success to request panel closing.",
 					"detail": "{}",
 					"source": "static"
 				},
 				{
 					"name": "ln-modal:request-open",
 					"cancelable": false,
-					"description": "Sent to target `ln-modal` to request panel opening.",
+					"description": "Sent to target `ln-modal` from hash routes to request panel opening.",
 					"detail": "{}",
 					"source": "static"
 				},
 				{
 					"name": "ln-toast:enqueue",
 					"cancelable": false,
-					"description": "Dispatched upon AJAX response `message` or network/server/upload error fallbacks.",
+					"description": "Dispatched with server `{ type, title, message }` from response envelopes.",
 					"detail": "{ type, title, message }",
 					"source": "static"
 				}
@@ -2489,50 +2482,29 @@
 				{
 					"name": "ln-ajax:error",
 					"cancelable": false,
-					"description": "Relays error `message` or network/server fallback toast, keeps modal open.",
+					"description": "Relays server error `message` to toast while keeping modal open.",
 					"detail": "{ method, url, status, data, error }",
 					"source": "static"
 				},
 				{
 					"name": "ln-ajax:success",
 					"cancelable": false,
-					"description": "Relays response `message` as toast, auto-closes parent modal, resets forms.",
+					"description": "Relays server `message` as toast, cleans modal URL hash, and auto-closes parent modal.",
 					"detail": "{ method, url, data }",
-					"source": "static"
-				},
-				{
-					"name": "ln-modal:before-open",
-					"cancelable": false,
-					"description": "Clears form fields if modal mode is `\"new\"`.",
-					"detail": "{ modalId, target }",
 					"source": "static"
 				},
 				{
 					"name": "ln-modal:close",
 					"cancelable": false,
-					"description": "Cleans up modal hash segment and resets fields if mode is `\"new\"`.",
+					"description": "Cleans up modal hash segment when modal closes.",
 					"detail": "{ modalId, target }",
-					"source": "static"
-				},
-				{
-					"name": "ln-modal:open",
-					"cancelable": false,
-					"description": "Adopts hash parameter and emits `ln-fill:request` for `\"edit\"` mode.",
-					"detail": "{ modalId, target, hashNs, param }",
 					"source": "static"
 				},
 				{
 					"name": "ln-upload:error",
 					"cancelable": false,
-					"description": "Enqueues error toast on upload failure.",
+					"description": "Relays server error `message` to toast.",
 					"detail": "{ file, message, status, error }",
-					"source": "static"
-				},
-				{
-					"name": "ln-upload:invalid",
-					"cancelable": false,
-					"description": "Enqueues error toast on file validation failure.",
-					"detail": "{ file, reason }",
 					"source": "static"
 				}
 			]

@@ -791,7 +791,7 @@
 		},
 		{
 			"name": "data-ln-modal-for",
-			"description": "data-ln-modal-for attribute"
+			"description": "Target modal ID to open on trigger click"
 		},
 		{
 			"name": "data-ln-modal-mode",
@@ -1654,10 +1654,6 @@
 			"name": "data-ln-ui-coordinator",
 			"description": "Mounts UI coordinator mediating global hash-routing, modals, and toasts",
 			"valueSet": "v"
-		},
-		{
-			"name": "data-ln-ui-coordinator-dict",
-			"description": "Dictionary key prefix mapping for translatable UI coordinator messages"
 		},
 		{
 			"name": "data-ln-upload",

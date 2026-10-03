@@ -1140,9 +1140,7 @@
 			"source": "dynamic-allowlist"
 		},
 		"ln-fill:request": {
-			"emitted_by": [
-				"ln-ui-coordinator"
-			],
+			"emitted_by": [],
 			"listened_by": [
 				"ln-fill"
 			],
@@ -1483,9 +1481,7 @@
 			"emitted_by": [
 				"ln-modal"
 			],
-			"listened_by": [
-				"ln-ui-coordinator"
-			],
+			"listened_by": [],
 			"cancelable": true,
 			"description": "Dispatched when state changes to `\"open\"`, before styles or focus are applied.",
 			"detail": "{ modalId: String, target: HTMLElement }",
@@ -1508,8 +1504,7 @@
 				"ln-modal"
 			],
 			"listened_by": [
-				"ln-toast",
-				"ln-ui-coordinator"
+				"ln-toast"
 			],
 			"cancelable": false,
 			"description": "Dispatched once modal is natively open, body scroll locked, and initial focus set.",
@@ -2337,9 +2332,7 @@
 			"emitted_by": [
 				"ln-upload"
 			],
-			"listened_by": [
-				"ln-ui-coordinator"
-			],
+			"listened_by": [],
 			"cancelable": false,
 			"description": "Fires when a file fails extension/size/count validation.",
 			"detail": "{ file, reason }",

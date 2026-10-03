@@ -1,8 +1,10 @@
-import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../../ln-core';
+import { registerComponent, dispatch, dispatchCancelable, isVisible, shouldIgnoreClick, isTargetDisabled } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-modal';
 	const DOM_ATTRIBUTE = 'lnModal';
+	const TRIGGER_ATTRIBUTE = 'data-ln-modal-for';
+	const CLOSE_TRIGGER_ATTRIBUTE = 'data-ln-modal-close';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -15,11 +17,47 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 			effect: _syncAttribute,
 			description: 'Control state of the modal dialog'
 		},
+		'data-ln-modal-for': {
+			type: 'string',
+			description: 'Target modal ID to open on trigger click'
+		},
 		'data-ln-modal-close': {
 			type: 'trigger',
 			description: 'Click dismiss trigger inside the modal'
 		}
 	};
+
+	const instances = new Set();
+	let clickListener = null;
+
+	function _ensureClickListener() {
+		if (clickListener) return;
+		clickListener = function (e) {
+			if (shouldIgnoreClick(e)) return;
+
+			const trigger = e.target.closest('[' + TRIGGER_ATTRIBUTE + ']');
+			if (!trigger || isTargetDisabled(trigger)) return;
+
+			const targetId = trigger.getAttribute(TRIGGER_ATTRIBUTE);
+			if (!targetId) return;
+
+			const target = document.getElementById(targetId) || document.querySelector('[' + DOM_SELECTOR + '="' + targetId + '"]');
+			if (!target || !target[DOM_ATTRIBUTE]) return;
+
+			e.preventDefault();
+			if (trigger.hasAttribute('data-ln-modal-mode')) {
+				target.setAttribute('data-ln-modal-mode', trigger.getAttribute('data-ln-modal-mode'));
+			}
+			target.setAttribute(DOM_SELECTOR, 'open');
+		};
+		document.addEventListener('click', clickListener);
+	}
+
+	function _maybeRemoveClickListener() {
+		if (instances.size > 0 || !clickListener) return;
+		document.removeEventListener('click', clickListener);
+		clickListener = null;
+	}
 
 	// ─── Component Constructor ─────────────────────────────
 
@@ -46,7 +84,7 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 
 		// Dismiss trigger buttons inside modal [data-ln-modal-close]
 		this._onClickClose = function (e) {
-			const closeBtn = e.target.closest('[data-ln-modal-close]');
+			const closeBtn = e.target.closest('[' + CLOSE_TRIGGER_ATTRIBUTE + ']');
 			if (closeBtn && self.dom.contains(closeBtn)) {
 				e.preventDefault();
 				self.dom.setAttribute(DOM_SELECTOR, 'close');
@@ -57,6 +95,9 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 		this.dom.addEventListener('ln-modal:request-close', this._onRequestClose);
 		this.dom.addEventListener('cancel', this._onCancel);
 		this.dom.addEventListener('click', this._onClickClose);
+
+		instances.add(this);
+		_ensureClickListener();
 
 		// Apply initial state if rendered with open attribute
 		if (this.isOpen) {
@@ -88,6 +129,9 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 		this.dom.removeEventListener('ln-modal:request-close', this._onRequestClose);
 		this.dom.removeEventListener('cancel', this._onCancel);
 		this.dom.removeEventListener('click', this._onClickClose);
+
+		instances.delete(this);
+		_maybeRemoveClickListener();
 
 		if (this.isOpen) {
 			const dom = this.dom;

@@ -789,7 +789,6 @@ const T = /* @__PURE__ */ new Set([
   "data-ln-translations-prefix",
   "data-ln-translations-remove-label",
   "data-ln-ui-coordinator",
-  "data-ln-ui-coordinator-dict",
   "data-ln-upload",
   "data-ln-upload-accept",
   "data-ln-upload-action",
