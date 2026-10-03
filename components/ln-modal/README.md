@@ -24,15 +24,33 @@ In `ln-ashlar`, the core design principle is **Three-Layer Architecture** and **
 Triggers and modals are paired by ID. The overlay has `class="ln-modal"` and `data-ln-modal`.
 
 ```html
-<!-- Trigger button -->
-<button data-ln-modal-for="user-modal">Add User</button>
+<!-- Trigger: New (opens modal in "new" mode and resets form) -->
+<button type="button"
+        data-ln-modal-for="user-modal"
+        data-ln-modal-mode="new"
+        data-ln-fill-form="user-form">
+    Add User
+</button>
+
+<!-- Trigger: Edit (opens modal in "edit" mode and fills form) -->
+<button type="button"
+        data-ln-modal-for="user-modal"
+        data-ln-modal-mode="edit"
+        data-ln-fill-form="user-form"
+        data-ln-fill-id="42"
+        data-ln-fill-name="Ada Lovelace">
+    Edit User
+</button>
 
 <!-- Modal overlay -->
-<dialog class="ln-modal" data-ln-modal id="user-modal">
-    <form>
-        <!-- Header -->
+<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="user-modal">
+    <form id="user-form" data-ln-form>
+        <!-- Header with mode-conditional title -->
         <header>
-            <h3>Add User</h3>
+            <h3 data-ln-fillable>
+                <span data-ln-modal-when="new">Add User</span>
+                <span data-ln-modal-when="edit">Edit User — <span data-ln-field="name"></span></span>
+            </h3>
             <button type="button" data-ln-modal-close aria-label="Close">
                 <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
             </button>
@@ -40,6 +58,7 @@ Triggers and modals are paired by ID. The overlay has `class="ln-modal"` and `da
         
         <!-- Scrollable content -->
         <main>
+            <input type="hidden" name="id">
             <label>Name <input type="text" name="name" autofocus></label>
         </main>
         
@@ -54,7 +73,8 @@ Triggers and modals are paired by ID. The overlay has `class="ln-modal"` and `da
 
 ### Key Anatomy Rules
 - **The Overlay (`data-ln-modal`)**: Driven by the value `"open"` (open) and `"close"` (closed).
-- **The Trigger (`data-ln-modal-for="id"`)**: Placed on buttons/links to request toggling modal display.
+- **The Trigger (`data-ln-modal-for="id"`)**: Placed on buttons/links to open target modal directly.
+- **The Mode Switch (`data-ln-modal-mode="new|edit"`)**: Transferred from trigger to modal on click. Displays child elements with matching `[data-ln-modal-when="new|edit"]`. Automatically resets to `"new"` upon closing.
 - **The Dismiss button (`data-ln-modal-close`)**: Placed on cancel or close buttons to request close.
 - **Focus Override (`autofocus`)**: Place on any form field to override default focus placement on open.
 
@@ -164,7 +184,7 @@ Coordinators (such as `ln-ui-coordinator`) intercept hash changes and coordinate
 
 ## 🔧 Internals
 
-Source: `components/ln-modal/src/ln-modal.js` (native `<dialog>`-backed). `ln-modal` operates autonomously: trigger buttons (`data-ln-modal-for`), dismiss buttons (`data-ln-modal-close`), and backdrop dismissals are handled directly by the component without requiring external coordinators. Hash-addressing and form-fill orchestration remain optional enhancements handled when `components/ln-ui-coordinator/src/ln-ui-coordinator.js` is present.
+Source: `components/ln-modal/src/ln-modal.js` (native `<dialog>`-backed). `ln-modal` operates autonomously: trigger buttons (`data-ln-modal-for`), dismiss buttons (`data-ln-modal-close`), and native ESC cancellation are handled directly by the component without requiring external coordinators. Mode switching (`data-ln-modal-mode="new|edit"`) is synchronized declaratively from triggers to modal dialogs.
 
 ### Single source of truth
 

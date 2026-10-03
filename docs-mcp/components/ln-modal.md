@@ -62,16 +62,49 @@ Below is a standard template for a simple modal dialog:
 </dialog>
 ```
 
-### Declarative Triggers
+### Declarative Triggers & New/Edit Mode Switching
 
-Triggers communicate with modals via `data-ln-modal-for="modalId"` or URL hash links:
+Triggers communicate with modals via `data-ln-modal-for="modalId"` and optionally transfer `data-ln-modal-mode="new|edit"`:
 
 ```html
-<!-- Declarative trigger button -->
-<button type="button" data-ln-modal-for="simple-modal">Open Modal</button>
+<!-- Trigger: New (opens in "new" mode and resets form) -->
+<button type="button"
+        data-ln-modal-for="user-modal"
+        data-ln-modal-mode="new"
+        data-ln-fill-form="user-form">
+    Add User
+</button>
 
-<!-- Hash deep-link anchor -->
-<a href="#simple-modal">Open via Hash</a>
+<!-- Trigger: Edit (opens in "edit" mode and populates form) -->
+<button type="button"
+        data-ln-modal-for="user-modal"
+        data-ln-modal-mode="edit"
+        data-ln-fill-form="user-form"
+        data-ln-fill-id="42"
+        data-ln-fill-name="Ada Lovelace">
+    Edit User
+</button>
+
+<!-- Target Modal with conditional headers -->
+<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="user-modal">
+    <form id="user-form" data-ln-form>
+        <header>
+            <h3 data-ln-fillable>
+                <span data-ln-modal-when="new">Add User</span>
+                <span data-ln-modal-when="edit">Edit User — <span data-ln-field="name"></span></span>
+            </h3>
+            <button type="button" data-ln-modal-close aria-label="Close">&times;</button>
+        </header>
+        <main>
+            <input type="hidden" name="id">
+            <label>Name <input type="text" name="name" autofocus></label>
+        </main>
+        <footer>
+            <button type="button" data-ln-modal-close>Cancel</button>
+            <button type="submit">Save</button>
+        </footer>
+    </form>
+</dialog>
 ```
 
 ---
