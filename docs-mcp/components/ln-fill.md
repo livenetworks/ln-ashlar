@@ -61,18 +61,28 @@ Below is a typical button that pre-fills a form directly on click:
 </form>
 ```
 
-### Variant 1: Hash-Bound Modal Trigger (Delegated Fill)
+### Variant 1: Modal Trigger with Mode & Form Fill
 
-When using a hash-bound trigger, `ln-fill` skips direct click population and delegates it to the coordinator and request events:
+Triggers can carry both `data-ln-modal-for` and `data-ln-fill-form`, allowing a single click to open a dialog, switch mode, and populate (or reset) the form:
 
 ```html
-<!-- Trigger Anchor (Hash-Bound) -->
-<a href="#edit-modal:42" 
-   data-ln-fill-id="42"
-   data-ln-fill-form="edit-form"
-   data-ln-fill-title="Project Alpha">
+<!-- New Button (Resets form & sets mode="new") -->
+<button type="button"
+        data-ln-modal-for="edit-modal"
+        data-ln-modal-mode="new"
+        data-ln-fill-form="edit-form">
+    New Project
+</button>
+
+<!-- Edit Trigger (Fills form & sets mode="edit") -->
+<button type="button"
+        data-ln-modal-for="edit-modal"
+        data-ln-modal-mode="edit"
+        data-ln-fill-form="edit-form"
+        data-ln-fill-id="42"
+        data-ln-fill-title="Project Alpha">
     Edit Project
-</a>
+</button>
 ```
 
 ---
@@ -145,35 +155,25 @@ Coordinators (e.g. [`ln-ui-coordinator`](./ln-ui-coordinator.md)) call `window.l
 ```mermaid
 sequenceDiagram
     participant User
-    participant Trigger as Button[data-ln-fill-form]
-    participant Coordinator as Coordinator (ln-ui-coordinator)
-    participant FillJS as ln-fill Global listener
-    participant DOM as document DOM
-    participant Form as Form[id="formId"]
+    participant Trigger as Trigger [data-ln-fill-form]
+    participant Modal as Dialog [data-ln-modal]
+    participant FillJS as ln-fill Global Listener
+    participant Form as Form [id="formId"]
     participant Core as ln-core (helpers)
 
-    alt Path A: Click on non-hash trigger
-        User->>Trigger: Click
-        Trigger->>FillJS: Click event bubbles to document
-        Note over FillJS: Read data-ln-fill-* attributes
-        FillJS->>FillJS: Construct camelCased record
-        FillJS->>Core: call window.lnCore.lnFill(Form, record)
-    else Path B: Fill Request Event
-        Coordinator->>FillJS: dispatch ln-fill:request { id: '142' } (bubbles)
-        FillJS->>DOM: Search for element with data-ln-fill-id="142"
-        DOM-->>FillJS: Return source element
-        Note over FillJS: Read data-ln-fill-* attributes from source
-        FillJS->>FillJS: Construct camelCased record
-        FillJS->>Core: call window.lnCore.lnFill(Form, record)
-    end
-    
+    User->>Trigger: Click Trigger
+    Trigger->>Modal: Transfers data-ln-modal-mode & sets data-ln-modal="open"
+    Trigger->>FillJS: Click event bubbles to document
+    Note over FillJS: Read data-ln-fill-* attributes
+    FillJS->>FillJS: Construct record object (or null if empty)
+    FillJS->>Core: call window.lnCore.lnFill(Form, record)
     Core->>Form: dispatch CustomEvent('ln-fill', { detail: record })
-    Form->>Form: populate form fields with values
+    Form->>Form: populate form fields (or reset if null)
 ```
 
 ---
 
 ## 7. Related Components
 
-- [`ln-form`](./ln-form.md) — the primary target for form filling.
-- [`ln-ui-coordinator`](./ln-ui-coordinator.md) — coordinator bridging hash modal opens to `ln-fill` requests.
+- [`ln-modal`](./ln-modal.md) — dialog overlay paired with triggers and mode switching (`data-ln-modal-mode`).
+- [`ln-form`](./ln-form.md) — primary target for form filling, resetting, and method/action switching.

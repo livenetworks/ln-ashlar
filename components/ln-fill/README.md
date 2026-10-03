@@ -89,28 +89,31 @@ No payload attributes → `lnFill(form, null)` → form resets (calls `this.rese
 
 ---
 
-## 4. Composing with `data-ln-modal-for`
+## 4. Composing with `data-ln-modal-for` and `data-ln-modal-mode`
 
-`ln-fill` intentionally does NOT call `e.preventDefault()`. A trigger may
-carry both `data-ln-fill-form` and `data-ln-modal-for` — both document
-listeners fire on the same click independently.
+`ln-fill` intentionally does NOT call `e.preventDefault()`. A trigger may carry both `data-ln-fill-form` and `data-ln-modal-for` (as well as `data-ln-modal-mode="new|edit"`) — both document listeners fire on the same click independently. Triggers can be authored on `<button>` elements or `<a href="#...">` anchor links.
 
 ```html
-<!-- One button fills the form AND opens the modal -->
-<button
+<!-- One button opens the modal in "edit" mode AND fills the form -->
+<button type="button"
     data-ln-modal-for="event-modal"
+    data-ln-modal-mode="edit"
     data-ln-fill-form="event-form"
     data-ln-fill-event-id="42"
     data-ln-fill-title="Annual Conference"
 >Edit</button>
+
+<!-- New button opens the modal in "new" mode AND resets the form -->
+<button type="button"
+    data-ln-modal-for="event-modal"
+    data-ln-modal-mode="new"
+    data-ln-fill-form="event-form"
+>New Event</button>
 ```
 
 Order of side-effects per click (both listeners are on `document`):
-1. `ln-modal` click listener → opens modal, sets `data-ln-modal-mode`.
-2. `ln-fill` click listener → fills form via `lnFill(form, record)`.
-
-### Double-Fill Prevention for Hash-Bound triggers
-If a clickable trigger is an anchor link that points to a hash segment (i.e., its `href` attribute contains `#`, such as `<a href="#event-modal:42" ...>`), `ln-fill`'s click listener will **ignore** the click. The fill process is instead delegated entirely to the `ln-ui-coordinator`, which will map the resulting hash change and `ln-modal:open` event to an `ln-fill:request` event. This prevents redundant, parallel form-filling operations.
+1. `ln-modal` click listener → transfers `data-ln-modal-mode` and opens modal (`data-ln-modal="open"`).
+2. `ln-fill` click listener → extracts attributes and calls `lnCore.lnFill(form, record)` (or `lnFill(form, null)` when no attributes are present, resetting the form for "new" mode).
 
 ---
 
