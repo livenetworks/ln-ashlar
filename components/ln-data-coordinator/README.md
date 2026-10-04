@@ -444,44 +444,15 @@ consumer existed for either).
 
 ---
 
-## 🔔 Toasts
+---
 
-The `ln-store-notify` component has been removed. Toasts now come from two
-independent sources, both funneled through the standard `ln-toast:enqueue`
-window event (consumed by `ln-toast` if present on the page, silently
-ignored otherwise):
+## ⚠️ Error Handling
 
-1. **Success — from the server's response envelope.** When a connector
-   mutation response includes a `message` (see the
-   [ln-api-connector README](../ln-api-connector/README.md) → Mutation
-   Response Envelope), the coordinator's `_toastFromMessage(message)`
-   enqueues it verbatim (`type`/`title`/`body` from the server, defaulting
-   `type` to `'success'`). **No `message` → no toast.** This mirrors
-   `ln-ajax`'s existing `data.message` → `ln-toast:enqueue` precedent
-   exactly.
-2. **Error — from a coordinator markup dictionary.** Error text is never
-   hardcoded in JS. It is authored once per coordinator instance via
-   `data-ln-data-coordinator-dict` child elements (parsed with the same
-   `buildDict()` helper `ln-upload` uses for its dictionary):
-
-   ```html
-   <ul id="documents-module" data-ln-data-coordinator hidden>
-     <li id="documents" data-ln-data-store></li>
-     <li data-ln-api-connector data-ln-api-connector-base-url="/api" data-ln-api-connector-path="/documents"></li>
-
-     <!-- consumed once at init, then removed from the DOM -->
-     <span data-ln-data-coordinator-dict="auth" hidden>Your session expired — please sign in again.</span>
-     <span data-ln-data-coordinator-dict="network" hidden>Could not reach the server — your change is saved locally and will retry.</span>
-     <span data-ln-data-coordinator-dict="conflict" hidden>Someone else updated this record — showing their version.</span>
-     <span data-ln-data-coordinator-dict="rejected" hidden>The server rejected that change.</span>
-   </ul>
-   ```
-
-   Keys are exactly the four buckets from the error reconciliation table:
-   `auth`, `network`, `conflict`, `rejected`. **A missing key is silent —
-   no fallback string is ever synthesized.** If the coordinator has no
-   dictionary at all, `this._dict` is `{}` and every `_toastFromDict` call
-   is a no-op.
+The coordinator emits `ln-data-coordinator:error` whenever a connector or reconciliation operation fails:
+```javascript
+// Detail: { operation: 'connector-error' | 'queue-failed' | ..., error, meta }
+```
+Displaying toast notifications or user-facing messages is the responsibility of the UI layer (`ln-ui-coordinator` or the component initiating the action). The data coordinator remains purely headless and does not manage UI dictionaries or dispatch toasts.
 
 ### Sync ownership
 

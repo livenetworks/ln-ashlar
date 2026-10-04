@@ -225,6 +225,10 @@
 			"description": "Confirmation timeout in seconds before reverting"
 		},
 		{
+			"name": "data-ln-connector",
+			"description": "data-ln-connector attribute"
+		},
+		{
 			"name": "data-ln-couchdb-auth",
 			"description": "Authentication credentials for CouchDB requests"
 		},
@@ -250,9 +254,8 @@
 			"description": "Coordinator name or identifier for data routing"
 		},
 		{
-			"name": "data-ln-data-coordinator-dict",
-			"description": "Marks dictionary container for coordinator translatable messages",
-			"valueSet": "v"
+			"name": "data-ln-data-coordinator-connector",
+			"description": "Selector, identifier, or namespace of the bound connector"
 		},
 		{
 			"name": "data-ln-data-coordinator-filters",
@@ -289,7 +292,7 @@
 		},
 		{
 			"name": "data-ln-data-coordinator-sort-field",
-			"description": "Active sort field property name"
+			"description": "Sort field name"
 		},
 		{
 			"name": "data-ln-data-coordinator-stale",
@@ -768,10 +771,6 @@
 		{
 			"name": "data-ln-list-window-threshold",
 			"description": "Scroll threshold margin in pixels to trigger page fetch"
-		},
-		{
-			"name": "data-ln-mapper",
-			"description": "data-ln-mapper attribute"
 		},
 		{
 			"name": "data-ln-modal",

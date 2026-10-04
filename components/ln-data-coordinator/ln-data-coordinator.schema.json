@@ -16,6 +16,12 @@
 			]
 		},
 		"data-ln-chart-source": {
+			"direction": null,
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
+		"data-ln-connector": {
 			"direction": "author",
 			"sources": [
 				"src/ln-data-coordinator.js"
@@ -36,13 +42,13 @@
 			"type": "string",
 			"description": "Coordinator name or identifier for data routing"
 		},
-		"data-ln-data-coordinator-dict": {
-			"direction": null,
+		"data-ln-data-coordinator-connector": {
+			"direction": "author",
 			"sources": [
 				"src/ln-data-coordinator.js"
 			],
-			"type": "marker",
-			"description": "Marks dictionary container for coordinator translatable messages"
+			"type": "string",
+			"description": "Selector, identifier, or namespace of the bound connector"
 		},
 		"data-ln-data-coordinator-filters": {
 			"direction": "both",
@@ -103,7 +109,7 @@
 				"src/ln-data-coordinator.js"
 			],
 			"type": "string",
-			"description": "Active sort field property name"
+			"description": "Sort field name"
 		},
 		"data-ln-data-coordinator-stale": {
 			"direction": "author",
@@ -139,31 +145,25 @@
 			]
 		},
 		"data-ln-list-source": {
-			"direction": "author",
-			"sources": [
-				"src/ln-data-coordinator.js"
-			]
-		},
-		"data-ln-list-window": {
 			"direction": null,
 			"sources": [
 				"src/ln-data-coordinator.js"
 			]
 		},
-		"data-ln-mapper": {
+		"data-ln-list-window": {
 			"direction": "author",
 			"sources": [
 				"src/ln-data-coordinator.js"
 			]
 		},
 		"data-ln-options": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-data-coordinator.js"
 			]
 		},
 		"data-ln-stat": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-data-coordinator.js"
 			]
@@ -175,13 +175,13 @@
 			]
 		},
 		"data-ln-table-source": {
-			"direction": "author",
+			"direction": null,
 			"sources": [
 				"src/ln-data-coordinator.js"
 			]
 		},
 		"data-ln-table-window": {
-			"direction": null,
+			"direction": "author",
 			"sources": [
 				"src/ln-data-coordinator.js"
 			]

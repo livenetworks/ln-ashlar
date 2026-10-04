@@ -811,7 +811,7 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords, checkNe
 	_component.prototype.count = function (filters) {
 		const hasFilters = filters && Object.keys(filters).length > 0;
 		if (!hasFilters) {
-			if (this.totalCount != null) return Promise.resolve(this.totalCount);
+			if (this.windowed && this.totalCount != null) return Promise.resolve(this.totalCount);
 			return _countRecords(this._name);
 		}
 		return _getAllRecords(this._name).then(records => filterRecords(records, filters).length);

@@ -716,26 +716,6 @@
 			"detail": "{ operation: String, error, meta: Object|null }` | `{ operation: 'query', kind: String, store: String, target: HTMLElement, error }",
 			"source": "static"
 		},
-		"ln-data-coordinator:offline": {
-			"emitted_by": [
-				"ln-data-coordinator"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched on `document` once per browser `online` / `offline` event; `online` also runs a sync check on every coordinator.",
-			"detail": "{}",
-			"source": "static"
-		},
-		"ln-data-coordinator:online": {
-			"emitted_by": [
-				"ln-data-coordinator"
-			],
-			"listened_by": [],
-			"cancelable": false,
-			"description": "Dispatched on `document` once per browser `online` / `offline` event; `online` also runs a sync check on every coordinator.",
-			"detail": "{}",
-			"source": "static"
-		},
 		"ln-data-coordinator:request-bulk-delete": {
 			"emitted_by": [],
 			"listened_by": [
@@ -949,16 +929,14 @@
 			"source": "static"
 		},
 		"ln-data-store:request-sync-failed": {
-			"emitted_by": [
-				"ln-data-coordinator"
-			],
+			"emitted_by": [],
 			"listened_by": [
 				"ln-data-store"
 			],
 			"cancelable": false,
 			"description": "The coordinator reports a failed connector sync. Clears `isSyncing` and re-emits it as `ln-data-store:sync-error`.",
 			"detail": "{ error: String, status: Number }",
-			"source": "mixed"
+			"source": "dynamic-allowlist"
 		},
 		"ln-data-store:request-update": {
 			"emitted_by": [
@@ -2140,7 +2118,6 @@
 		},
 		"ln-toast:enqueue": {
 			"emitted_by": [
-				"ln-data-coordinator",
 				"ln-ui-coordinator"
 			],
 			"listened_by": [

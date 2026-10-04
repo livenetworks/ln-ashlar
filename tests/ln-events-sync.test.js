@@ -60,9 +60,8 @@ test('generated catalogs have strict schemas, shape preservation, and accurate p
 	assert.equal(byComponent.$schema, 'http://json-schema.org/draft-07/schema#');
 	assert.equal(index.$schema, 'http://json-schema.org/draft-07/schema#');
 
-	// Verify all entries in flat index
 	const eventNames = Object.keys(index.events);
-	assert.equal(eventNames.length, 243, 'Flat index event count must be exactly 243');
+	assert.equal(eventNames.length, 241, 'Flat index event count must be exactly 241');
 
 	const validIndexSources = new Set(['static', 'dynamic-allowlist', 'mixed']);
 	const validByCompSources = new Set(['static', 'dynamic-allowlist']);
@@ -116,7 +115,7 @@ test('generated catalogs have strict schemas, shape preservation, and accurate p
 
 	// 55 allowlist entries across by-component (29 dc emits + 18 dc listens + 5 ds listens + 3 ln-fill)
 	assert.equal(dynamicAllowlistCount, 55, 'by-component dynamic-allowlist entries count must be exactly 55');
-	assert.equal(staticCount, 297, 'by-component static entries count must be exactly 297');
+	assert.equal(staticCount, 293, 'by-component static entries count must be exactly 293');
 
 	// Acceptance criteria 1, 2, 3: ln-table:set-data
 	const dcEmits = byComponent.components['ln-data-coordinator'].emits;

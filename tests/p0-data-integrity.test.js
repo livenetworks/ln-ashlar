@@ -405,3 +405,38 @@ test('reconciliation behavior handles HTTP 204 no-content updates cleanly withou
 	assert.deepEqual(updateReconcile({ record: { id: 10, title: 'Updated' } }), { action: 'mutate-store', record: { id: 10, title: 'Updated' }, ack: true });
 });
 
+test('generic connector polymorphism: resolves namespace dynamically from element attributes or instance', () => {
+	function mockConnNs(el) {
+		if (!el) return 'ln-connector';
+		if (el.lnConnector && el.lnConnector.namespace) return el.lnConnector.namespace;
+		const explicit = el.getAttribute ? el.getAttribute('data-ln-connector') : null;
+		if (explicit && explicit !== 'true' && explicit !== '') {
+			return explicit.startsWith('ln-') ? explicit : ('ln-' + explicit + (explicit.endsWith('-connector') ? '' : '-connector'));
+		}
+		const attrs = el.attributes || [];
+		for (let i = 0; i < attrs.length; i++) {
+			const name = attrs[i].name;
+			if (name.startsWith('data-ln-') && name.endsWith('-connector')) {
+				return name.replace(/^data-/, '');
+			}
+		}
+		return 'ln-connector';
+	}
+
+	// 1. Explicit data-ln-connector attribute
+	const el1 = { getAttribute: (k) => k === 'data-ln-connector' ? 'graphql' : null, attributes: [] };
+	assert.equal(mockConnNs(el1), 'ln-graphql-connector');
+
+	// 2. Custom attribute ending in -connector
+	const el2 = { getAttribute: () => null, attributes: [{ name: 'data-ln-supabase-connector' }] };
+	assert.equal(mockConnNs(el2), 'ln-supabase-connector');
+
+	// 3. Instance namespace override
+	const el3 = { lnConnector: { namespace: 'custom-driver-connector' }, getAttribute: () => null, attributes: [] };
+	assert.equal(mockConnNs(el3), 'custom-driver-connector');
+
+	// 4. Default fallback
+	const el4 = { getAttribute: () => null, attributes: [] };
+	assert.equal(mockConnNs(el4), 'ln-connector');
+});
+

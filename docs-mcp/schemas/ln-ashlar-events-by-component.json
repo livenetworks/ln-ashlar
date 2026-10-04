@@ -655,20 +655,6 @@
 					"source": "static"
 				},
 				{
-					"name": "ln-data-coordinator:offline",
-					"cancelable": false,
-					"description": "Dispatched on `document` once per browser `online` / `offline` event; `online` also runs a sync check on every coordinator.",
-					"detail": "{}",
-					"source": "static"
-				},
-				{
-					"name": "ln-data-coordinator:online",
-					"cancelable": false,
-					"description": "Dispatched on `document` once per browser `online` / `offline` event; `online` also runs a sync check on every coordinator.",
-					"detail": "{}",
-					"source": "static"
-				},
-				{
 					"name": "ln-data-store:request-bulk-delete",
 					"cancelable": false,
 					"description": "Optimistically deletes multiple records.",
@@ -687,13 +673,6 @@
 					"cancelable": false,
 					"description": "Optimistically deletes a record.",
 					"detail": "{ id: ID }",
-					"source": "static"
-				},
-				{
-					"name": "ln-data-store:request-sync-failed",
-					"cancelable": false,
-					"description": "Dispatched to the store when the connector's sync fails.",
-					"detail": "{ error: String, status: Number }",
 					"source": "static"
 				},
 				{
@@ -786,13 +765,6 @@
 					"description": "Toggles the `.ln-table--loading` class (Data-Driven mode).",
 					"detail": "{ loading: Boolean }",
 					"source": "dynamic-allowlist"
-				},
-				{
-					"name": "ln-toast:enqueue",
-					"cancelable": false,
-					"description": "Dispatched to `window` for success/error alerts.",
-					"detail": "{ message: String, type: String }",
-					"source": "static"
 				},
 				{
 					"name": "ln-websocket-connector:request-bulk-delete",
