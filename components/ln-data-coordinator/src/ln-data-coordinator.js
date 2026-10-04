@@ -543,6 +543,7 @@ import { MutationReceipts } from './mutation-receipts';
 
 			// ─── Connector Response Handlers (direct + queued paths) ──
 			connFetched: function (e) {
+				if (!e.detail) return;
 				const meta = e.detail.meta || {};
 				const children = self.findChildren();
 
@@ -625,8 +626,13 @@ import { MutationReceipts } from './mutation-receipts';
 			},
 
 			connCreated: function (e) {
+				if (!e.detail) return;
 				const children = self.findChildren();
 				const meta = e.detail.meta || {};
+				if (!e.detail.record) {
+					self._reportReconciliationError('create-empty-response', new Error('Create response missing record payload'), meta);
+					return;
+				}
 				const serverRecord = self.mapper.ingress(e.detail.record);
 				const reconciled = children.storeEl
 					? self._requestStoreMutation(children, 'update', { id: meta.tempId, data: serverRecord })
@@ -649,10 +655,11 @@ import { MutationReceipts } from './mutation-receipts';
 			},
 
 			connUpdated: function (e) {
+				if (!e.detail) return;
 				const children = self.findChildren();
 				const meta = e.detail.meta || {};
-				const serverRecord = self.mapper.ingress(e.detail.record);
-				const reconciled = children.storeEl
+				const serverRecord = e.detail.record ? self.mapper.ingress(e.detail.record) : null;
+				const reconciled = (children.storeEl && serverRecord)
 					? self._requestStoreMutation(children, 'update', { id: meta.id, data: serverRecord })
 					: Promise.resolve();
 
@@ -669,19 +676,21 @@ import { MutationReceipts } from './mutation-receipts';
 			},
 
 			connDeleted: function (e) {
+				const detail = e.detail || {};
 				const children = self.findChildren();
-				const meta = e.detail.meta || {};
+				const meta = detail.meta || {};
 				// Optimistic delete already applied; no local reconciliation.
-				self._toastFromMessage(e.detail.message); // null on 204 → silent
+				self._toastFromMessage(detail.message); // null on 204 → silent
 				if (meta.queued && children.queue) {
 					dispatch(children.queueEl, 'ln-api-queue:ack', { entryId: meta.entryId });
 				}
 			},
 
 			connBulkDeleted: function (e) {
+				const detail = e.detail || {};
 				const children = self.findChildren();
-				const meta = e.detail.meta || {};
-				self._toastFromMessage(e.detail.message);
+				const meta = detail.meta || {};
+				self._toastFromMessage(detail.message);
 				if (meta.queued && children.queue) {
 					dispatch(children.queueEl, 'ln-api-queue:ack', { entryId: meta.entryId });
 				}

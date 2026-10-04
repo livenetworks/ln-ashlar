@@ -1,6 +1,6 @@
 import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, decryptData, defineAttrs, attrSpec, attrInt, attrBool, attrList } from '../../ln-core';
 import { createWindowIndex } from './window-index.js';
-import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from './data-store-model.js';
+import { aggregateRecords, decorateRecords, filterRecords, queryRecords, checkNeedsUpgrade, normalizeSyncError } from './data-store-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-data-store';
@@ -66,7 +66,7 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 
 		_dbReady = new Promise(resolve => {
 			if (typeof indexedDB === 'undefined') {
-				console.warn('[ln-data-store] IndexedDB not available — falling back to in-memory store');
+				console.warn('[ln-data-store] IndexedDB is not available in this environment');
 				return resolve(null);
 			}
 
@@ -75,14 +75,24 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 			const probe = indexedDB.open(DB_NAME);
 
 			probe.onerror = () => {
-				console.warn('[ln-data-store] IndexedDB open failed — falling back to in-memory store');
+				console.warn('[ln-data-store] IndexedDB open failed');
 				resolve(null);
 			};
 
 			probe.onsuccess = e => {
 				const db = e.target.result;
 				const existing = Array.from(db.objectStoreNames);
-				const needsUpgrade = !existing.includes(META_STORE) || requiredNames.some(name => !existing.includes(name));
+				const existingRequired = requiredNames.filter(name => existing.includes(name));
+
+				let existingIndexMap = {};
+				if (existingRequired.length > 0) {
+					const tx = db.transaction(existingRequired, 'readonly');
+					for (const name of existingRequired) {
+						existingIndexMap[name] = Array.from(tx.objectStore(name).indexNames);
+					}
+				}
+
+				const needsUpgrade = checkNeedsUpgrade(existing, required, existingIndexMap, META_STORE);
 
 				if (!needsUpgrade) {
 					_setupVersionChangeHandler(db);
@@ -94,18 +104,35 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 				db.close();
 
 				const upgrade = indexedDB.open(DB_NAME, currentVersion + 1);
+				let settled = false;
+				let blockedTimeout = null;
 
 				upgrade.onblocked = () => {
 					console.warn('[ln-data-store] Database upgrade blocked — waiting for other tabs to close connection');
+					dispatch(document, 'ln-data-store:blocked', { db: DB_NAME });
+					if (!blockedTimeout) {
+						blockedTimeout = setTimeout(() => {
+							if (settled) return;
+							console.warn('[ln-data-store] Database upgrade timed out while blocked');
+							settled = true;
+							_dbReady = null;
+							resolve(null);
+						}, 5000);
+					}
 				};
 
 				upgrade.onerror = () => {
+					if (settled) return;
+					if (blockedTimeout) clearTimeout(blockedTimeout);
+					settled = true;
+					_dbReady = null;
 					console.warn('[ln-data-store] Database upgrade failed');
 					resolve(null);
 				};
 
 				upgrade.onupgradeneeded = e => {
 					const db = e.target.result;
+					const tx = e.target.transaction;
 					if (!db.objectStoreNames.contains(META_STORE)) {
 						db.createObjectStore(META_STORE, { keyPath: 'key' });
 					}
@@ -115,11 +142,24 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 							for (const idx of required[storeName].indexes) {
 								store.createIndex(idx, idx, { unique: false });
 							}
+						} else {
+							const store = tx.objectStore(storeName);
+							for (const idx of required[storeName].indexes) {
+								if (!store.indexNames.contains(idx)) {
+									store.createIndex(idx, idx, { unique: false });
+								}
+							}
 						}
 					}
 				};
 
 				upgrade.onsuccess = e => {
+					if (settled) {
+						if (e.target.result) e.target.result.close();
+						return;
+					}
+					if (blockedTimeout) clearTimeout(blockedTimeout);
+					settled = true;
 					const db = e.target.result;
 					_setupVersionChangeHandler(db);
 					_db = db;
@@ -791,12 +831,12 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 		meta = meta || {};
 		const self = this;
 		if (self._windowIndex && meta.queryGen != null && meta.queryGen !== self._windowIndex.queryGen) {
-			return Promise.resolve();
+			return Promise.resolve({ ok: true, stale: true });
 		}
 
-		const hasChanges = upsertedRecords.length > 0 || deletedIds.length > 0;
-
-		let chain = Promise.resolve();
+		let chain = _getDb().then(db => {
+			if (!db) throw new Error('IndexedDB unavailable');
+		});
 		if (upsertedRecords.length > 0) chain = chain.then(() => _putBulk(self._name, upsertedRecords));
 		if (deletedIds.length > 0) chain = chain.then(() => _deleteBulk(self._name, deletedIds));
 
@@ -836,9 +876,16 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 					meta: meta
 				});
 			}
+			return { ok: true };
 		}).catch(err => {
 			self.isSyncing = false;
+			const errorMsg = (err && err.message) ? err.message : String(err);
 			console.error('[ln-data-store] applySync failed:', err);
+			dispatch(self.dom, 'ln-data-store:sync-error', {
+				store: self._name,
+				error: errorMsg
+			});
+			return normalizeSyncError(err);
 		});
 	};
 
@@ -957,14 +1004,14 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords } from '
 
 	// The IndexedDB schema and the store's registered name are fixed at open
 	// time: createIndex is only legal inside a versionchange transaction
-	// (see onupgradeneeded, :85-94). A post-init edit is recorded on the host
+	// (see onupgradeneeded). A post-init edit is recorded on the host
 	// for the dev stylesheet to surface; nothing is applied.
 	function _markFrozen(el, attrName) {
 		el.setAttribute(FROZEN_ATTR, attrName);
 	}
 
 	// Shrinking the window drops positions; the records behind them stop being
-	// held, exactly as on ingest (:757-758), so they leave IndexedDB too.
+	// held, exactly as on ingest, so they leave IndexedDB too.
 	function _applyWindowSize(el) {
 		const inst = el[DOM_ATTRIBUTE];
 		if (!inst._windowIndex) return;

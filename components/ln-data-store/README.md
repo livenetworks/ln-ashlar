@@ -107,7 +107,7 @@ store.setPresenters({
 | `count(filters)` | `Promise<Number>` | Returns the total count of records. If filters are provided, returns the filtered count. |
 | `aggregate(field, fn)` | `Promise<Number>` | Performs aggregation. `fn` must be `'count'`, `'sum'`, or `'avg'`. |
 | `setPresenters(presenters)` | `void` | Registers presenters (decorators) for computed fields. |
-| `applySync(upserted, deleted, syncedAt)` | `Promise<void>` | Feeds synchronization delta updates into the cache. |
+| `applySync(upserted, deleted, syncedAt, meta)` | `Promise<{ ok: boolean, error?: string }>` | Feeds synchronization delta updates into the cache. Resolves `{ ok: true }` on success, or `{ ok: false, error }` on failure while dispatching `ln-data-store:sync-error`. |
 | `forceSync()` | `void` | Dispatches `ln-data-store:request-remote-sync` with the current last sync timestamp. |
 | `fullReload()` | `Promise<void>` | Clears the IndexedDB store, resets sync metadata, and triggers a sync. |
 | `destroy()` | `void` | Cleans up the instance, removes event listeners, and deletes the DOM reference. |
@@ -192,7 +192,8 @@ These events bubble up and can be listened to by coordinators or rendering views
 | `ln-data-store:updated` | `{ store, record, previous, requestId? }` | Emitted after optimistic update or id-swap rekey. |
 | `ln-data-store:deleted` | `{ store, id \| ids, requestId? }` | Emitted after optimistic delete or bulk delete. |
 | `ln-data-store:synced` | `{ store, added, deleted, changed }` | Emitted after subsequent delta sync merges. |
-| `ln-data-store:sync-error` | `{ store, error, status }` | A connector sync failed; `isSyncing` has been cleared so online/visibility retry can proceed. |
+| `ln-data-store:sync-error` | `{ store, error, status? }` | A sync failed (remote fetch or local storage commit). `status` is present on remote HTTP failures and omitted on local commit failures. |
+| `ln-data-store:blocked` | `{ db }` | Emitted on document if an IndexedDB version upgrade is blocked by open connections in other tabs. |
 | `ln-data-store:mutation-error` | `{ store, action, requestId, error }` | A serialized local mutation failed. `requestId` lets a coordinator correlate reconciliation failures. |
 
 ### Global System Events

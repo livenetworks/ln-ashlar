@@ -82,9 +82,9 @@ import { registerComponent, dispatch } from '../../ln-core';
 			if (el && el.hasAttribute && (el.hasAttribute('data-ln-table') || el.tagName === 'TABLE')) return el;
 			const targetId = (e.detail && e.detail.targetId) || (el && el.id);
 			if (!targetId) return null;
-			return dom.querySelector('[data-ln-table-source="' + targetId + '"]') ||
-			       dom.querySelector('[data-ln-table="' + targetId + '"]') ||
-			       dom.querySelector('#' + targetId) ||
+			const safeId = (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') ? CSS.escape(targetId) : targetId.replace(/(["\\])/g, '\\$1');
+			return dom.querySelector('[data-ln-table-source="' + safeId + '"]') ||
+			       dom.querySelector('[data-ln-table="' + safeId + '"]') ||
 			       (dom.id === targetId ? dom : null) ||
 			       document.getElementById(targetId);
 		}

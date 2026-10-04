@@ -63,9 +63,17 @@ import { dispatch, dispatchCancelable, computePlacement, measureHidden, isVisibl
 			self.toggle(trigger);
 		};
 
+		this._onNativeToggle = function (e) {
+			if (e.newState === 'closed' && self.isOpen) {
+				self._applyClose();
+				self.dom.setAttribute(DOM_SELECTOR, 'closed');
+			}
+		};
+
 		dom.addEventListener('ln-popover:request-open', this._onRequestOpen);
 		dom.addEventListener('ln-popover:request-close', this._onRequestClose);
 		dom.addEventListener('ln-popover:request-toggle', this._onRequestToggle);
+		dom.addEventListener('toggle', this._onNativeToggle);
 
 		// Make the popover container itself programmatically focusable
 		// as a fallback when it has no focusable children.
@@ -242,6 +250,7 @@ import { dispatch, dispatchCancelable, computePlacement, measureHidden, isVisibl
 		this.dom.removeEventListener('ln-popover:request-open', this._onRequestOpen);
 		this.dom.removeEventListener('ln-popover:request-close', this._onRequestClose);
 		this.dom.removeEventListener('ln-popover:request-toggle', this._onRequestToggle);
+		this.dom.removeEventListener('toggle', this._onNativeToggle);
 		if (this.isOpen) this._applyClose();
 		delete this.dom[DOM_ATTRIBUTE];
 	};

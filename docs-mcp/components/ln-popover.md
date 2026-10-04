@@ -28,7 +28,7 @@ Key responsibilities include:
 - **Dynamic Positioning:** Computing exact absolute viewport coordinates relative to the trigger using `computePlacement` and `measureHidden`, aligning the popover appropriately with support for auto-flip (reversing directions when edge collisions occur).
 - **LIFO ESC Management:** Maintaining a Last-In-First-Out (LIFO) open stack in JavaScript to ensure that pressing `Escape` dismisses the top-most active popover sequentially.
 - **Initial Focus:** Focusing the first visible interactive input/button inside the popover on open, falling back to the popover panel itself.
-- **Outside Click Dismissal:** Listening for document clicks outside the popover and trigger elements to automatically close the active popover.
+- **Outside Click Dismissal & Native Toggle Sync:** Listening for document clicks outside the popover and trigger elements to automatically close the active popover. Additionally, listens for the browser's native `toggle` event (`e.newState === 'closed'`) to instantly synchronize internal state and DOM attributes if dismissed directly by the browser's Popover API.
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

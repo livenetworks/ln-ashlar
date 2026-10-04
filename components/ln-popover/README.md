@@ -149,6 +149,10 @@ Set `isOpen = true`, store `trigger` (`null` if opened via direct attribute muta
 
 Clears `isOpen`, removes the outside-click/scroll/resize listeners, clears inline `top`/`left` and the placement attribute, sets `aria-expanded="false"`, exits the top layer via `hidePopover()`, splices itself from `openStack` (removing the ESC listener if the stack is now empty), then restores focus to the trigger **only if** the trigger was the previously-focused element (click→Escape, click→programmatic close) or `activeElement === document.body` (Escape from inside the popover, outside-click on inert whitespace) — an outside-click landing on another focusable element keeps that element's focus. Dispatches `ln-popover:close`.
 
+### Native Popover API Light Dismiss Synchronization
+
+The component attaches a native `toggle` event listener to the popover element. When the browser closes the popover via native light dismiss (`e.newState === 'closed'`), `ln-popover` detects this change and immediately runs `_applyClose()` and updates `data-ln-popover="closed"`. This prevents state desynchronization without firing an impossible cancelable `before-close` event (the browser has already completed the closing operation).
+
 ### Focus management
 
 A disclosure pattern, not a modal — no Tab trap. Because the popover is promoted to the top layer purely for rendering, it remains in its authored DOM position, so Tab order follows the markup rather than jumping to the end of `<body>`. `tabindex="-1"` and `role="dialog"` are set automatically at construction so the container itself is a valid focus target when there's no focusable child.

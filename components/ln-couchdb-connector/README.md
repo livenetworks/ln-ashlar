@@ -177,3 +177,7 @@ Ingress: every fetched/created/updated document gets `id = _id` before reaching 
 ### Envelope unwrap
 
 Same `{message, content}` presence-check as `ln-api-connector` (see its README) — `content` replaces the bare CouchDB body when present, `message` rides opaquely on the `:created`/`:updated`/`:deleted`/`:bulk-deleted` event detail. Raw CouchDB never sends this envelope, so a direct CouchDB backend never toasts; only a proxy/gateway that wraps responses can opt in.
+
+### Async Cancellation & Lifecycle (`destroy()`)
+
+In `destroy()`, any in-flight delta changes feed fetch (`fetchDelta`) is aborted via an internal `AbortController` (`_deltaController`), and its aborted promise rejection is safely ignored to prevent uncaught errors or stale event dispatches after element teardown. In accordance with offline sync data integrity rules, mutation requests (POST/PUT/DELETE) are not aborted mid-flight to avoid ambiguous states where the remote database commits a write while the client treats it as aborted.

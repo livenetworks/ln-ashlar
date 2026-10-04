@@ -776,6 +776,16 @@
 			"detail": "{ id: ID, data: Object, expected_version?: String }",
 			"source": "static"
 		},
+		"ln-data-store:blocked": {
+			"emitted_by": [
+				"ln-data-store"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "Emitted on `document` if an IndexedDB version upgrade is blocked by open connections in other tabs.",
+			"detail": "{ db: String }",
+			"source": "static"
+		},
 		"ln-data-store:created": {
 			"emitted_by": [
 				"ln-data-store"
@@ -968,8 +978,8 @@
 			],
 			"listened_by": [],
 			"cancelable": false,
-			"description": "A connector sync failed; `isSyncing` is cleared so a later retry can run.",
-			"detail": "{ store: String, error: String, status: Number }",
+			"description": "A connector sync or local cache commit failed; `isSyncing` is cleared so a later retry can run.",
+			"detail": "{ store: String, error: String, status?: Number }",
 			"source": "static"
 		},
 		"ln-data-store:synced": {
@@ -1495,7 +1505,7 @@
 				"ln-ui-coordinator"
 			],
 			"cancelable": false,
-			"description": "Dispatched after modal closes, before focus restoration.",
+			"description": "Dispatched after modal closes and body scroll lock is released.",
 			"detail": "{ modalId: String, target: HTMLElement }",
 			"source": "static"
 		},
@@ -1508,7 +1518,7 @@
 			],
 			"cancelable": false,
 			"description": "Dispatched once modal is natively open, body scroll locked, and initial focus set.",
-			"detail": "{ modalId: String, target: HTMLElement, hashNs: String?, param: String? }",
+			"detail": "{ modalId: String, target: HTMLElement }",
 			"source": "static"
 		},
 		"ln-modal:request-close": {

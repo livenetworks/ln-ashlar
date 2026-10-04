@@ -160,6 +160,7 @@ import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './
 		for (const k in this.mapPanels) {
 			const panel = this.mapPanels[k];
 			const show = (k === key);
+			panel.hidden = !show;
 			panel.classList.toggle("hidden", !show);
 			panel.setAttribute("aria-hidden", show ? "false" : "true");
 		}

@@ -47,7 +47,7 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible, shouldIgnor
 			const targetId = trigger.getAttribute(TRIGGER_ATTRIBUTE);
 			if (!targetId) return;
 
-			const target = document.getElementById(targetId) || document.querySelector('[' + DOM_SELECTOR + '="' + targetId + '"]');
+			const target = document.getElementById(targetId);
 			if (!target || !target[DOM_ATTRIBUTE]) return;
 
 			e.preventDefault();
@@ -90,6 +90,13 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible, shouldIgnor
 			self.dom.setAttribute(DOM_SELECTOR, 'close');
 		};
 
+		// Native dialog close synchronization (e.g. <form method="dialog"> or dialog.close())
+		this._onClose = function () {
+			if (!self.isOpen || self.dom.getAttribute(DOM_SELECTOR) !== 'open' || self.dom.open) return;
+			self._isNativeClosing = true;
+			self.dom.setAttribute(DOM_SELECTOR, 'close');
+		};
+
 		// Dismiss trigger buttons inside modal [data-ln-modal-close]
 		this._onClickClose = function (e) {
 			const closeBtn = e.target.closest('[' + CLOSE_TRIGGER_ATTRIBUTE + ']');
@@ -102,6 +109,7 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible, shouldIgnor
 		this.dom.addEventListener('ln-modal:request-open', this._onRequestOpen);
 		this.dom.addEventListener('ln-modal:request-close', this._onRequestClose);
 		this.dom.addEventListener('cancel', this._onCancel);
+		this.dom.addEventListener('close', this._onClose);
 		this.dom.addEventListener('click', this._onClickClose);
 
 		instances.add(this);
@@ -136,6 +144,7 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible, shouldIgnor
 		this.dom.removeEventListener('ln-modal:request-open', this._onRequestOpen);
 		this.dom.removeEventListener('ln-modal:request-close', this._onRequestClose);
 		this.dom.removeEventListener('cancel', this._onCancel);
+		this.dom.removeEventListener('close', this._onClose);
 		this.dom.removeEventListener('click', this._onClickClose);
 
 		instances.delete(this);
@@ -161,10 +170,18 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible, shouldIgnor
 		const instance = el[DOM_ATTRIBUTE];
 		if (!instance) return;
 
+		const isNativeClose = Boolean(instance._isNativeClosing);
+		instance._isNativeClosing = false;
+
 		const value = el.getAttribute(DOM_SELECTOR);
 		const shouldBeOpen = value === 'open';
 
-		if (shouldBeOpen === instance.isOpen) return;
+		if (shouldBeOpen === instance.isOpen) {
+			if (shouldBeOpen && el.isConnected && !el.open && typeof el.showModal === 'function') {
+				el.showModal();
+			}
+			return;
+		}
 
 		if (shouldBeOpen) {
 			const before = dispatchCancelable(el, 'ln-modal:before-open', { modalId: el.id, target: el });
@@ -193,22 +210,25 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible, shouldIgnor
 
 			dispatch(el, 'ln-modal:open', { modalId: el.id, target: el });
 		} else {
-			const before = dispatchCancelable(el, 'ln-modal:before-close', { modalId: el.id, target: el });
-			if (before.defaultPrevented) {
-				el.setAttribute(DOM_SELECTOR, 'open');
-				return;
+			if (!isNativeClose) {
+				const before = dispatchCancelable(el, 'ln-modal:before-close', { modalId: el.id, target: el });
+				if (before.defaultPrevented) {
+					el.setAttribute(DOM_SELECTOR, 'open');
+					return;
+				}
 			}
 			instance.isOpen = false;
 			if (el.hasAttribute('data-ln-modal-mode')) {
 				el.setAttribute('data-ln-modal-mode', 'new');
 			}
-			dispatch(el, 'ln-modal:close', { modalId: el.id, target: el });
 
-			if (typeof el.close === 'function') el.close();
+			if (typeof el.close === 'function' && el.open) el.close();
 
 			if (!document.querySelector('[' + DOM_SELECTOR + '="open"]')) {
 				document.body.classList.remove('ln-modal-open');
 			}
+
+			dispatch(el, 'ln-modal:close', { modalId: el.id, target: el });
 		}
 	}
 

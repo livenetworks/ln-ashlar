@@ -2,7 +2,7 @@
 
 > Applied to a wrapper `<section data-ln-tabs>` containing trigger buttons (`data-ln-tab="key"`) and panels (`data-ln-panel="key"`).
 > On trigger `click`, it writes `data-ln-tabs-active="key"` on the wrapper. An attribute observer synchronizes the DOM:
-> toggling `class="hidden"` and `aria-hidden` on panels, and updating `aria-selected` on triggers. When configured with an `id`
+> toggling the HTML5 `hidden` boolean property, `class="hidden"`, and `aria-hidden` on panels, and updating `aria-selected` on triggers. When configured with an `id`
 > and anchor triggers (`<a href="#id:key">`), it synchronizes the active tab with `window.location.hash` for deep-linking and browser history persistence.
 
 ---
@@ -206,7 +206,7 @@ Each instance caches `tabs[]`/`panels[]` and derived `mapTabs`/`mapPanels` (keye
 ### Activation order (`_applyActive`)
 
 1. An invalid key (typo, removed panel) silently resolves to `defaultKey` — permissive by design, the component is downstream of attribute writes.
-2. Tab buttons flip `data-active`/`aria-selected` first, then panels flip `.hidden`/`aria-hidden` — natural read order for assistive tech.
+2. Tab buttons flip `data-active`/`aria-selected` first, then panels toggle boolean `hidden`, `.hidden` class, and `aria-hidden` — natural read order for assistive tech.
 3. Auto-focus is deferred one `setTimeout(0)` (the panel was just un-hidden; layout hasn't settled) with `{ preventScroll: true }`.
 4. Event dispatch happens after all DOM/ARIA writes; persistence save happens last, only when `data-ln-persist` is present and hash mode is off.
 
