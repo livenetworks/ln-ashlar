@@ -17,6 +17,7 @@ import { dispatch, registerComponent } from '../../ln-core';
 		this.dom = dom;
 
 		this._onToggleOpen = function (e) {
+			if (!e.detail || !e.detail.target) return;
 			if (e.detail.target.closest('[data-ln-accordion]') !== dom) return;
 			const toggles = dom.querySelectorAll('[data-ln-toggle]');
 			for (const el of toggles) {

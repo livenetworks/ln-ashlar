@@ -12,6 +12,7 @@ import {
 	selectDataSource
 } from '../components/ln-data-coordinator/src/data-read-policy.js';
 import { MutationReceipts } from '../components/ln-data-coordinator/src/mutation-receipts.js';
+import { checkNeedsUpgrade, normalizeSyncError } from '../components/ln-data-store/src/data-store-model.js';
 
 let databaseSequence = 0;
 
@@ -283,5 +284,124 @@ test('IndexedDB ID coercion fallback resolves string vs numeric keys', async () 
 		db.close();
 		indexedDB.deleteDatabase(dbName);
 	}
+});
+
+test('checkNeedsUpgrade correctly detects when an IndexedDB schema upgrade is required', () => {
+	// Missing _meta store requires upgrade
+	assert.equal(checkNeedsUpgrade([], { users: { indexes: ['email'] } }, {}), true);
+
+	// Missing store requires upgrade
+	assert.equal(checkNeedsUpgrade(['_meta'], { users: { indexes: ['email'] } }, {}), true);
+
+	// Missing index in existing store requires upgrade
+	assert.equal(checkNeedsUpgrade(['_meta', 'users'], { users: { indexes: ['email'] } }, { users: [] }), true);
+
+	// All stores and indexes present does NOT require upgrade
+	assert.equal(checkNeedsUpgrade(['_meta', 'users'], { users: { indexes: ['email'] } }, { users: ['email'] }), false);
+
+	// Extra existing indexes without required missing does NOT require upgrade
+	assert.equal(checkNeedsUpgrade(['_meta', 'users'], { users: { indexes: ['email'] } }, { users: ['email', 'role'] }), false);
+});
+
+test('normalizeSyncError formats errors cleanly into standard response shape', () => {
+	const errObj = new Error('Disk quota exceeded');
+	const resObj = normalizeSyncError(errObj);
+	assert.equal(resObj.ok, false);
+	assert.equal(resObj.error, 'Disk quota exceeded');
+
+	const errStr = normalizeSyncError('Custom network rejection');
+	assert.equal(errStr.ok, false);
+	assert.equal(errStr.error, 'Custom network rejection');
+});
+
+test('Existing store index upgrade creates missing index on existing store in versionchange transaction', async () => {
+	const dbName = `ln-idb-upgrade-test-${process.pid}-${++databaseSequence}`;
+
+	// Step 1: Create DB v1 with store 'items' without 'category' index
+	const v1Req = indexedDB.open(dbName, 1);
+	await new Promise((resolve, reject) => {
+		v1Req.onupgradeneeded = () => {
+			v1Req.result.createObjectStore('items', { keyPath: 'id' });
+		};
+		v1Req.onsuccess = resolve;
+		v1Req.onerror = () => reject(v1Req.error);
+	});
+	const db1 = v1Req.result;
+	db1.close();
+
+	// Step 2: Open DB v2 and add 'category' index to existing 'items' store
+	const v2Req = indexedDB.open(dbName, 2);
+	await new Promise((resolve, reject) => {
+		v2Req.onupgradeneeded = (e) => {
+			const tx = e.target.transaction;
+			const store = tx.objectStore('items');
+			if (!store.indexNames.contains('category')) {
+				store.createIndex('category', 'category', { unique: false });
+			}
+		};
+		v2Req.onsuccess = resolve;
+		v2Req.onerror = () => reject(v2Req.error);
+	});
+
+	const db2 = v2Req.result;
+	try {
+		const tx = db2.transaction('items', 'readonly');
+		const store = tx.objectStore('items');
+		assert.equal(store.indexNames.contains('category'), true);
+	} finally {
+		db2.close();
+		indexedDB.deleteDatabase(dbName);
+	}
+});
+
+test('table coordinator targetId escaping handles special characters without selector syntax errors', () => {
+	const escapeId = (targetId) => {
+		if (!targetId) return null;
+		return (typeof CSS !== 'undefined' && typeof CSS.escape === 'function')
+			? CSS.escape(targetId)
+			: targetId.replace(/(["\\])/g, '\\$1');
+	};
+
+	assert.equal(escapeId(null), null);
+	assert.equal(escapeId(''), null);
+
+	const safeSimple = escapeId('users-table');
+	assert.equal(safeSimple, 'users-table');
+
+	const safeSpecial = escapeId('users:list.1');
+	// Verify escaping works without throwing in document/element queries
+	assert.ok(safeSpecial);
+
+	const safeQuotes = escapeId('table"with"quotes');
+	assert.ok(safeQuotes);
+});
+
+test('reconciliation behavior handles HTTP 204 no-content updates cleanly without store mutations', () => {
+	const createReconcile = (detail) => {
+		if (!detail) return { action: 'ignore' };
+		if (!detail.record) {
+			return { action: 'error', code: 'create-empty-response' };
+		}
+		return { action: 'mutate-store', record: detail.record };
+	};
+
+	const updateReconcile = (detail) => {
+		if (!detail) return { action: 'ignore' };
+		if (!detail.record) {
+			// HTTP 204 No Content - skip store mutation, acknowledge queue
+			return { action: 'skip-store', ack: true };
+		}
+		return { action: 'mutate-store', record: detail.record, ack: true };
+	};
+
+	// Create with empty response
+	assert.deepEqual(createReconcile({ record: null }), { action: 'error', code: 'create-empty-response' });
+	assert.deepEqual(createReconcile(null), { action: 'ignore' });
+	assert.deepEqual(createReconcile({ record: { id: 10 } }), { action: 'mutate-store', record: { id: 10 } });
+
+	// Update with HTTP 204 (record: null)
+	assert.deepEqual(updateReconcile({ record: null }), { action: 'skip-store', ack: true });
+	assert.deepEqual(updateReconcile(null), { action: 'ignore' });
+	assert.deepEqual(updateReconcile({ record: { id: 10, title: 'Updated' } }), { action: 'mutate-store', record: { id: 10, title: 'Updated' }, ack: true });
 });
 

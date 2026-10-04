@@ -23,6 +23,7 @@ import { registerComponent, dispatch, defineAttrs, attrSpec, attrStr } from '../
 		const self = this;
 
 		this._onSetData = function (e) {
+			if (!e.detail) return;
 			self._rebuild(e.detail.data || []);
 		};
 		dom.addEventListener('ln-options:set-data', this._onSetData);

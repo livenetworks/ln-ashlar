@@ -140,7 +140,8 @@ Exposed on the root element via `el.lnDataStore`:
 | `ln-data-store:synced` | Emits | No | Emitted after subsequent delta sync completes. | `{ store: String, added: Number, deleted: Number, changed: Boolean }` |
 | `ln-data-store:quota-exceeded` | Emits | No | Emitted on `document` if database storage runs out of quota. | `{ error: Error }` |
 | `ln-data-store:initialization-error` | Emits | No | IndexedDB could not be opened. `ready` still resolves, so a coordinator routes reads to its connector. | `{ store: String, error: Error }` |
-| `ln-data-store:sync-error` | Emits | No | A connector sync failed; `isSyncing` is cleared so a later retry can run. | `{ store: String, error: String, status: Number }` |
+| `ln-data-store:sync-error` | Emits | No | A connector sync or local cache commit failed; `isSyncing` is cleared so a later retry can run. | `{ store: String, error: String, status?: Number }` |
+| `ln-data-store:blocked` | Emits | No | Emitted on `document` if an IndexedDB version upgrade is blocked by open connections in other tabs. | `{ db: String }` |
 | `ln-data-store:mutation-error` | Emits | No | A local mutation failed. `requestId` correlates it with the coordinator's request. | `{ store: String, action: String, requestId: String, error: Error }` |
 | `ln-data-store:request-page` | Emits | No | Windowed residency: pages inside the sliding window are missing and must be fetched from the server. | `{ store: String, offset: Number, limit: Number, query: Object, queryGen: Number }` |
 

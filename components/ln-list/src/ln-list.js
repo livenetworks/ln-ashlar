@@ -306,7 +306,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 			// --- Sort ---
 			this._onSort = function (e) {
-				if (e.detail.field == null) return;
+				if (!e.detail || e.detail.field == null) return;
 				e.preventDefault();
 				self.currentSort = e.detail.direction === 'none' ? null : { field: e.detail.field, direction: e.detail.direction };
 				self._requestData();
@@ -418,10 +418,10 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			dom.addEventListener('ln-filter:change', this._onFilterChange);
 
 			this._onSort = function (e) {
-				if (e.detail && e.detail.field == null) return;
+				if (!e.detail || e.detail.field == null) return;
 				e.preventDefault();
-				const direction = e.detail && e.detail.direction === 'none' ? null : (e.detail && e.detail.direction);
-				self._sortField = direction === null ? null : (e.detail && e.detail.field);
+				const direction = e.detail.direction === 'none' ? null : e.detail.direction;
+				self._sortField = direction === null ? null : e.detail.field;
 				self._sortDir = direction;
 				self._applyFilterAndSort();
 				self._vStart = -1;

@@ -299,6 +299,7 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 
 			// --- Sort ---
 			this._onSort = function (e) {
+				if (!e.detail || e.detail.field == null) return;
 				e.preventDefault();
 				self.currentSort = e.detail.direction === 'none' ? null : { field: e.detail.field, direction: e.detail.direction };
 				self._requestData();
@@ -388,6 +389,7 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 			}
 
 			this._onSort = function (e) {
+				if (!e.detail || e.detail.column == null) return;
 				e.preventDefault();
 				const direction = e.detail.direction === 'none' ? null : e.detail.direction;
 				self._sortCol = direction === null ? -1 : e.detail.column;

@@ -26,6 +26,7 @@ tags: [input, forms, date, localization]
 - **Two-Way Value Binding:** Intercepts the native `value` property on the visible and hidden inputs to ensure consistent state and programmatic updates.
 - **Manual Input Parsing (Blur):** Gracefully handles manually entered values on blur, supporting dot (European `dd.MM.yyyy`), slash (US `MM/dd/yyyy`), and dash (ISO/standard) separators, with smart 2-digit year pivoting (00–49 → 2000–2049, 50–99 → 1950–1999).
 - **Declarative Dictionary Integration:** Integrates with `ln-core`'s `buildDict` pattern to register local language fallbacks when native browser translation engines are absent.
+- **Lifecycle & Teardown Detachment:** Cleanly unregisters global `ln-core:locale-change` listeners on `destroy()` across both interactive inputs and static text display elements (`<time>`, `<td>`, `<span>`), preventing memory leaks on dynamic DOM removal.
 - Located in [`components/ln-date/src/ln-date.js`](../../components/ln-date/src/ln-date.js).
 
 > [!IMPORTANT]

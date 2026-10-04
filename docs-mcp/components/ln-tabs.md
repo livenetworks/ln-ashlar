@@ -13,7 +13,7 @@ tags: [tabs, navigation, accessibility, deep-linking, state]
 > **Classification:** 🟢 Simple component / State Manager (Layer 1 - UI Primitive)  
 > Applied to a wrapper `<section data-ln-tabs>` containing trigger buttons (`data-ln-tab="key"`) and panels (`data-ln-panel="key"`).
 > On trigger `click`, it writes `data-ln-tabs-active="key"` on the wrapper. An attribute observer synchronizes the DOM:
-> toggling `class="hidden"` and `aria-hidden` on panels, and updating `aria-selected` on triggers. When configured with an `id`
+> toggling the HTML5 `hidden` boolean property, `class="hidden"`, and `aria-hidden` on panels, and updating `aria-selected` on triggers. When configured with an `id`
 > and anchor triggers (`<a href="#id:key">`), it synchronizes the active tab with `window.location.hash` for deep-linking and browser history persistence.
 
 ---
@@ -26,7 +26,7 @@ The `ln-tabs` component (~180 lines JS) manages N-way exclusive selection of con
 *   **Dual Operating Modes (Trigger-Based):**
     1.  **Anchor Triggers (`<a href="#nsKey:key">`) → URL Hash Sync Mode:** Enables shareable, bookmarkable deep links with browser Back/Forward navigation. Uses `id` or `data-ln-tabs-key` on the wrapper as the namespace via [`components/ln-core/hash.js`](../../components/ln-core/hash.js).
     2.  **Button Triggers (`<button>`) → localStorage Persist Mode:** Used for standard UI buttons. Does not mutate the URL. Opt-in persistence via `data-ln-persist` saves/restores state via [`components/ln-persist/src/ln-persist.js`](../../components/ln-persist/src/ln-persist.js).
-*   **Reactive ARIA & Focus Management:** Automatically updates `aria-selected` on triggers, toggles `.hidden` and `aria-hidden` on panels, and focuses the first focusable element inside newly activated panels (`data-ln-tabs-focus="true"` by default).
+*   **Reactive ARIA & Focus Management:** Automatically updates `aria-selected` on triggers, toggles the HTML5 boolean `hidden` property, `.hidden` class, and `aria-hidden` on panels, and focuses the first focusable element inside newly activated panels (`data-ln-tabs-focus="true"` by default).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

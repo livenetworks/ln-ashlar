@@ -143,9 +143,9 @@ All events bubble (`bubbles: true`) and contain target details in `event.detail`
 | `ln-modal:request-open` | Listens | No | Command request event sent to open the modal. | `{}` |
 | `ln-modal:request-close` | Listens | No | Command request event sent to close the modal. | `{}` |
 | `ln-modal:before-open` | Emits | **Yes** | Dispatched when state changes to `"open"`, before styles or focus are applied. | `{ modalId: String, target: HTMLElement }` |
-| `ln-modal:open` | Emits | No | Dispatched once modal is natively open, body scroll locked, and initial focus set. | `{ modalId: String, target: HTMLElement, hashNs: String?, param: String? }` |
+| `ln-modal:open` | Emits | No | Dispatched once modal is natively open, body scroll locked, and initial focus set. | `{ modalId: String, target: HTMLElement }` |
 | `ln-modal:before-close` | Emits | **Yes** | Dispatched upon request to close; calling `preventDefault()` cancels closing. | `{ modalId: String, target: HTMLElement }` |
-| `ln-modal:close` | Emits | No | Dispatched after modal closes, before focus restoration. | `{ modalId: String, target: HTMLElement }` |
+| `ln-modal:close` | Emits | No | Dispatched after modal closes and body scroll lock is released. | `{ modalId: String, target: HTMLElement }` |
 
 ---
 
@@ -193,7 +193,7 @@ body.ln-modal-open {
 - **Semantic Role:** Native `<dialog>` opened via `showModal()` provides implicit `role="dialog"` and modal semantics.
 - **Focus Management:** Focus is automatically directed to the child with `autofocus`, or the first visible interactive element.
 - **Native Focus Trap:** When opened via `showModal()`, the browser natively traps keyboard focus inside the dialog.
-- **Escape Key Integration:** Pressing `Escape` triggers native `cancel`. The component intercepts `cancel` to route through `data-ln-modal="close"`, ensuring `before-close` validation runs.
+- **Escape Key & Native Close Integration:** Pressing `Escape` triggers native `cancel`. The component intercepts `cancel` to route through `data-ln-modal="close"`, ensuring `before-close` validation runs. The component also listens to the native `close` event (triggered by `<form method="dialog">` or `dialog.close()`) to keep `data-ln-modal` and body scroll locks synchronized without running cancelable `before-close` after the dialog has already closed.
 
 ### Common Pitfalls
 
@@ -233,6 +233,10 @@ sequenceDiagram
         Browser->>Modal: Native cancel event
         Modal->>Browser: preventDefault()
         Modal->>Modal: setAttribute('data-ln-modal', 'close')
+    else User submits dialog form or calls dialog.close()
+        User->>Browser: Submit form method="dialog"
+        Browser->>Modal: Native close event
+        Modal->>Modal: setAttribute('data-ln-modal', 'close')
     else User clicks [data-ln-modal-close]
         User->>Modal: Click close button
         Modal->>Modal: setAttribute('data-ln-modal', 'close')
@@ -244,9 +248,9 @@ sequenceDiagram
     Modal->>Modal: Dispatch ln-modal:before-close (Cancelable)
 
     alt Close permitted
-        Modal->>Modal: Dispatch ln-modal:close
         Modal->>Browser: Call close()
         Note over Browser: Restore focus & remove .ln-modal-open
+        Modal->>Modal: Dispatch ln-modal:close
     else Close canceled via preventDefault()
         Modal->>Modal: Revert attribute to "open"
     end

@@ -153,3 +153,32 @@ export function decorateRecords(records, computed) {
 		return copy;
 	});
 }
+
+/**
+ * Pure helper to compute whether an IndexedDB upgrade is needed.
+ * @param {string[]} existingStoreNames
+ * @param {Record<string, { indexes: string[] }>} requiredStores
+ * @param {Record<string, string[]>} existingIndexMap
+ * @param {string} [metaStoreName='_meta']
+ * @returns {boolean}
+ */
+export function checkNeedsUpgrade(existingStoreNames, requiredStores, existingIndexMap, metaStoreName = '_meta') {
+	if (!Array.isArray(existingStoreNames) || !existingStoreNames.includes(metaStoreName)) return true;
+	for (const name of Object.keys(requiredStores || {})) {
+		if (!existingStoreNames.includes(name)) return true;
+		const requiredIdxs = (requiredStores[name] && requiredStores[name].indexes) || [];
+		const existingIdxs = (existingIndexMap && existingIndexMap[name]) || [];
+		if (requiredIdxs.some(idx => !existingIdxs.includes(idx))) return true;
+	}
+	return false;
+}
+
+/**
+ * Pure helper to normalize synchronization errors into a standard response shape.
+ * @param {any} err
+ * @returns {{ ok: false, error: string }}
+ */
+export function normalizeSyncError(err) {
+	const errorMsg = (err && err.message) ? err.message : String(err);
+	return { ok: false, error: errorMsg };
+}

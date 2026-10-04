@@ -207,3 +207,7 @@ On blur: empty → clear + dispatch; unchanged from the current formatted displa
 ### Observers
 
 A shared `document.body` `MutationObserver` auto-initializes new `[data-ln-date]` elements (`childList`) and re-initializes on `data-ln-date` attribute addition (`attributes`). A separate observer on `document.documentElement` watches `lang` and re-formats every active instance when it changes.
+
+### Teardown & Lifecycle (`destroy()`)
+
+When an element is destroyed, the component cleanly detaches the global `ln-core:locale-change` event listener regardless of whether the element is an input decorator or a static text display element (`<time>`, `<td>`, `<span>`). For inputs, wrapper children, blur/click listeners, and value interceptors are unhooked to prevent DOM leaks.

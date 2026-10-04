@@ -22,6 +22,7 @@ tags: [network, database, couchdb, sync]
 - Performs sequence-based delta synchronization over the CouchDB changes feed (`_changes?include_docs=true`).
 - Automatically resolves missing document revision parameters (`_rev`) by querying document states on PUT/DELETE mutations.
 - Translates relational schema `id` fields to NoSQL standard `_id` on request send, and reverse-maps them on response.
+- **Lifecycle & Async Cancellation:** Maintains an `AbortController` for read-only sync delta queries (`fetchDelta`). On `destroy()`, pending delta fetch requests are aborted cleanly. Mutation writes (POST/PUT/DELETE) are intentionally not aborted to preserve remote database consistency.
 - Located in [`components/ln-couchdb-connector/src/ln-couchdb-connector.js`](../../components/ln-couchdb-connector/src/ln-couchdb-connector.js).
 
 > [!IMPORTANT]

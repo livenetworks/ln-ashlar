@@ -169,9 +169,7 @@ Do not use visual layout utility classes in your markup. Apply structural sizing
 ## 6. Hash Addressing & Deep-Linking
 
 Any modal with an `id` is hash-addressable (e.g. `#user-modal` or `#user-modal:42`).
-When an `id` modal opens, `ln-modal` emits `ln-modal:open` containing `{ hashNs, param }` in `e.detail`.
-
-Coordinators (such as `ln-ui-coordinator`) intercept hash changes and coordinate data fetching / form populating via `ln-fill`.
+Coordinators (such as `ln-ui-coordinator`) intercept hash changes, request modal opening, and coordinate data fetching / form populating via `ln-fill`. Modal lifecycle events (`ln-modal:open`, `ln-modal:close`) emit `{ modalId, target }`.
 
 ---
 
@@ -194,11 +192,11 @@ Source: `components/ln-modal/src/ln-modal.js` (native `<dialog>`-backed). `ln-mo
 
 Open: cancelable `:before-open` → `instance.isOpen = true` → `body.ln-modal-open` class → `el.showModal()` (native `<dialog>` — top-layer stacking and backdrop are the platform's) → focus priority `[autofocus]` → first non-disabled input/select/textarea → first link/button, each filtered through `isVisible` → `:open`.
 
-Close: cancelable `:before-close` → `instance.isOpen = false` → `:close` → `el.close()` (native — restores focus to the pre-open `document.activeElement` automatically) → if no other `[data-ln-modal="open"]` remains, remove `body.ln-modal-open`.
+Close: cancelable `:before-close` (skipped for native close where dialog has already closed) → `instance.isOpen = false` → `el.close()` (native — restores focus to the pre-open `document.activeElement` automatically) → if no other `[data-ln-modal="open"]` remains, remove `body.ln-modal-open` → `:close`.
 
-### ESC handling
+### ESC & native close handling
 
-Not a custom keydown listener — the native `<dialog>` fires its own `cancel` event on ESC. `_onCancel` calls `preventDefault()` (so the dialog doesn't close ahead of the attribute-driven flow) and writes `data-ln-modal="close"`, routing ESC through the same single attribute path as every other close trigger.
+Not a custom keydown listener — the native `<dialog>` fires its own `cancel` event on ESC. `_onCancel` calls `preventDefault()` (so the dialog doesn't close ahead of the attribute-driven flow) and writes `data-ln-modal="close"`, routing ESC through the cancelable `before-close` lifecycle path. Furthermore, `_onClose` listens to the native `close` event (fired when `<form method="dialog">` is submitted or `dialog.close()` is called), resynchronizing `data-ln-modal="close"` and releasing scroll locks without stranded UI state.
 
 ### Trigger/close wiring
 

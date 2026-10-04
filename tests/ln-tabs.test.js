@@ -57,4 +57,29 @@ test('resolveActiveTabKey resolves against valid keys with fallback', () => {
 	assert.equal(resolveActiveTabKey('security', validKeys, 'general'), 'security');
 	assert.equal(resolveActiveTabKey('unknown', validKeys, 'general'), 'general');
 	assert.equal(resolveActiveTabKey('', validKeys, 'general'), 'general');
+	assert.equal(resolveActiveTabKey('SECURITY', validKeys, 'general'), 'security');
+	assert.equal(resolveActiveTabKey(null, validKeys, 'general'), 'general');
+	assert.equal(resolveActiveTabKey(undefined, validKeys, 'general'), 'general');
 });
+
+test('tab panel visibility model ensures boolean hidden and aria-hidden contract', () => {
+	const activeKey = 'security';
+	const validPanels = ['general', 'security', 'notifications'];
+
+	const panelStates = validPanels.map(k => {
+		const show = (k === activeKey);
+		return {
+			key: k,
+			hidden: !show,
+			classListHidden: !show,
+			ariaHidden: show ? 'false' : 'true'
+		};
+	});
+
+	assert.deepEqual(panelStates, [
+		{ key: 'general', hidden: true, classListHidden: true, ariaHidden: 'true' },
+		{ key: 'security', hidden: false, classListHidden: false, ariaHidden: 'false' },
+		{ key: 'notifications', hidden: true, classListHidden: true, ariaHidden: 'true' }
+	]);
+});
+

@@ -41,6 +41,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders, define
 		dom[DOM_ALIAS] = this; // Alias for 3-tier compatibility
 
 		this.refreshConfig();
+		this._deltaController = null;
 		this._handlers = null;
 		_bindEvents(this);
 
@@ -86,11 +87,17 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders, define
 
 	_component.prototype.fetchDelta = function (since) {
 		const self = this;
+		if (this._deltaController) {
+			this._deltaController.abort();
+		}
+		this._deltaController = new AbortController();
+		const signal = this._deltaController.signal;
+
 		const params = ['include_docs=true', 'feed=normal'];
 		if (since) params.push('since=' + encodeURIComponent(since));
 		const url = buildUrl(self.url, self.db, '_changes') + '?' + params.join('&');
 
-		return window.fetch(url, { method: 'GET', headers: getHeaders(self.headers, self.auth), credentials: self.credentials })
+		return window.fetch(url, { method: 'GET', headers: getHeaders(self.headers, self.auth), credentials: self.credentials, signal: signal })
 			.then(res => {
 				if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
 				return res.json();
@@ -102,6 +109,11 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders, define
 					deleted: results.filter(r => r.deleted).map(r => r.id),
 					synced_at: data.last_seq || since || ''
 				};
+			})
+			.finally(() => {
+				if (self._deltaController && self._deltaController.signal === signal) {
+					self._deltaController = null;
+				}
 			});
 	};
 
@@ -270,6 +282,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders, define
 						dispatch(self.dom, 'ln-couchdb-connector:fetched', { data: data, since: detail.since, meta: detail.meta || null });
 					})
 					.catch(function (err) {
+						if (err && err.name === 'AbortError') return;
 						dispatch(self.dom, 'ln-couchdb-connector:error', {
 							action: 'sync',
 							error: err.message,
@@ -365,6 +378,10 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders, define
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 
 		const self = this;
+		if (self._deltaController) {
+			self._deltaController.abort();
+			self._deltaController = null;
+		}
 		if (self._handlers) {
 			self.dom.removeEventListener('ln-couchdb-connector:request-sync', self._handlers.sync);
 			self.dom.removeEventListener('ln-couchdb-connector:request-create', self._handlers.create);

@@ -1144,6 +1144,13 @@
 		"ln-data-store": {
 			"emits": [
 				{
+					"name": "ln-data-store:blocked",
+					"cancelable": false,
+					"description": "Emitted on `document` if an IndexedDB version upgrade is blocked by open connections in other tabs.",
+					"detail": "{ db: String }",
+					"source": "static"
+				},
+				{
 					"name": "ln-data-store:created",
 					"cancelable": false,
 					"description": "Emitted after optimistic creation is done.",
@@ -1223,8 +1230,8 @@
 				{
 					"name": "ln-data-store:sync-error",
 					"cancelable": false,
-					"description": "A connector sync failed; `isSyncing` is cleared so a later retry can run.",
-					"detail": "{ store: String, error: String, status: Number }",
+					"description": "A connector sync or local cache commit failed; `isSyncing` is cleared so a later retry can run.",
+					"detail": "{ store: String, error: String, status?: Number }",
 					"source": "static"
 				},
 				{
@@ -1750,7 +1757,7 @@
 				{
 					"name": "ln-modal:close",
 					"cancelable": false,
-					"description": "Dispatched after modal closes, before focus restoration.",
+					"description": "Dispatched after modal closes and body scroll lock is released.",
 					"detail": "{ modalId: String, target: HTMLElement }",
 					"source": "static"
 				},
@@ -1758,7 +1765,7 @@
 					"name": "ln-modal:open",
 					"cancelable": false,
 					"description": "Dispatched once modal is natively open, body scroll locked, and initial focus set.",
-					"detail": "{ modalId: String, target: HTMLElement, hashNs: String?, param: String? }",
+					"detail": "{ modalId: String, target: HTMLElement }",
 					"source": "static"
 				}
 			],
@@ -2328,7 +2335,7 @@
 					"name": "ln-modal:open",
 					"cancelable": false,
 					"description": "Dispatched once modal is natively open, body scroll locked, and initial focus set.",
-					"detail": "{ modalId: String, target: HTMLElement, hashNs: String?, param: String? }",
+					"detail": "{ modalId: String, target: HTMLElement }",
 					"source": "static"
 				},
 				{
