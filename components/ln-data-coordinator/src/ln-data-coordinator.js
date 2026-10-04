@@ -1,130 +1,63 @@
-import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMethod, createBatcher, attrSpec, defineAttrs } from '../../ln-core';
-import { normalizeDataQuery, selectDataSource, composeQuery, needsRemoteSupersede } from './data-read-policy';
+import { registerComponent, dispatch, serializeForm, resolveFormMethod, createBatcher, attrSpec, defineAttrs, uuid } from '../../ln-core';
+import { normalizeDataQuery, selectDataSource, composeQuery } from './data-read-policy';
 import { MutationReceipts } from './mutation-receipts';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-data-coordinator';
 	const DOM_ATTRIBUTE = 'lnDataCoordinator';
 	const SCOPE_ATTR = 'data-ln-data-coordinator-scope';
+
+	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
 	const SEARCH_ATTR = 'data-ln-data-coordinator-search';
 	const FILTERS_ATTR = 'data-ln-data-coordinator-filters';
 	const SORT_FIELD_ATTR = 'data-ln-data-coordinator-sort-field';
 	const SORT_DIR_ATTR = 'data-ln-data-coordinator-sort-direction';
-	if (window[DOM_ATTRIBUTE] !== undefined) return;
-
-	// ─── Attribute Contract (SSOT) ──────────────────────────
-	function _applyMapper(el) {
-		const instance = el[DOM_ATTRIBUTE];
-		if (!instance) return;
-		instance.refreshMapper();
-	}
-
-	function _applyQuery(el) {
-		const instance = el[DOM_ATTRIBUTE];
-		if (!instance) return;
-		instance._queueQueryRefresh();
-	}
-
-	function _readName(el, name) {
-		return el.getAttribute(name) || el.id;
-	}
 
 	const ATTRIBUTES = {
-		'data-ln-data-coordinator':                { prop: '_name', type: 'string', read: _readName, description: 'Coordinator name or identifier for data routing' },
+		'data-ln-data-coordinator':                { prop: '_name', type: 'string', description: 'Coordinator name or identifier for data routing' },
 		'data-ln-data-coordinator-scope':          { type: 'string', description: 'Scope name addressing the bound data store and connector' },
-		'data-ln-data-coordinator-mapper':         { type: 'string', effect: _applyMapper, description: 'Name of the registered data mapper transform' },
-		'data-ln-data-coordinator-search':         { type: 'string', effect: _applyQuery, description: 'Active search query term' },
-		'data-ln-data-coordinator-filters':        { type: 'string', effect: _applyQuery, description: 'Active encoded filter parameters' },
-		'data-ln-data-coordinator-sort-field':     { type: 'string', effect: _applyQuery, description: 'Active sort field property name' },
-		'data-ln-data-coordinator-sort-direction': { type: 'enum', values: ['asc', 'desc'], fallback: 'asc', effect: _applyQuery, description: 'Sort direction' },
+		'data-ln-data-coordinator-connector':      { type: 'string', description: 'Selector, identifier, or namespace of the bound connector' },
+		'data-ln-data-coordinator-mapper':         { type: 'string', description: 'Name of the registered data mapper transform' },
+		'data-ln-data-coordinator-search':         { prop: '_searchAttr', type: 'string', description: 'Active search query term' },
+		'data-ln-data-coordinator-filters':        { prop: '_filtersAttr', type: 'string', description: 'Active encoded filter parameters' },
+		'data-ln-data-coordinator-sort-field':     { prop: '_sortFieldAttr', type: 'string', description: 'Sort field name' },
+		'data-ln-data-coordinator-sort-direction': { prop: '_sortDirAttr', type: 'enum', values: ['asc', 'desc'], fallback: 'asc', description: 'Sort direction' },
 		'data-ln-data-coordinator-stale':          { type: 'marker', description: 'Flag indicating data needs re-synchronization' },
-		'data-ln-data-coordinator-no-autosync':    { type: 'boolean', description: 'Disables automatic synchronization upon state changes' },
-		'data-ln-data-coordinator-dict':           { type: 'marker', description: 'Marks dictionary container for coordinator translatable messages' }
+		'data-ln-data-coordinator-no-autosync':    { type: 'boolean', description: 'Disables automatic synchronization upon state changes' }
 	};
 
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
+	const VIEW_TARGETS = [
+		['[data-ln-table-source]', 'data-ln-table-source', 'table'],
+		['[data-ln-list-source]', 'data-ln-list-source', 'list'],
+		['[data-ln-chart-source]', 'data-ln-chart-source', 'chart'],
+		['[data-ln-options]', 'data-ln-options', 'options'],
+		['[data-ln-stat]', 'data-ln-stat', 'stat']
+	];
 
-	// ─── Sync Orchestration Singleton ──────────────────────
-
-	const _coordinators = new Set();
-	let _globalSyncInstalled = false;
-	let _onlineHandler = null;
-	let _offlineHandler = null;
-	let _visibilityHandler = null;
-
-	function _installGlobalSync() {
-		if (_globalSyncInstalled) return;
-		_globalSyncInstalled = true;
-
-		_onlineHandler = function () {
-			dispatch(document, 'ln-data-coordinator:online', {});
-			_coordinators.forEach(function (coord) {
-				coord._maybeSync();
-			});
-		};
-
-		_offlineHandler = function () {
-			dispatch(document, 'ln-data-coordinator:offline', {});
-		};
-
-		_visibilityHandler = function () {
-			if (document.visibilityState !== 'visible') return;
-			_coordinators.forEach(function (coord) {
-				const children = coord.findChildren();
-				const store = children.store;
-				if (store && children.connector && store.isInitialized && !store.initializationError && !store.isSyncing && !coord._noAutosync && (!store.hasCache || coord._isStale())) {
-					store.forceSync();
-				}
-			});
-		};
-
-		window.addEventListener('online', _onlineHandler);
-		window.addEventListener('offline', _offlineHandler);
-		document.addEventListener('visibilitychange', _visibilityHandler);
-	}
-
-	function _uninstallGlobalSync() {
-		if (!_globalSyncInstalled) return;
-		if (_coordinators.size > 0) return;
-
-		window.removeEventListener('online', _onlineHandler);
-		window.removeEventListener('offline', _offlineHandler);
-		document.removeEventListener('visibilitychange', _visibilityHandler);
-
-		_onlineHandler = null;
-		_offlineHandler = null;
-		_visibilityHandler = null;
-		_globalSyncInstalled = false;
-	}
-
-	// ─── Local Helpers ──────────────────────────────────────
-
-	function _uuid() {
-		try { return crypto.randomUUID(); }
-		catch (_) {
-			return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-				const r = Math.random() * 16 | 0;
-				const v = c === 'x' ? r : (r & 0x3 | 0x8);
-				return v.toString(16);
-			});
+	function _findConnectorEl(dom) {
+		const target = dom.getAttribute('data-ln-data-coordinator-connector');
+		if (target) return dom.querySelector(target) || document.querySelector(target) || document.getElementById(target);
+		const standard = dom.querySelector('[data-ln-connector], [data-ln-api-connector], [data-ln-couchdb-connector], [data-ln-websocket-connector]');
+		if (standard) return standard;
+		for (const el of dom.querySelectorAll('*')) {
+			if (el.lnConnector) return el;
+			for (const a of el.attributes) if (a.name.startsWith('data-ln-') && a.name.endsWith('-connector')) return el;
 		}
+		return null;
 	}
 
-	// Connector response namespaces — generalized so writes work whether the
-	// paired connector is ln-api-connector, ln-couchdb-connector or
-	// ln-websocket-connector. A socket beside a REST connector only pushes;
-	// its :fetched still arrives here.
-	const CONNECTOR_RESPONSE_NAMESPACES = ['ln-api-connector', 'ln-couchdb-connector', 'ln-websocket-connector'];
-
-	function _connectorNamespace(connectorEl) {
-		if (!connectorEl) return 'ln-api-connector';
-		if (connectorEl.hasAttribute('data-ln-couchdb-connector')) return 'ln-couchdb-connector';
-		if (connectorEl.hasAttribute('data-ln-websocket-connector')) return 'ln-websocket-connector';
-		return 'ln-api-connector';
+	function _connNs(el) {
+		if (!el) return 'ln-connector';
+		if (el.lnConnector?.namespace) return el.lnConnector.namespace;
+		const exp = el.getAttribute('data-ln-connector');
+		if (exp && exp !== 'true') return exp.startsWith('ln-') ? exp : ('ln-' + exp + (exp.endsWith('-connector') ? '' : '-connector'));
+		for (const a of el.attributes) if (a.name.startsWith('data-ln-') && a.name.endsWith('-connector')) return a.name.replace(/^data-/, '');
+		return 'ln-connector';
 	}
 
 	// ─── Component Constructor ─────────────────────────────
-
 	function _component(dom) {
 		const self = this;
 		this.dom = dom;
@@ -134,1175 +67,362 @@ import { MutationReceipts } from './mutation-receipts';
 
 		this._destroyed = false;
 		this.mapper = null;
-		this._handlers = null;
+		this._unsubs = [];
 		this._boundQueries = new WeakMap();
 		this._boundDelivered = new WeakMap();
-		this._queryGens = new WeakMap();
 		this._mutationReceipts = new MutationReceipts();
-		this._dict = buildDict(dom, 'data-ln-data-coordinator-dict'); // flat key→string error-toast map; {} if none
 
-		this._queueQueryRefresh = createBatcher(function () {
-			if (self._destroyed) return;
-			self._refreshAll(null, true);
-		});
-
-		this.refreshConfig();
+		this._queueQueryRefresh = createBatcher(() => { if (!self._destroyed) self._refreshAll(null, true); });
+		this.refreshMapper();
 		_bindEvents(this);
-
-		_coordinators.add(this);
-		_installGlobalSync();
-
 		this._checkInitialSync();
-
 		return this;
 	}
 
-	// ─── Observable Live Attributes (Single Source of Truth) ──
-
-	Object.defineProperty(_component.prototype, '_staleThreshold', {
-		get: function () {
-			const children = this.findChildren();
-			const storeEl = children.storeEl;
-			const staleAttr = this.dom.getAttribute('data-ln-data-coordinator-stale')
-				|| (storeEl ? storeEl.getAttribute('data-ln-data-store-stale') : null);
-			if (staleAttr === 'never' || staleAttr === '-1') return -1;
-			const parsed = parseInt(staleAttr, 10);
-			return isNaN(parsed) ? 300 : parsed;
-		}
-	});
-
-	Object.defineProperty(_component.prototype, '_noAutosync', {
-		get: function () {
-			const children = this.findChildren();
-			const storeEl = children.storeEl;
-			return this.dom.hasAttribute('data-ln-data-coordinator-no-autosync')
-				|| (storeEl ? storeEl.hasAttribute('data-ln-data-store-no-autosync') : false);
-		}
-	});
-
-	_component.prototype.refreshConfig = function () {
-		this.refreshMapper();
+	_component.prototype._noAutosync = function (c) {
+		return this.dom.hasAttribute('data-ln-data-coordinator-no-autosync') || !!(c.storeEl?.hasAttribute('data-ln-data-store-no-autosync'));
 	};
 
-	_component.prototype._isStale = function () {
-		if (this._staleThreshold === -1) return false;
-		const children = this.findChildren();
-		const store = children.store;
-		if (!store || !store.lastSyncedAt) return true;
-		const ageSeconds = (Date.now() / 1000) - store.lastSyncedAt;
-		return ageSeconds > this._staleThreshold;
+	_component.prototype._isStale = function (c) {
+		const s = this.dom.getAttribute('data-ln-data-coordinator-stale') || c.storeEl?.getAttribute('data-ln-data-store-stale');
+		if (s === 'never' || s === '-1') return false;
+		return !c.store?.lastSyncedAt || ((Date.now() / 1000) - c.store.lastSyncedAt) > (parseInt(s, 10) || 300);
 	};
-
-	_component.prototype._maybeSync = function () {
-		const children = this.findChildren();
-		const store = children.store;
-		if (!store || store.initializationError || !children.connector || this._noAutosync) return;
-		if (!store.isInitialized || store.isSyncing) return;
-		if (!store.hasCache || this._isStale()) store.forceSync();
-	};
-
-	// ─── Race Guard: evaluate initial sync directly at children-resolve ────
 
 	_component.prototype._checkInitialSync = function () {
-		const self = this;
-		const initial = this.findChildren();
-		const store = initial.store;
-		if (!store) return;
-
-		Promise.resolve(store.ready).then(function () {
+		const self = this, c = this.findChildren();
+		if (!c.store) return;
+		Promise.resolve(c.store.ready).then(() => {
 			if (self._destroyed) return;
-			const children = self.findChildren();
-			const currentStore = children.store;
-			if (currentStore && currentStore.initializationError) {
-				self._reportReconciliationError('store-initialize', currentStore.initializationError, null);
-				return;
+			const cur = self.findChildren();
+			if (cur.store && cur.connector && !self._noAutosync(cur) && !cur.store.isSyncing && (!cur.store.hasCache || self._isStale(cur))) {
+				cur.store.forceSync();
 			}
-			if (!currentStore || !children.connector || self._noAutosync || currentStore.isSyncing) return;
-			if (!currentStore.hasCache || self._isStale()) currentStore.forceSync();
-		}).catch(function (error) {
-			if (self._destroyed) return;
-			self._reportReconciliationError('store-initialize', error, null);
-		});
+		}).catch(err => self._reportError('store-initialize', err, null));
 	};
-
-	// ─── Resolve and Refresh Mapper ──────────────────────────
 
 	_component.prototype.refreshMapper = function () {
-		this.mapper = null;
-
-		// 1. Check for deprecated/insecure inline script mapper
-		const inlineScript = this.dom.querySelector('script[data-ln-mapper]');
-		if (inlineScript) {
-			console.error('[ln-data-coordinator] Security Error: Inline script mappers using <script data-ln-mapper> are deprecated and disabled due to XSS vulnerability risks (unsafe-eval). Please register your mappers securely via window.lnCore.registerDataMapper() instead.');
-		}
-
-		// 2. Resolve to registered external mapper
-		const mapperName = this.dom.getAttribute('data-ln-data-coordinator-mapper')
-			|| this.dom.id;
-		if (mapperName && window.lnCore && typeof window.lnCore.getDataMapper === 'function') {
-			this.mapper = window.lnCore.getDataMapper(mapperName);
-		}
-
-		// 3. Ultimate safe fallback: no-op mapper
-		if (!this.mapper) {
-			this.mapper = {};
-		}
-
-		// Ensure ingress and egress are safe callable functions
-		if (typeof this.mapper.ingress !== 'function') {
-			this.mapper.ingress = function (r) { return r; };
-		}
-		if (typeof this.mapper.egress !== 'function') {
-			this.mapper.egress = function (r) { return r; };
-		}
+		const name = this.dom.getAttribute('data-ln-data-coordinator-mapper') || this.dom.id;
+		const m = (name && window.lnCore?.getDataMapper?.(name)) || null;
+		this.mapper = { ingress: m?.ingress || (r => r), egress: m?.egress || (r => r) };
 	};
-
-	// ─── Dynamic Child Discovery ──────────────────────────────
 
 	_component.prototype.findChildren = function () {
-		const storeEl = this.dom.querySelector('[data-ln-data-store]');
-		// Requests go to a REST/CouchDB connector when there is one; a socket
-		// takes them only when it is the sole transport.
-		const connectorEl = this.dom.querySelector('[data-ln-api-connector], [data-ln-couchdb-connector]')
-			|| this.dom.querySelector('[data-ln-websocket-connector]');
-		const queueEl = this.dom.querySelector('[data-ln-api-queue]');
-
-		return {
-			storeEl: storeEl,
-			connectorEl: connectorEl,
-			queueEl: queueEl,
-			store: storeEl ? storeEl.lnDataStore : null,
-			connector: connectorEl ? (connectorEl.lnApiConnector || connectorEl.lnCouchDbConnector || connectorEl.lnWebsocketConnector) : null,
-			queue: queueEl ? queueEl.lnApiQueue : null
-		};
+		const s = this.dom.querySelector('[data-ln-data-store]'), c = _findConnectorEl(this.dom), q = this.dom.querySelector('[data-ln-api-queue]');
+		return { storeEl: s, connectorEl: c, queueEl: q, store: s?.lnDataStore || null, connector: c?.lnConnector || c?.lnApiConnector || c?.lnCouchDbConnector || c?.lnWebsocketConnector || null, queue: q?.lnApiQueue || null };
 	};
 
-	// ─── Form Write Intake (native submit, claimed via preventDefault) ──
-
-	_component.prototype._handleSubmitRecord = function (detail) {
-		const children = this.findChildren();
-		if (!children.storeEl && !children.connectorEl) {
-			console.warn('[ln-data-coordinator] form submit claimed but neither [data-ln-data-store] nor a connector child found in "' + (this._name || '') + '"');
-			return;
-		}
-
-		const raw = detail.data || {};
-		const id = raw.id;
-		const expectedVersion = raw.expected_version;
-		const data = Object.assign({}, raw);
-		delete data.id;
-		delete data.expected_version;
-
-		const method = detail.method.toUpperCase();
-
-		if (method === 'POST') {
-			this._fanOutCreate(children, data, detail.action);
-		} else if (method === 'PUT' || method === 'PATCH') {
-			this._fanOutUpdate(children, id, data, expectedVersion, detail.action);
-		}
-	};
-
-	// ─── Parallel Fan-Out (local store write + remote connector/queue) ──────
-
-	_component.prototype._fanOutCreate = function (children, data, action) {
+	// ─── CRUD Intake & Fan-Out ───────────────────────────────
+	_component.prototype._fanOutRemote = function (c, op, qPayload, cPayload) {
 		this.refreshMapper();
-		const tempId = '_temp_' + _uuid();
-
-		if (children.storeEl) {
-			dispatch(children.storeEl, 'ln-data-store:request-create', { tempId: tempId, data: data });
-		}
-
-		if (children.queue) {
-			dispatch(children.queueEl, 'ln-api-queue:request-enqueue', {
-				chainKey: tempId, op: 'create', targetId: null,
-				payload: this.mapper.egress(data), expectedVersion: null,
-				meta: { tempId: tempId, action: action }
-			});
-		} else if (children.connector) {
-			dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-create', {
-				data: this.mapper.egress(data), url: action,
-				meta: { entryId: _uuid(), queued: false, op: 'create', tempId: tempId }
-			});
-		}
+		if (c.queue) dispatch(c.queueEl, 'ln-api-queue:request-enqueue', qPayload);
+		else if (c.connector) dispatch(c.connectorEl, _connNs(c.connectorEl) + ':request-' + op, cPayload);
 	};
 
-	_component.prototype._fanOutUpdate = function (children, id, data, expectedVersion, action) {
-		this.refreshMapper();
-
-		if (children.storeEl) {
-			dispatch(children.storeEl, 'ln-data-store:request-update', { id: id, data: data });
-		}
-
-		if (children.queue) {
-			dispatch(children.queueEl, 'ln-api-queue:request-enqueue', {
-				chainKey: id, op: 'update', targetId: id,
-				payload: this.mapper.egress(data), expectedVersion: expectedVersion,
-				meta: { id: id, action: action }
-			});
-		} else if (children.connector) {
-			dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-update', {
-				id: id, data: this.mapper.egress(data), expected_version: expectedVersion, url: action,
-				meta: { entryId: _uuid(), queued: false, op: 'update', id: id }
-			});
-		}
+	_component.prototype._fanOutCreate = function (c, data, action) {
+		const tempId = '_temp_' + uuid(), payload = this.mapper.egress(data);
+		if (c.storeEl) dispatch(c.storeEl, 'ln-data-store:request-create', { tempId, data });
+		this._fanOutRemote(c, 'create', { chainKey: tempId, op: 'create', targetId: null, payload, expectedVersion: null, meta: { tempId, action } }, { data: payload, url: action, meta: { entryId: uuid(), queued: false, op: 'create', tempId } });
 	};
 
-	_component.prototype._fanOutDelete = function (children, id) {
-		this.refreshMapper();
-
-		if (children.storeEl) {
-			dispatch(children.storeEl, 'ln-data-store:request-delete', { id: id });
-		}
-
-		if (children.queue) {
-			dispatch(children.queueEl, 'ln-api-queue:request-enqueue', {
-				chainKey: id, op: 'delete', targetId: id, payload: null, expectedVersion: null, meta: { id: id }
-			});
-		} else if (children.connector) {
-			dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-delete', {
-				id: id, meta: { entryId: _uuid(), queued: false, op: 'delete', id: id }
-			});
-		}
+	_component.prototype._fanOutUpdate = function (c, id, data, v, action) {
+		const payload = this.mapper.egress(data);
+		if (c.storeEl) dispatch(c.storeEl, 'ln-data-store:request-update', { id, data });
+		this._fanOutRemote(c, 'update', { chainKey: id, op: 'update', targetId: id, payload, expectedVersion: v, meta: { id, action } }, { id, data: payload, expected_version: v, url: action, meta: { entryId: uuid(), queued: false, op: 'update', id } });
 	};
 
-	_component.prototype._fanOutBulkDelete = function (children, ids) {
-		this.refreshMapper();
+	_component.prototype._fanOutDelete = function (c, id) {
+		if (c.storeEl) dispatch(c.storeEl, 'ln-data-store:request-delete', { id });
+		this._fanOutRemote(c, 'delete', { chainKey: id, op: 'delete', targetId: id, payload: null, expectedVersion: null, meta: { id } }, { id, meta: { entryId: uuid(), queued: false, op: 'delete', id } });
+	};
+
+	_component.prototype._fanOutBulkDelete = function (c, ids) {
 		const bulkKey = ids.join(',');
-
-		if (children.storeEl) {
-			dispatch(children.storeEl, 'ln-data-store:request-bulk-delete', { ids: ids });
-		}
-
-		if (children.queue) {
-			dispatch(children.queueEl, 'ln-api-queue:request-enqueue', {
-				chainKey: bulkKey, op: 'bulk-delete', targetId: null, payload: { ids: ids }, expectedVersion: null, meta: { bulkKey: bulkKey, ids: ids }
-			});
-		} else if (children.connector) {
-			dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-bulk-delete', {
-				ids: ids, meta: { entryId: _uuid(), queued: false, op: 'bulk-delete', bulkKey: bulkKey }
-			});
-		}
+		if (c.storeEl) dispatch(c.storeEl, 'ln-data-store:request-bulk-delete', { ids });
+		this._fanOutRemote(c, 'bulk-delete', { chainKey: bulkKey, op: 'bulk-delete', targetId: null, payload: { ids }, expectedVersion: null, meta: { bulkKey, ids } }, { ids, meta: { entryId: uuid(), queued: false, op: 'bulk-delete', bulkKey } });
 	};
 
-	// ─── Toast Helpers ────────────────────────────────────────
-
-	_component.prototype._toastFromMessage = function (message) {
-		if (!message) return;
-		dispatch(window, 'ln-toast:enqueue', {
-			type: message.type || 'success',
-			title: message.title || '',
-			message: message.body || ''
-		});
-	};
-
-	_component.prototype._toastFromDict = function (key) {
-		const text = this._dict[key];
-		if (!text) return;
-		dispatch(window, 'ln-toast:enqueue', { type: 'error', title: '', message: text });
-	};
-
-	_component.prototype._requestStoreMutation = function (children, action, detail) {
-		const storeEl = children.storeEl;
-		if (!storeEl) return Promise.reject(new Error('Store element not found'));
-
-		const requestId = _uuid();
-		const receipt = this._mutationReceipts.wait(requestId);
-		dispatch(storeEl, 'ln-data-store:request-' + action, Object.assign({}, detail, { requestId }));
+	_component.prototype._requestStoreMutation = function (c, action, detail) {
+		if (!c.storeEl) return Promise.reject(new Error('Store element not found'));
+		const requestId = uuid(), receipt = this._mutationReceipts.wait(requestId);
+		dispatch(c.storeEl, 'ln-data-store:request-' + action, Object.assign({}, detail, { requestId }));
 		return receipt;
 	};
 
-	_component.prototype._reportReconciliationError = function (operation, error, meta) {
-		if (this._destroyed) return;
-		dispatch(this.dom, 'ln-data-coordinator:error', {
-			operation,
-			error,
-			meta: meta || null
-		});
+	_component.prototype._reportError = function (operation, error, meta) {
+		if (!this._destroyed) dispatch(this.dom, 'ln-data-coordinator:error', { operation, error, meta: meta || null });
 	};
 
-	// ─── Event Binding ────────────────────────────────────────
-
-	function _bindEvents(self) {
-		self._handlers = {
-			sync: function (e) {
-				self.refreshMapper();
-				const children = self.findChildren();
-				if (!children.store || !children.connector) {
-					console.warn('[ln-data-coordinator] Cannot sync: store or connector not found in subtree');
-					return;
-				}
-				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-sync', { since: e.detail.since, meta: { op: 'sync' } });
-			},
-
-			requestPage: function (e) {
-				const children = self.findChildren();
-				if (!children.connectorEl) return;
-				const detail = e.detail || {};
-				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
-					query: Object.assign({}, detail.query, {
-						offset: detail.offset,
-						limit: detail.limit,
-						queryGen: detail.queryGen
-					})
-				});
-			},
-
-			reqCreate: function (e) {
-				const children = self.findChildren();
-				self._fanOutCreate(children, e.detail.data || {}, e.detail.action);
-			},
-
-			reqUpdate: function (e) {
-				const children = self.findChildren();
-				self._fanOutUpdate(children, e.detail.id, e.detail.data || {}, e.detail.expected_version, e.detail.action);
-			},
-
-			reqDelete: function (e) {
-				const children = self.findChildren();
-				self._fanOutDelete(children, e.detail.id);
-			},
-
-			reqBulkDelete: function (e) {
-				const children = self.findChildren();
-				self._fanOutBulkDelete(children, e.detail.ids || []);
-			},
-
-			queueFailed: function () {
-				self._toastFromDict('network');
-			},
-
-			// ─── Queue Transport Executor ─────────────────────────
-			queueSend: function (e) {
-				self.refreshMapper();
-				const children = self.findChildren();
-				if (!children.store || !children.connector || !children.queue) return;
-
-				const detail = e.detail || {};
-				const entryId = detail.entryId;
-				const op = detail.op;
-				const targetId = detail.targetId;
-				const payload = detail.payload;
-				const expectedVersion = detail.expectedVersion;
-				const queueMeta = detail.meta || {};
-				const resourceUrl = queueMeta.action || null;
-				const idempotencyKey = detail.idempotencyKey || entryId;
-
-				if (op === 'create') {
-					dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-create', {
-						data: payload, url: resourceUrl, idempotencyKey: idempotencyKey,
-						meta: { entryId: entryId, queued: true, op: 'create', tempId: queueMeta.tempId }
-					});
-				} else if (op === 'update') {
-					dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-update', {
-						id: targetId, data: payload, expected_version: expectedVersion, url: resourceUrl, idempotencyKey: idempotencyKey,
-						meta: { entryId: entryId, queued: true, op: 'update', id: targetId }
-					});
-				} else if (op === 'delete') {
-					dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-delete', {
-						id: targetId, idempotencyKey: idempotencyKey,
-						meta: { entryId: entryId, queued: true, op: 'delete', id: targetId }
-					});
-				} else if (op === 'bulk-delete') {
-					dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-bulk-delete', {
-						ids: (payload && payload.ids) ? payload.ids : [],
-						idempotencyKey: idempotencyKey,
-						meta: { entryId: entryId, queued: true, op: 'bulk-delete', bulkKey: queueMeta.bulkKey }
-					});
-				} else {
-					console.warn('[ln-data-coordinator] Unknown queue op:', op);
-				}
-			},
-
-			// ─── Form Write Intake — native submit, bubble phase ──────
-			formSubmit: function (e) {
-				const form = e.target;
-				if (e.defaultPrevented) return; // ln-validate's submit gate blocked it, or another coordinator already claimed it
-
-				const scopeAttr = form.hasAttribute(SCOPE_ATTR) ? form.getAttribute(SCOPE_ATTR) : null;
-				if (scopeAttr === null) return; // form never opted in — leave native submit alone
-
-				let isMine;
-				if (scopeAttr) {
-					isMine = self._owns(scopeAttr);
-				} else {
-					isMine = (form.closest('[data-ln-data-coordinator]') === self.dom);
-				}
-				if (!isMine) return;
-
-				const method = resolveFormMethod(form);
-				if (method !== 'POST' && method !== 'PUT' && method !== 'PATCH') return;
-
-				e.preventDefault(); // claim
-
-				const raw = serializeForm(form);
-				delete raw._method;
-				delete raw._token;
-
-				self._handleSubmitRecord({ data: raw, method: method, action: form.getAttribute('action') || '' });
-			},
-
-			// ─── Connector Response Handlers (direct + queued paths) ──
-			connFetched: function (e) {
-				if (!e.detail) return;
-				const meta = e.detail.meta || {};
-				const children = self.findChildren();
-
-				self.refreshMapper();
-				const rawResponse = e.detail.data;
-				let fetchedRecords = [], deletedIds = [], syncedAt = null;
-
-				if (Array.isArray(rawResponse)) {
-					fetchedRecords = rawResponse;
-					syncedAt = Math.floor(Date.now() / 1000);
-				} else if (rawResponse) {
-					fetchedRecords = Array.isArray(rawResponse.data) ? rawResponse.data : [];
-					deletedIds = Array.isArray(rawResponse.deleted) ? rawResponse.deleted : [];
-					syncedAt = rawResponse.synced_at !== undefined ? rawResponse.synced_at : (rawResponse.since !== undefined ? rawResponse.since : null);
-				}
-
-				const normalizedData = fetchedRecords.map(r => self.mapper.ingress(r));
-
-				// 1. Pass fetched remote data strictly to ln-data-store (Single Source of Truth)
-				if (children.store && !children.store.initializationError) {
-					if (meta.kind) {
-						if (meta.kind === 'table' || meta.kind === 'list' || meta.kind === 'chart') {
-							children.store.applyQuery(normalizedData, { total: e.detail.total }).then(function (decorated) {
-								if (meta.queryGen != null && !self._isCurrentGen(meta.targetEl, meta.queryGen)) return;
-								dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-loading', { loading: false });
-								dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-data', {
-									data: decorated,
-									total: e.detail.total !== undefined ? e.detail.total : decorated.length,
-									filtered: e.detail.filtered !== undefined ? e.detail.filtered : decorated.length,
-									offset: e.detail.offset,
-									queryGen: e.detail.queryGen
-								});
-								self._boundDelivered.set(meta.targetEl, true);
-							});
-						} else if (meta.kind === 'options') {
-							children.store.applyQuery(normalizedData, { total: e.detail.total }).then(function () {
-								return children.store.getAll({});
-							}).then(function (r) {
-								if (meta.queryGen != null && !self._isCurrentGen(meta.targetEl, meta.queryGen)) return;
-								dispatch(meta.targetEl, 'ln-options:set-data', { data: r.data });
-							});
-						} else if (meta.kind === 'stat') {
-							children.store.applyQuery(normalizedData, { total: e.detail.total }).then(function () {
-								if (meta.queryGen != null && !self._isCurrentGen(meta.targetEl, meta.queryGen)) return;
-								const count = e.detail.filtered !== undefined
-									? e.detail.filtered
-									: (e.detail.total !== undefined ? e.detail.total : normalizedData.length);
-								dispatch(meta.targetEl, 'ln-stat:set-count', { count: count });
-							});
-						}
-					} else {
-						children.store.applySync(normalizedData, deletedIds, syncedAt || Math.floor(Date.now() / 1000), {
-							total: e.detail.total,
-							filtered: e.detail.filtered,
-							offset: e.detail.offset,
-							queryGen: e.detail.queryGen,
-							targetEl: meta.targetEl
-						});
-					}
-				} else if (meta.targetEl && meta.kind) {
-					if (meta.kind === 'table' || meta.kind === 'list' || meta.kind === 'chart') {
-						dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-loading', { loading: false });
-						dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-data', {
-							data: normalizedData,
-							total: e.detail.total !== undefined ? e.detail.total : normalizedData.length,
-							filtered: e.detail.filtered !== undefined ? e.detail.filtered : normalizedData.length,
-							offset: e.detail.offset,
-							queryGen: e.detail.queryGen
-						});
-						self._boundDelivered.set(meta.targetEl, true);
-					} else if (meta.kind === 'options') {
-						dispatch(meta.targetEl, 'ln-options:set-data', { data: normalizedData });
-					} else if (meta.kind === 'stat') {
-						const count = e.detail.filtered !== undefined
-							? e.detail.filtered
-							: (e.detail.total !== undefined ? e.detail.total : normalizedData.length);
-						dispatch(meta.targetEl, 'ln-stat:set-count', { count: count });
-					}
-				}
-			},
-
-			connCreated: function (e) {
-				if (!e.detail) return;
-				const children = self.findChildren();
-				const meta = e.detail.meta || {};
-				if (!e.detail.record) {
-					self._reportReconciliationError('create-empty-response', new Error('Create response missing record payload'), meta);
-					return;
-				}
-				const serverRecord = self.mapper.ingress(e.detail.record);
-				const reconciled = children.storeEl
-					? self._requestStoreMutation(children, 'update', { id: meta.tempId, data: serverRecord })
-					: Promise.resolve();
-
-				reconciled
-					.then(function () {
-						self._toastFromMessage(e.detail.message);
-						if (meta.queued && children.queue) {
-							dispatch(children.queueEl, 'ln-api-queue:resolve-create', {
-								entryId: meta.entryId,
-								oldKey: meta.tempId,
-								newId: serverRecord.id
-							});
-						}
-					})
-					.catch(function (error) {
-						self._reportReconciliationError('create-reconcile', error, meta);
-					});
-			},
-
-			connUpdated: function (e) {
-				if (!e.detail) return;
-				const children = self.findChildren();
-				const meta = e.detail.meta || {};
-				const serverRecord = e.detail.record ? self.mapper.ingress(e.detail.record) : null;
-				const reconciled = (children.storeEl && serverRecord)
-					? self._requestStoreMutation(children, 'update', { id: meta.id, data: serverRecord })
-					: Promise.resolve();
-
-				reconciled
-					.then(function () {
-						self._toastFromMessage(e.detail.message);
-						if (meta.queued && children.queue) {
-							dispatch(children.queueEl, 'ln-api-queue:ack', { entryId: meta.entryId });
-						}
-					})
-					.catch(function (error) {
-						self._reportReconciliationError('update-reconcile', error, meta);
-					});
-			},
-
-			connDeleted: function (e) {
-				const detail = e.detail || {};
-				const children = self.findChildren();
-				const meta = detail.meta || {};
-				// Optimistic delete already applied; no local reconciliation.
-				self._toastFromMessage(detail.message); // null on 204 → silent
-				if (meta.queued && children.queue) {
-					dispatch(children.queueEl, 'ln-api-queue:ack', { entryId: meta.entryId });
-				}
-			},
-
-			connBulkDeleted: function (e) {
-				const detail = e.detail || {};
-				const children = self.findChildren();
-				const meta = detail.meta || {};
-				self._toastFromMessage(detail.message);
-				if (meta.queued && children.queue) {
-					dispatch(children.queueEl, 'ln-api-queue:ack', { entryId: meta.entryId });
-				}
-			},
-
-			connError: function (e) {
-				const detail = e.detail || {};
-				const meta = detail.meta || {};
-				const op = meta.op || detail.action;
-				const status = detail.status || (detail.error && detail.error.status) || 0;
-				const children = self.findChildren();
-
-				if (op === 'sync') {
-					if (children.storeEl) {
-						dispatch(children.storeEl, 'ln-data-store:request-sync-failed', {
-							error: detail.error,
-							status: status
-						});
-					}
-					console.error('[ln-data-coordinator] Sync failed:', detail.error);
-					return;
-				}
-
-				if (op === 'query') {
-					if (meta.targetEl && meta.kind) {
-						dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-loading', { loading: false });
-						if (meta.kind === 'table' || meta.kind === 'list') {
-							dispatch(meta.targetEl, 'ln-' + meta.kind + ':page-failed', { offset: meta.offset });
-						}
-					}
-					self._reportReconciliationError('query', detail.error || detail, meta);
-					return;
-				}
-
-				const isAuth = status === 401 || status === 419;
-				const isTransient = status === 0 || status >= 500;
-				const isConflict = status === 409 || status === 412;
-
-				// ── Auth: pause queue, keep local write ──
-				if (isAuth) {
-					self._toastFromDict('auth');
-					if (meta.queued && children.queue) {
-						dispatch(children.queueEl, 'ln-api-queue:nack', { entryId: meta.entryId, reason: 'auth' });
-					}
-					return;
-				}
-
-				// ── Transient (5xx / network / 0): NEVER delete local ──
-				if (isTransient) {
-					if (meta.queued && children.queue) {
-						// Retry via queue ladder; toast deferred to ln-api-queue:failed
-						dispatch(children.queueEl, 'ln-api-queue:nack', { entryId: meta.entryId, reason: 'retry' });
-					} else {
-						// No queue: single attempt spent; record stays local, surface now
-						self._toastFromDict('network');
-					}
-					return;
-				}
-
-				// ── Deterministic (4xx / 3xx): never retry ──
-				let reconciliation = Promise.resolve();
-				if (isConflict && op === 'update') {
-					const remote = detail.data && detail.data.remote ? self.mapper.ingress(detail.data.remote) : null;
-					if (remote && children.storeEl) {
-						reconciliation = self._requestStoreMutation(children, 'update', { id: meta.id, data: remote });
-					}
-					self._toastFromDict('conflict');
-				} else if (op === 'create') {
-					if (children.storeEl) {
-						reconciliation = self._requestStoreMutation(children, 'delete', { id: meta.tempId });
-					}
-					self._toastFromDict('rejected');
-				} else {
-					// update/delete/bulk generic 4xx (incl. 404): leave local, next sync reconciles
-					self._toastFromDict('rejected');
-				}
-
-				if (meta.queued && children.queue) {
-					reconciliation.then(function () {
-						dispatch(children.queueEl, 'ln-api-queue:nack', { entryId: meta.entryId, reason: 'drop' });
-					}).catch(function (error) {
-						self._reportReconciliationError('deterministic-reconcile', error, meta);
-					});
-				} else {
-					reconciliation.catch(function (error) {
-						self._reportReconciliationError('deterministic-reconcile', error, meta);
-					});
-				}
-			},
-
-			// ─── Store Initialized (Sync Ownership) ───────────────
-			storeInitialized: function (e) {
-				const children = self.findChildren();
-				const store = children.store;
-				if (!store || store.initializationError || !children.connector || self._noAutosync || store.isSyncing) return;
-
-				const detail = e.detail || {};
-				if (!detail.hasCache) {
-					store.forceSync();
-				} else if (self._isStale()) {
-					store.forceSync();
-				}
-			},
-
-			// A (re)opened socket may have missed pushes — catch up with a delta
-			// sync over whichever connector takes requests.
-			socketConnected: function () {
-				const children = self.findChildren();
-				const store = children.store;
-				if (!store || store.initializationError || !children.connector || self._noAutosync || !store.isInitialized || store.isSyncing) return;
-				store.forceSync();
-			},
-
-			// ─── View Binder Handlers ─────────────────────────────
-			reqTableData: function (e) { self._serveData(e, 'table'); },
-			reqListData: function (e) { self._serveData(e, 'list'); },
-			reqChartData: function (e) { self._serveData(e, 'chart'); },
-			reqOptions: function (e) { self._serveOptions(e); },
-			reqStat: function (e) { self._serveStat(e); },
-			refreshQuery: function () { self._refreshAll(null, true); },
-			refresh: function (e) {
-				self._mutationReceipts.resolve(e.detail);
-				self._refreshAll(null, false);
-			},
-			mutationError: function (e) {
-				self._mutationReceipts.reject(e.detail);
-			},
-			refreshSynced: function (e) {
-				if (e.detail && e.detail.changed) self._refreshAll(e.detail.meta, false);
-			},
-
-			searchChange: function (e) {
-				e.preventDefault();
-				const term = (e.detail && e.detail.term != null) ? e.detail.term : '';
-				if (term === (self.dom.getAttribute(SEARCH_ATTR) || '')) return;
-				self.dom.setAttribute(SEARCH_ATTR, term);
-			},
-
-			filterChange: function (e) {
-				e.preventDefault();
-				const key = e.detail && e.detail.key;
-				if (!key) return;
-				const values = (e.detail.values || []).slice();
-				const filters = self._currentQuery().filters;
-				const prev = filters[key];
-				const unchanged = prev
-					? (prev.length === values.length && prev.every((v, i) => v === values[i]))
-					: !values.length;
-				if (unchanged) return;
-				if (values.length) filters[key] = values;
-				else delete filters[key];
-				const params = new URLSearchParams();
-				Object.keys(filters).forEach(function (k) {
-					filters[k].forEach(function (v) { params.append(k, v); });
-				});
-				const next = params.toString();
-				if (next) self.dom.setAttribute(FILTERS_ATTR, next);
-				else self.dom.removeAttribute(FILTERS_ATTR);
-			},
-
-			sortChange: function (e) {
-				e.preventDefault();
-				const field = e.detail && e.detail.field;
-				const direction = e.detail && e.detail.direction;
-				const next = (field && direction && direction !== 'none') ? { field: field, direction: direction } : null;
-				const prev = self._currentQuery().sort;
-				const unchanged = (!prev && !next) || (prev && next && prev.field === next.field && prev.direction === next.direction);
-				if (unchanged) return;
-				if (next) {
-					self.dom.setAttribute(SORT_FIELD_ATTR, next.field);
-					self.dom.setAttribute(SORT_DIR_ATTR, next.direction);
-				} else {
-					self.dom.removeAttribute(SORT_FIELD_ATTR);
-					self.dom.removeAttribute(SORT_DIR_ATTR);
-				}
-			}
-		};
-
-		// Sync request bubbling up from the child store
-		self.dom.addEventListener('ln-data-store:request-remote-sync', self._handlers.sync);
-		self.dom.addEventListener('ln-data-store:request-page', self._handlers.requestPage);
-
-		// Coordinator-namespaced intake events (parallel fan-out)
-		self.dom.addEventListener('ln-data-coordinator:request-create', self._handlers.reqCreate);
-		self.dom.addEventListener('ln-data-coordinator:request-update', self._handlers.reqUpdate);
-		self.dom.addEventListener('ln-data-coordinator:request-delete', self._handlers.reqDelete);
-		self.dom.addEventListener('ln-data-coordinator:request-bulk-delete', self._handlers.reqBulkDelete);
-
-		// Queue transport executor + terminal failure
-		self.dom.addEventListener('ln-api-queue:send', self._handlers.queueSend);
-		self.dom.addEventListener('ln-api-queue:failed', self._handlers.queueFailed);
-
-		// Sync ownership — store initialization
-		self.dom.addEventListener('ln-data-store:initialized', self._handlers.storeInitialized);
-		self.dom.addEventListener('ln-websocket-connector:connected', self._handlers.socketConnected);
-
-		// Form write intake — native submit, document-level, bubble phase (never
-		// capture: ln-validate's own submit gate on the form must run first)
-		document.addEventListener('submit', self._handlers.formSubmit);
-
-		// Connector responses — generalized across concrete connector implementations
-		CONNECTOR_RESPONSE_NAMESPACES.forEach(function (ns) {
-			self.dom.addEventListener(ns + ':fetched', self._handlers.connFetched);
-			self.dom.addEventListener(ns + ':created', self._handlers.connCreated);
-			self.dom.addEventListener(ns + ':updated', self._handlers.connUpdated);
-			self.dom.addEventListener(ns + ':deleted', self._handlers.connDeleted);
-			self.dom.addEventListener(ns + ':bulk-deleted', self._handlers.connBulkDeleted);
-			self.dom.addEventListener(ns + ':error', self._handlers.connError);
-		});
-
-		// View binder — request handlers (document-level to reach tables/lists outside this subtree)
-		document.addEventListener('ln-table:request-data', self._handlers.reqTableData);
-		document.addEventListener('ln-list:request-data', self._handlers.reqListData);
-		document.addEventListener('ln-chart:request-data', self._handlers.reqChartData);
-		document.addEventListener('ln-options:request-data', self._handlers.reqOptions);
-		document.addEventListener('ln-stat:request-count', self._handlers.reqStat);
-
-		// Store-change refresh — attach to self.dom so bubbling store events are caught
-		self.dom.addEventListener('ln-data-store:ready', self._handlers.refresh);
-		self.dom.addEventListener('ln-data-store:created', self._handlers.refresh);
-		self.dom.addEventListener('ln-data-store:updated', self._handlers.refresh);
-		self.dom.addEventListener('ln-data-store:deleted', self._handlers.refresh);
-		self.dom.addEventListener('ln-data-store:mutation-error', self._handlers.mutationError);
-		self.dom.addEventListener('ln-data-store:synced', self._handlers.refreshSynced);
-		self.dom.addEventListener('ln-data-store:query-changed', self._handlers.refreshQuery);
-
-		// Query state — owned by the coordinator, written from the axis events
-		self.dom.addEventListener('ln-search:change', self._handlers.searchChange);
-		self.dom.addEventListener('ln-filter:change', self._handlers.filterChange);
-		self.dom.addEventListener('ln-sort:change', self._handlers.sortChange);
-	}
-
-	// ─── Store↔View Binder ───────────────────────────────────
-
+	// ─── Query State & View Serving ──────────────────────────
 	_component.prototype._owns = function (name) {
 		return !!name && name === this._name;
 	};
 
-	// ─── Query State — owned by the coordinator, read live (§1 doctrine) ────
-
 	_component.prototype._currentQuery = function () {
-		const field = this.dom.getAttribute(SORT_FIELD_ATTR);
-		const direction = this.dom.getAttribute(SORT_DIR_ATTR);
-		const params = new URLSearchParams(this.dom.getAttribute(FILTERS_ATTR) || '');
-		const filters = {};
+		const field = this.dom.getAttribute(SORT_FIELD_ATTR), direction = this.dom.getAttribute(SORT_DIR_ATTR);
+		const params = new URLSearchParams(this.dom.getAttribute(FILTERS_ATTR) || ''), filters = {};
 		for (const key of new Set(params.keys())) filters[key] = params.getAll(key);
-		return {
-			search: this.dom.getAttribute(SEARCH_ATTR) || '',
-			filters: filters,
-			sort: (field && direction) ? { field: field, direction: direction } : null
-		};
-	};
-
-	_component.prototype._nextQueryGen = function (el) {
-		const gen = (this._queryGens.get(el) || 0) + 1;
-		this._queryGens.set(el, gen);
-		return gen;
-	};
-
-	_component.prototype._isCurrentGen = function (el, gen) {
-		return this._queryGens.get(el) === gen;
-	};
-
-	_component.prototype._serveData = function (e, kind) {
-		const el = e.target;
-		const attrName = kind === 'table' ? 'data-ln-table-source'
-			: (kind === 'list' ? 'data-ln-list-source' : 'data-ln-chart-source');
-		const storeName = el.getAttribute(attrName);
-		if (!storeName) return;
-		if (!this._owns(storeName)) return;
-
-		const request = e.detail || {};
-		const query = normalizeDataQuery(request);
-		this._boundQueries.set(el, query);
-
-		const children = this.findChildren();
-		const self = this;
-		const store = children.store;
-		const ready = store && store.ready ? store.ready : Promise.resolve();
-
-		return ready.then(function () {
-			if (self._destroyed) return;
-			const source = selectDataSource(store, children.connector);
-			const effective = composeQuery(query, self._currentQuery());
-			if (source === 'remote') {
-				// The source owns search/filter/sort even when it holds no rows yet —
-				// the view only contributes the page window, so the server must be
-				// asked with the composed query, not the view's request as it arrived.
-				const gen = self._nextQueryGen(el);
-				dispatch(el, 'ln-' + kind + ':set-loading', { loading: true });
-				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
-					query: effective,
-					meta: { targetEl: el, kind: kind, offset: effective.offset, limit: effective.limit, queryGen: gen }
-				});
-				return;
-			}
-
-			if (source !== 'store') {
-				dispatch(el, 'ln-' + kind + ':set-loading', { loading: false });
-				return;
-			}
-
-			const supersede = needsRemoteSupersede(store, children.connector, source);
-			const gen = supersede ? self._nextQueryGen(el) : null;
-			if (supersede) {
-				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
-					query: effective,
-					meta: { targetEl: el, kind: kind, offset: effective.offset, limit: effective.limit, queryGen: gen }
-				});
-			}
-
-			return store.getAll(effective).then(function (r) {
-				if (self._destroyed || !self._boundDelivered) return;
-				if (supersede && !self._isCurrentGen(el, gen)) return; // a newer request has already superseded this one
-				const detail = {
-					data: r.data,
-					total: r.total,
-					filtered: r.filtered,
-					offset: request.offset !== undefined ? request.offset : r.offset,
-					queryGen: request.queryGen !== undefined ? request.queryGen : r.queryGen,
-					// The store answered from its own records while the server query
-					// is still out; the view renders it but keeps the refresh showing.
-					provisional: supersede || r.provisional === true
-				};
-				dispatch(el, 'ln-' + kind + ':set-data', detail);
-				self._boundDelivered.set(el, true);
-			});
-		}).catch(function (error) {
-			if (self._destroyed) return;
-			dispatch(el, 'ln-' + kind + ':set-loading', { loading: false });
-			dispatch(self.dom, 'ln-data-coordinator:error', {
-				operation: 'query',
-				kind: kind,
-				store: storeName,
-				target: el,
-				error: error
-			});
-		});
-	};
-
-	_component.prototype._serveOptions = function (e) {
-		const el = e.target;
-		const name = el.getAttribute('data-ln-options');
-		if (!this._owns(name)) return;
-
-		const children = this.findChildren();
-		const store = children.store;
-		const ready = store && store.ready ? store.ready : Promise.resolve();
-		const self = this;
-
-		return ready.then(function () {
-			if (self._destroyed) return;
-			const source = selectDataSource(store, children.connector);
-			if (source === 'remote') {
-				const gen = self._nextQueryGen(el);
-				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
-					query: {},
-					meta: { targetEl: el, kind: 'options', queryGen: gen }
-				});
-				return;
-			}
-			if (source !== 'store') return;
-
-			const supersede = needsRemoteSupersede(store, children.connector, source);
-			const gen = supersede ? self._nextQueryGen(el) : null;
-			if (supersede) {
-				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
-					query: {},
-					meta: { targetEl: el, kind: 'options', queryGen: gen }
-				});
-			}
-
-			return store.getAll({}).then(function (r) {
-				if (self._destroyed) return;
-				if (supersede && !self._isCurrentGen(el, gen)) return;
-				dispatch(el, 'ln-options:set-data', { data: r.data });
-			});
-		}).catch(function (error) {
-			if (self._destroyed) return;
-			self._reportReconciliationError('options-query', error, { targetEl: el, kind: 'options' });
-		});
-	};
-
-	_component.prototype._serveStat = function (e) {
-		const el = e.target;
-		const name = el.getAttribute('data-ln-stat');
-		if (!this._owns(name)) return;
-
-		const filters = e.detail && e.detail.filters ? e.detail.filters : null;
-		const children = this.findChildren();
-		const store = children.store;
-		const ready = store && store.ready ? store.ready : Promise.resolve();
-		const self = this;
-
-		return ready.then(function () {
-			if (self._destroyed) return;
-			const hasFilters = filters && Object.keys(filters).length > 0;
-			const requiresRemote = !!(children.connector && store && ((store.windowed && hasFilters) || store.noLocalQuery));
-			const source = requiresRemote ? 'remote' : selectDataSource(store, children.connector);
-			if (source === 'remote') {
-				const gen = self._nextQueryGen(el);
-				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
-					query: { filters: filters },
-					meta: { targetEl: el, kind: 'stat', queryGen: gen }
-				});
-				return;
-			}
-			if (source !== 'store') return;
-
-			const supersede = !requiresRemote && needsRemoteSupersede(store, children.connector, source);
-			const gen = supersede ? self._nextQueryGen(el) : null;
-			if (supersede) {
-				dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
-					query: { filters: filters },
-					meta: { targetEl: el, kind: 'stat', queryGen: gen }
-				});
-			}
-
-			return store.count(filters).then(function (n) {
-				if (self._destroyed) return;
-				if (supersede && !self._isCurrentGen(el, gen)) return;
-				dispatch(el, 'ln-stat:set-count', { count: n });
-			});
-		}).catch(function (error) {
-			if (self._destroyed) return;
-			self._reportReconciliationError('stat-query', error, { targetEl: el, kind: 'stat' });
-		});
+		return { search: this.dom.getAttribute(SEARCH_ATTR) || '', filters, sort: (field && direction) ? { field, direction } : null };
 	};
 
 	_component.prototype._refreshAll = function (syncMeta, isQueryChange) {
-		const self = this;
-		const allBound = document.querySelectorAll('[data-ln-table-source],[data-ln-list-source],[data-ln-chart-source],[data-ln-options],[data-ln-stat]');
-		for (let i = 0; i < allBound.length; i++) {
-			const el = allBound[i];
-			let storeName, kind;
-
-			if (el.hasAttribute('data-ln-table-source')) {
-				storeName = el.getAttribute('data-ln-table-source');
-				kind = 'table';
-			} else if (el.hasAttribute('data-ln-list-source')) {
-				storeName = el.getAttribute('data-ln-list-source');
-				kind = 'list';
-			} else if (el.hasAttribute('data-ln-chart-source')) {
-				storeName = el.getAttribute('data-ln-chart-source');
-				kind = 'chart';
-			} else if (el.hasAttribute('data-ln-options')) {
-				storeName = el.getAttribute('data-ln-options');
-				kind = 'options';
-			} else if (el.hasAttribute('data-ln-stat')) {
-				storeName = el.getAttribute('data-ln-stat');
-				kind = 'stat';
-			}
-
-			if (!self._owns(storeName)) continue;
-
-			const children = self.findChildren();
-			const store = children.store;
-
-			if (kind === 'table' || kind === 'list') {
-				const windowAttr = kind === 'table' ? 'data-ln-table-window' : 'data-ln-list-window';
-				if (el.hasAttribute(windowAttr)) {
-					// A windowed view holds no rows to re-serve — it is told to restart
-					// its window (query change) or refresh it in place (post-mutation),
-					// and pulls the pages back through request-data.
+		for (const [sel, attr, kind] of VIEW_TARGETS) {
+			for (const el of this.dom.ownerDocument.querySelectorAll(sel)) {
+				if (!this._owns(el.getAttribute(attr))) continue;
+				if ((kind === 'table' || kind === 'list') && el.hasAttribute(kind === 'table' ? 'data-ln-table-window' : 'data-ln-list-window')) {
 					dispatch(el, 'ln-' + kind + (isQueryChange ? ':request-invalidate' : ':request-revalidate'), {});
 					continue;
 				}
+				this._serveElement(el, kind, null, syncMeta);
 			}
+		}
+	};
+
+	_component.prototype._serveElement = function (el, kind, reqQuery, syncMeta) {
+		const c = this.findChildren(), store = c.store;
+		if (!store) return;
+		if (reqQuery) this._boundQueries.set(el, reqQuery);
+		const cached = this._boundQueries.get(el) || { sort: null, filters: {}, search: '' };
+		const effective = composeQuery(cached, this._currentQuery());
+
+		const self = this;
+		return Promise.resolve(store.ready).then(() => {
+			if (self._destroyed) return;
+			const source = selectDataSource(store, c.connector);
 			if (kind === 'table' || kind === 'list' || kind === 'chart') {
-				const cached = self._boundQueries.get(el) || { sort: null, filters: {}, search: '' };
-				const effective = composeQuery(cached, self._currentQuery());
-
-				// Same read policy the view-initiated path applies. Without this the
-				// store-change refresh would query the cache even when the store has
-				// been told to leave queries to the server.
-				if (selectDataSource(store, children.connector) === 'remote') {
-					const gen = self._nextQueryGen(el);
+				if (source === 'remote') {
 					dispatch(el, 'ln-' + kind + ':set-loading', { loading: true });
-					dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
-						query: effective,
-						meta: { targetEl: el, kind: kind, offset: effective.offset, limit: effective.limit, queryGen: gen }
-					});
-					continue;
+					return dispatch(c.connectorEl, _connNs(c.connectorEl) + ':request-query', { query: effective, meta: { targetEl: el, kind, offset: effective.offset, limit: effective.limit, queryGen: cached.queryGen } });
 				}
-
-				const supersede = needsRemoteSupersede(store, children.connector, selectDataSource(store, children.connector));
-				const gen = supersede ? self._nextQueryGen(el) : null;
-				if (supersede) {
-					dispatch(children.connectorEl, _connectorNamespace(children.connectorEl) + ':request-query', {
-						query: effective,
-						meta: { targetEl: el, kind: kind, offset: effective.offset, limit: effective.limit, queryGen: gen }
-					});
-				}
-
-				(function (capturedEl, capturedKind, capturedSupersede, capturedGen) {
-					store.getAll(effective).then(function (r) {
-						if (self._destroyed || !self._boundDelivered) return;
-						if (capturedSupersede && !self._isCurrentGen(capturedEl, capturedGen)) return;
-						const detail = {
-							data: r.data,
-							total: (syncMeta && syncMeta.total !== undefined) ? syncMeta.total : r.total,
-							filtered: (syncMeta && syncMeta.filtered !== undefined) ? syncMeta.filtered : r.filtered,
-							offset: (r.offset !== undefined) ? r.offset
-								: ((syncMeta && syncMeta.offset !== undefined) ? syncMeta.offset : cached.offset),
-							queryGen: (r.queryGen !== undefined) ? r.queryGen
-								: ((syncMeta && syncMeta.queryGen !== undefined) ? syncMeta.queryGen : cached.queryGen)
-						};
-						dispatch(capturedEl, 'ln-' + capturedKind + ':set-loading', { loading: false });
-						dispatch(capturedEl, 'ln-' + capturedKind + ':set-data', detail);
-						self._boundDelivered.set(capturedEl, true);
-					}).catch(function () {});
-				})(el, kind, supersede, gen);
-			} else if (kind === 'options') {
-				(function (capturedEl) {
-					store.getAll({}).then(function (r) {
-						if (self._destroyed) return;
-						dispatch(capturedEl, 'ln-options:set-data', { data: r.data });
-					}).catch(function () {});
-				})(el);
-			} else if (kind === 'stat') {
-				const raw = el.getAttribute('data-ln-stat-filter');
-				let filters = null;
-				if (raw) {
-					const colonIdx = raw.indexOf(':');
-					if (colonIdx !== -1) {
-						const field = raw.slice(0, colonIdx).trim();
-						const val = raw.slice(colonIdx + 1).trim();
-						if (field) {
-							filters = {};
-							filters[field] = [val];
-						}
-					}
-				}
-				(function (capturedEl, capturedFilters) {
-					store.count(capturedFilters).then(function (n) {
-						if (self._destroyed) return;
-						dispatch(capturedEl, 'ln-stat:set-count', { count: n });
-					}).catch(function () {});
-				})(el, filters);
+				if (source !== 'store') return dispatch(el, 'ln-' + kind + ':set-loading', { loading: false });
+				return store.getAll(effective).then(r => {
+					if (self._destroyed || !self._boundDelivered) return;
+					dispatch(el, 'ln-' + kind + ':set-loading', { loading: false });
+					dispatch(el, 'ln-' + kind + ':set-data', { data: r.data, total: syncMeta?.total ?? r.total, filtered: syncMeta?.filtered ?? r.filtered, offset: r.offset ?? syncMeta?.offset ?? cached.offset, queryGen: cached.queryGen !== undefined ? cached.queryGen : (syncMeta?.queryGen ?? r.queryGen), provisional: r.provisional === true });
+					self._boundDelivered.set(el, true);
+				});
 			}
+			if (kind === 'options') {
+				if (source === 'remote') return dispatch(c.connectorEl, _connNs(c.connectorEl) + ':request-query', { query: {}, meta: { targetEl: el, kind } });
+				if (source === 'store') return store.getAll({}).then(r => !self._destroyed && dispatch(el, 'ln-options:set-data', { data: r.data }));
+			}
+			if (kind === 'stat') {
+				let filters = reqQuery?.filters;
+				if (!filters) {
+					const raw = el.getAttribute('data-ln-stat-filter');
+					if (raw?.includes(':')) { const p = raw.split(':'); filters = { [p[0].trim()]: [p.slice(1).join(':').trim()] }; }
+				}
+				const statSource = (c.connector && store && ((store.windowed && filters && Object.keys(filters).length) || store.noLocalQuery)) ? 'remote' : source;
+				if (statSource === 'remote') return dispatch(c.connectorEl, _connNs(c.connectorEl) + ':request-query', { query: { filters }, meta: { targetEl: el, kind } });
+				if (statSource === 'store') return store.count(filters).then(n => !self._destroyed && dispatch(el, 'ln-stat:set-count', { count: n }));
+			}
+		}).catch(err => {
+			if (self._destroyed) return;
+			if (kind === 'table' || kind === 'list' || kind === 'chart') dispatch(el, 'ln-' + kind + ':set-loading', { loading: false });
+			self._reportError(kind + '-query', err, { targetEl: el, kind });
+		});
+	};
+
+	// ─── Event Binding & Handlers ─────────────────────────────
+	function _bindEvents(self) {
+		const unsubs = self._unsubs = [];
+		const addEventListener = (target, type, fn) => { target.addEventListener(type, fn); unsubs.push(() => target.removeEventListener(type, fn)); };
+
+		addEventListener(self.dom, 'ln-data-store:request-remote-sync', e => {
+			self.refreshMapper();
+			const c = self.findChildren();
+			if (c.store && c.connector) dispatch(c.connectorEl, _connNs(c.connectorEl) + ':request-sync', { since: e.detail.since, meta: { op: 'sync' } });
+		});
+
+		addEventListener(self.dom, 'ln-data-store:request-page', e => {
+			const c = self.findChildren(), d = e.detail || {};
+			if (!c.connectorEl) return;
+			const effective = composeQuery(d.query || {}, self._currentQuery());
+			dispatch(c.connectorEl, _connNs(c.connectorEl) + ':request-query', {
+				query: Object.assign({}, effective, { offset: d.offset, limit: d.limit, queryGen: d.queryGen })
+			});
+		});
+
+		addEventListener(self.dom, 'ln-data-coordinator:request-create', e => self._fanOutCreate(self.findChildren(), e.detail.data || {}, e.detail.action));
+		addEventListener(self.dom, 'ln-data-coordinator:request-update', e => self._fanOutUpdate(self.findChildren(), e.detail.id, e.detail.data || {}, e.detail.expected_version, e.detail.action));
+		addEventListener(self.dom, 'ln-data-coordinator:request-delete', e => self._fanOutDelete(self.findChildren(), e.detail.id));
+		addEventListener(self.dom, 'ln-data-coordinator:request-bulk-delete', e => self._fanOutBulkDelete(self.findChildren(), e.detail.ids || []));
+		addEventListener(self.dom, 'ln-api-queue:send', e => self._onQueueSend(e.detail || {}));
+		addEventListener(self.dom, 'ln-api-queue:failed', e => self._reportError('queue-failed', e?.detail?.error || new Error('Queue failed'), e?.detail || null));
+
+		addEventListener(self.dom, 'ln-data-store:initialized', e => {
+			const c = self.findChildren();
+			if (c.store && !c.store.initializationError && c.connector && !self._noAutosync(c) && !c.store.isSyncing && (!e.detail?.hasCache || self._isStale(c))) c.store.forceSync();
+		});
+
+		const onConnected = () => {
+			const c = self.findChildren();
+			if (c.store && !c.store.initializationError && c.connector && !self._noAutosync(c) && c.store.isInitialized && !c.store.isSyncing) c.store.forceSync();
+		};
+		addEventListener(self.dom, 'ln-websocket-connector:connected', onConnected);
+
+		addEventListener(document, 'submit', e => self._onFormSubmit(e));
+		const serve = (e, kind, attr) => {
+			if (self._owns(e.target.getAttribute(attr))) self._serveElement(e.target, kind, kind === 'stat' ? { filters: e.detail?.filters || null } : (kind === 'options' ? null : normalizeDataQuery(e.detail || {})), null);
+		};
+		addEventListener(document, 'ln-table:request-data', e => serve(e, 'table', 'data-ln-table-source'));
+		addEventListener(document, 'ln-list:request-data', e => serve(e, 'list', 'data-ln-list-source'));
+		addEventListener(document, 'ln-chart:request-data', e => serve(e, 'chart', 'data-ln-chart-source'));
+		addEventListener(document, 'ln-options:request-data', e => serve(e, 'options', 'data-ln-options'));
+		addEventListener(document, 'ln-stat:request-count', e => serve(e, 'stat', 'data-ln-stat'));
+
+		const refresh = e => { self._mutationReceipts.resolve(e.detail); self._refreshAll(null, false); };
+		addEventListener(self.dom, 'ln-data-store:ready', refresh);
+		addEventListener(self.dom, 'ln-data-store:created', refresh);
+		addEventListener(self.dom, 'ln-data-store:updated', refresh);
+		addEventListener(self.dom, 'ln-data-store:deleted', refresh);
+		addEventListener(self.dom, 'ln-data-store:mutation-error', e => self._mutationReceipts.reject(e.detail));
+		addEventListener(self.dom, 'ln-data-store:synced', e => { if (e.detail?.changed) self._refreshAll(e.detail.meta, false); });
+		addEventListener(self.dom, 'ln-data-store:query-changed', () => self._refreshAll(null, true));
+
+		addEventListener(self.dom, 'ln-search:change', e => {
+			e.preventDefault();
+			const term = e.detail?.term != null ? e.detail.term : '';
+			if (term !== (self.dom.getAttribute(SEARCH_ATTR) || '')) self.dom.setAttribute(SEARCH_ATTR, term);
+		});
+
+		addEventListener(self.dom, 'ln-filter:change', e => {
+			e.preventDefault();
+			const key = e.detail?.key;
+			if (!key) return;
+			const values = (e.detail.values || []).slice(), filters = self._currentQuery().filters, prev = filters[key];
+			if (prev ? (prev.length === values.length && prev.every((v, i) => v === values[i])) : !values.length) return;
+			if (values.length) filters[key] = values; else delete filters[key];
+			const p = new URLSearchParams();
+			Object.keys(filters).forEach(k => filters[k].forEach(v => p.append(k, v)));
+			const next = p.toString();
+			if (next) self.dom.setAttribute(FILTERS_ATTR, next); else self.dom.removeAttribute(FILTERS_ATTR);
+		});
+
+		addEventListener(self.dom, 'ln-sort:change', e => {
+			e.preventDefault();
+			const f = e.detail?.field, d = e.detail?.direction;
+			const next = (f && d && d !== 'none') ? { field: f, direction: d } : null, prev = self._currentQuery().sort;
+			if ((!prev && !next) || (prev && next && prev.field === next.field && prev.direction === next.direction)) return;
+			if (next) { self.dom.setAttribute(SORT_FIELD_ATTR, next.field); self.dom.setAttribute(SORT_DIR_ATTR, next.direction); }
+			else { self.dom.removeAttribute(SORT_FIELD_ATTR); self.dom.removeAttribute(SORT_DIR_ATTR); }
+		});
+
+		const connNamespaces = new Set(['ln-api-connector', 'ln-couchdb-connector', 'ln-websocket-connector', 'ln-connector']);
+		const childConn = self.findChildren().connectorEl;
+		if (childConn) { const customNs = _connNs(childConn); connNamespaces.add(customNs); addEventListener(self.dom, customNs + ':connected', onConnected); }
+		connNamespaces.forEach(ns => {
+			addEventListener(self.dom, ns + ':fetched', e => self._reconcileServerFetch(e.detail));
+			addEventListener(self.dom, ns + ':created', e => self._reconcileServerMutation('create', e.detail));
+			addEventListener(self.dom, ns + ':updated', e => self._reconcileServerMutation('update', e.detail));
+			addEventListener(self.dom, ns + ':deleted', e => self._reconcileServerMutation('ack', e.detail));
+			addEventListener(self.dom, ns + ':bulk-deleted', e => self._reconcileServerMutation('ack', e.detail));
+			addEventListener(self.dom, ns + ':error', e => self._reconcileServerMutation('error', e.detail));
+		});
+	}
+
+	_component.prototype._onQueueSend = function (d) {
+		this.refreshMapper();
+		const c = this.findChildren();
+		if (!c.store || !c.connector || !c.queue) return;
+		const m = d.meta || {}, ns = _connNs(c.connectorEl), key = d.idempotencyKey || d.entryId;
+		const actions = {
+			create: () => dispatch(c.connectorEl, ns + ':request-create', { data: d.payload, url: m.action || null, idempotencyKey: key, meta: { entryId: d.entryId, queued: true, op: 'create', tempId: m.tempId } }),
+			update: () => dispatch(c.connectorEl, ns + ':request-update', { id: d.targetId, data: d.payload, expected_version: d.expectedVersion, url: m.action || null, idempotencyKey: key, meta: { entryId: d.entryId, queued: true, op: 'update', id: d.targetId } }),
+			delete: () => dispatch(c.connectorEl, ns + ':request-delete', { id: d.targetId, idempotencyKey: key, meta: { entryId: d.entryId, queued: true, op: 'delete', id: d.targetId } }),
+			'bulk-delete': () => dispatch(c.connectorEl, ns + ':request-bulk-delete', { ids: d.payload?.ids || [], idempotencyKey: key, meta: { entryId: d.entryId, queued: true, op: 'bulk-delete', bulkKey: m.bulkKey } })
+		};
+		if (actions[d.op]) actions[d.op]();
+	};
+
+	_component.prototype._onFormSubmit = function (e) {
+		const form = e.target;
+		if (e.defaultPrevented) return;
+		const scope = form.hasAttribute(SCOPE_ATTR) ? form.getAttribute(SCOPE_ATTR) : null;
+		if (scope === null || (scope ? !this._owns(scope) : form.closest('[' + DOM_SELECTOR + ']') !== this.dom)) return;
+		const method = resolveFormMethod(form);
+		if (method !== 'POST' && method !== 'PUT' && method !== 'PATCH') return;
+		e.preventDefault();
+		const raw = serializeForm(form);
+		delete raw._method; delete raw._token;
+		const id = raw.id, v = raw.expected_version, action = form.getAttribute('action') || '', c = this.findChildren();
+		delete raw.id; delete raw.expected_version;
+		if (method === 'POST') this._fanOutCreate(c, raw, action);
+		else this._fanOutUpdate(c, id, raw, v, action);
+	};
+
+	_component.prototype._reconcileServerFetch = function (d) {
+		if (!d) return;
+		const meta = d.meta || {}, c = this.findChildren(), raw = d.data;
+		this.refreshMapper();
+		const fetched = Array.isArray(raw) ? raw : (raw?.data || []);
+		const deleted = Array.isArray(raw?.deleted) ? raw.deleted : [];
+		const syncedAt = Array.isArray(raw) ? Math.floor(Date.now() / 1000) : (raw?.synced_at ?? raw?.since ?? Math.floor(Date.now() / 1000));
+		const records = fetched.map(r => this.mapper.ingress(r));
+		if (!c.store || c.store.initializationError) return;
+
+		if (!meta.kind) return c.store.applySync(records, deleted, syncedAt, { total: d.total, filtered: d.filtered, offset: d.offset, queryGen: d.queryGen, targetEl: meta.targetEl });
+		c.store.applyQuery(records, { total: d.total }).then(dec => {
+			const k = meta.kind;
+			if (k === 'table' || k === 'list' || k === 'chart') {
+				dispatch(meta.targetEl, 'ln-' + k + ':set-loading', { loading: false });
+				dispatch(meta.targetEl, 'ln-' + k + ':set-data', { data: dec, total: d.total ?? dec.length, filtered: d.filtered ?? dec.length, offset: d.offset, queryGen: meta.queryGen });
+				this._boundDelivered.set(meta.targetEl, true);
+			} else if (k === 'options') {
+				c.store.getAll({}).then(r => dispatch(meta.targetEl, 'ln-options:set-data', { data: r.data }));
+			} else if (k === 'stat') {
+				dispatch(meta.targetEl, 'ln-stat:set-count', { count: d.filtered ?? d.total ?? records.length });
+			}
+		});
+	};
+
+	_component.prototype._reconcileServerMutation = function (type, d) {
+		if (!d) return;
+		const c = this.findChildren(), meta = d.meta || {};
+		if (type === 'create') {
+			if (!d.record) return this._reportError('create-empty-response', new Error('Create response missing record payload'), meta);
+			const rec = this.mapper.ingress(d.record);
+			(c.storeEl ? this._requestStoreMutation(c, 'update', { id: meta.tempId, data: rec }) : Promise.resolve()).then(() => {
+				if (meta.queued && c.queue) dispatch(c.queueEl, 'ln-api-queue:resolve-create', { entryId: meta.entryId, oldKey: meta.tempId, newId: rec.id });
+			}).catch(err => this._reportError('create-reconcile', err, meta));
+		} else if (type === 'update') {
+			const rec = d.record ? this.mapper.ingress(d.record) : null;
+			(c.storeEl && rec ? this._requestStoreMutation(c, 'update', { id: meta.id, data: rec }) : Promise.resolve()).then(() => {
+				if (meta.queued && c.queue) dispatch(c.queueEl, 'ln-api-queue:ack', { entryId: meta.entryId });
+			}).catch(err => this._reportError('update-reconcile', err, meta));
+		} else if (type === 'ack') {
+			if (meta.queued && c.queue) dispatch(c.queueEl, 'ln-api-queue:ack', { entryId: meta.entryId });
+		} else if (type === 'error') {
+			const status = d.status || d.error?.status || 0;
+			if (meta.queued && c.queue) {
+				dispatch(c.queueEl, 'ln-api-queue:nack', { entryId: meta.entryId, reason: (status === 401 || status === 419) ? 'auth' : ((status === 0 || status >= 500) ? 'retry' : 'drop') });
+			}
+			this._reportError('connector-error', d.error || d, meta);
 		}
 	};
 
 	// ─── Destroy and Cleanup ──────────────────────────────────
-
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
-
 		this._destroyed = true;
-		const self = this;
-		if (self._handlers) {
-			self.dom.removeEventListener('ln-data-store:request-remote-sync', self._handlers.sync);
-			self.dom.removeEventListener('ln-data-store:request-page', self._handlers.requestPage);
-
-			self.dom.removeEventListener('ln-data-coordinator:request-create', self._handlers.reqCreate);
-			self.dom.removeEventListener('ln-data-coordinator:request-update', self._handlers.reqUpdate);
-			self.dom.removeEventListener('ln-data-coordinator:request-delete', self._handlers.reqDelete);
-			self.dom.removeEventListener('ln-data-coordinator:request-bulk-delete', self._handlers.reqBulkDelete);
-
-			self.dom.removeEventListener('ln-api-queue:send', self._handlers.queueSend);
-			self.dom.removeEventListener('ln-api-queue:failed', self._handlers.queueFailed);
-			self.dom.removeEventListener('ln-data-store:initialized', self._handlers.storeInitialized);
-			self.dom.removeEventListener('ln-websocket-connector:connected', self._handlers.socketConnected);
-
-			document.removeEventListener('submit', self._handlers.formSubmit);
-
-			CONNECTOR_RESPONSE_NAMESPACES.forEach(function (ns) {
-				self.dom.removeEventListener(ns + ':fetched', self._handlers.connFetched);
-				self.dom.removeEventListener(ns + ':created', self._handlers.connCreated);
-				self.dom.removeEventListener(ns + ':updated', self._handlers.connUpdated);
-				self.dom.removeEventListener(ns + ':deleted', self._handlers.connDeleted);
-				self.dom.removeEventListener(ns + ':bulk-deleted', self._handlers.connBulkDeleted);
-				self.dom.removeEventListener(ns + ':error', self._handlers.connError);
-			});
-
-			// View binder — document-level listeners
-			document.removeEventListener('ln-table:request-data', self._handlers.reqTableData);
-			document.removeEventListener('ln-list:request-data', self._handlers.reqListData);
-			document.removeEventListener('ln-chart:request-data', self._handlers.reqChartData);
-			document.removeEventListener('ln-options:request-data', self._handlers.reqOptions);
-			document.removeEventListener('ln-stat:request-count', self._handlers.reqStat);
-
-			// Store-change listeners
-			self.dom.removeEventListener('ln-data-store:ready', self._handlers.refresh);
-			self.dom.removeEventListener('ln-data-store:created', self._handlers.refresh);
-			self.dom.removeEventListener('ln-data-store:updated', self._handlers.refresh);
-			self.dom.removeEventListener('ln-data-store:deleted', self._handlers.refresh);
-			self.dom.removeEventListener('ln-data-store:mutation-error', self._handlers.mutationError);
-			self.dom.removeEventListener('ln-data-store:synced', self._handlers.refreshSynced);
-			self.dom.removeEventListener('ln-data-store:query-changed', self._handlers.refreshQuery);
-
-			self.dom.removeEventListener('ln-search:change', self._handlers.searchChange);
-			self.dom.removeEventListener('ln-filter:change', self._handlers.filterChange);
-			self.dom.removeEventListener('ln-sort:change', self._handlers.sortChange);
-
-			self._handlers = null;
-		}
-
-		self._boundQueries = null;
-		self._boundDelivered = null;
-		self._queryGens = null;
-		self._queueQueryRefresh = null;
-		self._mutationReceipts.close(new Error('Data coordinator destroyed'));
-		self._mutationReceipts = null;
-
-		_coordinators.delete(this);
-		_uninstallGlobalSync();
-
+		while (this._unsubs?.length) this._unsubs.pop()();
+		this._unsubs = this._boundQueries = this._boundDelivered = this._queueQueryRefresh = null;
+		this._mutationReceipts.close(new Error('Data coordinator destroyed'));
+		this._mutationReceipts = null;
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
+	function _syncAttribute(el, attrName) {
+		const inst = el[DOM_ATTRIBUTE];
+		if (!inst) return;
+		if (attrName === 'data-ln-data-coordinator-mapper') inst.refreshMapper();
+		else if (attrName === SEARCH_ATTR || attrName === FILTERS_ATTR || attrName === SORT_FIELD_ATTR || attrName === SORT_DIR_ATTR) inst._queueQueryRefresh();
+	}
+
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-data-coordinator', {
-		attributes: ATTRIBUTES
+		extraAttributes: ['data-ln-data-coordinator-mapper', SEARCH_ATTR, FILTERS_ATTR, SORT_FIELD_ATTR, SORT_DIR_ATTR],
+		onAttributeChange: _syncAttribute
 	});
+
+	window[DOM_ATTRIBUTE].init = window[DOM_ATTRIBUTE];
 })();

@@ -39,6 +39,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders, define
 		defineAttrs(this, dom, ATTR_SPEC);
 		dom[DOM_ATTRIBUTE] = this;
 		dom[DOM_ALIAS] = this; // Alias for 3-tier compatibility
+		this.namespace = 'ln-couchdb-connector';
 
 		this.refreshConfig();
 		this._deltaController = null;

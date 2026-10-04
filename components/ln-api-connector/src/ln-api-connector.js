@@ -47,6 +47,7 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 		defineAttrs(this, dom, ATTR_SPEC);
 		dom[DOM_ATTRIBUTE] = this;
 		dom[DOM_ALIAS] = this; // Set alias for compatibility
+		this.namespace = 'ln-api-connector';
 
 		this._inflight = new Map();
 		this._queryTimers = new Map(); // per-key: { timer, pendingDetail, pendingParams, pendingTarget }

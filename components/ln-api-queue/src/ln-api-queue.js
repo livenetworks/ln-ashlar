@@ -1,4 +1,4 @@
-import { registerComponent, dispatch } from '../../ln-core';
+import { registerComponent, dispatch, uuid } from '../../ln-core';
 import { QueueStorage } from './queue-storage';
 
 (function () {
@@ -21,20 +21,10 @@ import { QueueStorage } from './queue-storage';
 		'data-ln-api-queue-online': { effect: _syncOnline, type: 'enum', values: ['true', 'false'], fallback: 'auto', description: 'Network connectivity override (true/false, or auto-detect from navigator.onLine)' }
 	};
 
-	function _uuid() {
-		try { return crypto.randomUUID(); }
-		catch (_) {
-			return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-				const r = Math.random() * 16 | 0;
-				return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-			});
-		}
-	}
-
 	const _storage = new QueueStorage({
 		indexedDB: window.indexedDB,
 		IDBKeyRange: window.IDBKeyRange,
-		uuid: _uuid
+		uuid: uuid
 	});
 
 	function _component(dom) {
@@ -46,7 +36,7 @@ import { QueueStorage } from './queue-storage';
 
 		this._paused = false;
 		this._timers = new Map();
-		this._workerId = _uuid();
+		this._workerId = uuid();
 		this._drainPromise = null;
 		this._onlineHandler = () => this._drain();
 

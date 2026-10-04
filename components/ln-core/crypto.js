@@ -263,3 +263,24 @@ export async function decryptData(encryptedObject, keyOrOptions, maybeOptions) {
 		throw new Error('[ln-crypto] Decryption failed. Key may be incorrect or payload tampered: ' + (err && err.message ? err.message : String(err)));
 	}
 }
+
+/**
+ * Generates a cryptographically random UUID (v4).
+ * Uses native crypto.randomUUID() when available, with a resilient fallback.
+ * @returns {string}
+ */
+export function uuid() {
+	if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+		return crypto.randomUUID();
+	}
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+		const r = Math.random() * 16 | 0;
+		const v = c === 'x' ? r : (r & 0x3 | 0x8);
+		return v.toString(16);
+	});
+}
+
+if (typeof window !== 'undefined') {
+	window.lnCore = window.lnCore || {};
+	window.lnCore.uuid = uuid;
+}

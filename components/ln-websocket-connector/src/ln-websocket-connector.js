@@ -3,6 +3,7 @@ import { registerComponent, dispatch, defineAttrs, attrSpec, attrStr } from '../
 (function () {
 	const DOM_SELECTOR = 'data-ln-websocket-connector';
 	const DOM_ATTRIBUTE = 'lnWebsocketConnector';
+	const DOM_ALIAS = 'lnConnector';
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	const RECONNECT_MIN_MS = 1000;
@@ -57,6 +58,8 @@ import { registerComponent, dispatch, defineAttrs, attrSpec, attrStr } from '../
 		this.dom = dom;
 		defineAttrs(this, dom, ATTR_SPEC);
 		dom[DOM_ATTRIBUTE] = this;
+		dom[DOM_ALIAS] = this;
+		this.namespace = 'ln-websocket-connector';
 
 		this._socket = null;
 		this._status = 'disconnected';
@@ -271,6 +274,7 @@ import { registerComponent, dispatch, defineAttrs, attrSpec, attrStr } from '../
 		this._held = [];
 
 		delete this.dom[DOM_ATTRIBUTE];
+		delete this.dom[DOM_ALIAS];
 	};
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-websocket-connector', {
