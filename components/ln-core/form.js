@@ -107,6 +107,9 @@ export function populateForm(form, data) {
 			filled.push(el);
 		} else {
 			el.value = value;
+			if (el.tagName === 'SELECT' && value != null) {
+				el.setAttribute('data-ln-value', value);
+			}
 			filled.push(el);
 		}
 	}
@@ -133,4 +136,11 @@ export function interceptValueProperty(dom, descriptor, { get, set }) {
 		},
 		configurable: true
 	});
+}
+
+if (typeof window !== 'undefined') {
+	window.lnCore = window.lnCore || {};
+	window.lnCore.populateForm = populateForm;
+	window.lnCore.serializeForm = serializeForm;
+	window.lnCore.resolveFormMethod = resolveFormMethod;
 }

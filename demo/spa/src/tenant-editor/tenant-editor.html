@@ -1,15 +1,15 @@
 <!-- @zone routes -->
 <template data-ln-route="/tenants/:id" data-ln-route-title="Tenant — DocuFlow">
-	<section id="tenant-editor">
-		<header class="page-header">
+	<section id="tenant-editor" data-docuflow-tenant-editor>
+		<header class="page-header" data-ln-fillable>
 			<nav aria-label="Breadcrumb">
 				<ol>
 					<li><a href="tenants">Tenants</a></li>
-					<li aria-current="page">Tenant</li>
+					<li aria-current="page" data-ln-field="name">Tenant</li>
 				</ol>
 			</nav>
 			<div class="page-title">
-				<h1 data-tenant-title>Tenant</h1>
+				<h1>Edit tenant — <span data-ln-field="name"></span></h1>
 			</div>
 		</header>
 		<section class="section-card">
@@ -18,7 +18,7 @@
 				      data-ln-data-coordinator-scope="tenants"
 				      method="post"
 				      action="/tenants"
-				      data-ln-form-action-edit>
+				      data-ln-form-action-edit="/tenants/:id">
 					<input type="hidden" name="id">
 					<fieldset>
 						<legend>Identity</legend>
@@ -65,8 +65,8 @@
 								</select>
 							</div>
 							<div class="form-element">
-								<label>
-									<input name="active" type="checkbox" value="1" checked>
+								<label for="tenant-active">
+									<input id="tenant-active" name="active" type="checkbox" value="1">
 									Active
 								</label>
 							</div>
@@ -77,20 +77,20 @@
 						<div class="form-grid">
 							<div class="form-element">
 								<label for="tenant-doc-numbering">Doc numbering scheme</label>
-								<input id="tenant-doc-numbering" name="doc_numbering_scheme" value="{TYPE}-{SEQ:4}">
+								<input id="tenant-doc-numbering" name="doc_numbering_scheme">
 								<small class="hint">{TYPE} = document type, {SEQ:4} = zero-padded sequence.</small>
 							</div>
 							<div class="form-element">
 								<label for="tenant-review-interval">Review interval (days)</label>
-								<input id="tenant-review-interval" name="review_interval" type="number" min="1" value="365"
+								<input id="tenant-review-interval" name="review_interval" type="number" min="1"
 								       data-ln-number data-ln-number-min="1" data-ln-validate>
 								<ul data-ln-validate-errors>
 									<li class="hidden" data-ln-validate-error="rangeUnderflow">Must be at least 1 day.</li>
 								</ul>
 							</div>
 							<div class="form-element">
-								<label>
-									<input name="read_confirmation" type="checkbox" value="1">
+								<label for="tenant-read-confirmation">
+									<input id="tenant-read-confirmation" name="read_confirmation" type="checkbox" value="1">
 									Read confirmation required
 								</label>
 							</div>

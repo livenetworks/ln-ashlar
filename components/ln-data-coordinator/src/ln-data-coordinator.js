@@ -121,13 +121,13 @@ import { MutationReceipts } from './mutation-receipts';
 
 	_component.prototype._fanOutCreate = function (c, data, action) {
 		const tempId = '_temp_' + uuid(), payload = this.mapper.egress(data);
-		if (c.storeEl) dispatch(c.storeEl, 'ln-data-store:request-create', { tempId, data });
+		if (c.storeEl) dispatch(c.storeEl, 'ln-data-store:request-create', { tempId, data: payload });
 		this._fanOutRemote(c, 'create', { chainKey: tempId, op: 'create', targetId: null, payload, expectedVersion: null, meta: { tempId, action } }, { data: payload, url: action, meta: { entryId: uuid(), queued: false, op: 'create', tempId } });
 	};
 
 	_component.prototype._fanOutUpdate = function (c, id, data, v, action) {
 		const payload = this.mapper.egress(data);
-		if (c.storeEl) dispatch(c.storeEl, 'ln-data-store:request-update', { id, data });
+		if (c.storeEl) dispatch(c.storeEl, 'ln-data-store:request-update', { id, data: payload });
 		this._fanOutRemote(c, 'update', { chainKey: id, op: 'update', targetId: id, payload, expectedVersion: v, meta: { id, action } }, { id, data: payload, expected_version: v, url: action, meta: { entryId: uuid(), queued: false, op: 'update', id } });
 	};
 

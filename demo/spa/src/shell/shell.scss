@@ -89,7 +89,15 @@
 	gap: var(--size-2xs);
 	align-items: center;
 
-	li button { @include table-row-action; }
+	li button,
+	li a {
+		@include table-row-action;
+		color: inherit;
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
 
 	li button[data-ln-table-row-action="delete"] {
 		@include table-row-action-delete;

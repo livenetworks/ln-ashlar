@@ -17,6 +17,7 @@
 - **Component Isolation & Zero Sibling Imports**: Components NEVER import or reference sibling components. Communication is 100% event-driven via CustomEvents (`{ bubbles: true }`) or attribute bridging by coordinators.
 - **The 2-Consumer Lifting Rule**: If a pure helper/math algorithm is needed by 2+ components (e.g. `calculateProgress`, `parseDateInput`, `formatNumber`), it MUST be lifted into `ln-core` (`progress.js`, `date.js`, `number.js`, `matching.js`, `compare.js`) rather than cross-imported.
 - **No Speculative Code (DoD)**: Functions enter a model ONLY if the DOM shell or system already actively calls them. Uncalled or dead functions are strictly forbidden.
+- **Lightweight Route & Feature Coordinators (Zero-Class UI Wiring)**: Application-level page and route coordinators MUST NOT be authored as heavy pseudo-classes (`function MyCoordinator`, `prototype`, `mount()`, `unmount()`). They must be written as lean, declarative IIFE event mediators (~20–60 lines) that query state (URL params, store), dispatch `ln-fill` or request events, and react to store/table lifecycle events.
 
 ### C. Attribute Bridge Pattern & Observable Single Source of Truth
 - **Core Axiom**: The DOM is the public/observable state surface (Control Plane), while JS maintains implementation mechanics and application data.

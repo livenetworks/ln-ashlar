@@ -385,6 +385,11 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 
 	window[attribute] = constructor;
 
+	if (typeof window !== 'undefined') {
+		window.lnCore = window.lnCore || {};
+		window.lnCore.registerComponent = registerComponent;
+	}
+
 	function boot() {
 		if (pendingCount() > 0) {
 			queueBoot(function () { constructor(document.body); });

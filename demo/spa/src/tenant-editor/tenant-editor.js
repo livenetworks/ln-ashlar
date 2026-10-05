@@ -1,57 +1,64 @@
 (function () {
 	'use strict';
 
-	function fillTenantEditor(id) {
-		const tenantsStoreEl = document.getElementById('tenants');
-		if (!tenantsStoreEl) return;
+	const DOM_SELECTOR = 'data-docuflow-tenant-editor';
+	const DOM_ATTRIBUTE = 'docuflowTenantEditor';
 
-		function applyRecord(record) {
-			if (!record) return;
-			const form = document.getElementById('tenant-form');
-			if (!form) return;
-			if (window.lnCore && window.lnCore.lnFill) {
-				window.lnCore.lnFill(form, record);
-			}
-			const titleEl = document.querySelector('[data-tenant-title]');
-			if (titleEl) titleEl.textContent = 'Edit tenant — ' + record.name;
-		}
+	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-		const store = tenantsStoreEl.lnDataStore;
-		if (store) {
-			(store.ready || Promise.resolve()).then(function () {
-				return store.get(Number(id));
-			}).then(applyRecord);
-		}
+	/**
+	 * Per-project Route Coordinator for Tenant Editor.
+	 * Mounted automatically on <section id="tenant-editor" data-docuflow-tenant-editor>
+	 * by ln-core lifecycle MutationObserver when the route view is rendered.
+	 */
+	function DocuflowTenantEditor(dom) {
+		this.dom = dom;
+		this.dom[DOM_ATTRIBUTE] = this;
+
+		const match = window.location.pathname.match(/\/tenants\/(\d+)/);
+		this.tenantId = match ? Number(match[1]) : null;
+
+		this._bindEvents();
+		this.loadRecord();
 	}
 
-	// Route navigation to tenant editor: populate form with store record
-	document.addEventListener('ln-router:navigated', function (e) {
-		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
-		if (pattern !== '/tenants/:id') return;
+	DocuflowTenantEditor.prototype.loadRecord = function () {
+		const store = document.getElementById('tenants').lnDataStore;
+		store.getById(this.tenantId).then(record => {
+			if (record) window.lnCore.lnFill(this.dom, record);
+		});
+	};
 
-		const id = e.detail.params && e.detail.params.id;
-		if (id) {
-			fillTenantEditor(id);
+	DocuflowTenantEditor.prototype._bindEvents = function () {
+		const storeEl = document.getElementById('tenants');
+
+		this._onStoreSync = () => this.loadRecord();
+		storeEl.addEventListener('ln-data-store:synced', this._onStoreSync);
+		storeEl.addEventListener('ln-data-store:ready', this._onStoreSync);
+
+		this._onStoreUpdated = (e) => {
+			if (e.detail && e.detail.store === 'tenants') {
+				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+					detail: { type: 'success', title: 'Tenant updated', message: 'Tenant saved successfully' }
+				}));
+			}
+		};
+		document.addEventListener('ln-data-store:updated', this._onStoreUpdated);
+	};
+
+	DocuflowTenantEditor.prototype.destroy = function () {
+		const storeEl = document.getElementById('tenants');
+		if (storeEl) {
+			storeEl.removeEventListener('ln-data-store:synced', this._onStoreSync);
+			storeEl.removeEventListener('ln-data-store:ready', this._onStoreSync);
 		}
-	});
+		document.removeEventListener('ln-data-store:updated', this._onStoreUpdated);
+		delete this.dom[DOM_ATTRIBUTE];
+	};
 
-	// If store loads after view was already mounted (e.g. direct deep-link load)
-	document.addEventListener('DOMContentLoaded', function () {
-		const tenantsStoreEl = document.getElementById('tenants');
-		if (tenantsStoreEl) {
-			tenantsStoreEl.addEventListener('ln-data-store:loaded', function () {
-				const cur = window.lnRouter && window.lnRouter.current();
-				if (cur && cur.route && cur.route.pattern === '/tenants/:id' && cur.params && cur.params.id) {
-					fillTenantEditor(cur.params.id);
-				}
-			});
-		}
-	});
+	window[DOM_ATTRIBUTE] = DocuflowTenantEditor;
 
-	// Write path is native-first (data-ln-data-coordinator-scope="tenants" on
-	// #tenant-form) — react to the store outcome instead of a form-level event.
-	document.addEventListener('ln-data-store:updated', function (e) {
-		if (e.detail.store !== 'tenants') return;
-		window.lnRouter.navigate('/tenants');
-	});
+	if (window.lnCore && window.lnCore.registerComponent) {
+		window.lnCore.registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, DocuflowTenantEditor, 'docuflow-tenant-editor');
+	}
 })();

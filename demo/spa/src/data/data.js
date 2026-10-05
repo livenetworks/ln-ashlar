@@ -2,11 +2,35 @@
 	'use strict';
 
 	function initData() {
-		// Identity mappers for packages and tenants
+		// Data mappers for packages and tenants
 		if (window.lnCore && typeof window.lnCore.registerDataMapper === 'function') {
-			const identity = { ingress: function (r) { return r; }, egress: function (r) { return r; } };
-			window.lnCore.registerDataMapper('packages', identity);
-			window.lnCore.registerDataMapper('tenants', identity);
+			window.lnCore.registerDataMapper('packages', {
+				ingress: function (r) { return r; },
+				egress: function (r) {
+					const out = Object.assign({}, r);
+					if (out.id != null && out.id !== '') out.id = Number(out.id);
+					if (out.price_monthly != null && out.price_monthly !== '') out.price_monthly = Number(out.price_monthly);
+					if (out.max_users != null && out.max_users !== '') out.max_users = Number(out.max_users);
+					if (out.storage_gb != null && out.storage_gb !== '') out.storage_gb = Number(out.storage_gb);
+					if (Array.isArray(out.active)) out.active = out.active.length > 0;
+					else if (out.active !== undefined) out.active = Boolean(out.active);
+					return out;
+				}
+			});
+			window.lnCore.registerDataMapper('tenants', {
+				ingress: function (r) { return r; },
+				egress: function (r) {
+					const out = Object.assign({}, r);
+					if (out.id != null && out.id !== '') out.id = Number(out.id);
+					if (out.package_id != null && out.package_id !== '') out.package_id = Number(out.package_id);
+					if (out.review_interval != null && out.review_interval !== '') out.review_interval = Number(out.review_interval);
+					if (Array.isArray(out.active)) out.active = out.active.length > 0;
+					else if (out.active !== undefined) out.active = Boolean(out.active);
+					if (Array.isArray(out.read_confirmation)) out.read_confirmation = out.read_confirmation.length > 0;
+					else if (out.read_confirmation !== undefined) out.read_confirmation = Boolean(out.read_confirmation);
+					return out;
+				}
+			});
 		}
 
 		const packagesStoreEl = document.getElementById('packages');

@@ -51,6 +51,8 @@
   If a pure algorithm, parsing logic, or math formula is needed by 2 or more distinct components (e.g. `calculateProgress`, `parseDateInput`, `formatNumber`, `matchesSearchTokens`), it **MUST** be lifted centrally into `ln-core` sub-modules (`progress.js`, `date.js`, `number.js`, `matching.js`, `compare.js`) rather than cross-imported between components.
 * **No Speculative Code (Definition of Done):**
   Functions enter a model **only if the DOM shell or system already actively calls them** — never for hypothetical "might be needed" utilities. Uncalled or dead functions are strictly forbidden.
+* **Lightweight Route & Feature Coordinators (Zero-Class UI Wiring):**
+  Application-level route and feature coordinators (wiring URLs, stores, forms, and buttons) **MUST NOT** be authored as heavy pseudo-classes (`function MyCoordinator`, `prototype`, `mount()`, `unmount()`). They are written as lean, declarative IIFE event mediators (~20–60 lines) that query state (URL params, store), dispatch `ln-fill` or request events, and react to store/table lifecycle events (see [`docs/architecture/coordinator.md`](docs/architecture/coordinator.md)).
 
 ---
 

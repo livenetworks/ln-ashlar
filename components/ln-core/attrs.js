@@ -271,3 +271,16 @@ export function reactiveNames(entry) {
 	return names;
 }
 
+if (typeof window !== 'undefined') {
+	window.lnCore = window.lnCore || {};
+	window.lnCore.defineAttrs = defineAttrs;
+	window.lnCore.attrSpec = attrSpec;
+	window.lnCore.attrStr = attrStr;
+	window.lnCore.attrInt = attrInt;
+	window.lnCore.attrBool = attrBool;
+	window.lnCore.attrList = attrList;
+	window.lnCore.attrEnum = attrEnum;
+	window.lnCore.attrFloat = attrFloat;
+	window.lnCore.attrJson = attrJson;
+}
+

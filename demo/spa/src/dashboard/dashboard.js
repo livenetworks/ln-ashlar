@@ -1,6 +1,11 @@
 (function () {
 	'use strict';
 
+	const DOM_SELECTOR = 'data-docuflow-dashboard';
+	const DOM_ATTRIBUTE = 'docuflowDashboard';
+
+	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
 	function fillUsageItem(el, item) {
 		const nameEl = el.querySelector('[data-pkg-usage-name]');
 		const countEl = el.querySelector('[data-pkg-usage-count]');
@@ -10,8 +15,8 @@
 		if (barEl) barEl.setAttribute('data-ln-progress', item.pct);
 	}
 
-	function renderUsage() {
-		const list = document.querySelector('[data-pkg-usage]');
+	function renderUsage(dom) {
+		const list = dom.querySelector('[data-pkg-usage]');
 		const packagesStoreEl = document.getElementById('packages');
 		const tenantsStoreEl = document.getElementById('tenants');
 		if (!list || !packagesStoreEl || !tenantsStoreEl) return;
@@ -43,52 +48,52 @@
 		});
 	}
 
-	function refreshDashboardUsageIfMounted() {
-		if (!document.getElementById('dashboard')) return;
-		renderUsage();
-	}
+	function DocuflowDashboard(dom) {
+		this.dom = dom;
+		this.dom[DOM_ATTRIBUTE] = this;
 
-	// Dashboard is-loading removal: once both stores have data, remove #dashboard.is-loading
-	let dashLoadCount = 0;
-	function onDashStoreLoaded() {
-		dashLoadCount++;
-		if (dashLoadCount >= 2) {
-			const dash = document.getElementById('dashboard');
-			if (dash) dash.classList.remove('is-loading');
-		}
-	}
+		this._onStoreMutation = () => renderUsage(this.dom);
 
-	// Route navigation: when navigating to '/', refresh dashboard usage
-	document.addEventListener('ln-router:navigated', function (e) {
-		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
-		if (pattern === '/') {
-			refreshDashboardUsageIfMounted();
-		}
-	});
+		const pStoreEl = document.getElementById('packages');
+		const tStoreEl = document.getElementById('tenants');
 
-	// Register persistent store event listeners to auto-refresh the dashboard usage
-	function initDashboard() {
-		const packagesStoreEl = document.getElementById('packages');
-		const tenantsStoreEl = document.getElementById('tenants');
+		this._checkLoaded = () => {
+			if (pStoreEl?.lnDataStore?.isLoaded && tStoreEl?.lnDataStore?.isLoaded) {
+				this.dom.classList.remove('is-loading');
+			}
+		};
 
-		if (!packagesStoreEl || !tenantsStoreEl) return;
-
-		[packagesStoreEl, tenantsStoreEl].forEach(function (storeEl) {
-			['ready', 'loaded', 'confirmed'].forEach(function (ev) {
-				storeEl.addEventListener('ln-data-store:' + ev, refreshDashboardUsageIfMounted);
-			});
-			storeEl.addEventListener('ln-data-store:synced', function (e) {
-				if (e.detail && e.detail.changed) refreshDashboardUsageIfMounted();
-			});
-			storeEl.addEventListener('ln-data-store:loaded', onDashStoreLoaded, { once: true });
+		[pStoreEl, tStoreEl].forEach(storeEl => {
+			if (!storeEl) return;
+			storeEl.addEventListener('ln-data-store:synced', this._onStoreMutation);
+			storeEl.addEventListener('ln-data-store:ready', this._onStoreMutation);
+			storeEl.addEventListener('ln-data-store:loaded', this._checkLoaded);
 		});
 
-		window.addEventListener('app:packages-rebuild', refreshDashboardUsageIfMounted);
+		window.addEventListener('app:packages-rebuild', this._onStoreMutation);
+
+		this._checkLoaded();
+		renderUsage(this.dom);
 	}
 
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', initDashboard);
-	} else {
-		initDashboard();
+	DocuflowDashboard.prototype.destroy = function () {
+		const pStoreEl = document.getElementById('packages');
+		const tStoreEl = document.getElementById('tenants');
+
+		[pStoreEl, tStoreEl].forEach(storeEl => {
+			if (!storeEl) return;
+			storeEl.removeEventListener('ln-data-store:synced', this._onStoreMutation);
+			storeEl.removeEventListener('ln-data-store:ready', this._onStoreMutation);
+			storeEl.removeEventListener('ln-data-store:loaded', this._checkLoaded);
+		});
+
+		window.removeEventListener('app:packages-rebuild', this._onStoreMutation);
+		delete this.dom[DOM_ATTRIBUTE];
+	};
+
+	window[DOM_ATTRIBUTE] = DocuflowDashboard;
+
+	if (window.lnCore && window.lnCore.registerComponent) {
+		window.lnCore.registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, DocuflowDashboard, 'docuflow-dashboard');
 	}
 })();

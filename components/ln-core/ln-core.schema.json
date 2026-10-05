@@ -100,9 +100,10 @@
 			]
 		},
 		"data-ln-value": {
-			"direction": "author",
+			"direction": "both",
 			"sources": [
-				"dom.js"
+				"dom.js",
+				"form.js"
 			]
 		}
 	}
