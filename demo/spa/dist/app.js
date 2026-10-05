@@ -2,6 +2,11 @@
 (function () {
 	'use strict';
 
+	const DOM_SELECTOR = 'data-docuflow-dashboard';
+	const DOM_ATTRIBUTE = 'docuflowDashboard';
+
+	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
 	function fillUsageItem(el, item) {
 		const nameEl = el.querySelector('[data-pkg-usage-name]');
 		const countEl = el.querySelector('[data-pkg-usage-count]');
@@ -11,8 +16,8 @@
 		if (barEl) barEl.setAttribute('data-ln-progress', item.pct);
 	}
 
-	function renderUsage() {
-		const list = document.querySelector('[data-pkg-usage]');
+	function renderUsage(dom) {
+		const list = dom.querySelector('[data-pkg-usage]');
 		const packagesStoreEl = document.getElementById('packages');
 		const tenantsStoreEl = document.getElementById('tenants');
 		if (!list || !packagesStoreEl || !tenantsStoreEl) return;
@@ -44,53 +49,53 @@
 		});
 	}
 
-	function refreshDashboardUsageIfMounted() {
-		if (!document.getElementById('dashboard')) return;
-		renderUsage();
-	}
+	function DocuflowDashboard(dom) {
+		this.dom = dom;
+		this.dom[DOM_ATTRIBUTE] = this;
 
-	// Dashboard is-loading removal: once both stores have data, remove #dashboard.is-loading
-	let dashLoadCount = 0;
-	function onDashStoreLoaded() {
-		dashLoadCount++;
-		if (dashLoadCount >= 2) {
-			const dash = document.getElementById('dashboard');
-			if (dash) dash.classList.remove('is-loading');
-		}
-	}
+		this._onStoreMutation = () => renderUsage(this.dom);
 
-	// Route navigation: when navigating to '/', refresh dashboard usage
-	document.addEventListener('ln-router:navigated', function (e) {
-		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
-		if (pattern === '/') {
-			refreshDashboardUsageIfMounted();
-		}
-	});
+		const pStoreEl = document.getElementById('packages');
+		const tStoreEl = document.getElementById('tenants');
 
-	// Register persistent store event listeners to auto-refresh the dashboard usage
-	function initDashboard() {
-		const packagesStoreEl = document.getElementById('packages');
-		const tenantsStoreEl = document.getElementById('tenants');
+		this._checkLoaded = () => {
+			if (pStoreEl?.lnDataStore?.isLoaded && tStoreEl?.lnDataStore?.isLoaded) {
+				this.dom.classList.remove('is-loading');
+			}
+		};
 
-		if (!packagesStoreEl || !tenantsStoreEl) return;
-
-		[packagesStoreEl, tenantsStoreEl].forEach(function (storeEl) {
-			['ready', 'loaded', 'confirmed'].forEach(function (ev) {
-				storeEl.addEventListener('ln-data-store:' + ev, refreshDashboardUsageIfMounted);
-			});
-			storeEl.addEventListener('ln-data-store:synced', function (e) {
-				if (e.detail && e.detail.changed) refreshDashboardUsageIfMounted();
-			});
-			storeEl.addEventListener('ln-data-store:loaded', onDashStoreLoaded, { once: true });
+		[pStoreEl, tStoreEl].forEach(storeEl => {
+			if (!storeEl) return;
+			storeEl.addEventListener('ln-data-store:synced', this._onStoreMutation);
+			storeEl.addEventListener('ln-data-store:ready', this._onStoreMutation);
+			storeEl.addEventListener('ln-data-store:loaded', this._checkLoaded);
 		});
 
-		window.addEventListener('app:packages-rebuild', refreshDashboardUsageIfMounted);
+		window.addEventListener('app:packages-rebuild', this._onStoreMutation);
+
+		this._checkLoaded();
+		renderUsage(this.dom);
 	}
 
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', initDashboard);
-	} else {
-		initDashboard();
+	DocuflowDashboard.prototype.destroy = function () {
+		const pStoreEl = document.getElementById('packages');
+		const tStoreEl = document.getElementById('tenants');
+
+		[pStoreEl, tStoreEl].forEach(storeEl => {
+			if (!storeEl) return;
+			storeEl.removeEventListener('ln-data-store:synced', this._onStoreMutation);
+			storeEl.removeEventListener('ln-data-store:ready', this._onStoreMutation);
+			storeEl.removeEventListener('ln-data-store:loaded', this._checkLoaded);
+		});
+
+		window.removeEventListener('app:packages-rebuild', this._onStoreMutation);
+		delete this.dom[DOM_ATTRIBUTE];
+	};
+
+	window[DOM_ATTRIBUTE] = DocuflowDashboard;
+
+	if (window.lnCore && window.lnCore.registerComponent) {
+		window.lnCore.registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, DocuflowDashboard, 'docuflow-dashboard');
 	}
 })();
 
@@ -99,11 +104,35 @@
 	'use strict';
 
 	function initData() {
-		// Identity mappers for packages and tenants
+		// Data mappers for packages and tenants
 		if (window.lnCore && typeof window.lnCore.registerDataMapper === 'function') {
-			const identity = { ingress: function (r) { return r; }, egress: function (r) { return r; } };
-			window.lnCore.registerDataMapper('packages', identity);
-			window.lnCore.registerDataMapper('tenants', identity);
+			window.lnCore.registerDataMapper('packages', {
+				ingress: function (r) { return r; },
+				egress: function (r) {
+					const out = Object.assign({}, r);
+					if (out.id != null && out.id !== '') out.id = Number(out.id);
+					if (out.price_monthly != null && out.price_monthly !== '') out.price_monthly = Number(out.price_monthly);
+					if (out.max_users != null && out.max_users !== '') out.max_users = Number(out.max_users);
+					if (out.storage_gb != null && out.storage_gb !== '') out.storage_gb = Number(out.storage_gb);
+					if (Array.isArray(out.active)) out.active = out.active.length > 0;
+					else if (out.active !== undefined) out.active = Boolean(out.active);
+					return out;
+				}
+			});
+			window.lnCore.registerDataMapper('tenants', {
+				ingress: function (r) { return r; },
+				egress: function (r) {
+					const out = Object.assign({}, r);
+					if (out.id != null && out.id !== '') out.id = Number(out.id);
+					if (out.package_id != null && out.package_id !== '') out.package_id = Number(out.package_id);
+					if (out.review_interval != null && out.review_interval !== '') out.review_interval = Number(out.review_interval);
+					if (Array.isArray(out.active)) out.active = out.active.length > 0;
+					else if (out.active !== undefined) out.active = Boolean(out.active);
+					if (Array.isArray(out.read_confirmation)) out.read_confirmation = out.read_confirmation.length > 0;
+					else if (out.read_confirmation !== undefined) out.read_confirmation = Boolean(out.read_confirmation);
+					return out;
+				}
+			});
 		}
 
 		const packagesStoreEl = document.getElementById('packages');
@@ -266,44 +295,8 @@
 
 	window[DOM_ATTRIBUTE] = PackagesCoordinator;
 
-	// ─── Route Lifecycle Mount / Unmount ─────────────────────
-	let activeCoordinator = null;
-
-	function mount(viewEl) {
-		if (activeCoordinator) activeCoordinator.destroy();
-		if (viewEl) activeCoordinator = new PackagesCoordinator(viewEl);
-	}
-
-	function unmount() {
-		if (activeCoordinator) {
-			activeCoordinator.destroy();
-			activeCoordinator = null;
-		}
-	}
-
-	document.addEventListener('ln-router:navigated', function (e) {
-		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
-		if (pattern === '/packages') {
-			const viewEl = e.detail.target || document.getElementById('packages-view');
-			mount(viewEl);
-		} else {
-			unmount();
-		}
-	});
-
-	// If page was loaded directly on this route
-	function checkInitialMount() {
-		const cur = window.lnRouter && window.lnRouter.current();
-		if (cur && cur.route && cur.route.pattern === '/packages') {
-			const viewEl = document.getElementById('packages-view');
-			if (viewEl && !activeCoordinator) mount(viewEl);
-		}
-	}
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', checkInitialMount);
-	} else {
-		checkInitialMount();
+	if (window.lnCore && window.lnCore.registerComponent) {
+		window.lnCore.registerComponent('data-packages-coordinator', DOM_ATTRIBUTE, PackagesCoordinator, 'packages-coordinator');
 	}
 })();
 
@@ -393,202 +386,111 @@
 (function () {
 	'use strict';
 
-	function fillTenantEditor(id) {
-		const tenantsStoreEl = document.getElementById('tenants');
-		if (!tenantsStoreEl) return;
+	const DOM_SELECTOR = 'data-docuflow-tenant-editor';
+	const DOM_ATTRIBUTE = 'docuflowTenantEditor';
 
-		function applyRecord(record) {
-			if (!record) return;
-			const form = document.getElementById('tenant-form');
-			if (!form) return;
-			if (window.lnCore && window.lnCore.lnFill) {
-				window.lnCore.lnFill(form, record);
-			}
-			const titleEl = document.querySelector('[data-tenant-title]');
-			if (titleEl) titleEl.textContent = 'Edit tenant — ' + record.name;
-		}
+	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-		const store = tenantsStoreEl.lnDataStore;
-		if (store) {
-			(store.ready || Promise.resolve()).then(function () {
-				return store.get(Number(id));
-			}).then(applyRecord);
-		}
+	/**
+	 * Per-project Route Coordinator for Tenant Editor.
+	 * Mounted automatically on <section id="tenant-editor" data-docuflow-tenant-editor>
+	 * by ln-core lifecycle MutationObserver when the route view is rendered.
+	 */
+	function DocuflowTenantEditor(dom) {
+		this.dom = dom;
+		this.dom[DOM_ATTRIBUTE] = this;
+
+		const match = window.location.pathname.match(/\/tenants\/(\d+)/);
+		this.tenantId = match ? Number(match[1]) : null;
+
+		this._bindEvents();
+		this.loadRecord();
 	}
 
-	// Route navigation to tenant editor: populate form with store record
-	document.addEventListener('ln-router:navigated', function (e) {
-		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
-		if (pattern !== '/tenants/:id') return;
+	DocuflowTenantEditor.prototype.loadRecord = function () {
+		const store = document.getElementById('tenants').lnDataStore;
+		store.getById(this.tenantId).then(record => {
+			if (record) window.lnCore.lnFill(this.dom, record);
+		});
+	};
 
-		const id = e.detail.params && e.detail.params.id;
-		if (id) {
-			fillTenantEditor(id);
+	DocuflowTenantEditor.prototype._bindEvents = function () {
+		const storeEl = document.getElementById('tenants');
+
+		this._onStoreSync = () => this.loadRecord();
+		storeEl.addEventListener('ln-data-store:synced', this._onStoreSync);
+		storeEl.addEventListener('ln-data-store:ready', this._onStoreSync);
+
+		this._onStoreUpdated = (e) => {
+			if (e.detail && e.detail.store === 'tenants') {
+				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+					detail: { type: 'success', title: 'Tenant updated', message: 'Tenant saved successfully' }
+				}));
+			}
+		};
+		document.addEventListener('ln-data-store:updated', this._onStoreUpdated);
+	};
+
+	DocuflowTenantEditor.prototype.destroy = function () {
+		const storeEl = document.getElementById('tenants');
+		if (storeEl) {
+			storeEl.removeEventListener('ln-data-store:synced', this._onStoreSync);
+			storeEl.removeEventListener('ln-data-store:ready', this._onStoreSync);
 		}
-	});
+		document.removeEventListener('ln-data-store:updated', this._onStoreUpdated);
+		delete this.dom[DOM_ATTRIBUTE];
+	};
 
-	// If store loads after view was already mounted (e.g. direct deep-link load)
-	document.addEventListener('DOMContentLoaded', function () {
-		const tenantsStoreEl = document.getElementById('tenants');
-		if (tenantsStoreEl) {
-			tenantsStoreEl.addEventListener('ln-data-store:loaded', function () {
-				const cur = window.lnRouter && window.lnRouter.current();
-				if (cur && cur.route && cur.route.pattern === '/tenants/:id' && cur.params && cur.params.id) {
-					fillTenantEditor(cur.params.id);
-				}
-			});
-		}
-	});
+	window[DOM_ATTRIBUTE] = DocuflowTenantEditor;
 
-	// Write path is native-first (data-ln-data-coordinator-scope="tenants" on
-	// #tenant-form) — react to the store outcome instead of a form-level event.
-	document.addEventListener('ln-data-store:updated', function (e) {
-		if (e.detail.store !== 'tenants') return;
-		window.lnRouter.navigate('/tenants');
-	});
+	if (window.lnCore && window.lnCore.registerComponent) {
+		window.lnCore.registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, DocuflowTenantEditor, 'docuflow-tenant-editor');
+	}
 })();
 
 /* ── module: tenants/tenants.js ─────────────────────────── */
 (function () {
 	'use strict';
 
-	const DOM_ATTRIBUTE = 'tenantsCoordinator';
+	// 1. Table row action: delete single tenant
+	document.addEventListener('ln-table:row-action', function (e) {
+		const d = e.detail;
+		if (!d || d.table !== 'tenants' || d.action !== 'delete') return;
 
-	if (window[DOM_ATTRIBUTE] !== undefined) return;
+		const targetId = Number(d.id || (d.record && d.record.id));
+		if (!targetId) return;
 
-	// ─── Tenants Coordinator (Layer 2) ──────────────────────
-	function TenantsCoordinator(dom) {
-		this.dom = dom;
-		this.dom[DOM_ATTRIBUTE] = this;
-		this._bindEvents();
-		return this;
-	}
-
-	TenantsCoordinator.prototype._bindEvents = function () {
-		const self = this;
-
-		// 1. Table row action: delete single tenant
-		// Scoped to this.dom subtree (bubbles from ln-table up to coordinator host)
-		this._onRowAction = function (e) {
-			const d = e.detail;
-			if (!d || d.table !== 'tenants' || d.action !== 'delete') return;
-
-			const targetId = Number(d.id || (d.record && d.record.id));
-			if (!targetId) return;
-
-			self._requestDelete(targetId);
-		};
-
-		this.dom.addEventListener('ln-table:row-action', this._onRowAction);
-
-		// 2. Toolbar action: bulk delete selected tenants
-		// Scoped to this.dom subtree (catches button click inside view header)
-		this._onBulkDeleteClick = function (e) {
-			const btn = e.target.closest('#bulk-delete-tenants');
-			if (!btn) return;
-
-			const table = self.dom.querySelector('#tenants-table');
-			if (!table || !table.lnTable) return;
-
-			const ids = Array.from(table.lnTable.selectedIds).map(Number);
-			if (!ids.length) return;
-
-			self._requestBulkDelete(ids);
-		};
-
-		this.dom.addEventListener('click', this._onBulkDeleteClick);
-
-		// 3. React to tenant store creation by closing tenant modal
-		this._onStoreCreated = function (e) {
-			if (e.detail && e.detail.store && e.detail.store !== 'tenants') return;
-			const tenantModal = document.getElementById('tenant-modal');
-			if (tenantModal) {
-				tenantModal.setAttribute('data-ln-modal', 'close');
-			}
-		};
-
-		const tenantsStore = document.getElementById('tenants');
-		if (tenantsStore) {
-			tenantsStore.addEventListener('ln-data-store:created', this._onStoreCreated);
-		}
-	};
-
-	TenantsCoordinator.prototype._requestDelete = function (id) {
-		const tenantsCoordEl = document.getElementById('tenants-coordinator') || document.querySelector('[data-ln-data-coordinator="tenants"]');
-		if (!tenantsCoordEl) return;
-		tenantsCoordEl.dispatchEvent(new CustomEvent('ln-data-coordinator:request-delete', {
-			detail: { id: id }
-		}));
-	};
-
-	TenantsCoordinator.prototype._requestBulkDelete = function (ids) {
-		const tenantsCoordEl = document.getElementById('tenants-coordinator') || document.querySelector('[data-ln-data-coordinator="tenants"]');
-		if (!tenantsCoordEl) return;
-		tenantsCoordEl.dispatchEvent(new CustomEvent('ln-data-coordinator:request-bulk-delete', {
-			detail: { ids: ids }
-		}));
-	};
-
-	// ─── Destroy (Teardown Lifecycle) ───────────────────────
-	TenantsCoordinator.prototype.destroy = function () {
-		if (this._onRowAction) {
-			this.dom.removeEventListener('ln-table:row-action', this._onRowAction);
-			this._onRowAction = null;
-		}
-
-		if (this._onBulkDeleteClick) {
-			this.dom.removeEventListener('click', this._onBulkDeleteClick);
-			this._onBulkDeleteClick = null;
-		}
-
-		const tenantsStore = document.getElementById('tenants');
-		if (tenantsStore && this._onStoreCreated) {
-			tenantsStore.removeEventListener('ln-data-store:created', this._onStoreCreated);
-			this._onStoreCreated = null;
-		}
-
-		delete this.dom[DOM_ATTRIBUTE];
-	};
-
-	window[DOM_ATTRIBUTE] = TenantsCoordinator;
-
-	// ─── Route Lifecycle Mount / Unmount ─────────────────────
-	let activeCoordinator = null;
-
-	function mount(viewEl) {
-		if (activeCoordinator) activeCoordinator.destroy();
-		if (viewEl) activeCoordinator = new TenantsCoordinator(viewEl);
-	}
-
-	function unmount() {
-		if (activeCoordinator) {
-			activeCoordinator.destroy();
-			activeCoordinator = null;
-		}
-	}
-
-	document.addEventListener('ln-router:navigated', function (e) {
-		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
-		if (pattern === '/tenants') {
-			const viewEl = e.detail.target || document.getElementById('tenants-view');
-			mount(viewEl);
-		} else {
-			unmount();
+		const coord = document.getElementById('tenants-coordinator');
+		if (coord) {
+			coord.dispatchEvent(new CustomEvent('ln-data-coordinator:request-delete', {
+				detail: { id: targetId }
+			}));
 		}
 	});
 
-	// If page was loaded directly on this route
-	function checkInitialMount() {
-		const cur = window.lnRouter && window.lnRouter.current();
-		if (cur && cur.route && cur.route.pattern === '/tenants') {
-			const viewEl = document.getElementById('tenants-view');
-			if (viewEl && !activeCoordinator) mount(viewEl);
-		}
-	}
+	// 2. Toolbar action: bulk delete selected tenants
+	document.addEventListener('click', function (e) {
+		const btn = e.target.closest('#bulk-delete-tenants');
+		if (!btn) return;
 
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', checkInitialMount);
-	} else {
-		checkInitialMount();
-	}
+		const table = document.getElementById('tenants-table');
+		const ids = Array.from((table && table.lnTable && table.lnTable.selectedIds) || []).map(Number);
+		if (!ids.length) return;
+
+		const coord = document.getElementById('tenants-coordinator');
+		if (coord) {
+			coord.dispatchEvent(new CustomEvent('ln-data-coordinator:request-bulk-delete', {
+				detail: { ids: ids }
+			}));
+		}
+	});
+
+	// 3. React to store creation by closing the create modal
+	document.addEventListener('ln-data-store:created', function (e) {
+		if (e.detail && e.detail.store && e.detail.store !== 'tenants') return;
+		const modal = document.getElementById('tenant-modal');
+		if (modal) {
+			modal.setAttribute('data-ln-modal', 'close');
+		}
+	});
 })();

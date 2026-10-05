@@ -36,6 +36,12 @@
 			"type": "string",
 			"fallback": "id",
 			"description": "Field name used for option value attribute"
+		},
+		"data-ln-value": {
+			"direction": "author",
+			"sources": [
+				"src/ln-options.js"
+			]
 		}
 	}
 }

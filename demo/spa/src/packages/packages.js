@@ -92,43 +92,7 @@
 
 	window[DOM_ATTRIBUTE] = PackagesCoordinator;
 
-	// ─── Route Lifecycle Mount / Unmount ─────────────────────
-	let activeCoordinator = null;
-
-	function mount(viewEl) {
-		if (activeCoordinator) activeCoordinator.destroy();
-		if (viewEl) activeCoordinator = new PackagesCoordinator(viewEl);
-	}
-
-	function unmount() {
-		if (activeCoordinator) {
-			activeCoordinator.destroy();
-			activeCoordinator = null;
-		}
-	}
-
-	document.addEventListener('ln-router:navigated', function (e) {
-		const pattern = e.detail && e.detail.route && e.detail.route.pattern;
-		if (pattern === '/packages') {
-			const viewEl = e.detail.target || document.getElementById('packages-view');
-			mount(viewEl);
-		} else {
-			unmount();
-		}
-	});
-
-	// If page was loaded directly on this route
-	function checkInitialMount() {
-		const cur = window.lnRouter && window.lnRouter.current();
-		if (cur && cur.route && cur.route.pattern === '/packages') {
-			const viewEl = document.getElementById('packages-view');
-			if (viewEl && !activeCoordinator) mount(viewEl);
-		}
-	}
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', checkInitialMount);
-	} else {
-		checkInitialMount();
+	if (window.lnCore && window.lnCore.registerComponent) {
+		window.lnCore.registerComponent('data-packages-coordinator', DOM_ATTRIBUTE, PackagesCoordinator, 'packages-coordinator');
 	}
 })();

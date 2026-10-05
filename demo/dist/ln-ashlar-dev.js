@@ -1,65 +1,138 @@
 function R() {
   return typeof window > "u" ? !1 : window.lnDebug === !0 || window.lnCore && window.lnCore._debugSink ? !0 : typeof document < "u" && document.body ? document.body.hasAttribute("data-ln-debug") || document.body.querySelector("[data-ln-debug]") !== null : !1;
 }
-function I(t) {
+function O(e) {
   if (typeof window > "u") return !1;
   if (window.lnDebug === !0) return !0;
   if (window.lnCore && window.lnCore._debugIsContained)
-    return t ? window.lnCore._debugIsContained(t) : window.lnCore._debugSink !== null;
-  if (t && t.closest) {
-    const e = t.closest("[data-ln-debug]");
-    return !(!e || typeof document < "u" && e === document.documentElement);
+    return e ? window.lnCore._debugIsContained(e) : window.lnCore._debugSink !== null;
+  if (e && e.closest) {
+    const t = e.closest("[data-ln-debug]");
+    return !(!t || typeof document < "u" && t === document.documentElement);
   }
   return typeof document < "u" && document.body ? document.body.hasAttribute("data-ln-debug") : !1;
 }
 if (typeof window < "u" && (window.lnCore = window.lnCore || {}, !window.lnCore._warnBound)) {
   window.lnCore._warnBound = !0;
-  const t = console.warn;
-  console.warn = function(...e) {
-    if (typeof e[0] == "string" && (e[0].startsWith("[ln-") || e[0].startsWith("[lnCore"))) {
+  const e = console.warn;
+  console.warn = function(...t) {
+    if (typeof t[0] == "string" && (t[0].startsWith("[ln-") || t[0].startsWith("[lnCore"))) {
       let a = null;
-      for (let r = 1; r < e.length; r++)
-        if (e[r] && e[r].nodeType === 1) {
-          a = e[r];
+      for (let l = 1; l < t.length; l++)
+        if (t[l] && t[l].nodeType === 1) {
+          a = t[l];
           break;
         }
-      if (!I(a))
+      if (!O(a))
         return;
     }
-    t.apply(console, e);
+    e.apply(console, t);
   };
 }
-function tt(t, e) {
-  window.lnCore = window.lnCore || {}, window.lnCore._debugSink = t, window.lnCore._debugIsContained = e || null;
+function se(e, t) {
+  window.lnCore = window.lnCore || {}, window.lnCore._debugSink = e, window.lnCore._debugIsContained = t || null;
 }
-function et(t, e, n) {
+function ce(e, t, n) {
   const a = n || {};
-  window.lnCore._debugSink && window.lnCore._debugSink("event", e, t, a), t.dispatchEvent(new CustomEvent(e, {
+  window.lnCore._debugSink && window.lnCore._debugSink("event", t, e, a), e.dispatchEvent(new CustomEvent(t, {
     bubbles: !0,
     detail: a
   }));
 }
-function m(t, e) {
+function m(e, t) {
   if (!document.body) {
     document.addEventListener("DOMContentLoaded", function() {
-      m(t, e);
-    }), console.warn("[" + e + '] Script loaded before <body> — add "defer" to your <script> tag');
+      m(e, t);
+    }), console.warn("[" + t + '] Script loaded before <body> — add "defer" to your <script> tag');
     return;
   }
-  t();
+  e();
 }
-const W = {};
-function nt(t, e) {
-  W[t] = e;
+function ue(e) {
+  const t = e.querySelector('input[name="_method"]');
+  return ((t && t.value !== "" ? t.value : e.method) || "").toUpperCase();
 }
-function at(t) {
-  return W[t] || { ingress: (e) => e, egress: (e) => e };
+function fe(e, t) {
+  const n = !!(t && t.typed), a = t && t.exclude, l = {}, i = e.elements, o = {};
+  if (n)
+    for (let d = 0; d < i.length; d++) {
+      const r = i[d];
+      r.name && r.type === "checkbox" && !r.disabled && (o[r.name] = (o[r.name] || 0) + 1);
+    }
+  for (let d = 0; d < i.length; d++) {
+    const r = i[d];
+    if (!(!r.name || r.disabled || r.type === "file" || r.type === "submit" || r.type === "button") && !(a && r.matches && r.matches(a)))
+      if (r.type === "checkbox")
+        n && o[r.name] === 1 ? l[r.name] = r.checked : (l[r.name] || (l[r.name] = []), r.checked && l[r.name].push(r.value));
+      else if (r.type === "radio")
+        r.checked && (l[r.name] = r.value);
+      else if (r.type === "select-multiple") {
+        l[r.name] = [];
+        for (let s = 0; s < r.options.length; s++)
+          r.options[s].selected && l[r.name].push(r.options[s].value);
+      } else if (n && r.type === "hidden")
+        l[r.name] = r.value;
+      else if (n && (r.type === "number" || r.type === "range")) {
+        const s = Number(r.value);
+        l[r.name] = r.value === "" || isNaN(s) ? null : s;
+      } else
+        l[r.name] = r.value;
+  }
+  return l;
 }
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerDataMapper = nt, window.lnCore.getDataMapper = at);
-function ot() {
+function we(e) {
+  if (typeof e != "string") return !!e;
+  const t = e.trim().toLowerCase();
+  return t !== "false" && t !== "0" && t !== "" && t !== "off" && t !== "no";
+}
+function pe(e, t) {
+  const n = e.elements, a = [], l = {};
+  for (let i = 0; i < n.length; i++) {
+    const o = n[i];
+    o.name && o.type === "checkbox" && (l[o.name] = (l[o.name] || 0) + 1);
+  }
+  for (let i = 0; i < n.length; i++) {
+    const o = n[i];
+    if (o.type === "file" || o.type === "submit" || o.type === "button") continue;
+    const d = o.getAttribute("data-ln-fill-as") || o.name;
+    if (!d || !(d in t)) continue;
+    const r = t[d];
+    if (o.type === "checkbox") {
+      if (Array.isArray(r))
+        o.checked = r.indexOf(o.value) !== -1;
+      else if (l[o.name] > 1) {
+        const s = String(r).split(",").map(function(c) {
+          return c.trim();
+        });
+        o.checked = s.indexOf(o.value) !== -1;
+      } else
+        o.checked = we(r);
+      a.push(o);
+    } else if (o.type === "radio")
+      o.checked = o.value === String(r), a.push(o);
+    else if (o.type === "select-multiple") {
+      if (Array.isArray(r))
+        for (let s = 0; s < o.options.length; s++)
+          o.options[s].selected = r.indexOf(o.options[s].value) !== -1;
+      a.push(o);
+    } else
+      o.value = r, o.tagName === "SELECT" && r != null && o.setAttribute("data-ln-value", r), a.push(o);
+  }
+  return a;
+}
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.populateForm = pe, window.lnCore.serializeForm = fe, window.lnCore.resolveFormMethod = ue);
+const j = {};
+function be(e, t) {
+  j[e] = t;
+}
+function he(e) {
+  return j[e] || { ingress: (t) => t, egress: (t) => t };
+}
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerDataMapper = be, window.lnCore.getDataMapper = he);
+function me() {
   typeof window > "u" || (window.lnCore = window.lnCore || {}, !window.lnCore._localeObserverBound && (window.lnCore._localeObserverBound = !0, m(function() {
     new MutationObserver(function() {
-      et(document, "ln-core:locale-change", {});
+      ce(document, "ln-core:locale-change", {});
     }).observe(document.documentElement, {
       attributes: !0,
       attributeFilter: ["lang"],
@@ -68,259 +141,350 @@ function ot() {
   }, "ln-core")));
 }
 const B = {};
-function lt(t, e) {
-  if (!t || typeof e != "object") return;
-  const n = t.toLowerCase().split("-")[0];
-  B[n] = e;
+function ge(e, t) {
+  if (!e || typeof t != "object") return;
+  const n = e.toLowerCase().split("-")[0];
+  B[n] = t;
 }
-function rt(t) {
-  if (!t) return null;
-  const e = t.toLowerCase().split("-")[0];
-  return B[e] || null;
+function ye(e) {
+  if (!e) return null;
+  const t = e.toLowerCase().split("-")[0];
+  return B[t] || null;
 }
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerLocaleFallback = lt, window.lnCore.getLocaleFallback = rt, window.lnCore.ensureLocaleObserver = ot);
-const k = {};
-function it(t, e) {
-  k[t] || (k[t] = document.querySelector('[data-ln-template="' + t + '"]'));
-  const n = k[t];
-  return n ? n.content.cloneNode(!0) : (console.warn("[" + (e || "ln-core") + '] Template "' + t + '" not found'), null);
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerLocaleFallback = ge, window.lnCore.getLocaleFallback = ye, window.lnCore.ensureLocaleObserver = me);
+const _ = {};
+function Ce(e, t) {
+  _[e] || (_[e] = document.querySelector('[data-ln-template="' + e + '"]'));
+  const n = _[e];
+  return n ? n.content.cloneNode(!0) : (console.warn("[" + (t || "ln-core") + '] Template "' + e + '" not found'), null);
 }
-function N(t, e) {
-  if (!t || !e) return t;
-  const n = t.querySelectorAll("[data-ln-field]");
-  for (let l = 0; l < n.length; l++) {
-    const d = n[l], i = d.getAttribute("data-ln-field");
-    e[i] != null && (d.textContent = e[i]);
+function W(e, t) {
+  if (!e || !t) return e;
+  const n = e.querySelectorAll("[data-ln-field]");
+  for (let o = 0; o < n.length; o++) {
+    const d = n[o], r = d.getAttribute("data-ln-field");
+    t[r] != null && (d.textContent = t[r]);
   }
-  const a = t.querySelectorAll("[data-ln-attr]");
-  for (let l = 0; l < a.length; l++) {
-    const d = a[l], i = d.getAttribute("data-ln-attr").split(",");
-    for (let s = 0; s < i.length; s++) {
-      const c = i[s].trim().split(":");
+  const a = e.querySelectorAll("[data-ln-attr]");
+  for (let o = 0; o < a.length; o++) {
+    const d = a[o], r = d.getAttribute("data-ln-attr").split(",");
+    for (let s = 0; s < r.length; s++) {
+      const c = r[s].trim().split(":");
       if (c.length !== 2) continue;
       const u = c[0].trim(), f = c[1].trim();
-      e[f] != null && d.setAttribute(u, e[f]);
+      t[f] != null && d.setAttribute(u, t[f]);
     }
   }
-  const r = t.querySelectorAll("[data-ln-show]");
-  for (let l = 0; l < r.length; l++) {
-    const d = r[l], i = d.getAttribute("data-ln-show");
-    i in e && d.classList.toggle("hidden", !e[i]);
+  const l = e.querySelectorAll("[data-ln-show]");
+  for (let o = 0; o < l.length; o++) {
+    const d = l[o], r = d.getAttribute("data-ln-show");
+    r in t && d.classList.toggle("hidden", !t[r]);
   }
-  const o = t.querySelectorAll("[data-ln-class]");
-  for (let l = 0; l < o.length; l++) {
-    const d = o[l], i = d.getAttribute("data-ln-class").split(",");
-    for (let s = 0; s < i.length; s++) {
-      const c = i[s].trim().split(":");
+  const i = e.querySelectorAll("[data-ln-class]");
+  for (let o = 0; o < i.length; o++) {
+    const d = i[o], r = d.getAttribute("data-ln-class").split(",");
+    for (let s = 0; s < r.length; s++) {
+      const c = r[s].trim().split(":");
       if (c.length !== 2) continue;
       const u = c[0].trim(), f = c[1].trim();
-      f in e && d.classList.toggle(u, !!e[f]);
+      f in t && d.classList.toggle(u, !!t[f]);
     }
   }
-  return t;
+  return e;
 }
-function dt(t, e) {
-  t.matches && t.matches("[data-ln-form], [data-ln-fillable]") && (window.lnCore._debugSink && window.lnCore._debugSink("event", "ln-fill", t, e ?? null), t.dispatchEvent(new CustomEvent("ln-fill", { detail: e ?? null, bubbles: !0 })));
-  const n = t.querySelectorAll("[data-ln-form], [data-ln-fillable]");
+function ve(e, t) {
+  e.matches && e.matches("[data-ln-form], [data-ln-fillable]") && (window.lnCore._debugSink && window.lnCore._debugSink("event", "ln-fill", e, t ?? null), e.dispatchEvent(new CustomEvent("ln-fill", { detail: t ?? null, bubbles: !0 })));
+  const n = e.querySelectorAll("[data-ln-form], [data-ln-fillable]");
   for (let a = 0; a < n.length; a++)
-    window.lnCore._debugSink && window.lnCore._debugSink("event", "ln-fill", n[a], e ?? null), n[a].dispatchEvent(new CustomEvent("ln-fill", { detail: e ?? null, bubbles: !0 }));
-  return t;
+    window.lnCore._debugSink && window.lnCore._debugSink("event", "ln-fill", n[a], t ?? null), n[a].dispatchEvent(new CustomEvent("ln-fill", { detail: t ?? null, bubbles: !0 }));
+  return e;
 }
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore._fillBound || (window.lnCore._fillBound = !0, document.addEventListener("ln-fill", function(t) {
-  if (!(!t.target.matches || !t.target.matches("[data-ln-fillable]")))
-    if (t.detail)
-      N(t.target, t.detail);
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore._fillBound || (window.lnCore._fillBound = !0, document.addEventListener("ln-fill", function(e) {
+  if (!(!e.target.matches || !e.target.matches("[data-ln-fillable]")))
+    if (e.detail)
+      W(e.target, e.detail);
     else {
-      const e = t.target.querySelectorAll("[data-ln-field]");
-      for (let n = 0; n < e.length; n++)
-        e[n].textContent = "";
+      const t = e.target.querySelectorAll("[data-ln-field]");
+      for (let n = 0; n < t.length; n++)
+        t[n].textContent = "";
     }
 })));
-function j(t, e) {
-  if (!t || !e) return t;
-  const n = document.createTreeWalker(t, NodeFilter.SHOW_TEXT);
+function U(e, t) {
+  if (!e || !t) return e;
+  const n = document.createTreeWalker(e, NodeFilter.SHOW_TEXT);
   for (; n.nextNode(); ) {
-    const o = n.currentNode;
-    o.textContent.indexOf("{{") !== -1 && (o.textContent = o.textContent.replace(
+    const i = n.currentNode;
+    i.textContent.indexOf("{{") !== -1 && (i.textContent = i.textContent.replace(
       /\{\{\s*(\w+)\s*\}\}/g,
-      function(l, d) {
-        return e[d] !== void 0 ? e[d] : "";
+      function(o, d) {
+        return t[d] !== void 0 ? t[d] : "";
       }
     ));
   }
-  const a = function(o, l) {
-    return e[l] !== void 0 ? e[l] : "";
-  }, r = Array.from(t.querySelectorAll("*"));
-  t.nodeType === 1 && r.push(t);
-  for (let o = 0; o < r.length; o++) {
-    const l = r[o], d = l.attributes;
-    for (let i = 0; i < d.length; i++) {
-      const s = d[i];
-      s.value.indexOf("{{") !== -1 && l.setAttribute(s.name, s.value.replace(/\{\{\s*(\w+)\s*\}\}/g, a));
+  const a = function(i, o) {
+    return t[o] !== void 0 ? t[o] : "";
+  }, l = Array.from(e.querySelectorAll("*"));
+  e.nodeType === 1 && l.push(e);
+  for (let i = 0; i < l.length; i++) {
+    const o = l[i], d = o.attributes;
+    for (let r = 0; r < d.length; r++) {
+      const s = d[r];
+      s.value.indexOf("{{") !== -1 && o.setAttribute(s.name, s.value.replace(/\{\{\s*(\w+)\s*\}\}/g, a));
     }
   }
-  return t;
+  return e;
 }
-function st(t, e, n, a, r, o) {
-  const l = {};
-  for (let i = 0; i < t.children.length; i++) {
-    const s = t.children[i], c = s.getAttribute("data-ln-render-key");
-    c && (l[c] = s);
+function Ae(e, t, n, a, l, i) {
+  const o = {};
+  for (let r = 0; r < e.children.length; r++) {
+    const s = e.children[r], c = s.getAttribute("data-ln-render-key");
+    c && (o[c] = s);
   }
   const d = document.createDocumentFragment();
-  for (let i = 0; i < e.length; i++) {
-    const s = e[i], c = String(a(s));
-    let u = l[c];
+  for (let r = 0; r < t.length; r++) {
+    const s = t[r], c = String(a(s));
+    let u = o[c];
     if (u)
-      r(u, s, i);
+      l(u, s, r);
     else {
-      const f = it(n, o);
-      if (!f || (j(f, s), u = f.firstElementChild, !u)) continue;
-      u.setAttribute("data-ln-render-key", c), r(u, s, i);
+      const f = Ce(n, i);
+      if (!f || (U(f, s), u = f.firstElementChild, !u)) continue;
+      u.setAttribute("data-ln-render-key", c), l(u, s, r);
     }
     d.appendChild(u);
   }
-  t.textContent = "", t.appendChild(d);
+  e.textContent = "", e.appendChild(d);
 }
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.fillTemplate = j, window.lnCore.fill = N, window.lnCore.lnFill = dt, window.lnCore.renderList = st);
-function F(t, e, n, a, r) {
-  if (!t || e === null) return !0;
-  const o = a || "ln-component", l = t.type;
-  if (l === "trigger" || l === "marker" || l === "string" || l === "list" || !l || e === "" && t.fallback !== void 0)
-    return !0;
-  const d = (i) => {
-    r ? console.warn(i, r) : console.warn(i);
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.fillTemplate = U, window.lnCore.fill = W, window.lnCore.lnFill = ve, window.lnCore.renderList = Ae);
+function $(e, t, n) {
+  const a = e.getAttribute(t);
+  return a === null ? n : a;
+}
+function V(e, t, n) {
+  const a = parseInt(e.getAttribute(t), 10);
+  return isNaN(a) ? n : a;
+}
+function H(e, t, n = !1) {
+  const a = e.getAttribute(t);
+  if (a === null) return !!n;
+  const l = a.trim().toLowerCase();
+  return !(l === "false" || l === "0");
+}
+function z(e, t) {
+  return (e.getAttribute(t) || "").split(",").map((n) => n.trim()).filter(Boolean);
+}
+const D = /* @__PURE__ */ new Map();
+function G(e, t) {
+  const n = (e ? e.join("|") : "") + "::" + t;
+  if (D.has(n)) return D.get(n);
+  const a = new Set(e || []), l = function(i, o) {
+    const d = i.getAttribute(o);
+    return d !== null && a.has(d) ? d : t;
   };
-  if (l === "boolean") {
-    const i = e.trim().toLowerCase();
-    return i !== "" && i !== "true" && i !== "false" && i !== "1" && i !== "0" ? (d(`[${o}] Invalid value "${e}" for boolean attribute "${n}". Allowed: "true", "false", or presence-only.`), !1) : !0;
+  return D.set(n, l), l;
+}
+function J(e, t, n) {
+  const a = parseFloat(e.getAttribute(t));
+  return isNaN(a) ? n : a;
+}
+function K(e, t, n) {
+  const a = e.getAttribute(t);
+  if (!a) return n;
+  try {
+    return JSON.parse(a);
+  } catch {
+    return n;
   }
-  if (l === "enum") {
-    const i = t.values || [];
-    return i.includes(e) ? !0 : (d(`[${o}] Invalid value "${e}" for attribute "${n}". Allowed: ${i.join(", ")}. Fallback: "${t.fallback}".`), !1);
+}
+function Q(e, t, n, a, l) {
+  if (!e || t === null) return !0;
+  const i = a || "ln-component", o = e.type;
+  if (o === "trigger" || o === "marker" || o === "string" || o === "list" || !o || t === "" && e.fallback !== void 0)
+    return !0;
+  const d = (r) => {
+    l ? console.warn(r, l) : console.warn(r);
+  };
+  if (o === "boolean") {
+    const r = t.trim().toLowerCase();
+    return r !== "" && r !== "true" && r !== "false" && r !== "1" && r !== "0" ? (d(`[${i}] Invalid value "${t}" for boolean attribute "${n}". Allowed: "true", "false", or presence-only.`), !1) : !0;
   }
-  if (l === "integer") {
-    if (!/^-?\d+$/.test(e))
-      return d(`[${o}] Invalid integer "${e}" for attribute "${n}". Fallback: ${t.fallback}.`), !1;
-    const i = parseInt(e, 10);
-    return t.min !== void 0 && i < t.min ? (d(`[${o}] Value ${i} for attribute "${n}" is less than min (${t.min}).`), !1) : t.max !== void 0 && i > t.max ? (d(`[${o}] Value ${i} for attribute "${n}" is greater than max (${t.max}).`), !1) : !0;
+  if (o === "enum") {
+    const r = e.values || [];
+    return r.includes(t) ? !0 : (d(`[${i}] Invalid value "${t}" for attribute "${n}". Allowed: ${r.join(", ")}. Fallback: "${e.fallback}".`), !1);
   }
-  if (l === "float")
-    return isNaN(Number(e)) ? (d(`[${o}] Invalid float "${e}" for attribute "${n}". Fallback: ${t.fallback}.`), !1) : !0;
-  if (l === "json")
+  if (o === "integer") {
+    if (!/^-?\d+$/.test(t))
+      return d(`[${i}] Invalid integer "${t}" for attribute "${n}". Fallback: ${e.fallback}.`), !1;
+    const r = parseInt(t, 10);
+    return e.min !== void 0 && r < e.min ? (d(`[${i}] Value ${r} for attribute "${n}" is less than min (${e.min}).`), !1) : e.max !== void 0 && r > e.max ? (d(`[${i}] Value ${r} for attribute "${n}" is greater than max (${e.max}).`), !1) : !0;
+  }
+  if (o === "float")
+    return isNaN(Number(t)) ? (d(`[${i}] Invalid float "${t}" for attribute "${n}". Fallback: ${e.fallback}.`), !1) : !0;
+  if (o === "json")
     try {
-      return JSON.parse(e), !0;
-    } catch (i) {
-      return d(`[${o}] Invalid JSON for attribute "${n}": ${i.message}. Fallback: ${t.fallback}.`), !1;
+      return JSON.parse(t), !0;
+    } catch (r) {
+      return d(`[${i}] Invalid JSON for attribute "${n}": ${r.message}. Fallback: ${e.fallback}.`), !1;
     }
   return !0;
 }
-function ct(t) {
-  const e = {};
-  for (const n in t) {
-    const a = t[n];
-    a && a.effect && (e[n] = a.effect);
+function xe(e, t, n) {
+  for (const a in n) {
+    const [l, i, o] = n[a];
+    Object.defineProperty(e, a, {
+      // Getter only, no setter — assignment throws in strict mode (ES
+      // modules are strict). Deliberate: it forbids a drifting copy.
+      get: function() {
+        return l(t, i, o);
+      },
+      enumerable: !0,
+      configurable: !0
+    });
   }
-  return Object.keys(e).length ? e : null;
-}
-function ut(t) {
-  if (t.onAttrChange && !t.declared) return null;
-  const e = /* @__PURE__ */ new Set();
-  if (t.effects) for (const n in t.effects) e.add(n);
-  if (t.onAttrChange && t.declared) for (const n of t.declared) e.add(n);
   return e;
 }
-function E(t, e, n, a) {
-  if (t.nodeType !== 1) return;
-  const o = e.indexOf("[") !== -1 || e.indexOf(".") !== -1 || e.indexOf("#") !== -1 ? e : "[" + e + "]", l = Array.from(t.querySelectorAll(o));
-  t.matches && t.matches(o) && l.push(t);
-  for (const d of l)
+function ke(e) {
+  const t = {};
+  for (const n in e) {
+    const a = e[n];
+    if (!a || !a.prop) continue;
+    let l = a.read;
+    if (!l && a.type)
+      switch (a.type) {
+        case "enum":
+          l = G(a.values, a.fallback);
+          break;
+        case "integer":
+          l = V;
+          break;
+        case "float":
+          l = J;
+          break;
+        case "boolean":
+          l = H;
+          break;
+        case "list":
+          l = z;
+          break;
+        case "json":
+          l = K;
+          break;
+        case "string":
+        default:
+          l = $;
+          break;
+      }
+    l || (l = $), t[a.prop] = [l, n, a.fallback];
+  }
+  return t;
+}
+function Se(e) {
+  const t = {};
+  for (const n in e) {
+    const a = e[n];
+    a && a.effect && (t[n] = a.effect);
+  }
+  return Object.keys(t).length ? t : null;
+}
+function _e(e) {
+  if (e.onAttrChange && !e.declared) return null;
+  const t = /* @__PURE__ */ new Set();
+  if (e.effects) for (const n in e.effects) t.add(n);
+  if (e.onAttrChange && e.declared) for (const n of e.declared) t.add(n);
+  return t;
+}
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.defineAttrs = xe, window.lnCore.attrSpec = ke, window.lnCore.attrStr = $, window.lnCore.attrInt = V, window.lnCore.attrBool = H, window.lnCore.attrList = z, window.lnCore.attrEnum = G, window.lnCore.attrFloat = J, window.lnCore.attrJson = K);
+function L(e, t, n, a) {
+  if (e.nodeType !== 1) return;
+  const i = t.indexOf("[") !== -1 || t.indexOf(".") !== -1 || t.indexOf("#") !== -1 ? t : "[" + t + "]", o = Array.from(e.querySelectorAll(i));
+  e.matches && e.matches(i) && o.push(e);
+  for (const d of o)
     if (!d[n]) {
-      window.lnCore._persistSink && d.hasAttribute("data-ln-persist") && window.lnCore._persistSink(d, e);
+      window.lnCore._persistSink && d.hasAttribute("data-ln-persist") && window.lnCore._persistSink(d, t);
       try {
         d[n] = new a(d);
-      } catch (i) {
-        console.error("[" + n + "] init failed", d, i);
+      } catch (r) {
+        console.error("[" + n + "] init failed", d, r);
       }
     }
 }
 typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore._bootHolds = window.lnCore._bootHolds || 0, window.lnCore._bootQueue = window.lnCore._bootQueue || []);
-function U() {
+function P() {
   return typeof window < "u" && window.lnCore && window.lnCore._bootHolds || 0;
 }
-function V(t) {
-  typeof window < "u" ? (window.lnCore = window.lnCore || {}, window.lnCore._bootHolds = window.lnCore._bootHolds || 0, window.lnCore._bootQueue = window.lnCore._bootQueue || [], window.lnCore._bootHolds > 0 ? window.lnCore._bootQueue.push(t) : setTimeout(t, 0)) : t();
+function X(e) {
+  typeof window < "u" ? (window.lnCore = window.lnCore || {}, window.lnCore._bootHolds = window.lnCore._bootHolds || 0, window.lnCore._bootQueue = window.lnCore._bootQueue || [], window.lnCore._bootHolds > 0 ? window.lnCore._bootQueue.push(e) : setTimeout(e, 0)) : e();
 }
-function H() {
+function Y() {
   window.lnCore = window.lnCore || {};
-  const t = window.lnCore._attrRegistry = window.lnCore._attrRegistry || { byAttr: /* @__PURE__ */ new Map(), reactive: [], persist: [] };
-  return t.byReactive = t.byReactive || /* @__PURE__ */ new Map(), t.reactiveWildcard = t.reactiveWildcard || [], t;
+  const e = window.lnCore._attrRegistry = window.lnCore._attrRegistry || { byAttr: /* @__PURE__ */ new Map(), reactive: [], persist: [] };
+  return e.byReactive = e.byReactive || /* @__PURE__ */ new Map(), e.reactiveWildcard = e.reactiveWildcard || [], e;
 }
-function z(t) {
-  const e = H(), n = t.observed || [];
+function Z(e) {
+  const t = Y(), n = e.observed || [];
   for (let a = 0; a < n.length; a++) {
-    const r = n[a];
-    e.byAttr.has(r) || e.byAttr.set(r, []), e.byAttr.get(r).push(t);
+    const l = n[a];
+    t.byAttr.has(l) || t.byAttr.set(l, []), t.byAttr.get(l).push(e);
   }
-  if (e.byDeclaredAttr = e.byDeclaredAttr || /* @__PURE__ */ new Map(), t.attributes)
-    for (const a in t.attributes) {
-      e.byDeclaredAttr.has(a) || e.byDeclaredAttr.set(a, []);
-      const r = e.byDeclaredAttr.get(a);
-      r.some((o) => o.componentTag === t.componentTag) || r.push({
-        spec: t.attributes[a],
-        componentTag: t.componentTag
+  if (t.byDeclaredAttr = t.byDeclaredAttr || /* @__PURE__ */ new Map(), e.attributes)
+    for (const a in e.attributes) {
+      t.byDeclaredAttr.has(a) || t.byDeclaredAttr.set(a, []);
+      const l = t.byDeclaredAttr.get(a);
+      l.some((i) => i.componentTag === e.componentTag) || l.push({
+        spec: e.attributes[a],
+        componentTag: e.componentTag
       });
     }
-  if (t.onAttrChange || t.effects) {
-    e.reactive.push(t);
-    const a = ut(t);
+  if (e.onAttrChange || e.effects) {
+    t.reactive.push(e);
+    const a = _e(e);
     if (a === null)
-      e.reactiveWildcard.push(t);
+      t.reactiveWildcard.push(e);
     else
-      for (const r of a)
-        e.byReactive.has(r) || e.byReactive.set(r, []), e.byReactive.get(r).push(t);
+      for (const l of a)
+        t.byReactive.has(l) || t.byReactive.set(l, []), t.byReactive.get(l).push(e);
   }
-  t.persist && e.persist.push(t);
+  e.persist && t.persist.push(e);
 }
-function L(t, e, n, a) {
-  for (let r = 0; r < t.length; r++) {
-    const o = t[r];
-    if (!e[o.attribute]) continue;
-    const l = o.effects && o.effects[n];
-    l ? l(e, n, a) : o.onAttrChange && (!o.declared || o.declared.has(n)) && o.onAttrChange(e, n, a);
+function N(e, t, n, a) {
+  for (let l = 0; l < e.length; l++) {
+    const i = e[l];
+    if (!t[i.attribute]) continue;
+    const o = i.effects && i.effects[n];
+    o ? o(t, n, a) : i.onAttrChange && (!i.declared || i.declared.has(n)) && i.onAttrChange(t, n, a);
   }
 }
-function ft(t) {
-  const e = t.target, n = t.attributeName;
-  if (t.oldValue === e.getAttribute(n)) return;
-  const a = H(), r = a.byAttr.get(n);
-  if (R() && a.byDeclaredAttr && a.byDeclaredAttr.has(n) && I(e)) {
-    const o = a.byDeclaredAttr.get(n), l = e.getAttribute(n);
-    for (let d = 0; d < o.length; d++)
-      F(o[d].spec, l, n, o[d].componentTag, e);
+function De(e) {
+  const t = e.target, n = e.attributeName;
+  if (e.oldValue === t.getAttribute(n)) return;
+  const a = Y(), l = a.byAttr.get(n);
+  if (R() && a.byDeclaredAttr && a.byDeclaredAttr.has(n) && O(t)) {
+    const i = a.byDeclaredAttr.get(n), o = t.getAttribute(n);
+    for (let d = 0; d < i.length; d++)
+      Q(i[d].spec, o, n, i[d].componentTag, t);
   }
-  if (window.lnCore._debugSink && (n.indexOf("data-ln-") === 0 || r) && window.lnCore._debugSink("attr", n, e, { oldValue: t.oldValue, newValue: e.getAttribute(n) }), n.indexOf("data-ln-") === 0) {
-    const o = a.byReactive.get(n);
-    o && L(o, e, n, t.oldValue), a.reactiveWildcard.length && L(a.reactiveWildcard, e, n, t.oldValue);
+  if (window.lnCore._debugSink && (n.indexOf("data-ln-") === 0 || l) && window.lnCore._debugSink("attr", n, t, { oldValue: e.oldValue, newValue: t.getAttribute(n) }), n.indexOf("data-ln-") === 0) {
+    const i = a.byReactive.get(n);
+    i && N(i, t, n, e.oldValue), a.reactiveWildcard.length && N(a.reactiveWildcard, t, n, e.oldValue);
   }
-  if (r)
-    for (let o = 0; o < r.length; o++) {
-      const l = r[o];
-      if (l.handler) {
-        l.handler(e, n, t.oldValue);
+  if (l)
+    for (let i = 0; i < l.length; i++) {
+      const o = l[i];
+      if (o.handler) {
+        o.handler(t, n, e.oldValue);
         continue;
       }
-      l.onAttributeChange && e[l.attribute] ? l.onAttributeChange(e, n) : (E(e, l.selector, l.attribute, l.ComponentFn), l.onInit && l.onInit(e));
+      o.onAttributeChange && t[o.attribute] ? o.onAttributeChange(t, n) : (L(t, o.selector, o.attribute, o.ComponentFn), o.onInit && o.onInit(t));
     }
 }
-function G() {
+function ee() {
   window.lnCore = window.lnCore || {}, !window.lnCore._attrObserverBound && (window.lnCore._attrObserverBound = !0, m(function() {
-    new MutationObserver(function(e) {
-      for (let n = 0; n < e.length; n++)
+    new MutationObserver(function(t) {
+      for (let n = 0; n < t.length; n++)
         try {
-          ft(e[n]);
+          De(t[n]);
         } catch (a) {
-          console.error("[ln-core] mutation handler failed", e[n].target, a);
+          console.error("[ln-core] mutation handler failed", t[n].target, a);
         }
     }).observe(document.body, {
       attributes: !0,
@@ -329,61 +493,61 @@ function G() {
     });
   }, "ln-core"));
 }
-function Q() {
+function te() {
   return window.lnCore = window.lnCore || {}, window.lnCore._lifecycleRegistry = window.lnCore._lifecycleRegistry || [];
 }
-function wt(t) {
-  const e = Q();
-  if (e.length) {
-    if (t.target)
-      for (let n = 0; n < e.length; n++) {
-        const a = e[n];
+function $e(e) {
+  const t = te();
+  if (t.length) {
+    if (e.target)
+      for (let n = 0; n < t.length; n++) {
+        const a = t[n];
         if (a.onSubtreeChange) {
-          const r = a.query, o = t.target.nodeType === 1 ? t.target.matches(r) ? t.target : t.target.closest(r) : t.target.parentElement ? t.target.parentElement.closest(r) : null;
-          o && a.onSubtreeChange(o, t);
+          const l = a.query, i = e.target.nodeType === 1 ? e.target.matches(l) ? e.target : e.target.closest(l) : e.target.parentElement ? e.target.parentElement.closest(l) : null;
+          i && a.onSubtreeChange(i, e);
         }
       }
-    for (let n = 0; n < t.addedNodes.length; n++) {
-      const a = t.addedNodes[n];
+    for (let n = 0; n < e.addedNodes.length; n++) {
+      const a = e.addedNodes[n];
       if (a.nodeType === 1)
-        for (let r = 0; r < e.length; r++) {
-          const o = e[r];
-          E(a, o.selector, o.attribute, o.ComponentFn), o.onInit && o.onInit(a);
+        for (let l = 0; l < t.length; l++) {
+          const i = t[l];
+          L(a, i.selector, i.attribute, i.ComponentFn), i.onInit && i.onInit(a);
         }
     }
-    for (let n = 0; n < t.removedNodes.length; n++) {
-      const a = t.removedNodes[n];
+    for (let n = 0; n < e.removedNodes.length; n++) {
+      const a = e.removedNodes[n];
       if (a.nodeType === 1)
-        for (let r = 0; r < e.length; r++) {
-          const o = e[r], l = o.query, d = Array.from(a.querySelectorAll(l));
-          a.matches && a.matches(l) && d.push(a);
-          for (let i = 0; i < d.length; i++) {
-            const s = d[i];
+        for (let l = 0; l < t.length; l++) {
+          const i = t[l], o = i.query, d = Array.from(a.querySelectorAll(o));
+          a.matches && a.matches(o) && d.push(a);
+          for (let r = 0; r < d.length; r++) {
+            const s = d[r];
             if (!document.contains(s)) {
-              const c = s[o.attribute];
+              const c = s[i.attribute];
               if (c && typeof c.destroy == "function")
                 try {
                   c.destroy();
                 } catch (u) {
-                  console.error("[" + o.attribute + "] destroy failed", s, u);
+                  console.error("[" + i.attribute + "] destroy failed", s, u);
                 }
-              delete s[o.attribute];
+              delete s[i.attribute];
             }
           }
         }
     }
   }
 }
-function bt() {
+function Ie() {
   window.lnCore = window.lnCore || {}, !window.lnCore._lifecycleObserverBound && (window.lnCore._lifecycleObserverBound = !0, m(function() {
-    new MutationObserver(function(e) {
-      for (let n = 0; n < e.length; n++) {
-        const a = e[n];
+    new MutationObserver(function(t) {
+      for (let n = 0; n < t.length; n++) {
+        const a = t[n];
         if (a.type === "childList")
           try {
-            wt(a);
-          } catch (r) {
-            console.error("[ln-core] lifecycle handler failed", a.target, r);
+            $e(a);
+          } catch (l) {
+            console.error("[ln-core] lifecycle handler failed", a.target, l);
           }
       }
     }).observe(document.body, {
@@ -392,138 +556,138 @@ function bt() {
     });
   }, "ln-core"));
 }
-function pt(t, e) {
-  z({ observed: t, handler: e }), G();
+function Ee(e, t) {
+  Z({ observed: e, handler: t }), ee();
 }
-function ht(t, e, n, a, r = {}) {
-  const o = r.extraAttributes || [], l = r.onAttributeChange || null, d = r.onSubtreeChange || null, i = r.onInit || null, s = r.onAttrChange || null, c = r.effects || null, u = r.attributes || null, f = u ? ct(u) : c, C = u ? new Set(Object.keys(u)) : null, X = r.persist || null;
+function ne(e, t, n, a, l = {}) {
+  const i = l.extraAttributes || [], o = l.onAttributeChange || null, d = l.onSubtreeChange || null, r = l.onInit || null, s = l.onAttrChange || null, c = l.effects || null, u = l.attributes || null, f = u ? Se(u) : c, C = u ? new Set(Object.keys(u)) : null, re = l.persist || null;
   function g(A) {
     const w = A || document.body;
-    if (E(w, t, e, n), u && R())
-      for (const p in u) {
-        const Z = u[p], x = Array.from(w.querySelectorAll("[" + p + "]"));
-        w.matches && w.matches("[" + p + "]") && x.push(w);
-        for (let S = 0; S < x.length; S++) {
-          const _ = x[S];
-          I(_) && F(Z, _.getAttribute(p), p, a, _);
+    if (L(w, e, t, n), u && R())
+      for (const b in u) {
+        const de = u[b], x = Array.from(w.querySelectorAll("[" + b + "]"));
+        w.matches && w.matches("[" + b + "]") && x.push(w);
+        for (let k = 0; k < x.length; k++) {
+          const S = x[k];
+          O(S) && Q(de, S.getAttribute(b), b, a, S);
         }
       }
-    i && i(w);
+    r && r(w);
   }
   const v = [];
-  if (t.indexOf("[") !== -1) {
+  if (e.indexOf("[") !== -1) {
     const A = /\[([\w-]+)/g;
     let w;
-    for (; (w = A.exec(t)) !== null; )
+    for (; (w = A.exec(e)) !== null; )
       v.push(w[1]);
   } else
-    v.push(t);
-  z({
-    selector: t,
-    attribute: e,
+    v.push(e);
+  Z({
+    selector: e,
+    attribute: t,
     componentTag: a,
     attributes: u,
     ComponentFn: n,
-    onInit: i,
-    observed: v.concat(o),
-    onAttributeChange: l,
+    onInit: r,
+    observed: v.concat(i),
+    onAttributeChange: o,
     onAttrChange: s,
     effects: f,
     declared: C,
-    persist: X
-  }), G();
-  const Y = t.indexOf("[") !== -1 || t.indexOf(".") !== -1 || t.indexOf("#") !== -1 ? t : "[" + t + "]";
-  Q().push({
-    selector: t,
-    attribute: e,
+    persist: re
+  }), ee();
+  const ie = e.indexOf("[") !== -1 || e.indexOf(".") !== -1 || e.indexOf("#") !== -1 ? e : "[" + e + "]";
+  te().push({
+    selector: e,
+    attribute: t,
     ComponentFn: n,
-    onInit: i,
+    onInit: r,
     onSubtreeChange: d,
-    query: Y
-  }), bt(), window[e] = g;
-  function q() {
-    U() > 0 ? V(function() {
+    query: ie
+  }), Ie(), window[t] = g, typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerComponent = ne);
+  function M() {
+    P() > 0 ? X(function() {
       g(document.body);
     }) : g(document.body);
   }
-  return document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", q) : q(), g;
+  return document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", M) : M(), g;
 }
-function K(t) {
-  return (t || "").replace(/^#/, "");
+function ae(e) {
+  return (e || "").replace(/^#/, "");
 }
-function O(t) {
-  const e = t === void 0 ? location.hash : t, n = {}, a = K(e);
+function T(e) {
+  const t = e === void 0 ? location.hash : e, n = {}, a = ae(t);
   if (!a) return n;
-  const r = a.split("&");
-  for (let o = 0; o < r.length; o++) {
-    const l = r[o];
-    if (!l) continue;
-    const d = l.indexOf(":"), i = d > -1 ? l.slice(0, d) : l, s = d > -1 ? l.slice(d + 1) : "";
-    if (i)
+  const l = a.split("&");
+  for (let i = 0; i < l.length; i++) {
+    const o = l[i];
+    if (!o) continue;
+    const d = o.indexOf(":"), r = d > -1 ? o.slice(0, d) : o, s = d > -1 ? o.slice(d + 1) : "";
+    if (r)
       try {
-        n[i] = decodeURIComponent(s);
+        n[r] = decodeURIComponent(s);
       } catch {
-        n[i] = s;
+        n[r] = s;
       }
   }
   return n;
 }
-function mt(t) {
-  if (!t) return null;
-  const e = O();
-  return t in e ? e[t] : null;
+function Oe(e) {
+  if (!e) return null;
+  const t = T();
+  return e in t ? t[e] : null;
 }
-function gt(t, e) {
-  if (!t) return;
-  const n = O();
-  e == null ? delete n[t] : n[t] = String(e);
-  const r = Object.keys(n).map(function(o) {
-    const l = n[o];
-    return l === "" ? o : o + ":" + encodeURIComponent(l);
+function Le(e, t) {
+  if (!e) return;
+  const n = T();
+  t == null ? delete n[e] : n[e] = String(t);
+  const l = Object.keys(n).map(function(i) {
+    const o = n[i];
+    return o === "" ? i : i + ":" + encodeURIComponent(o);
   }).join("&");
-  K(location.hash) !== r && (location.hash = r);
+  ae(location.hash) !== l && (location.hash = l);
 }
-function yt(t) {
-  return t.button === 1 || t.ctrlKey || t.metaKey || t.shiftKey ? !1 : (t.preventDefault(), !0);
+function Te(e) {
+  return e.button === 1 || e.ctrlKey || e.metaKey || e.shiftKey ? !1 : (e.preventDefault(), !0);
 }
-function Ct(t, e) {
-  if (!t || !t.hasAttribute("data-ln-hash")) return null;
-  const n = t.getAttribute("data-ln-hash");
+function qe(e, t) {
+  if (!e || !e.hasAttribute("data-ln-hash")) return null;
+  const n = e.getAttribute("data-ln-hash");
   if (n && n.trim() !== "") return n.trim();
-  const a = t.getAttribute("data-ln-sort") || t.getAttribute("data-ln-search-for") || t.getAttribute("data-ln-search") || t.getAttribute("data-ln-filter") || t.id;
-  return a ? e ? a + "-" + e : a : e || null;
+  const a = e.getAttribute("data-ln-sort") || e.getAttribute("data-ln-search-for") || e.getAttribute("data-ln-search") || e.getAttribute("data-ln-filter") || e.id;
+  return a ? t ? a + "-" + t : a : t || null;
 }
-function vt(t, e) {
-  return !e || e === "none" || t === null || t === void 0 ? null : String(t) + "." + e;
+function Me(e, t) {
+  return !t || t === "none" || e === null || e === void 0 ? null : String(e) + "." + t;
 }
-function At(t) {
-  return !t || typeof t != "string" ? null : t.endsWith(".asc") ? { fieldOrColumn: t.slice(0, -4), direction: "asc" } : t.endsWith(".desc") ? { fieldOrColumn: t.slice(0, -5), direction: "desc" } : null;
+function Ne(e) {
+  return !e || typeof e != "string" ? null : e.endsWith(".asc") ? { fieldOrColumn: e.slice(0, -4), direction: "asc" } : e.endsWith(".desc") ? { fieldOrColumn: e.slice(0, -5), direction: "desc" } : null;
 }
-function xt(t, e) {
-  return !t || !Array.isArray(e) || e.length === 0 ? null : t + ":" + e.map(encodeURIComponent).join(",");
+function Fe(e, t) {
+  return !e || !Array.isArray(t) || t.length === 0 ? null : e + ":" + t.map(encodeURIComponent).join(",");
 }
-function St(t) {
-  if (!t || typeof t != "string") return null;
-  const e = t.indexOf(":");
-  if (e === -1) return null;
-  const n = t.slice(0, e), a = t.slice(e + 1), r = a ? a.split(",").map(function(o) {
+function Re(e) {
+  if (!e || typeof e != "string") return null;
+  const t = e.indexOf(":");
+  if (t === -1) return null;
+  const n = e.slice(0, t), a = e.slice(t + 1), l = a ? a.split(",").map(function(i) {
     try {
-      return decodeURIComponent(o);
+      return decodeURIComponent(i);
     } catch {
-      return o;
+      return i;
     }
   }).filter(Boolean) : [];
-  return { key: n, values: r };
+  return { key: n, values: l };
 }
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.hashParse = O, window.lnCore.hashGet = mt, window.lnCore.hashSet = gt, window.lnCore.hashLinkClick = yt, window.lnCore.resolveHashNamespace = Ct, window.lnCore.hashSortEncode = vt, window.lnCore.hashSortDecode = At, window.lnCore.hashFilterEncode = xt, window.lnCore.hashFilterDecode = St);
-function _t() {
-  return typeof crypto < "u" && typeof crypto.randomUUID == "function" ? crypto.randomUUID() : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (t) => {
-    const e = Math.random() * 16 | 0;
-    return (t === "x" ? e : e & 3 | 8).toString(16);
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.hashParse = T, window.lnCore.hashGet = Oe, window.lnCore.hashSet = Le, window.lnCore.hashLinkClick = Te, window.lnCore.resolveHashNamespace = qe, window.lnCore.hashSortEncode = Me, window.lnCore.hashSortDecode = Ne, window.lnCore.hashFilterEncode = Fe, window.lnCore.hashFilterDecode = Re);
+function je() {
+  return typeof crypto < "u" && typeof crypto.randomUUID == "function" ? crypto.randomUUID() : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (e) => {
+    const t = Math.random() * 16 | 0;
+    return (e === "x" ? t : t & 3 | 8).toString(16);
   });
 }
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.uuid = _t);
-const T = /* @__PURE__ */ new Set([
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.uuid = je);
+const q = /* @__PURE__ */ new Set([
   "data-ln-accordion",
   "data-ln-ajax",
   "data-ln-api-base-url",
@@ -821,237 +985,237 @@ const T = /* @__PURE__ */ new Set([
   "data-ln-websocket-connector",
   "data-ln-websocket-connector-url"
 ]);
-function kt(t, e) {
-  if (t === e) return 0;
-  if (!t.length) return e.length;
+function Be(e, t) {
+  if (e === t) return 0;
   if (!e.length) return t.length;
+  if (!t.length) return e.length;
   const n = [];
-  for (let a = 0; a <= e.length; a++) n[a] = [a];
-  for (let a = 0; a <= t.length; a++) n[0][a] = a;
-  for (let a = 1; a <= e.length; a++)
-    for (let r = 1; r <= t.length; r++)
-      e.charAt(a - 1) === t.charAt(r - 1) ? n[a][r] = n[a - 1][r - 1] : n[a][r] = Math.min(
-        n[a - 1][r - 1] + 1,
-        n[a][r - 1] + 1,
-        n[a - 1][r] + 1
+  for (let a = 0; a <= t.length; a++) n[a] = [a];
+  for (let a = 0; a <= e.length; a++) n[0][a] = a;
+  for (let a = 1; a <= t.length; a++)
+    for (let l = 1; l <= e.length; l++)
+      t.charAt(a - 1) === e.charAt(l - 1) ? n[a][l] = n[a - 1][l - 1] : n[a][l] = Math.min(
+        n[a - 1][l - 1] + 1,
+        n[a][l - 1] + 1,
+        n[a - 1][l] + 1
       );
-  return n[e.length][t.length];
+  return n[t.length][e.length];
 }
-function Dt(t, e = T) {
-  if (e.has(t)) return null;
+function We(e, t = q) {
+  if (t.has(e)) return null;
   let n = null, a = 1 / 0;
-  for (const o of e) {
-    const l = kt(t, o);
-    l < a && (a = l, n = o);
+  for (const i of t) {
+    const o = Be(e, i);
+    o < a && (a = o, n = i);
   }
-  const r = Math.max(3, Math.floor(t.length * 0.4));
-  return a <= r ? n : null;
+  const l = Math.max(3, Math.floor(e.length * 0.4));
+  return a <= l ? n : null;
 }
-function J(t) {
-  return typeof CSS < "u" && CSS.escape ? CSS.escape(t) : t.replace(/([!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~])/g, "\\$1");
+function oe(e) {
+  return typeof CSS < "u" && CSS.escape ? CSS.escape(e) : e.replace(/([!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~])/g, "\\$1");
 }
-function $t(t = document) {
-  const e = t.ownerDocument || t, n = t.nodeType === 9 ? t.body || t.documentElement : t;
+function Ue(e = document) {
+  const t = e.ownerDocument || e, n = e.nodeType === 9 ? e.body || e.documentElement : e;
   if (!n) return [];
-  const a = [], r = [n, ...n.querySelectorAll("*")];
-  for (let o = 0; o < r.length; o++) {
-    const l = r[o];
-    if (l.attributes)
-      for (let d = 0; d < l.attributes.length; d++) {
-        const i = l.attributes[d];
-        if (i.name.startsWith("data-ln-") && i.name.endsWith("-for")) {
-          const s = (i.value || "").trim();
+  const a = [], l = [n, ...n.querySelectorAll("*")];
+  for (let i = 0; i < l.length; i++) {
+    const o = l[i];
+    if (o.attributes)
+      for (let d = 0; d < o.attributes.length; d++) {
+        const r = o.attributes[d];
+        if (r.name.startsWith("data-ln-") && r.name.endsWith("-for")) {
+          const s = (r.value || "").trim();
           if (!s) {
             a.push({
               type: "id-empty",
-              element: l,
-              attribute: i.name,
+              element: o,
+              attribute: r.name,
               targetId: "",
-              message: `[ln-debug] Empty ID reference in <${l.tagName.toLowerCase()} ${i.name}="">.`
+              message: `[ln-debug] Empty ID reference in <${o.tagName.toLowerCase()} ${r.name}="">.`
             });
             continue;
           }
-          e.getElementById(s) || e.querySelector("#" + J(s)) || a.push({
+          t.getElementById(s) || t.querySelector("#" + oe(s)) || a.push({
             type: "id-unresolved",
-            element: l,
-            attribute: i.name,
+            element: o,
+            attribute: r.name,
             targetId: s,
-            message: `[ln-debug] Unresolved ID reference: <${l.tagName.toLowerCase()} ${i.name}="${s}"> targets "#${s}", but no element with id="${s}" exists in the document.`
+            message: `[ln-debug] Unresolved ID reference: <${o.tagName.toLowerCase()} ${r.name}="${s}"> targets "#${s}", but no element with id="${s}" exists in the document.`
           });
         }
       }
   }
   return a;
 }
-function It(t = document) {
-  const e = t.ownerDocument || t, n = t.nodeType === 9 ? t.body || t.documentElement : t;
+function Ve(e = document) {
+  const t = e.ownerDocument || e, n = e.nodeType === 9 ? e.body || e.documentElement : e;
   if (!n) return [];
-  const a = [], r = [n, ...n.querySelectorAll("*")];
-  for (let o = 0; o < r.length; o++) {
-    const l = r[o];
-    if (l.attributes)
-      for (let d = 0; d < l.attributes.length; d++) {
-        const i = l.attributes[d];
-        if (i.name.startsWith("data-ln-") && (i.name.endsWith("-source") || i.name.endsWith("-store")) && i.name !== "data-ln-data-store") {
-          const c = (i.value || "").trim();
+  const a = [], l = [n, ...n.querySelectorAll("*")];
+  for (let i = 0; i < l.length; i++) {
+    const o = l[i];
+    if (o.attributes)
+      for (let d = 0; d < o.attributes.length; d++) {
+        const r = o.attributes[d];
+        if (r.name.startsWith("data-ln-") && (r.name.endsWith("-source") || r.name.endsWith("-store")) && r.name !== "data-ln-data-store") {
+          const c = (r.value || "").trim();
           if (!c) {
             a.push({
               type: "store-empty",
-              element: l,
-              attribute: i.name,
+              element: o,
+              attribute: r.name,
               storeName: "",
-              message: `[ln-debug] Empty store reference in <${l.tagName.toLowerCase()} ${i.name}="">.`
+              message: `[ln-debug] Empty store reference in <${o.tagName.toLowerCase()} ${r.name}="">.`
             });
             continue;
           }
-          const u = J(c), f = e.querySelector(`[data-ln-data-store="${u}"], [data-ln-store="${u}"]`), C = typeof window < "u" && window.lnDataStore && typeof window.lnDataStore.getStore == "function" && window.lnDataStore.getStore(c);
+          const u = oe(c), f = t.querySelector(`[data-ln-data-store="${u}"], [data-ln-store="${u}"]`), C = typeof window < "u" && window.lnDataStore && typeof window.lnDataStore.getStore == "function" && window.lnDataStore.getStore(c);
           !f && !C && a.push({
             type: "store-unresolved",
-            element: l,
-            attribute: i.name,
+            element: o,
+            attribute: r.name,
             storeName: c,
-            message: `[ln-debug] Unresolved store reference: <${l.tagName.toLowerCase()} ${i.name}="${c}"> targets store "${c}", but no [data-ln-data-store="${c}"] exists in the document.`
+            message: `[ln-debug] Unresolved store reference: <${o.tagName.toLowerCase()} ${r.name}="${c}"> targets store "${c}", but no [data-ln-data-store="${c}"] exists in the document.`
           });
         }
       }
   }
   return a;
 }
-function Et(t = document) {
-  t.ownerDocument;
-  const e = t.nodeType === 9 ? t.body || t.documentElement : t;
-  if (!e) return [];
-  const n = [], a = Array.from(e.querySelectorAll("[data-ln-data-store]"));
-  e.hasAttribute && e.hasAttribute("data-ln-data-store") && a.unshift(e);
-  const r = /* @__PURE__ */ new Map();
-  for (let o = 0; o < a.length; o++) {
-    const l = a[o], d = (l.getAttribute("data-ln-data-store") || "").trim();
-    d && (r.has(d) || r.set(d, []), r.get(d).push(l));
+function He(e = document) {
+  e.ownerDocument;
+  const t = e.nodeType === 9 ? e.body || e.documentElement : e;
+  if (!t) return [];
+  const n = [], a = Array.from(t.querySelectorAll("[data-ln-data-store]"));
+  t.hasAttribute && t.hasAttribute("data-ln-data-store") && a.unshift(t);
+  const l = /* @__PURE__ */ new Map();
+  for (let i = 0; i < a.length; i++) {
+    const o = a[i], d = (o.getAttribute("data-ln-data-store") || "").trim();
+    d && (l.has(d) || l.set(d, []), l.get(d).push(o));
   }
-  for (const [o, l] of r.entries())
-    l.length > 1 && n.push({
+  for (const [i, o] of l.entries())
+    o.length > 1 && n.push({
       type: "store-duplicate",
-      storeName: o,
-      elements: l,
-      message: `[ln-debug] Duplicate store name: Multiple elements declare data-ln-data-store="${o}". Store names must be unique across the document.`
+      storeName: i,
+      elements: o,
+      message: `[ln-debug] Duplicate store name: Multiple elements declare data-ln-data-store="${i}". Store names must be unique across the document.`
     });
   return n;
 }
-function Ot(t = document, e = T) {
-  const n = t.nodeType === 9 ? t.body || t.documentElement : t;
+function ze(e = document, t = q) {
+  const n = e.nodeType === 9 ? e.body || e.documentElement : e;
   if (!n) return [];
-  const a = [], r = [n, ...n.querySelectorAll("*")];
-  for (let o = 0; o < r.length; o++) {
-    const l = r[o];
-    if (l.attributes)
-      for (let d = 0; d < l.attributes.length; d++) {
-        const i = l.attributes[d];
-        if (i.name.startsWith("data-ln-") && !e.has(i.name)) {
-          const s = Dt(i.name, e), c = s ? ` Did you mean "${s}"?` : "";
+  const a = [], l = [n, ...n.querySelectorAll("*")];
+  for (let i = 0; i < l.length; i++) {
+    const o = l[i];
+    if (o.attributes)
+      for (let d = 0; d < o.attributes.length; d++) {
+        const r = o.attributes[d];
+        if (r.name.startsWith("data-ln-") && !t.has(r.name)) {
+          const s = We(r.name, t), c = s ? ` Did you mean "${s}"?` : "";
           a.push({
             type: "attribute-unknown",
-            element: l,
-            attribute: i.name,
+            element: o,
+            attribute: r.name,
             suggestion: s,
-            message: `[ln-debug] Unknown attribute "${i.name}" on <${l.tagName.toLowerCase()}>.${c}`
+            message: `[ln-debug] Unknown attribute "${r.name}" on <${o.tagName.toLowerCase()}>.${c}`
           });
         }
       }
   }
   return a;
 }
-function D(t = typeof document < "u" ? document : null, e = {}) {
-  if (!t)
+function I(e = typeof document < "u" ? document : null, t = {}) {
+  if (!e)
     return { idIssues: [], storeIssues: [], uniquenessIssues: [], spellingIssues: [], total: 0 };
-  const n = e.validAttributes || T, a = $t(t), r = It(t), o = Et(t), l = Ot(t, n), d = [
+  const n = t.validAttributes || q, a = Ue(e), l = Ve(e), i = He(e), o = ze(e, n), d = [
     ...a,
-    ...r,
-    ...o,
-    ...l
+    ...l,
+    ...i,
+    ...o
   ];
-  if (!e.silent)
-    for (let i = 0; i < d.length; i++)
-      console.warn(d[i].message);
+  if (!t.silent)
+    for (let r = 0; r < d.length; r++)
+      console.warn(d[r].message);
   return {
     idIssues: a,
-    storeIssues: r,
-    uniquenessIssues: o,
-    spellingIssues: l,
+    storeIssues: l,
+    uniquenessIssues: i,
+    spellingIssues: o,
     total: d.length
   };
 }
 let h = null;
-function y(t = typeof document < "u" ? document : null, e = 50, n = null) {
-  if (!t) return;
+function y(e = typeof document < "u" ? document : null, t = 50, n = null) {
+  if (!e) return;
   h && (clearTimeout(h), h = null);
   function a() {
     h = setTimeout(() => {
       h = null;
-      const r = D(t);
-      n && n(r);
-    }, e);
+      const l = I(e);
+      n && n(l);
+    }, t);
   }
-  U() > 0 ? V(a) : a();
+  P() > 0 ? X(a) : a();
 }
-function Tt(t, e, n, a) {
-  t === "event" ? (console.groupCollapsed("[ln-debug] event", e), console.log("target", n), console.log("detail", a), console.groupEnd()) : t === "attr" && (console.groupCollapsed("[ln-debug] attr", e), console.log("target", n), console.log("old → new", a.oldValue, "→", a.newValue), console.groupEnd());
+function Ge(e, t, n, a) {
+  e === "event" ? (console.groupCollapsed("[ln-debug] event", t), console.log("target", n), console.log("detail", a), console.groupEnd()) : e === "attr" && (console.groupCollapsed("[ln-debug] attr", t), console.log("target", n), console.log("old → new", a.oldValue, "→", a.newValue), console.groupEnd());
 }
-let b = [];
-function qt() {
-  b = Array.from(document.body.querySelectorAll("[data-ln-debug]")), document.body.hasAttribute("data-ln-debug") && b.push(document.body);
+let p = [];
+function Je() {
+  p = Array.from(document.body.querySelectorAll("[data-ln-debug]")), document.body.hasAttribute("data-ln-debug") && p.push(document.body);
 }
-function P(t) {
-  if (t === window || t === document)
-    return b.indexOf(document.body) !== -1;
-  for (let e = 0; e < b.length; e++)
-    if (b[e].contains(t)) return !0;
+function le(e) {
+  if (e === window || e === document)
+    return p.indexOf(document.body) !== -1;
+  for (let t = 0; t < p.length; t++)
+    if (p[t].contains(e)) return !0;
   return !1;
 }
-function Lt(t, e, n, a) {
-  P(n) && Tt(t, e, n, a);
+function Ke(e, t, n, a) {
+  le(n) && Ge(e, t, n, a);
 }
-function $() {
-  qt(), tt(b.length > 0 ? Lt : null, b.length > 0 ? P : null);
+function E() {
+  Je(), se(p.length > 0 ? Ke : null, p.length > 0 ? le : null);
 }
-function M() {
-  $();
+function F() {
+  E();
 }
-function Mt() {
+function Qe() {
   typeof window > "u" || (window.lnCore = window.lnCore || {}, !window.lnCore._debugGateBound && (window.lnCore._debugGateBound = !0, m(function() {
-    $(), pt(["data-ln-debug"], $);
+    E(), Ee(["data-ln-debug"], E);
   }, "ln-debug")));
 }
 (function() {
-  const t = "data-ln-debug", e = "lnDebug";
-  if (typeof window < "u" && window[e] !== void 0) return;
+  const e = "data-ln-debug", t = "lnDebug";
+  if (typeof window < "u" && window[t] !== void 0) return;
   const n = {
     "data-ln-debug": { type: "marker", description: "Enables developer diagnostics overlay, live validation badges, and inspection logging" }
   };
-  Mt();
-  function a(o) {
-    return this.dom = o, y(o.ownerDocument || document), M(), this;
+  Qe();
+  function a(i) {
+    return this.dom = i, y(i.ownerDocument || document), F(), this;
   }
-  a.prototype.verify = function(o, l) {
-    return D(o || (this.dom ? this.dom.ownerDocument || this.dom : document), l);
+  a.prototype.verify = function(i, o) {
+    return I(i || (this.dom ? this.dom.ownerDocument || this.dom : document), o);
   }, a.prototype.destroy = function() {
-    delete this.dom[e], M();
+    delete this.dom[t], F();
   };
-  const r = ht(t, e, a, "ln-debug", {
+  const l = ne(e, t, a, "ln-debug", {
     attributes: n,
-    onInit: function(o) {
-      typeof document < "u" && y(o && o.ownerDocument ? o.ownerDocument : document);
+    onInit: function(i) {
+      typeof document < "u" && y(i && i.ownerDocument ? i.ownerDocument : document);
     },
-    onSubtreeChange: function(o) {
-      typeof document < "u" && y(o && o.ownerDocument ? o.ownerDocument : document);
+    onSubtreeChange: function(i) {
+      typeof document < "u" && y(i && i.ownerDocument ? i.ownerDocument : document);
     }
   });
-  r.verify = function(o, l) {
-    return D(o || document, l);
-  }, r.schedule = function(o, l, d) {
-    return y(o || document, l, d);
+  l.verify = function(i, o) {
+    return I(i || document, o);
+  }, l.schedule = function(i, o, d) {
+    return y(i || document, o, d);
   };
 })();
 export {
   y as scheduleVerification,
-  D as verifyDOM
+  I as verifyDOM
 };

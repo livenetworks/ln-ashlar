@@ -1,6 +1,6 @@
 <!-- @zone routes -->
 <template data-ln-route="/tenants" data-ln-route-title="Tenants — DocuFlow">
-	<section id="tenants-view" data-tenants-coordinator>
+	<section id="tenants-view">
 		<header class="page-header">
 			<div class="page-title">
 				<h1>Tenants</h1>
@@ -10,10 +10,6 @@
 				<a href="#tenant-modal" id="new-tenant" class="btn" data-ln-fill-form="tenant-create-form">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
 					New tenant
-				</a>
-				<a href="#tenant-modal:1" class="btn">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg>
-					Edit tenant #1 (hash)
 				</a>
 			</div>
 		</header>
@@ -74,22 +70,7 @@
 					<td><span data-ln-table-cell-attr="status_class:class">{{ status_display }}</span></td>
 					<td>
 						<ul class="row-actions">
-							<li><a href="tenants/{{ id }}"
-								data-ln-fill-form="tenant-form"
-								data-ln-fill-id="{{ id }}"
-								data-ln-fill-name="{{ name }}"
-								data-ln-fill-slug="{{ slug }}"
-								data-ln-fill-custom-domain="{{ custom_domain }}"
-								data-ln-fill-package-id="{{ package_id }}"
-								data-ln-fill-auth-method="{{ auth_method }}"
-								data-ln-fill-active="{{ active }}"
-								data-ln-fill-doc-numbering-scheme="{{ doc_numbering_scheme }}"
-								data-ln-fill-review-interval="{{ review_interval }}"
-								data-ln-fill-read-confirmation="{{ read_confirmation }}"
-								data-ln-fill-brand-primary="{{ brand_primary }}"
-								data-ln-fill-brand-secondary="{{ brand_secondary }}"
-								aria-label="Edit tenant" data-ln-tooltip="Edit"
-							><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg></a></li>
+							<li><a href="tenants/{{ id }}" aria-label="Edit tenant" data-ln-tooltip="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg></a></li>
 							<li><button type="button" data-ln-table-row-action="delete" aria-label="Delete tenant" data-ln-tooltip="Delete" data-ln-confirm="Delete tenant?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg></button></li>
 						</ul>
 					</td>
@@ -155,10 +136,7 @@
 	      method="post"
 	      action="/tenants">
 		<header>
-			<h3 id="tenant-modal-title" data-ln-fillable>
-				<span data-ln-modal-when="new">New tenant</span>
-				<span data-ln-modal-when="edit">Edit tenant — <span data-ln-field="name"></span></span>
-			</h3>
+			<h3 id="tenant-modal-title">New tenant</h3>
 			<button type="button" aria-label="Close" data-ln-modal-close>
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 			</button>
@@ -210,8 +188,8 @@
 						</select>
 					</div>
 					<div class="form-element">
-						<label>
-							<input name="active" type="checkbox" value="1" checked>
+						<label for="tc-tenant-active">
+							<input id="tc-tenant-active" name="active" type="checkbox" value="1" checked>
 							Active
 						</label>
 					</div>
@@ -234,8 +212,8 @@
 						</ul>
 					</div>
 					<div class="form-element">
-						<label>
-							<input name="read_confirmation" type="checkbox" value="1">
+						<label for="tc-tenant-read-confirmation">
+							<input id="tc-tenant-read-confirmation" name="read_confirmation" type="checkbox" value="1">
 							Read confirmation required
 						</label>
 					</div>

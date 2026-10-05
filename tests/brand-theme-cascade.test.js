@@ -160,11 +160,11 @@ test('Derivation selector stays at normal specificity, unlike the paints beside 
 	// zero-specificity value blocks. The color/background paints below it must.
 	assert.match(
 		raw,
-		/^:root,\n\[data-theme\],\n\[data-mode\] \{\n\t@include ln-color-chain;/m,
+		/^:root,\r?\n\[data-theme\],\r?\n\[data-mode\] \{\r?\n\t@include ln-color-chain;/m,
 		'ln-color-chain must stay on unwrapped :root, [data-theme], [data-mode]'
 	);
-	assert.match(raw, /^:where\(\[data-mode\]\) \{\n\tcolor: var\(--color-fg\);/m);
-	assert.match(raw, /^:where\(\[data-mode\]:not\(html\):not\(body\)\) \{\n\tbackground-color: var\(--color-bg\);/m);
+	assert.match(raw, /^:where\(\[data-mode\]\) \{\r?\n\tcolor: var\(--color-fg\);/m);
+	assert.match(raw, /^:where\(\[data-mode\]:not\(html\):not\(body\)\) \{\r?\n\tbackground-color: var\(--color-bg\);/m);
 });
 
 test('sync-css-tokens integrity: requireVar throws loudly on missing tokens', () => {

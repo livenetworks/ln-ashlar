@@ -309,6 +309,140 @@ See the mode-toggle markup and coordinator wiring in [`components/ln-modal/READM
 
 ---
 
+## ⚡ Route & Feature Coordinators: The Authentic Ashlar Pattern
+
+In `ln-ashlar`, page and route coordinators are **authentic Layer 2 Ashlar components**. They are not loose script tags with global `document.addEventListener` listeners, nor are they heavy pseudo-classes with manual `mount()`/`unmount()` glue code.
+
+Instead, they strictly adhere to core Ashlar component doctrines:
+1. **Self-Registration via `registerComponent`**: Automatically discovered and instantiated by the kernel's shared `MutationObserver` whenever their host element (`data-ln-tenant-editor`, `data-ln-tenants`) enters the DOM.
+2. **Automatic Lifecycle Teardown (`destroy`)**: Automatically destroyed by `ln-core`'s childList observer when the route leaves and the element is removed.
+3. **Declared Attribute Contracts (`ATTRIBUTES`)**: State and configuration live on DOM attributes (`data-ln-tenant-editor-store="tenants"`), backed by `defineAttrs` and `attrSpec`.
+4. **Subtree Boundary (Rule 4)**: The coordinator attaches listeners to `this.dom` (e.g. `this.dom.addEventListener('ln-table:row-action')`) and queries only within its own subtree.
+5. **Aware of Children & Bridges Them**: It resolves child components (`this.form`, `this.titleEl`, `this.pkgSelect`, `this.table`) and connects them via standard CustomEvents (`ln-fill`, `ln-data-coordinator:request-delete`, `ln-toast:enqueue`).
+
+#### Canonical Example: The Tenant Coordinators (`tenants.js` & `tenant-editor.js`)
+
+Below are the two standard coordinator patterns in `ln-ashlar`:
+
+##### 1. Lean Declarative Event Mediator (`tenants.js`)
+When a view's markup is already driven by standard Ashlar primitives (`data-ln-table`, `data-ln-modal`, `data-ln-data-coordinator`), the coordinator is authored as a lightweight IIFE mediator (~20–40 lines). It has zero classes, zero router dependencies, and only forwards events:
+
+```javascript
+(function () {
+	'use strict';
+
+	// 1. Table row action: forward single row deletion to data coordinator
+	document.addEventListener('ln-table:row-action', function (e) {
+		const d = e.detail;
+		if (!d || d.table !== 'tenants' || d.action !== 'delete') return;
+
+		const targetId = Number(d.id || (d.record && d.record.id));
+		if (!targetId) return;
+
+		const coord = document.getElementById('tenants-coordinator');
+		if (coord) {
+			coord.dispatchEvent(new CustomEvent('ln-data-coordinator:request-delete', {
+				detail: { id: targetId }
+			}));
+		}
+	});
+
+	// 2. Toolbar action: forward bulk deletion to data coordinator
+	document.addEventListener('click', function (e) {
+		const btn = e.target.closest('#bulk-delete-tenants');
+		if (!btn) return;
+
+		const table = document.getElementById('tenants-table');
+		const ids = Array.from((table && table.lnTable && table.lnTable.selectedIds) || []).map(Number);
+		if (!ids.length) return;
+
+		const coord = document.getElementById('tenants-coordinator');
+		if (coord) {
+			coord.dispatchEvent(new CustomEvent('ln-data-coordinator:request-bulk-delete', {
+				detail: { ids: ids }
+			}));
+		}
+	});
+
+	// 3. React to store creation: close modal
+	document.addEventListener('ln-data-store:created', function (e) {
+		if (e.detail && e.detail.store && e.detail.store !== 'tenants') return;
+		const modal = document.getElementById('tenant-modal');
+		if (modal) modal.setAttribute('data-ln-modal', 'close');
+	});
+})();
+```
+
+##### 2. Autonomous Route Coordinator (`tenant-editor.js`)
+When a view requires instance-scoped lifecycle upon being mounted into a route outlet, it is registered as a component via `registerComponent`. It obeys the **Zero Router Coupling** and **Autonomous Data Population** rules:
+
+```javascript
+(function () {
+	'use strict';
+
+	const DOM_SELECTOR = 'data-docuflow-tenant-editor';
+	const DOM_ATTRIBUTE = 'docuflowTenantEditor';
+
+	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	function DocuflowTenantEditor(dom) {
+		this.dom = dom;
+		this.dom[DOM_ATTRIBUTE] = this;
+
+		// 1. Zero router coupling: extract parameters from native location
+		const match = window.location.pathname.match(/\/tenants\/(\d+)/);
+		this.tenantId = match ? Number(match[1]) : null;
+
+		this._bindEvents();
+		this.loadRecord();
+	}
+
+	// 2. Autonomous form population: one line via lnFill; coordinator ignores internal form controls
+	DocuflowTenantEditor.prototype.loadRecord = function () {
+		const store = document.getElementById('tenants').lnDataStore;
+		store.getById(this.tenantId).then(record => {
+			if (record) window.lnCore.lnFill(this.dom, record);
+		});
+	};
+
+	DocuflowTenantEditor.prototype._bindEvents = function () {
+		const storeEl = document.getElementById('tenants');
+
+		this._onStoreSync = () => this.loadRecord();
+		storeEl.addEventListener('ln-data-store:synced', this._onStoreSync);
+		storeEl.addEventListener('ln-data-store:ready', this._onStoreSync);
+
+		this._onStoreUpdated = (e) => {
+			if (e.detail && e.detail.store === 'tenants') {
+				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+					detail: { type: 'success', title: 'Tenant updated', message: 'Tenant saved successfully' }
+				}));
+			}
+		};
+		document.addEventListener('ln-data-store:updated', this._onStoreUpdated);
+	};
+
+	DocuflowTenantEditor.prototype.destroy = function () {
+		const storeEl = document.getElementById('tenants');
+		if (storeEl) {
+			storeEl.removeEventListener('ln-data-store:synced', this._onStoreSync);
+			storeEl.removeEventListener('ln-data-store:ready', this._onStoreSync);
+		}
+		document.removeEventListener('ln-data-store:updated', this._onStoreUpdated);
+		delete this.dom[DOM_ATTRIBUTE];
+	};
+
+	window[DOM_ATTRIBUTE] = DocuflowTenantEditor;
+
+	// Automatically mounted and destroyed by ln-core MutationObserver when route renders/unmounts
+	if (window.lnCore && window.lnCore.registerComponent) {
+		window.lnCore.registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, DocuflowTenantEditor, 'docuflow-tenant-editor');
+	}
+})();
+```
+
+---
+
 ## 📝 Best Practices Checklist for Coordinators
 
 When writing your own custom coordinators, adhere to this checklist to ensure stability and compatibility:

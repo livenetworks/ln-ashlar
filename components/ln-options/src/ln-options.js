@@ -39,8 +39,8 @@ import { registerComponent, dispatch, defineAttrs, attrSpec, attrStr } from '../
 		const valueField = this._valueField;
 		const labelField = this._labelField;
 
-		// Preserve current selection
-		const prev = dom.value;
+		// Preserve current selection or pending declarative value
+		const prev = dom.getAttribute('data-ln-value') || dom.value;
 
 		// Remove all non-placeholder options (keep option[value=""])
 		const existing = dom.querySelectorAll('option');
@@ -62,8 +62,8 @@ import { registerComponent, dispatch, defineAttrs, attrSpec, attrStr } from '../
 		// Restore previous selection if still available
 		const opts = dom.options;
 		for (let i = 0; i < opts.length; i++) {
-			if (opts[i].value === prev) {
-				dom.value = prev;
+			if (opts[i].value === String(prev)) {
+				dom.value = String(prev);
 				break;
 			}
 		}

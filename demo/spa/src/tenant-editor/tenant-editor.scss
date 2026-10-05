@@ -1,9 +1,14 @@
 @use '../../../../theme/config/mixins' as *;
 
 // ─── Tenant editor specifics ────────────────────────────────────────
+#tenant-editor {
+	max-inline-size: 56rem;
+}
+
 #tenant-editor form {
-	// Identity: name spans the full row; slug + domain share it
+	.form-grid .form-element { grid-column: span 3; }
 	.form-element:has([name="name"]) { grid-column: 1 / -1; }
+	.form-element:has([name="doc_numbering_scheme"]) { grid-column: 1 / -1; }
 
 	footer { @include form-actions; }
 }

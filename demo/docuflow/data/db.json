@@ -55,10 +55,66 @@
             "brand_secondary": "#1e40af",
             "read_confirmation": true,
             "active": true
+        },
+        {
+            "id": 2,
+            "name": "Globex",
+            "slug": "globex",
+            "custom_domain": "globex.example.com",
+            "package_id": 1,
+            "auth_method": "LDAP",
+            "doc_numbering_scheme": "{TYPE}-{SEQ:4}",
+            "review_interval": 365,
+            "brand_primary": "#16a34a",
+            "brand_secondary": "#15803d",
+            "read_confirmation": false,
+            "active": true
+        },
+        {
+            "id": 3,
+            "name": "Initech",
+            "slug": "initech",
+            "custom_domain": "",
+            "package_id": 2,
+            "auth_method": "Local",
+            "doc_numbering_scheme": "{TYPE}-{SEQ:4}",
+            "review_interval": 365,
+            "brand_primary": "#dc2626",
+            "brand_secondary": "#b91c1c",
+            "read_confirmation": true,
+            "active": true
+        },
+        {
+            "id": 4,
+            "name": "Umbrella",
+            "slug": "umbrella",
+            "custom_domain": "umbrella.example.com",
+            "package_id": 2,
+            "auth_method": "LDAP",
+            "doc_numbering_scheme": "{TYPE}-{SEQ:4}",
+            "review_interval": 365,
+            "brand_primary": "#7c3aed",
+            "brand_secondary": "#6d28d9",
+            "read_confirmation": false,
+            "active": true
+        },
+        {
+            "id": 5,
+            "name": "Wayne Enterprises",
+            "slug": "wayne",
+            "custom_domain": "",
+            "package_id": 3,
+            "auth_method": "Local",
+            "doc_numbering_scheme": "{TYPE}-{SEQ:4}",
+            "review_interval": 365,
+            "brand_primary": "#0f172a",
+            "brand_secondary": "#1e293b",
+            "read_confirmation": true,
+            "active": true
         }
     ],
     "next_id": {
-        "packages": 6,
+        "packages": 5,
         "tenants": 6
     }
 }

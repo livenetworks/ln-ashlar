@@ -190,8 +190,8 @@
 				</div>
 			</fieldset>
 			<div class="form-element">
-				<label>
-					<input name="active" type="checkbox" value="1" checked>
+				<label for="pkg-active">
+					<input id="pkg-active" name="active" type="checkbox" value="1" checked>
 					Active
 				</label>
 			</div>
@@ -243,10 +243,7 @@
 	      method="post"
 	      action="/tenants">
 		<header>
-			<h3 id="tenant-modal-title" data-ln-fillable>
-				<span data-ln-modal-when="new">New tenant</span>
-				<span data-ln-modal-when="edit">Edit tenant — <span data-ln-field="name"></span></span>
-			</h3>
+			<h3 id="tenant-modal-title">New tenant</h3>
 			<button type="button" aria-label="Close" data-ln-modal-close>
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 			</button>
@@ -298,8 +295,8 @@
 						</select>
 					</div>
 					<div class="form-element">
-						<label>
-							<input name="active" type="checkbox" value="1" checked>
+						<label for="tc-tenant-active">
+							<input id="tc-tenant-active" name="active" type="checkbox" value="1" checked>
 							Active
 						</label>
 					</div>
@@ -322,8 +319,8 @@
 						</ul>
 					</div>
 					<div class="form-element">
-						<label>
-							<input name="read_confirmation" type="checkbox" value="1">
+						<label for="tc-tenant-read-confirmation">
+							<input id="tc-tenant-read-confirmation" name="read_confirmation" type="checkbox" value="1">
 							Read confirmation required
 						</label>
 					</div>
@@ -354,7 +351,7 @@
 	
 		<!-- dashboard/dashboard.html -->
 		<template data-ln-route="/" data-ln-route-title="Dashboard — DocuFlow">
-	<section id="dashboard" class="is-loading">
+	<section id="dashboard" class="is-loading" data-docuflow-dashboard>
 		<header class="page-header">
 			<div class="page-title">
 				<h1>Dashboard</h1>
@@ -565,16 +562,16 @@
 
 		<!-- tenant-editor/tenant-editor.html -->
 		<template data-ln-route="/tenants/:id" data-ln-route-title="Tenant — DocuFlow">
-	<section id="tenant-editor">
-		<header class="page-header">
+	<section id="tenant-editor" data-docuflow-tenant-editor>
+		<header class="page-header" data-ln-fillable>
 			<nav aria-label="Breadcrumb">
 				<ol>
 					<li><a href="tenants">Tenants</a></li>
-					<li aria-current="page">Tenant</li>
+					<li aria-current="page" data-ln-field="name">Tenant</li>
 				</ol>
 			</nav>
 			<div class="page-title">
-				<h1 data-tenant-title>Tenant</h1>
+				<h1>Edit tenant — <span data-ln-field="name"></span></h1>
 			</div>
 		</header>
 		<section class="section-card">
@@ -583,7 +580,7 @@
 				      data-ln-data-coordinator-scope="tenants"
 				      method="post"
 				      action="/tenants"
-				      data-ln-form-action-edit>
+				      data-ln-form-action-edit="/tenants/:id">
 					<input type="hidden" name="id">
 					<fieldset>
 						<legend>Identity</legend>
@@ -630,8 +627,8 @@
 								</select>
 							</div>
 							<div class="form-element">
-								<label>
-									<input name="active" type="checkbox" value="1" checked>
+								<label for="tenant-active">
+									<input id="tenant-active" name="active" type="checkbox" value="1">
 									Active
 								</label>
 							</div>
@@ -642,20 +639,20 @@
 						<div class="form-grid">
 							<div class="form-element">
 								<label for="tenant-doc-numbering">Doc numbering scheme</label>
-								<input id="tenant-doc-numbering" name="doc_numbering_scheme" value="{TYPE}-{SEQ:4}">
+								<input id="tenant-doc-numbering" name="doc_numbering_scheme">
 								<small class="hint">{TYPE} = document type, {SEQ:4} = zero-padded sequence.</small>
 							</div>
 							<div class="form-element">
 								<label for="tenant-review-interval">Review interval (days)</label>
-								<input id="tenant-review-interval" name="review_interval" type="number" min="1" value="365"
+								<input id="tenant-review-interval" name="review_interval" type="number" min="1"
 								       data-ln-number data-ln-number-min="1" data-ln-validate>
 								<ul data-ln-validate-errors>
 									<li class="hidden" data-ln-validate-error="rangeUnderflow">Must be at least 1 day.</li>
 								</ul>
 							</div>
 							<div class="form-element">
-								<label>
-									<input name="read_confirmation" type="checkbox" value="1">
+								<label for="tenant-read-confirmation">
+									<input id="tenant-read-confirmation" name="read_confirmation" type="checkbox" value="1">
 									Read confirmation required
 								</label>
 							</div>
@@ -686,7 +683,7 @@
 
 		<!-- tenants/tenants.html -->
 		<template data-ln-route="/tenants" data-ln-route-title="Tenants — DocuFlow">
-	<section id="tenants-view" data-tenants-coordinator>
+	<section id="tenants-view">
 		<header class="page-header">
 			<div class="page-title">
 				<h1>Tenants</h1>
@@ -696,10 +693,6 @@
 				<a href="#tenant-modal" id="new-tenant" class="btn" data-ln-fill-form="tenant-create-form">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
 					New tenant
-				</a>
-				<a href="#tenant-modal:1" class="btn">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg>
-					Edit tenant #1 (hash)
 				</a>
 			</div>
 		</header>
@@ -760,22 +753,7 @@
 					<td><span data-ln-table-cell-attr="status_class:class">{{ status_display }}</span></td>
 					<td>
 						<ul class="row-actions">
-							<li><a href="tenants/{{ id }}"
-								data-ln-fill-form="tenant-form"
-								data-ln-fill-id="{{ id }}"
-								data-ln-fill-name="{{ name }}"
-								data-ln-fill-slug="{{ slug }}"
-								data-ln-fill-custom-domain="{{ custom_domain }}"
-								data-ln-fill-package-id="{{ package_id }}"
-								data-ln-fill-auth-method="{{ auth_method }}"
-								data-ln-fill-active="{{ active }}"
-								data-ln-fill-doc-numbering-scheme="{{ doc_numbering_scheme }}"
-								data-ln-fill-review-interval="{{ review_interval }}"
-								data-ln-fill-read-confirmation="{{ read_confirmation }}"
-								data-ln-fill-brand-primary="{{ brand_primary }}"
-								data-ln-fill-brand-secondary="{{ brand_secondary }}"
-								aria-label="Edit tenant" data-ln-tooltip="Edit"
-							><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg></a></li>
+							<li><a href="tenants/{{ id }}" aria-label="Edit tenant" data-ln-tooltip="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg></a></li>
 							<li><button type="button" data-ln-table-row-action="delete" aria-label="Delete tenant" data-ln-tooltip="Delete" data-ln-confirm="Delete tenant?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg></button></li>
 						</ul>
 					</td>
