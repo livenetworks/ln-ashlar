@@ -155,7 +155,8 @@ import { MutationReceipts } from './mutation-receipts';
 
 	// ─── Query State & View Serving ──────────────────────────
 	_component.prototype._owns = function (name) {
-		return !!name && name === this._name;
+		const target = this._name || this.findChildren().storeEl?.id;
+		return !!name && name === target;
 	};
 
 	_component.prototype._currentQuery = function () {
@@ -396,6 +397,9 @@ import { MutationReceipts } from './mutation-receipts';
 			const status = d.status || d.error?.status || 0;
 			if (meta.queued && c.queue) {
 				dispatch(c.queueEl, 'ln-api-queue:nack', { entryId: meta.entryId, reason: (status === 401 || status === 419) ? 'auth' : ((status === 0 || status >= 500) ? 'retry' : 'drop') });
+			}
+			if (c.storeEl) {
+				dispatch(c.storeEl, 'ln-data-store:request-sync-failed', { error: d.error || d, status });
 			}
 			this._reportError('connector-error', d.error || d, meta);
 		}

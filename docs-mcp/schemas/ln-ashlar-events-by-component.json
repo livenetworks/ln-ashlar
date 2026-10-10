@@ -676,6 +676,13 @@
 					"source": "static"
 				},
 				{
+					"name": "ln-data-store:request-sync-failed",
+					"cancelable": false,
+					"description": "Dispatched to the store when the connector's sync fails.",
+					"detail": "{ error: String, status: Number }",
+					"source": "static"
+				},
+				{
 					"name": "ln-data-store:request-update",
 					"cancelable": false,
 					"description": "Optimistically updates a record or rekeys ID.",

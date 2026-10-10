@@ -929,14 +929,16 @@
 			"source": "static"
 		},
 		"ln-data-store:request-sync-failed": {
-			"emitted_by": [],
+			"emitted_by": [
+				"ln-data-coordinator"
+			],
 			"listened_by": [
 				"ln-data-store"
 			],
 			"cancelable": false,
 			"description": "The coordinator reports a failed connector sync. Clears `isSyncing` and re-emits it as `ln-data-store:sync-error`.",
 			"detail": "{ error: String, status: Number }",
-			"source": "dynamic-allowlist"
+			"source": "mixed"
 		},
 		"ln-data-store:request-update": {
 			"emitted_by": [

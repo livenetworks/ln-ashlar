@@ -371,14 +371,15 @@
 		<p>The table, select, and stat counter below are wired purely via HTML attributes. No <code>&lt;script&gt;</code> block drives them — <code>ln-data-coordinator</code> binder handles initial load, filter delivery, and store-mutation refresh automatically.</p>
 
 		<!-- Coordinator tree wraps store + connector -->
-		<div data-ln-data-coordinator id="people-coordinator">
+		<div data-ln-data-coordinator="people" id="people-coordinator">
 			<div data-ln-data-store="people"
 			     data-ln-data-store-stale="60"
 			     data-ln-data-store-indexes="department,status,updated_at"
 			     data-ln-data-store-search-fields="title,department,owner"
 			     id="people"></div>
 			<div data-ln-api-connector
-			     data-ln-api-endpoint="/api/documents"></div>
+			     data-ln-api-base-url=""
+			     data-ln-api-path="/api/documents"></div>
 		</div>
 
 		<!-- Bound select — populated by ln-options -->

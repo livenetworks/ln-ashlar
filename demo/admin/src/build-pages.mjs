@@ -15,7 +15,9 @@ function escapeRegex(str) {
 }
 
 try {
-	const shell = await readFile(shellPath, 'utf8');
+	const pkg = JSON.parse(await readFile(join(__dir, '..', '..', '..', 'package.json'), 'utf8'));
+	let shell = await readFile(shellPath, 'utf8');
+	shell = shell.replaceAll('{{VERSION}}', pkg.version);
 
 	// Copy mock scripts to dist directory
 	const mockScripts = ['mock-related.js', 'mock-store-usecase.js', 'mock-http.js', 'mock-couchdb-connector.js', 'mock-api-queue.js', 'mock-write-workflow.js', 'websocket-demo.js'];

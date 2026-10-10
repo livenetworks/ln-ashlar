@@ -40,6 +40,27 @@
 		})
 	);
 
+	// ── Store Presenters ──────────────────────────────────────────────
+	function initPresenters() {
+		packagesStoreEl.lnDataStore?.setPresenters({
+			computed: {
+				max_users_display: r => r.max_users === 0 ? 'Unlimited' : r.max_users,
+				status_display: r => r.active ? 'Active' : 'Inactive'
+			}
+		});
+		tenantsStoreEl.lnDataStore?.setPresenters({
+			computed: {
+				package_name: r => pkgNameById.get(r.package_id) || '—',
+				status_display: r => r.active ? 'Active' : 'Inactive'
+			}
+		});
+	}
+	initPresenters();
+	['ready', 'loaded', 'synced'].forEach(ev => {
+		packagesStoreEl.addEventListener(`ln-data-store:${ev}`, initPresenters);
+		tenantsStoreEl.addEventListener(`ln-data-store:${ev}`, initPresenters);
+	});
+
 	// ── Entity view factory ────────────────────────────────────────────
 	function makeEntityView({ name, storeEl, tableId, formEl, modalEl, decorate }) {
 		let lastQuery = { sort: null, filters: {}, search: '' };
@@ -189,11 +210,14 @@
 	}
 
 	// ── C1: redirect to dashboard when path matches no known route ────
-	document.body.addEventListener('ln-router:not-found', e => {
+	document.addEventListener('ln-router:not-found', e => {
 		if (e.detail?.path !== '/') {
 			window.lnRouter.replace('/');
 		}
 	});
+	if (window.lnRouter && !window.lnRouter.current()) {
+		window.lnRouter.replace('/');
+	}
 
 	// Boot-safety window-load fallback removed — ln-router deferred boot dispatch
 	// makes it obsolete (boot event fires reliably via queueMicrotask/VT callback).

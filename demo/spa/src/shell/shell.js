@@ -21,8 +21,8 @@
 		function forceSyncBoth() {
 			const packagesStoreEl = document.getElementById('packages');
 			const tenantsStoreEl = document.getElementById('tenants');
-			if (packagesStoreEl && packagesStoreEl.lnDataStore) packagesStoreEl.lnDataStore.forceSync();
-			if (tenantsStoreEl && tenantsStoreEl.lnDataStore) tenantsStoreEl.lnDataStore.forceSync();
+			if (packagesStoreEl && packagesStoreEl.lnDataStore) packagesStoreEl.lnDataStore.fullReload();
+			if (tenantsStoreEl && tenantsStoreEl.lnDataStore) tenantsStoreEl.lnDataStore.fullReload();
 		}
 
 		// Reset demo data trigger

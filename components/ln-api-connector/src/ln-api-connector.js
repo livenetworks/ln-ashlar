@@ -18,6 +18,7 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 		'data-ln-api-connector':                { type: 'marker', description: 'Mounts API connector bridging REST backend and ln-ashlar data coordinators' },
 		'data-ln-api-base-url':                 { prop: 'baseUrl',    read: attrStr, type: 'string', fallback: '', effect: _syncAttribute, description: 'Base URL endpoint for API requests' },
 		'data-ln-api-path':                     { prop: 'path',       read: attrStr, type: 'string', fallback: '', effect: _syncAttribute, description: 'Resource path appended to base URL' },
+		'data-ln-api-endpoint':                 { prop: 'path',       read: attrStr, type: 'string', fallback: '', effect: _syncAttribute, description: 'Alias for data-ln-api-path' },
 		'data-ln-api-headers':                  { prop: 'rawHeaders', read: attrStr, type: 'json', fallback: null, effect: _syncAttribute, description: 'Custom HTTP headers in JSON format or semicolon-separated pairs' },
 		'data-ln-api-param-offset':             { effect: _syncAttribute, type: 'string', fallback: 'offset', description: 'Query parameter name for pagination offset' },
 		'data-ln-api-param-limit':              { effect: _syncAttribute, type: 'string', fallback: 'limit', description: 'Query parameter name for pagination page size' },

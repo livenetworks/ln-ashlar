@@ -1,7 +1,7 @@
 {
 	"$schema": "https://json.schemastore.org/web-types",
 	"name": "@livenetworks/ashlar",
-	"version": "2.0.8",
+	"version": "2.0.9",
 	"framework": "html",
 	"contributions": {
 		"html": {
@@ -39,6 +39,13 @@
 					"description": "Debounce delay in milliseconds before dispatching query requests",
 					"value": {
 						"type": "number"
+					}
+				},
+				{
+					"name": "data-ln-api-endpoint",
+					"description": "Alias for data-ln-api-path",
+					"value": {
+						"type": "string"
 					}
 				},
 				{
@@ -862,6 +869,13 @@
 				{
 					"name": "data-ln-include",
 					"description": "URL of external HTML template to fetch and include",
+					"value": {
+						"type": "string"
+					}
+				},
+				{
+					"name": "data-ln-initial-value",
+					"description": "data-ln-initial-value attribute",
 					"value": {
 						"type": "string"
 					}

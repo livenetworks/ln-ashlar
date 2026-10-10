@@ -3,6 +3,8 @@ import { run, assert, BASE_URL } from './_harness.mjs';
 // Every fact below is read from demo/admin/src/pages/tabs.html (live demos) and the
 // components it mounts: components/ln-tabs/src/ln-tabs.js, tabs-model.js,
 // components/ln-core/hash.js (hash codec) and components/ln-persist/src/ln-persist.js.
+// Driven by the REAL components (no mock, no interception): the page needs no backend.
+// Where page prose contradicts source (it says there is no :before-change), source is asserted and labelled [source].
 
 const PAGE_URL = BASE_URL + 'tabs.html';
 
@@ -27,10 +29,14 @@ const same = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
 
 run('demo/admin/tabs.html', async ({ page }) => {
 
+	page.setDefaultTimeout(15000);
+	page.setDefaultNavigationTimeout(30000);
+
 	const failures = [];
+	const started = Date.now();
 
 	async function section(title, fn) {
-		console.log(`\n--- ${title} ---`);
+		console.log(`\n--- ${title} --- (+${Date.now() - started}ms)`);
 		try {
 			await fn();
 		} catch (err) {
@@ -49,9 +55,11 @@ run('demo/admin/tabs.html', async ({ page }) => {
 	}
 
 	// Fresh, state-free page: ln-persist would otherwise restore a previous test's tab.
+	// A unique query string forces a full navigation even when only the hash would differ
+	// (a hash-only goto is a same-document navigation); going via about:blank stalls intermittently.
+	let nonce = 0;
 	async function load() {
-		await page.goto('about:blank');
-		await page.goto(PAGE_URL, { waitUntil: 'load' });
+		await page.goto(PAGE_URL + '?n=' + (++nonce), { waitUntil: 'load' });
 		await page.evaluate(() => localStorage.clear());
 		await page.reload({ waitUntil: 'load' });
 		await ready();
@@ -59,8 +67,7 @@ run('demo/admin/tabs.html', async ({ page }) => {
 
 	// Loads PAGE_URL with a fragment as the very first paint (no localStorage touch).
 	async function loadWithHash(hash) {
-		await page.goto('about:blank');
-		await page.goto(PAGE_URL + hash, { waitUntil: 'load' });
+		await page.goto(PAGE_URL + '?n=' + (++nonce) + hash, { waitUntil: 'load' });
 		await ready();
 	}
 
@@ -90,11 +97,14 @@ run('demo/admin/tabs.html', async ({ page }) => {
 	}, sel);
 
 	// Waits for the wrapper's active key, then asserts the full synced DOM state.
-	async function expectActive(sel, key, label) {
-		await page.waitForFunction((s, k) => document.querySelector(s).getAttribute('data-ln-tabs-active') === k,
-			{ timeout: 5000 }, sel, key).catch(() => {});
+	// `attr` is the raw wrapper attribute value when it differs from the resolved key
+	// (an unknown key written from outside is kept verbatim; the DOM resolves to the default).
+	async function expectActive(sel, key, label, attr = key) {
+		await page.waitForFunction((s, k, a) => document.querySelector(s).getAttribute('data-ln-tabs-active') === a
+			&& document.querySelector(s).lnTabs.activeKey === k,
+			{ timeout: 5000 }, sel, key, attr).catch(() => {});
 		const s = await snap(sel);
-		assert(s.active === key, `${label}: wrapper data-ln-tabs-active is "${key}" (got "${s.active}")`);
+		assert(s.active === attr, `${label}: wrapper data-ln-tabs-active is "${attr}" (got "${s.active}")`);
 		const shown = s.panels.filter(p => p.shown).map(p => p.key);
 		assert(same(shown, [key]), `${label}: only panel "${key}" is visible (got [${shown.join(',')}])`);
 		assert(s.panels.every(p => p.hidden === (p.key !== key) && p.cls === (p.key !== key)
@@ -210,7 +220,7 @@ run('demo/admin/tabs.html', async ({ page }) => {
 		await clickTab(PROJECT, 'members');
 		await page.waitForFunction(sel => /project-tabs → members$/.test(document.querySelector(sel).textContent),
 			{ timeout: 5000 }, LOG);
-		for (const key of ['details', 'overview']) {
+		for (const key of ['overview', 'details']) {
 			await clickTab(PLAIN, key);
 			await page.waitForFunction((sel, k) => new RegExp('\\(no id\\) → ' + k + '$').test(document.querySelector(sel).textContent),
 				{ timeout: 5000 }, LOG, key);
@@ -219,7 +229,7 @@ run('demo/admin/tabs.html', async ({ page }) => {
 		await page.waitForFunction(sel => /\(no id\) → settings$/.test(document.querySelector(sel).textContent),
 			{ timeout: 5000 }, LOG);
 		lines = (await page.$eval(LOG, el => el.textContent)).split('\n');
-		assert(lines.length === 5, `Log keeps at most 5 lines (got ${lines.length})`);
+		assert(lines.length === 5, `Log keeps exactly the last 5 lines (got ${lines.length})`);
 	});
 
 	await section('Hash tabs (user-tabs): anchor click writes the hash', async () => {
@@ -263,7 +273,7 @@ run('demo/admin/tabs.html', async ({ page }) => {
 		await page.evaluate(() => { location.hash = 'user-tabs:history'; });
 		await expectActive(USER, 'history', 'location.hash = user-tabs:history');
 		await page.evaluate(() => { location.hash = 'user-tabs:bogus'; });
-		await expectActive(USER, 'info', 'unknown key falls back to default');
+		await expectActive(USER, 'info', '[source] unknown hash key resolves to default tab (wrapper keeps the raw "bogus")', 'bogus');
 	});
 
 	await section('Hash tabs: deep link on first paint', async () => {
@@ -353,7 +363,7 @@ run('demo/admin/tabs.html', async ({ page }) => {
 			new CustomEvent('ln-tabs:request-select', { detail: { key: 'overview' } })), PLAIN);
 		await expectActive(PLAIN, 'overview', 'ln-tabs:request-select {key}');
 		await page.evaluate(s => document.querySelector(s).setAttribute('data-ln-tabs-active', 'nope'), PLAIN);
-		await expectActive(PLAIN, 'overview', 'unknown key falls back to the default tab');
+		await expectActive(PLAIN, 'overview', '[source] unknown key keeps the current/default tab (wrapper keeps the raw "nope")', 'nope');
 		await page.evaluate(s => document.querySelector(s).lnTabs.select('history'), USER);
 		await page.waitForFunction(() => location.hash === '#user-tabs:history', { timeout: 5000 });
 		await expectActive(USER, 'history', 'lnTabs.select on hash group goes through the hash');
