@@ -22,6 +22,29 @@
 	<script src="app.js" defer></script>
 </head>
 <body>
+	<!-- Toast container -->
+	<ul data-ln-toast>
+		<template data-ln-template="ln-toast-item">
+		<li data-ln-toast-item data-ln-attr="class:type">
+			<div class="icon">
+				<ul>
+					<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg></li>
+					<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-x"></use></svg></li>
+					<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg></li>
+					<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg></li>
+				</ul>
+			</div>
+			<section class="content">
+				<header>
+					<strong class="title" data-ln-field="title"></strong>
+					<button type="button" class="close" data-ln-toast-close aria-label="Close notification"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+				</header>
+				<p class="message" data-ln-field="message"></p>
+			</section>
+		</li>
+		</template>
+	</ul>
+
 	<div id="app">
 		<header id="app-header">
 			<a href="/" id="app-brand">
@@ -175,6 +198,7 @@
 							<ul class="row-actions">
 								<li><button type="button" data-ln-table-row-action="edit" aria-label="Edit package"
 						data-ln-modal-for="package-modal"
+						data-ln-modal-mode="edit"
 						data-ln-fill-form="package-form"
 						data-ln-fill-id="{{ id }}"
 						data-ln-fill-name="{{ name }}"
@@ -375,7 +399,7 @@
 	<!-- Package modal -->
 	<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="package-modal" aria-labelledby="package-modal-title">
 		<form data-ln-form="package-form" id="package-form" novalidate
-		      data-ln-form-scope="packages"
+		      data-ln-data-coordinator-scope="packages"
 		      method="post"
 		      action="/packages"
 		      data-ln-form-action-edit>
@@ -431,7 +455,7 @@
 	<!-- Tenant modal -->
 	<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="tenant-modal" aria-labelledby="tenant-modal-title">
 		<form data-ln-form="tenant-form" id="tenant-form" novalidate
-		      data-ln-form-scope="tenants"
+		      data-ln-data-coordinator-scope="tenants"
 		      method="post"
 		      action="/tenants"
 		      data-ln-form-action-edit>

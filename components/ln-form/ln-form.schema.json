@@ -40,6 +40,12 @@
 			],
 			"fallback": "PUT",
 			"description": "HTTP method used when submitting edit action"
+		},
+		"data-ln-initial-value": {
+			"direction": "both",
+			"sources": [
+				"src/ln-form.js"
+			]
 		}
 	}
 }

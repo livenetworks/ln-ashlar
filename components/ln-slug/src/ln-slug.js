@@ -1,4 +1,4 @@
-import { registerComponent, defineAttrs, attrSpec, attrStr } from '../../ln-core';
+import { registerComponent, defineAttrs, attrSpec, attrStr, interceptValueProperty } from '../../ln-core';
 import { generateSlug } from './slug-model.js';
 
 (function () {
@@ -12,6 +12,7 @@ import { generateSlug } from './slug-model.js';
 		'data-ln-slug-from': { prop: 'sourceName', type: 'string', read: attrStr, fallback: '', description: 'Name of the source input field to derive URL slug from' }
 	};
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
+	const _inputValueDesc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
 
 	function _component(dom) {
 		if (dom.tagName !== 'INPUT') {
@@ -35,11 +36,24 @@ import { generateSlug } from './slug-model.js';
 		}
 
 		this.dom = dom;
+		this.form = form;
 		this.source = source;
 		this._pristine = dom.value === '';
 		this._mirroring = false;
 
 		const self = this;
+
+		interceptValueProperty(dom, _inputValueDesc, {
+			get: function () {
+				return _inputValueDesc.get.call(dom);
+			},
+			set: function (val) {
+				_inputValueDesc.set.call(dom, val);
+				if (!self._mirroring) {
+					self._pristine = (val === '' || val === null || val === undefined);
+				}
+			}
+		});
 
 		this._onSource = function () {
 			if (!self._pristine) return;
@@ -49,9 +63,15 @@ import { generateSlug } from './slug-model.js';
 			if (self._mirroring) return;
 			self._pristine = (self.dom.value === '');
 		};
+		this._onFormReset = function () {
+			setTimeout(function () {
+				self._pristine = (self.dom.value === '');
+			}, 0);
+		};
 
 		source.addEventListener('input', this._onSource);
 		dom.addEventListener('input', this._onSlug);
+		form.addEventListener('reset', this._onFormReset);
 
 		// Initial check — if source field already has text and slug is pristine, mirror immediately
 		if (this._pristine && source.value && source.value.trim() !== '') {
@@ -72,6 +92,10 @@ import { generateSlug } from './slug-model.js';
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this.source.removeEventListener('input', this._onSource);
 		this.dom.removeEventListener('input', this._onSlug);
+		if (this._onFormReset && this.form) {
+			this.form.removeEventListener('reset', this._onFormReset);
+		}
+		Object.defineProperty(this.dom, 'value', _inputValueDesc);
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

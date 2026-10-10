@@ -158,6 +158,29 @@ import { calculateCursorPosition } from './number-model.js';
 			}
 		}
 
+		// ── Form reset listener ───────────────────────────
+		if (dom.form) {
+			this._onFormReset = function () {
+				setTimeout(function () {
+					const def = dom.defaultValue;
+					if (def !== '') {
+						const num = parseFloat(def);
+						if (!isNaN(num)) {
+							const maxDecimals = dom.getAttribute('data-ln-number-decimals');
+							self._setHiddenRaw(num);
+							self._setDisplayRaw(formatNumber(num, getLocale(dom), { maxDecimals }));
+							dom.dispatchEvent(new Event('input', { bubbles: true }));
+							return;
+						}
+					}
+					self._setHiddenRaw('');
+					self._setDisplayRaw('');
+					dom.dispatchEvent(new Event('input', { bubbles: true }));
+				}, 0);
+			};
+			dom.form.addEventListener('reset', this._onFormReset);
+		}
+
 		return this;
 	}
 
@@ -377,6 +400,9 @@ import { calculateCursorPosition } from './number-model.js';
 			document.removeEventListener('ln-core:locale-change', this._onLocaleChange);
 		}
 		if (!this.isTextElement) {
+			if (this._onFormReset && this.dom.form) {
+				this.dom.form.removeEventListener('reset', this._onFormReset);
+			}
 			this.dom.removeEventListener('input', this._onInput);
 			this.dom.removeEventListener('keydown', this._onKeyDown);
 			this.dom.removeEventListener('paste', this._onPaste);

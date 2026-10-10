@@ -25,6 +25,10 @@
 			"description": "Debounce delay in milliseconds before dispatching query requests"
 		},
 		{
+			"name": "data-ln-api-endpoint",
+			"description": "Alias for data-ln-api-path"
+		},
+		{
 			"name": "data-ln-api-headers",
 			"description": "Custom HTTP headers in JSON format or semicolon-separated pairs"
 		},
@@ -671,6 +675,10 @@
 		{
 			"name": "data-ln-include",
 			"description": "URL of external HTML template to fetch and include"
+		},
+		{
+			"name": "data-ln-initial-value",
+			"description": "data-ln-initial-value attribute"
 		},
 		{
 			"name": "data-ln-item",

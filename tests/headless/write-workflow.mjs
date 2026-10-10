@@ -15,6 +15,12 @@ import { run, assert, BASE_URL } from './_harness.mjs';
 // ln-form/src (_applyActionMode), ln-fill/src, ln-modal/src + ln-modal.scss, ln-confirm/src,
 // ln-api-connector/src (update body/url), ln-table/src (row-action, empty template).
 //
+// KNOWN DEMO BUG (asserted in the first section, left failing on purpose): the page's
+// <div data-ln-data-coordinator id="wwf-coordinator"> has an EMPTY attribute value, but the coordinator's name is
+// that value (ln-data-coordinator.js _name / _owns). The table source and the form scope are "wwf-documents", so
+// the coordinator never serves the table (0 rows) and never intercepts the form submit. The sections after it
+// therefore fail on the unpatched page; they pass when the value is set to "wwf-documents".
+//
 // Not covered: toasts (the mock returns {message} envelopes but no component on this page maps
 // api-connector results to ln-toast; ui-coordinator only listens to ln-ajax:*), and optimistic
 // ROLLBACK (the coordinator only reports 'connector-error'; it never reverts the store).
@@ -69,8 +75,12 @@ run('demo/admin/write-workflow.html', async ({ page }) => {
 			if (!coord || !coord.lnDataCoordinator || !store || !store.lnDataStore) return false;
 			if (!conn || !conn.lnApiConnector || !table || !table.lnTable) return false;
 			if (!modal || !modal.lnModal || !form || !form.lnForm) return false;
-			return document.querySelectorAll('#wwf-table tbody tr[data-ln-table-row]').length === n;
+			return true;
 		}, { timeout: 15000 }, rowCount);
+		// Row count is only waited for here; each section asserts it, so a demo that never renders rows fails on
+		// a clear assertion instead of a timeout that cascades through every section.
+		await page.waitForFunction(n => document.querySelectorAll('#wwf-table tbody tr[data-ln-table-row]').length === n,
+			{ timeout: 5000 }, rowCount).catch(() => {});
 		// Observation only: log requests that reach window.fetch (the page's mock still answers) and coordinator errors.
 		await page.evaluate(() => {
 			window.__reqs = [];
@@ -164,6 +174,20 @@ run('demo/admin/write-workflow.html', async ({ page }) => {
 
 	// ─── Sections ──────────────────────────────────────────────
 
+	await check('Coordinator is addressable: its name matches the table source, the form scope and the store id', async () => {
+		await load(2, true);
+		const names = await page.evaluate(() => ({
+			coord: document.getElementById('wwf-coordinator').getAttribute('data-ln-data-coordinator'),
+			source: document.getElementById('wwf-table').getAttribute('data-ln-table-source'),
+			scope: document.getElementById('wwf-form').getAttribute('data-ln-data-coordinator-scope'),
+			storeId: document.getElementById('wwf-documents').id
+		}));
+		// [source] ln-data-coordinator.js: _name = value of data-ln-data-coordinator; _owns(name) is `name === this._name`,
+		// used by _refreshAll/_serveElement (table source) and _onFormSubmit (form scope).
+		assert(names.coord === names.source && names.coord === names.scope && names.coord === names.storeId,
+			`[source] data-ln-data-coordinator value "${names.coord}" equals table-source "${names.source}", form scope "${names.scope}" and store id "${names.storeId}"`);
+	});
+
 	await check('Initial sync: connector GET /documents -> store -> table rows', async () => {
 		await load(2, true);
 		const list = await rows();
@@ -176,7 +200,8 @@ run('demo/admin/write-workflow.html', async ({ page }) => {
 		const empty = await page.$('#wwf-table .ln-table__empty-state');
 		assert(empty === null, 'No empty state while rows exist');
 		const m = await modalState();
-		assert(m.attr === 'close' && m.open === false, 'Modal starts closed');
+		// [source] ln-modal.js: data-ln-modal values are open|close with fallback 'close'; the markup carries the empty marker.
+		assert(m.attr !== 'open' && m.open === false, `Modal starts closed (data-ln-modal "${m.attr}", dialog.open ${m.open})`);
 		const gets = await page.evaluate(() => window.__reqs.filter(r => r.method === 'GET').length);
 		assert(true, `GET requests seen after observer install: ${gets} (informational)`);
 	});
@@ -271,7 +296,9 @@ run('demo/admin/write-workflow.html', async ({ page }) => {
 		await clickNew();
 		await waitModal(true);
 		const f = await formState();
-		assert(f.id === '' && f.title === '' && f.status === 'draft' && f.expectedVersion === '', 'Form fields reset');
+		// [source] ln-form.js _onLnFill: null record -> form.reset(); form.reset() restores each field's default value.
+		assert(f.id === '' && f.title === '' && f.status === 'draft' && f.expectedVersion === '',
+			`Form fields reset to defaults (id "", title "", status draft, expected_version ""), got ${JSON.stringify(f)}`);
 		assert(f.action === '/documents' && !f.method, 'Action restored to /documents, _method cleared');
 		assert((await modalState()).mode === 'new', 'Mode is "new"');
 		await clickCancel();
@@ -336,10 +363,11 @@ run('demo/admin/write-workflow.html', async ({ page }) => {
 	await check('Server error on update is reported as ln-data-coordinator:error (connector-error)', async () => {
 		await load(2, true);
 		// Remove record 1 from the mock only, so PUT /documents/1 gets the mock's own 404.
-		await page.evaluate(key => {
-			const r = JSON.parse(localStorage.getItem(key));
+		// The mock only writes localStorage on mutations, so on a fresh page it is still absent: start from its seed.
+		await page.evaluate((key, seed) => {
+			const r = JSON.parse(localStorage.getItem(key)) || seed;
 			localStorage.setItem(key, JSON.stringify(r.filter(x => x.id !== 1)));
-		}, MOCK_KEY);
+		}, MOCK_KEY, SEED);
 		await clickEdit(1);
 		await waitModal(true);
 		await setTitle('Will Fail');

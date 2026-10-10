@@ -18,6 +18,11 @@
     RewriteCond %{THE_REQUEST} \s/+demo(?:\s|\?) [NC]
     RewriteRule ^demo/?$ / [R=302,L]
 
+    # 2.5 Allow existing files or directories in root to be served directly
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
     # 3. Internally rewrite all other requests to demo/
     RewriteCond %{REQUEST_URI} !^.*/demo/
     RewriteRule ^(.*)$ demo/$1 [L]

@@ -30,6 +30,15 @@
 			"min": 0,
 			"description": "Debounce delay in milliseconds before dispatching query requests"
 		},
+		"data-ln-api-endpoint": {
+			"direction": null,
+			"sources": [
+				"src/ln-api-connector.js"
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "Alias for data-ln-api-path"
+		},
 		"data-ln-api-headers": {
 			"direction": null,
 			"sources": [

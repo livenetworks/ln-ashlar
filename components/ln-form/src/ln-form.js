@@ -23,22 +23,43 @@ import { populateForm, registerComponent, defineAttrs, attrSpec, attrStr } from 
 
 		const self = this;
 
+		function _captureHiddens() {
+			const hiddens = self.dom.querySelectorAll('input[type="hidden"]:not([name="_method"])');
+			for (let i = 0; i < hiddens.length; i++) {
+				if (!hiddens[i].hasAttribute('data-ln-initial-value')) {
+					hiddens[i].setAttribute('data-ln-initial-value', hiddens[i].getAttribute('value') || '');
+				}
+			}
+		}
+
+		function _resetHiddens() {
+			const hiddens = self.dom.querySelectorAll('input[type="hidden"]:not([name="_method"])');
+			for (let i = 0; i < hiddens.length; i++) {
+				hiddens[i].value = hiddens[i].getAttribute('data-ln-initial-value') || '';
+			}
+		}
+
+		_captureHiddens();
+
 		this._onLnFill = function (e) {
 			// Guard: only handle direct dispatches at this form, not bubbled
 			// events from [data-ln-fillable] children inside the form.
 			if (e.target !== self.dom) return;
 			if (e.detail) {
+				_captureHiddens();
 				self.fill(e.detail);
 				self._applyActionMode(e.detail);
 			} else {
 				// Null record = "new" mode. Native reset fires the 'reset'
 				// event, which restores the base action below.
 				self.dom.reset();
+				_resetHiddens();
 			}
 		};
 
 		this._onReset = function () {
 			self._applyActionMode(null);
+			_resetHiddens();
 		};
 
 		form.addEventListener('ln-fill', this._onLnFill);

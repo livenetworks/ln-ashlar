@@ -115,7 +115,7 @@ test('generated catalogs have strict schemas, shape preservation, and accurate p
 
 	// 55 allowlist entries across by-component (29 dc emits + 18 dc listens + 5 ds listens + 3 ln-fill)
 	assert.equal(dynamicAllowlistCount, 55, 'by-component dynamic-allowlist entries count must be exactly 55');
-	assert.equal(staticCount, 293, 'by-component static entries count must be exactly 293');
+	assert.equal(staticCount, 294, 'by-component static entries count must be exactly 294');
 
 	// Acceptance criteria 1, 2, 3: ln-table:set-data
 	const dcEmits = byComponent.components['ln-data-coordinator'].emits;
