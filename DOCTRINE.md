@@ -53,6 +53,8 @@
   Functions enter a model **only if the DOM shell or system already actively calls them** — never for hypothetical "might be needed" utilities. Uncalled or dead functions are strictly forbidden.
 * **Lightweight Route & Feature Coordinators (Zero-Class UI Wiring):**
   Application-level route and feature coordinators (wiring URLs, stores, forms, and buttons) **MUST NOT** be authored as heavy pseudo-classes (`function MyCoordinator`, `prototype`, `mount()`, `unmount()`). They are written as lean, declarative IIFE event mediators (~20–60 lines) that query state (URL params, store), dispatch `ln-fill` or request events, and react to store/table lifecycle events (see [`docs/architecture/coordinator.md`](docs/architecture/coordinator.md)).
+* **Deterministic DOM vs. Phantom Race Conditions (Zero React/V-DOM Mindset):**
+  Coordinators are pure event mediators that react *only* to native or custom DOM events bubbling from child elements. Because an event can bubble *only* from an element that is already physically created, attached, and initialized in the live DOM, "unmounted component race conditions", "render-phase timing gaps", and "phantom lifecycle states" common in Virtual-DOM frameworks (React/Vue) are **physically impossible** in Ashlar. AI agents and reviewers MUST NOT evaluate Ashlar with React/SPA priors or pollute coordinators and application code with speculative defensive guards (`if (!el) return;`, duplicate fallbacks, paranoid state flags). Defending against impossible DOM states directly violates the **No Speculative Code** doctrine.
 
 ---
 
