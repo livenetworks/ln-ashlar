@@ -1,4 +1,4 @@
-import { dispatchCancelable, guardBody, observeAttributes } from '../../ln-core';
+import { dispatchCancelable, guardBody, observeAttributes, observeLifecycle } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-link';
@@ -151,36 +151,26 @@ import { dispatchCancelable, guardBody, observeAttributes } from '../../ln-core'
 
 	function _domObserver() {
 		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (const mutation of mutations) {
-					if (mutation.type === 'childList') {
-						for (const node of mutation.addedNodes) {
-							if (node.nodeType === 1) {
-								findElements(node);
-
-								const parent = node.closest('[' + DOM_SELECTOR + ']');
-								if (parent) {
-									if (node.tagName === 'TR') {
-										_initRow(node);
-									} else {
-										const tag = parent.tagName;
-										if (tag === 'TABLE' || tag === 'TBODY') {
-											const rows = node.querySelectorAll ? node.querySelectorAll('tr') : [];
-											for (const r of rows) {
-												_initRow(r);
-											}
-										}
-									}
+			observeLifecycle({
+				query: '[' + DOM_SELECTOR + ']',
+				onInit: function (node) {
+					findElements(node);
+				},
+				onSubtreeChange: function (host, mutation) {
+					for (let i = 0; i < mutation.addedNodes.length; i++) {
+						const node = mutation.addedNodes[i];
+						if (node.nodeType === 1) {
+							if (node.tagName === 'TR') {
+								_initRow(node);
+							} else if (node.querySelectorAll) {
+								const rows = node.querySelectorAll('tr');
+								for (let r = 0; r < rows.length; r++) {
+									_initRow(rows[r]);
 								}
 							}
 						}
 					}
 				}
-			});
-
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true
 			});
 
 			observeAttributes([DOM_SELECTOR], function (el) {

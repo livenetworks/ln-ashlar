@@ -1,4 +1,4 @@
-import { calculateProgress, dispatch, registerComponent } from '../../ln-core';
+import { calculateProgress, dispatch, registerComponent, observeAttributes } from '../../ln-core';
 import { resolveProgressMax } from './progress-model.js';
 
 (function () {
@@ -22,7 +22,6 @@ import { resolveProgressMax } from './progress-model.js';
 		this.dom = dom;
 		this._parentObserver = null;
 		_render.call(this);
-		_listenParent.call(this);
 		return this;
 	}
 
@@ -34,26 +33,7 @@ import { resolveProgressMax } from './progress-model.js';
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	function _listenParent() {
-		const self = this;
-		const parent = this.dom.parentElement;
-		if (!parent) return;
 
-		const observer = new MutationObserver(function (mutations) {
-			for (const mutation of mutations) {
-				if (mutation.attributeName === 'data-ln-progress-max') {
-					_render.call(self);
-				}
-			}
-		});
-
-		observer.observe(parent, {
-			attributes: true,
-			attributeFilter: ['data-ln-progress-max']
-		});
-
-		this._parentObserver = observer;
-	}
 
 	function _render() {
 		const rawVal = this.dom.getAttribute('data-ln-progress');
@@ -88,4 +68,12 @@ import { resolveProgressMax } from './progress-model.js';
 			attributes: ATTRIBUTES
 		}
 	);
+
+	observeAttributes(['data-ln-progress-max'], function (parent) {
+		const bars = parent.querySelectorAll ? parent.querySelectorAll(DOM_SELECTOR) : [];
+		for (let i = 0; i < bars.length; i++) {
+			const inst = bars[i][DOM_ATTRIBUTE];
+			if (inst) _render.call(inst);
+		}
+	});
 })();

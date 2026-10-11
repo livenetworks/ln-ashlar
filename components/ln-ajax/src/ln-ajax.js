@@ -1,4 +1,4 @@
-import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink, observeAttributes } from '../../ln-core';
+import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink, observeAttributes, observeLifecycle } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-ajax';
@@ -257,34 +257,23 @@ import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink, observeAt
 
 	function _domObserver() {
 		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (const mutation of mutations) {
-					if (mutation.type === 'childList') {
-						for (const node of mutation.addedNodes) {
-							if (node.nodeType === 1) {
-								_constructor(node);
+			observeLifecycle({
+				onInit: function (node) {
+					_constructor(node);
 
-								if (!node.hasAttribute(DOM_SELECTOR)) {
-									for (const el of node.querySelectorAll('[' + DOM_SELECTOR + ']')) {
-										_constructor(el);
-									}
+					if (!node.hasAttribute(DOM_SELECTOR)) {
+						for (const el of node.querySelectorAll('[' + DOM_SELECTOR + ']')) {
+							_constructor(el);
+						}
 
-									const ajaxRoot = node.closest && node.closest('[' + DOM_SELECTOR + ']');
-									if (ajaxRoot && ajaxRoot.getAttribute(DOM_SELECTOR) !== 'false') {
-										const items = findElements(node);
-										_attachLinksAjax(items.links);
-										_attachFormsAjax(items.forms);
-									}
-								}
-							}
+						const ajaxRoot = node.closest && node.closest('[' + DOM_SELECTOR + ']');
+						if (ajaxRoot && ajaxRoot.getAttribute(DOM_SELECTOR) !== 'false') {
+							const items = findElements(node);
+							_attachLinksAjax(items.links);
+							_attachFormsAjax(items.forms);
 						}
 					}
 				}
-			});
-
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true
 			});
 
 			observeAttributes([DOM_SELECTOR], function (el) {

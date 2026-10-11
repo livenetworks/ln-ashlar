@@ -16,6 +16,8 @@
 //   <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg>
 //   <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-custom-file-pdf"></use></svg>
 
+import { guardBody, observeAttributes, observeLifecycle } from '../../ln-core';
+
 (function () {
 	const SPRITE_ID  = 'ln-icon-sprite';
 	const PREFIX_LN  = '#ln-icon-';
@@ -143,27 +145,23 @@
 
 	function _init() {
 		_scan(document);
-		new MutationObserver(function (mutations) {
-			mutations.forEach(function (m) {
-				if (m.type === 'childList') {
-					m.addedNodes.forEach(function (node) {
-						if (node.nodeType === 1) _scan(node);
-					});
-				} else if (m.type === 'attributes' && m.attributeName === 'href') {
-					// A <use href="..."> was swapped at runtime (e.g. ln-confirm
-					// replacing an icon). Trigger a load for the new target.
-					const h = m.target.getAttribute('href');
+		guardBody(function () {
+			observeLifecycle({
+				onInit: function (node) {
+					_scan(node);
+				}
+			});
+
+			observeAttributes(['href'], function (el) {
+				const tag = el.tagName ? el.tagName.toLowerCase() : '';
+				if (tag === 'use') {
+					const h = el.getAttribute('href');
 					if (h && (h.indexOf(PREFIX_LN) === 0 || h.indexOf(PREFIX_LNC) === 0)) {
 						_load(h);
 					}
 				}
 			});
-		}).observe(document.body, {
-			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeFilter: ['href']
-		});
+		}, 'ln-icon');
 	}
 
 	if (document.readyState === 'loading') {
