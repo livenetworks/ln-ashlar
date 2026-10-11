@@ -44,9 +44,7 @@ import { registerComponent, dispatch, dispatchCancelable, defineAttrs, attrSpec,
 		window.addEventListener('popstate', this.updateHandler);
 		history._lnNavCallbacks.push(this.updateHandler);
 
-		// Observe DOM changes inside this nav element
-		this.observer = new MutationObserver(() => this.update());
-		this.observer.observe(dom, { childList: true, subtree: true });
+		this.observer = null;
 
 		// Perform initial highlight
 		this.update();
@@ -148,6 +146,9 @@ import { registerComponent, dispatch, dispatchCancelable, defineAttrs, attrSpec,
 	// ─── Init ──────────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-nav', {
-		attributes: ATTRIBUTES
+		attributes: ATTRIBUTES,
+		onSubtreeChange: function (host) {
+			if (host[DOM_ATTRIBUTE]) host[DOM_ATTRIBUTE].update();
+		}
 	});
 })();

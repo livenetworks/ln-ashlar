@@ -2,6 +2,19 @@ import { attrEffects, reactiveNames, validateAttrValue } from './attrs.js';
 import { hasActiveDebug, isDevMode } from './events.js';
 import { guardBody } from './dom.js';
 
+function _initElement(el, entry) {
+	if (!el[entry.attribute]) {
+		if (window.lnCore._persistSink && el.hasAttribute && el.hasAttribute('data-ln-persist')) {
+			window.lnCore._persistSink(el, entry.selector);
+		}
+		try {
+			el[entry.attribute] = new entry.ComponentFn(el);
+		} catch (err) {
+			console.error('[' + entry.attribute + '] init failed', el, err);
+		}
+	}
+}
+
 // ─── Find Elements ─────────────────────────────────────────
 
 export function findElements(root, selector, attribute, ComponentClass) {
@@ -10,21 +23,15 @@ export function findElements(root, selector, attribute, ComponentClass) {
 	// Support both simple attribute names and full CSS selectors
 	const isComplex = selector.indexOf('[') !== -1 || selector.indexOf('.') !== -1 || selector.indexOf('#') !== -1;
 	const query = isComplex ? selector : '[' + selector + ']';
+	const entry = { selector: selector, attribute: attribute, ComponentFn: ComponentClass };
 
-	const items = Array.from(root.querySelectorAll(query));
 	if (root.matches && root.matches(query)) {
-		items.push(root);
+		_initElement(root, entry);
 	}
-	for (const el of items) {
-		if (!el[attribute]) {
-			if (window.lnCore._persistSink && el.hasAttribute('data-ln-persist')) {
-				window.lnCore._persistSink(el, selector);
-			}
-			try {
-				el[attribute] = new ComponentClass(el);
-			} catch (err) {
-				console.error('[' + attribute + '] init failed', el, err);
-			}
+	if (root.querySelectorAll) {
+		const items = root.querySelectorAll(query);
+		for (let i = 0; i < items.length; i++) {
+			_initElement(items[i], entry);
 		}
 	}
 }
@@ -137,17 +144,24 @@ function _runReactive(list, el, name, oldValue) {
 }
 
 function _handleAttrMutation(mut) {
-	const el = mut.target;
 	const name = mut.attributeName;
+	const isDataLn = name.indexOf('data-ln-') === 0;
+	const registry = _attrRegistry();
+	const entries = registry.byAttr.get(name);
+	const hasDeclared = hasActiveDebug() && registry.byDeclaredAttr && registry.byDeclaredAttr.has(name);
+
+	// Fast bailout: if attribute is not a data-ln-* attribute, not observed, and not declared, exit immediately without DOM read
+	if (!isDataLn && !entries && !hasDeclared) {
+		return;
+	}
+
+	const el = mut.target;
 
 	// echo guard — a same-value setAttribute still produces a record
 	if (mut.oldValue === el.getAttribute(name)) return;
 
-	const registry = _attrRegistry();
-	const entries = registry.byAttr.get(name);
-
 	// Dev-mode runtime attribute validation (validates all declared attributes on host or child)
-	if (hasActiveDebug() && registry.byDeclaredAttr && registry.byDeclaredAttr.has(name) && isDevMode(el)) {
+	if (hasDeclared && isDevMode(el)) {
 		const declared = registry.byDeclaredAttr.get(name);
 		const val = el.getAttribute(name);
 		for (let i = 0; i < declared.length; i++) {
@@ -156,12 +170,12 @@ function _handleAttrMutation(mut) {
 	}
 
 	// debug sink — library attribute mutations only
-	if (window.lnCore._debugSink && (name.indexOf('data-ln-') === 0 || entries)) {
+	if (window.lnCore._debugSink && (isDataLn || entries)) {
 		window.lnCore._debugSink('attr', name, el, { oldValue: mut.oldValue, newValue: el.getAttribute(name) });
 	}
 
 	// Reactive path
-	if (name.indexOf('data-ln-') === 0) {
+	if (isDataLn) {
 		const byName = registry.byReactive.get(name);
 		if (byName) _runReactive(byName, el, name, mut.oldValue);
 
@@ -209,12 +223,28 @@ function _ensureAttrObserver() {
 	}, 'ln-core');
 }
 
-// ─── Lifecycle Observer & Registry (Single Shared Observer) ───
-
 function _lifecycleRegistry() {
 	window.lnCore = window.lnCore || {};
 	const registry = window.lnCore._lifecycleRegistry = window.lnCore._lifecycleRegistry || [];
 	return registry;
+}
+
+function _destroyItem(item, entry) {
+	if (!document.contains(item)) {
+		if (entry.attribute) {
+			const inst = item[entry.attribute];
+			if (inst && typeof inst.destroy === 'function') {
+				try {
+					inst.destroy();
+				} catch (err) {
+					console.error('[' + entry.attribute + '] destroy failed', item, err);
+				}
+			}
+			delete item[entry.attribute];
+		} else if (entry.onDestroy) {
+			entry.onDestroy(item);
+		}
+	}
 }
 
 function _handleChildListMutation(mutation) {
@@ -224,11 +254,11 @@ function _handleChildListMutation(mutation) {
 	if (mutation.target) {
 		for (let r = 0; r < registry.length; r++) {
 			const entry = registry[r];
-			if (entry.onSubtreeChange) {
+			if (entry.onSubtreeChange && entry.query) {
 				const query = entry.query;
 				const host = mutation.target.nodeType === 1
-					? (mutation.target.matches(query) ? mutation.target : mutation.target.closest(query))
-					: (mutation.target.parentElement ? mutation.target.parentElement.closest(query) : null);
+					? (mutation.target.matches && mutation.target.matches(query) ? mutation.target : (mutation.target.closest ? mutation.target.closest(query) : null))
+					: (mutation.target.parentElement && mutation.target.parentElement.closest ? mutation.target.parentElement.closest(query) : null);
 				if (host) entry.onSubtreeChange(host, mutation);
 			}
 		}
@@ -237,9 +267,26 @@ function _handleChildListMutation(mutation) {
 	for (let j = 0; j < mutation.addedNodes.length; j++) {
 		const node = mutation.addedNodes[j];
 		if (node.nodeType === 1) {
+			const hasDescendants = !!(node.firstElementChild || (node.children && node.children.length));
 			for (let r = 0; r < registry.length; r++) {
 				const entry = registry[r];
-				findElements(node, entry.selector, entry.attribute, entry.ComponentFn);
+				if (entry.selector && entry.attribute && entry.ComponentFn) {
+					if (!hasDescendants) {
+						if (node.matches && node.matches(entry.query)) {
+							_initElement(node, entry);
+						}
+					} else {
+						if (node.matches && node.matches(entry.query)) {
+							_initElement(node, entry);
+						}
+						if (node.querySelectorAll) {
+							const matchedList = node.querySelectorAll(entry.query);
+							for (let m = 0; m < matchedList.length; m++) {
+								_initElement(matchedList[m], entry);
+							}
+						}
+					}
+				}
 				if (entry.onInit) entry.onInit(node);
 			}
 		}
@@ -248,25 +295,24 @@ function _handleChildListMutation(mutation) {
 	for (let j = 0; j < mutation.removedNodes.length; j++) {
 		const node = mutation.removedNodes[j];
 		if (node.nodeType === 1) {
+			const hasDescendants = !!(node.firstElementChild || (node.children && node.children.length));
 			for (let r = 0; r < registry.length; r++) {
 				const entry = registry[r];
 				const query = entry.query;
-				const items = Array.from(node.querySelectorAll(query));
-				if (node.matches && node.matches(query)) {
-					items.push(node);
-				}
-				for (let k = 0; k < items.length; k++) {
-					const item = items[k];
-					if (!document.contains(item)) {
-						const inst = item[entry.attribute];
-						if (inst && typeof inst.destroy === 'function') {
-							try {
-								inst.destroy();
-							} catch (err) {
-								console.error('[' + entry.attribute + '] destroy failed', item, err);
-							}
+				if (!query) continue;
+				if (!hasDescendants) {
+					if (node.matches && node.matches(query)) {
+						_destroyItem(node, entry);
+					}
+				} else {
+					if (node.matches && node.matches(query)) {
+						_destroyItem(node, entry);
+					}
+					if (node.querySelectorAll) {
+						const items = node.querySelectorAll(query);
+						for (let k = 0; k < items.length; k++) {
+							_destroyItem(items[k], entry);
 						}
-						delete item[entry.attribute];
 					}
 				}
 			}
@@ -308,6 +354,16 @@ function _ensureLifecycleObserver() {
 export function observeAttributes(names, handler) {
 	_registerAttrEntry({ observed: names, handler: handler });
 	_ensureAttrObserver();
+}
+
+/**
+ * For components that own their own DOM lifecycle and only need the
+ * shared childList observer rather than spawning duplicate MutationObservers on document.body.
+ * @param {Object} entry - { query?: string, onInit?: function(Element):void, onSubtreeChange?: function(Element, MutationRecord):void, onDestroy?: function(Element):void }
+ */
+export function observeLifecycle(entry) {
+	_lifecycleRegistry().push(entry);
+	_ensureLifecycleObserver();
 }
 
 // ─── Component Registration ───────────────────────────────
@@ -388,6 +444,7 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 	if (typeof window !== 'undefined') {
 		window.lnCore = window.lnCore || {};
 		window.lnCore.registerComponent = registerComponent;
+		window.lnCore.observeLifecycle = observeLifecycle;
 	}
 
 	function boot() {
