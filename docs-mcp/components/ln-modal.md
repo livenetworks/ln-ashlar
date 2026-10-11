@@ -85,6 +85,16 @@ Triggers communicate with modals via `data-ln-modal-for="modalId"` and optionall
     Edit User
 </button>
 
+<!-- Trigger: Edit (Hash Anchor Variant for deep-linkable entity editing) -->
+<a href="#user-modal"
+   data-ln-modal-for="user-modal"
+   data-ln-modal-mode="edit"
+   data-ln-fill-form="user-form"
+   data-ln-fill-id="42"
+   data-ln-fill-name="Ada Lovelace">
+    Edit User
+</a>
+
 <!-- Target Modal with conditional headers -->
 <dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="user-modal">
     <form id="user-form" data-ln-form>
