@@ -34,7 +34,7 @@
 			]
 		},
 		"data-ln-filter": {
-			"direction": null,
+			"direction": "author",
 			"sources": [
 				"ln-filter-dev.scss",
 				"src/ln-filter.js"
@@ -82,6 +82,14 @@
 			],
 			"type": "trigger",
 			"description": "Filter reset button or option trigger"
+		},
+		"data-ln-filter-target": {
+			"direction": "both",
+			"sources": [
+				"src/ln-filter.js"
+			],
+			"type": "marker",
+			"description": "Marker on target container or table observed by ln-filter"
 		},
 		"data-ln-filter-value": {
 			"direction": "author",

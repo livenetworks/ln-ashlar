@@ -11,6 +11,7 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 	const COL_ATTR = 'data-ln-filter-col';
 	const HASH_ATTR = 'data-ln-hash';
 	const VALUES_ATTR = 'data-ln-filter-values';
+	const TARGET_ATTR = 'data-ln-filter-target';
 
 	// Shared column filter state per plain table (AND across columns, OR within column)
 	const _tableFilters = new WeakMap();
@@ -19,14 +20,15 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-filter':        { prop: 'targetId', type: 'string', read: attrStr, fallback: null, description: 'Target table or list element ID to filter' },
+		'data-ln-filter':        { prop: 'targetId', type: 'string', read: attrStr, fallback: null, effect: _syncAttribute, description: 'Target table or list element ID to filter' },
 		'data-ln-hash':          { type: 'string', effect: _syncAttribute, description: 'URL hash routing key for filter state persistence' },
 		'data-ln-filter-values': { type: 'string', effect: _syncAttribute, description: 'Encoded active filter values' },
 		'data-ln-filter-col':    { type: 'string', description: 'Column name or index filter specifier' },
 		'data-ln-filter-key':    { type: 'string', description: 'Field key for filter matching' },
 		'data-ln-filter-reset':  { type: 'trigger', description: 'Filter reset button or option trigger' },
 		'data-ln-filter-value':  { type: 'string', description: 'Value to match for this filter input' },
-		'data-ln-filter-hide':   { type: 'enum', values: ['collapse', 'none'], fallback: 'collapse', description: 'CSS hiding strategy for non-matching rows' }
+		'data-ln-filter-hide':   { type: 'enum', values: ['collapse', 'none'], fallback: 'collapse', description: 'CSS hiding strategy for non-matching rows' },
+		'data-ln-filter-target': { type: 'marker', description: 'Marker on target container or table observed by ln-filter' }
 	};
 
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
@@ -90,6 +92,31 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 		});
 
 		this._queueRender = queueRender;
+
+		const queueDomFilter = createBatcher(function () {
+			if (!self._destroyed) {
+				self._applyDomFilter();
+			}
+		});
+
+		this._queueDomFilter = queueDomFilter;
+
+		function _ensureTargetMarked() {
+			if (!self.targetId) return;
+			const target = document.getElementById(self.targetId);
+			if (target && !target.hasAttribute(TARGET_ATTR)) {
+				target.setAttribute(TARGET_ATTR, self.targetId);
+			}
+		}
+
+		this._ensureTargetMarked = _ensureTargetMarked;
+		_ensureTargetMarked();
+		queueBoot(function () {
+			if (!self._destroyed) {
+				_ensureTargetMarked();
+			}
+		});
+
 		this._attachHandlers();
 
 		// Hash change listener
@@ -274,13 +301,19 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 		}
 
 		if (defaultPrevented) return;
+		self._applyDomFilter(target);
+	};
 
-		const table = target && (target.tagName === 'TABLE' ? target : (target.querySelector ? target.querySelector('table') : null));
+	_component.prototype._applyDomFilter = function (targetOverride) {
+		const target = targetOverride || document.getElementById(this.targetId);
+		if (!target) return;
+		const active = _deriveActive(this);
+		const isReset = active.key === null || active.values.length === 0;
+		const table = target.tagName === 'TABLE' ? target : (target.querySelector ? target.querySelector('table') : null);
 
 		if (table) {
-			self._filterTableRows(active, table);
+			this._filterTableRows(active, table);
 		} else {
-			if (!target) return;
 			const children = target.children;
 			for (let i = 0; i < children.length; i++) {
 				const el = children[i];
@@ -383,6 +416,13 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 				}
 				if (Object.keys(filters).length === 0) _tableFilters.delete(table);
 			}
+
+			if (this.targetId) {
+				const remaining = document.querySelectorAll('[' + DOM_SELECTOR + '="' + this.targetId + '"]');
+				if (remaining.length <= 1) {
+					target.removeAttribute(TARGET_ATTR);
+				}
+			}
 		}
 
 		if (this._onDomChange) {
@@ -420,6 +460,10 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 				_applyInputValues(el, key, values);
 				instance._render();
 			}
+		} else if (attrName === DOM_SELECTOR) {
+			instance.targetId = el.getAttribute(DOM_SELECTOR) || null;
+			instance._ensureTargetMarked();
+			instance._render();
 		}
 	}
 
@@ -427,6 +471,34 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-filter', {
 		attributes: ATTRIBUTES,
+		subtreeQuery: '[' + DOM_SELECTOR + '], [' + TARGET_ATTR + ']',
+		onSubtreeChange: function (host, mut) {
+			if (mut.addedNodes.length === 0 && mut.removedNodes.length === 0) return;
+
+			let targetId = null;
+			let targetEl = null;
+
+			if (host.hasAttribute(TARGET_ATTR)) {
+				targetEl = host;
+				targetId = host.getAttribute(TARGET_ATTR) || host.id;
+			} else if (host.hasAttribute(DOM_SELECTOR)) {
+				targetId = host.getAttribute(DOM_SELECTOR);
+				targetEl = targetId ? document.getElementById(targetId) : null;
+			}
+
+			if (!targetId || !targetEl) return;
+
+			const controls = document.querySelectorAll('[' + DOM_SELECTOR + '="' + targetId + '"]');
+			for (let i = 0; i < controls.length; i++) {
+				const inst = controls[i][DOM_ATTRIBUTE];
+				if (inst && !inst._destroyed) {
+					const active = _deriveActive(inst);
+					if (active.values.length > 0) {
+						inst._queueDomFilter();
+					}
+				}
+			}
+		},
 		persist: {
 			attr: VALUES_ATTR,
 			hashActive: function (el) { return !!resolveHashNamespace(el, 'filter'); }

@@ -371,7 +371,7 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 	_ensureAttrObserver();
 
 	const isComplex = selector.indexOf('[') !== -1 || selector.indexOf('.') !== -1 || selector.indexOf('#') !== -1;
-	const query = isComplex ? selector : '[' + selector + ']';
+	const query = options.subtreeQuery || (isComplex ? selector : '[' + selector + ']');
 
 	_lifecycleRegistry().push({
 		selector: selector,

@@ -197,6 +197,47 @@ run('demo/admin/search.html', async ({ page }) => {
 		assert(targetId === 'demo-list', 'input.lnSearchControl.targetId === "demo-list"');
 	});
 
+	await section('Dynamic item insertion while search is active (demo-list)', async () => {
+		await load();
+		await typeInto('demo-list', 'brazil');
+		await expectVisible('#demo-list > li', null, ['Brazil', EXEMPT], 'filtered to Brazil');
+
+		// Dynamically append a non-matching item to the list
+		await page.evaluate(() => {
+			const ul = document.getElementById('demo-list');
+			const li = document.createElement('li');
+			li.id = 'dynamic-non-matching';
+			li.textContent = 'Macedonia';
+			ul.appendChild(li);
+		});
+
+		// It must be automatically hidden by the MutationObserver batcher
+		await page.waitForFunction(() => {
+			const el = document.getElementById('dynamic-non-matching');
+			return el && el.hasAttribute('data-ln-search-hide');
+		}, { timeout: 3000 });
+		await expectVisible('#demo-list > li', null, ['Brazil', EXEMPT], 'non-matching dynamic item is automatically hidden');
+
+		// Dynamically append a matching item to the list
+		await page.evaluate(() => {
+			const ul = document.getElementById('demo-list');
+			const li = document.createElement('li');
+			li.id = 'dynamic-matching';
+			li.textContent = 'Brazil North';
+			ul.appendChild(li);
+		});
+
+		// It must remain visible in results
+		await page.waitForFunction(() => {
+			const el = document.getElementById('dynamic-matching');
+			return el && !el.hasAttribute('data-ln-search-hide');
+		}, { timeout: 3000 });
+		await expectVisible('#demo-list > li', null, ['Brazil', EXEMPT, 'Brazil North'], 'matching dynamic item is displayed in search results');
+
+		await eraseInput('demo-list');
+		await expectVisible('#demo-list > li', null, [...COUNTRIES, 'Macedonia', 'Brazil North'], 'clearing search restores all items including dynamic additions');
+	});
+
 	// ─── 2. Input directly, no wrapper ─────────────────────────
 
 	await section('Directly on the input (demo-teams)', async () => {
