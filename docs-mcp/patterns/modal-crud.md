@@ -21,6 +21,7 @@ The `modal-crud` pattern uses a **single `<form>` inside a `<dialog data-ln-moda
 - **Automatic Form Reset:** Clicking "Create" opens the modal with an empty payload, resetting the form and switching `data-ln-modal-mode="new"`.
 - **Automatic Prefill:** Clicking "Edit" populates form inputs and sets `data-ln-modal-mode="edit"`.
 - **Dynamic Header:** `<h3 data-ln-fillable>` toggles display titles between `<span data-ln-modal-when="new">` and `<span data-ln-modal-when="edit">`.
+- **Modal vs Dedicated Route (Hash Triggers):** For smaller/focused entities, Ashlar prescribes in-place modal editing over navigating away to a separate full-page route (e.g. `/entity/:id/edit`). To preserve deep-linkability, URL sharing, and browser history without full-page reloads, triggers may be authored as anchor tags (`<a href="#modal-id">`) while retaining the full declarative `data-ln-modal-*` and `data-ln-fill-*` contract.
 
 ---
 
@@ -46,7 +47,7 @@ The `modal-crud` pattern uses a **single `<form>` inside a `<dialog data-ln-moda
                 <td>50</td>
                 <td><span class="badge success">Active</span></td>
                 <td>
-                    <!-- Declarative Edit Trigger -->
+                    <!-- Declarative Edit Trigger (Button) -->
                     <button type="button" 
                             class="btn btn-sm btn-soft"
                             data-ln-modal-for="package-modal"
@@ -58,6 +59,20 @@ The `modal-crud` pattern uses a **single `<form>` inside a `<dialog data-ln-moda
                             data-ln-fill-is-active="1">
                         Edit
                     </button>
+
+                    <!-- Declarative Edit Trigger (Hash Anchor Variant) -->
+                    <!-- Used when modal state must reflect in the URL hash for deep-linking without a dedicated edit page -->
+                    <a href="#package-modal"
+                       class="btn btn-sm btn-soft"
+                       data-ln-modal-for="package-modal"
+                       data-ln-modal-mode="edit"
+                       data-ln-fill-form="package-form"
+                       data-ln-fill-id="42"
+                       data-ln-fill-name="Pro Plan"
+                       data-ln-fill-max-users="50"
+                       data-ln-fill-is-active="1">
+                        Edit (Hash Link)
+                    </a>
                 </td>
             </tr>
         </tbody>
@@ -155,6 +170,7 @@ sequenceDiagram
 > 1. **CamelCase Dataset Keys:** `data-ln-fill-max-users` maps to `maxUsers` in the JS dataset. If the input name has underscores (`name="max_users"`), supply `data-ln-fill-as="maxUsers"` on the input to match.
 > 2. **Fillable Header Slot:** Non-form display text (e.g. modal title) must carry `data-ln-fillable` with inner `<span data-ln-field="...">` to receive values from `data-ln-modal-*` attributes.
 > 3. **Hidden Inputs for Checkboxes:** Standalone checkboxes submit nothing when unchecked. Always include `<input type="hidden" name="is_active" value="0">` immediately preceding the checkbox.
+> 4. **Anchor Triggers vs Buttons:** While `<button type="button">` is the default for local overlays, `<a href="#modal-id">` is explicitly authorized when the modal state must be deep-linked into the URL hash fragment. `ln-modal` and `ln-fill` delegate by attribute selector (`[data-ln-modal-for]`, `[data-ln-fill-form]`), fully honoring both element types.
 
 ---
 

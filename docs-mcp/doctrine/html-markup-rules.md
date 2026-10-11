@@ -87,6 +87,7 @@ Every element that performs an action upon interaction must use the correct inte
 ### Rules:
 - **Buttons for Page-Local Actions:** Any action that updates page state, triggers overlays, or mutates data must use `<button type="button">` or `<button type="submit">`.
 - **Anchors for Navigation:** Only use `<a>` (with a valid `href`) for actions that navigate to another page or route.
+- **Anchors for Deep-Linkable Hash States (Authorized Exception):** While local overlays standardly use `<button type="button">`, anchors (`<a href="#modal-id">`) are explicitly permitted and recommended when smaller entity modals replace dedicated full-page routes (e.g. inline edit forms). This provides a shareable/bookmarkable URL hash fragment while keeping zero-JS declarative fill via `data-ln-modal-for`, `data-ln-modal-mode="edit"`, and `data-ln-fill-*`.
 - **No Div/Span Click Handlers:** Never bind click listeners to `<div>`, `<span>`, `<li>`, or `<td>` elements. This bypasses native keyboard navigation, breaks screen readers (ARIA), and requires custom focus management.
 - **Explicit Button Types:** Always specify `type="button"` on non-submit buttons (such as cancel or close triggers) inside form scopes. If omitted, the browser defaults to `type="submit"`, causing unintended form submissions.
 
