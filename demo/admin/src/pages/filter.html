@@ -202,9 +202,9 @@ nav[data-ln-filter] {
 											input.checked = values.indexOf(v) !== -1;
 										}
 									});
-									// Dispatch change once on any input so ln-filter renders.
-									const first = inputs[0];
-									if (first) first.dispatchEvent(new Event('change', { bubbles: true }));
+									// Dispatch change once on active input so ln-filter renders.
+									const active = Array.from(inputs).find(function (i) { return i.checked; }) || inputs[0];
+									if (active) active.dispatchEvent(new Event('change', { bubbles: true }));
 								};
 							})();
 						</script>

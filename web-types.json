@@ -1,7 +1,7 @@
 {
 	"$schema": "https://json.schemastore.org/web-types",
 	"name": "@livenetworks/ashlar",
-	"version": "2.0.9",
+	"version": "2.0.10",
 	"framework": "html",
 	"contributions": {
 		"html": {
@@ -815,6 +815,13 @@
 				{
 					"name": "data-ln-filter-search",
 					"description": "Visual / CSS styling attribute (theme/config/mixins/_filter.scss)",
+					"value": {
+						"type": "boolean"
+					}
+				},
+				{
+					"name": "data-ln-filter-target",
+					"description": "Marker on target container or table observed by ln-filter",
 					"value": {
 						"type": "boolean"
 					}

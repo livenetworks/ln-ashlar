@@ -1,4 +1,4 @@
-import { dispatchCancelable, hashGet, hashSet, queueBoot, registerComponent, resolveHashNamespace, defineAttrs, attrSpec, attrStr } from '../../ln-core';
+import { dispatchCancelable, hashGet, hashSet, queueBoot, registerComponent, resolveHashNamespace, defineAttrs, attrSpec, attrStr, createBatcher } from '../../ln-core';
 import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSearchFields, tokenizeSearchQuery } from '../../ln-core/matching.js';
 
 (function () {
@@ -89,6 +89,12 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 		const self = this;
 		this.nsKey = _resolveSearchHashNamespace(dom);
 		this.hashEnabled = !!this.nsKey;
+
+		this._queueApply = createBatcher(function () {
+			if (!self._destroyed) {
+				self._apply();
+			}
+		});
 
 		this._onHashChange = function () {
 			if (self._destroyed || !self.hashEnabled) return;
@@ -318,6 +324,16 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 			if (target && target._lnSearchText !== undefined) delete target._lnSearchText;
 			if (target && target.parentElement && target.parentElement._lnSearchText !== undefined) {
 				delete target.parentElement._lnSearchText;
+			}
+			const inst = el[DOM_ATTRIBUTE];
+			if (inst && !inst._destroyed && normalizeSearchTerm(inst.term)) {
+				if (mut.addedNodes.length > 0 || mut.removedNodes.length > 0) {
+					for (let i = 0; i < mut.addedNodes.length; i++) {
+						const node = mut.addedNodes[i];
+						if (node._lnSearchText !== undefined) delete node._lnSearchText;
+					}
+					inst._queueApply();
+				}
 			}
 		},
 		persist: {

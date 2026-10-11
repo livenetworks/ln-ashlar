@@ -637,6 +637,11 @@
 			"valueSet": "v"
 		},
 		{
+			"name": "data-ln-filter-target",
+			"description": "Marker on target container or table observed by ln-filter",
+			"valueSet": "v"
+		},
+		{
 			"name": "data-ln-filter-value",
 			"description": "Value to match for this filter input"
 		},

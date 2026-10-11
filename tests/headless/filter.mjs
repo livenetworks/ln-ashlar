@@ -173,6 +173,52 @@ run('demo/admin/filter.html', async ({ page }) => {
 		await expectNames('filter-basic-list', ALL_BASIC, 'all values checked shows every item');
 	});
 
+	await check('Basic filter: dynamic item insertion while filter active', async () => {
+		await clickOption(ROOT.basic, 'design');
+		await expectNames('filter-basic-list', ['Ana Petrova', 'Elena Ristova'], 'active design filter');
+
+		// Append non-matching item dynamically
+		await page.evaluate(() => {
+			const ul = document.getElementById('filter-basic-list');
+			const li = document.createElement('li');
+			li.id = 'dynamic-non-matching-member';
+			li.setAttribute('data-category', 'qa');
+			li.innerHTML = '<strong>Dimitar Trajkov</strong> — QA Tester';
+			ul.appendChild(li);
+		});
+
+		// Must be automatically hidden by MutationObserver batcher
+		await page.waitForFunction(() => {
+			const el = document.getElementById('dynamic-non-matching-member');
+			return el && el.getAttribute('data-ln-filter-hide') === 'true';
+		}, { timeout: 3000 });
+		await expectNames('filter-basic-list', ['Ana Petrova', 'Elena Ristova'], 'non-matching dynamic item is hidden');
+
+		// Append matching item dynamically
+		await page.evaluate(() => {
+			const ul = document.getElementById('filter-basic-list');
+			const li = document.createElement('li');
+			li.id = 'dynamic-matching-member';
+			li.setAttribute('data-category', 'design');
+			li.innerHTML = '<strong>Katerina Naumova</strong> — UI Designer';
+			ul.appendChild(li);
+		});
+
+		// Must remain visible in results
+		await page.waitForFunction(() => {
+			const el = document.getElementById('dynamic-matching-member');
+			return el && !el.hasAttribute('data-ln-filter-hide');
+		}, { timeout: 3000 });
+		await expectNames('filter-basic-list', ['Ana Petrova', 'Elena Ristova', 'Katerina Naumova'], 'matching dynamic item is shown');
+
+		// Clean up dynamically added items and reset filter
+		await page.evaluate(() => {
+			document.getElementById('dynamic-non-matching-member')?.remove();
+			document.getElementById('dynamic-matching-member')?.remove();
+		});
+		await clickOption(ROOT.basic, null);
+	});
+
 	await check('Filter with cards: status key, multi-value', async () => {
 		await clickOption(ROOT.cards, 'active');
 		await expectNames('filter-cards-list', ['Project Alpha', 'Project Delta', 'Project Zeta'], 'active');

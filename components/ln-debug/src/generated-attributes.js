@@ -105,6 +105,7 @@ export const VALID_ATTRIBUTES = new Set([
 	'data-ln-filter-options',
 	'data-ln-filter-reset',
 	'data-ln-filter-search',
+	'data-ln-filter-target',
 	'data-ln-filter-value',
 	'data-ln-filter-values',
 	'data-ln-form',

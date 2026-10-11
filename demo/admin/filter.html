@@ -223,7 +223,7 @@
 			</main>
 
 			<footer>
-				<small>ashlar-gui v2.0.9</small>
+				<small>ashlar-gui v2.0.10</small>
 			</footer>
 		</aside>
 		<div class="app-scrim"></div>
@@ -433,9 +433,9 @@ nav[data-ln-filter] {
 											input.checked = values.indexOf(v) !== -1;
 										}
 									});
-									// Dispatch change once on any input so ln-filter renders.
-									const first = inputs[0];
-									if (first) first.dispatchEvent(new Event('change', { bubbles: true }));
+									// Dispatch change once on active input so ln-filter renders.
+									const active = Array.from(inputs).find(function (i) { return i.checked; }) || inputs[0];
+									if (active) active.dispatchEvent(new Event('change', { bubbles: true }));
 								};
 							})();
 						</script>
@@ -691,7 +691,7 @@ document.addEventListener('ln-filter:reset', function (e) {
 		<!-- Footer -->
 		<footer class="app-footer">
 			<span>ashlar-gui &copy; 2026 LiveNetworks</span>
-			<span>ln-ashlar v2.0.9</span>
+			<span>ln-ashlar v2.0.10</span>
 		</footer>
 		</main>
 	</div><!-- /.app-wrapper -->
