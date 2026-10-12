@@ -148,20 +148,44 @@ import { dispatch, dispatchCancelable, registerComponent, cloneTemplateScoped } 
 			_handleKeydown(self, e);
 		};
 
+		this._listeningSelection = false;
+		this._rafSelection = null;
+
 		this._onSelectionChange = function () {
-			// Document-level listener: no-op when the surface has been removed
-			// from the DOM without destroy() (e.g. SPA subtree swap). The
-			// listener is intentionally NOT removed here so a temporarily
-			// detached-then-reattached surface keeps working.
-			if (!document.contains(self._surface)) return;
-			self._updateActiveStates();
+			if (self._rafSelection) return;
+			self._rafSelection = requestAnimationFrame(function () {
+				self._rafSelection = null;
+				if (!document.contains(self._surface)) return;
+				self._updateActiveStates();
+			});
+		};
+
+		this._attachSelection = function () {
+			if (!self._listeningSelection) {
+				self._listeningSelection = true;
+				document.addEventListener('selectionchange', self._onSelectionChange);
+			}
+		};
+
+		this._detachSelection = function () {
+			if (self._listeningSelection) {
+				self._listeningSelection = false;
+				document.removeEventListener('selectionchange', self._onSelectionChange);
+			}
+			if (self._rafSelection) {
+				cancelAnimationFrame(self._rafSelection);
+				self._rafSelection = null;
+			}
 		};
 
 		this._onFocus = function () {
+			self._attachSelection();
+			self._updateActiveStates();
 			dispatch(self.dom, 'ln-editor:focus', { target: self.dom });
 		};
 
 		this._onBlur = function () {
+			self._detachSelection();
 			// Sync on blur to ensure textarea is up-to-date
 			self._syncToTextarea();
 			dispatch(self.dom, 'ln-editor:blur', { target: self.dom });
@@ -189,8 +213,6 @@ import { dispatch, dispatchCancelable, registerComponent, cloneTemplateScoped } 
 			toolbar.addEventListener('mousedown', this._onMousedownToolbar);
 			toolbar.addEventListener('click', this._onClickToolbar);
 		}
-
-		document.addEventListener('selectionchange', this._onSelectionChange);
 
 		// Request event — set content programmatically
 		this._onSetContent = function (e) {
@@ -310,12 +332,19 @@ import { dispatch, dispatchCancelable, registerComponent, cloneTemplateScoped } 
 			}
 
 			if (_isToggleAction(action)) {
-				btn.setAttribute('aria-pressed', String(isActive));
+				const pressedStr = String(isActive);
+				if (btn.getAttribute('aria-pressed') !== pressedStr) {
+					btn.setAttribute('aria-pressed', pressedStr);
+				}
 			}
 			if (isActive) {
-				btn.classList.add('ln-editor-active');
+				if (!btn.classList.contains('ln-editor-active')) {
+					btn.classList.add('ln-editor-active');
+				}
 			} else {
-				btn.classList.remove('ln-editor-active');
+				if (btn.classList.contains('ln-editor-active')) {
+					btn.classList.remove('ln-editor-active');
+				}
 			}
 		}
 	};
@@ -354,7 +383,11 @@ import { dispatch, dispatchCancelable, registerComponent, cloneTemplateScoped } 
 			toolbar.removeEventListener('click', this._onClickToolbar);
 		}
 
-		document.removeEventListener('selectionchange', this._onSelectionChange);
+		if (this._detachSelection) {
+			this._detachSelection();
+		} else {
+			document.removeEventListener('selectionchange', this._onSelectionChange);
+		}
 		this.dom.removeEventListener('ln-editor:set-content', this._onSetContent);
 
 		const form = this._textarea ? this._textarea.form : null;

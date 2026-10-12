@@ -18,9 +18,9 @@ if (typeof window < "u" && (window.lnCore = window.lnCore || {}, !window.lnCore.
   console.warn = function(...t) {
     if (typeof t[0] == "string" && (t[0].startsWith("[ln-") || t[0].startsWith("[lnCore"))) {
       let n = null;
-      for (let r = 1; r < t.length; r++)
-        if (t[r] && t[r].nodeType === 1) {
-          n = t[r];
+      for (let o = 1; o < t.length; o++)
+        if (t[o] && t[o].nodeType === 1) {
+          n = t[o];
           break;
         }
       if (!L(n))
@@ -53,32 +53,32 @@ function be(e) {
   return ((t && t.value !== "" ? t.value : e.method) || "").toUpperCase();
 }
 function he(e, t) {
-  const a = !!(t && t.typed), n = t && t.exclude, r = {}, i = e.elements, o = {};
+  const a = !!(t && t.typed), n = t && t.exclude, o = {}, i = e.elements, r = {};
   if (a)
     for (let d = 0; d < i.length; d++) {
       const l = i[d];
-      l.name && l.type === "checkbox" && !l.disabled && (o[l.name] = (o[l.name] || 0) + 1);
+      l.name && l.type === "checkbox" && !l.disabled && (r[l.name] = (r[l.name] || 0) + 1);
     }
   for (let d = 0; d < i.length; d++) {
     const l = i[d];
     if (!(!l.name || l.disabled || l.type === "file" || l.type === "submit" || l.type === "button") && !(n && l.matches && l.matches(n)))
       if (l.type === "checkbox")
-        a && o[l.name] === 1 ? r[l.name] = l.checked : (r[l.name] || (r[l.name] = []), l.checked && r[l.name].push(l.value));
+        a && r[l.name] === 1 ? o[l.name] = l.checked : (o[l.name] || (o[l.name] = []), l.checked && o[l.name].push(l.value));
       else if (l.type === "radio")
-        l.checked && (r[l.name] = l.value);
+        l.checked && (o[l.name] = l.value);
       else if (l.type === "select-multiple") {
-        r[l.name] = [];
+        o[l.name] = [];
         for (let s = 0; s < l.options.length; s++)
-          l.options[s].selected && r[l.name].push(l.options[s].value);
+          l.options[s].selected && o[l.name].push(l.options[s].value);
       } else if (a && l.type === "hidden")
-        r[l.name] = l.value;
+        o[l.name] = l.value;
       else if (a && (l.type === "number" || l.type === "range")) {
         const s = Number(l.value);
-        r[l.name] = l.value === "" || isNaN(s) ? null : s;
+        o[l.name] = l.value === "" || isNaN(s) ? null : s;
       } else
-        r[l.name] = l.value;
+        o[l.name] = l.value;
   }
-  return r;
+  return o;
 }
 function me(e) {
   if (typeof e != "string") return !!e;
@@ -86,37 +86,37 @@ function me(e) {
   return t !== "false" && t !== "0" && t !== "" && t !== "off" && t !== "no";
 }
 function ge(e, t) {
-  const a = e.elements, n = [], r = {};
+  const a = e.elements, n = [], o = {};
   for (let i = 0; i < a.length; i++) {
-    const o = a[i];
-    o.name && o.type === "checkbox" && (r[o.name] = (r[o.name] || 0) + 1);
+    const r = a[i];
+    r.name && r.type === "checkbox" && (o[r.name] = (o[r.name] || 0) + 1);
   }
   for (let i = 0; i < a.length; i++) {
-    const o = a[i];
-    if (o.type === "file" || o.type === "submit" || o.type === "button") continue;
-    const d = o.getAttribute("data-ln-fill-as") || o.name;
+    const r = a[i];
+    if (r.type === "file" || r.type === "submit" || r.type === "button") continue;
+    const d = r.getAttribute("data-ln-fill-as") || r.name;
     if (!d || !(d in t)) continue;
     const l = t[d];
-    if (o.type === "checkbox") {
+    if (r.type === "checkbox") {
       if (Array.isArray(l))
-        o.checked = l.indexOf(o.value) !== -1;
-      else if (r[o.name] > 1) {
+        r.checked = l.indexOf(r.value) !== -1;
+      else if (o[r.name] > 1) {
         const s = String(l).split(",").map(function(c) {
           return c.trim();
         });
-        o.checked = s.indexOf(o.value) !== -1;
+        r.checked = s.indexOf(r.value) !== -1;
       } else
-        o.checked = me(l);
-      n.push(o);
-    } else if (o.type === "radio")
-      o.checked = o.value === String(l), n.push(o);
-    else if (o.type === "select-multiple") {
+        r.checked = me(l);
+      n.push(r);
+    } else if (r.type === "radio")
+      r.checked = r.value === String(l), n.push(r);
+    else if (r.type === "select-multiple") {
       if (Array.isArray(l))
-        for (let s = 0; s < o.options.length; s++)
-          o.options[s].selected = l.indexOf(o.options[s].value) !== -1;
-      n.push(o);
+        for (let s = 0; s < r.options.length; s++)
+          r.options[s].selected = l.indexOf(r.options[s].value) !== -1;
+      n.push(r);
     } else
-      o.value = l, o.tagName === "SELECT" && l != null && o.setAttribute("data-ln-value", l), n.push(o);
+      r.value = l, r.tagName === "SELECT" && l != null && r.setAttribute("data-ln-value", l), n.push(r);
   }
   return n;
 }
@@ -161,13 +161,13 @@ function Se(e, t) {
 function V(e, t) {
   if (!e || !t) return e;
   const a = e.querySelectorAll("[data-ln-field]");
-  for (let o = 0; o < a.length; o++) {
-    const d = a[o], l = d.getAttribute("data-ln-field");
+  for (let r = 0; r < a.length; r++) {
+    const d = a[r], l = d.getAttribute("data-ln-field");
     t[l] != null && (d.textContent = t[l]);
   }
   const n = e.querySelectorAll("[data-ln-attr]");
-  for (let o = 0; o < n.length; o++) {
-    const d = n[o], l = d.getAttribute("data-ln-attr").split(",");
+  for (let r = 0; r < n.length; r++) {
+    const d = n[r], l = d.getAttribute("data-ln-attr").split(",");
     for (let s = 0; s < l.length; s++) {
       const c = l[s].trim().split(":");
       if (c.length !== 2) continue;
@@ -175,14 +175,14 @@ function V(e, t) {
       t[f] != null && d.setAttribute(u, t[f]);
     }
   }
-  const r = e.querySelectorAll("[data-ln-show]");
-  for (let o = 0; o < r.length; o++) {
-    const d = r[o], l = d.getAttribute("data-ln-show");
+  const o = e.querySelectorAll("[data-ln-show]");
+  for (let r = 0; r < o.length; r++) {
+    const d = o[r], l = d.getAttribute("data-ln-show");
     l in t && d.classList.toggle("hidden", !t[l]);
   }
   const i = e.querySelectorAll("[data-ln-class]");
-  for (let o = 0; o < i.length; o++) {
-    const d = i[o], l = d.getAttribute("data-ln-class").split(",");
+  for (let r = 0; r < i.length; r++) {
+    const d = i[r], l = d.getAttribute("data-ln-class").split(",");
     for (let s = 0; s < l.length; s++) {
       const c = l[s].trim().split(":");
       if (c.length !== 2) continue;
@@ -216,47 +216,47 @@ function H(e, t) {
     const i = a.currentNode;
     i.textContent.indexOf("{{") !== -1 && (i.textContent = i.textContent.replace(
       /\{\{\s*(\w+)\s*\}\}/g,
-      function(o, d) {
+      function(r, d) {
         return t[d] !== void 0 ? t[d] : "";
       }
     ));
   }
-  const n = function(i, o) {
-    return t[o] !== void 0 ? t[o] : "";
-  }, r = Array.from(e.querySelectorAll("*"));
-  e.nodeType === 1 && r.push(e);
-  for (let i = 0; i < r.length; i++) {
-    const o = r[i], d = o.attributes;
+  const n = function(i, r) {
+    return t[r] !== void 0 ? t[r] : "";
+  }, o = Array.from(e.querySelectorAll("*"));
+  e.nodeType === 1 && o.push(e);
+  for (let i = 0; i < o.length; i++) {
+    const r = o[i], d = r.attributes;
     for (let l = 0; l < d.length; l++) {
       const s = d[l];
-      s.value.indexOf("{{") !== -1 && o.setAttribute(s.name, s.value.replace(/\{\{\s*(\w+)\s*\}\}/g, n));
+      s.value.indexOf("{{") !== -1 && r.setAttribute(s.name, s.value.replace(/\{\{\s*(\w+)\s*\}\}/g, n));
     }
   }
   return e;
 }
-function _e(e, t, a, n, r, i) {
-  const o = {};
+function _e(e, t, a, n, o, i) {
+  const r = {};
   for (let l = 0; l < e.children.length; l++) {
     const s = e.children[l], c = s.getAttribute("data-ln-render-key");
-    c && (o[c] = s);
+    c && (r[c] = s);
   }
   const d = document.createDocumentFragment();
   for (let l = 0; l < t.length; l++) {
     const s = t[l], c = String(n(s));
-    let u = o[c];
+    let u = r[c];
     if (u)
-      r(u, s, l);
+      o(u, s, l);
     else {
       const f = Se(a, i);
       if (!f || (H(f, s), u = f.firstElementChild, !u)) continue;
-      u.setAttribute("data-ln-render-key", c), r(u, s, l);
+      u.setAttribute("data-ln-render-key", c), o(u, s, l);
     }
     d.appendChild(u);
   }
   e.textContent = "", e.appendChild(d);
 }
 typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.fillTemplate = H, window.lnCore.fill = V, window.lnCore.lnFill = ke, window.lnCore.renderList = _e);
-function E(e, t, a) {
+function I(e, t, a) {
   const n = e.getAttribute(t);
   return n === null ? a : n;
 }
@@ -267,21 +267,21 @@ function z(e, t, a) {
 function G(e, t, a = !1) {
   const n = e.getAttribute(t);
   if (n === null) return !!a;
-  const r = n.trim().toLowerCase();
-  return !(r === "false" || r === "0");
+  const o = n.trim().toLowerCase();
+  return !(o === "false" || o === "0");
 }
 function Q(e, t) {
   return (e.getAttribute(t) || "").split(",").map((a) => a.trim()).filter(Boolean);
 }
-const $ = /* @__PURE__ */ new Map();
+const E = /* @__PURE__ */ new Map();
 function J(e, t) {
   const a = (e ? e.join("|") : "") + "::" + t;
-  if ($.has(a)) return $.get(a);
-  const n = new Set(e || []), r = function(i, o) {
-    const d = i.getAttribute(o);
+  if (E.has(a)) return E.get(a);
+  const n = new Set(e || []), o = function(i, r) {
+    const d = i.getAttribute(r);
     return d !== null && n.has(d) ? d : t;
   };
-  return $.set(a, r), r;
+  return E.set(a, o), o;
 }
 function K(e, t, a) {
   const n = parseFloat(e.getAttribute(t));
@@ -296,31 +296,31 @@ function P(e, t, a) {
     return a;
   }
 }
-function X(e, t, a, n, r) {
+function X(e, t, a, n, o) {
   if (!e || t === null) return !0;
-  const i = n || "ln-component", o = e.type;
-  if (o === "trigger" || o === "marker" || o === "string" || o === "list" || !o || t === "" && e.fallback !== void 0)
+  const i = n || "ln-component", r = e.type;
+  if (r === "trigger" || r === "marker" || r === "string" || r === "list" || !r || t === "" && e.fallback !== void 0)
     return !0;
   const d = (l) => {
-    r ? console.warn(l, r) : console.warn(l);
+    o ? console.warn(l, o) : console.warn(l);
   };
-  if (o === "boolean") {
+  if (r === "boolean") {
     const l = t.trim().toLowerCase();
     return l !== "" && l !== "true" && l !== "false" && l !== "1" && l !== "0" ? (d(`[${i}] Invalid value "${t}" for boolean attribute "${a}". Allowed: "true", "false", or presence-only.`), !1) : !0;
   }
-  if (o === "enum") {
+  if (r === "enum") {
     const l = e.values || [];
     return l.includes(t) ? !0 : (d(`[${i}] Invalid value "${t}" for attribute "${a}". Allowed: ${l.join(", ")}. Fallback: "${e.fallback}".`), !1);
   }
-  if (o === "integer") {
+  if (r === "integer") {
     if (!/^-?\d+$/.test(t))
       return d(`[${i}] Invalid integer "${t}" for attribute "${a}". Fallback: ${e.fallback}.`), !1;
     const l = parseInt(t, 10);
     return e.min !== void 0 && l < e.min ? (d(`[${i}] Value ${l} for attribute "${a}" is less than min (${e.min}).`), !1) : e.max !== void 0 && l > e.max ? (d(`[${i}] Value ${l} for attribute "${a}" is greater than max (${e.max}).`), !1) : !0;
   }
-  if (o === "float")
+  if (r === "float")
     return isNaN(Number(t)) ? (d(`[${i}] Invalid float "${t}" for attribute "${a}". Fallback: ${e.fallback}.`), !1) : !0;
-  if (o === "json")
+  if (r === "json")
     try {
       return JSON.parse(t), !0;
     } catch (l) {
@@ -330,12 +330,12 @@ function X(e, t, a, n, r) {
 }
 function De(e, t, a) {
   for (const n in a) {
-    const [r, i, o] = a[n];
+    const [o, i, r] = a[n];
     Object.defineProperty(e, n, {
       // Getter only, no setter — assignment throws in strict mode (ES
       // modules are strict). Deliberate: it forbids a drifting copy.
       get: function() {
-        return r(t, i, o);
+        return o(t, i, r);
       },
       enumerable: !0,
       configurable: !0
@@ -343,42 +343,42 @@ function De(e, t, a) {
   }
   return e;
 }
-function $e(e) {
+function Ee(e) {
   const t = {};
   for (const a in e) {
     const n = e[a];
     if (!n || !n.prop) continue;
-    let r = n.read;
-    if (!r && n.type)
+    let o = n.read;
+    if (!o && n.type)
       switch (n.type) {
         case "enum":
-          r = J(n.values, n.fallback);
+          o = J(n.values, n.fallback);
           break;
         case "integer":
-          r = z;
+          o = z;
           break;
         case "float":
-          r = K;
+          o = K;
           break;
         case "boolean":
-          r = G;
+          o = G;
           break;
         case "list":
-          r = Q;
+          o = Q;
           break;
         case "json":
-          r = P;
+          o = P;
           break;
         case "string":
         default:
-          r = E;
+          o = I;
           break;
       }
-    r || (r = E), t[n.prop] = [r, a, n.fallback];
+    o || (o = I), t[n.prop] = [o, a, n.fallback];
   }
   return t;
 }
-function Ie(e) {
+function $e(e) {
   const t = {};
   for (const a in e) {
     const n = e[a];
@@ -386,14 +386,14 @@ function Ie(e) {
   }
   return Object.keys(t).length ? t : null;
 }
-function Ee(e) {
+function Ie(e) {
   if (e.onAttrChange && !e.declared) return null;
   const t = /* @__PURE__ */ new Set();
   if (e.effects) for (const a in e.effects) t.add(a);
   if (e.onAttrChange && e.declared) for (const a of e.declared) t.add(a);
   return t;
 }
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.defineAttrs = De, window.lnCore.attrSpec = $e, window.lnCore.attrStr = E, window.lnCore.attrInt = z, window.lnCore.attrBool = G, window.lnCore.attrList = Q, window.lnCore.attrEnum = J, window.lnCore.attrFloat = K, window.lnCore.attrJson = P);
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.defineAttrs = De, window.lnCore.attrSpec = Ee, window.lnCore.attrStr = I, window.lnCore.attrInt = z, window.lnCore.attrBool = G, window.lnCore.attrList = Q, window.lnCore.attrEnum = J, window.lnCore.attrFloat = K, window.lnCore.attrJson = P);
 function m(e, t) {
   if (!e[t.attribute]) {
     window.lnCore._persistSink && e.hasAttribute && e.hasAttribute("data-ln-persist") && window.lnCore._persistSink(e, t.selector);
@@ -406,11 +406,11 @@ function m(e, t) {
 }
 function Y(e, t, a, n) {
   if (e.nodeType !== 1) return;
-  const i = t.indexOf("[") !== -1 || t.indexOf(".") !== -1 || t.indexOf("#") !== -1 ? t : "[" + t + "]", o = { selector: t, attribute: a, ComponentFn: n };
-  if (e.matches && e.matches(i) && m(e, o), e.querySelectorAll) {
+  const i = t.indexOf("[") !== -1 || t.indexOf(".") !== -1 || t.indexOf("#") !== -1 ? t : "[" + t + "]", r = { selector: t, attribute: a, ComponentFn: n };
+  if (e.matches && e.matches(i) && m(e, r), e.querySelectorAll) {
     const d = e.querySelectorAll(i);
     for (let l = 0; l < d.length; l++)
-      m(d[l], o);
+      m(d[l], r);
   }
 }
 typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore._bootHolds = window.lnCore._bootHolds || 0, window.lnCore._bootQueue = window.lnCore._bootQueue || []);
@@ -428,60 +428,60 @@ function te() {
 function ne(e) {
   const t = te(), a = e.observed || [];
   for (let n = 0; n < a.length; n++) {
-    const r = a[n];
-    t.byAttr.has(r) || t.byAttr.set(r, []), t.byAttr.get(r).push(e);
+    const o = a[n];
+    t.byAttr.has(o) || t.byAttr.set(o, []), t.byAttr.get(o).push(e);
   }
   if (t.byDeclaredAttr = t.byDeclaredAttr || /* @__PURE__ */ new Map(), e.attributes)
     for (const n in e.attributes) {
       t.byDeclaredAttr.has(n) || t.byDeclaredAttr.set(n, []);
-      const r = t.byDeclaredAttr.get(n);
-      r.some((i) => i.componentTag === e.componentTag) || r.push({
+      const o = t.byDeclaredAttr.get(n);
+      o.some((i) => i.componentTag === e.componentTag) || o.push({
         spec: e.attributes[n],
         componentTag: e.componentTag
       });
     }
   if (e.onAttrChange || e.effects) {
     t.reactive.push(e);
-    const n = Ee(e);
+    const n = Ie(e);
     if (n === null)
       t.reactiveWildcard.push(e);
     else
-      for (const r of n)
-        t.byReactive.has(r) || t.byReactive.set(r, []), t.byReactive.get(r).push(e);
+      for (const o of n)
+        t.byReactive.has(o) || t.byReactive.set(o, []), t.byReactive.get(o).push(e);
   }
   e.persist && t.persist.push(e);
 }
 function R(e, t, a, n) {
-  for (let r = 0; r < e.length; r++) {
-    const i = e[r];
+  for (let o = 0; o < e.length; o++) {
+    const i = e[o];
     if (!t[i.attribute]) continue;
-    const o = i.effects && i.effects[a];
-    o ? o(t, a, n) : i.onAttrChange && (!i.declared || i.declared.has(a)) && i.onAttrChange(t, a, n);
+    const r = i.effects && i.effects[a];
+    r ? r(t, a, n) : i.onAttrChange && (!i.declared || i.declared.has(a)) && i.onAttrChange(t, a, n);
   }
 }
 function qe(e) {
-  const t = e.attributeName, a = t.indexOf("data-ln-") === 0, n = te(), r = n.byAttr.get(t), i = B() && n.byDeclaredAttr && n.byDeclaredAttr.has(t);
-  if (!a && !r && !i)
+  const t = e.attributeName, a = t.indexOf("data-ln-") === 0, n = te(), o = n.byAttr.get(t), i = B() && n.byDeclaredAttr && n.byDeclaredAttr.has(t);
+  if (!a && !o && !i)
     return;
-  const o = e.target;
-  if (e.oldValue !== o.getAttribute(t)) {
-    if (i && L(o)) {
-      const d = n.byDeclaredAttr.get(t), l = o.getAttribute(t);
+  const r = e.target;
+  if (e.oldValue !== r.getAttribute(t)) {
+    if (i && L(r)) {
+      const d = n.byDeclaredAttr.get(t), l = r.getAttribute(t);
       for (let s = 0; s < d.length; s++)
-        X(d[s].spec, l, t, d[s].componentTag, o);
+        X(d[s].spec, l, t, d[s].componentTag, r);
     }
-    if (window.lnCore._debugSink && (a || r) && window.lnCore._debugSink("attr", t, o, { oldValue: e.oldValue, newValue: o.getAttribute(t) }), a) {
+    if (window.lnCore._debugSink && (a || o) && window.lnCore._debugSink("attr", t, r, { oldValue: e.oldValue, newValue: r.getAttribute(t) }), a) {
       const d = n.byReactive.get(t);
-      d && R(d, o, t, e.oldValue), n.reactiveWildcard.length && R(n.reactiveWildcard, o, t, e.oldValue);
+      d && R(d, r, t, e.oldValue), n.reactiveWildcard.length && R(n.reactiveWildcard, r, t, e.oldValue);
     }
-    if (r)
-      for (let d = 0; d < r.length; d++) {
-        const l = r[d];
+    if (o)
+      for (let d = 0; d < o.length; d++) {
+        const l = o[d];
         if (l.handler) {
-          l.handler(o, t, e.oldValue);
+          l.handler(r, t, e.oldValue);
           continue;
         }
-        l.onAttributeChange && o[l.attribute] ? l.onAttributeChange(o, t) : (Y(o, l.selector, l.attribute, l.ComponentFn), l.onInit && l.onInit(o));
+        l.onAttributeChange && r[l.attribute] ? l.onAttributeChange(r, t) : (Y(r, l.selector, l.attribute, l.ComponentFn), l.onInit && l.onInit(r));
       }
   }
 }
@@ -504,7 +504,7 @@ function ae() {
 function T() {
   return window.lnCore = window.lnCore || {}, window.lnCore._lifecycleRegistry = window.lnCore._lifecycleRegistry || [];
 }
-function I(e, t) {
+function $(e, t) {
   if (!document.contains(e))
     if (t.attribute) {
       const a = e[t.attribute];
@@ -519,48 +519,53 @@ function I(e, t) {
 }
 function Oe(e) {
   const t = T();
-  if (t.length) {
-    if (e.target)
-      for (let a = 0; a < t.length; a++) {
-        const n = t[a];
-        if (n.onSubtreeChange && n.query) {
-          const r = n.query, i = e.target.nodeType === 1 ? e.target.matches && e.target.matches(r) ? e.target : e.target.closest ? e.target.closest(r) : null : e.target.parentElement && e.target.parentElement.closest ? e.target.parentElement.closest(r) : null;
-          i && n.onSubtreeChange(i, e);
-        }
-      }
-    for (let a = 0; a < e.addedNodes.length; a++) {
-      const n = e.addedNodes[a];
-      if (n.nodeType === 1) {
-        const r = !!(n.firstElementChild || n.children && n.children.length);
-        for (let i = 0; i < t.length; i++) {
-          const o = t[i];
-          if (o.selector && o.attribute && o.ComponentFn) {
-            if (!r)
-              n.matches && n.matches(o.query) && m(n, o);
-            else if (n.matches && n.matches(o.query) && m(n, o), n.querySelectorAll) {
-              const d = n.querySelectorAll(o.query);
-              for (let l = 0; l < d.length; l++)
-                m(d[l], o);
-            }
-          }
-          o.onInit && o.onInit(n);
-        }
+  if (!t.length) return;
+  const a = e.target;
+  if (a) {
+    const n = a.nodeType === 1 ? a : a.parentElement;
+    if (n && (n.isContentEditable || n.closest && n.closest('[contenteditable]:not([contenteditable="false"])')))
+      return;
+  }
+  if (e.target)
+    for (let n = 0; n < t.length; n++) {
+      const o = t[n];
+      if (o.onSubtreeChange && o.query) {
+        const i = o.query, r = e.target.nodeType === 1 ? e.target.matches && e.target.matches(i) ? e.target : e.target.closest ? e.target.closest(i) : null : e.target.parentElement && e.target.parentElement.closest ? e.target.parentElement.closest(i) : null;
+        r && o.onSubtreeChange(r, e);
       }
     }
-    for (let a = 0; a < e.removedNodes.length; a++) {
-      const n = e.removedNodes[a];
-      if (n.nodeType === 1) {
-        const r = !!(n.firstElementChild || n.children && n.children.length);
-        for (let i = 0; i < t.length; i++) {
-          const o = t[i], d = o.query;
-          if (d) {
-            if (!r)
-              n.matches && n.matches(d) && I(n, o);
-            else if (n.matches && n.matches(d) && I(n, o), n.querySelectorAll) {
-              const l = n.querySelectorAll(d);
-              for (let s = 0; s < l.length; s++)
-                I(l[s], o);
-            }
+  for (let n = 0; n < e.addedNodes.length; n++) {
+    const o = e.addedNodes[n];
+    if (o.nodeType === 1) {
+      const i = !!(o.firstElementChild || o.children && o.children.length);
+      for (let r = 0; r < t.length; r++) {
+        const d = t[r];
+        if (d.selector && d.attribute && d.ComponentFn) {
+          if (!i)
+            o.matches && o.matches(d.query) && m(o, d);
+          else if (o.matches && o.matches(d.query) && m(o, d), o.querySelectorAll) {
+            const l = o.querySelectorAll(d.query);
+            for (let s = 0; s < l.length; s++)
+              m(l[s], d);
+          }
+        }
+        d.onInit && d.onInit(o);
+      }
+    }
+  }
+  for (let n = 0; n < e.removedNodes.length; n++) {
+    const o = e.removedNodes[n];
+    if (o.nodeType === 1) {
+      const i = !!(o.firstElementChild || o.children && o.children.length);
+      for (let r = 0; r < t.length; r++) {
+        const d = t[r], l = d.query;
+        if (l) {
+          if (!i)
+            o.matches && o.matches(l) && $(o, d);
+          else if (o.matches && o.matches(l) && $(o, d), o.querySelectorAll) {
+            const s = o.querySelectorAll(l);
+            for (let c = 0; c < s.length; c++)
+              $(s[c], d);
           }
         }
       }
@@ -575,8 +580,8 @@ function oe() {
         if (n.type === "childList")
           try {
             Oe(n);
-          } catch (r) {
-            console.error("[ln-core] lifecycle handler failed", n.target, r);
+          } catch (o) {
+            console.error("[ln-core] lifecycle handler failed", n.target, o);
           }
       }
     }).observe(document.body, {
@@ -591,8 +596,8 @@ function Le(e, t) {
 function Te(e) {
   T().push(e), oe();
 }
-function le(e, t, a, n, r = {}) {
-  const i = r.extraAttributes || [], o = r.onAttributeChange || null, d = r.onSubtreeChange || null, l = r.onInit || null, s = r.onAttrChange || null, c = r.effects || null, u = r.attributes || null, f = u ? Ie(u) : c, v = u ? new Set(Object.keys(u)) : null, se = r.persist || null;
+function le(e, t, a, n, o = {}) {
+  const i = o.extraAttributes || [], r = o.onAttributeChange || null, d = o.onSubtreeChange || null, l = o.onInit || null, s = o.onAttrChange || null, c = o.effects || null, u = o.attributes || null, f = u ? $e(u) : c, v = u ? new Set(Object.keys(u)) : null, se = o.persist || null;
   function y(x) {
     const w = x || document.body;
     if (Y(w, e, t, a), u && B())
@@ -622,13 +627,13 @@ function le(e, t, a, n, r = {}) {
     ComponentFn: a,
     onInit: l,
     observed: A.concat(i),
-    onAttributeChange: o,
+    onAttributeChange: r,
     onAttrChange: s,
     effects: f,
     declared: v,
     persist: se
   }), ae();
-  const ce = e.indexOf("[") !== -1 || e.indexOf(".") !== -1 || e.indexOf("#") !== -1, ue = r.subtreeQuery || (ce ? e : "[" + e + "]");
+  const ce = e.indexOf("[") !== -1 || e.indexOf(".") !== -1 || e.indexOf("#") !== -1, ue = o.subtreeQuery || (ce ? e : "[" + e + "]");
   T().push({
     selector: e,
     attribute: t,
@@ -650,11 +655,11 @@ function re(e) {
 function M(e) {
   const t = e === void 0 ? location.hash : e, a = {}, n = re(t);
   if (!n) return a;
-  const r = n.split("&");
-  for (let i = 0; i < r.length; i++) {
-    const o = r[i];
-    if (!o) continue;
-    const d = o.indexOf(":"), l = d > -1 ? o.slice(0, d) : o, s = d > -1 ? o.slice(d + 1) : "";
+  const o = n.split("&");
+  for (let i = 0; i < o.length; i++) {
+    const r = o[i];
+    if (!r) continue;
+    const d = r.indexOf(":"), l = d > -1 ? r.slice(0, d) : r, s = d > -1 ? r.slice(d + 1) : "";
     if (l)
       try {
         a[l] = decodeURIComponent(s);
@@ -673,11 +678,11 @@ function Ne(e, t) {
   if (!e) return;
   const a = M();
   t == null ? delete a[e] : a[e] = String(t);
-  const r = Object.keys(a).map(function(i) {
-    const o = a[i];
-    return o === "" ? i : i + ":" + encodeURIComponent(o);
+  const o = Object.keys(a).map(function(i) {
+    const r = a[i];
+    return r === "" ? i : i + ":" + encodeURIComponent(r);
   }).join("&");
-  re(location.hash) !== r && (location.hash = r);
+  re(location.hash) !== o && (location.hash = o);
 }
 function Fe(e) {
   return e.button === 1 || e.ctrlKey || e.metaKey || e.shiftKey ? !1 : (e.preventDefault(), !0);
@@ -702,14 +707,14 @@ function Ue(e) {
   if (!e || typeof e != "string") return null;
   const t = e.indexOf(":");
   if (t === -1) return null;
-  const a = e.slice(0, t), n = e.slice(t + 1), r = n ? n.split(",").map(function(i) {
+  const a = e.slice(0, t), n = e.slice(t + 1), o = n ? n.split(",").map(function(i) {
     try {
       return decodeURIComponent(i);
     } catch {
       return i;
     }
   }).filter(Boolean) : [];
-  return { key: a, values: r };
+  return { key: a, values: o };
 }
 typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.hashParse = M, window.lnCore.hashGet = Me, window.lnCore.hashSet = Ne, window.lnCore.hashLinkClick = Fe, window.lnCore.resolveHashNamespace = Re, window.lnCore.hashSortEncode = je, window.lnCore.hashSortDecode = Be, window.lnCore.hashFilterEncode = We, window.lnCore.hashFilterDecode = Ue);
 function Ve() {
@@ -1028,11 +1033,11 @@ function He(e, t) {
   for (let n = 0; n <= t.length; n++) a[n] = [n];
   for (let n = 0; n <= e.length; n++) a[0][n] = n;
   for (let n = 1; n <= t.length; n++)
-    for (let r = 1; r <= e.length; r++)
-      t.charAt(n - 1) === e.charAt(r - 1) ? a[n][r] = a[n - 1][r - 1] : a[n][r] = Math.min(
-        a[n - 1][r - 1] + 1,
-        a[n][r - 1] + 1,
-        a[n - 1][r] + 1
+    for (let o = 1; o <= e.length; o++)
+      t.charAt(n - 1) === e.charAt(o - 1) ? a[n][o] = a[n - 1][o - 1] : a[n][o] = Math.min(
+        a[n - 1][o - 1] + 1,
+        a[n][o - 1] + 1,
+        a[n - 1][o] + 1
       );
   return a[t.length][e.length];
 }
@@ -1040,11 +1045,11 @@ function ze(e, t = N) {
   if (t.has(e)) return null;
   let a = null, n = 1 / 0;
   for (const i of t) {
-    const o = He(e, i);
-    o < n && (n = o, a = i);
+    const r = He(e, i);
+    r < n && (n = r, a = i);
   }
-  const r = Math.max(3, Math.floor(e.length * 0.4));
-  return n <= r ? a : null;
+  const o = Math.max(3, Math.floor(e.length * 0.4));
+  return n <= o ? a : null;
 }
 function ie(e) {
   return typeof CSS < "u" && CSS.escape ? CSS.escape(e) : e.replace(/([!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~])/g, "\\$1");
@@ -1052,30 +1057,30 @@ function ie(e) {
 function Ge(e = document) {
   const t = e.ownerDocument || e, a = e.nodeType === 9 ? e.body || e.documentElement : e;
   if (!a) return [];
-  const n = [], r = [a, ...a.querySelectorAll("*")];
-  for (let i = 0; i < r.length; i++) {
-    const o = r[i];
-    if (o.attributes)
-      for (let d = 0; d < o.attributes.length; d++) {
-        const l = o.attributes[d];
+  const n = [], o = [a, ...a.querySelectorAll("*")];
+  for (let i = 0; i < o.length; i++) {
+    const r = o[i];
+    if (r.attributes)
+      for (let d = 0; d < r.attributes.length; d++) {
+        const l = r.attributes[d];
         if (l.name.startsWith("data-ln-") && l.name.endsWith("-for")) {
           const s = (l.value || "").trim();
           if (!s) {
             n.push({
               type: "id-empty",
-              element: o,
+              element: r,
               attribute: l.name,
               targetId: "",
-              message: `[ln-debug] Empty ID reference in <${o.tagName.toLowerCase()} ${l.name}="">.`
+              message: `[ln-debug] Empty ID reference in <${r.tagName.toLowerCase()} ${l.name}="">.`
             });
             continue;
           }
           t.getElementById(s) || t.querySelector("#" + ie(s)) || n.push({
             type: "id-unresolved",
-            element: o,
+            element: r,
             attribute: l.name,
             targetId: s,
-            message: `[ln-debug] Unresolved ID reference: <${o.tagName.toLowerCase()} ${l.name}="${s}"> targets "#${s}", but no element with id="${s}" exists in the document.`
+            message: `[ln-debug] Unresolved ID reference: <${r.tagName.toLowerCase()} ${l.name}="${s}"> targets "#${s}", but no element with id="${s}" exists in the document.`
           });
         }
       }
@@ -1085,31 +1090,31 @@ function Ge(e = document) {
 function Qe(e = document) {
   const t = e.ownerDocument || e, a = e.nodeType === 9 ? e.body || e.documentElement : e;
   if (!a) return [];
-  const n = [], r = [a, ...a.querySelectorAll("*")];
-  for (let i = 0; i < r.length; i++) {
-    const o = r[i];
-    if (o.attributes)
-      for (let d = 0; d < o.attributes.length; d++) {
-        const l = o.attributes[d];
+  const n = [], o = [a, ...a.querySelectorAll("*")];
+  for (let i = 0; i < o.length; i++) {
+    const r = o[i];
+    if (r.attributes)
+      for (let d = 0; d < r.attributes.length; d++) {
+        const l = r.attributes[d];
         if (l.name.startsWith("data-ln-") && (l.name.endsWith("-source") || l.name.endsWith("-store")) && l.name !== "data-ln-data-store") {
           const c = (l.value || "").trim();
           if (!c) {
             n.push({
               type: "store-empty",
-              element: o,
+              element: r,
               attribute: l.name,
               storeName: "",
-              message: `[ln-debug] Empty store reference in <${o.tagName.toLowerCase()} ${l.name}="">.`
+              message: `[ln-debug] Empty store reference in <${r.tagName.toLowerCase()} ${l.name}="">.`
             });
             continue;
           }
           const u = ie(c), f = t.querySelector(`[data-ln-data-store="${u}"], [data-ln-store="${u}"]`), v = typeof window < "u" && window.lnDataStore && typeof window.lnDataStore.getStore == "function" && window.lnDataStore.getStore(c);
           !f && !v && n.push({
             type: "store-unresolved",
-            element: o,
+            element: r,
             attribute: l.name,
             storeName: c,
-            message: `[ln-debug] Unresolved store reference: <${o.tagName.toLowerCase()} ${l.name}="${c}"> targets store "${c}", but no [data-ln-data-store="${c}"] exists in the document.`
+            message: `[ln-debug] Unresolved store reference: <${r.tagName.toLowerCase()} ${l.name}="${c}"> targets store "${c}", but no [data-ln-data-store="${c}"] exists in the document.`
           });
         }
       }
@@ -1122,16 +1127,16 @@ function Je(e = document) {
   if (!t) return [];
   const a = [], n = Array.from(t.querySelectorAll("[data-ln-data-store]"));
   t.hasAttribute && t.hasAttribute("data-ln-data-store") && n.unshift(t);
-  const r = /* @__PURE__ */ new Map();
+  const o = /* @__PURE__ */ new Map();
   for (let i = 0; i < n.length; i++) {
-    const o = n[i], d = (o.getAttribute("data-ln-data-store") || "").trim();
-    d && (r.has(d) || r.set(d, []), r.get(d).push(o));
+    const r = n[i], d = (r.getAttribute("data-ln-data-store") || "").trim();
+    d && (o.has(d) || o.set(d, []), o.get(d).push(r));
   }
-  for (const [i, o] of r.entries())
-    o.length > 1 && a.push({
+  for (const [i, r] of o.entries())
+    r.length > 1 && a.push({
       type: "store-duplicate",
       storeName: i,
-      elements: o,
+      elements: r,
       message: `[ln-debug] Duplicate store name: Multiple elements declare data-ln-data-store="${i}". Store names must be unique across the document.`
     });
   return a;
@@ -1139,20 +1144,20 @@ function Je(e = document) {
 function Ke(e = document, t = N) {
   const a = e.nodeType === 9 ? e.body || e.documentElement : e;
   if (!a) return [];
-  const n = [], r = [a, ...a.querySelectorAll("*")];
-  for (let i = 0; i < r.length; i++) {
-    const o = r[i];
-    if (o.attributes)
-      for (let d = 0; d < o.attributes.length; d++) {
-        const l = o.attributes[d];
+  const n = [], o = [a, ...a.querySelectorAll("*")];
+  for (let i = 0; i < o.length; i++) {
+    const r = o[i];
+    if (r.attributes)
+      for (let d = 0; d < r.attributes.length; d++) {
+        const l = r.attributes[d];
         if (l.name.startsWith("data-ln-") && !t.has(l.name)) {
           const s = ze(l.name, t), c = s ? ` Did you mean "${s}"?` : "";
           n.push({
             type: "attribute-unknown",
-            element: o,
+            element: r,
             attribute: l.name,
             suggestion: s,
-            message: `[ln-debug] Unknown attribute "${l.name}" on <${o.tagName.toLowerCase()}>.${c}`
+            message: `[ln-debug] Unknown attribute "${l.name}" on <${r.tagName.toLowerCase()}>.${c}`
           });
         }
       }
@@ -1162,20 +1167,20 @@ function Ke(e = document, t = N) {
 function q(e = typeof document < "u" ? document : null, t = {}) {
   if (!e)
     return { idIssues: [], storeIssues: [], uniquenessIssues: [], spellingIssues: [], total: 0 };
-  const a = t.validAttributes || N, n = Ge(e), r = Qe(e), i = Je(e), o = Ke(e, a), d = [
+  const a = t.validAttributes || N, n = Ge(e), o = Qe(e), i = Je(e), r = Ke(e, a), d = [
     ...n,
-    ...r,
+    ...o,
     ...i,
-    ...o
+    ...r
   ];
   if (!t.silent)
     for (let l = 0; l < d.length; l++)
       console.warn(d[l].message);
   return {
     idIssues: n,
-    storeIssues: r,
+    storeIssues: o,
     uniquenessIssues: i,
-    spellingIssues: o,
+    spellingIssues: r,
     total: d.length
   };
 }
@@ -1186,8 +1191,8 @@ function C(e = typeof document < "u" ? document : null, t = 50, a = null) {
   function n() {
     h = setTimeout(() => {
       h = null;
-      const r = q(e);
-      a && a(r);
+      const o = q(e);
+      a && a(o);
     }, t);
   }
   Z() > 0 ? ee(n) : n();
@@ -1230,12 +1235,12 @@ function Ze() {
   function n(i) {
     return this.dom = i, C(i.ownerDocument || document), j(), this;
   }
-  n.prototype.verify = function(i, o) {
-    return q(i || (this.dom ? this.dom.ownerDocument || this.dom : document), o);
+  n.prototype.verify = function(i, r) {
+    return q(i || (this.dom ? this.dom.ownerDocument || this.dom : document), r);
   }, n.prototype.destroy = function() {
     delete this.dom[t], j();
   };
-  const r = le(e, t, n, "ln-debug", {
+  const o = le(e, t, n, "ln-debug", {
     attributes: a,
     onInit: function(i) {
       typeof document < "u" && C(i && i.ownerDocument ? i.ownerDocument : document);
@@ -1244,10 +1249,10 @@ function Ze() {
       typeof document < "u" && C(i && i.ownerDocument ? i.ownerDocument : document);
     }
   });
-  r.verify = function(i, o) {
-    return q(i || document, o);
-  }, r.schedule = function(i, o, d) {
-    return C(i || document, o, d);
+  o.verify = function(i, r) {
+    return q(i || document, r);
+  }, o.schedule = function(i, r, d) {
+    return C(i || document, r, d);
   };
 })();
 export {
