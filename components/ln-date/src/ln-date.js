@@ -109,6 +109,7 @@ import {
 		dom[DOM_ATTRIBUTE] = this;
 
 		this.dom = dom;
+		const self = this;
 		_instances.add(this);
 		_ensureLocaleListener();
 
