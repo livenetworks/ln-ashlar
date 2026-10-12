@@ -251,6 +251,15 @@ function _handleChildListMutation(mutation) {
 	const registry = _lifecycleRegistry();
 	if (!registry.length) return;
 
+	// Fast bailout: ignore mutations inside contenteditable / rich-text editor surfaces
+	const target = mutation.target;
+	if (target) {
+		const targetEl = target.nodeType === 1 ? target : target.parentElement;
+		if (targetEl && (targetEl.isContentEditable || (targetEl.closest && targetEl.closest('[contenteditable]:not([contenteditable="false"])')))) {
+			return;
+		}
+	}
+
 	if (mutation.target) {
 		for (let r = 0; r < registry.length; r++) {
 			const entry = registry[r];
