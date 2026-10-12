@@ -52,6 +52,7 @@ import { calculateCursorPosition } from './number-model.js';
 		if (dom[DOM_ATTRIBUTE]) return dom[DOM_ATTRIBUTE];
 		dom[DOM_ATTRIBUTE] = this;
 		this.dom = dom;
+		const self = this;
 
 		_instances.add(this);
 		_ensureLocaleListener();
