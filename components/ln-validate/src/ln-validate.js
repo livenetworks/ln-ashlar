@@ -140,14 +140,25 @@ import { hasInitialValue, isFieldValid, resolveActiveErrorKeys } from './validat
 				const items = errorList.querySelectorAll('[' + ERROR_SELECTOR + ']');
 				for (let i = 0; i < items.length; i++) {
 					const errorKey = items[i].getAttribute(ERROR_SELECTOR);
-					items[i].classList.toggle('hidden', !activeErrors.includes(errorKey));
+					const shouldHide = !activeErrors.includes(errorKey);
+					if (items[i].classList.contains('hidden') !== shouldHide) {
+						items[i].classList.toggle('hidden', shouldHide);
+					}
 				}
 			}
 		}
 
-		dom.classList.toggle(CSS_VALID, isValid);
-		dom.classList.toggle(CSS_INVALID, !isValid);
-		dom.setAttribute('aria-invalid', isValid ? 'false' : 'true');
+		if (dom.classList.contains(CSS_VALID) !== isValid) {
+			dom.classList.toggle(CSS_VALID, isValid);
+		}
+		if (dom.classList.contains(CSS_INVALID) === isValid) {
+			dom.classList.toggle(CSS_INVALID, !isValid);
+		}
+
+		const ariaStr = isValid ? 'false' : 'true';
+		if (dom.getAttribute('aria-invalid') !== ariaStr) {
+			dom.setAttribute('aria-invalid', ariaStr);
+		}
 
 		const eventName = isValid ? 'ln-validate:valid' : 'ln-validate:invalid';
 		dispatch(dom, eventName, { target: dom, field: dom.name, errors: activeErrors });
@@ -158,14 +169,17 @@ import { hasInitialValue, isFieldValid, resolveActiveErrorKeys } from './validat
 	_component.prototype.reset = function () {
 		this._touched = false;
 		this._customErrors.clear();
-		this.dom.classList.remove(CSS_VALID, CSS_INVALID);
-		this.dom.removeAttribute('aria-invalid');
+		if (this.dom.classList.contains(CSS_VALID)) this.dom.classList.remove(CSS_VALID);
+		if (this.dom.classList.contains(CSS_INVALID)) this.dom.classList.remove(CSS_INVALID);
+		if (this.dom.hasAttribute('aria-invalid')) this.dom.removeAttribute('aria-invalid');
 
 		const parent = this.dom.closest('.form-element');
 		if (parent) {
 			const items = parent.querySelectorAll('[' + ERROR_SELECTOR + ']');
 			for (let i = 0; i < items.length; i++) {
-				items[i].classList.add('hidden');
+				if (!items[i].classList.contains('hidden')) {
+					items[i].classList.add('hidden');
+				}
 			}
 		}
 	};

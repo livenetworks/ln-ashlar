@@ -149,20 +149,24 @@ import { deriveKeyFromTrigger, determineTabsMode, resolveActiveTabKey } from './
 
 		for (const k in this.mapTabs) {
 			const btn = this.mapTabs[k];
-			if (k === key) {
-				btn.setAttribute("data-active", "");
-				btn.setAttribute("aria-selected", "true");
+			const isActive = (k === key);
+			if (isActive) {
+				if (!btn.hasAttribute("data-active")) btn.setAttribute("data-active", "");
+				if (btn.getAttribute("aria-selected") !== "true") btn.setAttribute("aria-selected", "true");
 			} else {
-				btn.removeAttribute("data-active");
-				btn.setAttribute("aria-selected", "false");
+				if (btn.hasAttribute("data-active")) btn.removeAttribute("data-active");
+				if (btn.getAttribute("aria-selected") !== "false") btn.setAttribute("aria-selected", "false");
 			}
 		}
 		for (const k in this.mapPanels) {
 			const panel = this.mapPanels[k];
 			const show = (k === key);
-			panel.hidden = !show;
-			panel.classList.toggle("hidden", !show);
-			panel.setAttribute("aria-hidden", show ? "false" : "true");
+			if (panel.hidden !== !show) panel.hidden = !show;
+			if (panel.classList.contains("hidden") !== !show) panel.classList.toggle("hidden", !show);
+			const ariaHiddenStr = show ? "false" : "true";
+			if (panel.getAttribute("aria-hidden") !== ariaHiddenStr) {
+				panel.setAttribute("aria-hidden", ariaHiddenStr);
+			}
 		}
 		if (this.autoFocus) {
 			const first = this.mapPanels[key]?.querySelector('input,button,select,textarea,[tabindex]:not([tabindex="-1"])');

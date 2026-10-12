@@ -52,7 +52,7 @@
 			"description": "Column name or index filter specifier"
 		},
 		"data-ln-filter-hide": {
-			"direction": "runtime",
+			"direction": "both",
 			"sources": [
 				"ln-filter.scss",
 				"src/ln-filter.js"

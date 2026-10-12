@@ -29,7 +29,7 @@
 			"description": "Dropdown menu element containing items"
 		},
 		"data-ln-dropdown-placement": {
-			"direction": "runtime",
+			"direction": "both",
 			"sources": [
 				"src/ln-dropdown.js"
 			],

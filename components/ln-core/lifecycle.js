@@ -229,6 +229,12 @@ function _lifecycleRegistry() {
 	return registry;
 }
 
+function _subtreeRegistry() {
+	window.lnCore = window.lnCore || {};
+	const registry = window.lnCore._subtreeRegistry = window.lnCore._subtreeRegistry || [];
+	return registry;
+}
+
 function _destroyItem(item, entry) {
 	if (!document.contains(item)) {
 		if (entry.attribute) {
@@ -260,16 +266,15 @@ function _handleChildListMutation(mutation) {
 		}
 	}
 
-	if (mutation.target) {
-		for (let r = 0; r < registry.length; r++) {
-			const entry = registry[r];
-			if (entry.onSubtreeChange && entry.query) {
-				const query = entry.query;
-				const host = mutation.target.nodeType === 1
-					? (mutation.target.matches && mutation.target.matches(query) ? mutation.target : (mutation.target.closest ? mutation.target.closest(query) : null))
-					: (mutation.target.parentElement && mutation.target.parentElement.closest ? mutation.target.parentElement.closest(query) : null);
-				if (host) entry.onSubtreeChange(host, mutation);
-			}
+	const subtreeEntries = _subtreeRegistry();
+	if (mutation.target && subtreeEntries.length) {
+		for (let r = 0; r < subtreeEntries.length; r++) {
+			const entry = subtreeEntries[r];
+			const query = entry.query;
+			const host = mutation.target.nodeType === 1
+				? (mutation.target.matches && mutation.target.matches(query) ? mutation.target : (mutation.target.closest ? mutation.target.closest(query) : null))
+				: (mutation.target.parentElement && mutation.target.parentElement.closest ? mutation.target.parentElement.closest(query) : null);
+			if (host) entry.onSubtreeChange(host, mutation);
 		}
 	}
 
@@ -372,6 +377,9 @@ export function observeAttributes(names, handler) {
  */
 export function observeLifecycle(entry) {
 	_lifecycleRegistry().push(entry);
+	if (entry.onSubtreeChange && entry.query) {
+		_subtreeRegistry().push(entry);
+	}
 	_ensureLifecycleObserver();
 }
 
@@ -438,14 +446,18 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 	const isComplex = selector.indexOf('[') !== -1 || selector.indexOf('.') !== -1 || selector.indexOf('#') !== -1;
 	const query = options.subtreeQuery || (isComplex ? selector : '[' + selector + ']');
 
-	_lifecycleRegistry().push({
+	const lifecycleEntry = {
 		selector: selector,
 		attribute: attribute,
 		ComponentFn: ComponentFn,
 		onInit: onInit,
 		onSubtreeChange: onSubtreeChange,
 		query: query
-	});
+	};
+	_lifecycleRegistry().push(lifecycleEntry);
+	if (onSubtreeChange && query) {
+		_subtreeRegistry().push(lifecycleEntry);
+	}
 	_ensureLifecycleObserver();
 
 	window[attribute] = constructor;

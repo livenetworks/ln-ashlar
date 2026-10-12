@@ -707,12 +707,17 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			}
 		};
 
+		this._resizeRafId = null;
 		this._resizeHandler = function () {
-			self._itemHeight = 0;
-			self._measureItemHeight();
-			self._vStart = -1;
-			self._vEnd = -1;
-			self._windowed ? self._renderWindowed() : self._renderVirtual();
+			if (self._resizeRafId) return;
+			self._resizeRafId = requestAnimationFrame(function () {
+				self._resizeRafId = null;
+				self._itemHeight = 0;
+				self._measureItemHeight();
+				self._vStart = -1;
+				self._vEnd = -1;
+				self._windowed ? self._renderWindowed() : self._renderVirtual();
+			});
 		};
 
 		container.addEventListener('scroll', this._scrollHandler, { passive: true });
@@ -731,6 +736,10 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		if (this._resizeHandler) {
 			window.removeEventListener('resize', this._resizeHandler);
 			this._resizeHandler = null;
+		}
+		if (this._resizeRafId) {
+			cancelAnimationFrame(this._resizeRafId);
+			this._resizeRafId = null;
 		}
 		this._scrollContainer = null;
 

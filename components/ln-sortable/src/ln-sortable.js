@@ -90,8 +90,22 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 		});
 
 		const self = this;
-		const onMove = function (ev) { self._handlePointerMove(ev); };
+		let rafMove = null;
+		let lastEvent = null;
+
+		const onMove = function (ev) {
+			lastEvent = ev;
+			if (rafMove) return;
+			rafMove = requestAnimationFrame(function () {
+				rafMove = null;
+				if (lastEvent) self._handlePointerMove(lastEvent);
+			});
+		};
 		const onEnd = function (ev) {
+			if (rafMove) {
+				cancelAnimationFrame(rafMove);
+				rafMove = null;
+			}
 			self._handlePointerEnd(ev);
 			handle.removeEventListener('pointermove', onMove);
 			handle.removeEventListener('pointerup', onEnd);
@@ -109,23 +123,51 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 		const children = Array.from(this.dom.children);
 		const dragging = this._dragging;
 
-		for (const child of children) {
-			child.classList.remove('ln-sortable--drop-before', 'ln-sortable--drop-after');
-		}
+		let targetChild = null;
+		let targetPos = null;
 
-		for (const child of children) {
+		for (let i = 0; i < children.length; i++) {
+			const child = children[i];
 			if (child === dragging) continue;
 
 			const rect = child.getBoundingClientRect();
 			const mid = rect.top + rect.height / 2;
 
 			if (e.clientY >= rect.top && e.clientY < mid) {
-				child.classList.add('ln-sortable--drop-before');
+				targetChild = child;
+				targetPos = 'before';
 				break;
 			} else if (e.clientY >= mid && e.clientY <= rect.bottom) {
-				child.classList.add('ln-sortable--drop-after');
+				targetChild = child;
+				targetPos = 'after';
 				break;
 			}
+		}
+
+		if (this._lastDropTarget === targetChild && this._lastDropPos === targetPos) {
+			return;
+		}
+
+		if (this._lastDropTarget && this._lastDropTarget !== targetChild) {
+			this._lastDropTarget.classList.remove('ln-sortable--drop-before', 'ln-sortable--drop-after');
+		}
+
+		this._lastDropTarget = targetChild;
+		this._lastDropPos = targetPos;
+
+		for (let i = 0; i < children.length; i++) {
+			const child = children[i];
+			if (child !== targetChild) {
+				if (child.classList.contains('ln-sortable--drop-before')) child.classList.remove('ln-sortable--drop-before');
+				if (child.classList.contains('ln-sortable--drop-after')) child.classList.remove('ln-sortable--drop-after');
+			}
+		}
+
+		if (targetChild) {
+			const cls = targetPos === 'before' ? 'ln-sortable--drop-before' : 'ln-sortable--drop-after';
+			const otherCls = targetPos === 'before' ? 'ln-sortable--drop-after' : 'ln-sortable--drop-before';
+			if (targetChild.classList.contains(otherCls)) targetChild.classList.remove(otherCls);
+			if (!targetChild.classList.contains(cls)) targetChild.classList.add(cls);
 		}
 	};
 
@@ -151,6 +193,9 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 				break;
 			}
 		}
+
+		this._lastDropTarget = null;
+		this._lastDropPos = null;
 
 		for (const child of children) {
 			child.classList.remove('ln-sortable--drop-before', 'ln-sortable--drop-after');

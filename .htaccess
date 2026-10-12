@@ -1,6 +1,9 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Set default directory index
+    DirectoryIndex demo/index.html index.html index.php
+
     # 1. Stop if this request has already been internally rewritten
     RewriteCond %{ENV:REDIRECT_STATUS} !^$
     RewriteRule ^ - [L]
@@ -18,8 +21,10 @@
     RewriteCond %{THE_REQUEST} \s/+demo(?:\s|\?) [NC]
     RewriteRule ^demo/?$ / [R=302,L]
 
-    # 2.5 Allow existing files or directories in root to be served directly
+    # 2.5 Allow existing files or non-root directories in root to be served directly
+    RewriteCond %{REQUEST_URI} !^/?$
     RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_URI} !^/?$
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
 

@@ -81,6 +81,17 @@ import { populateForm, registerComponent, defineAttrs, attrSpec, attrStr } from 
 		}
 	};
 
+	_component.prototype.reset = function () {
+		this.dom.reset();
+		this._applyActionMode(null);
+		const elements = this.dom.elements;
+		for (let k = 0; k < elements.length; k++) {
+			const el = elements[k];
+			const isChangeBased = el.tagName === 'SELECT' || el.type === 'checkbox' || el.type === 'radio';
+			el.dispatchEvent(new Event(isChangeBased ? 'change' : 'input', { bubbles: true }));
+		}
+	};
+
 	_component.prototype._ensureMethodInput = function () {
 		let input = this.dom.querySelector('input[name="_method"]');
 		if (!input) {
