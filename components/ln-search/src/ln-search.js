@@ -155,13 +155,17 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 
 		for (let i = 0; i < items.length; i++) {
 			const el = items[i];
-			el.removeAttribute(HIDE_ATTR);
-			if (el.hasAttribute(EXCLUDE_ATTR)) continue;
-			if (tokens.length === 0) continue;
+			if (el.hasAttribute(EXCLUDE_ATTR)) {
+				if (el.hasAttribute(HIDE_ATTR)) el.removeAttribute(HIDE_ATTR);
+				continue;
+			}
 
-			const text = _searchText(el);
-			if (!matchesSearchTokens(text, tokens)) {
+			const shouldHide = tokens.length > 0 && !matchesSearchTokens(_searchText(el), tokens);
+			const isHidden = el.hasAttribute(HIDE_ATTR);
+			if (shouldHide && !isHidden) {
 				el.setAttribute(HIDE_ATTR, 'true');
+			} else if (!shouldHide && isHidden) {
+				el.removeAttribute(HIDE_ATTR);
 			}
 		}
 	};

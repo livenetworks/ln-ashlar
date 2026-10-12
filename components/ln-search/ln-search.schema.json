@@ -72,7 +72,7 @@
 			"description": "Target table or list element ID that this input controls"
 		},
 		"data-ln-search-hide": {
-			"direction": "runtime",
+			"direction": "both",
 			"sources": [
 				"ln-search.scss",
 				"src/ln-search.js"

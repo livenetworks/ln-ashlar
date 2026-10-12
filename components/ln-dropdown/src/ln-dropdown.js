@@ -188,15 +188,19 @@ import { dispatch, computePlacement, measureHidden, registerComponent, defineAtt
 	// ─── Positioning ───────────────────────────────────────────
 
 	_component.prototype._reposition = function () {
-		if (!this.triggerBtn || !this.toggleEl) return;
+		if (!this.triggerBtn || !this.toggleEl || !document.contains(this.toggleEl)) return;
 		const rect = this.triggerBtn.getBoundingClientRect();
 		const size = measureHidden(this.toggleEl);
 		const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--size-xs')) * 16 || 4;
 		const position = this.position || DEFAULT_POSITION;
 		const p = computePlacement(rect, size, position, gap);
-		this.toggleEl.style.top = p.top + 'px';
-		this.toggleEl.style.left = p.left + 'px';
-		this.toggleEl.setAttribute('data-ln-dropdown-placement', p.placement);
+		const topStr = p.top + 'px';
+		const leftStr = p.left + 'px';
+		if (this.toggleEl.style.top !== topStr) this.toggleEl.style.top = topStr;
+		if (this.toggleEl.style.left !== leftStr) this.toggleEl.style.left = leftStr;
+		if (this.toggleEl.getAttribute('data-ln-dropdown-placement') !== p.placement) {
+			this.toggleEl.setAttribute('data-ln-dropdown-placement', p.placement);
+		}
 	};
 
 	// ─── Outside click ─────────────────────────────────────────
@@ -232,13 +236,22 @@ import { dispatch, computePlacement, measureHidden, registerComponent, defineAtt
 
 	_component.prototype._addScrollRepositionListener = function () {
 		const self = this;
+		this._scrollRepositionRaf = null;
 		this._boundScrollReposition = function () {
-			self._reposition();
+			if (self._scrollRepositionRaf) return;
+			self._scrollRepositionRaf = requestAnimationFrame(function () {
+				self._scrollRepositionRaf = null;
+				self._reposition();
+			});
 		};
 		window.addEventListener('scroll', this._boundScrollReposition, { passive: true, capture: true });
 	};
 
 	_component.prototype._removeScrollRepositionListener = function () {
+		if (this._scrollRepositionRaf) {
+			cancelAnimationFrame(this._scrollRepositionRaf);
+			this._scrollRepositionRaf = null;
+		}
 		if (this._boundScrollReposition) {
 			window.removeEventListener('scroll', this._boundScrollReposition, { capture: true });
 			this._boundScrollReposition = null;

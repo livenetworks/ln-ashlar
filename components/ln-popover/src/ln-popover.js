@@ -168,15 +168,27 @@ import { dispatch, dispatchCancelable, computePlacement, measureHidden, isVisibl
 		}, 0);
 
 		// Reposition on scroll/resize while open.
-		this._boundReposition = function () {
-			if (!self.trigger) return;
+		this._repositionRaf = null;
+		this._performReposition = function () {
+			if (!self.trigger || !document.contains(self.dom)) return;
 			const r = self.trigger.getBoundingClientRect();
 			const sz = measureHidden(self.dom);
 			const preferred = self.dom.getAttribute(POSITION_SELECTOR) || 'bottom';
 			const p = computePlacement(r, sz, preferred, 8);
-			self.dom.style.top = p.top + 'px';
-			self.dom.style.left = p.left + 'px';
-			self.dom.setAttribute('data-ln-popover-placement', p.placement);
+			const topStr = p.top + 'px';
+			const leftStr = p.left + 'px';
+			if (self.dom.style.top !== topStr) self.dom.style.top = topStr;
+			if (self.dom.style.left !== leftStr) self.dom.style.left = leftStr;
+			if (self.dom.getAttribute('data-ln-popover-placement') !== p.placement) {
+				self.dom.setAttribute('data-ln-popover-placement', p.placement);
+			}
+		};
+		this._boundReposition = function () {
+			if (self._repositionRaf) return;
+			self._repositionRaf = requestAnimationFrame(function () {
+				self._repositionRaf = null;
+				self._performReposition();
+			});
 		};
 		window.addEventListener('scroll', this._boundReposition, { passive: true, capture: true });
 		window.addEventListener('resize', this._boundReposition);
@@ -193,6 +205,11 @@ import { dispatch, dispatchCancelable, computePlacement, measureHidden, isVisibl
 
 	_component.prototype._applyClose = function () {
 		this.isOpen = false;
+
+		if (this._repositionRaf) {
+			cancelAnimationFrame(this._repositionRaf);
+			this._repositionRaf = null;
+		}
 
 		if (this._docClickTimeout) {
 			clearTimeout(this._docClickTimeout);

@@ -139,17 +139,26 @@ import { calculateRelativeTime, resolveDateFormatOptions } from './time-model.js
 		}
 	}
 
+	const _allInstances = new Set();
+	let _localeListenerBound = false;
+
+	function _ensureLocaleListener() {
+		ensureLocaleObserver();
+		if (_localeListenerBound) return;
+		_localeListenerBound = true;
+		document.addEventListener('ln-core:locale-change', function () {
+			_allInstances.forEach(function (inst) {
+				_render(inst);
+			});
+		});
+	}
+
 	// ─── Component ────────────────────────────────────────────
 	function _constructor(dom) {
 		this.dom = dom;
-		const self = this;
 
-		// ── Subscribe to global locale changes ──────────────
-		this._onLocaleChange = function () {
-			_render(self);
-		};
-		ensureLocaleObserver();
-		document.addEventListener('ln-core:locale-change', this._onLocaleChange);
+		_allInstances.add(this);
+		_ensureLocaleListener();
 
 		_render(this);
 
@@ -166,6 +175,7 @@ import { calculateRelativeTime, resolveDateFormatOptions } from './time-model.js
 	};
 
 	_constructor.prototype.destroy = function () {
+		_allInstances.delete(this);
 		if (this._onLocaleChange) {
 			document.removeEventListener('ln-core:locale-change', this._onLocaleChange);
 		}

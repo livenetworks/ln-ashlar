@@ -317,14 +317,13 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 			const children = target.children;
 			for (let i = 0; i < children.length; i++) {
 				const el = children[i];
-				el.removeAttribute(HIDE_ATTR);
-				if (isReset) continue;
-
-				const attr = el.getAttribute('data-' + active.key);
-				if (attr === null) continue;
-
-				if (!matchesFilterValues(attr, active.values)) {
+				const attr = !isReset ? el.getAttribute('data-' + active.key) : null;
+				const shouldHide = !isReset && attr !== null && !matchesFilterValues(attr, active.values);
+				const isHidden = el.hasAttribute(HIDE_ATTR);
+				if (shouldHide && !isHidden) {
 					el.setAttribute(HIDE_ATTR, 'true');
+				} else if (!shouldHide && isHidden) {
+					el.removeAttribute(HIDE_ATTR);
 				}
 			}
 		}
@@ -388,10 +387,12 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 					cellValuesByCol[c] = _readCell(row.cells[c]);
 				}
 
-				if (evaluateRowFilters(cellValuesByCol, filters, row)) {
-					row.removeAttribute(HIDE_ATTR);
-				} else {
+				const shouldHide = !evaluateRowFilters(cellValuesByCol, filters, row);
+				const isHidden = row.hasAttribute(HIDE_ATTR);
+				if (shouldHide && !isHidden) {
 					row.setAttribute(HIDE_ATTR, 'true');
+				} else if (!shouldHide && isHidden) {
+					row.removeAttribute(HIDE_ATTR);
 				}
 			}
 		}

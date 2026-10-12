@@ -30,22 +30,31 @@ import { calculateCursorPosition } from './number-model.js';
 
 	// ─── Component ─────────────────────────────────────────────
 
+	const _instances = new Set();
+	let _localeListenerBound = false;
+
+	function _ensureLocaleListener() {
+		ensureLocaleObserver();
+		if (_localeListenerBound) return;
+		_localeListenerBound = true;
+		document.addEventListener('ln-core:locale-change', function () {
+			_instances.forEach(function (inst) {
+				if (inst.isTextElement) {
+					inst._formatTextContent();
+				} else if (!isNaN(inst.value)) {
+					inst._displayFormatted(inst.value);
+				}
+			});
+		});
+	}
+
 	function _component(dom) {
 		if (dom[DOM_ATTRIBUTE]) return dom[DOM_ATTRIBUTE];
 		dom[DOM_ATTRIBUTE] = this;
 		this.dom = dom;
-		const self = this;
 
-		// ── Subscribe to global locale changes ──────────────
-		this._onLocaleChange = function () {
-			if (self.isTextElement) {
-				self._formatTextContent();
-			} else if (!isNaN(self.value)) {
-				self._displayFormatted(self.value);
-			}
-		};
-		ensureLocaleObserver();
-		document.addEventListener('ln-core:locale-change', this._onLocaleChange);
+		_instances.add(this);
+		_ensureLocaleListener();
 
 		if (dom.tagName !== 'INPUT') {
 			this.isTextElement = true;
@@ -396,6 +405,7 @@ import { calculateCursorPosition } from './number-model.js';
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
+		_instances.delete(this);
 		if (this._onLocaleChange) {
 			document.removeEventListener('ln-core:locale-change', this._onLocaleChange);
 		}

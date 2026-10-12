@@ -35,8 +35,10 @@ import { registerComponent } from '../../ln-core';
 	}
 
 	_component.prototype._resize = function () {
+		const prev = this.dom.style.height;
 		this.dom.style.height = 'auto';
-		this.dom.style.height = this.dom.scrollHeight + 'px';
+		const next = this.dom.scrollHeight + 'px';
+		this.dom.style.height = (prev === next) ? prev : next;
 	};
 
 	_component.prototype.destroy = function () {

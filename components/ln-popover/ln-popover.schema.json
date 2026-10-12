@@ -34,7 +34,7 @@
 			"description": "Target element ID that this trigger controls"
 		},
 		"data-ln-popover-placement": {
-			"direction": "runtime",
+			"direction": "both",
 			"sources": [
 				"src/ln-popover.js"
 			],
