@@ -1,4 +1,4 @@
-import { compareValues, detectValueType, dispatchCancelable, getLocale, hashGet, hashSet, hashSortDecode, hashSortEncode, queueBoot, readValue, registerComponent, resolveHashNamespace, attrStr, attrSpec, defineAttrs } from '../../ln-core';
+import { compareValues, detectValueType, dispatchCancelable, getLocale, hashGet, hashSet, hashSortDecode, hashSortEncode, queueBoot, readValue, registerComponent, resolveHashNamespace, withoutLifecycle, attrStr, attrSpec, defineAttrs } from '../../ln-core';
 import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortTarget, normalizeSortDirection, resolveSortItems } from './sort-model.js';
 
 (function () {
@@ -261,17 +261,19 @@ import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortT
 			ordered = mapped.map(function (entry) { return entry.el; });
 		}
 
-		const frag = document.createDocumentFragment();
-		let orderIdx = 0;
-		for (let i = 0; i < allItems.length; i++) {
-			const el = allItems[i];
-			if (isExcludedSortItem(el)) {
-				frag.appendChild(el);
-			} else if (orderIdx < ordered.length) {
-				frag.appendChild(ordered[orderIdx++]);
+		withoutLifecycle(function () {
+			const frag = document.createDocumentFragment();
+			let orderIdx = 0;
+			for (let i = 0; i < allItems.length; i++) {
+				const el = allItems[i];
+				if (isExcludedSortItem(el)) {
+					frag.appendChild(el);
+				} else if (orderIdx < ordered.length) {
+					frag.appendChild(ordered[orderIdx++]);
+				}
 			}
-		}
-		parent.appendChild(frag);
+			parent.appendChild(frag);
+		});
 	};
 
 	// ─── Destroy ───────────────────────────────────────────────

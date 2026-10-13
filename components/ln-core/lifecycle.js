@@ -309,6 +309,8 @@ function _handleChildListMutation(mutation) {
 	for (let j = 0; j < mutation.removedNodes.length; j++) {
 		const node = mutation.removedNodes[j];
 		if (node.nodeType === 1) {
+			// Fast bailout: if the node is still in the document, it was simply moved or reordered!
+			if (document.contains(node)) continue;
 			const hasDescendants = !!(node.firstElementChild || (node.children && node.children.length));
 			for (let r = 0; r < registry.length; r++) {
 				const entry = registry[r];
@@ -352,11 +354,49 @@ function _ensureLifecycleObserver() {
 				}
 			}
 		});
+		window.lnCore._lifecycleObserver = observer;
 		observer.observe(document.body, {
 			childList: true,
 			subtree: true
 		});
 	}, 'ln-core');
+}
+
+/**
+ * Executes a callback while temporarily disconnecting the lifecycle childList observer.
+ * Useful for bulk DOM operations like sorting, reordering, or virtual list windowing
+ * where existing initialized DOM nodes are moved rather than newly mounted.
+ * @param {function():*} fn - Synchronous callback to execute
+ * @returns {*} Return value of fn
+ */
+export function withoutLifecycle(fn) {
+	if (typeof window === 'undefined') return fn();
+	window.lnCore = window.lnCore || {};
+	const obs = window.lnCore._lifecycleObserver;
+	if (!obs) return fn();
+
+	// Drain any pending mutations before disconnecting so they are not lost
+	const pending = obs.takeRecords();
+	for (let i = 0; i < pending.length; i++) {
+		const mutation = pending[i];
+		if (mutation.type === 'childList') {
+			try {
+				_handleChildListMutation(mutation);
+			} catch (err) {
+				console.error('[ln-core] lifecycle handler failed', mutation.target, err);
+			}
+		}
+	}
+
+	obs.disconnect();
+	try {
+		return fn();
+	} finally {
+		obs.observe(document.body, {
+			childList: true,
+			subtree: true
+		});
+	}
 }
 
 /**
@@ -466,6 +506,7 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 		window.lnCore = window.lnCore || {};
 		window.lnCore.registerComponent = registerComponent;
 		window.lnCore.observeLifecycle = observeLifecycle;
+		window.lnCore.withoutLifecycle = withoutLifecycle;
 	}
 
 	function boot() {
