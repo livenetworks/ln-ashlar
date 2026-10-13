@@ -102,14 +102,14 @@ export function shouldInterceptLink(event, anchor) {
  * Single read path for value-based sort/filter across components.
  */
 export function readValue(el) {
+	if (el.hasAttribute('value')) {
+		return el.getAttribute('value');
+	}
 	if (el.hasAttribute('data-ln-value')) {
 		return el.getAttribute('data-ln-value');
 	}
 	if (el.tagName === 'TIME' && el.hasAttribute('datetime')) {
 		return el.getAttribute('datetime');
-	}
-	if (el.tagName === 'DATA' && el.hasAttribute('value')) {
-		return el.getAttribute('value');
 	}
 	return el.textContent.trim();
 }

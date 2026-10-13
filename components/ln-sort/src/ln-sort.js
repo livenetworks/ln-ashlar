@@ -245,17 +245,20 @@ import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortT
 		} else {
 			const field = this.field;
 			const column = this.column;
-			const values = items.map(function (el) { return _readItemValue(el, field, column); });
-			const type = detectValueType(values);
+			const mapped = items.map(function (el) {
+				return { el: el, val: _readItemValue(el, field, column) };
+			});
+			const type = detectValueType(mapped.map(function (entry) { return entry.val; }));
 			const collator = typeof Intl !== 'undefined'
 				? new Intl.Collator(getLocale(this.dom), { sensitivity: 'base', numeric: true })
 				: null;
 
-			const comparator = createSortComparator(direction, type, collator, function (el) {
-				return _readItemValue(el, field, column);
+			const comparator = createSortComparator(direction, type, collator, function (entry) {
+				return entry.val;
 			});
 
-			ordered = items.slice().sort(comparator);
+			mapped.sort(comparator);
+			ordered = mapped.map(function (entry) { return entry.el; });
 		}
 
 		const frag = document.createDocumentFragment();

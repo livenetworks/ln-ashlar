@@ -79,8 +79,7 @@
 		},
 		{
 			"name": "data-ln-autoresize",
-			"description": "Automatically adjusts textarea height to match its scrollable content",
-			"valueSet": "v"
+			"description": "data-ln-autoresize attribute"
 		},
 		{
 			"name": "data-ln-autosave",

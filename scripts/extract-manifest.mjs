@@ -632,7 +632,6 @@ const HEADLESS_COMPONENTS = new Set([
 	'ln-slug',
 	'ln-time',
 	'ln-include',
-	'ln-autoresize',
 	'ln-autosave',
 	'ln-fill',
 	'ln-router',

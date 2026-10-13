@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.1.4](./v2.1.4.md) — October 13, 2026
+Performance optimization for `ln-sort` utilizing Schwartzian Transform (pre-computed keys), cutting DOM sorting queries by up to 90%, inverting `ln-core.readValue` priority to honor native `value` first, and consolidating `ln-autoresize` into `ln-form`.  
+👉 [Read full v2.1.4 release notes](./v2.1.4.md)
+
 ### [v2.1.3](./v2.1.3.md) — October 13, 2026
 Hotfix for `ln-date` and `ln-number` input controls, restoring the `const self = this` lexical scope reference inadvertently removed during the v2.1.2 listener pooling migration. Eliminates runtime `TypeError: e._setHiddenRaw is not a function` during form interaction.  
 👉 [Read full v2.1.3 release notes](./v2.1.3.md)

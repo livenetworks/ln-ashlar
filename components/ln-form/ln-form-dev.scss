@@ -5,4 +5,9 @@
 	[data-ln-form]:not(form) {
 		@include dev-inline-error("data-ln-form belongs only on <form> elements");
 	}
+
+	// 2. Host Element Check: data-ln-autoresize belongs only on <textarea>
+	[data-ln-autoresize]:not(textarea) {
+		@include dev-inline-error("data-ln-autoresize belongs only on <textarea> elements");
+	}
 }

@@ -339,14 +339,14 @@ Read the raw machine value behind a formatted cell/item display. The single
 read path for value-based sort/filter across components.
 
 ```js
-const raw = readValue(td); // '1250.50' from data-ln-value, datetime on <time>, value on <data>, else trimmed text
+const raw = readValue(td); // '42' from value on <data>, '1250.50' from data-ln-value, datetime on <time>, else trimmed text
 ```
 
+- Returns `value` attribute value if the element has it (native machine value on `<data>`, `<input>`, `<time>`, etc.).
 - Returns `data-ln-value` attribute value if the element has it.
 - Returns `datetime` attribute if the element is `<time>` and has it.
-- Returns `value` attribute if the element is `<data>` and has it.
 - Otherwise falls back to `el.textContent.trim()`.
-- Used by `ln-table` for sort/filter.
+- Used by `ln-table` and `ln-sort` for sort/filter.
 
 ### registerComponent(selector, attribute, ComponentFn, componentTag, options)
 

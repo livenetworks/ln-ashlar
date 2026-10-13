@@ -63,7 +63,6 @@ import './ln-picklist/src/ln-picklist.js';
 import './ln-confirm/src/ln-confirm.js';
 import './ln-translations/src/ln-translations.js';
 import './ln-autosave/src/ln-autosave.js';
-import './ln-autoresize/src/ln-autoresize.js';
 import './ln-editor/src/ln-editor.js';
 import './ln-fill/src/ln-fill.js';
 import './ln-slug/src/ln-slug.js';
