@@ -79,8 +79,17 @@ test('compareValues performs type-sensitive comparisons', () => {
 	assert.equal(compareValues('apple', 'apple', 'string'), 0);
 });
 
-test('readValue prioritizes data-ln-value, then datetime on <time>, then value on <data>, then textContent', () => {
-	// 1. data-ln-value on td or any element
+test('readValue prioritizes native value, then data-ln-value, then datetime on <time>, then textContent', () => {
+	// 1. native value (e.g. on <data>, <time>, or any element, takes precedence over data-ln-value)
+	const dataEl = {
+		tagName: 'DATA',
+		hasAttribute: (name) => name === 'value' || name === 'data-ln-value',
+		getAttribute: (name) => name === 'value' ? '42' : '999',
+		textContent: ' 42 units '
+	};
+	assert.equal(readValue(dataEl), '42');
+
+	// 2. data-ln-value on td or any element without native value
 	const tdWithValue = {
 		tagName: 'TD',
 		hasAttribute: (name) => name === 'data-ln-value',
@@ -89,7 +98,7 @@ test('readValue prioritizes data-ln-value, then datetime on <time>, then value o
 	};
 	assert.equal(readValue(tdWithValue), '1250.50');
 
-	// 2. <time> with datetime attribute
+	// 3. <time> with datetime attribute
 	const timeEl = {
 		tagName: 'TIME',
 		hasAttribute: (name) => name === 'datetime',
@@ -97,15 +106,6 @@ test('readValue prioritizes data-ln-value, then datetime on <time>, then value o
 		textContent: ' 25.07.2026 '
 	};
 	assert.equal(readValue(timeEl), '2026-07-25');
-
-	// 3. <data> with value attribute
-	const dataEl = {
-		tagName: 'DATA',
-		hasAttribute: (name) => name === 'value',
-		getAttribute: (name) => name === 'value' ? '42' : null,
-		textContent: ' 42 units '
-	};
-	assert.equal(readValue(dataEl), '42');
 
 	// 4. plain fallback to trimmed textContent
 	const plainEl = {

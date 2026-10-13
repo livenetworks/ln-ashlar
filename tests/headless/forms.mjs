@@ -58,7 +58,7 @@ run('demo/admin/forms.html', async ({ page }) => {
 			const modal = document.getElementById('demo-rest-modal');
 			if (!modal || !modal.lnModal) return false;
 			const ta = document.getElementById('demo-ta-auto');
-			if (!ta || !ta.lnAutoresize) return false;
+			if (!ta) return false;
 			return !!(window.lnFill && window.lnCore && window.lnCore.lnFill);
 		}, { timeout: 10000 });
 		// Record validity events bubbling to the live form.
@@ -323,9 +323,9 @@ run('demo/admin/forms.html', async ({ page }) => {
 		assert(await val('#demo-fname') === '', 'Reset button clears the form');
 	});
 
-	// ─── 10. Autoresize ───────────────────────────────────────
+	// ─── 10. Autoresize (Native CSS field-sizing) ─────────────
 
-	await part('ln-autoresize', async () => {
+	await part('ln-autoresize (CSS field-sizing)', async () => {
 		await load();
 		const h0 = await taHeight();
 		await page.click('#demo-ta-auto');
@@ -333,10 +333,9 @@ run('demo/admin/forms.html', async ({ page }) => {
 		await waitFor(h => document.getElementById('demo-ta-auto').getBoundingClientRect().height > h, h0);
 		const taState = await page.evaluate(() => {
 			const el = document.getElementById('demo-ta-auto');
-			return { h: el.getBoundingClientRect().height, styleH: el.style.height, scroll: el.scrollHeight };
+			return { h: el.getBoundingClientRect().height, scroll: el.scrollHeight };
 		});
 		assert(taState.h > h0, `Textarea grew while typing (${h0} -> ${taState.h})`);
-		assert(taState.styleH === taState.scroll + 'px', 'Inline height equals scrollHeight (content fits)');
 		await page.evaluate(() => {
 			const el = document.getElementById('demo-ta-auto');
 			el.value = '';
@@ -344,8 +343,6 @@ run('demo/admin/forms.html', async ({ page }) => {
 		});
 		await waitFor(h => document.getElementById('demo-ta-auto').getBoundingClientRect().height < h, taState.h);
 		assert(await taHeight() < taState.h, 'Textarea shrinks back when content is cleared');
-		assert(await page.evaluate(() => !document.getElementById('demo-ta1').lnAutoresize && !document.getElementById('demo-ta1').style.height),
-			'Plain textarea (no data-ln-autoresize) is untouched');
 	});
 
 	// ─── 11. Native controls (pills, switches, states) ───────

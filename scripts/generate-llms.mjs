@@ -88,7 +88,7 @@ for (const file of componentFiles) {
 // Group components by domain/layer
 const overlayComponents = ['ln-modal', 'ln-popover', 'ln-tooltip', 'ln-confirm'];
 const dataDisplayComponents = ['ln-table', 'ln-list', 'ln-chart', 'ln-progress', 'ln-circular-progress', 'ln-stat'];
-const formComponents = ['ln-form', 'ln-validate', 'ln-upload', 'ln-autosave', 'ln-autoresize', 'ln-picklist', 'ln-options', 'ln-date', 'ln-number', 'ln-editor', 'ln-slug'];
+const formComponents = ['ln-form', 'ln-validate', 'ln-upload', 'ln-autosave', 'ln-picklist', 'ln-options', 'ln-date', 'ln-number', 'ln-editor', 'ln-slug'];
 const navigationComponents = ['ln-nav', 'ln-tabs', 'ln-router', 'ln-scroll', 'ln-link', 'ln-external-links'];
 const feedbackComponents = ['ln-toast'];
 const stateComponents = ['ln-toggle', 'ln-accordion', 'ln-dropdown', 'ln-sortable', 'ln-key'];

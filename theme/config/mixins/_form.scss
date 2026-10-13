@@ -132,6 +132,12 @@
 @mixin form-textarea {
 	min-height: 6rem;
 	resize: vertical;
+
+	&[data-ln-autoresize] {
+		field-sizing: content;
+		min-height: unset;
+		resize: none;
+	}
 }
 
 @mixin form-select {

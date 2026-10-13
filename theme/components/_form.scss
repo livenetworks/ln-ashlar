@@ -12,6 +12,12 @@ textarea {
 	@include form-textarea;
 }
 
+[data-ln-autoresize] {
+	field-sizing: content;
+	min-height: unset;
+	resize: none;
+}
+
 select {
 	@include form-select;
 }

@@ -95,7 +95,7 @@ This service module exposes no declarative HTML attributes directly on itself.
 | `guardBody` | `(setupFn: Function, componentTag: String)` | `void` | Defers script execution until `DOMContentLoaded` if `document.body` is not yet available. |
 | `findElements` | `(root: HTMLElement, selector: String, attribute: String, ComponentClass: Class)` | `void` | Instantiates `ComponentClass` on all matching elements under `root` that lack `el[attribute]`. |
 | `isVisible` | `(el: HTMLElement)` | `Boolean` | Returns true if element has a non-zero layout width/height or bounding client rects. |
-| `readValue` | `(el: HTMLElement)` | `String` | Reads `data-ln-value` attribute if present, otherwise returns trimmed `textContent`. Single path for machine value extraction. |
+| `readValue` | `(el: HTMLElement)` | `String` | Reads native `value` if present, then `data-ln-value`, then `datetime` on `<time>`, else returns trimmed `textContent`. Single path for machine value extraction. |
 | `interceptValueProperty` | `(dom: HTMLElement, descriptor: PropertyDescriptor, callbacks: { get?: Function, set?: Function })` | `void` | Intercepts programmatic `value` getter/setter on inputs to sync custom formatting. |
 | `serializeForm` | `(form: HTMLFormElement, opts?: { typed?: Boolean, exclude?: String })` | `Object` | Serializes form inputs into a plain JavaScript object. Option `typed: true` converts numbers to `Number` and single checkboxes to booleans. |
 | `populateForm` | `(form: HTMLFormElement, data: Object)` | `Array<HTMLElement>` | Populates form elements matching field names or `data-ln-fill-as` overrides. |

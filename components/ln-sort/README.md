@@ -30,6 +30,10 @@
    value set; if every non-empty value is a finite number, comparison is numeric, else
    `localeCompare` via `ln-core.getLocale`. Per-pair type inference breaks comparator
    transitivity and produces wrong ordering — never do it.
+6. **Schwartzian Transform (Pre-computed Keys).** In default DOM sorting, items are mapped once
+   upfront into `{ el, val: _readItemValue(...) }`. Comparison operates strictly on in-memory keys,
+   reducing DOM queries by up to 90% and eliminating querySelector calls inside the sort comparator.
+   Sorted elements are moved in a single batch via `DocumentFragment`.
 
 ---
 

@@ -3,6 +3,12 @@
 	"component": "ln-form",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-autoresize": {
+			"direction": null,
+			"sources": [
+				"ln-form-dev.scss"
+			]
+		},
 		"data-ln-debug": {
 			"direction": null,
 			"sources": [

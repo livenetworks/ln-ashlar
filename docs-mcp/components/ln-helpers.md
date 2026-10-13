@@ -122,7 +122,7 @@ populateForm(form, { name: "Jane", age: 31, isAdmin: false });
 | `guardBody` | `(setupFn: Function, componentTag: String)` | `void` | Defers execution until `DOMContentLoaded` if `document.body` is not yet available. |
 | `findElements` | `(root: HTMLElement, selector: String, attribute: String, ComponentClass: Class)` | `void` | Instantiates `ComponentClass` on all matching elements under `root` that lack `el[attribute]`. |
 | `isVisible` | `(el: HTMLElement)` | `Boolean` | Returns true if element has layout bounds or bounding client rects. |
-| `readValue` | `(el: HTMLElement)` | `String` | Reads `data-ln-value` attribute if present, otherwise returns trimmed `textContent`. |
+| `readValue` | `(el: HTMLElement)` | `String` | Reads native `value` if present, then `data-ln-value`, then `datetime` on `<time>`, else returns trimmed `textContent`. |
 | `interceptValueProperty` | `(dom: HTMLElement, descriptor: PropertyDescriptor, callbacks: { get?: Function, set?: Function })` | `void` | Intercepts programmatic `value` getter/setter on inputs to sync custom formatting. |
 | `serializeForm` | `(form: HTMLFormElement, opts?: { typed?: Boolean, exclude?: String })` | `Object` | Extracts form inputs into a plain JavaScript object. |
 | `populateForm` | `(form: HTMLFormElement, data: Object)` | `Array<HTMLElement>` | Fills form inputs matching field names or `data-ln-fill-as` attributes. |

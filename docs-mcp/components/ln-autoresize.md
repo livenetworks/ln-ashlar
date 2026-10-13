@@ -3,33 +3,29 @@ name: ln-autoresize
 classification: simple
 status: stable
 domain: frontend
-summary: Automatically adjusts textarea height based on content size to prevent scroll bars.
-source: components/ln-autoresize/src/ln-autoresize.js
-tags: [forms, inputs, textarea, layout]
+summary: Pure CSS textarea auto-resizing powered natively by field-sizing: content without JavaScript runtime overhead.
+source: theme/components/_form.scss
+tags: [forms, inputs, textarea, layout, css]
 ---
 
 # ↕️ ln-autoresize
 
-> **Classification:** 🟢 Simple Component / Layer 1 UI Utility  
-> Applied directly to a `<textarea data-ln-autoresize rows="1">`. It listens for native `input` events:
-> in the handler, it resets `textarea.style.height = 'auto'`, reads `textarea.scrollHeight`, and sets
-> `textarea.style.height = textarea.scrollHeight + 'px'`. It carries zero state, executing a synchronous layout calculation to expand and collapse the box dynamically.
+> Applied directly to a `<textarea data-ln-autoresize rows="1">`. It leverages native CSS `field-sizing: content` to automatically expand and collapse textarea height according to its content volume directly in the browser's C++ rendering engine. It carries zero JavaScript runtime overhead, zero event listeners, and zero layout thrashing.
 
 ---
 
 ## 1. Core Behavior & Responsibility
 
-- **Core Role:** Dynamically adjusts the vertical height of HTML `<textarea>` elements to fit their content, eliminating unnecessary scroll bars and improving visual layouts.
-- **Real-Time Resizing:** Monitors the native `input` event on textareas and matches the CSS height property to the element's current `scrollHeight`.
-- **Pre-filled Content Recognition:** Computes and sets initial heights immediately upon page load to accommodate pre-populated server-rendered content (such as edit states).
-- **Cleanup Mechanics:** Restores original styling properties and clears event listeners when the instance is torn down.
-- Located in [`components/ln-autoresize/src/ln-autoresize.js`](../../components/ln-autoresize/src/ln-autoresize.js).
+- **Core Role:** Dynamically adjusts the vertical height of HTML `<textarea>` elements to fit their content intrinsically, eliminating vertical scroll bars and unnecessary white space.
+- **Pure CSS Execution:** Driven entirely by native CSS (`field-sizing: content`), eliminating legacy forced reflows (`scrollHeight` reading) and main-thread freezing.
+- **Zero-JS Lifecycle:** Textarea boxes size accurately on first paint with pre-filled server text, expand smoothly during typing/paste, and collapse immediately on delete or form reset.
+- Located in [`theme/components/_form.scss`](../../theme/components/_form.scss) and [`theme/config/mixins/_form.scss`](../../theme/config/mixins/_form.scss).
 
 > [!IMPORTANT]
-> **What the component does NOT do (Orthogonality Doctrine):**
-> - **Does NOT validate input lengths** — Form constraints are managed by [`ln-validate`](./ln-validate.md).
-> - **Does NOT persist input text** — Preserving drafts is delegated to [`ln-persist`](./ln-persist.md) or coordinators.
-> - **Does NOT submit forms** — Form transactions are handled by [`ln-form`](./ln-form.md).
+> **What the utility does NOT do (Orthogonality Doctrine):**
+> - **Does NOT attach JavaScript event listeners** — Sizing is handled natively in the browser's layout pass.
+> - **Does NOT validate input lengths** — Form validation is handled by [`ln-validate`](./ln-validate.md).
+> - **Does NOT manage form submissions** — Form data flow is handled by [`ln-form`](./ln-form.md).
 
 ---
 
@@ -37,17 +33,17 @@ tags: [forms, inputs, textarea, layout]
 
 ### Base HTML Markup
 
-Standard copy-paste implementation showing how to activate auto-resizing on a textarea:
+Standard implementation for an auto-growing textarea:
 
 ```html
-<textarea data-ln-autoresize placeholder="Write text..."></textarea>
+<textarea data-ln-autoresize rows="1" placeholder="Write text..."></textarea>
 ```
 
 ---
 
 ### Variant 1: Pre-populated Form Data (SSR / Edit Modes)
 
-When data is loaded dynamically or rendered by the server, the component automatically calculates the initial volume and expands the textarea accordingly:
+When data is loaded or pre-rendered by the server, native CSS intrinsically computes the accurate layout height on initial paint:
 
 ```html
 <div class="form-element">
@@ -55,7 +51,20 @@ When data is loaded dynamically or rendered by the server, the component automat
     <textarea id="description" 
               name="description" 
               data-ln-autoresize
-              rows="3">This is a long pre-populated description. The textarea automatically adjusts its layout height to ensure the entirety of this text is readable without displaying scroll bars.</textarea>
+              rows="3">This is a long pre-populated description. The textarea intrinsically sizes to ensure all text is readable without extra script execution.</textarea>
+</div>
+```
+
+---
+
+### Variant 2: Capped Growth with Overflow Scroll
+
+To set an upper ceiling and allow scrolling once content exceeds a specific height, pair the attribute with standard CSS `max-height`:
+
+```html
+<div class="form-element">
+    <label for="capped-notes">Notes (max 6rem):</label>
+    <textarea id="capped-notes" data-ln-autoresize rows="1" style="max-height: 6rem; overflow-y: auto;"></textarea>
 </div>
 ```
 
@@ -65,39 +74,44 @@ When data is loaded dynamically or rendered by the server, the component automat
 
 ### Attributes Table
 
-| Attribute | Element | Type / Values | Default | Description |
+| Attribute | Element | Type | Default | Description |
 |---|---|---|---|---|
-| `data-ln-autoresize` | `<textarea>` | Flag | — | Initializes the auto-resizing behavior on the target element. |
+| `data-ln-autoresize` | `<textarea>` | marker | — | Activates native CSS `field-sizing: content` and resets manual resize handles. |
+| `rows` | `<textarea>` | integer | `1` | Defines the baseline row height when empty. Recommended: `1`. |
 
 ### Events API
 
-This component emits and listens to no custom ln-* events.
+This utility is 100% pure CSS and does not listen to or emit custom events.
 
 ---
 
 ## 4. CSS Styling & Behavioral Concept
 
-### Styling Guidelines
+### Built-in CSS Definition
 
-For optimal display, disable browser manual resizing hooks and hide the overflow-y scroll indicators in your stylesheet:
+Ashlar includes the following styling in `_form.scss`:
 
 ```scss
 textarea[data-ln-autoresize] {
+    field-sizing: content;
+    min-height: unset;
     resize: none;
-    overflow-y: hidden;
-    min-height: 80px;
 }
 ```
 
-### Height Calculation Algorithm
+### Height Capping & Styling Guidelines
 
-On every typing input, height calculation must temporarily reset the height style to measure the true container scroll bounds:
+Ceilings are authored using standard CSS constraints:
 
-1. `this.dom.style.height = 'auto';`
-2. `this.dom.style.height = this.dom.scrollHeight + 'px';`
+```scss
+.my-form textarea[data-ln-autoresize] {
+    max-height: 8rem;
+    overflow-y: auto;
+}
+```
 
 > [!NOTE]
-> Avoid binding long CSS height transitions (`transition: height ...`) to auto-resizing textareas. Transition delays disrupt typing flows and cause cursor jump issues.
+> `resize: none` is automatically set by Ashlar for `[data-ln-autoresize]` to prevent conflicts between native auto-expansion and user drag handles.
 
 ---
 
@@ -105,54 +119,41 @@ On every typing input, height calculation must temporarily reset the height styl
 
 ### ARIA & Keyboard Semantics
 
-- **Native Textareas:** Standard keyboard commands, visual focus borders, and screen reader announcements are fully managed by the browser. No custom ARIA properties are required.
+- **Native Textareas:** Standard accessibility semantics, keyboard focus, and screen reader announcements remain untouched and 100% native.
 
 ### Common Pitfalls & Anti-patterns
 
 > [!CAUTION]
-> 1. **Applying to Unsupported Tags:**
->    Placing `data-ln-autoresize` on generic text `<input>` fields or `<div>` boxes causes initialization to fail, logging console warnings.
-> 2. **Zero-Height Measurements in Collapsed Containers:**
->    If the `<textarea>` resides in a hidden tab, drawer, or modal dialog (`display: none`), its `scrollHeight` measures as `0` on load. Once the container is revealed:
->    - **Option 1 (HTML):** Dispatch a native event: `textarea.dispatchEvent(new Event('input'))`
->    - **Option 2 (JS API):** Call the internal resize method directly:
->      ```javascript
->      textarea.lnAutoresize._resize();
->      ```
+> 1. **Applying to Unsupported Elements:**
+>    Placing `data-ln-autoresize` on non-textarea elements (`<input>`, `<div>`) triggers a dev-time warning from `ln-form-dev.scss`.
+> 2. **Forgetting `rows="1"`:**
+>    Textareas default to `rows="2"`. To ensure compact single-row inputs when empty, always declare `rows="1"`.
 
 ---
 
-## 6. Flow Diagram & Lifecycle
+## 6. Sequence & Lifecycle Flow
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor User as User
-    participant Textarea as textarea [data-ln-autoresize]
-    participant Component as ln-autoresize JS
-    participant Observer as MutationObserver
+    participant Browser as Browser Layout Engine (C++)
+    participant DOM as textarea [data-ln-autoresize]
 
-    Note over Textarea, Component: 1. Setup Phase (Mount)
-    Textarea->>Component: Component Mount
-    Component->>Component: Verify tagName is TEXTAREA
-    Component->>Component: Execute initial height calculation (_resize)
-    Component->>Textarea: Attach 'input' event listener
+    Note over Browser, DOM: 1. Initial Render
+    DOM->>Browser: Apply CSS field-sizing: content
+    Browser->>DOM: Intrinsic layout computed on first paint (0ms JS)
 
-    Note over User, Component: 2. Input Resizing
-    User->>Textarea: Type / delete content
-    Textarea->>Component: input event triggers
-    Component->>Textarea: _resize() (sets height to auto, then scrollHeight px)
-
-    Note over Observer, Component: 3. Cleanup Phase (Unmount)
-    Observer->>Component: Element detached from DOM
-    Component->>Component: destroy()
-    Component->>Textarea: Remove 'input' event listener
-    Component->>Textarea: Purge inline style height ('')
+    Note over User, DOM: 2. Keystroke / Paste / Deletion
+    User->>DOM: Types, pastes, or removes text
+    Browser->>Browser: Computes intrinsic box size in normal layout pass
+    Browser->>DOM: Updates height without JS layout thrashing
 ```
 
 ---
 
-## 7. Related Components
+## 7. Related Components & Coordinators
 
 - [`ln-form.md`](./ln-form.md) — Standard wrapping form context.
-- [`ln-modal.md`](./ln-modal.md) — Target overlays where saving canvas layout space is essential.
+- [`ln-validate.md`](./ln-validate.md) — Field validation on input and blur.
+- [`ln-modal.md`](./ln-modal.md) — Compact dialogs and modal forms.
