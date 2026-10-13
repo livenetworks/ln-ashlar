@@ -27,7 +27,7 @@ export { getLocale, ensureLocaleObserver, registerLocaleFallback, getLocaleFallb
 export { cloneTemplate, cloneTemplateScoped, fill, lnFill, fillTemplate, renderList, buildDict } from './template.js';
 
 // Lifecycle & Kernel Registration
-export { findElements, holdInit, releaseInit, pendingCount, queueBoot, observeAttributes, observeLifecycle, registerComponent } from './lifecycle.js';
+export { findElements, holdInit, releaseInit, pendingCount, queueBoot, observeAttributes, observeLifecycle, withoutLifecycle, registerComponent } from './lifecycle.js';
 
 // Value Comparison Primitives (re-exported from compare.js for backward compatibility)
 export { compareValues, detectValueType } from './compare.js';

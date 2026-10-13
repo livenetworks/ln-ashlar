@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.1.5](./v2.1.5.md) — October 13, 2026
+Core `withoutLifecycle(fn)` observer suspension and moved-node fast bailouts eliminating 100% of redundant DOM queries during table sorting and DOM reordering.  
+👉 [Read full v2.1.5 release notes](./v2.1.5.md)
+
 ### [v2.1.4](./v2.1.4.md) — October 13, 2026
 Performance optimization for `ln-sort` utilizing Schwartzian Transform (pre-computed keys), cutting DOM sorting queries by up to 90%, inverting `ln-core.readValue` priority to honor native `value` first, and consolidating `ln-autoresize` into `ln-form`.  
 👉 [Read full v2.1.4 release notes](./v2.1.4.md)
