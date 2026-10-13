@@ -74,7 +74,7 @@ To set an upper ceiling and allow scrolling once content exceeds a specific heig
 
 ### Attributes Table
 
-| Attribute | Element | Type | Default | Description |
+| Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-autoresize` | `<textarea>` | marker | — | Activates native CSS `field-sizing: content` and resets manual resize handles. |
 | `rows` | `<textarea>` | integer | `1` | Defines the baseline row height when empty. Recommended: `1`. |
