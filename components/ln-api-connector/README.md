@@ -81,8 +81,14 @@ All attributes are dynamically observed. Any runtime changes to these attributes
 | `data-ln-api-connector` | Selector | Creates the component instance. Optional value serves as name. |
 | `data-ln-api-base-url` | Connection | The base URL of the API gateway (e.g. `https://api.example.com/v1` or `/api`). |
 | `data-ln-api-path` | Connection | Resource path endpoint (e.g. `/documents`). |
+| `data-ln-api-endpoint` | Connection | Alias for `data-ln-api-path`. |
 | `data-ln-api-headers` | Credentials | JSON-formatted string of request headers (e.g. `{"Authorization": "Bearer tok_123"}`). |
-| `data-ln-api-connector-query-debounce="ms"` | Connection | Debounce delay in milliseconds for `request-query` events. Default `300`. Set to `0` to disable. Mutations (create/update/delete) are never debounced. |
+| `data-ln-api-param-offset` | Parameters | Query parameter name for pagination offset (default: `'offset'`). |
+| `data-ln-api-param-limit` | Parameters | Query parameter name for pagination page size (default: `'limit'`). |
+| `data-ln-api-param-search` | Parameters | Query parameter name for text search filter (default: `'search'`). |
+| `data-ln-api-param-sort-field` | Parameters | Query parameter name for sort field (default: `'sort_by'`). |
+| `data-ln-api-param-sort-dir` | Parameters | Query parameter name for sort direction (default: `'sort_dir'`). |
+| `data-ln-api-connector-query-debounce="ms"` | Connection | Debounce delay in milliseconds for `request-query` events. Default `200` ms. Set to `0` to disable. Mutations (create/update/delete) are never debounced. |
 
 ---
 
