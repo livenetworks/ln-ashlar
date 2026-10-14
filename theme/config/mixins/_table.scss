@@ -124,8 +124,6 @@
 	tbody tr {
 		@include transition;
 		min-height: var(--density-row-h);
-		content-visibility: auto;
-		contain-intrinsic-size: auto var(--density-row-h, 45px);
 
 		&:hover {
 			--color-bg: var(--bg-row-hover);
