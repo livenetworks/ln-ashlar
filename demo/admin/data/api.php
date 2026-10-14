@@ -139,7 +139,7 @@ if (!empty($where)) {
 }
 
 // 4. Sorting
-$sortField = isset($_GET['sort_field']) ? $_GET['sort_field'] : '';
+$sortField = isset($_GET['sort_field']) ? $_GET['sort_field'] : (isset($_GET['sort_by']) ? $_GET['sort_by'] : '');
 $allowedSort = ['id', 'title', 'department', 'status', 'priority', 'owner', 'file_size', 'created_at', 'updated_at'];
 $orderSql = '';
 

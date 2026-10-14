@@ -8600,8 +8600,8 @@ function mn(t) {
   const u = {
     "data-ln-api-connector": { type: "marker", description: "Mounts API connector bridging REST backend and ln-ashlar data coordinators" },
     "data-ln-api-base-url": { prop: "baseUrl", read: K, type: "string", fallback: "", effect: d, description: "Base URL endpoint for API requests" },
-    "data-ln-api-path": { prop: "path", read: K, type: "string", fallback: "", effect: d, description: "Resource path appended to base URL" },
-    "data-ln-api-endpoint": { prop: "path", read: K, type: "string", fallback: "", effect: d, description: "Alias for data-ln-api-path" },
+    "data-ln-api-path": { prop: "path", read: (el) => el.getAttribute("data-ln-api-path") || el.getAttribute("data-ln-api-endpoint") || "", type: "string", fallback: "", effect: d, description: "Resource path appended to base URL" },
+    "data-ln-api-endpoint": { read: (el) => el.getAttribute("data-ln-api-path") || el.getAttribute("data-ln-api-endpoint") || "", type: "string", fallback: "", effect: d, description: "Alias for data-ln-api-path" },
     "data-ln-api-headers": { prop: "rawHeaders", read: K, type: "json", fallback: null, effect: d, description: "Custom HTTP headers in JSON format or semicolon-separated pairs" },
     "data-ln-api-param-offset": { effect: d, type: "string", fallback: "offset", description: "Query parameter name for pagination offset" },
     "data-ln-api-param-limit": { effect: d, type: "string", fallback: "limit", description: "Query parameter name for pagination page size" },

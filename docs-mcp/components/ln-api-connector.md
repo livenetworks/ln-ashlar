@@ -55,12 +55,14 @@ tags: [network, REST, sync, fetch, debounce]
 | `data-ln-api-connector` | Wrapper | `String` | — | Initializes the component and declares the driver namespace. |
 | `data-ln-api-base-url` | Wrapper | `String` | — | Base HTTP URL address of backend API endpoint. |
 | `data-ln-api-path` | Wrapper | `String` | — | Targeted query path resource name. |
-| `data-ln-api-headers` | Wrapper | `String` | — | Comma-separated list of custom HTTP headers. |
+| `data-ln-api-endpoint` | Wrapper | `String` | — | Alias for `data-ln-api-path`. |
+| `data-ln-api-headers` | Wrapper | `String` | — | Comma-separated list or JSON object of custom HTTP headers. |
 | `data-ln-api-param-offset` | Wrapper | `String` | `"offset"` | Configures URL parameter key for pagination offset (e.g. `"offset"`, `"skip"`, `"page_offset"`). |
 | `data-ln-api-param-limit` | Wrapper | `String` | `"limit"` | Configures URL parameter key for page size limit (e.g. `"limit"`, `"take"`, `"page_size"`). |
 | `data-ln-api-param-search` | Wrapper | `String` | `"search"` | Configures URL parameter key for search query term (e.g. `"search"`, `"q"`, `"query"`). |
-| `data-ln-api-param-sort-field` | Wrapper | `String` | `"sort_field"` | Configures URL parameter key for sorting field name (e.g. `"sort_field"`, `"sort"`, `"order_by"`). |
+| `data-ln-api-param-sort-field` | Wrapper | `String` | `"sort_by"` | Configures URL parameter key for sorting field name (e.g. `"sort_by"`, `"sort_field"`, `"order_by"`). |
 | `data-ln-api-param-sort-dir` | Wrapper | `String` | `"sort_dir"` | Configures URL parameter key for sorting direction (e.g. `"sort_dir"`, `"order"`, `"dir"`). |
+| `data-ln-api-connector-query-debounce` | Wrapper | `Integer` | `200` | Debounce delay in milliseconds before dispatching query requests. |
 
 ### Programmatic JS API
 

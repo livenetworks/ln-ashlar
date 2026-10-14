@@ -25,3 +25,7 @@ graphify-out/
 .agents/plugins/
 .agents/skills/
 
+# Local IDE configuration & antigravity files
+.gemini/
+.mcp.json
+

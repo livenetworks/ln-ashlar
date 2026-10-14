@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.1.6](./v2.1.6.md) — October 14, 2026
+Fixed `ln-api-connector` path collision where `data-ln-api-endpoint` shadowed `data-ln-api-path`, aligned remote sort query parameter naming in `api.php`, and introduced zero-dependency Python local dev server.  
+👉 [Read full v2.1.6 release notes](./v2.1.6.md)
+
 ### [v2.1.5](./v2.1.5.md) — October 13, 2026
 Core `withoutLifecycle(fn)` observer suspension and moved-node fast bailouts eliminating 100% of redundant DOM queries during table sorting and DOM reordering.  
 👉 [Read full v2.1.5 release notes](./v2.1.5.md)
