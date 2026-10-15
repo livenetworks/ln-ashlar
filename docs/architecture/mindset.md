@@ -28,7 +28,7 @@ ln-ashlar makes deliberate trade-offs, and its wins and costs are not the ones a
 
 **Concrete example:**
 - `demo/admin/src/pages/table-filter.html` — filter popovers are complete HTML, authored once, no JS generation.
-- `<template data-ln-template="documents-row">` in `demo/admin/src/pages/table-sync.html` — row templates are the *sole* `<template>` use case.
+- `<template data-ln-template="documents-row">` in `demo/admin/src/pages/table-api.html` — row templates are the *sole* `<template>` use case.
 
 ---
 
@@ -41,7 +41,7 @@ ln-ashlar makes deliberate trade-offs, and its wins and costs are not the ones a
 **Why:** No hydration cost, no structure mismatch, progressive enhancement is free.
 
 **Concrete example:**
-`demo/admin/src/pages/table-filter.html` (SSR pattern) and `demo/admin/src/pages/table-sync.html` (data-driven) share the same `<th>`, `[data-ln-popover]`, `[data-ln-filter]` markup. The table body is the only difference.
+`demo/admin/src/pages/table-filter.html` (SSR pattern) and `demo/admin/src/pages/table-api.html` (data-driven) share the same `<th>`, `[data-ln-popover]`, `[data-ln-filter]` markup. The table body is the only difference.
 
 ---
 

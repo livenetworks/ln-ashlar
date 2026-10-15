@@ -171,7 +171,7 @@ import { MutationReceipts } from './mutation-receipts';
 			for (const el of this.dom.ownerDocument.querySelectorAll(sel)) {
 				if (!this._owns(el.getAttribute(attr))) continue;
 				if ((kind === 'table' || kind === 'list') && el.hasAttribute(kind === 'table' ? 'data-ln-table-window' : 'data-ln-list-window')) {
-					dispatch(el, 'ln-' + kind + (isQueryChange ? ':request-invalidate' : ':request-revalidate'), {});
+					dispatch(el, 'ln-' + kind + (isQueryChange ? ':request-invalidate' : ':request-revalidate'), { query: this._currentQuery() });
 					continue;
 				}
 				this._serveElement(el, kind, null, syncMeta);

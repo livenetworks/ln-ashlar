@@ -3,7 +3,7 @@
 scripts/serve.py — Zero-dependency local dev server for ln-ashlar demos.
 
 Serves all static assets (HTML, CSS, JS, fonts, SVGs) from project root,
-and transparently emulates `api.php` endpoints (e.g. table-sync.html, list.html)
+and transparently emulates `api.php` endpoints (e.g. table-api.html, list.html)
 using `demo/admin/data/documents.json`.
 
 Usage:
@@ -193,7 +193,7 @@ def run_server():
             print(f"  ln-ashlar Local Dev Server running on port {port}")
             print("=" * 60)
             print(f"  • Root:            http://localhost:{port}/demo/index.html")
-            print(f"  • Table Sync Demo: http://localhost:{port}/demo/admin/table-sync.html")
+            print(f"  • Table API Demo: http://localhost:{port}/demo/admin/table-api.html")
             print(f"  • List Demo:       http://localhost:{port}/demo/admin/list.html")
             print("=" * 60)
             print("  (Press Ctrl+C to stop)\n")

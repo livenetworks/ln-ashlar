@@ -94,7 +94,7 @@ In SSR mode, the table is functional immediately with the server-rendered markup
 > `data-ln-table` altogether. See `demo/admin/src/pages/table.html`. `ln-table`
 > is only needed once sort, column filters (`data-ln-table-filter-col`), or
 > data-driven rows enter the picture — see `demo/admin/src/pages/table-filter.html`
-> and `demo/admin/src/pages/table-sync.html`. The two shapes never combine on
+> and `demo/admin/src/pages/table-api.html`. The two shapes never combine on
 > the same target: `ln-table` calls `preventDefault()` unconditionally on
 > `ln-search:change`, and since the event bubbles, that supersedes `ln-search`'s
 > own DOM-filter path the instant `data-ln-table` is present.

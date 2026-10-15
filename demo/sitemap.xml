@@ -279,12 +279,12 @@
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>https://ashlar.live.net.mk/admin/table-filter.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/table-api.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>
 	<url>
-		<loc>https://ashlar.live.net.mk/admin/table-sync.html</loc>
+		<loc>https://ashlar.live.net.mk/admin/table-filter.html</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.6</priority>
 	</url>

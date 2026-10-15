@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.1.7](./v2.1.7.md) — October 16, 2026
+Clean separation of SSR DOM and Virtual API table architectures (`table-api`), elimination of empty table flash on optimistic search/filter, live query viewport scroll stability, and GPU composite acceleration for table sticky headers.  
+👉 [Read full v2.1.7 release notes](./v2.1.7.md)
+
 ### [v2.1.6](./v2.1.6.md) — October 14, 2026
 Fixed `ln-api-connector` path collision where `data-ln-api-endpoint` shadowed `data-ln-api-path`, aligned remote sort query parameter naming in `api.php`, and introduced zero-dependency Python local dev server.  
 👉 [Read full v2.1.6 release notes](./v2.1.6.md)
