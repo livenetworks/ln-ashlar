@@ -13,7 +13,7 @@ if (!CHROME_PATH) {
 	process.exit(1);
 }
 
-const URL = 'http://localhost/ln-ashlar/demo/admin/table-sync.html';
+const URL = 'http://localhost/ln-ashlar/demo/admin/table-api.html';
 
 async function run() {
 	console.log(`Starting Headless Chrome via: ${CHROME_PATH}`);
@@ -33,8 +33,36 @@ async function run() {
 		console.error(`  [BROWSER UNCAUGHT ERROR]`, err.message);
 	});
 
+	page.on('console', msg => console.log('  [CONSOLE]', msg.type(), msg.text()));
+	page.on('request', req => console.log('  [REQUEST]', req.url()));
+	page.on('response', res => console.log('  [RESPONSE]', res.url(), res.status()));
+	page.on('requestfailed', req => console.log('  [REQ FAILED]', req.url(), req.failure()?.errorText));
+
 	console.log(`Navigating to ${URL}...`);
 	await page.goto(URL, { waitUntil: 'networkidle2' });
+	try {
+		await page.waitForSelector('#hybrid-table tbody tr[data-ln-table-row]', { timeout: 4000 });
+	} catch (e) {
+		const diag = await page.evaluate(() => {
+			const t = document.getElementById('hybrid-table')?.lnTable;
+			const s = document.getElementById('hybrid-docs')?.lnDataStore;
+			const c = document.getElementById('hybrid-table-coordinator')?.lnDataCoordinator;
+			return {
+				tableLoaded: t?.isLoaded,
+				windowed: t?._windowed,
+				cacheLogical: t?._cache?.logicalTotal,
+				cacheGrand: t?._cache?.grandTotal,
+				cacheSize: t?._cache?.size,
+				storeLoaded: s?.isLoaded,
+				storeCanServe: s?.canServe,
+				storeHasCache: s?.hasCache,
+				storeTotal: s?.totalCount,
+				coordinatorName: c?._name
+			};
+		});
+		console.log('--- DIAGNOSTIC STATE ---\n', diag);
+		throw e;
+	}
 
 	async function getTableStats() {
 		return page.evaluate(() => {

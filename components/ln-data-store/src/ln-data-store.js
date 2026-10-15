@@ -774,14 +774,12 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords, checkNe
 				// (empty store, or nothing matched locally) is not an answer either:
 				// the positional page reports the window as unresolved and the view
 				// keeps the previous generation until the server settles it.
-				const provisional = records => records.length
-					? {
-						data: _decorate(self, records),
-						offset: offset,
-						queryGen: self._windowIndex.queryGen,
-						provisional: true
-					}
-					: _positionalPage(self, offset, limit);
+				const provisional = records => ({
+					data: _decorate(self, records),
+					offset: offset,
+					queryGen: self._windowIndex.queryGen,
+					provisional: true
+				});
 
 				if (_canScanEarly(options)) {
 					return _scanLocal(self, options, need).then(matches =>

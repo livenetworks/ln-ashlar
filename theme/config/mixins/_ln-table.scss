@@ -52,7 +52,7 @@
 		border-spacing: 0;
 		border-radius: 0;
 		box-shadow: none;
-		table-layout: auto !important;
+		table-layout: var(--table-layout, auto);
 		min-width: var(--table-min-width, 768px);
 	}
 
@@ -61,6 +61,8 @@
 	// so per-th radius is unnecessary.
 	thead {
 		@include sticky-top;
+		will-change: transform;
+		transform: translateZ(0);
 	}
 
 	thead th {
@@ -198,6 +200,8 @@
 	position: sticky;
 	bottom: 0;
 	z-index: var(--z-sticky);
+	will-change: transform;
+	transform: translateZ(0);
 
 	strong {
 		color: var(--color-fg);

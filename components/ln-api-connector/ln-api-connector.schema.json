@@ -31,7 +31,7 @@
 			"description": "Debounce delay in milliseconds before dispatching query requests"
 		},
 		"data-ln-api-endpoint": {
-			"direction": null,
+			"direction": "author",
 			"sources": [
 				"src/ln-api-connector.js"
 			],
@@ -93,7 +93,7 @@
 			"description": "Query parameter name for sort field"
 		},
 		"data-ln-api-path": {
-			"direction": null,
+			"direction": "author",
 			"sources": [
 				"src/ln-api-connector.js"
 			],

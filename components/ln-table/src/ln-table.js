@@ -291,8 +291,14 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 			// The source owns the query, so a query change reaches the view as a
 			// restart order, not as query state — the window drops to page 0 and
 			// the composed query is resolved at serve time.
-			this._onRequestInvalidate = function () {
+			this._onRequestInvalidate = function (e) {
 				if (!self._windowed || !self._cache) return;
+				if (e && e.detail && e.detail.query) {
+					const q = e.detail.query;
+					if (q.search !== undefined) self.currentSearch = q.search;
+					if (q.filters !== undefined) self.currentFilters = q.filters;
+					if (q.sort !== undefined) self.currentSort = q.sort;
+				}
 				self._requestData();
 			};
 			dom.addEventListener('ln-table:request-invalidate', this._onRequestInvalidate);
@@ -359,17 +365,20 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 				this._parseRows();
 			}
 
-			// Initial request-data
-			if (this._windowed) {
-				this._kickWindowInitial();
-			} else {
-				dispatch(dom, 'ln-table:request-data', {
-					table: this.name,
-					sort: this.currentSort,
-					filters: this.currentFilters,
-					search: this.currentSearch
-				});
-			}
+			// Initial request-data deferred so coordinators have attached listeners
+			setTimeout(function () {
+				if (!self.dom || !document.contains(self.dom)) return;
+				if (self._windowed) {
+					self._kickWindowInitial();
+				} else {
+					dispatch(dom, 'ln-table:request-data', {
+						table: self.name,
+						sort: self.currentSort,
+						filters: self.currentFilters,
+						search: self.currentSearch
+					});
+				}
+			}, 0);
 
 		} else {
 			// SSR Mode
@@ -813,6 +822,8 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 		const vw = calculateVirtualWindow(scrollIntoData, viewportH, rowH, total, BUFFER_ROWS);
 		const startRow = vw.start;
 		const endRow = vw.end;
+
+		if (startRow === this._vStart && endRow === this._vEnd) return;
 
 		const colSpan = this.ths.length || 1;
 		const topH = vw.topPadding;

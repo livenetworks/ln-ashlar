@@ -3,8 +3,8 @@ name: data-table-sync
 classification: pattern
 status: draft
 domain: frontend
-summary: Full synchronized data table architecture integrating SSR hydration, client-side sort, filter, search, data-store sync, and coordinator fan-out.
-source: demo/admin/table-sync.html
+summary: Full synchronized data table architecture integrating ln-table sliding-window virtualization, client-side sort, filter, search, ln-data-store sync, and coordinator fan-out.
+source: demo/admin/table-api.html
 tags: [patterns, table, data-store, coordinator, search, sort, filter]
 ---
 
@@ -14,12 +14,12 @@ tags: [patterns, table, data-store, coordinator, search, sort, filter]
 
 ## 1. Problem & Context
 
-High-performance enterprise applications require data tables that deliver instant first paint (via SSR rows) and dynamic client-side filtering, sorting, searching, and background synchronization without full page reloads.
+High-performance enterprise applications require data tables that deliver dynamic client-side filtering, sorting, searching, and background synchronization for large datasets without full page reloads.
 
 The `data-table-sync` pattern coordinates:
-- **`ln-table`:** View presenter managing row rendering, selection, and keyboard navigation.
+- **`ln-table`:** View presenter managing virtualized sliding-window row rendering via templates, selection, and keyboard navigation.
 - **`ln-data-store`:** IndexedDB / in-memory store maintaining local state and delta synchronization.
-- **`ln-table-coordinator`:** Mediator bridging search inputs, filter panels, and sort buttons to table mutations.
+- **`ln-table-coordinator` / `ln-data-coordinator`:** Mediator bridging search inputs, filter panels, and sort buttons to table and remote API fetches.
 
 ---
 
@@ -71,15 +71,18 @@ The `data-table-sync` pattern coordinates:
                     <th data-ln-table-col="status">Status</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- SSR Hydration Rows -->
-                <tr data-ln-table-row data-id="1">
-                    <td>Alice Johnson</td>
-                    <td>admin</td>
-                    <td><span class="badge success">Active</span></td>
-                </tr>
+            <tbody data-ln-table-body>
             </tbody>
         </table>
+
+        <!-- Row Template -->
+        <template data-ln-template="users-row">
+            <tr data-ln-table-row data-ln-table-row-id="{{ id }}">
+                <td>{{ name }}</td>
+                <td>{{ role }}</td>
+                <td><span class="badge {{ status_class }}">{{ status }}</span></td>
+            </tr>
+        </template>
     </div>
 </section>
 ```
