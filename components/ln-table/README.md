@@ -72,6 +72,14 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
     <tbody data-ln-table-body></tbody>
   </table>
 
+  <!-- Initial Loading State Template -->
+  <template data-ln-template="products-loading">
+    <article data-ln-empty-state="loading">
+      <svg class="ln-icon ln-ajax-spinner" aria-hidden="true"><use href="#ln-icon-loader-2"></use></svg>
+      <p>Loading products...</p>
+    </article>
+  </template>
+
   <!-- Row Template -->
   <template data-ln-template="products-row">
     <tr data-ln-table-row>
@@ -79,6 +87,14 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
       <td>{{ category }}</td>
     </tr>
   </template>
+
+  <footer>
+    <span>Showing <span data-ln-table-filtered>0</span> of <strong data-ln-table-total>0</strong> products</span>
+    <!-- Background Loading Indicator (hidden by default, displayed during re-fetching) -->
+    <div data-ln-table-loading class="table-loading hidden" aria-hidden="true">
+      <svg class="ln-icon ln-ajax-spinner"><use href="#ln-icon-loader-2"></use></svg>
+    </div>
+  </footer>
 </section>
 ```
 
@@ -106,6 +122,7 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
 | `data-ln-table-row` | `<tr>` | Target row container in row templates. |
 | `data-ln-table-row-select` | `<input>` | Selection checkbox in row templates. |
 | `data-ln-table-row-action="name"`| `<button>` | Action button trigger in row templates. |
+| `data-ln-table-loading` | Indicator / Template | Loading indicator element in footer (revealed during background re-fetch) or loading state template. |
 
 ---
 
@@ -234,14 +251,15 @@ Source: `components/ln-table/ln-table.js`. Sort is a separate, co-loaded compone
 - The constructor branches once, at construction: `this.isDataDriven = dom.hasAttribute('data-ln-table-source')`.
 - **SSR**: reads `<tbody>` rows once at bootstrap, caches them as static HTML strings in `_data`, and re-sorts/filters that in-memory cache on `ln-search:change`, `ln-sort:change`, and `ln-filter:change`.
 - **Data-driven**: `isLoaded = false` until the first `ln-table:set-data`. If `<tbody>` already has rows (hybrid), they're parsed synchronously first — instant local sort/filter/search response before the authoritative dataset arrives. When the background sync lands, `_vStart`/`_vEnd` reset to `-1` and virtual scroll re-initializes against the full dataset.
-- **Loading state**: `ln-table:set-loading {loading:true}` adds `.ln-table--loading` to the wrapper; `ln-table:set-data` clears it automatically.
+- **Loading state**: In Data-Driven mode with no initial rows, `_showLoadingState()` immediately renders the loading state template and sets `aria-busy="true"`, preventing empty-state flash before data arrives. When `_initialLoaded = true`, subsequent `ln-table:set-loading {loading:true}` events preserve existing rows, toggle `.ln-table--loading`, and display the `[data-ln-table-loading]` footer indicator. `ln-table:set-data` clears loading state automatically.
 
 ### DOM mutations
 
 | Phase | Mutation |
 |---|---|
-| `set-loading` | `.ln-table--loading` on the wrapper |
-| `set-data` / sort / filter / search | `<tbody>` rows re-rendered (cloned templates in data-driven mode, cached HTML in SSR); footer counters (`data-ln-table-total` / `-filtered` / `-selected`) updated |
+| Initial load (data-driven) | Clones loading template into `<tbody>` with `colspan`, sets `aria-busy="true"` on wrapper |
+| `set-loading` (subsequent) | `.ln-table--loading` on wrapper, toggles `[data-ln-table-loading]` in footer, sets `aria-busy` |
+| `set-data` / sort / filter / search | `<tbody>` rows re-rendered (cloned templates in data-driven mode, cached HTML in SSR); footer counters (`data-ln-table-total` / `-filtered` / `-selected`) updated; `[data-ln-table-loading]` hidden |
 | sort click | `data-ln-sort-state` on the `[data-ln-sort]` element, owned entirely by `ln-sort` — `ln-table` never touches it |
 | filter change | `.ln-filter-active` toggled on the column's filter button |
 

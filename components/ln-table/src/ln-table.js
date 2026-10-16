@@ -63,6 +63,7 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 		'data-ln-table-col-select':       { type: 'trigger', description: 'Header select-all checkbox trigger' },
 		'data-ln-table-cell-attr':        { type: 'string', description: 'Cell attribute template mapping' },
 		'data-ln-table-empty':            { type: 'marker', description: 'Container for table empty state' },
+		'data-ln-table-loading':          { type: 'marker', description: 'Loading indicator element in footer or template' },
 		'data-ln-table-select-all-label': { type: 'string', description: 'Accessibility label for select-all header trigger' }
 	};
 
@@ -118,6 +119,10 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 			this._selectedWrap = this._selectedSpan.parentElement !== dom
 				? this._selectedSpan.parentElement
 				: null;
+		}
+		this._loadingIndicator = dom.querySelector('[data-ln-table-loading]');
+		if (this._loadingIndicator) {
+			this._loadingIndicator.classList.add('hidden');
 		}
 
 		this.isDataDriven = dom.hasAttribute('data-ln-table-source');
@@ -206,6 +211,7 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 
 		if (this.isDataDriven) {
 			this.isLoaded = false;
+			this._initialLoaded = false;
 			this.totalCount = 0;
 			this.visibleCount = 0;
 			this.currentSort = null;
@@ -237,7 +243,10 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 					// one means the source has not resolved the new query yet; a
 					// provisional one is the store's own answer, rendered while the
 					// server query is still out.
-					if (self._cache.ingest(detail) && !detail.provisional) dom.classList.remove('ln-table--loading');
+					if (self._cache.ingest(detail) && !detail.provisional) {
+						dom.classList.remove('ln-table--loading');
+						dom.setAttribute('aria-busy', 'false');
+					}
 					return;
 				}
 
@@ -248,9 +257,14 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 				self.totalCount = self._lastTotal;
 				self.visibleCount = self._lastFiltered;
 				self.isLoaded = true;
+				self._initialLoaded = true;
 				self._hasInitialSeed = false;
 
 				dom.classList.remove('ln-table--loading');
+				dom.setAttribute('aria-busy', 'false');
+				if (self._loadingIndicator) {
+					self._loadingIndicator.classList.add('hidden');
+				}
 
 				self._vStart = -1;
 				self._vEnd = -1;
@@ -268,10 +282,15 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 			dom.addEventListener('ln-table:set-data', this._onSetData);
 
 			this._onSetLoading = function (e) {
-				const loading = e.detail && e.detail.loading;
-				dom.classList.toggle('ln-table--loading', !!loading);
-				if (loading) {
+				const loading = !!(e.detail && e.detail.loading);
+				dom.classList.toggle('ln-table--loading', loading);
+				dom.setAttribute('aria-busy', loading ? 'true' : 'false');
+				if (loading && !self._initialLoaded) {
 					self.isLoaded = false;
+					self._showLoadingState();
+				}
+				if (self._loadingIndicator) {
+					self._loadingIndicator.classList.toggle('hidden', !(loading && self._initialLoaded));
 				}
 			};
 			dom.addEventListener('ln-table:set-loading', this._onSetLoading);
@@ -360,9 +379,12 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 
 
 
-			// Local hydration of initial SSR rows
+			// Local hydration of initial SSR rows or initial loading state
 			if (this.tbody && this.tbody.rows.length > 0) {
 				this._parseRows();
+			} else {
+				this._showLoadingState();
+				dom.setAttribute('aria-busy', 'true');
 			}
 
 			// Initial request-data deferred so coordinators have attached listeners
@@ -561,12 +583,20 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 
 			if (total === 0) {
 				this._disableVirtualScroll();
+				if (!this.isLoaded) {
+					this._showLoadingState();
+					return;
+				}
 				this._showEmptyState();
 				return;
 			}
 
 			if (this._filteredData.length === 0 || filtered === 0) {
 				this._disableVirtualScroll();
+				if (!this.isLoaded) {
+					this._showLoadingState();
+					return;
+				}
 				this._showEmptyState();
 				return;
 			}
@@ -869,6 +899,42 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 		this._vEnd = endRow;
 
 		this._cache.ensure(startRow, endRow);
+	};
+
+	// ─── Loading state ──────────────────────────────────────────
+
+	_component.prototype._showLoadingState = function () {
+		const colSpan = this.ths.length || 1;
+		let loadingEl = null;
+
+		let clone = cloneTemplateScoped(this.dom, this.name + '-loading', 'ln-table');
+
+		if (!clone) {
+			const genericTpl = this.dom.querySelector('template[data-ln-table-loading]');
+			if (genericTpl) {
+				clone = document.importNode(genericTpl.content, true);
+			}
+		}
+
+		if (clone) {
+			if (clone.tagName === 'TR') {
+				loadingEl = clone;
+			} else {
+				const td = document.createElement('td');
+				td.setAttribute('colspan', String(colSpan));
+				td.appendChild(clone);
+				const tr = document.createElement('tr');
+				tr.className = 'table-empty ln-table__empty';
+				tr.appendChild(td);
+				loadingEl = tr;
+			}
+		}
+
+		if (loadingEl) {
+			this.tbody.replaceChildren(loadingEl);
+		} else {
+			this.tbody.replaceChildren();
+		}
 	};
 
 	// ─── Empty state ───────────────────────────────────────────
@@ -1365,6 +1431,7 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 			this._colgroup = null;
 		}
 		if (this.table) this.table.style.tableLayout = '';
+		this._loadingIndicator = null;
 		this._data = [];
 		this._filteredData = [];
 		delete this.dom[DOM_ATTRIBUTE];

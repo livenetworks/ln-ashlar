@@ -1367,6 +1367,11 @@
 			"description": "data-ln-table-filtered attribute"
 		},
 		{
+			"name": "data-ln-table-loading",
+			"description": "Loading indicator element in footer or template",
+			"valueSet": "v"
+		},
+		{
 			"name": "data-ln-table-row",
 			"description": "Table row template element",
 			"valueSet": "v"

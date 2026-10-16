@@ -2054,7 +2054,7 @@
 				"ln-table"
 			],
 			"cancelable": false,
-			"description": "Toggles the `.ln-table--loading` class (Data-Driven mode).",
+			"description": "Updates loading state (Data-Driven mode). Prior to initial data load, renders the loading template into `<tbody>` and sets `aria-busy=\"true\"`. During subsequent queries, preserves existing rows, toggles `.ln-table--loading`, and reveals the `[data-ln-table-loading]` footer spinner.",
 			"detail": "{ loading: Boolean }",
 			"source": "mixed"
 		},

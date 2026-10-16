@@ -1,7 +1,7 @@
 {
 	"$schema": "https://json.schemastore.org/web-types",
 	"name": "@livenetworks/ashlar",
-	"version": "2.1.9",
+	"version": "2.1.10",
 	"framework": "html",
 	"contributions": {
 		"html": {
@@ -1779,6 +1779,13 @@
 					"description": "data-ln-table-filtered attribute",
 					"value": {
 						"type": "string"
+					}
+				},
+				{
+					"name": "data-ln-table-loading",
+					"description": "Loading indicator element in footer or template",
+					"value": {
+						"type": "boolean"
 					}
 				},
 				{

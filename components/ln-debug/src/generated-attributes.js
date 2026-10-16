@@ -229,6 +229,7 @@ export const VALID_ATTRIBUTES = new Set([
 	'data-ln-table-empty-when',
 	'data-ln-table-filter-col',
 	'data-ln-table-filtered',
+	'data-ln-table-loading',
 	'data-ln-table-row',
 	'data-ln-table-row-action',
 	'data-ln-table-row-id',

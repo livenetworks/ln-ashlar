@@ -137,12 +137,29 @@ Use when the table queries a store and connects through a coordinator rather tha
       <tbody data-ln-table-body></tbody>
     </table>
 
+    <!-- Initial Loading State Template -->
+    <template data-ln-template="products-loading">
+      <article data-ln-empty-state="loading">
+        <svg class="ln-icon ln-ajax-spinner" aria-hidden="true"><use href="#ln-icon-loader-2"></use></svg>
+        <p>Loading products...</p>
+      </article>
+    </template>
+
+    <!-- Row Template -->
     <template data-ln-template="products-row">
       <tr data-ln-table-row>
         <td>{{ name }}</td>
         <td>{{ price }}</td>
       </tr>
     </template>
+
+    <footer>
+      <span>Showing <span data-ln-table-filtered>0</span> of <strong data-ln-table-total>0</strong> products</span>
+      <!-- Background Loading Indicator (hidden by default, displayed during re-fetching) -->
+      <div data-ln-table-loading class="table-loading hidden" aria-hidden="true">
+        <svg class="ln-icon ln-ajax-spinner"><use href="#ln-icon-loader-2"></use></svg>
+      </div>
+    </footer>
   </div>
 </div>
 ```
@@ -174,6 +191,7 @@ Use when the table queries a store and connects through a coordinator rather tha
 | `data-ln-table-filtered` | `<span>` | - | - | Displays filtered count in footer. The immediate parent element is automatically shown/hidden based on active filters. |
 | `data-ln-table-selected` | `<span>` | - | - | Displays selection count in footer. The immediate parent element is automatically shown/hidden when selection > 0. |
 | `data-ln-table-filter-col` | `<th>` | `String` | - | Maps column header to a filter key. Required for column filtering. |
+| `data-ln-table-loading` | Indicator element (in footer) / Template | `Marker` | - | Marks a background loading indicator element (automatically toggled during re-fetch) or a generic loading template (`template[data-ln-table-loading]`). |
 | `data-ln-table-clear` | `<button>` | - | - | Resets local search inputs and column filters in SSR mode. |
 | `data-ln-table-clear-all` | `<button>` | - | - | Resets all active filters and triggers a new data request in Data-Driven mode. |
 | `data-ln-table-cell-attr` | Template element | `String` | - | List of `field:attribute` mappings for attribute interpolation. *(Processed externally via `ln-core.js` / `fillTemplate()`)* |
@@ -186,7 +204,7 @@ Use when the table queries a store and connects through a coordinator rather tha
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-table:set-data` | Listens | No | Populates the table with a raw dataset (Data-Driven mode). Windowed mode (`data-ln-table-window`) additionally reads `offset`/`queryGen` off the payload, routing it into the internal window cache. | `{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }` |
-| `ln-table:set-loading` | Listens | No | Toggles the `.ln-table--loading` class (Data-Driven mode). | `{ loading: Boolean }` |
+| `ln-table:set-loading` | Listens | No | Updates loading state (Data-Driven mode). Prior to initial data load, renders the loading template into `<tbody>` and sets `aria-busy="true"`. During subsequent queries, preserves existing rows, toggles `.ln-table--loading`, and reveals the `[data-ln-table-loading]` footer spinner. | `{ loading: Boolean }` |
 | `ln-table:page-failed` | Listens | No | Windowed mode (`data-ln-table-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry. | `{ offset: Number }` |
 | `ln-table:request-revalidate` | Listens | No | Windowed mode (`data-ln-table-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives. | *(no payload)* |
 | `ln-table:request-invalidate` | Listens | No | Windowed mode (`data-ln-table-window`): invalidates the window cache and resets to page 0. | *(no payload)* |
