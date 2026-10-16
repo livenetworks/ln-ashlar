@@ -11,9 +11,11 @@
 		const nameEl = el.querySelector('[data-pkg-usage-name]');
 		const countEl = el.querySelector('[data-pkg-usage-count]');
 		const barEl = el.querySelector('[data-ln-progress]');
+		const link = el.querySelector('a');
 		if (nameEl) nameEl.textContent = item.name;
 		if (countEl) countEl.textContent = item.count;
 		if (barEl) barEl.setAttribute('data-ln-progress', item.pct);
+		if (link && item.id != null) link.setAttribute('href', 'tenants?package=' + encodeURIComponent(item.id));
 	}
 
 	function renderUsage(dom) {

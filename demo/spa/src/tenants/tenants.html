@@ -19,7 +19,7 @@
 			<header class="ln-table__toolbar">
 				<search aria-label="Search tenants">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Search tenants…" data-ln-search-for="tenants">
+					<input type="search" placeholder="Search tenants…" data-ln-search-for="tenants" data-ln-query="q">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 					</button>
@@ -34,20 +34,36 @@
 				<thead>
 					<tr>
 						<th data-ln-table-col-select></th>
-						<th data-ln-table-col="name">Name <ul data-ln-sort="tenants" data-ln-sort-field="name">
+						<th data-ln-table-col="name">Name <ul data-ln-sort="tenants" data-ln-sort-field="name" data-ln-query="sort">
 							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
 						</ul></th>
-						<th data-ln-table-col="slug">Slug <ul data-ln-sort="tenants" data-ln-sort-field="slug">
+						<th data-ln-table-col="slug">Slug <ul data-ln-sort="tenants" data-ln-sort-field="slug" data-ln-query="sort">
 							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
 						</ul></th>
-						<th data-ln-table-col="custom_domain">Domain</th>
-						<th data-ln-table-col="package_name">Package</th>
-						<th data-ln-table-col="auth_method" data-ln-table-filter-col="auth_method">Auth <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-tenants-auth" aria-label="Filter auth method"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button></th>
-						<th data-ln-table-col="active" data-ln-table-filter-col="active">Status <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-tenants-active" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button></th>
+						<th data-ln-table-col="custom_domain">Domain <ul data-ln-sort="tenants" data-ln-sort-field="custom_domain" data-ln-query="sort">
+							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+						</ul></th>
+						<th data-ln-table-col="package_name" data-ln-table-filter-col="package_id">Package <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-tenants-package" aria-label="Filter package"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button> <ul data-ln-sort="tenants" data-ln-sort-field="package_name" data-ln-query="sort">
+							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+						</ul></th>
+						<th data-ln-table-col="auth_method" data-ln-table-filter-col="auth_method">Auth <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-tenants-auth" aria-label="Filter auth method"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button> <ul data-ln-sort="tenants" data-ln-sort-field="auth_method" data-ln-query="sort">
+							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+						</ul></th>
+						<th data-ln-table-col="active" data-ln-table-filter-col="active">Status <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-tenants-active" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button> <ul data-ln-sort="tenants" data-ln-sort-field="active" data-ln-query="sort">
+							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+						</ul></th>
 						<th>Actions</th>
 					</tr>
 				</thead>
@@ -100,9 +116,20 @@
 
 		</section>
 
+		<!-- Tenants table: package filter popover -->
+		<div data-ln-popover id="filter-tenants-package">
+			<ul data-ln-filter="tenants" data-ln-query="package">
+				<li><label><input type="checkbox" data-ln-filter-key="package_id" data-ln-filter-reset checked> All</label></li>
+				<li><label><input type="checkbox" data-ln-filter-key="package_id" data-ln-filter-value="1"> Starter</label></li>
+				<li><label><input type="checkbox" data-ln-filter-key="package_id" data-ln-filter-value="2"> Professional</label></li>
+				<li><label><input type="checkbox" data-ln-filter-key="package_id" data-ln-filter-value="3"> Enterprise</label></li>
+				<li><label><input type="checkbox" data-ln-filter-key="package_id" data-ln-filter-value="4"> Legacy</label></li>
+			</ul>
+		</div>
+
 		<!-- Tenants table: auth method filter popover -->
 		<div data-ln-popover id="filter-tenants-auth">
-			<ul data-ln-filter="tenants">
+			<ul data-ln-filter="tenants" data-ln-query="auth_method">
 				<li><label><input type="checkbox" data-ln-filter-key="auth_method" data-ln-filter-reset checked> All</label></li>
 				<li><label><input type="checkbox" data-ln-filter-key="auth_method" data-ln-filter-value="Local"> Local</label></li>
 				<li><label><input type="checkbox" data-ln-filter-key="auth_method" data-ln-filter-value="LDAP"> LDAP</label></li>
@@ -111,7 +138,7 @@
 
 		<!-- Tenants table: status filter popover -->
 		<div data-ln-popover id="filter-tenants-active">
-			<ul data-ln-filter="tenants">
+			<ul data-ln-filter="tenants" data-ln-query="active">
 				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-reset checked> All</label></li>
 				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="true"> Active</label></li>
 				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="false"> Inactive</label></li>
