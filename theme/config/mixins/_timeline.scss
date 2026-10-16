@@ -23,6 +23,8 @@
 		padding-left: var(--padding-x);
 		--padding-y: var(--size-lg);
 		padding-bottom: var(--padding-y);
+		content-visibility: auto;
+		contain-intrinsic-size: auto 5rem;
 
 		&:last-child {
 			padding-bottom: 0;

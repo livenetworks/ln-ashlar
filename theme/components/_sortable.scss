@@ -1,0 +1,19 @@
+@use '../config/mixins' as *;
+
+[data-ln-sortable] {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+
+	> * {
+		transition: box-shadow var(--transition-fast) var(--easing-standard), opacity var(--transition-fast) var(--easing-standard);
+
+		&.ln-sortable--drop-before {
+			box-shadow: inset 0 2px 0 0 var(--color-accent);
+		}
+
+		&.ln-sortable--drop-after {
+			box-shadow: inset 0 -2px 0 0 var(--color-accent);
+		}
+	}
+}

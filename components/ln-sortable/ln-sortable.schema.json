@@ -13,6 +13,7 @@
 			"direction": "author",
 			"sources": [
 				"ln-sortable-dev.scss",
+				"ln-sortable.scss",
 				"src/ln-sortable.js"
 			],
 			"type": "enum",
@@ -27,6 +28,7 @@
 			"direction": "author",
 			"sources": [
 				"ln-sortable-dev.scss",
+				"ln-sortable.scss",
 				"src/ln-sortable.js"
 			],
 			"type": "marker",

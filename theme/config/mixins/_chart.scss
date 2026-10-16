@@ -19,6 +19,7 @@
 	display: grid;
 	gap: var(--chart-gap);
 	min-inline-size: 0;
+	contain: layout style;
 
 	.chart__plot {
 		display: block;

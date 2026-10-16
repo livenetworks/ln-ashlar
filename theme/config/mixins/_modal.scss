@@ -120,6 +120,7 @@
 		min-height: 0;
 		overflow-y: auto;
 		overflow-x: hidden;
+		overscroll-behavior: contain;
 		flex: 1 1 auto;
 	}
 

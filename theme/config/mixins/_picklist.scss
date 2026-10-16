@@ -46,6 +46,7 @@
 		--max-height: 20rem;
 		max-height: var(--max-height);
 		overflow-y: auto;
+		overscroll-behavior: contain;
 	}
 
 	// The input stays visible (pill-outline reverts pill's display:none),

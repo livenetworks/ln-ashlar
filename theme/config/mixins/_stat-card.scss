@@ -22,6 +22,7 @@
 	border-inline-start: var(--border-inline-start, var(--border-width) solid var(--color-border));
 	border-inline-end:   var(--border-inline-end,   var(--border-width) solid var(--color-border));
 	@include transition;
+	contain: layout style;
 
 	> [data-ln-stat-label] {
 		--color-fg: var(--fg-muted);
