@@ -61,7 +61,7 @@
 	opacity: 1;
 	@include motion-safe {
 		transform: translateX(0);
-		transition: all var(--transition-base) var(--easing-standard);
+		transition: transform var(--transition-base) var(--easing-standard), opacity var(--transition-base) var(--easing-standard);
 	}
 
 	& + & {
@@ -73,6 +73,7 @@
 @mixin toast-item-enter {
 	opacity: 0;
 	@include motion-safe {
+		will-change: transform, opacity;
 		transform: translateX(30px);
 	}
 }
@@ -80,8 +81,9 @@
 @mixin toast-item-out {
 	opacity: 0;
 	@include motion-safe {
+		will-change: transform, opacity;
 		transform: scale(0.95);
-		transition: all var(--transition-fast);
+		transition: transform var(--transition-fast), opacity var(--transition-fast);
 	}
 }
 

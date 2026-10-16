@@ -150,6 +150,7 @@
 	ul[data-ln-search] {
 		max-height: 15rem;
 		overflow-y: auto;
+		overscroll-behavior: contain;
 		scrollbar-width: thin;
 		scrollbar-color: var(--border-subtle) transparent;
 

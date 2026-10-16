@@ -1,0 +1,25 @@
+// ==========================================================================
+// ln-sortable — Functional State & Drag Rules
+// ==========================================================================
+
+[data-ln-sortable] {
+	&.ln-sortable--active {
+		user-select: none;
+	}
+
+	> * {
+		&.ln-sortable--dragging {
+			will-change: transform, opacity;
+			opacity: 0.4;
+		}
+	}
+}
+
+[data-ln-sortable-handle] {
+	touch-action: none;
+	cursor: grab;
+
+	&:active {
+		cursor: grabbing;
+	}
+}

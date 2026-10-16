@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.1.8](./v2.1.8.md) — October 16, 2026
+Component rendering and compositing performance optimizations: core functional CSS and touch/GPU drag support for `ln-sortable`, compositor transitions on `ln-toast`, scroll chaining elimination via `overscroll-behavior: contain`, reflow containment for stat cards and charts, and offscreen rendering on timelines.  
+👉 [Read full v2.1.8 release notes](./v2.1.8.md)
+
 ### [v2.1.7](./v2.1.7.md) — October 16, 2026
 Clean separation of SSR DOM and Virtual API table architectures (`table-api`), elimination of empty table flash on optimistic search/filter, live query viewport scroll stability, and GPU composite acceleration for table sticky headers.  
 👉 [Read full v2.1.7 release notes](./v2.1.7.md)

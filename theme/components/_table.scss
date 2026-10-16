@@ -27,6 +27,7 @@ table {
 .table-container {
 	@include container(table);
 	overflow-x: auto;
+	overscroll-behavior-x: contain;
 
 	@container table (max-width: 640px) {
 		table { @include table-responsive; }
