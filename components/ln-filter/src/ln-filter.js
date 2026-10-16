@@ -1,4 +1,4 @@
-import { attrSpec, attrStr, createBatcher, defineAttrs, dispatch, dispatchCancelable, hashFilterDecode, hashFilterEncode, hashGet, hashSet, matchesFilterValues, queueBoot, readValue, registerComponent, resolveHashNamespace } from '../../ln-core';
+import { attrSpec, attrStr, createBatcher, defineAttrs, dispatch, dispatchCancelable, hashFilterDecode, hashFilterEncode, hashGet, hashSet, queryFilterDecode, queryFilterEncode, queryGet, querySet, resolveQueryParam, matchesFilterValues, queueBoot, readValue, registerComponent, resolveHashNamespace } from '../../ln-core';
 import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValues, evaluateRowFilters, resolveColumnIndex } from './filter-model.js';
 
 (function () {
@@ -10,6 +10,7 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 	const RESET_ATTR = 'data-ln-filter-reset';
 	const COL_ATTR = 'data-ln-filter-col';
 	const HASH_ATTR = 'data-ln-hash';
+	const QUERY_ATTR = 'data-ln-query';
 	const VALUES_ATTR = 'data-ln-filter-values';
 	const TARGET_ATTR = 'data-ln-filter-target';
 
@@ -22,6 +23,7 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 	const ATTRIBUTES = {
 		'data-ln-filter':        { prop: 'targetId', type: 'string', read: attrStr, fallback: null, effect: _syncAttribute, description: 'Target table or list element ID to filter' },
 		'data-ln-hash':          { type: 'string', effect: _syncAttribute, description: 'URL hash routing key for filter state persistence' },
+		'data-ln-query':         { type: 'string', effect: _syncAttribute, description: 'URL query parameter name for filter state synchronization' },
 		'data-ln-filter-values': { type: 'string', effect: _syncAttribute, description: 'Encoded active filter values' },
 		'data-ln-filter-col':    { type: 'string', description: 'Column name or index filter specifier' },
 		'data-ln-filter-key':    { type: 'string', description: 'Field key for filter matching' },
@@ -32,6 +34,20 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 	};
 
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
+
+	function _resolveFilterQueryParam(dom) {
+		if (!dom.hasAttribute(QUERY_ATTR)) return null;
+		const explicit = dom.getAttribute(QUERY_ATTR);
+		if (explicit && explicit.trim() !== '') return explicit.trim();
+		const col = dom.getAttribute(COL_ATTR);
+		if (col && isNaN(parseInt(col, 10))) return col.trim();
+		const keyEl = dom.querySelector('[' + KEY_ATTR + ']');
+		if (keyEl) {
+			const key = keyEl.getAttribute(KEY_ATTR);
+			if (key && key.trim() !== '') return key.trim();
+		}
+		return resolveQueryParam(dom, 'filter');
+	}
 
 	function _isReset(input) {
 		return input.hasAttribute(RESET_ATTR) || !input.getAttribute(VALUE_ATTR);
@@ -85,6 +101,9 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 		this.nsKey = resolveHashNamespace(dom, 'filter');
 		this.hashEnabled = !!this.nsKey;
 
+		this.queryParam = _resolveFilterQueryParam(dom);
+		this.queryEnabled = !!this.queryParam;
+
 		const self = this;
 
 		const queueRender = createBatcher(function () {
@@ -132,8 +151,22 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 			self._render();
 		};
 
+		// PopState listener
+		this._onPopState = function () {
+			if (self._destroyed || !self.queryEnabled) return;
+			const queryVal = queryGet(self.queryParam);
+			const values = queryFilterDecode(queryVal);
+			const keyEl = self.dom.querySelector('[' + KEY_ATTR + ']');
+			const key = keyEl ? keyEl.getAttribute(KEY_ATTR) : self.queryParam;
+			_applyInputValues(self.dom, key, values);
+			self._render();
+		};
+
 		if (this.hashEnabled) {
 			window.addEventListener('hashchange', this._onHashChange);
+		}
+		if (this.queryEnabled) {
+			window.addEventListener('popstate', this._onPopState);
 		}
 
 		// ─── Restore State on Boot ─────────────────────────────────
@@ -144,6 +177,19 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 			const decoded = hashFilterDecode(hashVal);
 			if (decoded && decoded.key && decoded.values.length > 0) {
 				_applyInputValues(dom, decoded.key, decoded.values);
+				queueBoot(function () {
+					if (self._destroyed) return;
+					self._render();
+				});
+				restored = true;
+			}
+		} else if (this.queryEnabled) {
+			const queryVal = queryGet(this.queryParam);
+			const values = queryFilterDecode(queryVal);
+			if (values.length > 0) {
+				const keyEl = dom.querySelector('[' + KEY_ATTR + ']');
+				const key = keyEl ? keyEl.getAttribute(KEY_ATTR) : self.queryParam;
+				_applyInputValues(dom, key, values);
 				queueBoot(function () {
 					if (self._destroyed) return;
 					self._render();
@@ -298,6 +344,12 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 		if (this.hashEnabled) {
 			const encoded = hashFilterEncode(active.key, active.values);
 			hashSet(this.nsKey, encoded);
+		} else if (this.queryEnabled) {
+			const encoded = queryFilterEncode(active.values);
+			const paramKey = this.queryParam || active.key;
+			if (paramKey) {
+				querySet(paramKey, encoded);
+			}
 		}
 
 		if (defaultPrevented) return;
@@ -435,6 +487,10 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 			window.removeEventListener('hashchange', this._onHashChange);
 		}
 
+		if (this.queryEnabled && this._onPopState) {
+			window.removeEventListener('popstate', this._onPopState);
+		}
+
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
@@ -452,6 +508,15 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 			instance.hashEnabled = !!instance.nsKey;
 			if (instance.hashEnabled) {
 				window.addEventListener('hashchange', instance._onHashChange);
+			}
+		} else if (attrName === QUERY_ATTR) {
+			if (instance.queryEnabled && instance._onPopState) {
+				window.removeEventListener('popstate', instance._onPopState);
+			}
+			instance.queryParam = _resolveFilterQueryParam(el);
+			instance.queryEnabled = !!instance.queryParam;
+			if (instance.queryEnabled) {
+				window.addEventListener('popstate', instance._onPopState);
 			}
 		} else if (attrName === VALUES_ATTR) {
 			const values = decodeFilterValues(el.getAttribute(VALUES_ATTR));
@@ -502,7 +567,7 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 		},
 		persist: {
 			attr: VALUES_ATTR,
-			hashActive: function (el) { return !!resolveHashNamespace(el, 'filter'); }
+			hashActive: function (el) { return !!resolveHashNamespace(el, 'filter') || !!_resolveFilterQueryParam(el); }
 		}
 	});
 })();

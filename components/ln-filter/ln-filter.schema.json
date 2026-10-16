@@ -127,6 +127,14 @@
 				"src/filter-model.js"
 			]
 		},
+		"data-ln-query": {
+			"direction": "author",
+			"sources": [
+				"src/ln-filter.js"
+			],
+			"type": "string",
+			"description": "URL query parameter name for filter state synchronization"
+		},
 		"data-ln-sort-exclude": {
 			"direction": "author",
 			"sources": [

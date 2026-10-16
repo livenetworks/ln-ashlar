@@ -266,7 +266,28 @@ Ashlar components support opt-in URL hash synchronization (`data-ln-hash`) to en
 
 ---
 
-## 8. Naming Conventions
+## 8. URL Search Query Synchronization Doctrine (`data-ln-query`)
+
+Data-layer components (`ln-search`, `ln-filter`, `ln-sort`) support opt-in URL query parameter synchronization (`data-ln-query`) to enable REST API compliance, shareable search strings, and bookmarkable table states without interfering with hash-based overlays (`#modal-id`, `#tab-panel`).
+
+### Core Architectural Principles:
+1. **Query vs. Hash Decoupling:**
+   - URL hash (`#`) is reserved for visual UI overlays, modals, and tab switches.
+   - URL query (`?`) is reserved for dataset parameters (`?q=term&status=active,pending&sort=amount.desc`).
+   - If both `data-ln-hash` and `data-ln-query` are authored on the same element, `data-ln-hash` takes precedence.
+2. **History ReplaceState (No Keystroke Flooding):**
+   - Query updates are written via `window.history.replaceState` (`querySet`).
+   - Rapid keystrokes in search or filter toggles do NOT pollute the browser history stack.
+   - Back and forward history navigation is preserved and observed via `window.addEventListener('popstate')`.
+3. **Parameter Resolution & Fallback:**
+   - Explicit parameter names: `data-ln-query="search"`, `data-ln-query="q"`.
+   - Automatic fallback: If authored bare (`data-ln-query` or empty string), `resolveQueryParam` infers the parameter name from control names, `data-ln-filter-col`, `data-ln-filter-key`, or standard defaults (`'sort'`, `'q'`).
+4. **Boot Precedence:**
+   - `data-ln-hash` > `data-ln-query` > `data-ln-persist` > authored DOM markup.
+
+---
+
+## 9. Naming Conventions
 
 All naming must follow strict, predictable conventions:
 
@@ -275,6 +296,7 @@ All naming must follow strict, predictable conventions:
 | State Host Attribute | `data-ln-{name}` | `data-ln-modal`, `data-ln-search` |
 | Control Pointer Attribute | `data-ln-{name}-for` | `data-ln-modal-for="id"`, `data-ln-search-for="id"` |
 | Hash Sync Attribute | `data-ln-hash` | `data-ln-hash`, `data-ln-hash="q"` |
+| Query Sync Attribute | `data-ln-query` | `data-ln-query`, `data-ln-query="q"` |
 | Storage Persist Attribute | `data-ln-persist` | `data-ln-persist`, `data-ln-persist="key"` |
 | JS State Instance | `el.ln{Name}` | `el.lnModal`, `el.lnSearch` |
 | JS Control Instance | `el.ln{Name}Control` | `el.lnSearchControl`, `el.lnModalTrigger` |

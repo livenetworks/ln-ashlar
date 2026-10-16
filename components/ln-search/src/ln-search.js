@@ -1,4 +1,4 @@
-import { dispatchCancelable, hashGet, hashSet, queueBoot, registerComponent, resolveHashNamespace, defineAttrs, attrSpec, attrStr, createBatcher } from '../../ln-core';
+import { dispatchCancelable, hashGet, hashSet, queryGet, querySet, resolveQueryParam, queueBoot, registerComponent, resolveHashNamespace, defineAttrs, attrSpec, attrStr, createBatcher } from '../../ln-core';
 import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSearchFields, tokenizeSearchQuery } from '../../ln-core/matching.js';
 
 (function () {
@@ -11,6 +11,7 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 	const EXCLUDE_ATTR = 'data-ln-search-exclude';
 	const HIDE_ATTR = 'data-ln-search-hide';
 	const HASH_ATTR = 'data-ln-hash';
+	const QUERY_ATTR = 'data-ln-query';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -18,6 +19,7 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 	const ATTRIBUTES = {
 		'data-ln-search':           { type: 'string', effect: _syncAttribute, description: 'Active search query term on target element or container' },
 		'data-ln-hash':             { type: 'string', effect: _syncAttribute, description: 'URL hash routing key for search state persistence' },
+		'data-ln-query':            { type: 'string', effect: _syncAttribute, description: 'URL query parameter name for search query state synchronization' },
 		'data-ln-search-for':       { prop: 'targetId', type: 'string', read: attrStr, fallback: null, description: 'Target table or list element ID that this input controls' },
 		'data-ln-search-fields':    { type: 'list', description: 'Comma-separated field names to include in client search' },
 		'data-ln-search-items':     { type: 'string', description: 'CSS selector matching searchable child items' },
@@ -37,6 +39,19 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 			const control = document.querySelector('[' + CONTROL_SELECTOR + '="' + target.id + '"]');
 			if (control) {
 				const fromControl = resolveHashNamespace(control, 'search');
+				if (fromControl) return fromControl;
+			}
+		}
+		return null;
+	}
+
+	function _resolveSearchQueryParam(target) {
+		const fromTarget = resolveQueryParam(target, 'search');
+		if (fromTarget) return fromTarget;
+		if (target.id) {
+			const control = document.querySelector('[' + CONTROL_SELECTOR + '="' + target.id + '"]');
+			if (control) {
+				const fromControl = resolveQueryParam(control, 'search');
 				if (fromControl) return fromControl;
 			}
 		}
@@ -90,6 +105,9 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 		this.nsKey = _resolveSearchHashNamespace(dom);
 		this.hashEnabled = !!this.nsKey;
 
+		this.queryParam = _resolveSearchQueryParam(dom);
+		this.queryEnabled = !!this.queryParam;
+
 		this._queueApply = createBatcher(function () {
 			if (!self._destroyed) {
 				self._apply();
@@ -107,8 +125,20 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 			}
 		};
 
+		this._onPopState = function () {
+			if (self._destroyed || !self.queryEnabled) return;
+			const query = queryGet(self.queryParam) || '';
+			const current = self.dom.getAttribute(DOM_SELECTOR) || '';
+			if (query !== current) {
+				self.dom.setAttribute(DOM_SELECTOR, query);
+			}
+		};
+
 		if (this.hashEnabled) {
 			window.addEventListener('hashchange', this._onHashChange);
+		}
+		if (this.queryEnabled) {
+			window.addEventListener('popstate', this._onPopState);
 		}
 
 		queueBoot(function () {
@@ -119,6 +149,15 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 					self.term = hashVal;
 					self.dom.setAttribute(DOM_SELECTOR, hashVal);
 					_syncControls(self.dom, hashVal);
+					self._apply();
+					return;
+				}
+			} else if (self.queryEnabled) {
+				const queryVal = queryGet(self.queryParam);
+				if (queryVal !== null && queryVal !== self.term) {
+					self.term = queryVal;
+					self.dom.setAttribute(DOM_SELECTOR, queryVal);
+					_syncControls(self.dom, queryVal);
 					self._apply();
 					return;
 				}
@@ -139,6 +178,8 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 
 		if (this.hashEnabled) {
 			hashSet(this.nsKey, this.term ? this.term : null);
+		} else if (this.queryEnabled) {
+			querySet(this.queryParam, this.term ? this.term : null);
 		}
 
 		const fields = parseSearchFields(dom.getAttribute(FIELDS_ATTR));
@@ -175,6 +216,9 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 		this._destroyed = true;
 		if (this.hashEnabled && this._onHashChange) {
 			window.removeEventListener('hashchange', this._onHashChange);
+		}
+		if (this.queryEnabled && this._onPopState) {
+			window.removeEventListener('popstate', this._onPopState);
 		}
 		delete this.dom[DOM_ATTRIBUTE];
 	};
@@ -311,6 +355,14 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 			return;
 		}
 
+		if (attrName === QUERY_ATTR) {
+			if (instance._onPopState) window.removeEventListener('popstate', instance._onPopState);
+			instance.queryParam = _resolveSearchQueryParam(el);
+			instance.queryEnabled = !!instance.queryParam;
+			if (instance.queryEnabled) window.addEventListener('popstate', instance._onPopState);
+			return;
+		}
+
 		const next = el.getAttribute(DOM_SELECTOR) || '';
 		if (next === instance.term) return;
 
@@ -342,7 +394,7 @@ import { collapseSearchParts, matchesSearchTokens, normalizeSearchTerm, parseSea
 		},
 		persist: {
 			attr: DOM_SELECTOR,
-			hashActive: function (el) { return !!_resolveSearchHashNamespace(el); }
+			hashActive: function (el) { return !!_resolveSearchHashNamespace(el) || !!_resolveSearchQueryParam(el); }
 		}
 	});
 

@@ -190,6 +190,10 @@ The re-query is **not** triggered from these handlers. It is declared once, as a
 the four query attributes (`extraAttributes` + `onAttributeChange`), and batched — so one
 sort change, which writes two attributes, still re-queries once.
 
+#### URL Query Synchronization (`data-ln-query`)
+
+Query controls (`ln-search`, `ln-filter`, `ln-sort`) targeting the coordinator's store or table can carry `data-ln-query` (e.g. `data-ln-query="search"`, `data-ln-query="status"`, `data-ln-query="sort"`). The controls synchronize the browser's URL query string (`?search=term&status=active&sort=field.asc`) via `history.replaceState` while emitting bubbled events to the coordinator. On initial load or bookmarked visits, the controls automatically restore from the query string during boot (`queueBoot`) and seed the coordinator without requiring any bespoke page coordinator script.
+
 ### 0. Form Write Intake (native `submit`, claimed via `preventDefault()`)
 
 The coordinator listens for the native `submit` event on `document`

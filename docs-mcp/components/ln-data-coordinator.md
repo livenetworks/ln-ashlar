@@ -71,6 +71,36 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 </div>
 ```
 
+### Variant 2: URL Query String Synchronization (`data-ln-query`)
+
+Data-layer query controls ([`ln-search`](./ln-search.md), [`ln-filter`](./ln-filter.md), [`ln-sort`](./ln-sort.md)) target the store element by ID (`id="users"`). Adding `data-ln-query` synchronizes state directly to the browser's URL query string (`?search=term&status=active&sort=created_at.desc`) without needing a custom page coordinator.
+
+```html
+<!-- Search bar with URL sync -->
+<search>
+    <input type="search" placeholder="Search..." data-ln-search-for="users" data-ln-query="search">
+</search>
+
+<!-- Sortable table headers with URL sync -->
+<th data-ln-table-col="name">
+    Name
+    <ul data-ln-sort="users" data-ln-sort-field="name" data-ln-query="sort">
+        <li><button type="button" data-ln-sort-dir="asc">Asc</button></li>
+        <li><button type="button" data-ln-sort-dir="desc">Desc</button></li>
+    </ul>
+</th>
+
+<!-- Filter popover with URL sync -->
+<div data-ln-popover id="status-popover">
+    <ul data-ln-filter="users" data-ln-query="status">
+        <li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="active"> Active</label></li>
+        <li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="pending"> Pending</label></li>
+    </ul>
+</div>
+```
+
+When users type, filter, or sort, `ln-search`/`ln-filter`/`ln-sort` update the URL parameters via `history.replaceState` and dispatch bubbled CustomEvents. The coordinator intercepts them on `self.dom`, updates its internal query state (`data-ln-data-coordinator-search`, `-filters`, `-sort-field`), and triggers a re-query through the connector. On page load / bookmark visits, the controls automatically read the query string during boot (`queueBoot`) and seed the coordinator.
+
 ---
 
 ## 3. Declarative API Contract (Attributes & Events)

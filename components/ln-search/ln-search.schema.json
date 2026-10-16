@@ -23,6 +23,14 @@
 				"src/ln-search.js"
 			]
 		},
+		"data-ln-query": {
+			"direction": null,
+			"sources": [
+				"src/ln-search.js"
+			],
+			"type": "string",
+			"description": "URL query parameter name for search query state synchronization"
+		},
 		"data-ln-search": {
 			"direction": "both",
 			"sources": [

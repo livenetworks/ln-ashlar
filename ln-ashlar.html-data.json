@@ -1053,6 +1053,10 @@
 			"description": "Maximum progress scale value"
 		},
 		{
+			"name": "data-ln-query",
+			"description": "URL query parameter name for filter state synchronization URL query parameter name for search query state synchronization URL query parameter name for sort state persistence"
+		},
+		{
 			"name": "data-ln-render-key",
 			"description": "data-ln-render-key attribute"
 		},

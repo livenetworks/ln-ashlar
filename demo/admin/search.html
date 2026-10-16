@@ -223,7 +223,7 @@
 			</main>
 
 			<footer>
-				<small>ashlar-gui v2.1.8</small>
+				<small>ashlar-gui v2.1.9</small>
 			</footer>
 		</aside>
 		<div class="app-scrim"></div>
@@ -348,6 +348,8 @@
 									<tr><td><code>data-ln-search-clear</code></td><td><code>&lt;button&gt;</code> (in control or target empty-state)</td><td>Universal clear button. Clears input, resets target search state, and refocuses input.</td></tr>
 									<tr><td><code>data-ln-search-clear-for="targetId"</code></td><td><code>&lt;button&gt;</code> (anywhere)</td><td>Remote clear button targeting a specific element ID. Clears linked input and resets target state.</td></tr>
 									<tr><td><code>data-ln-search-hide="true"</code></td><td>Non-matching items (auto)</td><td>Set by default filter on items that do not match (styled with <code>display: none !important</code>).</td></tr>
+									<tr><td><code>data-ln-hash</code></td><td>Target container or input</td><td>Opt-in. Synchronizes search term into URL hash (e.g. <code>#demo-search:term</code>).</td></tr>
+									<tr><td><code>data-ln-query</code></td><td>Target container or input</td><td>Opt-in. Synchronizes search term into URL search string (e.g. <code>?q=term</code>). Preserves browser history without polluting back/forward stack.</td></tr>
 								</tbody>
 							</table>
 							</div>
@@ -649,6 +651,46 @@ document.getElementById('demo-list').setAttribute('data-ln-search', 'argentina')
 						</main>
 					</section>
 
+					<!-- URL Query String Synchronization -->
+					<section class="section-card">
+						<header><h3>URL Query String Synchronization (<code>data-ln-query</code>)</h3></header>
+						<main>
+							<p>Adding <code>data-ln-query="q"</code> to the search input or target element synchronizes the search query into the browser's URL search parameters (e.g. <code>?q=react</code>) using <code>history.replaceState</code>. This keeps URL search strings clean for REST APIs and deep-links without colliding with hash overlays (modals/tabs):</p>
+
+							<div class="search-wrap" style="margin-bottom: var(--size-md);">
+								<search aria-label="Search frameworks">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+									<input type="search" placeholder="Type to sync to URL query (?q=...)" data-ln-search-for="demo-query-list" data-ln-query="q">
+									<button type="button" data-ln-search-clear aria-label="Clear search">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+									</button>
+								</search>
+							</div>
+
+							<ul id="demo-query-list" data-ln-search="" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--size-xs);">
+								<li style="padding: var(--size-xs) var(--size-sm); background: var(--bg-sunken); border-radius: var(--radius-sm);">Laravel (PHP)</li>
+								<li style="padding: var(--size-xs) var(--size-sm); background: var(--bg-sunken); border-radius: var(--radius-sm);">Symfony (PHP)</li>
+								<li style="padding: var(--size-xs) var(--size-sm); background: var(--bg-sunken); border-radius: var(--radius-sm);">Node.js &amp; Express</li>
+								<li style="padding: var(--size-xs) var(--size-sm); background: var(--bg-sunken); border-radius: var(--radius-sm);">FastAPI &amp; Django</li>
+								<li style="padding: var(--size-xs) var(--size-sm); background: var(--bg-sunken); border-radius: var(--radius-sm);">Go &amp; Gin</li>
+							</ul>
+
+<pre><code>&lt;search aria-label="Search frameworks"&gt;
+  &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-icon-search"&gt;&lt;/use&gt;&lt;/svg&gt;
+  &lt;input type="search" placeholder="Search..." data-ln-search-for="demo-query-list" data-ln-query="q"&gt;
+  &lt;button type="button" data-ln-search-clear aria-label="Clear search"&gt;
+    &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-icon-x"&gt;&lt;/use&gt;&lt;/svg&gt;
+  &lt;/button&gt;
+&lt;/search&gt;
+
+&lt;ul id="demo-query-list" data-ln-search=""&gt;
+  &lt;li&gt;Laravel (PHP)&lt;/li&gt;
+  &lt;li&gt;Symfony (PHP)&lt;/li&gt;
+  ...
+&lt;/ul&gt;</code></pre>
+						</main>
+					</section>
+
 
 <script>
 	(function () {
@@ -700,7 +742,7 @@ document.getElementById('demo-list').setAttribute('data-ln-search', 'argentina')
 		<!-- Footer -->
 		<footer class="app-footer">
 			<span>ashlar-gui &copy; 2026 LiveNetworks</span>
-			<span>ln-ashlar v2.1.8</span>
+			<span>ln-ashlar v2.1.9</span>
 		</footer>
 		</main>
 	</div><!-- /.app-wrapper -->
