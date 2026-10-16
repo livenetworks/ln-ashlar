@@ -1,4 +1,4 @@
-import { compareValues, detectValueType, dispatchCancelable, getLocale, hashGet, hashSet, hashSortDecode, hashSortEncode, queueBoot, readValue, registerComponent, resolveHashNamespace, withoutLifecycle, attrStr, attrSpec, defineAttrs } from '../../ln-core';
+import { compareValues, detectValueType, dispatchCancelable, getLocale, hashGet, hashSet, hashSortDecode, hashSortEncode, queryGet, querySet, queryParse, querySortDecode, querySortEncode, queueBoot, readValue, registerComponent, resolveHashNamespace, resolveQueryParam, withoutLifecycle, attrStr, attrSpec, defineAttrs } from '../../ln-core';
 import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortTarget, normalizeSortDirection, resolveSortItems } from './sort-model.js';
 
 (function () {
@@ -8,6 +8,7 @@ import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortT
 	const STATE_ATTR = 'data-ln-sort-state';
 	const DIR_ATTR = 'data-ln-sort-dir';
 	const HASH_ATTR = 'data-ln-hash';
+	const QUERY_ATTR = 'data-ln-query';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -22,7 +23,8 @@ import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortT
 		'data-ln-sort-dir':   { type: 'enum', values: ['asc', 'desc'], fallback: 'asc', description: 'Default or requested sort direction' },
 		'data-ln-sort-items': { prop: 'itemsSelector', type: 'string', read: _readOrNull, description: 'CSS selector matching sortable child items' },
 		'data-ln-sort-state': { type: 'enum', values: ['asc', 'desc', 'none'], fallback: 'none', effect: _syncAttribute, description: 'Active sort state applied to column or control' },
-		'data-ln-hash':       { type: 'string', effect: _syncAttribute, description: 'URL hash routing key for sort state persistence' }
+		'data-ln-hash':       { type: 'string', effect: _syncAttribute, description: 'URL hash routing key for sort state persistence' },
+		'data-ln-query':      { type: 'string', effect: _syncAttribute, description: 'URL query parameter name for sort state persistence' }
 	};
 
 	const ATTR_SPEC = attrSpec(ATTRIBUTES);
@@ -58,6 +60,9 @@ import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortT
 
 		this.nsKey = resolveHashNamespace(dom, 'sort');
 		this.hashEnabled = !!this.nsKey;
+
+		this.queryParam = resolveQueryParam(dom, 'sort');
+		this.queryEnabled = !!this.queryParam;
 
 		const self = this;
 
@@ -136,8 +141,48 @@ import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortT
 			}
 		};
 
+		// ─── Popstate change listener ──────────────────────────────
+		this._onPopState = function () {
+			if (self._destroyed || !self.queryEnabled) return;
+			const qVal = queryGet(self.queryParam);
+			const allParams = queryParse();
+			const decoded = querySortDecode(qVal, allParams);
+			if (decoded) {
+				const matches = (self.field !== null && decoded.fieldOrColumn === self.field)
+					|| (self.column !== null && String(self.column) === decoded.fieldOrColumn);
+				if (matches) {
+					if (self._state !== decoded.direction) self._apply(decoded.direction, true);
+				} else {
+					if (self._state !== 'none') {
+						self._state = 'none';
+						dom.setAttribute(STATE_ATTR, 'none');
+						self._updateAriaSort('none');
+					}
+				}
+			} else {
+				if (self._state !== 'none') {
+					self._state = 'none';
+					dom.setAttribute(STATE_ATTR, 'none');
+					self._updateAriaSort('none');
+					const target = self._resolveTarget();
+					if (target) {
+						const evt = dispatchCancelable(target, 'ln-sort:change', {
+							field: self.field,
+							column: self.column,
+							direction: 'none',
+							targetId: self.targetId
+						});
+						if (!evt.defaultPrevented) self._defaultSort(target, 'none');
+					}
+				}
+			}
+		};
+
 		if (this.hashEnabled) {
 			window.addEventListener('hashchange', this._onHashChange);
+		}
+		if (this.queryEnabled) {
+			window.addEventListener('popstate', this._onPopState);
 		}
 
 		// ─── Restore State on Boot ─────────────────────────────────
@@ -146,6 +191,21 @@ import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortT
 		if (this.hashEnabled) {
 			const hashVal = hashGet(this.nsKey);
 			const decoded = hashSortDecode(hashVal);
+			if (decoded) {
+				const matches = (self.field !== null && decoded.fieldOrColumn === self.field)
+					|| (self.column !== null && String(self.column) === decoded.fieldOrColumn);
+				if (matches) {
+					queueBoot(function () {
+						if (self._destroyed) return;
+						self._apply(decoded.direction, true);
+					});
+				}
+				restored = true;
+			}
+		} else if (this.queryEnabled) {
+			const qVal = queryGet(this.queryParam);
+			const allParams = queryParse();
+			const decoded = querySortDecode(qVal, allParams);
 			if (decoded) {
 				const matches = (self.field !== null && decoded.fieldOrColumn === self.field)
 					|| (self.column !== null && String(self.column) === decoded.fieldOrColumn);
@@ -210,6 +270,9 @@ import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortT
 			if (this.hashEnabled) {
 				const encoded = hashSortEncode(this.field !== null ? this.field : this.column, normalized);
 				hashSet(this.nsKey, encoded);
+			} else if (this.queryEnabled) {
+				const encoded = querySortEncode(this.field !== null ? this.field : this.column, normalized);
+				querySet(this.queryParam, encoded);
 			}
 		}
 
@@ -286,6 +349,9 @@ import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortT
 		if (this.hashEnabled && this._onHashChange) {
 			window.removeEventListener('hashchange', this._onHashChange);
 		}
+		if (this.queryEnabled && this._onPopState) {
+			window.removeEventListener('popstate', this._onPopState);
+		}
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
@@ -311,6 +377,15 @@ import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortT
 			if (instance.hashEnabled) {
 				window.addEventListener('hashchange', instance._onHashChange);
 			}
+		} else if (attrName === QUERY_ATTR) {
+			if (instance.queryEnabled && instance._onPopState) {
+				window.removeEventListener('popstate', instance._onPopState);
+			}
+			instance.queryParam = resolveQueryParam(el, 'sort');
+			instance.queryEnabled = !!instance.queryParam;
+			if (instance.queryEnabled) {
+				window.addEventListener('popstate', instance._onPopState);
+			}
 		}
 	}
 
@@ -320,7 +395,7 @@ import { createSortComparator, getAriaSortValue, isExcludedSortItem, isSameSortT
 		attributes: ATTRIBUTES,
 		persist: {
 			attr: STATE_ATTR,
-			hashActive: function (el) { return !!resolveHashNamespace(el, 'sort'); }
+			hashActive: function (el) { return !!resolveHashNamespace(el, 'sort') || !!resolveQueryParam(el, 'sort'); }
 		}
 	});
 })();

@@ -42,7 +42,8 @@
 		"data-ln-filter": {
 			"direction": "author",
 			"sources": [
-				"hash.js"
+				"hash.js",
+				"query.js"
 			]
 		},
 		"data-ln-form": {
@@ -63,6 +64,12 @@
 				"lifecycle.js"
 			]
 		},
+		"data-ln-query": {
+			"direction": "author",
+			"sources": [
+				"query.js"
+			]
+		},
 		"data-ln-render-key": {
 			"direction": "both",
 			"sources": [
@@ -72,13 +79,15 @@
 		"data-ln-search": {
 			"direction": "author",
 			"sources": [
-				"hash.js"
+				"hash.js",
+				"query.js"
 			]
 		},
 		"data-ln-search-for": {
 			"direction": "author",
 			"sources": [
-				"hash.js"
+				"hash.js",
+				"query.js"
 			]
 		},
 		"data-ln-show": {
@@ -90,7 +99,8 @@
 		"data-ln-sort": {
 			"direction": "author",
 			"sources": [
-				"hash.js"
+				"hash.js",
+				"query.js"
 			]
 		},
 		"data-ln-template": {

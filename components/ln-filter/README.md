@@ -75,6 +75,7 @@ Filters plain `<table>` rows by Column Index `2` (Department) and saves state to
 | `data-ln-persist` | Container root | Opt-in. Persists active checkbox selections (`data-ln-filter-values`) in `localStorage`. |
 | `data-ln-persist-scope` | Container root | Opt-in, independent attribute. `"page"` scopes the persisted key to the current URL pathname. |
 | `data-ln-hash` | Container root | Opt-in. Synchronizes active filters to URL hash fragment (e.g. `#users-filter:status:active,pending`). Value is custom namespace; if empty defaults to `[targetId]-filter`. |
+| `data-ln-query` | Container root | Opt-in. Synchronizes active filter values to URL query parameter (e.g. `?category=design,dev` or `?status=active`). Value is parameter name (if omitted, falls back to `data-ln-filter-col` or `data-ln-filter-key`). Interoperable with browser back/forward history (`popstate`). |
 | `data-ln-filter-values` | Container root | *State*. Comma-joined, percent-encoded list of currently active filter values. Written by the component, read by `ln-persist` for restore/save. |
 | `data-ln-filter-hide` | Children of target | *State*. Automatically toggled on non-matching elements (`display: none !important`). |
 

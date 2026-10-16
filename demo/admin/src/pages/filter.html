@@ -49,6 +49,8 @@
 								<tr><td data-label="Attribute"><code>data-ln-filter-reset</code></td><td data-label="On element"><code>&lt;input type="checkbox"&gt;</code></td><td data-label="Description">Marks the "All" (reset) checkbox. Replaces <code>data-ln-filter-value=""</code> which still works as fallback.</td></tr>
 								<tr><td data-label="Attribute"><code>data-ln-filter-hide</code></td><td data-label="On element">target children</td><td data-label="Description">Set by JS when element doesn't match</td></tr>
 									<tr><td data-label="Attribute"><code>data-ln-filter-col</code></td><td data-label="On element">Component root</td><td data-label="Description">Column index (0-based) for table row filtering. Reads <code>&lt;td&gt;</code> text at column N.</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-hash</code></td><td data-label="On element">Component root</td><td data-label="Description">Opt-in. Synchronizes active filters to URL hash fragment (e.g. <code>#users-filter:dept:design</code>).</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-query</code></td><td data-label="On element">Component root</td><td data-label="Description">Opt-in. Synchronizes active filter values to URL query parameter (e.g. <code>?category=design,dev</code>).</td></tr>
 							</tbody>
 						</table>
 						</div>
@@ -391,6 +393,31 @@ table {
     @include table-base;
 }
 					</script>
+				</section>
+
+				<!-- URL Query String Synchronization -->
+				<section class="section-card" data-demo-html>
+					<header><h3>URL Query String Synchronization (<code>data-ln-query</code>)</h3></header>
+					<main>
+						<p>Adding <code>data-ln-query="category"</code> (or bare <code>data-ln-query</code>) to the filter container automatically synchronizes the selected checkbox filter values to the browser's URL query string (e.g. <code>?category=design,qa</code>) via <code>history.replaceState</code>. Works seamlessly with browser history (Back / Forward) and REST endpoints:</p>
+
+						<nav data-ln-filter="filter-query-list" data-ln-query="category">
+							<ul id="filter-query-pills">
+								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-reset checked> All</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="design"> Design</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="dev"> Development</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="qa"> QA</label></li>
+							</ul>
+						</nav>
+
+						<ul id="filter-query-list" style="margin-top: var(--size-md);">
+							<li data-category="design">Ana Petrova — UI Designer</li>
+							<li data-category="dev">Marko Nikolov — Frontend Developer</li>
+							<li data-category="qa">Sara Dimitrova — QA Engineer</li>
+							<li data-category="design">Elena Ristova — UX Designer</li>
+							<li data-category="qa">Toni Angelov — QA Lead</li>
+						</ul>
+					</main>
 				</section>
 
 				<!-- Events -->

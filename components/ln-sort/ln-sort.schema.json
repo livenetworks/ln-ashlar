@@ -35,6 +35,14 @@
 			"type": "string",
 			"description": "URL hash routing key for sort state persistence"
 		},
+		"data-ln-query": {
+			"direction": null,
+			"sources": [
+				"src/ln-sort.js"
+			],
+			"type": "string",
+			"description": "URL query parameter name for sort state persistence"
+		},
 		"data-ln-sort": {
 			"direction": null,
 			"sources": [

@@ -17,6 +17,7 @@ ln-core exposes helpers in these categories:
 - **Windowing** — sliding-window sparse cache for server-side virtualization (`createWindowCache`)
 - **Layout & Positioning** — viewport-aware positioning (`computePlacement`), measurement (`measureHidden`)
 - **Hash codec** — namespaced URL fragment state (`hashParse`, `hashGet`, `hashSet`, `hashSortEncode`, `hashSortDecode`, `hashFilterEncode`, `hashFilterDecode`, `resolveHashNamespace`)
+- **Query codec** — URL search query parameter state (`queryParse`, `queryGet`, `querySet`, `querySortEncode`, `querySortDecode`, `queryFilterEncode`, `queryFilterDecode`, `resolveQueryParam`) (`query.js`)
 - **Cryptography** — high-performance Web Crypto helpers for encryption at rest (`crypto.js`)
 - **Searching & Filtering** — query tokenization, multi-field and filter matching (`matching.js`)
 - **Comparing & Sorting** — type inference and localized/numeric comparison (`compare.js`)
@@ -1118,4 +1119,28 @@ Installs live getters on `target` mapping property names to dynamic attribute re
 
 ### `validateAttrValue(entry, value, attrName, componentTag)`
 Validates attribute string against entry constraints (`enum`, `integer`, `float`, `boolean`, `min`, `max`, etc.) and outputs descriptive `console.warn` in dev mode.
+
+---
+
+## query.js (URL Query Codecs)
+
+URL query string (`?key=value`) state codecs for REST/SPA data synchronization without colliding with hash-based overlays (`#modal`, `#tab`).
+
+### `queryParse(search)`
+Parses search string (defaults to `window.location.search`) into a key-value dictionary.
+
+### `queryGet(key, search)`
+Retrieves the string value for `key` from the query string, or `null` if absent.
+
+### `querySet(key, value)`
+Updates, adds, or deletes `key` in `window.location.search` using `history.replaceState` (avoiding history pollution on typing while preserving back/forward navigation). If `value` is `null` or `""`, the parameter is removed.
+
+### `resolveQueryParam(element, defaultParam)`
+Resolves the query parameter name from an element's `data-ln-query` attribute, falling back to control names/IDs or `defaultParam`.
+
+### `querySortEncode(field, direction)` / `querySortDecode(val, search)`
+Encodes `{ field, direction }` into `field.direction` (e.g. `amount.desc`). Decodes compact dot-notation queries or legacy `sort_field`/`sort_dir` parameter pairs.
+
+### `queryFilterEncode(values)` / `queryFilterDecode(val)`
+Encodes and decodes comma-separated filter value lists (e.g. `?status=active,pending`).
 

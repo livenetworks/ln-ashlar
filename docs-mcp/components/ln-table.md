@@ -118,7 +118,7 @@ Use when the table queries a store and connects through a coordinator rather tha
         <tr>
           <th data-ln-table-col="name">
             <span>Product</span>
-            <ul data-ln-sort="products-table" data-ln-sort-field="name" data-ln-sort-state="none">
+            <ul data-ln-sort="products-table" data-ln-sort-field="name" data-ln-sort-state="none" data-ln-query="sort">
               <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
               <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
               <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -126,7 +126,7 @@ Use when the table queries a store and connects through a coordinator rather tha
           </th>
           <th data-ln-table-col="price">
             <span>Price</span>
-            <ul data-ln-sort="products-table" data-ln-sort-field="price" data-ln-sort-state="none">
+            <ul data-ln-sort="products-table" data-ln-sort-field="price" data-ln-sort-state="none" data-ln-query="sort">
               <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
               <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
               <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>

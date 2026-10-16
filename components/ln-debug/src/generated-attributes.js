@@ -168,6 +168,7 @@ export const VALID_ATTRIBUTES = new Set([
 	'data-ln-popover-position',
 	'data-ln-progress',
 	'data-ln-progress-max',
+	'data-ln-query',
 	'data-ln-render-key',
 	'data-ln-route',
 	'data-ln-route-keep',

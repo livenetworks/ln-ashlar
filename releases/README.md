@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.1.9](./v2.1.9.md) — October 16, 2026
+First-class URL query string (`?key=value`) state synchronization (`data-ln-query`) across data-layer components (`ln-search`, `ln-filter`, `ln-sort`), cleanly decoupled from hash-based UI overlays (`#modal`, `#tab`), zero-coordinator SPA/REST bookmarking, and history replaceState with popstate navigation.  
+👉 [Read full v2.1.9 release notes](./v2.1.9.md)
+
 ### [v2.1.8](./v2.1.8.md) — October 16, 2026
 Component rendering and compositing performance optimizations: core functional CSS and touch/GPU drag support for `ln-sortable`, compositor transitions on `ln-toast`, scroll chaining elimination via `overscroll-behavior: contain`, reflow containment for stat cards and charts, and offscreen rendering on timelines.  
 👉 [Read full v2.1.8 release notes](./v2.1.8.md)

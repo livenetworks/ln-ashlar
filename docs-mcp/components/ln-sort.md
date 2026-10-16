@@ -124,6 +124,7 @@ Target a generic `<ul>`/`<li>` container by `id`. Set `data-ln-sort-items` for d
 | `data-ln-persist` | Same as root | `String` (Optional) | - | Opt-in. Persists the `data-ln-sort-state` string (`"asc"\|"desc"\|"none"`) to `localStorage`. Give each `[data-ln-sort]` its own value (or `id`) — persistence is per-instance, not per-table. |
 | `data-ln-persist-scope` | Same as root | `"page"` | Absent (global) | Opt-in, independent attribute. Scopes the persisted key to the current URL pathname. |
 | `data-ln-hash` | Same as root | `String` (Optional) | - | Opt-in. Synchronizes sort state to URL hash fragment (e.g. `#users-sort:price.asc`). Value is the custom namespace; if empty defaults to `[targetId]-sort`. |
+| `data-ln-query` | Same as root | `String` (Optional) | - | Opt-in. Synchronizes sort column and direction to URL query parameter (e.g. `?sort=price.asc` or `?sort=amount.desc`). Value specifies parameter name (defaults to `'sort'`). Interoperable with browser back/forward history (`popstate`). |
 
 ### Programmatic JS API (`element.lnSort`)
 

@@ -158,6 +158,7 @@ The canonical composition for table per-column filters. `ln-filter` dispatches e
 | `data-ln-persist` | Container root | Flag \| `String` | — | Enables `localStorage` persistence of `data-ln-filter-values`, keyed by the container's `id` or by the attribute's string value. |
 | `data-ln-persist-scope` | Container root | `"page"` | Absent (global) | Opt-in, independent attribute. Scopes the persisted key to the current URL pathname. |
 | `data-ln-hash` | Container root | Flag \| `String` | — | Opt-in. Synchronizes active filters to URL hash fragment (e.g. `#users-filter:status:active,pending`). Value is custom namespace; if empty defaults to `[targetId]-filter`. |
+| `data-ln-query` | Container root | Flag \| `String` | — | Opt-in. Synchronizes active filters to URL query parameter (e.g. `?category=design,dev` or `?status=active`). Value specifies parameter name (defaults to column name or filter key). Interoperable with browser back/forward history (`popstate`). |
 | `data-ln-filter-values` | Container root | `String` | — | Component-written state attribute: the comma-joined, percent-encoded list of currently active filter values. Read by `ln-persist` for restore/save. |
 | `data-ln-filter-hide` | Target children / rows | `"true"` | — | Written by the component on elements that fail the active filters. |
 

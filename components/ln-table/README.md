@@ -148,6 +148,7 @@ Column filters use static authored markup — a `[data-ln-popover]` block contai
 - **SSR Mode (`!this.isDataDriven`)**: `ln-table` listens for `ln-filter:change` directly on its root element. It calls `e.preventDefault()` (preventing `ln-filter`'s default child-hiding DOM mutation), updates its in-memory `_columnFilters[key]`, runs `_applyFilterAndSort()`, `_render()`, and `_updateFooter()`, and dispatches `ln-table:filter`.
 - **Data-Driven Mode (`this.isDataDriven`)**: `ln-table` does not filter locally — `ln-data-store` intercepts `ln-filter:change` on the shared store, updates `query.filters[key]`, and `ln-data-coordinator` re-serves updated datasets to the table via `ln-table:set-data`.
 - **Header Indicator**: `ln-table-coordinator` receives the bubbled `ln-filter:change` from the popover, maps `e.detail.key` to a column via `data-ln-table-filter-col` on `<th>`, and toggles `.ln-filter-active` on the funnel `<button>` (the dot indicator).
+- **URL Query Synchronization (`data-ln-query`)**: Adding `data-ln-query` to the search input (`data-ln-query="search"` or `q`), sort controls (`data-ln-query="sort"`), or column filter lists (`data-ln-query="department"`) synchronizes the table's state to browser URL search parameters (`?search=...&department=...&sort=...`) via `history.replaceState`. Works out-of-the-box in both SSR and Data-Driven modes without custom page coordinators.
 
 ### What ln-table does NOT do
 
