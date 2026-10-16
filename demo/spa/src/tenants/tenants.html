@@ -71,9 +71,22 @@
 			</table>
 
 			<footer class="ln-table__footer">
-				<span data-ln-table-total></span> items
-				<span class="hidden"> · <span data-ln-table-filtered></span> filtered</span>
+				<div>
+					<span data-ln-table-total></span> items
+					<span class="hidden"> · <span data-ln-table-filtered></span> filtered</span>
+				</div>
+				<div data-ln-table-loading class="table-loading hidden" aria-hidden="true">
+					<svg class="ln-icon ln-ajax-spinner"><use href="#ln-icon-loader-2"></use></svg>
+				</div>
 			</footer>
+
+			<template data-ln-template="tenants-loading">
+				<article data-ln-empty-state="loading">
+					<svg class="ln-icon ln-icon--xl ln-ajax-spinner" aria-hidden="true"><use href="#ln-icon-loader-2"></use></svg>
+					<h3>Loading tenants…</h3>
+					<p>Please wait while records are being fetched.</p>
+				</article>
+			</template>
 
 			<template data-ln-template="tenants-row">
 				<tr data-ln-table-row>

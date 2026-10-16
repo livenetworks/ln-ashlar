@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.1.10](./v2.1.10.md) — October 16, 2026
+Elimination of initial empty-state flashing in data-driven tables (`ln-table`) with declarative initial loading templates and `aria-busy`, row preservation during subsequent queries with footer indicator (`data-ln-table-loading`), and standardization of `data-ln-empty-state="loading"`.  
+👉 [Read full v2.1.10 release notes](./v2.1.10.md)
+
 ### [v2.1.9](./v2.1.9.md) — October 16, 2026
 First-class URL query string (`?key=value`) state synchronization (`data-ln-query`) across data-layer components (`ln-search`, `ln-filter`, `ln-sort`), cleanly decoupled from hash-based UI overlays (`#modal`, `#tab`), zero-coordinator SPA/REST bookmarking, and history replaceState with popstate navigation.  
 👉 [Read full v2.1.9 release notes](./v2.1.9.md)

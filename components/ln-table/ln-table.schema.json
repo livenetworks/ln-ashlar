@@ -104,6 +104,14 @@
 				"src/ln-table.js"
 			]
 		},
+		"data-ln-table-loading": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			],
+			"type": "marker",
+			"description": "Loading indicator element in footer or template"
+		},
 		"data-ln-table-row": {
 			"direction": "both",
 			"sources": [

@@ -16,9 +16,10 @@ tags: [empty-state, placeholder, zero-data, search-empty, feedback]
 
 The `empty-state` component (`theme/config/mixins/_empty-state.scss` and `theme/components/_empty-state.scss`) renders centered, icon-led placeholders when a dataset or view contains no records:
 
-- **Two Semantic Scenarios:**
+- **Semantic Scenarios:**
   - `no-data`: First-time / onboarding state inviting the user to create records.
   - `no-results`: Filter / search results returned 0 matches, offering a clear filter action.
+  - `loading`: Initial loading state displaying a centered spinner and status text before records arrive.
 - **Vertical Stack Alignment:** Centers icon, title (`heading-sm`), subtitle (`body-md`), and primary call-to-action button vertically.
 
 ---
@@ -47,6 +48,15 @@ The `empty-state` component (`theme/config/mixins/_empty-state.scss` and `theme/
 </div>
 ```
 
+### Variant 2: Initial Loading State
+
+```html
+<article data-ln-empty-state="loading">
+    <svg class="ln-icon ln-ajax-spinner" aria-hidden="true"><use href="#ln-icon-loader-2"></use></svg>
+    <p>Loading records...</p>
+</article>
+```
+
 ---
 
 ## 3. SCSS API (Mixins, Classes & Tokens)
@@ -54,7 +64,7 @@ The `empty-state` component (`theme/config/mixins/_empty-state.scss` and `theme/
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
 | `empty-state` | mixin | — | Centered flex column layout with muted icon and title rhythm |
-| `data-ln-empty-state` | attribute | `no-data` \| `no-results` | Declarative attribute selector for empty states |
+| `data-ln-empty-state` | attribute | `no-data` \| `no-results` \| `loading` | Declarative attribute selector for empty and loading states |
 
 ---
 
