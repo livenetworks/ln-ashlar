@@ -491,12 +491,14 @@ Every `ln-ajax:start` is followed by exactly one of `ln-ajax:complete` or `ln-aj
 | `data-ln-api-connector` | Wrapper | `String` | — | Initializes the component and declares the driver namespace. |
 | `data-ln-api-base-url` | Wrapper | `String` | — | Base HTTP URL address of backend API endpoint. |
 | `data-ln-api-path` | Wrapper | `String` | — | Targeted query path resource name. |
-| `data-ln-api-headers` | Wrapper | `String` | — | Comma-separated list of custom HTTP headers. |
+| `data-ln-api-endpoint` | Wrapper | `String` | — | Alias for `data-ln-api-path`. |
+| `data-ln-api-headers` | Wrapper | `String` | — | Comma-separated list or JSON object of custom HTTP headers. |
 | `data-ln-api-param-offset` | Wrapper | `String` | `"offset"` | Configures URL parameter key for pagination offset (e.g. `"offset"`, `"skip"`, `"page_offset"`). |
 | `data-ln-api-param-limit` | Wrapper | `String` | `"limit"` | Configures URL parameter key for page size limit (e.g. `"limit"`, `"take"`, `"page_size"`). |
 | `data-ln-api-param-search` | Wrapper | `String` | `"search"` | Configures URL parameter key for search query term (e.g. `"search"`, `"q"`, `"query"`). |
-| `data-ln-api-param-sort-field` | Wrapper | `String` | `"sort_field"` | Configures URL parameter key for sorting field name (e.g. `"sort_field"`, `"sort"`, `"order_by"`). |
+| `data-ln-api-param-sort-field` | Wrapper | `String` | `"sort_by"` | Configures URL parameter key for sorting field name (e.g. `"sort_by"`, `"sort_field"`, `"order_by"`). |
 | `data-ln-api-param-sort-dir` | Wrapper | `String` | `"sort_dir"` | Configures URL parameter key for sorting direction (e.g. `"sort_dir"`, `"order"`, `"dir"`). |
+| `data-ln-api-connector-query-debounce` | Wrapper | `Integer` | `200` | Debounce delay in milliseconds before dispatching query requests. |
 
 ### Programmatic JS API
 
@@ -604,27 +606,24 @@ Every `ln-ajax:start` is followed by exactly one of `ln-ajax:complete` or `ln-aj
 
 ### ln-autoresize
 - **Classification:** `simple` | **Status:** `stable`
-- **Summary:** Automatically adjusts textarea height based on content size to prevent scroll bars.
+- **Summary:** Pure CSS textarea auto-resizing powered natively by field-sizing: content without JavaScript runtime overhead.
 
-> **Classification:** 🟢 Simple Component / Layer 1 UI Utility  
-> Applied directly to a `<textarea data-ln-autoresize rows="1">`. It listens for native `input` events:
-> in the handler, it resets `textarea.style.height = 'auto'`, reads `textarea.scrollHeight`, and sets
-> `textarea.style.height = textarea.scrollHeight + 'px'`. It carries zero state, executing a synchronous layout calculation to expand and collapse the box dynamically.
+> Applied directly to a `<textarea data-ln-autoresize rows="1">`. It leverages native CSS `field-sizing: content` to automatically expand and collapse textarea height according to its content volume directly in the browser's C++ rendering engine. It carries zero JavaScript runtime overhead, zero event listeners, and zero layout thrashing.
 
 #### Minimal HTML Markup & Usage:
 ### Base HTML Markup
 
-Standard copy-paste implementation showing how to activate auto-resizing on a textarea:
+Standard implementation for an auto-growing textarea:
 
 ```html
-<textarea data-ln-autoresize placeholder="Write text..."></textarea>
+<textarea data-ln-autoresize rows="1" placeholder="Write text..."></textarea>
 ```
 
 ---
 
 ### Variant 1: Pre-populated Form Data (SSR / Edit Modes)
 
-When data is loaded dynamically or rendered by the server, the component automatically calculates the initial volume and expands the textarea accordingly:
+When data is loaded or pre-rendered by the server, native CSS intrinsically computes the accurate layout height on initial paint:
 
 ```html
 <div class="form-element">
@@ -632,7 +631,20 @@ When data is loaded dynamically or rendered by the server, the component automat
     <textarea id="description" 
               name="description" 
               data-ln-autoresize
-              rows="3">This is a long pre-populated description. The textarea automatically adjusts its layout height to ensure the entirety of this text is readable without displaying scroll bars.</textarea>
+              rows="3">This is a long pre-populated description. The textarea intrinsically sizes to ensure all text is readable without extra script execution.</textarea>
+</div>
+```
+
+---
+
+### Variant 2: Capped Growth with Overflow Scroll
+
+To set an upper ceiling and allow scrolling once content exceeds a specific height, pair the attribute with standard CSS `max-height`:
+
+```html
+<div class="form-element">
+    <label for="capped-notes">Notes (max 6rem):</label>
+    <textarea id="capped-notes" data-ln-autoresize rows="1" style="max-height: 6rem; overflow-y: auto;"></textarea>
 </div>
 ```
 
@@ -643,11 +655,12 @@ When data is loaded dynamically or rendered by the server, the component automat
 
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
-| `data-ln-autoresize` | `<textarea>` | Flag | — | Initializes the auto-resizing behavior on the target element. |
+| `data-ln-autoresize` | `<textarea>` | marker | — | Activates native CSS `field-sizing: content` and resets manual resize handles. |
+| `rows` | `<textarea>` | integer | `1` | Defines the baseline row height when empty. Recommended: `1`. |
 
 ### Events API
 
-This component emits and listens to no custom ln-* events.
+This utility is 100% pure CSS and does not listen to or emit custom events.
 
 ---
 
@@ -1022,7 +1035,7 @@ This service module exposes no declarative HTML attributes directly on itself.
 | `guardBody` | `(setupFn: Function, componentTag: String)` | `void` | Defers script execution until `DOMContentLoaded` if `document.body` is not yet available. |
 | `findElements` | `(root: HTMLElement, selector: String, attribute: String, ComponentClass: Class)` | `void` | Instantiates `ComponentClass` on all matching elements under `root` that lack `el[attribute]`. |
 | `isVisible` | `(el: HTMLElement)` | `Boolean` | Returns true if element has a non-zero layout width/height or bounding client rects. |
-| `readValue` | `(el: HTMLElement)` | `String` | Reads `data-ln-value` attribute if present, otherwise returns trimmed `textContent`. Single path for machine value extraction. |
+| `readValue` | `(el: HTMLElement)` | `String` | Reads native `value` if present, then `data-ln-value`, then `datetime` on `<time>`, else returns trimmed `textContent`. Single path for machine value extraction. |
 | `interceptValueProperty` | `(dom: HTMLElement, descriptor: PropertyDescriptor, callbacks: { get?: Function, set?: Function })` | `void` | Intercepts programmatic `value` getter/setter on inputs to sync custom formatting. |
 | `serializeForm` | `(form: HTMLFormElement, opts?: { typed?: Boolean, exclude?: String })` | `Object` | Serializes form inputs into a plain JavaScript object. Option `typed: true` converts numbers to `Number` and single checkboxes to booleans. |
 | `populateForm` | `(form: HTMLFormElement, data: Object)` | `Array<HTMLElement>` | Populates form elements matching field names or `data-ln-fill-as` overrides. |
@@ -1227,6 +1240,36 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 </div>
 ```
 
+### Variant 2: URL Query String Synchronization (`data-ln-query`)
+
+Data-layer query controls ([`ln-search`](./ln-search.md), [`ln-filter`](./ln-filter.md), [`ln-sort`](./ln-sort.md)) target the store element by ID (`id="users"`). Adding `data-ln-query` synchronizes state directly to the browser's URL query string (`?search=term&status=active&sort=created_at.desc`) without needing a custom page coordinator.
+
+```html
+<!-- Search bar with URL sync -->
+<search>
+    <input type="search" placeholder="Search..." data-ln-search-for="users" data-ln-query="search">
+</search>
+
+<!-- Sortable table headers with URL sync -->
+<th data-ln-table-col="name">
+    Name
+    <ul data-ln-sort="users" data-ln-sort-field="name" data-ln-query="sort">
+        <li><button type="button" data-ln-sort-dir="asc">Asc</button></li>
+        <li><button type="button" data-ln-sort-dir="desc">Desc</button></li>
+    </ul>
+</th>
+
+<!-- Filter popover with URL sync -->
+<div data-ln-popover id="status-popover">
+    <ul data-ln-filter="users" data-ln-query="status">
+        <li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="active"> Active</label></li>
+        <li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="pending"> Pending</label></li>
+    </ul>
+</div>
+```
+
+When users type, filter, or sort, `ln-search`/`ln-filter`/`ln-sort` update the URL parameters via `history.replaceState` and dispatch bubbled CustomEvents. The coordinator intercepts them on `self.dom`, updates its internal query state (`data-ln-data-coordinator-search`, `-filters`, `-sort-field`), and triggers a re-query through the connector. On page load / bookmark visits, the controls automatically read the query string during boot (`queueBoot`) and seed the coordinator.
+
 ---
 
 #### Declarative API Contract (Attributes & Events):
@@ -1400,6 +1443,26 @@ Use when synchronizing with a REST backend API.
 </ul>
 ```
 
+### Variant 3: Server-Rendered (SSR) Instant Seed (Zero-Network Fetch)
+
+Use when backend pre-populates dataset into the initial page response. The store parses the array instantly, populating IndexedDB and serving reads without needing an API connector.
+
+#### HTML Markup
+```html
+<ul id="tenants"
+    data-ln-data-store
+    data-ln-data-store-indexes="package_id,active"
+    data-ln-data-store-search-fields="name,slug"
+    hidden>
+    <script type="application/json">
+      [
+        {"id": 1, "name": "Acme Corp", "slug": "acme", "package_id": 2, "active": 1},
+        {"id": 2, "name": "Globex", "slug": "globex", "package_id": 1, "active": 1}
+      ]
+    </script>
+</ul>
+```
+
 ---
 
 #### Declarative API Contract (Attributes & Events):
@@ -1408,6 +1471,7 @@ Use when synchronizing with a REST backend API.
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-data-store` | Root | Flag / Valueless | *Required* | Activates the store. The store name is defined by the element's `id`. |
+| `data-ln-data-store-seed` | Root | `String` | *Optional* | Selector or element ID of an external seed script block. |
 | `data-ln-data-store-stale` | Root | `Integer` \| `"never"` \| `-1` | `300` | Seconds before data is considered stale. |
 | `data-ln-data-store-indexes` | Root | `String` | `""` | Comma-separated IndexedDB index fields. |
 | `data-ln-data-store-search-fields` | Root | `String` | `""` | Comma-separated list of text fields for search. |
@@ -1462,7 +1526,8 @@ Exposed on the root element via `el.lnDataStore`:
 | `ln-data-store:synced` | Emits | No | Emitted after subsequent delta sync completes. | `{ store: String, added: Number, deleted: Number, changed: Boolean }` |
 | `ln-data-store:quota-exceeded` | Emits | No | Emitted on `document` if database storage runs out of quota. | `{ error: Error }` |
 | `ln-data-store:initialization-error` | Emits | No | IndexedDB could not be opened. `ready` still resolves, so a coordinator routes reads to its connector. | `{ store: String, error: Error }` |
-| `ln-data-store:sync-error` | Emits | No | A connector sync failed; `isSyncing` is cleared so a later retry can run. | `{ store: String, error: String, status: Number }` |
+| `ln-data-store:sync-error` | Emits | No | A connector sync or local cache commit failed; `isSyncing` is cleared so a later retry can run. | `{ store: String, error: String, status?: Number }` |
+| `ln-data-store:blocked` | Emits | No | Emitted on `document` if an IndexedDB version upgrade is blocked by open connections in other tabs. | `{ db: String }` |
 | `ln-data-store:mutation-error` | Emits | No | A local mutation failed. `requestId` correlates it with the coordinator's request. | `{ store: String, action: String, requestId: String, error: Error }` |
 | `ln-data-store:request-page` | Emits | No | Windowed residency: pages inside the sliding window are missing and must be fetched from the server. | `{ store: String, offset: Number, limit: Number, query: Object, queryGen: Number }` |
 
@@ -2195,6 +2260,7 @@ The canonical composition for table per-column filters. `ln-filter` dispatches e
 | `data-ln-persist` | Container root | Flag \| `String` | — | Enables `localStorage` persistence of `data-ln-filter-values`, keyed by the container's `id` or by the attribute's string value. |
 | `data-ln-persist-scope` | Container root | `"page"` | Absent (global) | Opt-in, independent attribute. Scopes the persisted key to the current URL pathname. |
 | `data-ln-hash` | Container root | Flag \| `String` | — | Opt-in. Synchronizes active filters to URL hash fragment (e.g. `#users-filter:status:active,pending`). Value is custom namespace; if empty defaults to `[targetId]-filter`. |
+| `data-ln-query` | Container root | Flag \| `String` | — | Opt-in. Synchronizes active filters to URL query parameter (e.g. `?category=design,dev` or `?status=active`). Value specifies parameter name (defaults to column name or filter key). Interoperable with browser back/forward history (`popstate`). |
 | `data-ln-filter-values` | Container root | `String` | — | Component-written state attribute: the comma-joined, percent-encoded list of currently active filter values. Read by `ln-persist` for restore/save. |
 | `data-ln-filter-hide` | Target children / rows | `"true"` | — | Written by the component on elements that fail the active filters. |
 
@@ -2445,7 +2511,7 @@ populateForm(form, { name: "Jane", age: 31, isAdmin: false });
 | `guardBody` | `(setupFn: Function, componentTag: String)` | `void` | Defers execution until `DOMContentLoaded` if `document.body` is not yet available. |
 | `findElements` | `(root: HTMLElement, selector: String, attribute: String, ComponentClass: Class)` | `void` | Instantiates `ComponentClass` on all matching elements under `root` that lack `el[attribute]`. |
 | `isVisible` | `(el: HTMLElement)` | `Boolean` | Returns true if element has layout bounds or bounding client rects. |
-| `readValue` | `(el: HTMLElement)` | `String` | Reads `data-ln-value` attribute if present, otherwise returns trimmed `textContent`. |
+| `readValue` | `(el: HTMLElement)` | `String` | Reads native `value` if present, then `data-ln-value`, then `datetime` on `<time>`, else returns trimmed `textContent`. |
 | `interceptValueProperty` | `(dom: HTMLElement, descriptor: PropertyDescriptor, callbacks: { get?: Function, set?: Function })` | `void` | Intercepts programmatic `value` getter/setter on inputs to sync custom formatting. |
 | `serializeForm` | `(form: HTMLFormElement, opts?: { typed?: Boolean, exclude?: String })` | `Object` | Extracts form inputs into a plain JavaScript object. |
 | `populateForm` | `(form: HTMLFormElement, data: Object)` | `Array<HTMLElement>` | Fills form inputs matching field names or `data-ln-fill-as` attributes. |
@@ -3052,6 +3118,16 @@ Triggers communicate with modals via `data-ln-modal-for="modalId"` and optionall
     Edit User
 </button>
 
+<!-- Trigger: Edit (Hash Anchor Variant for deep-linkable entity editing) -->
+<a href="#user-modal"
+   data-ln-modal-for="user-modal"
+   data-ln-modal-mode="edit"
+   data-ln-fill-form="user-form"
+   data-ln-fill-id="42"
+   data-ln-fill-name="Ada Lovelace">
+    Edit User
+</a>
+
 <!-- Target Modal with conditional headers -->
 <dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="user-modal">
     <form id="user-form" data-ln-form>
@@ -3109,9 +3185,9 @@ All events bubble (`bubbles: true`) and contain target details in `event.detail`
 | `ln-modal:request-open` | Listens | No | Command request event sent to open the modal. | `{}` |
 | `ln-modal:request-close` | Listens | No | Command request event sent to close the modal. | `{}` |
 | `ln-modal:before-open` | Emits | **Yes** | Dispatched when state changes to `"open"`, before styles or focus are applied. | `{ modalId: String, target: HTMLElement }` |
-| `ln-modal:open` | Emits | No | Dispatched once modal is natively open, body scroll locked, and initial focus set. | `{ modalId: String, target: HTMLElement, hashNs: String?, param: String? }` |
+| `ln-modal:open` | Emits | No | Dispatched once modal is natively open, body scroll locked, and initial focus set. | `{ modalId: String, target: HTMLElement }` |
 | `ln-modal:before-close` | Emits | **Yes** | Dispatched upon request to close; calling `preventDefault()` cancels closing. | `{ modalId: String, target: HTMLElement }` |
-| `ln-modal:close` | Emits | No | Dispatched after modal closes, before focus restoration. | `{ modalId: String, target: HTMLElement }` |
+| `ln-modal:close` | Emits | No | Dispatched after modal closes and body scroll lock is released. | `{ modalId: String, target: HTMLElement }` |
 
 ---
 
@@ -4225,10 +4301,11 @@ Clear triggers work universally without external coordinators:
 | `data-ln-search-clear-for` | Button | String | — | Remote clear button referencing target element ID. Clears linked input and resets target state. |
 | `data-ln-search-hide` | Target Children | Boolean | `false` | State attribute added to non-matching DOM elements (`"true"`). |
 | `data-ln-hash` | Target / Control | String (Optional) | — | Opt-in. Synchronizes search query to URL hash fragment (e.g. `#users-search:john`). Value is custom namespace; if empty defaults to `[targetId]-search`. |
+| `data-ln-query` | Target / Control | String (Optional) | — | Opt-in. Synchronizes search query to URL query string (`?q=term` or `?search=term`). Value specifies query parameter name (defaults to `'q'` or `'search'`). Interoperable with browser back/forward (`popstate`) and keeps hash free for modals/tabs. |
 | `data-ln-persist` | Target (State Host) | String (Optional) | — | **Recommended.** Stores the term in `localStorage` and restores it before boot; omit it only when the search must start empty on every visit. Goes on `[data-ln-search]`, never on the input. The target needs an `id`, or give the attribute an explicit key (`data-ln-persist="key"`). An empty term removes the entry rather than storing `""`. Stored key format: `ln:{id}:data-ln-search` (global by default); add `data-ln-persist-scope="page"` to opt into page-scoping, which stores `ln:{id}:{pathname}:data-ln-search`. No effect while `data-ln-hash` is active — hash wins, never double-written. |
 | `data-ln-persist-scope` | Target (State Host) | `"page"` | Absent (global) | Opt-in, independent attribute. Scopes the persisted key to the current URL pathname. |
 
-Boot precedence when more than one source carries a term: `data-ln-hash` wins first (persist is skipped entirely while hash is active — never double-written), then `data-ln-persist` (restored via `ln-persist`'s sink before the target's own component instance is constructed), then the term authored on the target.
+Boot precedence when more than one source carries a term: `data-ln-hash` wins first (persist is skipped entirely while hash is active — never double-written), then `data-ln-query` (reads `queryGet`), then `data-ln-persist` (restored via `ln-persist`'s sink before the target's own component instance is constructed), then the term authored on the target.
 
 ### Programmatic JS API
 
@@ -4390,6 +4467,7 @@ Target a generic `<ul>`/`<li>` container by `id`. Set `data-ln-sort-items` for d
 | `data-ln-persist` | Same as root | `String` (Optional) | - | Opt-in. Persists the `data-ln-sort-state` string (`"asc"\|"desc"\|"none"`) to `localStorage`. Give each `[data-ln-sort]` its own value (or `id`) — persistence is per-instance, not per-table. |
 | `data-ln-persist-scope` | Same as root | `"page"` | Absent (global) | Opt-in, independent attribute. Scopes the persisted key to the current URL pathname. |
 | `data-ln-hash` | Same as root | `String` (Optional) | - | Opt-in. Synchronizes sort state to URL hash fragment (e.g. `#users-sort:price.asc`). Value is the custom namespace; if empty defaults to `[targetId]-sort`. |
+| `data-ln-query` | Same as root | `String` (Optional) | - | Opt-in. Synchronizes sort column and direction to URL query parameter (e.g. `?sort=price.asc` or `?sort=amount.desc`). Value specifies parameter name (defaults to `'sort'`). Interoperable with browser back/forward history (`popstate`). |
 
 ### Programmatic JS API (`element.lnSort`)
 
@@ -4901,7 +4979,7 @@ In SSR mode, the table is functional immediately with the server-rendered markup
 > `data-ln-table` altogether. See `demo/admin/src/pages/table.html`. `ln-table`
 > is only needed once sort, column filters (`data-ln-table-filter-col`), or
 > data-driven rows enter the picture — see `demo/admin/src/pages/table-filter.html`
-> and `demo/admin/src/pages/table-sync.html`. The two shapes never combine on
+> and `demo/admin/src/pages/table-api.html`. The two shapes never combine on
 > the same target: `ln-table` calls `preventDefault()` unconditionally on
 > `ln-search:change`, and since the event bubbles, that supersedes `ln-search`'s
 > own DOM-filter path the instant `data-ln-table` is present.
@@ -4925,7 +5003,7 @@ Use when the table queries a store and connects through a coordinator rather tha
         <tr>
           <th data-ln-table-col="name">
             <span>Product</span>
-            <ul data-ln-sort="products-table" data-ln-sort-field="name" data-ln-sort-state="none">
+            <ul data-ln-sort="products-table" data-ln-sort-field="name" data-ln-sort-state="none" data-ln-query="sort">
               <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
               <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
               <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -4933,7 +5011,7 @@ Use when the table queries a store and connects through a coordinator rather tha
           </th>
           <th data-ln-table-col="price">
             <span>Price</span>
-            <ul data-ln-sort="products-table" data-ln-sort-field="price" data-ln-sort-state="none">
+            <ul data-ln-sort="products-table" data-ln-sort-field="price" data-ln-sort-state="none" data-ln-query="sort">
               <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
               <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
               <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -4944,14 +5022,108 @@ Use when the table queries a store and connects through a coordinator rather tha
       <tbody data-ln-table-body></tbody>
     </table>
 
+    <!-- Initial Loading State Template -->
+    <template data-ln-template="products-loading">
+      <article data-ln-empty-state="loading">
+        <svg class="ln-icon ln-ajax-spinner" aria-hidden="true"><use href="#ln-icon-loader-2"></use></svg>
+        <p>Loading products...</p>
+      </article>
+    </template>
+
+    <!-- Row Template -->
     <template data-ln-template="products-row">
       <tr data-ln-table-row>
         <td>{{ name }}</td>
         <td>{{ price }}</td>
       </tr>
     </template>
+
+    <footer>
+      <span>Showing <span data-ln-table-filtered>0</span> of <strong data-ln-table-total>0</strong> products</span>
+      <!-- Background Loading Indicator (hidden by default, displayed during re-fetching) -->
+      <div data-ln-table-loading class="table-loading hidden" aria-hidden="true">
+        <svg class="ln-icon ln-ajax-spinner"><use href="#ln-icon-loader-2"></use></svg>
+      </div>
+    </footer>
   </div>
 </div>
+```
+
+---
+
+### Variant 2: Injected JSON Seed Mode (0ms Network, Cheetah-Style DOM Row Pool)
+
+Use when the backend embeds the entire dataset (e.g. 10,000 records) into `<script type="application/json">` or pairs with a seeded `ln-data-store`. Eliminates secondary network roundtrips completely while maintaining fluid 60 FPS scrolling through a recycled DOM row pool (~38 `<tr>` elements).
+
+#### HTML Markup
+
+```html
+<!-- Table Coordinator & Declarative Store Layer (NO API CONNECTOR NEEDED) -->
+<section data-ln-table-coordinator>
+  <ul data-ln-data-coordinator="seed-docs" id="seed-table-coordinator" hidden>
+    <li data-ln-data-store="seed-docs"
+        data-ln-data-store-seed="seed-docs-data"
+        data-ln-data-store-indexes="department,status,priority"
+        data-ln-data-store-search-fields="title,department,owner,status,priority"
+        id="seed-docs"></li>
+  </ul>
+
+  <!-- Authoritative Injected JSON Payload (e.g. 10,000 records) -->
+  <script type="application/json" id="seed-docs-data">
+    [
+      { "id": 1, "title": "Security Policy", "department": "IT", "status": "Approved", "owner": "Alice", "file_size": 11112, "file_size_display": "10.9 KB", "updated_at": 1776339624, "updated_display": "2026-04-16" }
+    ]
+  </script>
+
+  <!-- Table Viewport with Recycled DOM Row Pool -->
+  <section data-ln-table="seed-docs"
+           data-ln-table-source="seed-docs"
+           data-ln-table-selectable
+           id="seed-table"
+           class="data-table-demo"
+           style="max-height: 540px; overflow-y: auto;">
+    <table>
+      <thead>
+        <tr>
+          <th data-ln-table-col-select style="width: 40px;"></th>
+          <th data-ln-table-col="title">
+            <span>Title</span>
+            <ul data-ln-sort="seed-docs" data-ln-sort-field="title" data-ln-sort-state="none" data-ln-query="sort">
+              <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+              <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+              <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+            </ul>
+          </th>
+          <th data-ln-table-col="department">
+            <span>Department</span>
+            <ul data-ln-sort="seed-docs" data-ln-sort-field="department" data-ln-sort-state="none" data-ln-query="sort">
+              <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+              <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+              <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+            </ul>
+          </th>
+        </tr>
+      </thead>
+      <tbody data-ln-table-body></tbody>
+    </table>
+
+    <footer class="ln-table__footer">
+      <p>
+        <span class="hidden"><span data-ln-table-filtered></span> / </span>
+        <span data-ln-table-total data-ln-number></span> items
+      </p>
+    </footer>
+
+    <!-- Row Template Cloned Once for the Pool (~38 rows total) -->
+    <template data-ln-template="seed-docs-row" data-ln-table-row>
+      <tr data-ln-table-row data-ln-table-row-id="{{ id }}">
+        <td><input type="checkbox" data-ln-table-row-select></td>
+        <td><strong>{{ title }}</strong></td>
+        <td>{{ department }}</td>
+      </tr>
+    </template>
+  </section>
+</section>
 ```
 
 ---
@@ -4963,6 +5135,7 @@ Use when the table queries a store and connects through a coordinator rather tha
 |---|---|---|---|---|
 | `data-ln-table` | Root container | `String` | - | Identifies the table. The value names generated events. Must have a unique `id`. |
 | `data-ln-table-source` | Root container | `String` | - | Enables Data-Driven mode. Value maps to the target data store ID. |
+| `data-ln-table-seed` | Root container | `String` | - | Selector or element ID of an external seed script block containing an initial JSON records array. |
 | `data-ln-table-selectable` | Root container | `Boolean` | `false` | Enables row multi-selection and checkboxes. |
 | `data-ln-table-window` | Root container | `Number` | - | Opt-in server-side sliding-window virtualization. Sets the resident-row cap (`windowSize`) for the internal `ln-core.createWindowCache` instance. Observable — adding/removing it toggles windowed mode ON/OFF live, no re-init; changing the value while windowed reconfigures the live cache. |
 | `data-ln-table-window-page` | Root container | `Number` | `200` | Configures the chunk/page fetch size (`pageSize` / `limit`) for page-aligned server requests. Observable — applies to the live cache without re-init. |
@@ -4980,6 +5153,7 @@ Use when the table queries a store and connects through a coordinator rather tha
 | `data-ln-table-filtered` | `<span>` | - | - | Displays filtered count in footer. The immediate parent element is automatically shown/hidden based on active filters. |
 | `data-ln-table-selected` | `<span>` | - | - | Displays selection count in footer. The immediate parent element is automatically shown/hidden when selection > 0. |
 | `data-ln-table-filter-col` | `<th>` | `String` | - | Maps column header to a filter key. Required for column filtering. |
+| `data-ln-table-loading` | Indicator element (in footer) / Template | `Marker` | - | Marks a background loading indicator element (automatically toggled during re-fetch) or a generic loading template (`template[data-ln-table-loading]`). |
 | `data-ln-table-clear` | `<button>` | - | - | Resets local search inputs and column filters in SSR mode. |
 | `data-ln-table-clear-all` | `<button>` | - | - | Resets all active filters and triggers a new data request in Data-Driven mode. |
 | `data-ln-table-cell-attr` | Template element | `String` | - | List of `field:attribute` mappings for attribute interpolation. *(Processed externally via `ln-core.js` / `fillTemplate()`)* |
@@ -4992,7 +5166,7 @@ Use when the table queries a store and connects through a coordinator rather tha
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-table:set-data` | Listens | No | Populates the table with a raw dataset (Data-Driven mode). Windowed mode (`data-ln-table-window`) additionally reads `offset`/`queryGen` off the payload, routing it into the internal window cache. | `{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }` |
-| `ln-table:set-loading` | Listens | No | Toggles the `.ln-table--loading` class (Data-Driven mode). | `{ loading: Boolean }` |
+| `ln-table:set-loading` | Listens | No | Updates loading state (Data-Driven mode). Prior to initial data load, renders the loading template into `<tbody>` and sets `aria-busy="true"`. During subsequent queries, preserves existing rows, toggles `.ln-table--loading`, and reveals the `[data-ln-table-loading]` footer spinner. | `{ loading: Boolean }` |
 | `ln-table:page-failed` | Listens | No | Windowed mode (`data-ln-table-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry. | `{ offset: Number }` |
 | `ln-table:request-revalidate` | Listens | No | Windowed mode (`data-ln-table-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives. | *(no payload)* |
 | `ln-table:request-invalidate` | Listens | No | Windowed mode (`data-ln-table-window`): invalidates the window cache and resets to page 0. | *(no payload)* |
@@ -5024,7 +5198,7 @@ Use when the table queries a store and connects through a coordinator rather tha
 > **Classification:** 🟢 Simple component / State Manager (Layer 1 - UI Primitive)  
 > Applied to a wrapper `<section data-ln-tabs>` containing trigger buttons (`data-ln-tab="key"`) and panels (`data-ln-panel="key"`).
 > On trigger `click`, it writes `data-ln-tabs-active="key"` on the wrapper. An attribute observer synchronizes the DOM:
-> toggling `class="hidden"` and `aria-hidden` on panels, and updating `aria-selected` on triggers. When configured with an `id`
+> toggling the HTML5 `hidden` boolean property, `class="hidden"`, and `aria-hidden` on panels, and updating `aria-selected` on triggers. When configured with an `id`
 > and anchor triggers (`<a href="#id:key">`), it synchronizes the active tab with `window.location.hash` for deep-linking and browser history persistence.
 
 #### Minimal HTML Markup & Usage:
@@ -6212,6 +6386,7 @@ The `modal-crud` pattern uses a **single `<form>` inside a `<dialog data-ln-moda
 - **Automatic Form Reset:** Clicking "Create" opens the modal with an empty payload, resetting the form and switching `data-ln-modal-mode="new"`.
 - **Automatic Prefill:** Clicking "Edit" populates form inputs and sets `data-ln-modal-mode="edit"`.
 - **Dynamic Header:** `<h3 data-ln-fillable>` toggles display titles between `<span data-ln-modal-when="new">` and `<span data-ln-modal-when="edit">`.
+- **Modal vs Dedicated Route (Hash Triggers):** For smaller/focused entities, Ashlar prescribes in-place modal editing over navigating away to a separate full-page route (e.g. `/entity/:id/edit`). To preserve deep-linkability, URL sharing, and browser history without full-page reloads, triggers may be authored as anchor tags (`<a href="#modal-id">`) while retaining the full declarative `data-ln-modal-*` and `data-ln-fill-*` contract.
 
 ---
 
@@ -6237,7 +6412,7 @@ The `modal-crud` pattern uses a **single `<form>` inside a `<dialog data-ln-moda
                 <td>50</td>
                 <td><span class="badge success">Active</span></td>
                 <td>
-                    <!-- Declarative Edit Trigger -->
+                    <!-- Declarative Edit Trigger (Button) -->
                     <button type="button" 
                             class="btn btn-sm btn-soft"
                             data-ln-modal-for="package-modal"
@@ -6249,6 +6424,20 @@ The `modal-crud` pattern uses a **single `<form>` inside a `<dialog data-ln-moda
                             data-ln-fill-is-active="1">
                         Edit
                     </button>
+
+                    <!-- Declarative Edit Trigger (Hash Anchor Variant) -->
+                    <!-- Used when modal state must reflect in the URL hash for deep-linking without a dedicated edit page -->
+                    <a href="#package-modal"
+                       class="btn btn-sm btn-soft"
+                       data-ln-modal-for="package-modal"
+                       data-ln-modal-mode="edit"
+                       data-ln-fill-form="package-form"
+                       data-ln-fill-id="42"
+                       data-ln-fill-name="Pro Plan"
+                       data-ln-fill-max-users="50"
+                       data-ln-fill-is-active="1">
+                        Edit (Hash Link)
+                    </a>
                 </td>
             </tr>
         </tbody>
@@ -6346,6 +6535,7 @@ sequenceDiagram
 > 1. **CamelCase Dataset Keys:** `data-ln-fill-max-users` maps to `maxUsers` in the JS dataset. If the input name has underscores (`name="max_users"`), supply `data-ln-fill-as="maxUsers"` on the input to match.
 > 2. **Fillable Header Slot:** Non-form display text (e.g. modal title) must carry `data-ln-fillable` with inner `<span data-ln-field="...">` to receive values from `data-ln-modal-*` attributes.
 > 3. **Hidden Inputs for Checkboxes:** Standalone checkboxes submit nothing when unchecked. Always include `<input type="hidden" name="is_active" value="0">` immediately preceding the checkbox.
+> 4. **Anchor Triggers vs Buttons:** While `<button type="button">` is the default for local overlays, `<a href="#modal-id">` is explicitly authorized when the modal state must be deep-linked into the URL hash fragment. `ln-modal` and `ln-fill` delegate by attribute selector (`[data-ln-modal-for]`, `[data-ln-fill-form]`), fully honoring both element types.
 
 ---
 
@@ -6365,12 +6555,12 @@ sequenceDiagram
 
 ## 1. Problem & Context
 
-High-performance enterprise applications require data tables that deliver instant first paint (via SSR rows) and dynamic client-side filtering, sorting, searching, and background synchronization without full page reloads.
+High-performance enterprise applications require data tables that deliver dynamic client-side filtering, sorting, searching, and background synchronization for large datasets without full page reloads.
 
 The `data-table-sync` pattern coordinates:
-- **`ln-table`:** View presenter managing row rendering, selection, and keyboard navigation.
+- **`ln-table`:** View presenter managing virtualized sliding-window row rendering via templates, selection, and keyboard navigation.
 - **`ln-data-store`:** IndexedDB / in-memory store maintaining local state and delta synchronization.
-- **`ln-table-coordinator`:** Mediator bridging search inputs, filter panels, and sort buttons to table mutations.
+- **`ln-table-coordinator` / `ln-data-coordinator`:** Mediator bridging search inputs, filter panels, and sort buttons to table and remote API fetches.
 
 ---
 
@@ -6422,15 +6612,18 @@ The `data-table-sync` pattern coordinates:
                     <th data-ln-table-col="status">Status</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- SSR Hydration Rows -->
-                <tr data-ln-table-row data-id="1">
-                    <td>Alice Johnson</td>
-                    <td>admin</td>
-                    <td><span class="badge success">Active</span></td>
-                </tr>
+            <tbody data-ln-table-body>
             </tbody>
         </table>
+
+        <!-- Row Template -->
+        <template data-ln-template="users-row">
+            <tr data-ln-table-row data-ln-table-row-id="{{ id }}">
+                <td>{{ name }}</td>
+                <td>{{ role }}</td>
+                <td><span class="badge {{ status_class }}">{{ status }}</span></td>
+            </tr>
+        </template>
     </div>
 </section>
 ```

@@ -1,5 +1,5 @@
 import { cloneTemplateScoped, createBatcher, createWindowCache, dispatch, fill, fillTemplate, getLocale, readValue, registerComponent, requestData, attrBool, attrStr, attrSpec, defineAttrs } from '../../ln-core';
-import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, toggleSelectAll } from './table-model.js';
+import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, parseTableSeed, toggleRowSelection, toggleSelectAll } from './table-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-table';
@@ -50,6 +50,7 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 	const ATTRIBUTES = {
 		'data-ln-table':                  { prop: 'name', type: 'string', read: attrStr, fallback: '', description: 'Table instance name or identifier' },
 		'data-ln-table-source':           { prop: 'source', type: 'string', read: attrStr, fallback: '', description: 'Source store or coordinator addressing' },
+		'data-ln-table-seed':             { type: 'string', description: 'Selector or element ID of an external seed script element' },
 		'data-ln-table-selectable':       { prop: '_selectable', type: 'boolean', read: attrBool, description: 'Enables row selection check controls' },
 		'data-ln-table-window':           { type: 'integer', fallback: WINDOW_DEFAULT, min: 10, effect: _applyWindow, description: 'Virtual scrolling window size in rows' },
 		'data-ln-table-window-page':      { type: 'integer', fallback: WINDOW_PAGE, min: 5, effect: _applyWindowPage, description: 'Virtual scrolling slice page size' },
@@ -144,6 +145,11 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 		this._scrollHandler = null;
 		this._scrollContainer = null;
 		this._colgroup = null;
+		this._rowPool = null;
+		this._topSpacer = null;
+		this._topTd = null;
+		this._bottomSpacer = null;
+		this._bottomTd = null;
 
 		const self = this;
 
@@ -406,7 +412,35 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 			// SSR Mode
 			this._emptyTbodyObserver = null;
 
-			if (this.tbody && this.tbody.rows.length > 0) {
+			let seedRecords = null;
+			const seedAttr = dom.getAttribute('data-ln-table-seed');
+			let seedScript = null;
+			if (seedAttr) {
+				seedScript = document.getElementById(seedAttr);
+				if (!seedScript) {
+					try {
+						seedScript = document.querySelector(seedAttr);
+					} catch (_) {}
+				}
+			}
+			if (!seedScript) {
+				seedScript = dom.querySelector('script[type="application/json"]') || dom.querySelector('script');
+			}
+			if (seedScript && seedScript.textContent) {
+				seedRecords = parseTableSeed(seedScript.textContent);
+			}
+
+			if (seedRecords && seedRecords.length > 0) {
+				this._data = seedRecords;
+				this._filteredData = seedRecords.slice();
+				this._rowHeight = 40;
+				this._lockColumnWidths();
+				this._render();
+				this._updateFooter();
+				dispatch(this.dom, 'ln-table:ready', {
+					total: this._data.length
+				});
+			} else if (this.tbody && this.tbody.rows.length > 0) {
 				this._parseRows();
 			} else if (this.tbody) {
 				this._emptyTbodyObserver = new MutationObserver(function () {
@@ -625,8 +659,15 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 	};
 
 	_component.prototype._renderAll = function () {
-		if (this.isDataDriven) {
-			const data = this._filteredData;
+		this._rowPool = null;
+		this._topSpacer = null;
+		this._topTd = null;
+		this._bottomSpacer = null;
+		this._bottomTd = null;
+
+		const data = this._filteredData;
+
+		if (this.isDataDriven || (data.length > 0 && !data[0].html)) {
 			const frag = document.createDocumentFragment();
 
 			for (let i = 0; i < data.length; i++) {
@@ -640,7 +681,6 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 			if (this._selectable) this._updateSelectAll();
 		} else {
 			const html = [];
-			const data = this._filteredData;
 			for (let i = 0; i < data.length; i++) html.push(data[i].html);
 
 			this.tbody.innerHTML = html.join('');
@@ -713,6 +753,183 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 		}
 		this._vStart = -1;
 		this._vEnd = -1;
+		this._rowPool = null;
+		this._topSpacer = null;
+		this._topTd = null;
+		this._bottomSpacer = null;
+		this._bottomTd = null;
+	};
+
+	// ─── Row Pool (Cheetah / Glide style DOM Recycling) ────────
+
+	_component.prototype._compileRowBindings = function (tr) {
+		const bindings = {
+			textNodes: [],
+			attrs: [],
+			cellAttrs: []
+		};
+
+		const walker = document.createTreeWalker(tr, NodeFilter.SHOW_TEXT);
+		while (walker.nextNode()) {
+			const node = walker.currentNode;
+			if (node.textContent.indexOf('{{') !== -1) {
+				bindings.textNodes.push({
+					node: node,
+					raw: node.textContent
+				});
+			}
+		}
+
+		const elements = Array.from(tr.querySelectorAll('*'));
+		if (tr.nodeType === 1) elements.push(tr);
+
+		for (let i = 0; i < elements.length; i++) {
+			const el = elements[i];
+			if (el.hasAttribute('data-ln-table-cell-attr')) {
+				const pairs = el.getAttribute('data-ln-table-cell-attr').split(',');
+				for (let j = 0; j < pairs.length; j++) {
+					const parts = pairs[j].trim().split(':');
+					if (parts.length === 2) {
+						bindings.cellAttrs.push({
+							el: el,
+							field: parts[0].trim(),
+							attr: parts[1].trim()
+						});
+					}
+				}
+			}
+
+			const attrs = el.attributes;
+			for (let j = 0; j < attrs.length; j++) {
+				const a = attrs[j];
+				if (a.value.indexOf('{{') !== -1) {
+					bindings.attrs.push({
+						el: el,
+						name: a.name,
+						raw: a.value
+					});
+				}
+			}
+		}
+
+		tr._lnBindings = bindings;
+		return bindings;
+	};
+
+	_component.prototype._createTemplateRow = function () {
+		let clone = cloneTemplateScoped(this.dom, this.name + '-row', 'ln-table');
+		if (!clone) {
+			const genericTpl = this.dom.querySelector('template[data-ln-table-row]');
+			if (genericTpl) {
+				clone = document.importNode(genericTpl.content, true);
+			}
+		}
+
+		let tr = clone ? (clone.querySelector('[data-ln-table-row]') || clone.firstElementChild) : null;
+
+		if (!tr) {
+			if (window.lnDebug || (typeof document !== 'undefined' && document.body && document.body.hasAttribute('data-ln-debug'))) {
+				console.warn(`[ln-table] Missing row template: <template data-ln-template="${this.name}-row">`);
+			}
+			return null;
+		}
+
+		this._compileRowBindings(tr);
+		return tr;
+	};
+
+	_component.prototype._updateRow = function (tr, record) {
+		if (!record) return;
+		tr._lnRecord = record;
+		if (record.id != null) {
+			tr.setAttribute('data-ln-table-row-id', record.id);
+		}
+
+		const bindings = tr._lnBindings || this._compileRowBindings(tr);
+
+		const textNodes = bindings.textNodes;
+		for (let i = 0; i < textNodes.length; i++) {
+			const item = textNodes[i];
+			item.node.textContent = item.raw.replace(
+				/\{\{\s*(\w+)\s*\}\}/g,
+				function (_, key) { return record[key] !== undefined && record[key] !== null ? record[key] : ''; }
+			);
+		}
+
+		const attrs = bindings.attrs;
+		for (let i = 0; i < attrs.length; i++) {
+			const item = attrs[i];
+			item.el.setAttribute(
+				item.name,
+				item.raw.replace(
+					/\{\{\s*(\w+)\s*\}\}/g,
+					function (_, key) { return record[key] !== undefined && record[key] !== null ? record[key] : ''; }
+				)
+			);
+		}
+
+		const cellAttrs = bindings.cellAttrs;
+		for (let i = 0; i < cellAttrs.length; i++) {
+			const item = cellAttrs[i];
+			const val = record[item.field];
+			if (val != null) {
+				item.el.setAttribute(item.attr, val);
+			}
+		}
+
+		if (bindings.textNodes.length === 0 && bindings.attrs.length === 0 && this.ths.length > 0) {
+			for (let j = 0; j < this.ths.length; j++) {
+				const colName = this.ths[j].getAttribute('data-ln-table-col');
+				if (colName && j < tr.cells.length && record[colName] != null) {
+					tr.cells[j].textContent = String(record[colName]);
+				}
+			}
+		}
+
+		if (this._selectable) {
+			const id = record.id != null ? String(record.id) : null;
+			const isSelected = id != null && this.selectedIds.has(id);
+			tr.classList.toggle('ln-row-selected', isSelected);
+			const rowCb = tr.querySelector('[data-ln-table-row-select]');
+			if (rowCb) rowCb.checked = isSelected;
+		}
+	};
+
+	_component.prototype._ensureRowPool = function (requiredCount, colSpan) {
+		if (!this._rowPool) {
+			this._rowPool = [];
+			this._topSpacer = document.createElement('tr');
+			this._topSpacer.className = 'ln-table__spacer';
+			this._topSpacer.setAttribute('aria-hidden', 'true');
+			this._topTd = document.createElement('td');
+			this._topTd.setAttribute('colspan', colSpan);
+			this._topTd.style.padding = '0';
+			this._topTd.style.border = 'none';
+			this._topSpacer.appendChild(this._topTd);
+
+			this._bottomSpacer = document.createElement('tr');
+			this._bottomSpacer.className = 'ln-table__spacer';
+			this._bottomSpacer.setAttribute('aria-hidden', 'true');
+			this._bottomTd = document.createElement('td');
+			this._bottomTd.setAttribute('colspan', colSpan);
+			this._bottomTd.style.padding = '0';
+			this._bottomTd.style.border = 'none';
+			this._bottomSpacer.appendChild(this._bottomTd);
+
+			this.tbody.replaceChildren(this._topSpacer, this._bottomSpacer);
+		} else {
+			if (this._topTd && this._topTd.getAttribute('colspan') !== String(colSpan)) {
+				this._topTd.setAttribute('colspan', colSpan);
+				this._bottomTd.setAttribute('colspan', colSpan);
+			}
+		}
+
+		while (this._rowPool.length < requiredCount) {
+			const tr = this._createTemplateRow();
+			if (!tr) break;
+			this._rowPool.push(tr);
+			this.tbody.insertBefore(tr, this._bottomSpacer);
+		}
 	};
 
 	_component.prototype._renderVirtual = function () {
@@ -749,59 +966,51 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 		this._vEnd = endRow;
 
 		const colSpan = this.ths.length || 1;
-		const topH = vw.topPadding;
-		const bottomH = vw.bottomPadding;
+		const neededRows = endRow - startRow;
 
-		if (this.isDataDriven) {
-			const frag = document.createDocumentFragment();
+		this._ensureRowPool(neededRows, colSpan);
 
-			if (topH > 0) {
-				const topSpacer = document.createElement('tr');
-				topSpacer.className = 'ln-table__spacer';
-				topSpacer.setAttribute('aria-hidden', 'true');
-				const topTd = document.createElement('td');
-				topTd.setAttribute('colspan', colSpan);
-				topTd.style.height = topH + 'px';
-				topSpacer.appendChild(topTd);
-				frag.appendChild(topSpacer);
-			}
-
-			for (let i = startRow; i < endRow; i++) {
-				const tr = this._buildRow(data[i]);
-				if (tr) frag.appendChild(tr);
-			}
-
-			if (bottomH > 0) {
-				const bottomSpacer = document.createElement('tr');
-				bottomSpacer.className = 'ln-table__spacer';
-				bottomSpacer.setAttribute('aria-hidden', 'true');
-				const bottomTd = document.createElement('td');
-				bottomTd.setAttribute('colspan', colSpan);
-				bottomTd.style.height = bottomH + 'px';
-				bottomSpacer.appendChild(bottomTd);
-				frag.appendChild(bottomSpacer);
-			}
-
-			this.tbody.replaceChildren(frag);
-
-			if (this._selectable) this._updateSelectAll();
+		if (vw.topPadding > 0) {
+			this._topTd.style.height = vw.topPadding + 'px';
+			this._topSpacer.style.display = '';
 		} else {
-			let html = '';
-
-			if (topH > 0) {
-				html += '<tr class="ln-table__spacer" aria-hidden="true"><td colspan="' +
-					colSpan + '" style="height:' + topH + 'px;padding:0;border:none"></td></tr>';
-			}
-			for (let i = startRow; i < endRow; i++) html += data[i].html;
-			if (bottomH > 0) {
-				html += '<tr class="ln-table__spacer" aria-hidden="true"><td colspan="' +
-					colSpan + '" style="height:' + bottomH + 'px;padding:0;border:none"></td></tr>';
-			}
-
-			this.tbody.innerHTML = html;
-
-			if (this._selectable) this._restoreSelection();
+			this._topTd.style.height = '0px';
+			this._topSpacer.style.display = 'none';
 		}
+
+		if (vw.bottomPadding > 0) {
+			this._bottomTd.style.height = vw.bottomPadding + 'px';
+			this._bottomSpacer.style.display = '';
+		} else {
+			this._bottomTd.style.height = '0px';
+			this._bottomSpacer.style.display = 'none';
+		}
+
+		for (let k = 0; k < this._rowPool.length; k++) {
+			const rowEl = this._rowPool[k];
+			const dataIndex = startRow + k;
+			if (k < neededRows && dataIndex < total) {
+				rowEl.style.display = '';
+				const rec = data[dataIndex];
+				if (rec && rec.html) {
+					const temp = document.createElement('tbody');
+					temp.innerHTML = rec.html;
+					const parsedTr = temp.firstElementChild;
+					if (parsedTr) {
+						rowEl.innerHTML = parsedTr.innerHTML;
+						rowEl.className = parsedTr.className;
+						rowEl._lnRecord = rec;
+						if (rec.id != null) rowEl.setAttribute('data-ln-table-row-id', rec.id);
+					}
+				} else {
+					this._updateRow(rowEl, rec);
+				}
+			} else {
+				rowEl.style.display = 'none';
+			}
+		}
+
+		if (this._selectable) this._updateSelectAll();
 	};
 
 	// ─── Windowed virtualization (opt-in sliding window) ───────
@@ -856,43 +1065,42 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 		if (startRow === this._vStart && endRow === this._vEnd) return;
 
 		const colSpan = this.ths.length || 1;
-		const topH = vw.topPadding;
-		const bottomH = vw.bottomPadding;
+		const neededRows = endRow - startRow;
 
-		const frag = document.createDocumentFragment();
+		this._ensureRowPool(neededRows, colSpan);
 
-		if (topH > 0) {
-			const topSpacer = document.createElement('tr');
-			topSpacer.className = 'ln-table__spacer';
-			topSpacer.setAttribute('aria-hidden', 'true');
-			const topTd = document.createElement('td');
-			topTd.setAttribute('colspan', colSpan);
-			topTd.style.height = topH + 'px';
-			topSpacer.appendChild(topTd);
-			frag.appendChild(topSpacer);
+		if (vw.topPadding > 0) {
+			this._topTd.style.height = vw.topPadding + 'px';
+			this._topSpacer.style.display = '';
+		} else {
+			this._topTd.style.height = '0px';
+			this._topSpacer.style.display = 'none';
 		}
 
-		for (let i = startRow; i < endRow; i++) {
-			if (this._cache.has(i)) {
-				const tr = this._buildRow(this._cache.get(i));
-				if (tr) frag.appendChild(tr);
+		if (vw.bottomPadding > 0) {
+			this._bottomTd.style.height = vw.bottomPadding + 'px';
+			this._bottomSpacer.style.display = '';
+		} else {
+			this._bottomTd.style.height = '0px';
+			this._bottomSpacer.style.display = 'none';
+		}
+
+		for (let k = 0; k < this._rowPool.length; k++) {
+			const rowEl = this._rowPool[k];
+			const dataIndex = startRow + k;
+			if (k < neededRows && dataIndex < total) {
+				rowEl.style.display = '';
+				if (this._cache.has(dataIndex)) {
+					rowEl.classList.remove('ln-table__placeholder');
+					this._updateRow(rowEl, this._cache.get(dataIndex));
+				} else {
+					rowEl.classList.add('ln-table__placeholder');
+					rowEl.innerHTML = '<td colspan="' + colSpan + '" style="height:' + rowH + 'px"></td>';
+				}
 			} else {
-				frag.appendChild(this._buildPlaceholderRow());
+				rowEl.style.display = 'none';
 			}
 		}
-
-		if (bottomH > 0) {
-			const bottomSpacer = document.createElement('tr');
-			bottomSpacer.className = 'ln-table__spacer';
-			bottomSpacer.setAttribute('aria-hidden', 'true');
-			const bottomTd = document.createElement('td');
-			bottomTd.setAttribute('colspan', colSpan);
-			bottomTd.style.height = bottomH + 'px';
-			bottomSpacer.appendChild(bottomTd);
-			frag.appendChild(bottomSpacer);
-		}
-
-		this.tbody.replaceChildren(frag);
 
 		// Select-all is disabled in windowed mode (D4) — no _updateSelectAll() call.
 		this._vStart = startRow;
@@ -904,6 +1112,11 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 	// ─── Loading state ──────────────────────────────────────────
 
 	_component.prototype._showLoadingState = function () {
+		this._rowPool = null;
+		this._topSpacer = null;
+		this._topTd = null;
+		this._bottomSpacer = null;
+		this._bottomTd = null;
 		const colSpan = this.ths.length || 1;
 		let loadingEl = null;
 
@@ -940,6 +1153,11 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 	// ─── Empty state ───────────────────────────────────────────
 
 	_component.prototype._showEmptyState = function () {
+		this._rowPool = null;
+		this._topSpacer = null;
+		this._topTd = null;
+		this._bottomSpacer = null;
+		this._bottomTd = null;
 		const colSpan = this.ths.length || 1;
 		let emptyEl = null;
 
@@ -1043,28 +1261,10 @@ import { calculateSelectionState, calculateVirtualWindow, toggleRowSelection, to
 				temp.innerHTML = record.html;
 				tr = temp.firstElementChild;
 			} else {
-				tr = document.createElement('tr');
-				tr.setAttribute('data-ln-table-row', '');
-				const ths = this.ths;
-
-				for (let j = 0; j < ths.length; j++) {
-					const isSelectCol = ths[j].hasAttribute('data-ln-table-col-select');
-					const td = document.createElement('td');
-
-					if (isSelectCol) {
-						const cb = document.createElement('input');
-						cb.type = 'checkbox';
-						cb.setAttribute('data-ln-table-row-select', '');
-						cb.setAttribute('aria-label', 'Select row');
-						td.appendChild(cb);
-					} else {
-						const colName = ths[j].getAttribute('data-ln-table-col');
-						if (colName && record[colName] != null) {
-							td.textContent = String(record[colName]);
-						}
-					}
-					tr.appendChild(td);
+				if (window.lnDebug || (typeof document !== 'undefined' && document.body && document.body.hasAttribute('data-ln-debug'))) {
+					console.warn(`[ln-table] Missing row template: <template data-ln-template="${this.name}-row">`);
 				}
+				return null;
 			}
 		} else {
 			this._fillRow(tr, record);

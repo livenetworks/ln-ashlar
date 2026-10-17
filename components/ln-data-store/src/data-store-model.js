@@ -182,3 +182,20 @@ export function normalizeSyncError(err) {
 	const errorMsg = (err && err.message) ? err.message : String(err);
 	return { ok: false, error: errorMsg };
 }
+
+/**
+ * Parses raw JSON seed string into an array of record objects.
+ * @param {string} raw
+ * @returns {Array<Record<string, any>> | null}
+ */
+export function parseSeedRecords(raw) {
+	if (!raw || typeof raw !== 'string') return null;
+	const trimmed = raw.trim();
+	if (!trimmed) return null;
+	try {
+		const parsed = JSON.parse(trimmed);
+		return Array.isArray(parsed) ? parsed : null;
+	} catch (_) {
+		return null;
+	}
+}

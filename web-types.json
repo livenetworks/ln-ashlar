@@ -514,6 +514,13 @@
 					}
 				},
 				{
+					"name": "data-ln-data-store-seed",
+					"description": "Selector or element ID of an external seed script block",
+					"value": {
+						"type": "string"
+					}
+				},
+				{
 					"name": "data-ln-data-store-stale",
 					"description": "Cache staleness threshold in seconds, or -1/never",
 					"value": {
@@ -1812,6 +1819,13 @@
 				{
 					"name": "data-ln-table-row-select",
 					"description": "Row selection checkbox trigger",
+					"value": {
+						"type": "string"
+					}
+				},
+				{
+					"name": "data-ln-table-seed",
+					"description": "Selector or element ID of an external seed script element",
 					"value": {
 						"type": "string"
 					}

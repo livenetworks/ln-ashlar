@@ -28,6 +28,37 @@ export function calculateVirtualWindow(scrollTop, viewportHeight, rowHeight, tot
 }
 
 /**
+ * Computes the required row pool size based on viewport height, row height, and buffer.
+ * @param {number} viewportHeight
+ * @param {number} rowHeight
+ * @param {number} [bufferRows=15]
+ * @returns {number}
+ */
+export function calculatePoolSize(viewportHeight, rowHeight, bufferRows = 15) {
+	if (rowHeight <= 0) return 0;
+	const safeViewportHeight = Math.max(0, viewportHeight || 0);
+	const visibleCount = Math.ceil(safeViewportHeight / rowHeight);
+	return visibleCount + (bufferRows * 2);
+}
+
+/**
+ * Parses raw JSON seed string for a table into an array of records.
+ * @param {string} raw
+ * @returns {Array<Record<string, any>> | null}
+ */
+export function parseTableSeed(raw) {
+	if (!raw || typeof raw !== 'string') return null;
+	const trimmed = raw.trim();
+	if (!trimmed) return null;
+	try {
+		const parsed = JSON.parse(trimmed);
+		return Array.isArray(parsed) ? parsed : null;
+	} catch (_) {
+		return null;
+	}
+}
+
+/**
  * Computes selection state metadata across a dataset.
  * @param {string[]|number[]} allIds
  * @param {Set<string|number>|Array<string|number>} selectedIds

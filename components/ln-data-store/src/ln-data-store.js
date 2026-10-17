@@ -1,6 +1,6 @@
 import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, decryptData, defineAttrs, attrSpec, attrInt, attrBool, attrList } from '../../ln-core';
 import { createWindowIndex } from './window-index.js';
-import { aggregateRecords, decorateRecords, filterRecords, queryRecords, checkNeedsUpgrade, normalizeSyncError } from './data-store-model.js';
+import { aggregateRecords, decorateRecords, filterRecords, queryRecords, checkNeedsUpgrade, normalizeSyncError, parseSeedRecords } from './data-store-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-data-store';
@@ -21,6 +21,7 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords, checkNe
 	const ATTRIBUTES = {
 		'data-ln-data-store':                  { type: 'marker', effect: _markFrozen, description: 'Identifies the element as a data-store definition container' },
 		'data-ln-data-store-indexes':          { type: 'list', effect: _markFrozen, description: 'Comma-separated index field names for the IndexedDB store' },
+		'data-ln-data-store-seed':             { type: 'string', description: 'Selector or element ID of an external seed script block' },
 		'data-ln-data-store-stale':            { prop: '_staleThreshold', type: 'integer', read: _readStale, fallback: 300, description: 'Cache staleness threshold in seconds, or -1/never' },
 		'data-ln-data-store-search-fields':    { prop: '_searchFields', type: 'list', read: attrList, description: 'Record fields to index for client-side search' },
 		'data-ln-data-store-no-local-query':   { prop: 'noLocalQuery', type: 'boolean', read: attrBool, description: 'Bypasses local IndexedDB query resolution, forcing remote fetching' },
@@ -515,11 +516,63 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords, checkNe
 
 	// ─── Initialization ────────────────────────────────────
 
+	function _readSeedRecords(self) {
+		let scriptEl = null;
+		const seedSelector = self.dom.getAttribute('data-ln-data-store-seed');
+		if (seedSelector) {
+			scriptEl = document.getElementById(seedSelector);
+			if (!scriptEl) {
+				try {
+					scriptEl = document.querySelector(seedSelector);
+				} catch (_) {}
+			}
+		}
+		if (!scriptEl) {
+			scriptEl = self.dom.querySelector('script[type="application/json"]') || self.dom.querySelector('script');
+		}
+		if (scriptEl && scriptEl.textContent) {
+			return parseSeedRecords(scriptEl.textContent);
+		}
+		return null;
+	}
+
 	function _initStore(self) {
+		const seedRecords = _readSeedRecords(self);
+		self._seedRecords = seedRecords;
+
+		if (seedRecords) {
+			self.lastSyncedAt = Math.floor(Date.now() / 1000);
+			self.totalCount = seedRecords.length;
+			self.hasCache = true;
+			self.isLoaded = true;
+			self.canServe = true;
+			self.isInitialized = true;
+			setTimeout(() => {
+				dispatch(self.dom, 'ln-data-store:ready', { store: self._name, count: self.totalCount, source: 'seed' });
+				dispatch(self.dom, 'ln-data-store:initialized', { store: self._name, hasCache: true, lastSyncedAt: self.lastSyncedAt, count: self.totalCount, source: 'seed' });
+			}, 0);
+
+			// Persist seed asynchronously to IndexedDB in background without blocking immediate queries
+			_openDatabase().then(db => {
+				if (!db) return;
+				return _clearStore(self._name)
+					.then(() => _putBulk(self._name, seedRecords))
+					.then(() => _setMeta(self._name, {
+						schema_version: SCHEMA_VERSION,
+						last_synced_at: self.lastSyncedAt,
+						has_cache: true,
+						record_count: self.totalCount
+					}));
+			}).catch(() => {});
+
+			return Promise.resolve({ ok: true, source: 'seed' });
+		}
+
 		return _openDatabase().then(db => {
 			if (!db) throw new Error('IndexedDB is unavailable');
 			return _getMeta(self._name);
 		}).then(meta => {
+			if (seedRecords) return;
 			self.initializationError = null;
 			if (meta && meta.schema_version === SCHEMA_VERSION) {
 				self.lastSyncedAt = meta.last_synced_at || null;
@@ -548,6 +601,17 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords, checkNe
 				dispatch(self.dom, 'ln-data-store:initialized', { store: self._name, hasCache: false, lastSyncedAt: null, count: 0 });
 			}
 		}).catch(error => {
+			if (seedRecords) {
+				self.lastSyncedAt = Math.floor(Date.now() / 1000);
+				self.totalCount = seedRecords.length;
+				self.hasCache = true;
+				self.isLoaded = true;
+				self.canServe = true;
+				self.isInitialized = true;
+				dispatch(self.dom, 'ln-data-store:ready', { store: self._name, count: self.totalCount, source: 'seed' });
+				dispatch(self.dom, 'ln-data-store:initialized', { store: self._name, hasCache: true, lastSyncedAt: self.lastSyncedAt, count: self.totalCount, source: 'seed' });
+				return { ok: true, source: 'seed' };
+			}
 			self.isInitialized = true;
 			self.isLoaded = false;
 			self.canServe = false;
@@ -752,6 +816,14 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords, checkNe
 
 	_component.prototype.getAll = function (options = {}) {
 		const self = this;
+		if (self._seedRecords) {
+			const r = _queryLocal(self, self._seedRecords, options);
+			return Promise.resolve({
+				data: _decorate(self, r.records),
+				total: r.total,
+				filtered: r.filtered
+			});
+		}
 		if (self._windowIndex) {
 			const offset = options.offset || 0;
 			const limit = options.limit || 200;
@@ -807,6 +879,10 @@ import { aggregateRecords, decorateRecords, filterRecords, queryRecords, checkNe
 	};
 
 	_component.prototype.count = function (filters) {
+		if (this._seedRecords) {
+			const hasFilters = filters && Object.keys(filters).length > 0;
+			return Promise.resolve(hasFilters ? filterRecords(this._seedRecords, filters).length : this._seedRecords.length);
+		}
 		const hasFilters = filters && Object.keys(filters).length > 0;
 		if (!hasFilters) {
 			if (this.windowed && this.totalCount != null) return Promise.resolve(this.totalCount);

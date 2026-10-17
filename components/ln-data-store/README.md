@@ -19,6 +19,24 @@
 </ul>
 ```
 
+### ⚡ Server-Rendered (SSR) Instant Seed
+Embed authoritative server data directly in a `<script type="application/json">` child (or point to it via `data-ln-data-store-seed="#my-seed"`). The store parses the array on initialization and serves reads with zero network latency:
+
+```html
+<ul id="tenants"
+    data-ln-data-store
+    data-ln-data-store-indexes="status,package_id"
+    data-ln-data-store-search-fields="name,slug"
+    hidden>
+    <script type="application/json">
+      [
+        {"id": 1, "name": "Acme Corp", "slug": "acme", "status": "active"},
+        {"id": 2, "name": "Globex", "slug": "globex", "status": "pending"}
+      ]
+    </script>
+</ul>
+```
+
 ---
 
 ## 🌐 Declarative Attributes
@@ -27,6 +45,7 @@
 |---|---|---|
 | `id="name"` | Unique identifier of the store (the store name). | *Required* |
 | `data-ln-data-store` | Marker attribute to declare the component. | *Required* |
+| `data-ln-data-store-seed="…"` | Selector or element ID of an external seed script block containing an initial JSON records array. | *Optional* |
 | `data-ln-data-store-stale="N"` | Seconds before cache is considered stale. Set to `never` or `-1` to disable staleness. | `300` |
 | `data-ln-data-store-indexes="…"` | Comma-separated list of IndexedDB index fields. | `""` |
 | `data-ln-data-store-search-fields="…"` | Comma-separated list of text-search fields for local query search matching. | `""` |

@@ -330,6 +330,10 @@
 			"description": "Record fields to index for client-side search"
 		},
 		{
+			"name": "data-ln-data-store-seed",
+			"description": "Selector or element ID of an external seed script block"
+		},
+		{
 			"name": "data-ln-data-store-stale",
 			"description": "Cache staleness threshold in seconds, or -1/never"
 		},
@@ -1387,6 +1391,10 @@
 		{
 			"name": "data-ln-table-row-select",
 			"description": "Row selection checkbox trigger"
+		},
+		{
+			"name": "data-ln-table-seed",
+			"description": "Selector or element ID of an external seed script element"
 		},
 		{
 			"name": "data-ln-table-select-all-label",

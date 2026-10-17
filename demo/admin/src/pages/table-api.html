@@ -13,6 +13,37 @@
 	}
 </style>
 
+<!-- 3 Table Architectures Comparison Banner -->
+<section class="section-card">
+	<header><h3>3 Architectural Modes for ln-table</h3></header>
+	<main>
+		<p>Ashlar provides three distinct architectural paradigms for data grids, allowing you to choose the exact trade-off between SEO/initial paint, client memory, and network throughput:</p>
+		<div class="card-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--size-md); margin-top: var(--size-md);">
+			<div class="card" style="border-top: 4px solid var(--color-info); padding: var(--size-md); background: var(--bg-surface); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+				<header><h4 style="margin-top:0;">1. SSR Pre-Rendered Table</h4></header>
+				<main>
+					<p><small>HTML <code>&lt;tr&gt;</code> DOM elements emitted by backend (PHP/Node). Instant initial paint &amp; SEO. Zero client template compile. In-memory DOM sorting &amp; filtering.</small></p>
+					<a href="table.html" class="btn btn-sm">View SSR Demo &rarr;</a>
+				</main>
+			</div>
+			<div class="card" style="border-top: 4px solid var(--color-warning); padding: var(--size-md); background: var(--bg-sunken); border: 2px solid var(--color-warning); border-radius: var(--radius-md); box-shadow: var(--shadow-md);">
+				<header><h4 style="margin-top:0; color: var(--color-warning);">2. Remote API &amp; Virtual Window (Active)</h4></header>
+				<main>
+					<p><small>Paginates infinite backend data on-demand via <code>ln-api-connector</code>. Ideal for huge databases (100k+ records) with server-side SQL/querying.</small></p>
+					<span class="badge warning">Active Demo</span>
+				</main>
+			</div>
+			<div class="card" style="border-top: 4px solid var(--color-success); padding: var(--size-md); background: var(--bg-surface); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+				<header><h4 style="margin-top:0;">3. Injected JSON Seed</h4></header>
+				<main>
+					<p><small>Backend injects 1,000+ JSON records directly into <code>&lt;script type="application/json"&gt;</code>. Ingested into <code>ln-data-store</code> in 0ms. Rendered via Cheetah/Glide virtual DOM row recycling pool (~35 recycled rows).</small></p>
+					<a href="table-seed.html" class="btn btn-sm">View Injected Seed Demo &rarr;</a>
+				</main>
+			</div>
+		</div>
+	</main>
+</section>
+
 <section class="section-card">
 	<header><h3>Overview &amp; Architecture</h3></header>
 	<main>

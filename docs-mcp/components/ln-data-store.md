@@ -77,6 +77,26 @@ Use when synchronizing with a REST backend API.
 </ul>
 ```
 
+### Variant 3: Server-Rendered (SSR) Instant Seed (Zero-Network Fetch)
+
+Use when backend pre-populates dataset into the initial page response. The store parses the array instantly, populating IndexedDB and serving reads without needing an API connector.
+
+#### HTML Markup
+```html
+<ul id="tenants"
+    data-ln-data-store
+    data-ln-data-store-indexes="package_id,active"
+    data-ln-data-store-search-fields="name,slug"
+    hidden>
+    <script type="application/json">
+      [
+        {"id": 1, "name": "Acme Corp", "slug": "acme", "package_id": 2, "active": 1},
+        {"id": 2, "name": "Globex", "slug": "globex", "package_id": 1, "active": 1}
+      ]
+    </script>
+</ul>
+```
+
 ---
 
 ## 3. Declarative API Contract (Attributes & Events)
@@ -86,6 +106,7 @@ Use when synchronizing with a REST backend API.
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-data-store` | Root | Flag / Valueless | *Required* | Activates the store. The store name is defined by the element's `id`. |
+| `data-ln-data-store-seed` | Root | `String` | *Optional* | Selector or element ID of an external seed script block. |
 | `data-ln-data-store-stale` | Root | `Integer` \| `"never"` \| `-1` | `300` | Seconds before data is considered stale. |
 | `data-ln-data-store-indexes` | Root | `String` | `""` | Comma-separated IndexedDB index fields. |
 | `data-ln-data-store-search-fields` | Root | `String` | `""` | Comma-separated list of text fields for search. |
