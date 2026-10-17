@@ -4,9 +4,10 @@
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
 		"data-ln-debug": {
-			"direction": null,
+			"direction": "author",
 			"sources": [
-				"ln-table-dev.scss"
+				"ln-table-dev.scss",
+				"src/ln-table.js"
 			]
 		},
 		"data-ln-sort": {
@@ -113,7 +114,7 @@
 			"description": "Loading indicator element in footer or template"
 		},
 		"data-ln-table-row": {
-			"direction": "both",
+			"direction": "author",
 			"sources": [
 				"src/ln-table.js"
 			],
@@ -137,12 +138,20 @@
 			"description": "Record identifier on row element"
 		},
 		"data-ln-table-row-select": {
-			"direction": "both",
+			"direction": "author",
 			"sources": [
 				"src/ln-table.js"
 			],
 			"type": "trigger",
 			"description": "Row selection checkbox trigger"
+		},
+		"data-ln-table-seed": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			],
+			"type": "string",
+			"description": "Selector or element ID of an external seed script element"
 		},
 		"data-ln-table-select-all-label": {
 			"direction": "author",
@@ -214,6 +223,12 @@
 			"fallback": 50,
 			"min": 0,
 			"description": "Scroll threshold margin in pixels to trigger page fetch"
+		},
+		"data-ln-template": {
+			"direction": null,
+			"sources": [
+				"src/ln-table.js"
+			]
 		}
 	}
 }

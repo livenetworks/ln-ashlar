@@ -7,7 +7,8 @@ import {
 	filterRecords,
 	queryRecords,
 	searchRecords,
-	sortRecords
+	sortRecords,
+	parseSeedRecords
 } from '../components/ln-data-store/src/data-store-model.js';
 
 const SAMPLE_RECORDS = [
@@ -101,4 +102,18 @@ test('decorateRecords adds computed fields safely', () => {
 		fullNameAndRole: r => `${r.name} (${r.department})`
 	});
 	assert.equal(decorated[0].fullNameAndRole, 'Alice Smith (Engineering)');
+});
+
+test('parseSeedRecords parses valid JSON array and handles empty or invalid strings safely', () => {
+	const validJson = '[{"id": 1, "name": "Test 1"}, {"id": 2, "name": "Test 2"}]';
+	const parsed = parseSeedRecords(validJson);
+	assert.equal(Array.isArray(parsed), true);
+	assert.equal(parsed.length, 2);
+	assert.equal(parsed[0].name, 'Test 1');
+
+	assert.equal(parseSeedRecords(''), null);
+	assert.equal(parseSeedRecords('   '), null);
+	assert.equal(parseSeedRecords(null), null);
+	assert.equal(parseSeedRecords('{"not": "an array"}'), null);
+	assert.equal(parseSeedRecords('invalid-json'), null);
 });

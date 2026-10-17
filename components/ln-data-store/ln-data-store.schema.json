@@ -45,6 +45,14 @@
 			"type": "list",
 			"description": "Record fields to index for client-side search"
 		},
+		"data-ln-data-store-seed": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-store.js"
+			],
+			"type": "string",
+			"description": "Selector or element ID of an external seed script block"
+		},
 		"data-ln-data-store-stale": {
 			"direction": null,
 			"sources": [

@@ -4,6 +4,8 @@ import assert from 'node:assert/strict';
 import {
 	calculateSelectionState,
 	calculateVirtualWindow,
+	calculatePoolSize,
+	parseTableSeed,
 	toggleRowSelection,
 	toggleSelectAll
 } from '../components/ln-table/src/table-model.js';
@@ -73,4 +75,26 @@ test('toggleRowSelection and toggleSelectAll manage selection sets immutably', (
 
 	const cleared = toggleSelectAll(allSelected, allIds, false);
 	assert.equal(cleared.size, 0);
+});
+
+test('calculatePoolSize computes minimum pool size from viewport height and row height with buffer', () => {
+	assert.equal(calculatePoolSize(0, 0), 0);
+	assert.equal(calculatePoolSize(400, 0), 0);
+	// 400px viewport, 40px rowHeight -> 10 visible rows + 2 * 15 buffer = 40 rows
+	assert.equal(calculatePoolSize(400, 40, 15), 40);
+	// 600px viewport, 30px rowHeight -> 20 visible rows + 2 * 10 buffer = 40 rows
+	assert.equal(calculatePoolSize(600, 30, 10), 40);
+});
+
+test('parseTableSeed parses valid JSON records array and handles invalid values', () => {
+	const valid = '[{"id": 1, "name": "Row 1"}, {"id": 2, "name": "Row 2"}]';
+	const parsed = parseTableSeed(valid);
+	assert.equal(Array.isArray(parsed), true);
+	assert.equal(parsed.length, 2);
+	assert.equal(parsed[0].name, 'Row 1');
+
+	assert.equal(parseTableSeed(''), null);
+	assert.equal(parseTableSeed(null), null);
+	assert.equal(parseTableSeed('{"not": "array"}'), null);
+	assert.equal(parseTableSeed('not json'), null);
 });

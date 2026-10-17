@@ -55,7 +55,6 @@ ln-ashlar provides a robust, production-proven foundation for web applications. 
 - [ln-validate](docs-mcp/components/ln-validate.md): A validation wrapper that adapts browser ValidityState and gates form submission.
 - [ln-upload](docs-mcp/components/ln-upload.md): A file upload component featuring drag-and-drop zones, progress tracking via ln-progress, file extension and size validation, SSR hydration, and automatic hidden input generation for form submits.
 - [ln-autosave](docs-mcp/components/ln-autosave.md): Saves draft form states in localStorage on field boundaries, restoring them on load and clearing them on submit or reset.
-- [ln-autoresize](docs-mcp/components/ln-autoresize.md): Automatically adjusts textarea height based on content size to prevent scroll bars.
 - [ln-picklist](docs-mcp/components/ln-picklist.md): A dual-list selection primitive where checking a checkbox transfers the <li> into the selected list, and unchecking returns it to available. Supports declarative selection capping via data-ln-picklist-max.
 - [ln-options](docs-mcp/components/ln-options.md): Dynamically populates HTML select controls with option elements from data stores while preserving state.
 - [ln-date](docs-mcp/components/ln-date.md): Locale-aware date formatter with native calendar picker and manual input parsing support.

@@ -20,10 +20,12 @@ tags: [tables, data-grid, virtual-scrolling, sorting, selection]
 
 ## 1. Core Behavior & Responsibility
 
-`ln-table` is a high-performance presenter component in the `ln-ashlar` design system, built for tabular data display. It operates in two fundamental modes:
+`ln-table` is a high-performance presenter component in the `ln-ashlar` design system, built for tabular data display. It operates in multiple specialized modes:
 
-1. **SSR (Server-Side Rendered) Mode:** Hydrates pre-existing markup in `<tbody>` sent from the server. It parses the rows once on initialization and enables instant client-side sorting, column filtering, search, and virtual scrolling on the existing DOM.
-2. **Data-Driven Mode:** Functions as a dynamic template engine. When provided with a dataset, it clones a specified row template (`<template data-ln-template="...-row">`), performs safe XSS interpolation using double curly braces (`{{ field }}`), manages active row selections, and updates stats counters in the footer.
+1. **Server-Rendered (SSR) Seed Mode (0ms Boot Lag):** Instead of emitting thousands of bulky HTML `<tr><td>` tags from the server, the backend injects an authoritative JSON array inside `<script type="application/json">` (or pairs with a seeded `ln-data-store`). `ln-table` parses the seed instantly with zero network latency.
+2. **Cheetah / Glide Style DOM Row Recycling Pool (60 FPS Virtualization):** Instead of destroying and recreating DOM rows during scroll, `ln-table` allocates a fixed pool of ~30-40 `<tr>` elements and updates values in-place via pre-compiled binding descriptors. Zero Garbage Collection pauses, constant memory footprint, and rock-solid 60 FPS scrolling even with 50,000+ records.
+3. **Legacy SSR Markup Mode:** Hydrates pre-existing markup in `<tbody>` sent from the server. It parses the rows once on initialization and enables instant client-side sorting, column filtering, search, and virtual scrolling on the existing DOM.
+4. **Data-Driven Mode:** Functions as a dynamic template engine. When provided with a dataset, it clones a specified row template (`<template data-ln-template="...-row">`), performs safe XSS interpolation using double curly braces (`{{ field }}`), manages active row selections, and updates stats counters in the footer.
 
 The JavaScript source is located at [ln-table.js](../../components/ln-table/src/ln-table.js). Column sorting is delegated entirely to [`ln-sort`](./ln-sort.md) — `ln-table` never renders or owns a sort trigger button itself; it only listens for `ln-sort:change` on its own root and reacts (see §3 Events API).
 
@@ -166,6 +168,83 @@ Use when the table queries a store and connects through a coordinator rather tha
 
 ---
 
+### Variant 2: Injected JSON Seed Mode (0ms Network, Cheetah-Style DOM Row Pool)
+
+Use when the backend embeds the entire dataset (e.g. 10,000 records) into `<script type="application/json">` or pairs with a seeded `ln-data-store`. Eliminates secondary network roundtrips completely while maintaining fluid 60 FPS scrolling through a recycled DOM row pool (~38 `<tr>` elements).
+
+#### HTML Markup
+
+```html
+<!-- Table Coordinator & Declarative Store Layer (NO API CONNECTOR NEEDED) -->
+<section data-ln-table-coordinator>
+  <ul data-ln-data-coordinator="seed-docs" id="seed-table-coordinator" hidden>
+    <li data-ln-data-store="seed-docs"
+        data-ln-data-store-seed="seed-docs-data"
+        data-ln-data-store-indexes="department,status,priority"
+        data-ln-data-store-search-fields="title,department,owner,status,priority"
+        id="seed-docs"></li>
+  </ul>
+
+  <!-- Authoritative Injected JSON Payload (e.g. 10,000 records) -->
+  <script type="application/json" id="seed-docs-data">
+    [
+      { "id": 1, "title": "Security Policy", "department": "IT", "status": "Approved", "owner": "Alice", "file_size": 11112, "file_size_display": "10.9 KB", "updated_at": 1776339624, "updated_display": "2026-04-16" }
+    ]
+  </script>
+
+  <!-- Table Viewport with Recycled DOM Row Pool -->
+  <section data-ln-table="seed-docs"
+           data-ln-table-source="seed-docs"
+           data-ln-table-selectable
+           id="seed-table"
+           class="data-table-demo"
+           style="max-height: 540px; overflow-y: auto;">
+    <table>
+      <thead>
+        <tr>
+          <th data-ln-table-col-select style="width: 40px;"></th>
+          <th data-ln-table-col="title">
+            <span>Title</span>
+            <ul data-ln-sort="seed-docs" data-ln-sort-field="title" data-ln-sort-state="none" data-ln-query="sort">
+              <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+              <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+              <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+            </ul>
+          </th>
+          <th data-ln-table-col="department">
+            <span>Department</span>
+            <ul data-ln-sort="seed-docs" data-ln-sort-field="department" data-ln-sort-state="none" data-ln-query="sort">
+              <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+              <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+              <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+            </ul>
+          </th>
+        </tr>
+      </thead>
+      <tbody data-ln-table-body></tbody>
+    </table>
+
+    <footer class="ln-table__footer">
+      <p>
+        <span class="hidden"><span data-ln-table-filtered></span> / </span>
+        <span data-ln-table-total data-ln-number></span> items
+      </p>
+    </footer>
+
+    <!-- Row Template Cloned Once for the Pool (~38 rows total) -->
+    <template data-ln-template="seed-docs-row" data-ln-table-row>
+      <tr data-ln-table-row data-ln-table-row-id="{{ id }}">
+        <td><input type="checkbox" data-ln-table-row-select></td>
+        <td><strong>{{ title }}</strong></td>
+        <td>{{ department }}</td>
+      </tr>
+    </template>
+  </section>
+</section>
+```
+
+---
+
 ## 3. Declarative API Contract (Attributes & Events)
 
 ### Attributes Table
@@ -174,6 +253,7 @@ Use when the table queries a store and connects through a coordinator rather tha
 |---|---|---|---|---|
 | `data-ln-table` | Root container | `String` | - | Identifies the table. The value names generated events. Must have a unique `id`. |
 | `data-ln-table-source` | Root container | `String` | - | Enables Data-Driven mode. Value maps to the target data store ID. |
+| `data-ln-table-seed` | Root container | `String` | - | Selector or element ID of an external seed script block containing an initial JSON records array. |
 | `data-ln-table-selectable` | Root container | `Boolean` | `false` | Enables row multi-selection and checkboxes. |
 | `data-ln-table-window` | Root container | `Number` | - | Opt-in server-side sliding-window virtualization. Sets the resident-row cap (`windowSize`) for the internal `ln-core.createWindowCache` instance. Observable — adding/removing it toggles windowed mode ON/OFF live, no re-init; changing the value while windowed reconfigures the live cache. |
 | `data-ln-table-window-page` | Root container | `Number` | `200` | Configures the chunk/page fetch size (`pageSize` / `limit`) for page-aligned server requests. Observable — applies to the live cache without re-init. |
