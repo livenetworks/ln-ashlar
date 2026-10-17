@@ -84,8 +84,8 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 		}
 	}
 
-	function _findScrollContainer(el) {
-		let p = el.parentElement;
+	function _findScrollContainer(el, table) {
+		let p = table ? table.parentElement : el;
 		while (p && p !== document.body && p !== document.documentElement) {
 			const cs = getComputedStyle(p);
 			const oy = cs.overflowY;
@@ -717,11 +717,7 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 			}
 		}
 
-		if (this.isDataDriven) {
-			this._scrollContainer = _findScrollContainer(this.dom);
-		} else {
-			this._scrollContainer = null;
-		}
+		this._scrollContainer = _findScrollContainer(this.dom, this.table);
 		const scrollTarget = this._scrollContainer || window;
 
 		this._scrollHandler = function () {
