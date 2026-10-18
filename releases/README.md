@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.1.11](./v2.1.11.md) — October 18, 2026
+Injected JSON dataset seed mode (`data-ln-table-seed`) with virtual DOM row recycling pool for instant rendering of 10,000+ records, scroll anchoring loop elimination (`overflow-anchor: none`), and table header ellipsis truncation and action-aware minimum column widths.  
+👉 [Read full v2.1.11 release notes](./v2.1.11.md)
+
 ### [v2.1.10](./v2.1.10.md) — October 16, 2026
 Elimination of initial empty-state flashing in data-driven tables (`ln-table`) with declarative initial loading templates and `aria-busy`, row preservation during subsequent queries with footer indicator (`data-ln-table-loading`), and standardization of `data-ln-empty-state="loading"`.  
 👉 [Read full v2.1.10 release notes](./v2.1.10.md)

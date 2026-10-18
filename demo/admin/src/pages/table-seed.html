@@ -94,8 +94,18 @@
 			         data-ln-table-selectable
 			         id="seed-table"
 			         class="data-table-demo"
-			         style="max-height: 540px; overflow-y: auto;">
-				<table>
+			         style="max-height: 540px; overflow: auto;">
+				<table style="--table-layout: fixed; table-layout: fixed; width: 100%; min-width: 860px;">
+					<colgroup>
+						<col style="width: 44px;">
+						<col style="width: 22%;">
+						<col style="width: 15%;">
+						<col style="width: 13%;">
+						<col style="width: 12%;">
+						<col style="width: 13%;">
+						<col style="width: 10%;">
+						<col style="width: 15%;">
+					</colgroup>
 					<thead>
 						<tr>
 							<th colspan="8">
@@ -114,7 +124,7 @@
 							</th>
 						</tr>
 						<tr>
-							<th data-ln-table-col-select style="width: 40px;"></th>
+							<th data-ln-table-col-select></th>
 							<th data-ln-table-col="title">
 								Title
 								<ul data-ln-sort="seed-docs" data-ln-sort-field="title" data-ln-sort-state="none" data-ln-query="sort">

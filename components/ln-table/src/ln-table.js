@@ -720,6 +720,13 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 		this._scrollContainer = _findScrollContainer(this.dom, this.table);
 		const scrollTarget = this._scrollContainer || window;
 
+		// Disable browser scroll anchoring on table, tbody, and scroll container
+		// to prevent runaway scroll feedback loops when spacer heights dynamically resize.
+		if (this.dom) this.dom.style.overflowAnchor = 'none';
+		if (this.table) this.table.style.overflowAnchor = 'none';
+		if (this.tbody) this.tbody.style.overflowAnchor = 'none';
+		if (this._scrollContainer) this._scrollContainer.style.overflowAnchor = 'none';
+
 		this._scrollHandler = function () {
 			if (self._rafId) return;
 			self._rafId = requestAnimationFrame(function () {
@@ -897,19 +904,23 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 			this._topSpacer = document.createElement('tr');
 			this._topSpacer.className = 'ln-table__spacer';
 			this._topSpacer.setAttribute('aria-hidden', 'true');
+			this._topSpacer.style.overflowAnchor = 'none';
 			this._topTd = document.createElement('td');
 			this._topTd.setAttribute('colspan', colSpan);
 			this._topTd.style.padding = '0';
 			this._topTd.style.border = 'none';
+			this._topTd.style.overflowAnchor = 'none';
 			this._topSpacer.appendChild(this._topTd);
 
 			this._bottomSpacer = document.createElement('tr');
 			this._bottomSpacer.className = 'ln-table__spacer';
 			this._bottomSpacer.setAttribute('aria-hidden', 'true');
+			this._bottomSpacer.style.overflowAnchor = 'none';
 			this._bottomTd = document.createElement('td');
 			this._bottomTd.setAttribute('colspan', colSpan);
 			this._bottomTd.style.padding = '0';
 			this._bottomTd.style.border = 'none';
+			this._bottomTd.style.overflowAnchor = 'none';
 			this._bottomSpacer.appendChild(this._bottomTd);
 
 			this.tbody.replaceChildren(this._topSpacer, this._bottomSpacer);
@@ -1015,9 +1026,11 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 		const tr = document.createElement('tr');
 		tr.className = 'ln-table__placeholder';
 		tr.setAttribute('aria-hidden', 'true');
+		tr.style.overflowAnchor = 'none';
 		const td = document.createElement('td');
 		td.setAttribute('colspan', this.ths.length || 1);
 		td.style.height = this._rowHeight + 'px';
+		td.style.overflowAnchor = 'none';
 		tr.appendChild(td);
 		return tr;
 	};
