@@ -5963,7 +5963,7 @@ function wn(t, e, i) {
       }
     this._scrollContainer = _(this.dom, this.table);
     const g = this._scrollContainer || window;
-    this._scrollHandler = function() {
+    this.dom && (this.dom.style.overflowAnchor = "none"), this.table && (this.table.style.overflowAnchor = "none"), this.tbody && (this.tbody.style.overflowAnchor = "none"), this._scrollContainer && (this._scrollContainer.style.overflowAnchor = "none"), this._scrollHandler = function() {
       r._rafId || (r._rafId = requestAnimationFrame(function() {
         r._rafId = null, r._windowed ? r._renderWindowed() : r._renderVirtual();
       }));
@@ -6060,7 +6060,7 @@ function wn(t, e, i) {
       C && (C.checked = A);
     }
   }, u.prototype._ensureRowPool = function(r, g) {
-    for (this._rowPool ? this._topTd && this._topTd.getAttribute("colspan") !== String(g) && (this._topTd.setAttribute("colspan", g), this._bottomTd.setAttribute("colspan", g)) : (this._rowPool = [], this._topSpacer = document.createElement("tr"), this._topSpacer.className = "ln-table__spacer", this._topSpacer.setAttribute("aria-hidden", "true"), this._topTd = document.createElement("td"), this._topTd.setAttribute("colspan", g), this._topTd.style.padding = "0", this._topTd.style.border = "none", this._topSpacer.appendChild(this._topTd), this._bottomSpacer = document.createElement("tr"), this._bottomSpacer.className = "ln-table__spacer", this._bottomSpacer.setAttribute("aria-hidden", "true"), this._bottomTd = document.createElement("td"), this._bottomTd.setAttribute("colspan", g), this._bottomTd.style.padding = "0", this._bottomTd.style.border = "none", this._bottomSpacer.appendChild(this._bottomTd), this.tbody.replaceChildren(this._topSpacer, this._bottomSpacer)); this._rowPool.length < r; ) {
+    for (this._rowPool ? this._topTd && this._topTd.getAttribute("colspan") !== String(g) && (this._topTd.setAttribute("colspan", g), this._bottomTd.setAttribute("colspan", g)) : (this._rowPool = [], this._topSpacer = document.createElement("tr"), this._topSpacer.className = "ln-table__spacer", this._topSpacer.setAttribute("aria-hidden", "true"), this._topSpacer.style.overflowAnchor = "none", this._topTd = document.createElement("td"), this._topTd.setAttribute("colspan", g), this._topTd.style.padding = "0", this._topTd.style.border = "none", this._topTd.style.overflowAnchor = "none", this._topSpacer.appendChild(this._topTd), this._bottomSpacer = document.createElement("tr"), this._bottomSpacer.className = "ln-table__spacer", this._bottomSpacer.setAttribute("aria-hidden", "true"), this._bottomSpacer.style.overflowAnchor = "none", this._bottomTd = document.createElement("td"), this._bottomTd.setAttribute("colspan", g), this._bottomTd.style.padding = "0", this._bottomTd.style.border = "none", this._bottomTd.style.overflowAnchor = "none", this._bottomSpacer.appendChild(this._bottomTd), this.tbody.replaceChildren(this._topSpacer, this._bottomSpacer)); this._rowPool.length < r; ) {
       const h = this._createTemplateRow();
       if (!h) break;
       this._rowPool.push(h), this.tbody.insertBefore(h, this._bottomSpacer);
@@ -6100,9 +6100,9 @@ function wn(t, e, i) {
     this._selectable && this._updateSelectAll();
   }, u.prototype._buildPlaceholderRow = function() {
     const r = document.createElement("tr");
-    r.className = "ln-table__placeholder", r.setAttribute("aria-hidden", "true");
+    r.className = "ln-table__placeholder", r.setAttribute("aria-hidden", "true"), r.style.overflowAnchor = "none";
     const g = document.createElement("td");
-    return g.setAttribute("colspan", this.ths.length || 1), g.style.height = this._rowHeight + "px", r.appendChild(g), r;
+    return g.setAttribute("colspan", this.ths.length || 1), g.style.height = this._rowHeight + "px", g.style.overflowAnchor = "none", r.appendChild(g), r;
   }, u.prototype._renderWindowed = function() {
     if (this.isLoaded && this._cache.logicalTotal === 0) {
       this._disableVirtualScroll(), this._showEmptyState();

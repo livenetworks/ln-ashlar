@@ -73,11 +73,15 @@
 		top: auto;
 		z-index: auto;
 		vertical-align: middle;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 
 		// Shared header-button stack — keyed off the unprefixed structural filter button
 		// class and the [data-ln-sort] JS-component selector, so table / ln-table /
 		// ln-data-table all share one positioning rule.
 		&:has([data-ln-sort]):has(.table-filter) {
+			min-width: var(--th-double-action-min-width, 8.5rem);
 			padding-inline-end: calc(var(--padding-x, var(--size-md)) + 3.75rem);
 
 			.table-filter {
@@ -97,6 +101,7 @@
 		}
 
 		&:has([data-ln-sort]):not(:has(.table-filter)) {
+			min-width: var(--th-single-action-min-width, 6rem);
 			padding-inline-end: calc(var(--padding-x, var(--size-md)) + 2rem);
 
 			[data-ln-sort] {
@@ -109,6 +114,7 @@
 		}
 
 		&:has(.table-filter):not(:has([data-ln-sort])) {
+			min-width: var(--th-single-action-min-width, 6rem);
 			padding-inline-end: calc(var(--padding-x, var(--size-md)) + 2rem);
 
 			.table-filter {
@@ -281,8 +287,8 @@
 // ─── Column sort & filter buttons ──────────────────────────────
 
 @mixin table-header-btn-base {
-	width: 1.75rem;
-	height: 1.75rem;
+	width: var(--table-header-btn-size, 1.75rem);
+	height: var(--table-header-btn-size, 1.75rem);
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -295,6 +301,10 @@
 	box-shadow: none;
 	opacity: 0.45;
 	transition: all 0.15s ease-in-out;
+
+	.ln-icon {
+		--icon-size: var(--table-header-icon-size, 1.125rem);
+	}
 
 	&:hover {
 		background-color: color-mix(in srgb, var(--color-accent) var(--tint-hover), transparent);
@@ -371,9 +381,12 @@
 }
 
 @mixin table-spacer-row {
+	overflow-anchor: none;
+
 	td {
 		padding: 0 !important;
 		border: none !important;
+		overflow-anchor: none;
 	}
 }
 

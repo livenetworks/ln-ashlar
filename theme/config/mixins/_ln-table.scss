@@ -39,11 +39,8 @@
 	// bind to the outer .app-main > section scroll surface (same doctrine
 	// as @mixin section-card).
 	overflow-x: clip;
+	overflow-anchor: none;
 	max-width: 100%;
-
-	colgroup {
-		display: none !important;
-	}
 
 	// Table overrides inside component
 	table {
@@ -57,16 +54,22 @@
 	}
 
 	// Whole thead sticky as one unit (toolbar row + column-headers row).
-	// Wrapper's `overflow: clip` + `rounded-lg` clip the top corners,
-	// so per-th radius is unnecessary.
+	// Solid opaque background prevents underlying scrolled rows from bleeding through.
 	thead {
 		@include sticky-top;
-		will-change: transform;
-		transform: translateZ(0);
+		background: var(--color-bg);
+		isolation: isolate;
 	}
 
 	thead th {
 		background: var(--bg-sunken);
+	}
+
+	// Prevent height fluctuation on recycled virtual table rows
+	tbody tr[data-ln-table-row] td {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	// First td override -- remove global bold/bg
@@ -200,8 +203,7 @@
 	position: sticky;
 	bottom: 0;
 	z-index: var(--z-sticky);
-	will-change: transform;
-	transform: translateZ(0);
+	isolation: isolate;
 
 	strong {
 		color: var(--color-fg);
@@ -382,10 +384,13 @@
 // Virtual-scroll spacer rows (JS-injected) — neutralize cell chrome including bg.
 
 @mixin ln-table-spacer-row {
+	overflow-anchor: none;
+
 	td {
 		padding: 0 !important;
 		border: none !important;
 		background: transparent !important;
+		overflow-anchor: none;
 	}
 }
 
@@ -393,10 +398,13 @@
 // only. No shimmer (window-cache.md §4); height stays JS-owned via inline
 // px, spacer geometry depends on the exact value so nothing here may touch it.
 @mixin ln-table-placeholder-row {
+	overflow-anchor: none;
+
 	td {
 		padding: 0 !important;
 		border: none !important;
 		background: var(--bg-sunken);
+		overflow-anchor: none;
 	}
 }
 

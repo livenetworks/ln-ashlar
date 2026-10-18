@@ -20,7 +20,7 @@ run('Performance & Scalability Benchmark — 3 Table Architectures', async ({ pa
 	console.log('>>> [1/3] Benchmarking SSR Pre-Rendered Table (table.html)...');
 	{
 		const t0 = performance.now();
-		await page.goto(BASE_URL + 'table.html', { waitUntil: 'load' });
+		await page.goto(BASE_URL + 'table.html', { waitUntil: 'domcontentloaded' });
 		const ssrLoadTime = performance.now() - t0;
 
 		await page.waitForSelector('#demo-table tbody tr');
