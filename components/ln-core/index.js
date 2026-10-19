@@ -1,5 +1,5 @@
 export { cloneTemplate, cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, lnFill, fillTemplate, renderList, buildDict, guardBody, findElements, isVisible, shouldIgnoreClick, isTargetDisabled, isUsableTarget, isEditableTarget, serializeForm, populateForm, resolveFormMethod, getLocale, readValue, detectValueType, compareValues, registerComponent, shouldInterceptLink, buildUrl, getHeaders, parseHeaders, registerDataMapper, getDataMapper, interceptValueProperty, registerLocaleFallback, getLocaleFallback, holdInit, releaseInit, pendingCount, queueBoot, ensureLocaleObserver, observeAttributes, observeLifecycle, withoutLifecycle, setDebugSink, setPersistSink, isDevMode, hasActiveDebug } from './helpers.js';
-export { reactiveState, deepReactive, createBatcher } from './reactive.js';
+export { createBatcher } from './reactive.js';
 export { createWindowCache } from './window-cache.js';
 export { hashParse, hashGet, hashSet, hashLinkClick, resolveHashNamespace, hashSortEncode, hashSortDecode, hashFilterEncode, hashFilterDecode } from './hash.js';
 export { queryParse, queryGet, querySet, resolveQueryParam, querySortEncode, querySortDecode, queryFilterEncode, queryFilterDecode } from './query.js';

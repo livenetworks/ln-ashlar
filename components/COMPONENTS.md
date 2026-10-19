@@ -96,8 +96,6 @@ import { deepReactive, createBatcher } from '../ln-core';
 | `fillTemplate(clone, data)` | Replace `{{ key }}` text-node placeholders in cloned template with `data[key]` values |
 | `buildDict(root, selector)` | Read hidden i18n elements once at init, return plain object, remove from DOM |
 | `renderList(container, items, tpl, keyFn, fillFn, tag)` | Keyed list rendering with DOM reuse |
-| `reactiveState(initial, onChange)` | Shallow Proxy — onChange(prop, value, old) per set |
-| `deepReactive(obj, onChange)` | Deep Proxy — onChange() on any nested change |
 | `createBatcher(renderFn, afterRender)` | Coalesce multiple sync state changes into one render |
 
 Import only what the component needs. Vite tree-shakes unused exports.
@@ -985,7 +983,7 @@ The component calls `_ensureDefaultItemTemplate()` at the top of `_initUpload()`
 
 | Component | Pattern | Data Attr | Description |
 |-----------|---------|-----------|------|
-| ln-core | Shared module | — | cloneTemplate, cloneTemplateScoped, dispatch, dispatchCancelable, fill, fillTemplate, renderList, buildDict, guardBody, findElements, reactiveState, deepReactive, createBatcher, createWindowCache |
+| ln-core | Shared module | — | cloneTemplate, cloneTemplateScoped, dispatch, dispatchCancelable, fill, fillTemplate, renderList, buildDict, guardBody, findElements, createBatcher, createWindowCache |
 | ln-toggle | Instance | `data-ln-toggle` | Generic toggle (sidebar, collapse) |
 | ln-accordion | Instance | `data-ln-accordion` | Wrapper — only one toggle open at a time |
 | ln-tabs | Instance | `data-ln-tabs` | Tab navigation — URL hash (anchor triggers) or localStorage persist (button triggers) |

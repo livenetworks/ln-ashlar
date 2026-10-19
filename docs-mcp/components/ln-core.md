@@ -144,7 +144,7 @@ This service module exposes no declarative HTML attributes directly on itself.
 
 `ln-core` re-exports infrastructure modules and pure primitives from sub-files:
 
-- [`ln-reactive`](./ln-reactive.md) — `reactiveState`, `deepReactive`, `createBatcher`
+- [`ln-reactive`](./ln-reactive.md) — `createBatcher`
 - [`window-cache`](./window-cache.md) — `createWindowCache`
 - [`ln-persist`](./ln-persist.md) — `persistGet`, `persistSet`, `persistRemove`, `persistClear`
 - [`ln-hash`](./ln-hash.md) — `hashParse`, `hashGet`, `hashSet`, `hashLinkClick`, `hashSortEncode`, `hashSortDecode`, `hashFilterEncode`, `hashFilterDecode`, `resolveHashNamespace`
