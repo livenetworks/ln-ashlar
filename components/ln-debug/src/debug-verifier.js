@@ -1,5 +1,5 @@
 import { VALID_ATTRIBUTES } from './generated-attributes.js';
-import { pendingCount, queueBoot } from '../../ln-core/index.js';
+import { pendingCount, queueBoot, hasActiveDebug } from '../../ln-core/index.js';
 
 /**
  * Calculates Levenshtein distance between two strings.
@@ -43,8 +43,11 @@ export function findClosestAttribute(attrName, validSet = VALID_ATTRIBUTES) {
 
 	let bestMatch = null;
 	let minDistance = Infinity;
+	const maxAllowedDist = Math.max(3, Math.floor(attrName.length * 0.4));
 
 	for (const valid of validSet) {
+		if (Math.abs(attrName.length - valid.length) > 3) continue;
+		if (Math.abs(attrName.length - valid.length) >= minDistance) continue;
 		const dist = levenshtein(attrName, valid);
 		if (dist < minDistance) {
 			minDistance = dist;
@@ -52,7 +55,6 @@ export function findClosestAttribute(attrName, validSet = VALID_ATTRIBUTES) {
 		}
 	}
 
-	const maxAllowedDist = Math.max(3, Math.floor(attrName.length * 0.4));
 	if (minDistance <= maxAllowedDist) {
 		return bestMatch;
 	}
@@ -226,8 +228,8 @@ export function verifyStoreUniqueness(root = document) {
  * @param {Set<string>} validSet
  * @returns {Array<{ type: string, element: Element, attribute: string, suggestion: string|null, message: string }>}
  */
-export function verifyAttributeSpelling(root = document, validSet = VALID_ATTRIBUTES) {
-	const scope = root.nodeType === 9 ? root.body || root.documentElement : root;
+export function verifyAttributeSpelling(root = (typeof document !== 'undefined' ? document : null), validSet = VALID_ATTRIBUTES) {
+	const scope = root && (root.nodeType === 9 ? root.body || root.documentElement : root);
 	if (!scope) return [];
 
 	const issues = [];
@@ -239,24 +241,23 @@ export function verifyAttributeSpelling(root = document, validSet = VALID_ATTRIB
 
 		for (let j = 0; j < el.attributes.length; j++) {
 			const attr = el.attributes[j];
-			if (attr.name.startsWith('data-ln-')) {
-				if (!validSet.has(attr.name)) {
-					const suggestion = findClosestAttribute(attr.name, validSet);
-					const suggestionMsg = suggestion ? ` Did you mean "${suggestion}"?` : '';
-					issues.push({
-						type: 'attribute-unknown',
-						element: el,
-						attribute: attr.name,
-						suggestion: suggestion,
-						message: `[ln-debug] Unknown attribute "${attr.name}" on <${el.tagName.toLowerCase()}>.${suggestionMsg}`
-					});
-				}
-			}
+			if (!attr.name.startsWith('data-ln-') || validSet.has(attr.name)) continue;
+
+			const suggestion = findClosestAttribute(attr.name, validSet);
+			issues.push({
+				type: 'attribute-unknown',
+				element: el,
+				attribute: attr.name,
+				suggestion: suggestion,
+				message: `[ln-debug] Unknown attribute "${attr.name}" on <${el.tagName.toLowerCase()}>.${suggestion ? ` Did you mean "${suggestion}"?` : ''}`
+			});
 		}
 	}
 
 	return issues;
 }
+
+export { verifyAttributeSpelling as checkAttributeSpelling };
 
 /**
  * Performs a complete contract verification scan of the DOM.
@@ -308,24 +309,17 @@ let _debounceTimer = null;
  * @param {function} [callback]
  */
 export function scheduleVerification(root = (typeof document !== 'undefined' ? document : null), delay = 50, callback = null) {
-	if (!root) return;
+	if (!root || !hasActiveDebug()) return;
 
-	if (_debounceTimer) {
-		clearTimeout(_debounceTimer);
-		_debounceTimer = null;
-	}
-
-	function run() {
+	clearTimeout(_debounceTimer);
+	const run = () => {
 		_debounceTimer = setTimeout(() => {
 			_debounceTimer = null;
 			const report = verifyDOM(root);
 			if (callback) callback(report);
 		}, delay);
-	}
+	};
 
-	if (pendingCount() > 0) {
-		queueBoot(run);
-	} else {
-		run();
-	}
+	if (pendingCount() > 0) return queueBoot(run);
+	run();
 }

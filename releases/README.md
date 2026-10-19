@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.1.12](./v2.1.12.md) — October 20, 2026
+Elimination of 3+ second main-thread freeze during DOM mutations and virtual row recycling via scoped lifecycle `onInit` dispatching, `ln-debug` active debug gating (`hasActiveDebug()`), length-difference Levenshtein optimization, and mutation loop guard-clause refactoring.  
+👉 [Read full v2.1.12 release notes](./v2.1.12.md)
+
 ### [v2.1.11](./v2.1.11.md) — October 18, 2026
 Injected JSON dataset seed mode (`data-ln-table-seed`) with virtual DOM row recycling pool for instant rendering of 10,000+ records, scroll anchoring loop elimination (`overflow-anchor: none`), and table header ellipsis truncation and action-aware minimum column widths.  
 👉 [Read full v2.1.11 release notes](./v2.1.11.md)

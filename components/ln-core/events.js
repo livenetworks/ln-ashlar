@@ -4,8 +4,11 @@ export function hasActiveDebug() {
 	if (typeof window === 'undefined') return false;
 	if (window.lnDebug === true) return true;
 	if (window.lnCore && window.lnCore._debugSink) return true;
-	if (typeof document !== 'undefined' && document.body) {
-		return document.body.hasAttribute('data-ln-debug') || document.body.querySelector('[data-ln-debug]') !== null;
+	if (typeof document !== 'undefined') {
+		if (document.documentElement && document.documentElement.hasAttribute('data-ln-debug')) return true;
+		if (document.body) {
+			return document.body.hasAttribute('data-ln-debug') || document.body.querySelector('[data-ln-debug]') !== null;
+		}
 	}
 	return false;
 }
