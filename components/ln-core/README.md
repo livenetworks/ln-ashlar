@@ -13,7 +13,7 @@ ln-core exposes helpers in these categories:
 - **DOM binding** — declarative data-attribute-driven rendering (`fill`, `renderList`, `fillTemplate`)
 - **Forms & Inputs** — serialize/populate by field `name`, intercept input value getters/setters (`interceptValueProperty`)
 - **Target & Event Predicates** — `shouldIgnoreClick`, `isTargetDisabled`, `isUsableTarget`, `isEditableTarget`
-- **Reactivity** — `reactiveState`, `deepReactive`, `createBatcher`
+- **Reactivity & Batching** — microtask-coalesced render batcher (`createBatcher`)
 - **Windowing** — sliding-window sparse cache for server-side virtualization (`createWindowCache`)
 - **Layout & Positioning** — viewport-aware positioning (`computePlacement`), measurement (`measureHidden`)
 - **Hash codec** — namespaced URL fragment state (`hashParse`, `hashGet`, `hashSet`, `hashSortEncode`, `hashSortDecode`, `hashFilterEncode`, `hashFilterDecode`, `resolveHashNamespace`)
@@ -542,37 +542,6 @@ fetch('/tpl.html').then(html => {
 
 ## reactive.js
 
-### reactiveState(initial, onChange)
-
-Shallow `Proxy` — fires `onChange(prop, value, old)` on every property set. No-op if value hasn't changed.
-
-```js
-const state = reactiveState({ searchTerm: '', sortCol: -1 }, function (prop, value, old) {
-    batchRender();
-});
-```
-
-- Returns a Proxy wrapping a shallow copy of `initial`
-- Only tracks direct property assignments (not nested objects)
-- Used by `ln-filter` for flat state
-
-### deepReactive(obj, onChange)
-
-Deep `Proxy` — recursively wraps nested objects and arrays. Fires `onChange()` (no args) on any nested mutation.
-
-```js
-const state = deepReactive({ toasts: [], files: [] }, function () {
-    batchRender();
-});
-state.toasts.push({ title: 'Hello' }); // triggers onChange
-```
-
-- Wraps existing nested objects on creation
-- Auto-wraps newly assigned objects/arrays
-- `deleteProperty` also triggers `onChange`
-- Internal `Symbol('deepReactive')` flag prevents double-wrapping
-- Used by `ln-toast`, `ln-upload` for complex state
-
 ### createBatcher(renderFn, afterRender)
 
 Coalesce multiple synchronous state changes into a single `renderFn` call via `queueMicrotask`.
@@ -586,7 +555,7 @@ const batchRender = createBatcher(
 
 - Multiple calls to `schedule()` within the same microtask result in one `renderFn` call
 - Optional `afterRender` callback fires after each render
-- Pattern: `deepReactive(state, batchRender)` — every state mutation schedules a batched render
+- Pattern: used in `ln-search`, `ln-filter`, `ln-list`, `ln-data-coordinator` to debounce/coalesce state and render operations
 
 ---
 

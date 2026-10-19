@@ -3,9 +3,9 @@ name: ln-reactive
 classification: service
 status: stable
 domain: frontend
-summary: Lightweight Proxy-based reactive state wrappers and microtask render batcher primitives.
+summary: Microtask-based render batcher primitive for coalescing high-frequency state updates.
 source: components/ln-core/reactive.js
-tags: [reactive, proxy, state, batcher, performance, service]
+tags: [reactive, batcher, microtask, performance, service]
 ---
 
 # ⚡ ln-reactive
@@ -16,19 +16,19 @@ tags: [reactive, proxy, state, batcher, performance, service]
 
 ## 1. Core Behavior & Responsibility
 
-`ln-reactive` provides lightweight, framework-free reactive state management using native JavaScript `Proxy` objects, alongside a microtask-based render batcher to prevent redundant DOM updates.
+`ln-reactive` provides a microtask-based render batcher (`createBatcher`) to coalesce multiple synchronous state changes into a single DOM render pass, preventing redundant renders and layout thrashing.
 
 The JavaScript source is located at [reactive.js](../../components/ln-core/reactive.js).
 
 Key responsibilities include:
-- **Shallow Reactive Proxy (`reactiveState`):** Wraps an initial state object in a Proxy that triggers a callback when top-level properties are mutated.
-- **Deep Reactive Proxy (`deepReactive`):** Recursively wraps nested objects and arrays in Proxies, notifying on nested updates or property deletions.
 - **Microtask Render Batcher (`createBatcher`):** Batches multiple synchronous state mutations into a single DOM render cycle using `queueMicrotask`.
+- **Render Coalescing:** Multiple calls to `schedule()` within the same synchronous execution block execute `renderFn` exactly once.
+- **After-Render Hook:** Dispatches notification events or post-render callbacks through the optional `afterRender` handler.
 
 > [!IMPORTANT]
 > **What the module does NOT do (Orthogonality Doctrine):**
-> - **Virtual DOM Diffing:** `ln-reactive` does not diff virtual DOM trees. Component rendering callbacks must update target DOM nodes directly.
-> - **Global Store Management:** It is a primitive utility, not a centralized store architecture (use [`ln-data-store`](./ln-data-store.md) for domain data stores).
+> - **Virtual DOM Diffing:** `ln-reactive` does not diff virtual DOM trees. Component rendering callbacks update target DOM nodes directly (`fill`, `renderList`).
+> - **Global Store Management:** It is a low-level scheduler primitive, not a centralized store architecture (use [`ln-data-store`](./ln-data-store.md) for domain data stores).
 
 ---
 
@@ -37,27 +37,22 @@ Key responsibilities include:
 `ln-reactive` is a pure JavaScript utility module imported directly into components:
 
 ```javascript
-import { reactiveState, deepReactive, createBatcher } from '../../ln-core';
+import { createBatcher } from '../../ln-core';
 
 // 1. Create a render batcher
 const scheduleRender = createBatcher(
     () => {
-        document.getElementById('counter').textContent = state.count;
+        self._render();
     },
     () => {
-        console.log('Render cycle complete');
+        self.dom.dispatchEvent(new CustomEvent('ln-component:rendered', { bubbles: true }));
     }
 );
 
-// 2. Create reactive state attached to the batcher
-const state = reactiveState({ count: 0 }, (prop, value, old) => {
-    scheduleRender();
-});
-
-// 3. Synchronous mutations trigger only ONE scheduled render
-state.count = 1;
-state.count = 2;
-state.count = 3;
+// 2. Synchronous calls trigger only ONE scheduled render pass
+scheduleRender();
+scheduleRender();
+scheduleRender();
 ```
 
 ---
@@ -72,8 +67,6 @@ This service module exposes no declarative HTML attributes directly.
 
 | Helper | Signature | Returns | Description |
 |---|---|---|---|
-| `reactiveState` | `(initial: Object, onChange: Function)` | `Proxy` | Creates a shallow reactive Proxy around `initial`. `onChange(prop, value, old)` fires when any top-level property changes. |
-| `deepReactive` | `(obj: Object, onChange: Function)` | `Proxy` | Recursively wraps `obj` and its nested objects/arrays in reactive Proxies. `onChange()` fires on any property write or deletion. |
 | `createBatcher` | `(renderFn: Function, afterRender?: Function)` | `Function` | Returns a `schedule()` function that queues `renderFn` and optional `afterRender` on the microtask queue. Multiple calls within the same tick execute `renderFn` exactly once. |
 
 ### Events API
@@ -84,49 +77,43 @@ This service module emits and listens to no custom DOM events directly.
 
 ## 4. Performance & Batching Concept
 
-When multiple properties on a reactive state change sequentially in a synchronous block, executing DOM writes for every change causes layout thrashing.
+When multiple properties change sequentially in a synchronous block (e.g., search input, filter checkboxes, sorting), executing DOM writes for every change causes layout thrashing.
 
-`createBatcher` uses `queueMicrotask` to combine state mutations:
+`createBatcher` uses `queueMicrotask` to coalesce state operations:
 
 ```
-[Sync Mutate A] ──┐
-[Sync Mutate B] ──┼──> queueMicrotask ──> [ single renderFn() ]
-[Sync Mutate C] ──┘
+[Sync Update A] ──┐
+[Sync Update B] ──┼──> queueMicrotask ──> [ single renderFn() ]
+[Sync Update C] ──┘
 ```
 
 ---
 
-## 5. Accessibility (ARIA) & Common Pitfalls
-
-- **Identical Value Guard:** `reactiveState` skips firing `onChange` if the new value is strictly equal (`===`) to the existing value.
-- **Common Pitfall — Cyclic References:** Avoid creating circular object references inside objects passed to `deepReactive`, as the recursive proxy wrapper does not track cyclic references.
-
----
-
-## 6. Flow Diagram & Lifecycle
+## 5. Flow Diagram & Lifecycle
 
 ```mermaid
 sequenceDiagram
-    participant Code as Component JS
-    participant Proxy as deepReactive Proxy
+    participant Component as Component JS
     participant Batcher as Render Batcher
-    participant DOM as DOM Element
+    participant Microtask as Microtask Queue
+    participant DOM as Target DOM
 
-    Code->>Proxy: state.user.name = 'Alice'
-    Proxy->>Batcher: Trigger onChange()
-    Batcher->>Batcher: queueMicrotask(render) (pending = true)
+    Component->>Batcher: schedule() (pending = false)
+    Batcher->>Microtask: queueMicrotask(render) (pending = true)
     
-    Code->>Proxy: state.user.age = 30
-    Proxy->>Batcher: Trigger onChange()
-    Note over Batcher: Already pending — skip duplicate scheduling
+    Component->>Batcher: schedule() (pending = true)
+    Note over Batcher: Already pending — skip duplicate queueing
     
     Microtask-->>Batcher: Microtask tick executes
-    Batcher->>DOM: Call renderFn() & afterRender()
+    Batcher->>DOM: Call renderFn()
+    Batcher->>Component: Call afterRender()
 ```
 
 ---
 
-## 7. Related Components
+## 6. Related Components
 
-- [`ln-core`](./ln-core.md) — Re-exports `reactiveState`, `deepReactive`, and `createBatcher`.
-- [`ln-data-store`](./ln-data-store.md) — Uses reactive state management for local record stores.
+- [`ln-core`](./ln-core.md) — Re-exports `createBatcher`.
+- [`ln-search`](./ln-search.md) — Uses `createBatcher` to batch apply operations.
+- [`ln-filter`](./ln-filter.md) — Uses `createBatcher` to debounce filter execution.
+- [`ln-list`](./ln-list.md) — Uses `createBatcher` for virtualized sparse window updates.
