@@ -17,7 +17,7 @@ import { ensureDebugGate, refreshDebugHosts } from './gate.js';
 
 	function _component(dom) {
 		this.dom = dom;
-		scheduleVerification(dom.ownerDocument || document);
+		scheduleVerification(dom);
 		refreshDebugHosts();
 		return this;
 	}
@@ -33,16 +33,8 @@ import { ensureDebugGate, refreshDebugHosts } from './gate.js';
 
 	const _ctor = registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-debug', {
 		attributes: ATTRIBUTES,
-		onInit: function (node) {
-			if (typeof document !== 'undefined') {
-				scheduleVerification(node && node.ownerDocument ? node.ownerDocument : document);
-			}
-		},
-		onSubtreeChange: function (host) {
-			if (typeof document !== 'undefined') {
-				scheduleVerification(host && host.ownerDocument ? host.ownerDocument : document);
-			}
-		}
+		onInit: (node) => scheduleVerification(node),
+		onSubtreeChange: (host) => scheduleVerification(host)
 	});
 
 	// registerComponent assigns window[DOM_ATTRIBUTE] = constructor, so the

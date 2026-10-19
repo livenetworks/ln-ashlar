@@ -143,7 +143,15 @@ async function run() {
 		const { entryName, srcPath } = entriesToBuild[i];
 		console.log(`[${i + 1}/${entriesToBuild.length}] Compiling ${entryName}...`);
 		const config = getComponentConfig(entryName, srcPath);
-		await build(config);
+		for (let attempt = 0; attempt < 3; attempt++) {
+			try {
+				await build(config);
+				break;
+			} catch (err) {
+				if (attempt === 2) throw err;
+				await new Promise(r => setTimeout(r, 150));
+			}
+		}
 	}
 
 	console.log('All builds completed successfully!');

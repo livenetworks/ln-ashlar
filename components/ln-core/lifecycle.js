@@ -280,57 +280,38 @@ function _handleChildListMutation(mutation) {
 
 	for (let j = 0; j < mutation.addedNodes.length; j++) {
 		const node = mutation.addedNodes[j];
-		if (node.nodeType === 1) {
-			const hasDescendants = !!(node.firstElementChild || (node.children && node.children.length));
-			for (let r = 0; r < registry.length; r++) {
-				const entry = registry[r];
-				if (entry.selector && entry.attribute && entry.ComponentFn) {
-					if (!hasDescendants) {
-						if (node.matches && node.matches(entry.query)) {
-							_initElement(node, entry);
-						}
-					} else {
-						if (node.matches && node.matches(entry.query)) {
-							_initElement(node, entry);
-						}
-						if (node.querySelectorAll) {
-							const matchedList = node.querySelectorAll(entry.query);
-							for (let m = 0; m < matchedList.length; m++) {
-								_initElement(matchedList[m], entry);
-							}
-						}
-					}
-				}
+		if (node.nodeType !== 1) continue;
+		const hasDesc = !!(node.firstElementChild || (node.children && node.children.length));
+		for (let r = 0; r < registry.length; r++) {
+			const entry = registry[r];
+			const q = entry.query;
+			if (!q) continue;
+			if (node.matches && node.matches(q)) {
+				if (entry.ComponentFn) _initElement(node, entry);
 				if (entry.onInit) entry.onInit(node);
+			}
+			if (hasDesc && node.querySelectorAll) {
+				const items = node.querySelectorAll(q);
+				for (let m = 0; m < items.length; m++) {
+					if (entry.ComponentFn) _initElement(items[m], entry);
+					if (entry.onInit) entry.onInit(items[m]);
+				}
 			}
 		}
 	}
 
 	for (let j = 0; j < mutation.removedNodes.length; j++) {
 		const node = mutation.removedNodes[j];
-		if (node.nodeType === 1) {
-			// Fast bailout: if the node is still in the document, it was simply moved or reordered!
-			if (document.contains(node)) continue;
-			const hasDescendants = !!(node.firstElementChild || (node.children && node.children.length));
-			for (let r = 0; r < registry.length; r++) {
-				const entry = registry[r];
-				const query = entry.query;
-				if (!query) continue;
-				if (!hasDescendants) {
-					if (node.matches && node.matches(query)) {
-						_destroyItem(node, entry);
-					}
-				} else {
-					if (node.matches && node.matches(query)) {
-						_destroyItem(node, entry);
-					}
-					if (node.querySelectorAll) {
-						const items = node.querySelectorAll(query);
-						for (let k = 0; k < items.length; k++) {
-							_destroyItem(items[k], entry);
-						}
-					}
-				}
+		if (node.nodeType !== 1 || document.contains(node)) continue;
+		const hasDesc = !!(node.firstElementChild || (node.children && node.children.length));
+		for (let r = 0; r < registry.length; r++) {
+			const entry = registry[r];
+			const q = entry.query;
+			if (!q) continue;
+			if (node.matches && node.matches(q)) _destroyItem(node, entry);
+			if (hasDesc && node.querySelectorAll) {
+				const items = node.querySelectorAll(q);
+				for (let k = 0; k < items.length; k++) _destroyItem(items[k], entry);
 			}
 		}
 	}
