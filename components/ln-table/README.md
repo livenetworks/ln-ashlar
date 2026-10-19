@@ -169,10 +169,8 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
 | Attribute | Elements | Description |
 | :--- | :--- | :--- |
 | `data-ln-table` | Root wrapper | Component identifier. Target must carry a unique `id`. |
-| `data-ln-table-source` | Root wrapper | Opt-in indicator for Data-Driven Mode. |
-| `data-ln-table-seed="selector"` | Root wrapper | Selector or element ID of an external seed script block containing an initial JSON records array. |
+| `data-ln-table-source` | Root wrapper | Opt-in indicator for Data-Driven Mode (maps to `ln-data-store` ID). |
 | `data-ln-table-selectable` | Root wrapper | Enables checkbox-based row selections. |
-| `data-ln-table-window="N"` | Root wrapper | Opt-in server-side sliding-window virtualization. `N` sets the resident-row cap (default 1000). Requires Data-Driven Mode. Observable: add/remove toggles windowed mode ON/OFF live; changing `N` while windowed reconfigures the live cache. |
 | ~~`data-ln-table-search`~~ | — | **Removed.** Drive the search input with `data-ln-search-for="<tableId>"` — `ln-table` consumes `ln-search:change` directly in SSR mode only; data-driven mode relies on `ln-table-coordinator` to translate it into `ln-table:set-search`. |
 | `data-ln-table-col="field"` | `<th>` | Maps column header to data object field keys. |
 | `data-ln-value` | `<td>` | Raw machine value behind a formatted cell — sorting/filtering operate on this, not the displayed text. Read via `ln-core.readValue`. |
@@ -193,7 +191,7 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
 - **`ln-table:ready`** `{ total }`  
   Fired after the initial DOM rows are parsed.
 - **`ln-table:request-data`** `{ table, sort, filters, search }`  
-  Requests a fresh dataset when sort, filter, or search is changed. Windowed mode (`data-ln-table-window`) adds `{ offset, limit, queryGen }`.
+  Requests a fresh dataset when sort, filter, or search is changed (Data-Driven mode).
 - **`ln-table:rendered`** `{ table, total, visible }`  
   Fired after a dynamic template render finishes drawing.
 - **`ln-table:row-click`** `{ table, id, record }`  
@@ -206,13 +204,10 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
 ### Received Events
 
 - **`ln-table:set-data`** `{ data, total, filtered, filterOptions }`  
-  Applies the payload array and triggers rendering. Windowed mode expects `{ offset, queryGen }` echoed back — routed straight into the internal window cache.
+  Applies the payload array and triggers rendering.
 - **`ln-table:set-loading`** `{ loading }`  
   Toggles the visual loading dimmed state overlay.
-- **`ln-table:page-failed`** `{ offset }`  
-  Windowed mode: the coordinator reports the page fetch at `offset` failed. Releases it from the cache's in-flight set — no auto-retry; the next `ensure()` (scroll, filter, resize) requests it again.
-- **`ln-table:request-revalidate`**  
-  Windowed mode: the coordinator asks the cache to re-fetch the currently visible page after a local mutation. Stale rows stay visible until the response lands; does not jump back to page 0.
+
 
 ---
 
@@ -270,41 +265,17 @@ Options come from the domain (backend enum or lookup), never derived from the da
 
 ---
 
-## Windowed Mode
+## Virtual Scrolling & Large Datasets
 
-Opt-in server-side sliding-window virtualization for datasets too large to cache client-side. Add `data-ln-table-window="N"` to a Data-Driven Mode table; the component owns a bounded `ln-core.createWindowCache` instance instead of the full dataset.
+For large datasets, `ln-table` automatically activates DOM row virtualization (`calculateVirtualWindow`) when the row count exceeds `VIRTUAL_THRESHOLD` (200 rows). It mounts top/bottom spacer elements and maintains a recycled pool of ~35–50 rows in the DOM corresponding to the active scroll viewport, providing smooth 60fps scrolling over tens of thousands of records.
 
-### What it does
-
-1. Caches at most `N` rows (default 1000), LRU-evicting the least-recently-touched rows once the cap is exceeded.
-2. Extends `ln-table:request-data` with `{ offset, limit, queryGen }` on every scroll pass that needs new rows.
-3. Reads `{ offset, queryGen }` off `ln-table:set-data` and routes it into the window cache, dropping the response if `queryGen` no longer matches the current query.
-4. Renders blank placeholder rows (no shimmer) for logical rows not yet resident.
-5. Hides the select-all checkbox (D4) — per-row selection still works and survives eviction.
-
-### Live observability
-
-`data-ln-table-window`, `data-ln-table-window-page`, `data-ln-table-window-threshold`, and `data-ln-table-count` are all observed and apply live, without re-init. Adding `data-ln-table-window` to an initialized, non-windowed, data-driven table enables windowing live — the cache seeds from resident rows, honoring `data-ln-table-count` if present. Removing it disables windowing live: the cache is destroyed and the table issues a fresh full `ln-table:request-data` (no `offset`/`limit`) to repopulate the complete dataset before rendering non-windowed again.
-
-### What it does NOT do
-
-- Does not cache the full dataset client-side — that's the non-windowed Data-Driven path.
-- Does not paginate — scrolling stays continuous; `offset`/`limit` address server-side pages, not user-facing "Page 2" navigation.
-- Does not retry a dropped stale response — the next `ensure()` pass re-requests it under the current `queryGen`.
-
-### Markup contract
-
-```html
-<section data-ln-table="documents" data-ln-table-source="documents" data-ln-table-window="1000" id="documents-table">
-    ...
-</section>
-```
+For remote sliding-window caching, windowing is handled at the data layer by `ln-data-store` (`data-ln-data-store-window` and `data-ln-data-store-window-page`). The table consumes the streamed records cleanly via `ln-table:set-data` without needing private table-level window caches.
 
 ---
 
 ## 🔧 Internals
 
-Source: `components/ln-table/ln-table.js`. Sort is a separate, co-loaded component — see `components/ln-sort/ln-sort.js`. Imports from `ln-core`: `cloneTemplateScoped`, `dispatch`, `fill`, `fillTemplate`, `registerComponent`, `createWindowCache`, `readValue`, `detectValueType`, `compareValues`.
+Source: `components/ln-table/ln-table.js`. Sort is a separate, co-loaded component — see `components/ln-sort/ln-sort.js`. Imports from `ln-core`: `cloneTemplateScoped`, `dispatch`, `fill`, `fillTemplate`, `registerComponent`, `readValue`, `detectValueType`, `compareValues`.
 
 ### Mode detection & lifecycle
 

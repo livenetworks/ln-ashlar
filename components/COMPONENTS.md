@@ -1000,7 +1000,7 @@ The component calls `_ensureDefaultItemTemplate()` at the top of `_initUpload()`
 | ln-search | Instance | `data-ln-search` | Generic search (textContent filter) |
 | ln-filter | Instance | `data-ln-filter` | Generic filter (data attribute filter) |
 | ln-sort | Instance | `data-ln-sort` | Sort control primitive — 3-trigger cycle (none→asc→desc→none), search-precedent cancelable event; targets ln-table, ln-list, or plain lists |
-| ln-table | Instance | `data-ln-table` | Data table (search, filter, sort, virtual scroll; opt-in server-side windowed virtualization via `data-ln-table-window`) |
+| ln-table | Instance | `data-ln-table` | Data table (search, filter, sort, and viewport row virtualization) |
 | ln-chart | Instance | `data-ln-chart` | SVG line/area dataset renderer with `ln-data-coordinator` binding |
 | ln-sortable | Instance | `data-ln-sortable` | Drag & drop reorder |
 | ln-picklist | Instance | `data-ln-picklist` | Two-list checkbox selection |

@@ -232,11 +232,11 @@ ${jsonSeed}
 					<tr data-ln-table-row data-ln-table-row-id="{{ id }}">
 						<td><input type="checkbox" data-ln-table-row-select></td>
 						<td><strong>{{ title }}</strong></td>
-						<td>{{ department }}</td>
+						<td><span>{{ department }}</span></td>
 						<td><span class="badge {{ status_badge }}">{{ status }}</span></td>
-						<td>{{ priority }}</td>
-						<td>{{ owner }}</td>
-						<td data-ln-value="{{ file_size }}">{{ file_size_display }}</td>
+						<td><span>{{ priority }}</span></td>
+						<td><span>{{ owner }}</span></td>
+						<td data-ln-value="{{ file_size }}"><span>{{ file_size_display }}</span></td>
 						<td data-ln-value="{{ updated_at }}"><time datetime="{{ updated_at }}">{{ updated_display }}</time></td>
 					</tr>
 				</template>

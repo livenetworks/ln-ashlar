@@ -1346,17 +1346,12 @@
 			"valueSet": "v"
 		},
 		{
-			"name": "data-ln-table-count",
-			"description": "Total record count override for virtual scrollbar calculation"
-		},
-		{
 			"name": "data-ln-table-dict",
 			"description": "data-ln-table-dict attribute"
 		},
 		{
 			"name": "data-ln-table-empty",
-			"description": "Container for table empty state",
-			"valueSet": "v"
+			"description": "data-ln-table-empty attribute"
 		},
 		{
 			"name": "data-ln-table-empty-when",
@@ -1372,8 +1367,7 @@
 		},
 		{
 			"name": "data-ln-table-loading",
-			"description": "Loading indicator element in footer or template",
-			"valueSet": "v"
+			"description": "data-ln-table-loading attribute"
 		},
 		{
 			"name": "data-ln-table-row",
@@ -1391,10 +1385,6 @@
 		{
 			"name": "data-ln-table-row-select",
 			"description": "Row selection checkbox trigger"
-		},
-		{
-			"name": "data-ln-table-seed",
-			"description": "Selector or element ID of an external seed script element"
 		},
 		{
 			"name": "data-ln-table-select-all-label",
@@ -1423,15 +1413,7 @@
 		},
 		{
 			"name": "data-ln-table-window",
-			"description": "Virtual scrolling window size in rows"
-		},
-		{
-			"name": "data-ln-table-window-page",
-			"description": "Virtual scrolling slice page size"
-		},
-		{
-			"name": "data-ln-table-window-threshold",
-			"description": "Scroll threshold margin in pixels to trigger page fetch"
+			"description": "data-ln-table-window attribute"
 		},
 		{
 			"name": "data-ln-tabs",
