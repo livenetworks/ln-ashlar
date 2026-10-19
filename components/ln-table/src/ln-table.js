@@ -1,61 +1,20 @@
-import { cloneTemplateScoped, createBatcher, createWindowCache, dispatch, fill, fillTemplate, getLocale, readValue, registerComponent, requestData, attrBool, attrStr, attrSpec, defineAttrs } from '../../ln-core';
-import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, parseTableSeed, toggleRowSelection, toggleSelectAll } from './table-model.js';
+import { cloneTemplateScoped, dispatch, fill, fillTemplate, readValue, registerComponent, requestData, attrBool, attrStr, attrSpec, defineAttrs } from '../../ln-core';
+import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, toggleRowSelection, toggleSelectAll } from './table-model.js';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-table';
 	const DOM_ATTRIBUTE = 'lnTable';
-	const EMPTY_TEMPLATE = 'data-ln-table-empty';
 	// Tuning constant — duplicated in ln-data-table for component independence
 	const VIRTUAL_THRESHOLD = 200;
 	const BUFFER_ROWS = 15;
-	const WINDOW_DEFAULT = 1000;
-	const WINDOW_PAGE = 200;
-	const FETCH_DEBOUNCE = 120;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
-	function _applyWindow(inst, val) {
-		if (!inst || !inst.isDataDriven) return;
-		const present = inst.dom.hasAttribute('data-ln-table-window');
-		if (present && !inst._windowed) {
-			inst._enterWindowedMode();
-			inst._kickWindowInitial();
-		} else if (!present && inst._windowed) {
-			inst._exitWindowedMode();
-		} else if (present && inst._windowed) {
-			const v = parseInt(val, 10);
-			if (v > 0) inst._cache.configure({ windowSize: v });
-		}
-	}
-
-	function _applyWindowPage(inst, val) {
-		if (!inst || !inst.isDataDriven || !inst._windowed || !inst._cache) return;
-		const v = parseInt(val, 10);
-		if (v > 0) inst._cache.configure({ pageSize: v });
-	}
-
-	function _applyWindowThreshold(inst, val) {
-		if (!inst || !inst.isDataDriven || !inst._windowed || !inst._cache) return;
-		const v = parseInt(val, 10);
-		if (v >= 0) inst._cache.configure({ threshold: v });
-	}
-
-	function _applyCount(inst, val) {
-		if (!inst || !inst.isDataDriven || !inst._windowed || !inst._cache) return;
-		const v = parseInt(val, 10);
-		if (v >= 0) inst._cache.setGrandTotal(v);
-	}
-
 	const ATTRIBUTES = {
 		'data-ln-table':                  { prop: 'name', type: 'string', read: attrStr, fallback: '', description: 'Table instance name or identifier' },
 		'data-ln-table-source':           { prop: 'source', type: 'string', read: attrStr, fallback: '', description: 'Source store or coordinator addressing' },
-		'data-ln-table-seed':             { type: 'string', description: 'Selector or element ID of an external seed script element' },
 		'data-ln-table-selectable':       { prop: '_selectable', type: 'boolean', read: attrBool, description: 'Enables row selection check controls' },
-		'data-ln-table-window':           { type: 'integer', fallback: WINDOW_DEFAULT, min: 10, effect: _applyWindow, description: 'Virtual scrolling window size in rows' },
-		'data-ln-table-window-page':      { type: 'integer', fallback: WINDOW_PAGE, min: 5, effect: _applyWindowPage, description: 'Virtual scrolling slice page size' },
-		'data-ln-table-window-threshold': { type: 'integer', fallback: 50, min: 0, effect: _applyWindowThreshold, description: 'Scroll threshold margin in pixels to trigger page fetch' },
-		'data-ln-table-count':            { type: 'integer', min: 0, effect: _applyCount, description: 'Total record count override for virtual scrollbar calculation' },
 		'data-ln-table-row':              { type: 'marker', description: 'Table row template element' },
 		'data-ln-table-row-id':           { type: 'string', description: 'Record identifier on row element' },
 		'data-ln-table-row-action':       { type: 'trigger', description: 'Action trigger inside a table row' },
@@ -63,8 +22,6 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 		'data-ln-table-col':              { type: 'string', description: 'Column header identifier or field mapping' },
 		'data-ln-table-col-select':       { type: 'trigger', description: 'Header select-all checkbox trigger' },
 		'data-ln-table-cell-attr':        { type: 'string', description: 'Cell attribute template mapping' },
-		'data-ln-table-empty':            { type: 'marker', description: 'Container for table empty state' },
-		'data-ln-table-loading':          { type: 'marker', description: 'Loading indicator element in footer or template' },
 		'data-ln-table-select-all-label': { type: 'string', description: 'Accessibility label for select-all header trigger' }
 	};
 
@@ -75,12 +32,25 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 		? new Intl.Collator(document.documentElement.lang || undefined, { sensitivity: 'base' })
 		: null;
 
-	function _formatNum(n, dom) {
-		if (n == null || isNaN(n)) return '';
-		try {
-			return new Intl.NumberFormat(getLocale(dom)).format(n);
-		} catch (e) {
-			return String(n);
+	function _setNumberValue(el, val) {
+		if (!el) return;
+		if (val == null || isNaN(val)) {
+			el.removeAttribute('data-ln-value');
+			if ('value' in el && el.tagName === 'DATA') el.value = '';
+			if (el.lnNumber) {
+				el.lnNumber.value = NaN;
+			} else {
+				el.textContent = '';
+			}
+			return;
+		}
+		const s = String(val);
+		el.setAttribute('data-ln-value', s);
+		if ('value' in el && el.tagName === 'DATA') el.value = s;
+		if (el.lnNumber) {
+			el.lnNumber.value = val;
+		} else {
+			el.textContent = s;
 		}
 	}
 
@@ -228,11 +198,6 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 			this._lastFiltered = 0;
 			this._hasInitialSeed = false;
 
-			// Windowed (sliding-window) server-side virtualization — opt-in
-			this._windowed = false;
-			this._cache = null;
-			if (this.isDataDriven && dom.hasAttribute('data-ln-table-window')) this._enterWindowedMode();
-
 			// --- Event listeners ---
 			this._onSetData = function (e) {
 				const detail = e.detail || {};
@@ -241,18 +206,6 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 
 				// Protect initial SSR seed rows: do not overwrite pre-rendered HTML rows with empty un-synced store payloads before initial API response arrives
 				if (self._hasInitialSeed && !self.isLoaded && newData.length === 0 && newTotal === 0) {
-					return;
-				}
-
-				if (self._windowed) {
-					// Only an accepted, authoritative page ends the refresh. A declined
-					// one means the source has not resolved the new query yet; a
-					// provisional one is the store's own answer, rendered while the
-					// server query is still out.
-					if (self._cache.ingest(detail) && !detail.provisional) {
-						dom.classList.remove('ln-table--loading');
-						dom.setAttribute('aria-busy', 'false');
-					}
 					return;
 				}
 
@@ -301,33 +254,6 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 			};
 			dom.addEventListener('ln-table:set-loading', this._onSetLoading);
 
-			this._onPageFailed = function (e) {
-				if (!self._windowed || !self._cache) return;
-				self._cache.release(e.detail && e.detail.offset);
-			};
-			dom.addEventListener('ln-table:page-failed', this._onPageFailed);
-
-			this._onRequestRevalidate = function () {
-				if (!self._windowed || !self._cache) return;
-				self._cache.revalidate();
-			};
-			dom.addEventListener('ln-table:request-revalidate', this._onRequestRevalidate);
-
-			// The source owns the query, so a query change reaches the view as a
-			// restart order, not as query state — the window drops to page 0 and
-			// the composed query is resolved at serve time.
-			this._onRequestInvalidate = function (e) {
-				if (!self._windowed || !self._cache) return;
-				if (e && e.detail && e.detail.query) {
-					const q = e.detail.query;
-					if (q.search !== undefined) self.currentSearch = q.search;
-					if (q.filters !== undefined) self.currentFilters = q.filters;
-					if (q.sort !== undefined) self.currentSort = q.sort;
-				}
-				self._requestData();
-			};
-			dom.addEventListener('ln-table:request-invalidate', this._onRequestInvalidate);
-
 			// --- Sort ---
 			this._onSort = function (e) {
 				if (!e.detail || e.detail.field == null) return;
@@ -336,11 +262,6 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 				self._requestData();
 			};
 			dom.addEventListener('ln-sort:change', this._onSort);
-
-			// D4 — windowed tables cannot select rows they have never fetched
-			if (this._windowed && this._selectable && this._selectAllCheckbox) {
-				this._selectAllCheckbox.classList.add('hidden');
-			}
 
 			// --- Row Click & Actions ---
 			this._onRowClick = function (e) {
@@ -383,8 +304,6 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 			};
 			if (this.tbody) this.tbody.addEventListener('click', this._onRowAction);
 
-
-
 			// Local hydration of initial SSR rows or initial loading state
 			if (this.tbody && this.tbody.rows.length > 0) {
 				this._parseRows();
@@ -396,51 +315,19 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 			// Initial request-data deferred so coordinators have attached listeners
 			setTimeout(function () {
 				if (!self.dom || !document.contains(self.dom)) return;
-				if (self._windowed) {
-					self._kickWindowInitial();
-				} else {
-					dispatch(dom, 'ln-table:request-data', {
-						table: self.name,
-						sort: self.currentSort,
-						filters: self.currentFilters,
-						search: self.currentSearch
-					});
-				}
+				dispatch(dom, 'ln-table:request-data', {
+					table: self.name,
+					sort: self.currentSort,
+					filters: self.currentFilters,
+					search: self.currentSearch
+				});
 			}, 0);
 
 		} else {
 			// SSR Mode
 			this._emptyTbodyObserver = null;
 
-			let seedRecords = null;
-			const seedAttr = dom.getAttribute('data-ln-table-seed');
-			let seedScript = null;
-			if (seedAttr) {
-				seedScript = document.getElementById(seedAttr);
-				if (!seedScript) {
-					try {
-						seedScript = document.querySelector(seedAttr);
-					} catch (_) {}
-				}
-			}
-			if (!seedScript) {
-				seedScript = dom.querySelector('script[type="application/json"]') || dom.querySelector('script');
-			}
-			if (seedScript && seedScript.textContent) {
-				seedRecords = parseTableSeed(seedScript.textContent);
-			}
-
-			if (seedRecords && seedRecords.length > 0) {
-				this._data = seedRecords;
-				this._filteredData = seedRecords.slice();
-				this._rowHeight = 40;
-				this._lockColumnWidths();
-				this._render();
-				this._updateFooter();
-				dispatch(this.dom, 'ln-table:ready', {
-					total: this._data.length
-				});
-			} else if (this.tbody && this.tbody.rows.length > 0) {
+			if (this.tbody && this.tbody.rows.length > 0) {
 				this._parseRows();
 			} else if (this.tbody) {
 				this._emptyTbodyObserver = new MutationObserver(function () {
@@ -611,7 +498,6 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 		if (!this.tbody) return;
 
 		if (this.isDataDriven) {
-			if (this._windowed) { this._renderWindowed(); return; }
 			const total = this._lastTotal;
 			const filtered = this.visibleCount;
 
@@ -703,10 +589,7 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 				this._rowHeight = this.tbody.rows[0].offsetHeight || 40;
 			} else {
 				let tempRow = null;
-				if (this._windowed) {
-					const sample = this._cache ? this._cache.peek() : null;
-					tempRow = sample ? this._buildRow(sample) : this._buildPlaceholderRow();
-				} else if (this.isDataDriven && this._data.length > 0) {
+				if (this.isDataDriven && this._data.length > 0) {
 					tempRow = this._buildRow(this._data[0]);
 				}
 				if (tempRow && this.tbody) {
@@ -731,7 +614,7 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 			if (self._rafId) return;
 			self._rafId = requestAnimationFrame(function () {
 				self._rafId = null;
-				self._windowed ? self._renderWindowed() : self._renderVirtual();
+				self._renderVirtual();
 			});
 		};
 
@@ -776,9 +659,12 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 		while (walker.nextNode()) {
 			const node = walker.currentNode;
 			if (node.textContent.indexOf('{{') !== -1) {
+				const parent = node.parentElement;
 				bindings.textNodes.push({
 					node: node,
-					raw: node.textContent
+					raw: node.textContent,
+					el: parent,
+					isLeaf: !!(parent && parent.children.length === 0)
 				});
 			}
 		}
@@ -853,10 +739,17 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 		const textNodes = bindings.textNodes;
 		for (let i = 0; i < textNodes.length; i++) {
 			const item = textNodes[i];
-			item.node.textContent = item.raw.replace(
+			const val = item.raw.replace(
 				/\{\{\s*(\w+)\s*\}\}/g,
 				function (_, key) { return record[key] !== undefined && record[key] !== null ? record[key] : ''; }
 			);
+			if (item.isLeaf && item.el) {
+				item.el.textContent = val;
+			} else if (item.node && item.node.parentNode) {
+				item.node.textContent = val;
+			} else if (item.el) {
+				item.el.textContent = val;
+			}
 		}
 
 		const attrs = bindings.attrs;
@@ -1020,103 +913,7 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 		if (this._selectable) this._updateSelectAll();
 	};
 
-	// ─── Windowed virtualization (opt-in sliding window) ───────
 
-	_component.prototype._buildPlaceholderRow = function () {
-		const tr = document.createElement('tr');
-		tr.className = 'ln-table__placeholder';
-		tr.setAttribute('aria-hidden', 'true');
-		tr.style.overflowAnchor = 'none';
-		const td = document.createElement('td');
-		td.setAttribute('colspan', this.ths.length || 1);
-		td.style.height = this._rowHeight + 'px';
-		td.style.overflowAnchor = 'none';
-		tr.appendChild(td);
-		return tr;
-	};
-
-	_component.prototype._renderWindowed = function () {
-		if (this.isLoaded && this._cache.logicalTotal === 0) {
-			this._disableVirtualScroll();
-			this._showEmptyState();
-			return;
-		}
-
-		if (!this._virtual) this._enableVirtualScroll();
-
-		const rowH = this._rowHeight;
-		if (!rowH) return;
-
-		const total = this._cache.logicalTotal;
-		const theadH = this.thead ? this.thead.offsetHeight : 0;
-		const sc = this._scrollContainer;
-		let scrollIntoData;
-		let viewportH;
-
-		if (sc) {
-			const tableRect = this.table.getBoundingClientRect();
-			const scRect = sc.getBoundingClientRect();
-			const dataStartInContainer = (tableRect.top - scRect.top) + sc.scrollTop + theadH;
-			scrollIntoData = sc.scrollTop - dataStartInContainer;
-			viewportH = sc.clientHeight;
-		} else {
-			const tableRect = this.table.getBoundingClientRect();
-			const tableTopInPage = tableRect.top + window.scrollY;
-			const dataStartInPage = tableTopInPage + theadH;
-			scrollIntoData = window.scrollY - dataStartInPage;
-			viewportH = window.innerHeight;
-		}
-
-		const vw = calculateVirtualWindow(scrollIntoData, viewportH, rowH, total, BUFFER_ROWS);
-		const startRow = vw.start;
-		const endRow = vw.end;
-
-		if (startRow === this._vStart && endRow === this._vEnd) return;
-
-		const colSpan = this.ths.length || 1;
-		const neededRows = endRow - startRow;
-
-		this._ensureRowPool(neededRows, colSpan);
-
-		if (vw.topPadding > 0) {
-			this._topTd.style.height = vw.topPadding + 'px';
-			this._topSpacer.style.display = '';
-		} else {
-			this._topTd.style.height = '0px';
-			this._topSpacer.style.display = 'none';
-		}
-
-		if (vw.bottomPadding > 0) {
-			this._bottomTd.style.height = vw.bottomPadding + 'px';
-			this._bottomSpacer.style.display = '';
-		} else {
-			this._bottomTd.style.height = '0px';
-			this._bottomSpacer.style.display = 'none';
-		}
-
-		for (let k = 0; k < this._rowPool.length; k++) {
-			const rowEl = this._rowPool[k];
-			const dataIndex = startRow + k;
-			if (k < neededRows && dataIndex < total) {
-				rowEl.style.display = '';
-				if (this._cache.has(dataIndex)) {
-					rowEl.classList.remove('ln-table__placeholder');
-					this._updateRow(rowEl, this._cache.get(dataIndex));
-				} else {
-					rowEl.classList.add('ln-table__placeholder');
-					rowEl.innerHTML = '<td colspan="' + colSpan + '" style="height:' + rowH + 'px"></td>';
-				}
-			} else {
-				rowEl.style.display = 'none';
-			}
-		}
-
-		// Select-all is disabled in windowed mode (D4) — no _updateSelectAll() call.
-		this._vStart = startRow;
-		this._vEnd = endRow;
-
-		this._cache.ensure(startRow, endRow);
-	};
 
 	// ─── Loading state ──────────────────────────────────────────
 
@@ -1129,7 +926,8 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 		const colSpan = this.ths.length || 1;
 		let loadingEl = null;
 
-		let clone = cloneTemplateScoped(this.dom, this.name + '-loading', 'ln-table');
+		let clone = cloneTemplateScoped(this.dom, this.name + '-loading', 'ln-table')
+			|| cloneTemplateScoped(this.dom, 'table-loading', 'ln-table');
 
 		if (!clone) {
 			const genericTpl = this.dom.querySelector('template[data-ln-table-loading]');
@@ -1169,7 +967,6 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 		this._bottomTd = null;
 		const colSpan = this.ths.length || 1;
 		let emptyEl = null;
-
 		let clone = null;
 
 		if (this.isDataDriven) {
@@ -1181,7 +978,8 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 			const isFiltered = filtered === 0 && total > 0;
 
 			const templateName = isFiltered ? (this.name + '-empty-filtered') : (this.name + '-empty');
-			clone = cloneTemplateScoped(this.dom, templateName, 'ln-table');
+			clone = cloneTemplateScoped(this.dom, templateName, 'ln-table')
+				|| cloneTemplateScoped(this.dom, isFiltered ? 'table-empty-filtered' : 'table-empty', 'ln-table');
 
 			if (!clone) {
 				const genericTpl = this.dom.querySelector('template[data-ln-table-empty]');
@@ -1194,30 +992,29 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 					}
 				}
 			}
-
-			if (clone) {
-				if (clone.tagName === 'TR') {
-					emptyEl = clone;
-				} else {
-					const td = document.createElement('td');
-					td.setAttribute('colspan', String(colSpan));
-					td.appendChild(clone);
-					const tr = document.createElement('tr');
-					tr.className = 'ln-table__empty';
-					tr.appendChild(td);
-					emptyEl = tr;
+		} else {
+			clone = cloneTemplateScoped(this.dom, this.name + '-empty', 'ln-table')
+				|| cloneTemplateScoped(this.dom, 'table-empty', 'ln-table');
+			if (!clone) {
+				const genericTpl = this.dom.querySelector('template[data-ln-table-empty]');
+				if (genericTpl) {
+					clone = document.importNode(genericTpl.content, true);
 				}
 			}
-		} else {
-			const tpl = this.dom.querySelector('template[' + EMPTY_TEMPLATE + ']');
-			const td = document.createElement('td');
-			td.setAttribute('colspan', String(colSpan));
-			if (tpl) td.appendChild(document.importNode(tpl.content, true));
+		}
 
-			const tr = document.createElement('tr');
-			tr.className = 'ln-table__empty';
-			tr.appendChild(td);
-			emptyEl = tr;
+		if (clone) {
+			if (clone.tagName === 'TR') {
+				emptyEl = clone;
+			} else {
+				const td = document.createElement('td');
+				td.setAttribute('colspan', String(colSpan));
+				td.appendChild(clone);
+				const tr = document.createElement('tr');
+				tr.className = 'ln-table__empty';
+				tr.appendChild(td);
+				emptyEl = tr;
+			}
 		}
 
 		if (emptyEl) {
@@ -1294,117 +1091,7 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 	};
 
 	_component.prototype._requestData = function () {
-		if (this._windowed) {
-			this.dom.classList.add('ln-table--loading');
-			this._cache.invalidate({
-				sort: this.currentSort,
-				filters: this.currentFilters,
-				search: this.currentSearch
-			});
-			return;
-		}
 		requestData(this, 'ln-table:request-data', 'table');
-	};
-
-	// ─── Windowed Mode — enter/exit/seed (live toggle) ──────────
-
-	_component.prototype._enterWindowedMode = function () {
-		const self = this;
-		const dom = this.dom;
-		const winAttr = parseInt(dom.getAttribute('data-ln-table-window'), 10);
-		const pageAttr = parseInt(dom.getAttribute('data-ln-table-window-page'), 10);
-		const threshAttr = parseInt(dom.getAttribute('data-ln-table-window-threshold'), 10);
-
-		// Cache change → sync totals off the cache, re-render (pull), notify.
-		this._onCacheChange = function () {
-			if (!self._windowed || !self._cache) return;
-			self.totalCount = self._cache.grandTotal;
-			self.visibleCount = self._cache.logicalTotal;
-			self._lastTotal = self._cache.grandTotal;
-			self.isLoaded = true;
-			self._vStart = -1;
-			self._vEnd = -1;
-			self._render();
-			self._updateFooter();
-			dispatch(dom, 'ln-table:rendered', {
-				table: self.name,
-				total: self.totalCount,
-				visible: self.visibleCount
-			});
-		};
-		this._renderBatch = createBatcher(this._onCacheChange);
-
-		this._cache = createWindowCache({
-			windowSize: winAttr > 0 ? winAttr : WINDOW_DEFAULT,
-			pageSize: pageAttr > 0 ? pageAttr : WINDOW_PAGE,
-			threshold: threshAttr >= 0 ? threshAttr : 25,
-			fetchDebounce: FETCH_DEBOUNCE,
-			requestPage: function (query, offset, limit) {
-				dispatch(dom, 'ln-table:request-data', {
-					table: self.name,
-					sort: query.sort,
-					filters: query.filters,
-					search: query.search,
-					offset: offset,
-					limit: limit,
-					queryGen: self._cache.queryGen
-				});
-			},
-			onChange: this._renderBatch
-		});
-
-		this._windowed = true;
-
-		// D4 — windowed tables cannot select rows they have never fetched
-		if (this._selectable && this._selectAllCheckbox) {
-			this._selectAllCheckbox.classList.add('hidden');
-		}
-	};
-
-	_component.prototype._kickWindowInitial = function () {
-		if (this._data.length > 0) {
-			// SSR-seeded / warm-seeded: page 0 is already resident, the grand
-			// total is declared in markup — no initial fetch needed. No
-			// queryGen on the seed — it must never be dropped as stale.
-			let declaredTotal = parseInt(this.dom.getAttribute('data-ln-table-count'), 10);
-			if (isNaN(declaredTotal) && this._totalSpan) {
-				const spanText = this._totalSpan.textContent.replace(/[^\d]/g, '');
-				if (spanText) declaredTotal = parseInt(spanText, 10);
-			}
-			const seedTotal = (declaredTotal > 0) ? declaredTotal : this._data.length;
-			this._cache.ingest({
-				data: this._data,
-				offset: 0,
-				total: seedTotal,
-				filtered: seedTotal
-			});
-		} else {
-			this.dom.classList.add('ln-table--loading');
-			this._cache.requestInitial({
-				sort: this.currentSort,
-				filters: this.currentFilters,
-				search: this.currentSearch
-			});
-		}
-	};
-
-	_component.prototype._exitWindowedMode = function () {
-		this._disableVirtualScroll();
-		if (this._cache) this._cache.destroy();
-		this._cache = null;
-		this._windowed = false;
-		this._renderBatch = null;
-		this._onCacheChange = null;
-		if (this._selectAllCheckbox) {
-			this._selectAllCheckbox.classList.remove('hidden');
-		}
-		this._rowHeight = 0;
-		this._vStart = -1;
-		this._vEnd = -1;
-		this._data = [];
-		this._filteredData = [];
-		this.dom.classList.add('ln-table--loading');
-		this._requestData();
 	};
 
 	// ─── Selection Helpers ─────────────────────────────────────
@@ -1579,11 +1266,11 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 		const isFiltered = filtered < total;
 
 		if (this._totalSpan) {
-			this._totalSpan.textContent = _formatNum(total, this.dom);
+			_setNumberValue(this._totalSpan, total);
 		}
 
 		if (this._filteredSpan) {
-			this._filteredSpan.textContent = isFiltered ? _formatNum(filtered, this.dom) : '';
+			_setNumberValue(this._filteredSpan, isFiltered ? filtered : null);
 		}
 
 		if (this._filteredWrap) {
@@ -1592,7 +1279,7 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 
 		if (this._selectedSpan) {
 			const count = this.selectedIds ? this.selectedIds.size : 0;
-			this._selectedSpan.textContent = count > 0 ? _formatNum(count, this.dom) : '';
+			_setNumberValue(this._selectedSpan, count > 0 ? count : null);
 			if (this._selectedWrap) {
 				this._selectedWrap.classList.toggle('hidden', count === 0);
 			}
@@ -1613,15 +1300,11 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, par
 		if (this.isDataDriven) {
 			this.dom.removeEventListener('ln-table:set-data', this._onSetData);
 			this.dom.removeEventListener('ln-table:set-loading', this._onSetLoading);
-			this.dom.removeEventListener('ln-table:page-failed', this._onPageFailed);
-			this.dom.removeEventListener('ln-table:request-revalidate', this._onRequestRevalidate);
-			this.dom.removeEventListener('ln-table:request-invalidate', this._onRequestInvalidate);
 			this.dom.removeEventListener('ln-sort:change', this._onSort);
 			if (this.tbody) {
 				this.tbody.removeEventListener('click', this._onRowClick);
 				this.tbody.removeEventListener('click', this._onRowAction);
 			}
-			if (this._cache) this._cache.destroy();
 		} else {
 			if (this._emptyTbodyObserver) {
 				this._emptyTbodyObserver.disconnect();

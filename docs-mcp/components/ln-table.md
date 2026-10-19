@@ -253,12 +253,7 @@ Use when the backend embeds the entire dataset (e.g. 10,000 records) into `<scri
 |---|---|---|---|---|
 | `data-ln-table` | Root container | `String` | - | Identifies the table. The value names generated events. Must have a unique `id`. |
 | `data-ln-table-source` | Root container | `String` | - | Enables Data-Driven mode. Value maps to the target data store ID. |
-| `data-ln-table-seed` | Root container | `String` | - | Selector or element ID of an external seed script block containing an initial JSON records array. |
 | `data-ln-table-selectable` | Root container | `Boolean` | `false` | Enables row multi-selection and checkboxes. |
-| `data-ln-table-window` | Root container | `Number` | - | Opt-in server-side sliding-window virtualization. Sets the resident-row cap (`windowSize`) for the internal `ln-core.createWindowCache` instance. Observable — adding/removing it toggles windowed mode ON/OFF live, no re-init; changing the value while windowed reconfigures the live cache. |
-| `data-ln-table-window-page` | Root container | `Number` | `200` | Configures the chunk/page fetch size (`pageSize` / `limit`) for page-aligned server requests. Observable — applies to the live cache without re-init. |
-| `data-ln-table-window-threshold` | Root container | `Number` | `25` | Prefetch margin threshold in rows before reaching unloaded page boundaries. Observable — applies to the live cache without re-init. |
-| `data-ln-table-count` | Root container | `Number` | - | Declares the unfiltered grand total (windowed mode). Observable — applies to the live cache via `setGrandTotal()` without re-init. |
 | `data-ln-table-col` | `<th>` | `String` | - | Maps a table header to a JSON payload field. |
 | `data-ln-value` | `<td>` | `String` | - | Raw computer-readable sorting value, ignoring HTML formatting. *(Processed externally via `ln-core.js` / `fill()`)* |
 | `data-ln-table-col-filter` | `<button>` | - | - | Receives `.ln-filter-active` styling when filters are active on the column. |
@@ -267,9 +262,9 @@ Use when the backend embeds the entire dataset (e.g. 10,000 records) into `<scri
 | `data-ln-table-row-id` | `<tr>` | `String` | - | Rendered unique ID of the row, populated from record. |
 | `data-ln-table-row-select` | `<input>` | - | - | Local selection checkbox in the row template. |
 | `data-ln-table-row-action` | `<button>` | `String` | - | Trigger button for actions. Click bubbles to `ln-table:row-action` and stops propagation to select/row clicks. |
-| `data-ln-table-total` | `<span>` | - | - | Displays total count in footer. |
-| `data-ln-table-filtered` | `<span>` | - | - | Displays filtered count in footer. The immediate parent element is automatically shown/hidden based on active filters. |
-| `data-ln-table-selected` | `<span>` | - | - | Displays selection count in footer. The immediate parent element is automatically shown/hidden when selection > 0. |
+| `data-ln-table-total` | `<span>`, `<data>` | - | - | Holds total count in footer, setting machine-readable `data-ln-value` and delegating formatting to `data-ln-number`. |
+| `data-ln-table-filtered` | `<span>`, `<data>` | - | - | Holds filtered count in footer, setting machine-readable `data-ln-value` and delegating formatting to `data-ln-number`. The immediate parent element is automatically shown/hidden based on active filters. |
+| `data-ln-table-selected` | `<span>`, `<data>` | - | - | Holds selection count in footer, setting machine-readable `data-ln-value` and delegating formatting to `data-ln-number`. The immediate parent element is automatically shown/hidden when selection > 0. |
 | `data-ln-table-filter-col` | `<th>` | `String` | - | Maps column header to a filter key. Required for column filtering. |
 | `data-ln-table-loading` | Indicator element (in footer) / Template | `Marker` | - | Marks a background loading indicator element (automatically toggled during re-fetch) or a generic loading template (`template[data-ln-table-loading]`). |
 | `data-ln-table-clear` | `<button>` | - | - | Resets local search inputs and column filters in SSR mode. |
@@ -283,18 +278,15 @@ Use when the backend embeds the entire dataset (e.g. 10,000 records) into `<scri
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-table:set-data` | Listens | No | Populates the table with a raw dataset (Data-Driven mode). Windowed mode (`data-ln-table-window`) additionally reads `offset`/`queryGen` off the payload, routing it into the internal window cache. | `{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }` |
+| `ln-table:set-data` | Listens | No | Populates the table with a raw dataset (Data-Driven mode). Triggers rendering and updates total/filtered counts. | `{ data: Array, total: Number, filtered: Number }` |
 | `ln-table:set-loading` | Listens | No | Updates loading state (Data-Driven mode). Prior to initial data load, renders the loading template into `<tbody>` and sets `aria-busy="true"`. During subsequent queries, preserves existing rows, toggles `.ln-table--loading`, and reveals the `[data-ln-table-loading]` footer spinner. | `{ loading: Boolean }` |
-| `ln-table:page-failed` | Listens | No | Windowed mode (`data-ln-table-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry. | `{ offset: Number }` |
-| `ln-table:request-revalidate` | Listens | No | Windowed mode (`data-ln-table-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives. | *(no payload)* |
-| `ln-table:request-invalidate` | Listens | No | Windowed mode (`data-ln-table-window`): invalidates the window cache and resets to page 0. | *(no payload)* |
 | `ln-table:set-search` | Listens | No | Applies a search term. Data-Driven mode emits `ln-table:search` and requests fresh data; SSR mode filters in memory and emits `ln-table:filter`. | `{ query: String }` (`term` is read when `query` is absent) |
 | `ln-search:change` | Listens | Yes (`preventDefault`) | Consumed directly on itself in SSR mode only, triggering local in-memory search matching. In Data-Driven mode `ln-table-coordinator` intercepts this event on the search input's target and dispatches `ln-table:set-search` instead. | `{ term: String }` |
 | `ln-filter:change` | Listens | Yes (`preventDefault`) | Consumed directly on itself in SSR mode only (`!this.isDataDriven`), applying column filters to the in-memory `_data` cache. | `{ key: String, values: Array, targetId: String }` |
 | `ln-sort:change` | Listens | No | Column sort intent from [`ln-sort`](./ln-sort.md). SSR mode re-orders in-memory rows locally and dispatches `ln-table:sorted`; Data-Driven mode sets `currentSort` and dispatches a fresh `ln-table:request-data`. `ln-table` always calls `preventDefault()`, superseding `ln-sort`'s own default DOM-reorder fallback. | `{ field: String\|null, column: Number\|null, direction: 'asc'\|'desc'\|'none', targetId: String }` |
 | `ln-table:ready` | Emits | No | Fired once after initial row hydration/parsing completes (SSR and Data-Driven modes). | `{ total: Number }` |
 | `ln-table:rendered` | Emits | No | Fired after `ln-table:set-data` finishes rendering (Data-Driven mode). | `{ table: String, total: Number, visible: Number }` |
-| `ln-table:request-data` | Emits | No | Requests a new data page from the coordinator whenever sort/filter/search state changes, including the initial mount (Data-Driven mode). Windowed mode (`data-ln-table-window`) additionally emits `offset`/`limit`/`queryGen`. | `{ table: String, sort: Object\|null, filters: Object, search: String, offset?: Number, limit?: Number, queryGen?: Number }` |
+| `ln-table:request-data` | Emits | No | Requests a fresh data payload from the coordinator whenever sort/filter/search state changes, including the initial mount (Data-Driven mode). | `{ table: String, sort: Object\|null, filters: Object, search: String }` |
 | `ln-table:sorted` | Emits | No | Emitted after applying a local sort (SSR mode). | `{ column: Number, direction: String\|null, matched: Number, total: Number }` |
 | `ln-table:filter` | Emits | No | Emitted after applying search, column filter, or clear actions locally (SSR mode). | `{ term: String, matched: Number, total: Number }` |
 | `ln-table:search` | Emits | No | Emitted when receiving an `ln-table:set-search` command (dispatched by `ln-table-coordinator` in response to `ln-search:change`), before requesting fresh data (Data-Driven mode). | `{ table: String, query: String }` |
@@ -377,8 +369,6 @@ Text comparisons utilize `Intl.Collator` read from the document `<html lang>` ta
 > 2. **Manual DOM Injection:** In Data-Driven mode, do not append table rows manually. Modifying dataset collections must go through the coordinator via `ln-table:set-data` events to preserve virtual scrolling and selected states.
 > 3. **Unformatted SSR Sort:** Column sorting on dates or formatted currencies will fail if done via raw text. Always define `data-ln-value` attributes with raw values on `<td>` cells for proper sorting.
 
-> [!CAUTION]
-> 4. **Windowed Select-All:** When `data-ln-table-window` is active, the header "select all" checkbox (`data-ln-table-col-select`) is automatically hidden — a windowed table cannot select rows it has never fetched. Per-row selection (`data-ln-table-row-select`) still works and survives LRU eviction.
 
 ---
 

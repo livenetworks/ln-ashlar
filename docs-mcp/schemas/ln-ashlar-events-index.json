@@ -1908,13 +1908,11 @@
 			"emitted_by": [
 				"ln-data-coordinator"
 			],
-			"listened_by": [
-				"ln-table"
-			],
+			"listened_by": [],
 			"cancelable": false,
-			"description": "Windowed mode (`data-ln-table-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry.",
-			"detail": "{ offset: Number }",
-			"source": "mixed"
+			"description": "",
+			"detail": "",
+			"source": "dynamic-allowlist"
 		},
 		"ln-table:ready": {
 			"emitted_by": [
@@ -1956,33 +1954,29 @@
 				"ln-data-coordinator"
 			],
 			"cancelable": false,
-			"description": "Requests a new data page from the coordinator whenever sort/filter/search state changes, including the initial mount (Data-Driven mode). Windowed mode (`data-ln-table-window`) additionally emits `offset`/`limit`/`queryGen`.",
-			"detail": "{ table: String, sort: Object|null, filters: Object, search: String, offset?: Number, limit?: Number, queryGen?: Number }",
+			"description": "Requests a fresh data payload from the coordinator whenever sort/filter/search state changes, including the initial mount (Data-Driven mode).",
+			"detail": "{ table: String, sort: Object|null, filters: Object, search: String }",
 			"source": "static"
 		},
 		"ln-table:request-invalidate": {
 			"emitted_by": [
 				"ln-data-coordinator"
 			],
-			"listened_by": [
-				"ln-table"
-			],
+			"listened_by": [],
 			"cancelable": false,
-			"description": "Windowed mode (`data-ln-table-window`): invalidates the window cache and resets to page 0.",
-			"detail": "*(no payload)*",
-			"source": "mixed"
+			"description": "",
+			"detail": "",
+			"source": "dynamic-allowlist"
 		},
 		"ln-table:request-revalidate": {
 			"emitted_by": [
 				"ln-data-coordinator"
 			],
-			"listened_by": [
-				"ln-table"
-			],
+			"listened_by": [],
 			"cancelable": false,
-			"description": "Windowed mode (`data-ln-table-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives.",
-			"detail": "*(no payload)*",
-			"source": "mixed"
+			"description": "",
+			"detail": "",
+			"source": "dynamic-allowlist"
 		},
 		"ln-table:row-action": {
 			"emitted_by": [
@@ -2042,8 +2036,8 @@
 				"ln-table"
 			],
 			"cancelable": false,
-			"description": "Populates the table with a raw dataset (Data-Driven mode). Windowed mode (`data-ln-table-window`) additionally reads `offset`/`queryGen` off the payload, routing it into the internal window cache.",
-			"detail": "{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }",
+			"description": "Populates the table with a raw dataset (Data-Driven mode). Triggers rendering and updates total/filtered counts.",
+			"detail": "{ data: Array, total: Number, filtered: Number }",
 			"source": "mixed"
 		},
 		"ln-table:set-loading": {

@@ -1747,13 +1747,6 @@
 					}
 				},
 				{
-					"name": "data-ln-table-count",
-					"description": "Total record count override for virtual scrollbar calculation",
-					"value": {
-						"type": "number"
-					}
-				},
-				{
 					"name": "data-ln-table-dict",
 					"description": "data-ln-table-dict attribute",
 					"value": {
@@ -1762,9 +1755,9 @@
 				},
 				{
 					"name": "data-ln-table-empty",
-					"description": "Container for table empty state",
+					"description": "data-ln-table-empty attribute",
 					"value": {
-						"type": "boolean"
+						"type": "string"
 					}
 				},
 				{
@@ -1790,9 +1783,9 @@
 				},
 				{
 					"name": "data-ln-table-loading",
-					"description": "Loading indicator element in footer or template",
+					"description": "data-ln-table-loading attribute",
 					"value": {
-						"type": "boolean"
+						"type": "string"
 					}
 				},
 				{
@@ -1819,13 +1812,6 @@
 				{
 					"name": "data-ln-table-row-select",
 					"description": "Row selection checkbox trigger",
-					"value": {
-						"type": "string"
-					}
-				},
-				{
-					"name": "data-ln-table-seed",
-					"description": "Selector or element ID of an external seed script element",
 					"value": {
 						"type": "string"
 					}
@@ -1874,23 +1860,9 @@
 				},
 				{
 					"name": "data-ln-table-window",
-					"description": "Virtual scrolling window size in rows",
+					"description": "data-ln-table-window attribute",
 					"value": {
-						"type": "number"
-					}
-				},
-				{
-					"name": "data-ln-table-window-page",
-					"description": "Virtual scrolling slice page size",
-					"value": {
-						"type": "number"
-					}
-				},
-				{
-					"name": "data-ln-table-window-threshold",
-					"description": "Scroll threshold margin in pixels to trigger page fetch",
-					"value": {
-						"type": "number"
+						"type": "string"
 					}
 				},
 				{

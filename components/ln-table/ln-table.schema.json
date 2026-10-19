@@ -70,15 +70,6 @@
 				"ln-table-dev.scss"
 			]
 		},
-		"data-ln-table-count": {
-			"direction": "author",
-			"sources": [
-				"src/ln-table.js"
-			],
-			"type": "integer",
-			"min": 0,
-			"description": "Total record count override for virtual scrollbar calculation"
-		},
 		"data-ln-table-dict": {
 			"direction": "author",
 			"sources": [
@@ -145,14 +136,6 @@
 			"type": "trigger",
 			"description": "Row selection checkbox trigger"
 		},
-		"data-ln-table-seed": {
-			"direction": "author",
-			"sources": [
-				"src/ln-table.js"
-			],
-			"type": "string",
-			"description": "Selector or element ID of an external seed script element"
-		},
 		"data-ln-table-select-all-label": {
 			"direction": "author",
 			"sources": [
@@ -196,36 +179,14 @@
 				"src/ln-table.js"
 			]
 		},
-		"data-ln-table-window": {
-			"direction": "author",
-			"sources": [
-				"src/ln-table.js"
-			],
-			"type": "integer",
-			"min": 10,
-			"description": "Virtual scrolling window size in rows"
-		},
-		"data-ln-table-window-page": {
-			"direction": "author",
-			"sources": [
-				"src/ln-table.js"
-			],
-			"type": "integer",
-			"min": 5,
-			"description": "Virtual scrolling slice page size"
-		},
-		"data-ln-table-window-threshold": {
-			"direction": "author",
-			"sources": [
-				"src/ln-table.js"
-			],
-			"type": "integer",
-			"fallback": 50,
-			"min": 0,
-			"description": "Scroll threshold margin in pixels to trigger page fetch"
-		},
 		"data-ln-template": {
 			"direction": null,
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-value": {
+			"direction": "runtime",
 			"sources": [
 				"src/ln-table.js"
 			]
