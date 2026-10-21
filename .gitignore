@@ -29,3 +29,6 @@ graphify-out/
 .gemini/
 .mcp.json
 
+
+# Headless test generated screenshots
+tests/headless/screenshots/

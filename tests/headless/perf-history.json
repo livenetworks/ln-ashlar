@@ -1,0 +1,1211 @@
+{
+  "version": 1,
+  "runs": [
+    {
+      "id": "run-2026-10-21T22-11-23-898Z",
+      "timestamp": "2026-10-21T22:11:23.898Z",
+      "git": {
+        "branch": "feature/tailwind-v4-theme",
+        "commit": "0456639c",
+        "message": "chore(release): bump version to 2.1.12, eliminate main-thread freeze via scoped onInit, active debug guards, and Levenshtein cutoffs"
+      },
+      "meta": {
+        "nodeVersion": "v22.21.1",
+        "platform": "win32",
+        "iterations": 1
+      },
+      "summary": {
+        "totalComponents": 4,
+        "fasterInTailwind": 4,
+        "fasterInAshlar": 0,
+        "avgAshlarMs": 170.23,
+        "avgTailwindMs": 129.9,
+        "overallSpeedupPercent": 23.7
+      },
+      "benchmarks": {
+        "dropdown": {
+          "name": "dropdown",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 31.07,
+          "tailwindMs": 15.31,
+          "speedupPercent": 50.7,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 2039,
+          "tailwindNodes": 4186,
+          "ashlarHeapMb": 1.53,
+          "tailwindHeapMb": 2.71,
+          "samples": {
+            "ashlar": [
+              31.07
+            ],
+            "tailwind": [
+              15.31
+            ]
+          }
+        },
+        "accordion": {
+          "name": "accordion",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 78.81,
+          "tailwindMs": 40.28,
+          "speedupPercent": 48.9,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 3374,
+          "tailwindNodes": 6426,
+          "ashlarHeapMb": 2.26,
+          "tailwindHeapMb": 3.22,
+          "samples": {
+            "ashlar": [
+              78.81
+            ],
+            "tailwind": [
+              40.28
+            ]
+          }
+        },
+        "tabs": {
+          "name": "tabs",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 217.1,
+          "tailwindMs": 186.51,
+          "speedupPercent": 14.1,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 3431,
+          "tailwindNodes": 6651,
+          "ashlarHeapMb": 2.39,
+          "tailwindHeapMb": 3.03,
+          "samples": {
+            "ashlar": [
+              217.1
+            ],
+            "tailwind": [
+              186.51
+            ]
+          }
+        },
+        "modal": {
+          "name": "modal",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 353.93,
+          "tailwindMs": 277.51,
+          "speedupPercent": 21.6,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 3302,
+          "tailwindNodes": 6267,
+          "ashlarHeapMb": 2.29,
+          "tailwindHeapMb": 3.08,
+          "samples": {
+            "ashlar": [
+              353.93
+            ],
+            "tailwind": [
+              277.51
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "run-2026-10-21T22-12-43-844Z",
+      "timestamp": "2026-10-21T22:12:43.844Z",
+      "git": {
+        "branch": "feature/tailwind-v4-theme",
+        "commit": "0456639c",
+        "message": "chore(release): bump version to 2.1.12, eliminate main-thread freeze via scoped onInit, active debug guards, and Levenshtein cutoffs"
+      },
+      "meta": {
+        "nodeVersion": "v22.21.1",
+        "platform": "win32",
+        "iterations": 1
+      },
+      "summary": {
+        "totalComponents": 4,
+        "fasterInTailwind": 4,
+        "fasterInAshlar": 0,
+        "avgAshlarMs": 177.92,
+        "avgTailwindMs": 136.64,
+        "overallSpeedupPercent": 23.2
+      },
+      "benchmarks": {
+        "dropdown": {
+          "name": "dropdown",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 22.91,
+          "tailwindMs": 15.76,
+          "speedupPercent": 31.2,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 2146,
+          "tailwindNodes": 4226,
+          "ashlarHeapMb": 1.71,
+          "tailwindHeapMb": 2.31,
+          "samples": {
+            "ashlar": [
+              22.91
+            ],
+            "tailwind": [
+              15.76
+            ]
+          }
+        },
+        "accordion": {
+          "name": "accordion",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 123.55,
+          "tailwindMs": 76.79,
+          "speedupPercent": 37.8,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 3374,
+          "tailwindNodes": 6426,
+          "ashlarHeapMb": 2.28,
+          "tailwindHeapMb": 3.23,
+          "samples": {
+            "ashlar": [
+              123.55
+            ],
+            "tailwind": [
+              76.79
+            ]
+          }
+        },
+        "tabs": {
+          "name": "tabs",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 213.93,
+          "tailwindMs": 180.36,
+          "speedupPercent": 15.7,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 3431,
+          "tailwindNodes": 6651,
+          "ashlarHeapMb": 2.4,
+          "tailwindHeapMb": 3.03,
+          "samples": {
+            "ashlar": [
+              213.93
+            ],
+            "tailwind": [
+              180.36
+            ]
+          }
+        },
+        "modal": {
+          "name": "modal",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 351.29,
+          "tailwindMs": 273.64,
+          "speedupPercent": 22.1,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 3302,
+          "tailwindNodes": 6267,
+          "ashlarHeapMb": 2.32,
+          "tailwindHeapMb": 3.05,
+          "samples": {
+            "ashlar": [
+              351.29
+            ],
+            "tailwind": [
+              273.64
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "run-2026-10-21T22-35-47-287Z",
+      "timestamp": "2026-10-21T22:35:47.287Z",
+      "git": {
+        "branch": "feature/tailwind-v4-theme",
+        "commit": "0456639c",
+        "message": "chore(release): bump version to 2.1.12, eliminate main-thread freeze via scoped onInit, active debug guards, and Levenshtein cutoffs"
+      },
+      "meta": {
+        "nodeVersion": "v22.21.1",
+        "platform": "win32",
+        "iterations": 1
+      },
+      "summary": {
+        "totalComponents": 46,
+        "fasterInTailwind": 25,
+        "fasterInAshlar": 2,
+        "avgAshlarMs": 148.18,
+        "avgTailwindMs": 122.82,
+        "overallSpeedupPercent": 17.1
+      },
+      "benchmarks": {
+        "accordion": {
+          "name": "accordion",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 95.19,
+          "tailwindMs": 40.85,
+          "speedupPercent": 57.1,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 3653,
+          "tailwindNodes": 6705,
+          "ashlarHeapMb": 2.35,
+          "tailwindHeapMb": 2.85,
+          "samples": {
+            "ashlar": [
+              95.19
+            ],
+            "tailwind": [
+              40.85
+            ]
+          }
+        },
+        "ajax": {
+          "name": "ajax",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 16.68,
+          "tailwindMs": 11.73,
+          "speedupPercent": 29.7,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 1906,
+          "tailwindNodes": 3837,
+          "ashlarHeapMb": 1.48,
+          "tailwindHeapMb": 2.52,
+          "samples": {
+            "ashlar": [
+              16.68
+            ],
+            "tailwind": [
+              11.73
+            ]
+          }
+        },
+        "api-connector": {
+          "name": "api-connector",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 200.59,
+          "tailwindMs": 185.36,
+          "speedupPercent": 7.6,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 1853,
+          "tailwindNodes": 3568,
+          "ashlarHeapMb": 1.77,
+          "tailwindHeapMb": 2.3,
+          "samples": {
+            "ashlar": [
+              200.59
+            ],
+            "tailwind": [
+              185.36
+            ]
+          }
+        },
+        "api-queue": {
+          "name": "api-queue",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 150.36,
+          "tailwindMs": 136.96,
+          "speedupPercent": 8.9,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 2023,
+          "tailwindNodes": 3890,
+          "ashlarHeapMb": 1.93,
+          "tailwindHeapMb": 2.65,
+          "samples": {
+            "ashlar": [
+              150.36
+            ],
+            "tailwind": [
+              136.96
+            ]
+          }
+        },
+        "autoresize": {
+          "name": "autoresize",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 436.71,
+          "tailwindMs": 245.73,
+          "speedupPercent": 43.7,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 2349,
+          "tailwindNodes": 4813,
+          "ashlarHeapMb": 1.63,
+          "tailwindHeapMb": 2.95,
+          "samples": {
+            "ashlar": [
+              436.71
+            ],
+            "tailwind": [
+              245.73
+            ]
+          }
+        },
+        "autosave": {
+          "name": "autosave",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 215.82,
+          "tailwindMs": 214.95,
+          "speedupPercent": 0.4,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 2384,
+          "tailwindNodes": 4804,
+          "ashlarHeapMb": 1.7,
+          "tailwindHeapMb": 2.9,
+          "samples": {
+            "ashlar": [
+              215.82
+            ],
+            "tailwind": [
+              214.95
+            ]
+          }
+        },
+        "chip": {
+          "name": "chip",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 16.12,
+          "tailwindMs": 10.73,
+          "speedupPercent": 33.4,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 2120,
+          "tailwindNodes": 4101,
+          "ashlarHeapMb": 2.3,
+          "tailwindHeapMb": 2.85,
+          "samples": {
+            "ashlar": [
+              16.12
+            ],
+            "tailwind": [
+              10.73
+            ]
+          }
+        },
+        "circular-progress": {
+          "name": "circular-progress",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 39.82,
+          "tailwindMs": 30.86,
+          "speedupPercent": 22.5,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 3589,
+          "tailwindNodes": 6973,
+          "ashlarHeapMb": 2.22,
+          "tailwindHeapMb": 3.86,
+          "samples": {
+            "ashlar": [
+              39.82
+            ],
+            "tailwind": [
+              30.86
+            ]
+          }
+        },
+        "confirm": {
+          "name": "confirm",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 139.37,
+          "tailwindMs": 139.67,
+          "speedupPercent": -0.2,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 4243,
+          "tailwindNodes": 8307,
+          "ashlarHeapMb": 2.42,
+          "tailwindHeapMb": 2.99,
+          "samples": {
+            "ashlar": [
+              139.37
+            ],
+            "tailwind": [
+              139.67
+            ]
+          }
+        },
+        "coordinator": {
+          "name": "coordinator",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 149.14,
+          "tailwindMs": 125.93,
+          "speedupPercent": 15.6,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 3103,
+          "tailwindNodes": 5839,
+          "ashlarHeapMb": 3,
+          "tailwindHeapMb": 3.25,
+          "samples": {
+            "ashlar": [
+              149.14
+            ],
+            "tailwind": [
+              125.93
+            ]
+          }
+        },
+        "couchdb-connector": {
+          "name": "couchdb-connector",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 112.69,
+          "tailwindMs": 104.05,
+          "speedupPercent": 7.7,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 1930,
+          "tailwindNodes": 3714,
+          "ashlarHeapMb": 2.13,
+          "tailwindHeapMb": 2.54,
+          "samples": {
+            "ashlar": [
+              112.69
+            ],
+            "tailwind": [
+              104.05
+            ]
+          }
+        },
+        "density": {
+          "name": "density",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 116.77,
+          "tailwindMs": 110.48,
+          "speedupPercent": 5.4,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 2298,
+          "tailwindNodes": 4526,
+          "ashlarHeapMb": 1.43,
+          "tailwindHeapMb": 2.55,
+          "samples": {
+            "ashlar": [
+              116.77
+            ],
+            "tailwind": [
+              110.48
+            ]
+          }
+        },
+        "dropdown": {
+          "name": "dropdown",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 10.73,
+          "tailwindMs": 11.71,
+          "speedupPercent": -9.1,
+          "fasterEngine": "ashlar",
+          "ashlarNodes": 2261,
+          "tailwindNodes": 4341,
+          "ashlarHeapMb": 2.36,
+          "tailwindHeapMb": 2.62,
+          "samples": {
+            "ashlar": [
+              10.73
+            ],
+            "tailwind": [
+              11.71
+            ]
+          }
+        },
+        "editor": {
+          "name": "editor",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 200.05,
+          "tailwindMs": 181.02,
+          "speedupPercent": 9.5,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 3635,
+          "tailwindNodes": 7017,
+          "ashlarHeapMb": 2.29,
+          "tailwindHeapMb": 2.91,
+          "samples": {
+            "ashlar": [
+              200.05
+            ],
+            "tailwind": [
+              181.02
+            ]
+          }
+        },
+        "filter": {
+          "name": "filter",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 10.7,
+          "tailwindMs": 8.21,
+          "speedupPercent": 23.3,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 4070,
+          "tailwindNodes": 7742,
+          "ashlarHeapMb": 2.15,
+          "tailwindHeapMb": 3.22,
+          "samples": {
+            "ashlar": [
+              10.7
+            ],
+            "tailwind": [
+              8.21
+            ]
+          }
+        },
+        "forms": {
+          "name": "forms",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 270.49,
+          "tailwindMs": 170.58,
+          "speedupPercent": 36.9,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 6927,
+          "tailwindNodes": 13536,
+          "ashlarHeapMb": 2.39,
+          "tailwindHeapMb": 3.87,
+          "samples": {
+            "ashlar": [
+              270.49
+            ],
+            "tailwind": [
+              170.58
+            ]
+          }
+        },
+        "http": {
+          "name": "http",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 106.44,
+          "tailwindMs": 104.92,
+          "speedupPercent": 1.4,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 2562,
+          "tailwindNodes": 5025,
+          "ashlarHeapMb": 1.51,
+          "tailwindHeapMb": 2.34,
+          "samples": {
+            "ashlar": [
+              106.44
+            ],
+            "tailwind": [
+              104.92
+            ]
+          }
+        },
+        "index": {
+          "name": "index",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 23.26,
+          "tailwindMs": 20.54,
+          "speedupPercent": 11.7,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 2325,
+          "tailwindNodes": 4676,
+          "ashlarHeapMb": 1.78,
+          "tailwindHeapMb": 2.91,
+          "samples": {
+            "ashlar": [
+              23.26
+            ],
+            "tailwind": [
+              20.54
+            ]
+          }
+        },
+        "list": {
+          "name": "list",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 71.41,
+          "tailwindMs": 40.04,
+          "speedupPercent": 43.9,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 15106,
+          "tailwindNodes": 21631,
+          "ashlarHeapMb": 2.99,
+          "tailwindHeapMb": 4.64,
+          "samples": {
+            "ashlar": [
+              71.41
+            ],
+            "tailwind": [
+              40.04
+            ]
+          }
+        },
+        "localization": {
+          "name": "localization",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 108.16,
+          "tailwindMs": 106.78,
+          "speedupPercent": 1.3,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 3383,
+          "tailwindNodes": 6571,
+          "ashlarHeapMb": 2.04,
+          "tailwindHeapMb": 2.78,
+          "samples": {
+            "ashlar": [
+              108.16
+            ],
+            "tailwind": [
+              106.78
+            ]
+          }
+        },
+        "modal": {
+          "name": "modal",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 384.14,
+          "tailwindMs": 262.03,
+          "speedupPercent": 31.8,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 3302,
+          "tailwindNodes": 6267,
+          "ashlarHeapMb": 2.29,
+          "tailwindHeapMb": 3.12,
+          "samples": {
+            "ashlar": [
+              384.14
+            ],
+            "tailwind": [
+              262.03
+            ]
+          }
+        },
+        "obfuscator": {
+          "name": "obfuscator",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 151.42,
+          "tailwindMs": 136.56,
+          "speedupPercent": 9.8,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 2016,
+          "tailwindNodes": 4080,
+          "ashlarHeapMb": 1.67,
+          "tailwindHeapMb": 2.83,
+          "samples": {
+            "ashlar": [
+              151.42
+            ],
+            "tailwind": [
+              136.56
+            ]
+          }
+        },
+        "persist": {
+          "name": "persist",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 105.34,
+          "tailwindMs": 103.19,
+          "speedupPercent": 2,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 3450,
+          "tailwindNodes": 6754,
+          "ashlarHeapMb": 1.96,
+          "tailwindHeapMb": 2.92,
+          "samples": {
+            "ashlar": [
+              105.34
+            ],
+            "tailwind": [
+              103.19
+            ]
+          }
+        },
+        "picklist": {
+          "name": "picklist",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 104.86,
+          "tailwindMs": 107.12,
+          "speedupPercent": -2.2,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 1737,
+          "tailwindNodes": 3494,
+          "ashlarHeapMb": 1.39,
+          "tailwindHeapMb": 2.38,
+          "samples": {
+            "ashlar": [
+              104.86
+            ],
+            "tailwind": [
+              107.12
+            ]
+          }
+        },
+        "popover": {
+          "name": "popover",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 214.27,
+          "tailwindMs": 184.92,
+          "speedupPercent": 13.7,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 2703,
+          "tailwindNodes": 5264,
+          "ashlarHeapMb": 2.24,
+          "tailwindHeapMb": 3.11,
+          "samples": {
+            "ashlar": [
+              214.27
+            ],
+            "tailwind": [
+              184.92
+            ]
+          }
+        },
+        "progress": {
+          "name": "progress",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 105.02,
+          "tailwindMs": 104.49,
+          "speedupPercent": 0.5,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 3512,
+          "tailwindNodes": 6823,
+          "ashlarHeapMb": 1.99,
+          "tailwindHeapMb": 3.48,
+          "samples": {
+            "ashlar": [
+              105.02
+            ],
+            "tailwind": [
+              104.49
+            ]
+          }
+        },
+        "router": {
+          "name": "router",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 106.81,
+          "tailwindMs": 105.38,
+          "speedupPercent": 1.3,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 2108,
+          "tailwindNodes": 4010,
+          "ashlarHeapMb": 2.01,
+          "tailwindHeapMb": 3.11,
+          "samples": {
+            "ashlar": [
+              106.81
+            ],
+            "tailwind": [
+              105.38
+            ]
+          }
+        },
+        "search": {
+          "name": "search",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 11.9,
+          "tailwindMs": 12.02,
+          "speedupPercent": -1,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 3527,
+          "tailwindNodes": 6845,
+          "ashlarHeapMb": 1.99,
+          "tailwindHeapMb": 2.88,
+          "samples": {
+            "ashlar": [
+              11.9
+            ],
+            "tailwind": [
+              12.02
+            ]
+          }
+        },
+        "slug": {
+          "name": "slug",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 368.86,
+          "tailwindMs": 199.18,
+          "speedupPercent": 46,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 1706,
+          "tailwindNodes": 3461,
+          "ashlarHeapMb": 1.61,
+          "tailwindHeapMb": 2.72,
+          "samples": {
+            "ashlar": [
+              368.86
+            ],
+            "tailwind": [
+              199.18
+            ]
+          }
+        },
+        "sortable": {
+          "name": "sortable",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 105.4,
+          "tailwindMs": 106.32,
+          "speedupPercent": -0.9,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 2485,
+          "tailwindNodes": 5027,
+          "ashlarHeapMb": 1.43,
+          "tailwindHeapMb": 2.57,
+          "samples": {
+            "ashlar": [
+              105.4
+            ],
+            "tailwind": [
+              106.32
+            ]
+          }
+        },
+        "stepper": {
+          "name": "stepper",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 105.74,
+          "tailwindMs": 104.84,
+          "speedupPercent": 0.9,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 2163,
+          "tailwindNodes": 4151,
+          "ashlarHeapMb": 2.22,
+          "tailwindHeapMb": 2.69,
+          "samples": {
+            "ashlar": [
+              105.74
+            ],
+            "tailwind": [
+              104.84
+            ]
+          }
+        },
+        "store": {
+          "name": "store",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 105.6,
+          "tailwindMs": 108.6,
+          "speedupPercent": -2.8,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 2294,
+          "tailwindNodes": 4589,
+          "ashlarHeapMb": 1.58,
+          "tailwindHeapMb": 2.12,
+          "samples": {
+            "ashlar": [
+              105.6
+            ],
+            "tailwind": [
+              108.6
+            ]
+          }
+        },
+        "store-usecase": {
+          "name": "store-usecase",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 108.54,
+          "tailwindMs": 108.62,
+          "speedupPercent": -0.1,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 3673,
+          "tailwindNodes": 7199,
+          "ashlarHeapMb": 10.17,
+          "tailwindHeapMb": 13.39,
+          "samples": {
+            "ashlar": [
+              108.54
+            ],
+            "tailwind": [
+              108.62
+            ]
+          }
+        },
+        "table": {
+          "name": "table",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 12.36,
+          "tailwindMs": 8.1,
+          "speedupPercent": 34.5,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 3462,
+          "tailwindNodes": 6712,
+          "ashlarHeapMb": 2.17,
+          "tailwindHeapMb": 3.09,
+          "samples": {
+            "ashlar": [
+              12.36
+            ],
+            "tailwind": [
+              8.1
+            ]
+          }
+        },
+        "table-api": {
+          "name": "table-api",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 185.01,
+          "tailwindMs": 204.84,
+          "speedupPercent": -10.7,
+          "fasterEngine": "ashlar",
+          "ashlarNodes": 2647,
+          "tailwindNodes": 5345,
+          "ashlarHeapMb": 1.76,
+          "tailwindHeapMb": 7.62,
+          "samples": {
+            "ashlar": [
+              185.01
+            ],
+            "tailwind": [
+              204.84
+            ]
+          }
+        },
+        "table-filter": {
+          "name": "table-filter",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 217.85,
+          "tailwindMs": 196.44,
+          "speedupPercent": 9.8,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 3238,
+          "tailwindNodes": 6349,
+          "ashlarHeapMb": 2.25,
+          "tailwindHeapMb": 2.96,
+          "samples": {
+            "ashlar": [
+              217.85
+            ],
+            "tailwind": [
+              196.44
+            ]
+          }
+        },
+        "table-seed": {
+          "name": "table-seed",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 151.17,
+          "tailwindMs": 153.64,
+          "speedupPercent": -1.6,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 2841,
+          "tailwindNodes": 8246,
+          "ashlarHeapMb": 4.42,
+          "tailwindHeapMb": 17.04,
+          "samples": {
+            "ashlar": [
+              151.17
+            ],
+            "tailwind": [
+              153.64
+            ]
+          }
+        },
+        "tabs": {
+          "name": "tabs",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 201.28,
+          "tailwindMs": 183.75,
+          "speedupPercent": 8.7,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 3432,
+          "tailwindNodes": 6720,
+          "ashlarHeapMb": 2.13,
+          "tailwindHeapMb": 3.37,
+          "samples": {
+            "ashlar": [
+              201.28
+            ],
+            "tailwind": [
+              183.75
+            ]
+          }
+        },
+        "toast": {
+          "name": "toast",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 216.17,
+          "tailwindMs": 213.04,
+          "speedupPercent": 1.4,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 2371,
+          "tailwindNodes": 4640,
+          "ashlarHeapMb": 2.02,
+          "tailwindHeapMb": 3.1,
+          "samples": {
+            "ashlar": [
+              216.17
+            ],
+            "tailwind": [
+              213.04
+            ]
+          }
+        },
+        "toggle": {
+          "name": "toggle",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 215.46,
+          "tailwindMs": 197.93,
+          "speedupPercent": 8.1,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 3472,
+          "tailwindNodes": 6634,
+          "ashlarHeapMb": 2.23,
+          "tailwindHeapMb": 2.82,
+          "samples": {
+            "ashlar": [
+              215.46
+            ],
+            "tailwind": [
+              197.93
+            ]
+          }
+        },
+        "tooltip": {
+          "name": "tooltip",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 168.9,
+          "tailwindMs": 151.67,
+          "speedupPercent": 10.2,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 3014,
+          "tailwindNodes": 5873,
+          "ashlarHeapMb": 2.46,
+          "tailwindHeapMb": 3.06,
+          "samples": {
+            "ashlar": [
+              168.9
+            ],
+            "tailwind": [
+              151.67
+            ]
+          }
+        },
+        "translations": {
+          "name": "translations",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 106.68,
+          "tailwindMs": 103.53,
+          "speedupPercent": 3,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 2634,
+          "tailwindNodes": 5039,
+          "ashlarHeapMb": 1.95,
+          "tailwindHeapMb": 2.84,
+          "samples": {
+            "ashlar": [
+              106.68
+            ],
+            "tailwind": [
+              103.53
+            ]
+          }
+        },
+        "upload": {
+          "name": "upload",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 107.02,
+          "tailwindMs": 104.65,
+          "speedupPercent": 2.2,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 2662,
+          "tailwindNodes": 5085,
+          "ashlarHeapMb": 2.03,
+          "tailwindHeapMb": 2.94,
+          "samples": {
+            "ashlar": [
+              107.02
+            ],
+            "tailwind": [
+              104.65
+            ]
+          }
+        },
+        "validate": {
+          "name": "validate",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 553.11,
+          "tailwindMs": 276.19,
+          "speedupPercent": 50.1,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 4873,
+          "tailwindNodes": 8392,
+          "ashlarHeapMb": 2.47,
+          "tailwindHeapMb": 3.1,
+          "samples": {
+            "ashlar": [
+              553.11
+            ],
+            "tailwind": [
+              276.19
+            ]
+          }
+        },
+        "websocket-connector": {
+          "name": "websocket-connector",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 106.91,
+          "tailwindMs": 105.83,
+          "speedupPercent": 1,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 1841,
+          "tailwindNodes": 3606,
+          "ashlarHeapMb": 2.12,
+          "tailwindHeapMb": 3.08,
+          "samples": {
+            "ashlar": [
+              106.91
+            ],
+            "tailwind": [
+              105.83
+            ]
+          }
+        },
+        "write-workflow": {
+          "name": "write-workflow",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 105.93,
+          "tailwindMs": 105.88,
+          "speedupPercent": 0,
+          "fasterEngine": "equivalent",
+          "ashlarNodes": 1994,
+          "tailwindNodes": 4195,
+          "ashlarHeapMb": 2.01,
+          "tailwindHeapMb": 2.79,
+          "samples": {
+            "ashlar": [
+              105.93
+            ],
+            "tailwind": [
+              105.88
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

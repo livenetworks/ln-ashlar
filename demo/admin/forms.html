@@ -37,8 +37,30 @@
 		} catch (e) { /* localStorage unavailable — fall through */ }
 	})();
 	</script>
-	<link rel="stylesheet" href="dist/admin.css">
+	<link rel="stylesheet" id="theme-ashlar" href="dist/admin.css">
+	<link rel="stylesheet" id="theme-tailwind" href="dist/admin-tailwind.css" disabled>
 	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css">
+	<!-- CSS Engine bootstrap — runs after link tags before first paint to prevent FOUC. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-engine';
+		var linkAshlar = document.getElementById('theme-ashlar');
+		var linkTailwind = document.getElementById('theme-tailwind');
+		if (!linkAshlar || !linkTailwind) return;
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored === 'tailwind') {
+				linkAshlar.disabled = true;
+				linkTailwind.disabled = false;
+				document.documentElement.setAttribute('data-css-engine', 'tailwind');
+			} else {
+				linkAshlar.disabled = false;
+				linkTailwind.disabled = true;
+				document.documentElement.setAttribute('data-css-engine', 'ashlar');
+			}
+		} catch (e) { /* localStorage unavailable */ }
+	})();
+	</script>
 	<script src="../dist/ln-ashlar.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
 </head>
@@ -116,6 +138,15 @@
 							<li><button type="button" data-demo-density="compact">Compact</button></li>
 							<li><button type="button" data-demo-density="comfortable">Comfortable</button></li>
 							<li><button type="button" data-demo-density="spacious">Spacious</button></li>
+						</ul>
+					</div>
+					<button type="button" id="demo-engine-trigger" data-ln-popover-for="demo-engine-picker" aria-label="Choose CSS Engine" title="Choose CSS Engine">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-adjustments-alt"></use></svg>
+					</button>
+					<div class="demo-engine-picker" data-ln-popover id="demo-engine-picker">
+						<ul>
+							<li><button type="button" data-demo-engine="ashlar">Ashlar SCSS</button></li>
+							<li><button type="button" data-demo-engine="tailwind">Tailwind v4</button></li>
 						</ul>
 					</div>
 					<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'This is a demo notification.'}}))">
@@ -1665,6 +1696,53 @@ input:focus-visible {
 			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
 			markActive();
 			const popover = document.getElementById('demo-density-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+
+	(function () {
+		const KEY = 'ln-demo-engine';
+		const VALID = ['ashlar', 'tailwind'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-css-engine') || 'ashlar';
+			document.querySelectorAll('[data-demo-engine]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-engine') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-engine]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-engine');
+			if (VALID.indexOf(value) === -1) return;
+
+			root.setAttribute('data-css-engine', value);
+			const linkAshlar = document.getElementById('theme-ashlar');
+			const linkTailwind = document.getElementById('theme-tailwind');
+
+			if (value === 'tailwind') {
+				if (linkAshlar) linkAshlar.disabled = true;
+				if (linkTailwind) linkTailwind.disabled = false;
+			} else {
+				if (linkAshlar) linkAshlar.disabled = false;
+				if (linkTailwind) linkTailwind.disabled = true;
+			}
+
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+
+			const popover = document.getElementById('demo-engine-picker');
 			if (popover && popover.lnPopover && popover.lnPopover.close) {
 				popover.lnPopover.close();
 			}
