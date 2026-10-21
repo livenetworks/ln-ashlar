@@ -1,0 +1,23 @@
+/* ==========================================================================
+   ln-ashlar Tailwind v4 Theme Specification
+   ==========================================================================
+   Pure Tailwind v4 styling layer for ln-ashlar headless components.
+   Zero dependency on Ashlar SCSS tokens.
+   ========================================================================== */
+
+@import "tailwindcss";
+
+/* --------------------------------------------------------------------------
+   Custom Variants for ln-ashlar Data Attributes
+   -------------------------------------------------------------------------- */
+@custom-variant ln-open (&[data-ln-toggle="open"]);
+@custom-variant ln-modal-open (&[data-ln-modal="open"]);
+@custom-variant ln-active (&[data-ln-active]);
+@custom-variant ln-selected (&[aria-selected="true"]);
+@custom-variant ln-expanded (&[aria-expanded="true"]);
+@custom-variant ln-loading (&[data-ln-loading]);
+@custom-variant ln-valid (&[data-ln-valid="true"]);
+@custom-variant ln-invalid (&[data-ln-valid="false"]);
+
+/* Dark Mode support via [data-mode="dark"] or [data-theme="dark"] or .dark */
+@custom-variant dark (&:where([data-mode="dark"], [data-theme="dark"], .dark, [data-mode="dark"] *, [data-theme="dark"] *, .dark *));

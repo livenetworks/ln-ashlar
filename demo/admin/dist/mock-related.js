@@ -266,7 +266,7 @@
 
 			let line = `[${formatTime()}] ${prefix}${msg}`;
 			if (detail) {
-				line += ` ${JSON.stringify(detail)}`;
+				try { line += ` ${JSON.stringify(detail)}`; } catch (_) { line += ` [Object]`; }
 			}
 
 			const span = document.createElement('span');
