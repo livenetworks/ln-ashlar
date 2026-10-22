@@ -26,6 +26,7 @@ The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand
   3. Automatic system preference: `@media (prefers-color-scheme: dark)` when no explicit root polarity attribute is set.
   4. Structural activation: `<html data-skin="glass">` globally applies structural overrides like flatter radii and shadows. A skin can also be scoped to an island (`<section data-skin="glass">`): `[data-skin]` is one of the four axes in the base-defaults block, so `--radius` and the colour primitives re-derive there. Root-level scales the skin rebinds directly (`--radius-*`, `--shadow-*`) still resolve on the skin element itself — see R6 for what does and does not follow an island.
 - **Brand.css Integration:** Custom brand tokens are injected by declaring bare HSL triplets on `:root` in a client stylesheet, without editing library sources. Brand is polarity-free — one declaration serves both modes.
+- **Dual CSS Engine (Tailwind v4 Integration):** All design tokens, theme palettes, and dark mode surfaces map directly into Tailwind CSS v4 via `@theme` bindings in `theme/tailwind/theme.css` (output bundle: `dist/ln-ashlar-tailwind.css`).
 
 ---
 

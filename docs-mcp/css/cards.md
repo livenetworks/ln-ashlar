@@ -20,6 +20,7 @@ The `cards` module (`theme/config/mixins/_card.scss` and `theme/components/_card
 - **`section-card`:** Composed layout card featuring pre-structured `<header>`, `<main>`, and `<footer>` sections with unified borders and paddings.
 - **Direct Child Bindings:** Automatically formats direct child `> header` (`panel-header`), `> main` (`panel-body`), and `> footer` (`panel-footer`) without interfering with nested content components.
 - **Whole-Card Links:** Wrapping content in a direct `> a` child converts the card into a clickable tile while preserving internal layout and inheriting colors.
+- **Auto-Flush Table Integration:** Pure table cards (`> main > table:only-child` or `> main > .table-container:only-child`) automatically strip cell padding and outer border-radius so tabular data spans edge-to-edge. Optimized globally via `:is()` to prevent CSSOM selector explosion.
 
 ---
 
