@@ -109,7 +109,7 @@ ln-ashlar provides a robust, production-proven foundation for web applications. 
 - [ln-obfuscator](docs-mcp/components/ln-obfuscator.md): Autonomous component for anti-crawler obfuscation and deobfuscation of plain text, emails, telephone numbers, and links using reversible ROT, Base64, and XOR ciphers.
 - [ln-crypto](docs-mcp/components/ln-crypto.md): A client-side encryption and decryption utility wrapper around the Web Crypto API.
 - [ln-hash](docs-mcp/components/ln-hash.md): A namespaced URL fragment state serialization codec.
-- [ln-reactive](docs-mcp/components/ln-reactive.md): Lightweight Proxy-based reactive state wrappers and microtask render batcher primitives.
+- [ln-reactive](docs-mcp/components/ln-reactive.md): Microtask-based render batcher primitive for coalescing high-frequency state updates.
 - [ln-translations](docs-mcp/components/ln-translations.md): A zero-dependency form translation coordinator that clones translatable fields per language, synchronizing a locale-picker dropdown and active-language badges.
 - [ln-persist](docs-mcp/components/ln-persist.md): Registry-driven, no-instance component that restores and saves an owning component's state attribute to localStorage.
 - [ln-debug](docs-mcp/components/ln-debug.md): Development diagnostics and contract verifier providing console log suppression, generic cross-reference validation (*-for, *-source), typo detection, and CSS visual linter integration.

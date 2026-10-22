@@ -2,7 +2,7 @@
 
 `ln-ashlar` provides a high-performance visual layer with **Dual CSS Engine Support**:
 1. **Ashlar SCSS (Native):** Semantic class-free, design token-driven stylesheet system optimized for minimal CSSOM invalidation and modern W3C standards.
-2. **Tailwind CSS v4:** Utility-first engine compiling into a standalone bundle (`dist/ln-ashlar-tailwind.css`) with 100% design and visual layout parity.
+2. **Tailwind CSS v4:** Utility-first engine compiling into a standalone bundle (`dist/ln-ashlar-tailwind.css`) with comprehensive layout and interaction parity verified across all 67 demo pages.
 
 ---
 

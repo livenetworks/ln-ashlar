@@ -69,7 +69,7 @@ Every component is an IIFE (Immediately Invoked Function Expression). Shared hel
 
 ```javascript
 import { dispatch } from '../ln-core';
-import { deepReactive, createBatcher } from '../ln-core';
+import { createBatcher } from '../ln-core';
 
 (function () {
     const DOM_SELECTOR = 'data-ln-{name}';
@@ -213,31 +213,38 @@ function _domObserver() {
 
 ## Reactive Rendering Pattern
 
-When a component has **multiple internal state properties** that together drive DOM updates, use `reactiveState` + `createBatcher` + `fill()` from ln-core. This eliminates manual querySelector chains and coalesces multiple synchronous state changes into a single DOM update.
+When a component has **multiple internal state properties** or frequent updates that drive DOM updates, use `createBatcher` + `fill()` from ln-core. This eliminates manual querySelector chains and coalesces multiple synchronous state changes into a single DOM update.
 
-### The three primitives
+### The core primitives
 
 | Helper | Role |
 |--------|------|
-| `reactiveState(initial, onChange)` | Proxy — calls `onChange(prop, value, old)` on every top-level property set |
 | `createBatcher(renderFn, afterRender)` | Coalesces sync state changes into one `renderFn` call via `queueMicrotask` |
 | `fill(root, data)` | Writes state to DOM via `data-ln-field`, `data-ln-attr`, `data-ln-show`, `data-ln-class` |
 
 ### Pattern
 
 ```javascript
-import { reactiveState, createBatcher, fill, dispatch } from '../ln-core';
+import { createBatcher, fill, dispatch } from '../ln-core';
 
 function _component(dom) {
     this.dom = dom;
     const self = this;
 
-    const queueRender = createBatcher(
-        function () { self._render(); },      // runs after current sync block
-        function () { self._afterRender(); }  // runs after render — dispatch events here
-    );
+    this.state = { key: null, value: null };
 
-    this.state = reactiveState({ key: null, value: null }, queueRender);
+    this.queueRender = createBatcher(
+        function () {
+            if (!self._destroyed) {
+                self._render();
+            }
+        },      // runs after current sync block
+        function () {
+            if (!self._destroyed) {
+                self._afterRender();
+            }
+        }  // runs after render — dispatch events here
+    );
 }
 
 _component.prototype._render = function () {
@@ -248,23 +255,22 @@ _component.prototype._render = function () {
 _component.prototype._afterRender = function () {
     dispatch(this.dom, 'ln-component:changed', { key: this.state.key });
 };
+
+_component.prototype.update = function (key, value) {
+    this.state.key = key;
+    this.state.value = value;
+    this.queueRender(); // Multiple sync updates trigger exactly ONE render pass
+};
 ```
 
 When multiple properties change in the same sync block:
 
 ```javascript
-this.state.key = 'status';   // queues render
-this.state.value = 'active'; // queues again — same microtask, no duplicate
+this.state.key = 'status';
+this.state.value = 'active';
+this.queueRender();
 // → microtask fires → _render() once → _afterRender() once
 ```
-
-### `reactiveState` vs `deepReactive`
-
-| | `reactiveState` | `deepReactive` |
-|---|---|---|
-| **Depth** | Shallow — top-level sets only | Deep — nested object/array mutations |
-| **onChange args** | `(prop, value, old)` | `()` — no args |
-| **Use when** | Flat state with primitive values | State contains nested objects or arrays |
 
 ### `fill()` — limitations
 
@@ -272,7 +278,7 @@ this.state.value = 'active'; // queues again — same microtask, no duplicate
 
 ### When to use
 
-Use reactive rendering when a component has **2+ state properties** that together drive DOM, and multiple changes happen in the same sync block.
+Use `createBatcher` when a component has **frequent or multiple state updates** (e.g. search input, filter checkboxes, sorting), and multiple updates can occur in the same synchronous cycle.
 
 **Don't use it for:**
 - Single boolean state — `this.isOpen = true; dom.classList.toggle(...)` is simpler
@@ -281,7 +287,7 @@ Use reactive rendering when a component has **2+ state properties** that togethe
 
 ### Used in
 
-*No library component currently uses this pattern. It remains documented for project-level components that need multi-property reactive state.*
+Used in `ln-search`, `ln-filter`, `ln-list`, and `ln-data-coordinator` for microtask render coalescing.
 
 ---
 

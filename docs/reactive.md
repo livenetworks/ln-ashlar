@@ -24,21 +24,21 @@ State is visible in the DOM inspector. Any code can read or set it. This is the 
 
 **Use for:** mode switches (`view`/`edit`), open/closed, loading state, active tab ID — any externally controlled flag.
 
-### Internal State — Proxy
+### Internal State — JavaScript Memory & Batcher
 
-Complex data (objects, arrays, derived values) lives inside the component as a Proxy. State changes automatically schedule a render.
+Complex data (objects, arrays, cache records, query generation counters) lives inside the component instance in JS memory. Synchronous state changes schedule microtask renders via `createBatcher`.
 
 ```
-this.state.users.push(newUser)
-    → Proxy set trap fires
+this.data.push(newItem)
+    → this._queueRender()
     → queueMicrotask schedules _render()
     → fill() + renderList() update DOM
     → Component emits change event
 ```
 
-Internal state is not visible in the DOM. It is not part of the coordinator interface.
+Internal state is not exposed directly as DOM attributes. Operational mechanics (promises, AbortController, queryGen) live in JS memory.
 
-**Use for:** record lists, form data, computed flags, pagination state — anything too complex for an attribute.
+**Use for:** record lists, client caches, filter parameters, window indexes — operational data that does not belong on attributes.
 
 ### How they connect
 
@@ -49,7 +49,7 @@ coordinator.setAttribute('data-ln-profile-mode', 'edit')
     ↓
 MutationObserver: type=attributes, name='data-ln-profile-mode'
     ↓
-this.state.mode = 'edit'    ← Proxy set trap
+this._mode = 'edit'         ← Internal state update
     ↓
 createBatcher schedules _render()
     ↓
@@ -196,57 +196,9 @@ renderList(
 
 ---
 
-## Reactive State
+## State Synchronization & Microtask Batching
 
-### `reactiveState(initial, onChange)` — Shallow Proxy
-
-A Proxy over a flat object. Calls `onChange(prop, value, old)` on every top-level property set, but only if the value actually changed.
-
-```javascript
-import { reactiveState } from '../ln-core';
-
-this.state = reactiveState({
-    name: '',
-    mode: 'view',
-    count: 0
-}, function (prop, value, old) {
-    scheduleRender();
-});
-```
-
-Use when the state is a flat object with primitive values (strings, numbers, booleans). This covers most ln-ashlar library components.
-
-Setting the same value twice does not call `onChange` (strict equality check before dispatch).
-
-### `deepReactive(obj, onChange)` — Deep Proxy
-
-Wraps an object recursively. Calls `onChange()` (no arguments) on any nested change — including array mutations (`push`, `splice`, index assignment) and nested object property sets.
-
-```javascript
-import { deepReactive } from '../ln-core';
-
-this.state = deepReactive({
-    users: [],
-    selectedId: null
-}, scheduleRender);
-
-// All of these trigger onChange():
-this.state.users.push({ id: 4, name: 'New' });
-this.state.users[2].name = 'Updated';
-this.state.users.splice(1, 1);
-this.state.selectedId = 3;
-```
-
-Use when state contains arrays or nested objects that are mutated in place.
-
-### When to use which
-
-| | `reactiveState` | `deepReactive` |
-|---|---|---|
-| **Depth** | Top-level sets only | Any nested change |
-| **onChange args** | `(prop, value, old)` | `()` — no args |
-| **Use when** | Flat state, primitives | Arrays or nested objects |
-| **Typical usage** | UI state, flags, scalar fields | Record lists, nested data |
+ln-ashlar components manage internal state directly on component instances (or via `ln-data-store` for domain entities) rather than heavyweight reactive proxy wrappers, maintaining the DOM and attributes as the observable single source of truth.
 
 ---
 
@@ -255,7 +207,7 @@ Use when state contains arrays or nested objects that are mutated in place.
 Returns a `schedule()` function. The first call to `schedule()` enqueues `renderFn` via `queueMicrotask`. Subsequent calls within the same synchronous block are no-ops. After `renderFn` runs, `afterRender` is called (if provided).
 
 ```javascript
-import { reactiveState, createBatcher } from '../ln-core';
+import { createBatcher } from '../ln-core';
 
 const self = this;
 
@@ -264,7 +216,8 @@ const scheduleRender = createBatcher(
     function () { self._afterRender(); }  // fires after render — dispatch events here
 );
 
-this.state = reactiveState({ key: null, count: 0 }, scheduleRender);
+this.state = { key: null, count: 0 };
+this.scheduleRender = scheduleRender;
 ```
 
 ### Why batching matters
@@ -290,39 +243,49 @@ this.state.mode = 'edit';      // onChange → schedule()  → already queued, n
 
 This is the same mechanism as Vue 3's `nextTick`, using the native `queueMicrotask` API.
 
-### The trinity
+### Canonical Render Loop
 
-`reactiveState` + `createBatcher` + `fill` work as a unit:
+`createBatcher` + `fill` work together as a lean microtask rendering unit:
 
 ```javascript
-import { reactiveState, createBatcher, fill, dispatch } from '../ln-core';
+import { createBatcher, fill, dispatch } from '../ln-core';
 
 function _component(dom) {
     this.dom = dom;
-    const self = this;
-
-    const scheduleRender = createBatcher(
-        function () { self._render(); },
-        function () {
-            dispatch(self.dom, 'ln-example:changed', {
-                value: self.state.value
-            });
-        }
-    );
-
-    this.state = reactiveState({
+    this.state = {
         label: '',
         value: null,
         isActive: false
-    }, scheduleRender);
+    };
+    const self = this;
+
+    this.scheduleRender = createBatcher(
+        function () {
+            if (!self._destroyed) {
+                self._render();
+            }
+        },
+        function () {
+            if (!self._destroyed) {
+                dispatch(self.dom, 'ln-example:changed', {
+                    value: self.state.value
+                });
+            }
+        }
+    );
 }
 
 _component.prototype._render = function () {
     fill(this.dom, this.state);
 };
+
+_component.prototype.setValue = function (val) {
+    this.state.value = val;
+    this.scheduleRender();
+};
 ```
 
-Any change to `this.state` automatically schedules one render. The event fires after the DOM is updated.
+Any synchronous changes to `this.state` automatically coalesce into one render pass. The notification event fires after the DOM is updated.
 
 ---
 
@@ -374,8 +337,7 @@ Existing component attributes (`data-ln-modal`, `data-ln-tabs`, etc.) are not pa
 
 ```javascript
 import {
-    dispatch, findElements, guardBody,
-    deepReactive, createBatcher,
+    dispatch, findElements, guardBody, createBatcher,
     fill, renderList
 } from '../ln-core';
 
@@ -388,19 +350,25 @@ import {
         this.dom = dom;
         const self = this;
 
-        const scheduleRender = createBatcher(
-            function () { self._render(); },
+        this.scheduleRender = createBatcher(
             function () {
-                dispatch(self.dom, 'ln-user-list:changed', {
-                    count: self.state.users.length
-                });
+                if (!self._destroyed) {
+                    self._render();
+                }
+            },
+            function () {
+                if (!self._destroyed) {
+                    dispatch(self.dom, 'ln-user-list:changed', {
+                        count: self.state.users.length
+                    });
+                }
             }
         );
 
-        this.state = deepReactive({
+        this.state = {
             users: [],
             selectedId: null
-        }, scheduleRender);
+        };
 
         this._bindEvents();
         this._render();

@@ -561,33 +561,18 @@ const batchRender = createBatcher(
 
 ## Reactive Rendering Pattern
 
-The three reactive primitives (`reactiveState` / `deepReactive` +
-`createBatcher` + `fill`) are designed to be used together. They are
-the canonical ln-ashlar render loop:
+The `createBatcher` primitive and DOM rendering helpers (`fill`, `renderList`) are designed to be used together as the canonical ln-ashlar microtask render loop:
 
-1. **State mutation.** Component code assigns to a property on a
-   reactive proxy (`this.state.value = 'x'`). The proxy fires its
-   onChange callback.
-2. **Microtask queue.** The onChange is wired to a `createBatcher`
-   schedule function. Any number of synchronous assignments in the
-   same sync block schedule a single microtask.
-3. **One render.** When the microtask fires, the batcher calls
-   `renderFn` exactly once. `renderFn` typically calls `fill(this.dom,
-   this.state)` (or `renderList` for keyed collections) to project
-   state into the DOM, then the optional `afterRender` callback fires
-   (commonly used to dispatch a `ln-{component}:rendered` event).
+1. **State mutation.** Component updates internal data properties (e.g. `this.state.key = 'val'`).
+2. **Microtask queue.** The component triggers the `schedule()` function returned by `createBatcher`. Any number of synchronous assignments in the same sync block schedule a single microtask.
+3. **One render.** When the microtask fires, the batcher calls `renderFn` exactly once. `renderFn` typically calls `fill(this.dom, this.state)` (or `renderList` for keyed collections) to project state into the DOM, then the optional `afterRender` callback fires (commonly used to dispatch a `ln-{component}:rendered` or changed event).
 
-Two assignments on the same tick produce one DOM update. External
-callers that need to set several properties at once do not need a
-`batch()` helper — the batcher handles it.
+Two state assignments on the same tick produce one DOM update:
 
 The pattern is: **state mutation → microtask queue → one render**.
-Never wire a reactive onChange directly to `_render()` without a
-batcher between them — you will get one render per assignment, and
-the DOM will thrash.
+Never wire sync state updates directly to immediate DOM writes when multiple attributes or filter parameters can change simultaneously — batching prevents layout thrashing.
 
-For the full decision matrix (`reactiveState` vs `deepReactive`, when
-to use this pattern at all, anti-patterns), see
+For further details, see
 [Reactive Rendering Pattern in components/COMPONENTS.md](../../components/COMPONENTS.md#reactive-rendering-pattern).
 
 ---
@@ -950,7 +935,7 @@ Returns `true` if the element is an `<input>`, `<textarea>`, `<select>`, or `[co
 ## Typical Usage Pattern
 
 ```js
-import { dispatch, dispatchCancelable, guardBody, findElements, deepReactive, createBatcher, fill, renderList } from '../ln-core';
+import { dispatch, dispatchCancelable, guardBody, findElements, createBatcher, fill, renderList } from '../ln-core';
 
 (function () {
     const DOM_SELECTOR = 'data-ln-example';
@@ -966,8 +951,10 @@ import { dispatch, dispatchCancelable, guardBody, findElements, deepReactive, cr
         const self = this;
 
         // Reactive state + batched rendering
-        const batchRender = createBatcher(function () { self._render(); });
-        this.state = deepReactive({ items: [] }, batchRender);
+                this.state = { items: [] };
+        this.batchRender = createBatcher(function () {
+            if (!self._destroyed) self._render();
+        });
 
         return this;
     }
