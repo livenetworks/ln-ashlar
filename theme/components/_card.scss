@@ -8,3 +8,27 @@
 .section-card {
 	@include section-card;
 }
+
+// Table handling inside cards — defined once globally to prevent selector explosion
+:is(.card, .section-card, [class*="card"], [data-ln-modal], article) > :is(main, a > main) {
+	&:has(> :is(table, .table-container)) {
+	overflow-x: auto;
+	max-width: 100%;
+	-webkit-overflow-scrolling: touch;
+	}
+
+	&:has(> [data-ln-table]) {
+	overflow-x: clip;
+	max-width: 100%;
+	}
+
+	&:has(> :is(table, .table-container, [data-ln-table]):only-child) {
+	padding: 0;
+
+	> :is(table, .table-container > table, [data-ln-table] > table) {
+		border-radius: 0;
+		box-shadow: none;
+		margin-bottom: 0;
+	}
+	}
+}
