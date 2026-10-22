@@ -107,7 +107,9 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 		const self = this;
 
 		const queueRender = createBatcher(function () {
-			self._render();
+			if (!self._destroyed) {
+				self._render();
+			}
 		});
 
 		this._queueRender = queueRender;

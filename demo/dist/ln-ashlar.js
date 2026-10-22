@@ -4939,7 +4939,7 @@ function yn(t) {
     const w = y.getAttribute(c);
     this.colIndex = w !== null ? parseInt(w, 10) : null, this._lastSnapshot = null, this._destroyed = !1, this.nsKey = St(y, "filter"), this.hashEnabled = !!this.nsKey, this.queryParam = g(y), this.queryEnabled = !!this.queryParam;
     const A = this, T = Xt(function() {
-      A._render();
+      A._destroyed || A._render();
     });
     this._queueRender = T;
     const L = Xt(function() {

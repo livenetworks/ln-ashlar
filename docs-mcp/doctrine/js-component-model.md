@@ -206,7 +206,7 @@ Server-rendered content is authored as full markup; JS hydration adds behavior o
 
 ## 5. Reactive Rendering Pattern
 
-When a component manages complex internal states that update the DOM, it uses `reactiveState` (shallow proxy) or `deepReactive` (recursive proxy) combined with `createBatcher` and `fill`.
+When a component manages state changes that update the DOM, it uses microtask batching (`createBatcher`) combined with `fill` or `renderList` to coalesce synchronous mutations into a single DOM update.
 
 ```
 State Mutation (state.key = 'value')
