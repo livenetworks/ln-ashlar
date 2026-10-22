@@ -165,8 +165,45 @@
 @mixin panel-body {
 	padding: var(--padding-y) var(--padding-x);
 
+	&:has(> table),
+	&:has(> .table-container) {
+		overflow-x: auto;
+		max-width: 100%;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	// ln-table brings its own chrome and sticky thead/footer — `clip` keeps
+	// this cell from becoming the scroll container that would trap them.
+	&:has(> [data-ln-table]) {
+		overflow-x: clip;
+		max-width: 100%;
+	}
+
 	table {
 		min-width: var(--table-min-width, 600px);
+	}
+
+	// Auto-flush: ONLY when the table (or .table-container) is the
+	// sole child of main — i.e. the card is a pure table card.
+	// Strip padding so the table spans edge-to-edge, and drop the
+	// table's own radius/shadow (card's overflow:hidden handles
+	// rounded corners).
+	//
+	// If main has mixed content (intro <p>, demo-split, <h4>,
+	// then <table>), :only-child doesn't match, padding stays,
+	// and the table keeps its own inset.
+	&:has(> table:only-child),
+	&:has(> .table-container:only-child),
+	&:has(> [data-ln-table]:only-child) {
+		padding: 0;
+
+		> table,
+		> .table-container > table,
+		> [data-ln-table] > table {
+			border-radius: 0;
+			box-shadow: none;
+			margin-bottom: 0;
+		}
 	}
 }
 
