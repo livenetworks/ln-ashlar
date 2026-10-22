@@ -116,9 +116,9 @@
 `classification: service`. Овие немаат markup темплејти — §2 покажува JS употреба
 (import + повик), §3 е API табела. Сите линкаат назад кон `guides/component-authoring`.
 
-- [x] **ln-core** — прегледен документ на споделениот модул: `findElements`, `dispatch`/`dispatchCancelable`, `cloneTemplate`/`cloneTemplateScoped`, `fill`/`fillTemplate`, `buildDict`, `renderList`, `reactiveState`/`deepReactive`/`createBatcher` + мапа кон модулските документи подолу — извори: `components/ln-core/index.js`, `components/ln-core/helpers.js`, `components/COMPONENTS.md`
+- [x] **ln-core** — прегледен документ на споделениот модул: `findElements`, `dispatch`/`dispatchCancelable`, `cloneTemplate`/`cloneTemplateScoped`, `fill`/`fillTemplate`, `buildDict`, `renderList`, `createBatcher` + мапа кон модулските документи подолу — извори: `components/ln-core/index.js`, `components/ln-core/helpers.js`, `components/COMPONENTS.md`
 - [x] **ln-helpers** — извор: `components/ln-core/helpers.js`
-- [x] **ln-reactive** — `reactiveState`/`deepReactive`/`createBatcher` — извори: `components/ln-core/reactive.js`, `docs/js/core.md`
+- [x] **ln-reactive** — `createBatcher` — извори: `components/ln-core/reactive.js`, `docs/js/core.md`
 - [x] **positioning** — споделено viewport-aware позиционирање (dropdown/popover/tooltip) — извор: `components/ln-core/positioning.js`
 - [x] **ln-hash** — hash state примитив — извор: `components/ln-core/hash.js` (го користат ln-router, ln-tabs)
 - [x] **ln-persist** — localStorage persistence примитив — извор: `components/ln-core/persist.js` (го користат ln-tabs, ln-filter, ln-toggle, ln-sort)
