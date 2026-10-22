@@ -270,6 +270,29 @@ For detailed manual instructions, properties, attributes, and events of individu
 
 ---
 
+---
+
+## 🎨 Dual CSS Engine Architecture
+
+`ln-ashlar` offers dual-engine visual styling with 100% design parity across all components and layouts:
+
+1. **Native Ashlar SCSS:** Class-free semantic HTML styling and design tokens. Optimized for minimal CSSOM invalidation by eliminating mixin selector explosions and `:not(:has())` bottlenecks.
+2. **Tailwind CSS v4 Engine:** Utility-first stylesheet compiled directly with Tailwind v4 `@theme` tokens (`npm run build:tailwind`).
+
+See [Theme Architecture & SCSS Guidelines](theme/README.md) for details.
+
+---
+
+## 🧪 Automated Testing & Performance Suite
+
+`ln-ashlar` includes an automated headless verification and benchmarking harness comparing both CSS engines:
+
+- **Visual & Design Suite (`npm run test:visual`):** Validates responsive layout, horizontal overflow, and reactive UI across all 67 demo admin pages.
+- **JS Performance Suite (`npm run test:perf`):** Benchmarks execution latency, DOM node churn, and JS heap memory across 46 interactive JS components.
+- **Historical Comparison (`npm run test:perf:compare`):** Tracks performance trends across git commits and alerts on performance regressions (`>20%`).
+
+See [Headless Testing Documentation](tests/headless/README.md) for full usage and options.
+
 ## 🖥️ Interactive Demo Site
 
 `ln-ashlar` ships with a complete local dashboard environment inside `demo/admin/`. The demo is itself a project consuming `ln-ashlar`, showing real-world layout structures, component setups, and customized semantic SCSS:
