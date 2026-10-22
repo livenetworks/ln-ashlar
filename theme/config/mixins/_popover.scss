@@ -68,11 +68,16 @@
 			margin-top: var(--size-2xs);
 		}
 
-		@include menu-items;
-		@include check-list-nav;
+		// When containing interactive actions/buttons (menus, pickers)
+		&:has(> li > :is(a, button, input[type="submit"], input[type="reset"], input[type="button"])) {
+			@include menu-items;
+		}
 
-		li label {
-			> input {
+		// When containing checkbox/radio filter options
+		&:has(> li > label) {
+			@include check-list-nav;
+
+			> li > label > input {
 				// Override pill's display:none — keep in focus order for keyboard nav
 				display: revert;
 				position: absolute;
@@ -84,7 +89,7 @@
 			}
 
 			// Focus ring on label when the hidden input receives keyboard focus
-			&:has(> input:focus-visible) {
+			> li > label:has(> input:focus-visible) {
 				@include focus-ring;
 			}
 		}

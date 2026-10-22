@@ -9,10 +9,8 @@ table {
 
 	td.numeric,
 	td.num,
-	td > time,
-	td > [data-ln-number],
-	time,
-	[data-ln-number] {
+	td:has(time),
+	td:has([data-ln-number]) {
 		@include font-tabular;
 	}
 
@@ -89,7 +87,7 @@ th:hover .table-filter { opacity: 0.7; }
 }
 
 // ─── Table Row Actions ──────────────────────────────────────────
-td:has(> .table-row-actions) {
+td:has(.table-row-actions) {
 	position: relative;
 }
 

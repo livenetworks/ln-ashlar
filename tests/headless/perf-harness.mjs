@@ -53,8 +53,7 @@ export async function benchmarkComponent(spec, options = {}) {
 		shouldCloseBrowser = true;
 	}
 
-	const context = await browserInstance.createBrowserContext();
-	const page = await context.newPage();
+	const page = await browserInstance.newPage();
 	await page.setViewport({ width: 1440, height: 900 });
 
 	const pageErrors = [];
@@ -137,7 +136,6 @@ export async function benchmarkComponent(spec, options = {}) {
 		};
 	} finally {
 		try { await page.close(); } catch {}
-		try { if (context) await context.close(); } catch {}
 		if (shouldCloseBrowser && browserInstance) {
 			try { await browserInstance.close(); } catch {}
 		}
