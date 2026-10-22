@@ -45,7 +45,8 @@
     "./dev.css": "./dist/ln-ashlar-dev.css",
     "./dev.js": "./dist/ln-ashlar-dev.js",
     "./theme/*": "./theme/*",
-    "./components/*": "./components/*"
+    "./components/*": "./components/*",
+    "./tailwind.css": "./dist/ln-ashlar-tailwind.css"
   },
   "scripts": {
     "test": "npm run sync:ln-schemas:check && npm run sync:ln-events:check && npm run sync:css-tokens:check && node --test \"tests/*.test.js\"",

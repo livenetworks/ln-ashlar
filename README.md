@@ -107,7 +107,7 @@ Combine autonomous components directly in semantic HTML — **zero initializatio
 
 ### 1. 🏛️ Dual-Core Architecture (SSR + Client-Side SPA)
 - **Backend-First Progressive HTML Enhancement (SSR):** Your backend (Laravel, Go, Django, Rails) delivers indexable, semantic HTML. Elements auto-activate via attributes (`data-ln-modal`, `data-ln-filter`, `data-ln-table`).
-- **Client-Side Single-Page Applications (SPA / JSON Mode):** Built-in client router (`ln-router`), compound hash-state codec (`hash.js`), 3-tier local storage (`ln-data-store`), and microtask-batched Proxy reactivity (`deepReactive`, `renderList`) when client JSON APIs are required.
+- **Client-Side Single-Page Applications (SPA / JSON Mode):** Built-in client router (`ln-router`), compound hash-state codec (`hash.js`), 3-tier local storage (`ln-data-store`), and microtask-batched state rendering (`createBatcher`, `renderList`) when client JSON APIs are required.
 
 ### 2. 🤖 AI-Native & MCP Surface
 - **Machine-Readable Component Corpus (`docs-mcp/`):** Schema-validated documentation served directly to AI agent workflows via Model Context Protocol (MCP).
