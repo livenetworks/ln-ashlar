@@ -21,6 +21,7 @@ The `forms` styling system (`theme/config/mixins/_form.scss` and `theme/componen
 - **Responsive 6-Column Form Grid (`form-grid`):** A CSS Grid layout with column spanning utilities (`.col-span-1` through `.col-span-6`) collapsing smoothly on small viewports.
 - **Required Indicator via CSS `:has()`:** Mandatory inputs with the HTML `required` attribute automatically display an indicator without manual asterisk characters.
 - **Button Variants:** Primary fill defaults automatically on `<button type="submit">`, while `.btn-ghost` and `.btn-soft` provide secondary actions.
+- **Pills & Segmented Controls:** `.pills`, `.pills-outline`, and `.pills-segmented` style checkbox/radio lists with connected border radii, driving checked states with optimized CSS `:has(> input:checked)` cascades.
 
 ---
 

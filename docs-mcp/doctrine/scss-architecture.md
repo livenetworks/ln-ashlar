@@ -259,3 +259,34 @@ Certain visual behaviors are fixed library-wide defaults, not per-component choi
 
 `@container` queries style components (the parent declares `container-type`, the child queries it — never the same element); `@media` is reserved for the layout shell only. Container breakpoints are content-driven, not predetermined by viewport size.
 
+---
+
+## 10. Dual CSS Engine Architecture (Ashlar SCSS vs. Tailwind CSS v4)
+
+`ln-ashlar` supports two interoperable visual engines with 100% design and layout parity across all components:
+
+1. **Native Ashlar SCSS (`ln-ashlar.css`):**
+   - Class-free, semantic HTML5 markup with design tokens and SCSS mixins.
+   - Ideal for long-lived systems, minimal markup pollution, and semantic design systems.
+2. **Tailwind CSS v4 Engine (`dist/ln-ashlar-tailwind.css`):**
+   - Utility-first stylesheet compiled with Tailwind v4 `@theme` directives mapping to Ashlar design tokens (`theme/tailwind/`).
+   - Ideal for teams preferring utility classes or micro-adjustments directly in markup.
+   - Compiled via `npm run build:tailwind`.
+   - Verified for 100% visual parity across all 67 demo admin pages via `npm run test:visual`.
+
+---
+
+## 11. CSSOM Performance & Selector Matching Doctrines
+
+To eliminate browser style invalidation storms during high-frequency DOM mutations and interactive events, the following authoring invariants must be preserved:
+
+1. **Mixin Selector De-duplication:**
+   - Complex `:has()` and combinator selectors MUST NOT be nested inside reusable mixins that are `@include`d repeatedly.
+   - Hoist shared structure to global scopes using `:is()` (e.g. `:is(.card, .section-card, [class*="card"]) > :is(main, a > main):has(...)`).
+2. **Natural Cascade Over Inversion (`:not(:has())` Forbidden in States):**
+   - Avoid `:hover:not(:has(> input:checked))` or similar inverse selectors; they force browser layout engines into exhaustive negative ancestor traversals.
+   - Instead, declare base `:hover` followed by the state-specific override `&:has(> input:checked):hover`.
+3. **Modern CSS Logical Properties:**
+   - Structural spacing mixins use logical properties (`padding-inline`, `padding-block`, `margin-inline`, `margin-block`), cutting generated rules by 50% compared to physical directional properties.
+4. **Direct Pseudo-Element Attachment:**
+   - Active indicators (e.g. `::before`) must attach directly to the element (`a::before` with `position: relative`), never querying parent containers via `li:has(a.active)::before`.
