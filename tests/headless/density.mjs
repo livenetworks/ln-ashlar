@@ -1,4 +1,4 @@
-import { run, assert, BASE_URL } from './_harness.mjs';
+import { run, assert, sleep, BASE_URL } from './_harness.mjs';
 
 // Every fact below is read from demo/admin/src/pages/density.html (inline page script +
 // markup) and demo/admin/src/shell.html (density picker buttons, density bootstrap).
@@ -93,6 +93,7 @@ run('demo/admin/density.html', async ({ page }) => {
 	await page.waitForFunction(() => document.documentElement.getAttribute('data-density') === 'comfortable', { timeout: 5000 });
 	assert(await rootDensity() === 'comfortable', 'unchecking global returns html to comfortable');
 	assert(await stored() === 'comfortable', 'localStorage ln-demo-density = comfortable');
+	await sleep(250);
 	assert(px(await pad('#density-name')) === comfInputPad, 'input padding restored');
 
 	// ─── Persistence ───────────────────────────────────────────
@@ -113,12 +114,14 @@ run('demo/admin/density.html', async ({ page }) => {
 	assert(await scopedDensity() === 'compact', 'checking scoped sets data-density="compact" on the form section');
 	assert(await rootDensity() === 'comfortable', 'html stays comfortable (scope is local)');
 	assert(await stored() === null, 'scoped toggle does not write localStorage');
+	await sleep(250);
 	assert(px(await pad('#density-name')) < scopedBefore, 'form input padding shrinks inside the scoped section');
 	assert(await rowH() === comfRowH, 'table outside the scope keeps its row height');
 
 	await toggle(SCOPED_CB);
 	await page.waitForFunction(sel => !document.querySelector(sel).hasAttribute('data-density'), { timeout: 5000 }, SCOPED_TARGET);
 	assert(await scopedDensity() === null, 'unchecking scoped removes the attribute');
+	await sleep(250);
 	assert(px(await pad('#density-name')) === scopedBefore, 'form input padding restored');
 
 	// ─── Shell density buttons ─────────────────────────────────
