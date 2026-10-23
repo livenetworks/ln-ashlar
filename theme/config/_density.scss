@@ -1,33 +1,31 @@
 // ==========================================================================
-// Density — ln-ashlar v2.0
+// Density — ln-ashlar
 // ==========================================================================
-// Inverted density system. The :root default is DENSE (DocuFlow scale:
-// 14px body, 52px header, 232px sidebar). Density goes UP via the
-// [data-density] attribute, mirroring how [data-mode] / [data-theme] works.
+// Information density scaling via spatial compression.
+//
+// The :root default is dense base (DocuFlow scale: 36px row height floor,
+// 6px padding-y, 52px header, 232px sidebar). Density scales spacing upward
+// via the [data-density] attribute, mirroring how [data-mode] / [data-theme] works.
 //
 // Activation:
-//   <html>                              ← default: dense (DocuFlow look)
-//   <html data-density="compact">       ← explicit dense handle (same as base)
-//   <html data-density="comfortable">   ← pre-v2 default (16px / roomier)
-//   <html data-density="spacious">      ← large type, generous padding
+//   <html>                              ← default: compact base
+//   <html data-density="compact">       ← explicit compact handle (same as base)
+//   <html data-density="comfortable">   ← roomy default (44px row floor, 8px padding)
+//   <html data-density="spacious">      ← generous touch/kiosk density (48px row floor, 16px padding)
 //   <main data-density="compact">       ← scope dense within comfortable page
 //
 // Density is an explicit user choice (settings toggle).
 // It is NEVER auto-switched by viewport — viewport breakpoints handle
 // layout, density handles information density inside that layout.
 //
-// What reacts: everything reading --padding-y, --gap, --text-body-*,
-// --text-label-*, --text-title-*, --text-heading-*, --text-display-sm,
-// --lh-*, --app-header-height, --app-sidebar-width, --density-row-h,
-// --btn-padding-y, --input-padding-y.
+// What reacts: spatial rhythm and layout geometry:
+// --padding-y, --gap, --app-header-height, --app-sidebar-width,
+// --density-row-h, --btn-padding-y, --btn-padding-x, --input-padding-y.
 //
-// Interactive controls (buttons, inputs, pills): density-reactive UPWARD.
-// Base (~38px) = WCAG AA. Comfortable (≥46px) and Spacious (≥54px) = AAA.
-// Controls rebind --btn-padding-y and --input-padding-y in up-tier scopes.
-// See docs-mcp/css/density.md §wcag for the height math.
-//
-// No parallel --density-* token scale. Density overrides existing base
-// tokens at the scope root, exactly like theme color overrides.
+// Typography (font-size, line-height) remains stable across density modes:
+//   (1) Prevents text disappearing/reappearing (glyph cache drop on variable fonts)
+//   (2) Eliminates layout thrashing during CSS transitions
+//   (3) Enables smooth, gentle CSS transitions on padding and row height
 // ==========================================================================
 
 :root {
@@ -48,21 +46,16 @@
 //       returning to base (rather than removing the attribute)
 //   (b) a region inside a comfortable page can be scoped dense:
 //       <table data-density="compact">
-//
-// Rebinds --density-row-h so a compact-scoped region keeps the dense row
-// floor inside a comfortable/spacious page. NOTE: only row-h is restored —
-// full dense region-scoping (type, padding) would re-declare the base
-// surface; deferred. The global switcher returns to base via :root (dense).
 // ---------------------------------------------------------------------------
 [data-density="compact"] {
-	--density-row-h:    2.25rem;  // 36px — restore dense base in scoped context
+	--density-row-h:      2.25rem;            // 36px — restore dense base in scoped context
+	--input-padding-y:    var(--size-xs-up);  // 6px — compact input padding
 }
 
 // ---------------------------------------------------------------------------
-// [data-density="comfortable"] — pre-v2 default, now an explicit opt-in.
+// [data-density="comfortable"] — roomy spacing opt-in.
 //
-// Restores the roomy 16px / lh 1.6 scale that was the :root default before
-// design-v2. WCAG 2.5.5 AAA: buttons 46px, inputs/pills ≥44px.
+// WCAG 2.5.5 AAA: buttons 38-44px, inputs/pills ≥44px, table rows 44px.
 //
 // <html data-density="comfortable">   ← global comfortable
 // <aside data-density="comfortable">  ← scoped comfortable sidebar
@@ -73,63 +66,23 @@
 	--padding-y:          var(--size-sm);       // 8px (was dense 6px)
 	--gap:                var(--size-sm);       // 8px (was dense 6px)
 
-	// -- Body text (restore 16px / 1.6 scale) ----------------------------
-	--text-body-md:       1rem;
-	--lh-body-md:         1.6;
-
-	--text-body-sm:       0.875rem;
-	--lh-body-sm:         1.5;
-
-	// Explicit rebind — form inputs consume --font-size and don't always
-	// cascade lazy var(--text-body-md) resolutions under a scope.
-	--font-size:          var(--text-body-md);
-	--line-height:        var(--lh-body-md);
-
-	// -- Labels ----------------------------------------------------------
-	--text-label-md:      0.875rem;
-	--lh-label-md:        1.4;
-
-	--text-label-sm:      0.8125rem;   // 13px (was dense 12px) — form-label, table th
-	--lh-label-sm:        1.4;
-
-	// -- Caption ---------------------------------------------------------
-	--text-caption:       0.8125rem;   // 13px — modal subtitle, validation errors
-	--lh-caption:         1.4;
-
-	// -- Titles ----------------------------------------------------------
-	--text-title-md:      1.125rem;
-	--lh-title-md:        1.4;
-
-	--text-title-sm:      1rem;
-	--lh-title-sm:        1.4;
-
-	// -- Headings --------------------------------------------------------
-	--text-heading-sm:    1.25rem;   --lh-heading-sm:  1.3;
-	--text-heading-md:    1.5rem;    --lh-heading-md:  1.25;
-	--text-heading-lg:    1.875rem;  --lh-heading-lg:  1.2;
-
-	// -- Display ---------------------------------------------------------
-	--text-display-sm:    2.25rem;   --lh-display-sm:  1.15;
-
 	// -- App shell -------------------------------------------------------
-	--app-header-height:  3.5rem;    // 56px (was dense 3.25rem)
-	--app-sidebar-width:  16rem;     // 256px (was dense 14.5rem)
+	--app-header-height:  3.5rem;               // 56px (was dense 3.25rem)
+	--app-sidebar-width:  16rem;                // 256px (was dense 14.5rem)
 
 	// -- Row height ------------------------------------------------------
-	--density-row-h:      2.75rem;   // 44px (was dense 2.25rem)
+	--density-row-h:      2.75rem;              // 44px (was dense 2.25rem)
 
-	// -- Interactive controls — Tailwind / shadcn standard (38px height) ---
-	--btn-padding-y:      var(--size-sm);       // 8px → buttons 38px
-	--btn-padding-x:      var(--size-md);       // 16px
-	--input-padding-y:    var(--size-sm);       // 8px → inputs/selects 38px
+	// -- Interactive controls — roomy 44px inputs ------------------------
+	--input-padding-y:    var(--size-sm-up);    // 12px → inputs/selects roomy
 }
 
 // ---------------------------------------------------------------------------
-// [data-density="spacious"] — NEW tier above comfortable.
+// [data-density="spacious"] — generous spacing tier above comfortable.
 //
 // For low-vision, touch-primary, or presentation contexts.
-// Body 18px, generous padding, larger shell. WCAG 2.5.5 AAA:
-// buttons 54px, inputs/pills ≥48px.
+// Generous padding, larger shell. WCAG 2.5.5 AAA:
+// inputs/pills ≥48px, table rows 48px.
 //
 // <html data-density="spacious">
 // ---------------------------------------------------------------------------
@@ -139,53 +92,13 @@
 	--padding-y:          var(--size-md);       // 16px
 	--gap:                var(--size-md);       // 16px
 
-	// -- Body text -------------------------------------------------------
-	--text-body-md:       1.125rem;             // 18px
-	--lh-body-md:         1.75;
-
-	--text-body-sm:       1rem;
-	--lh-body-sm:         1.6;
-
-	--font-size:          var(--text-body-md);
-	--line-height:        var(--lh-body-md);
-
-	// -- Labels ----------------------------------------------------------
-	--text-label-md:      1rem;
-	--lh-label-md:        1.5;
-
-	--text-label-sm:      0.9375rem;   // 15px (was dense 12px) — form-label, table th
-	--lh-label-sm:        1.45;
-
-	// -- Caption ---------------------------------------------------------
-	--text-caption:       0.9375rem;   // 15px — modal subtitle, validation errors
-	--lh-caption:         1.45;
-
-	// -- Titles ----------------------------------------------------------
-	--text-title-md:      1.25rem;
-	--lh-title-md:        1.5;
-
-	--text-title-sm:      1.125rem;
-	--lh-title-sm:        1.45;
-
-	// -- Headings --------------------------------------------------------
-	--text-heading-sm:    1.5rem;    --lh-heading-sm:  1.35;
-	--text-heading-md:    1.875rem;  --lh-heading-md:  1.3;
-	--text-heading-lg:    2.25rem;   --lh-heading-lg:  1.25;
-
-	// -- Display ---------------------------------------------------------
-	--text-display-sm:    2.75rem;   --lh-display-sm:  1.2;
-
 	// -- App shell -------------------------------------------------------
-	--app-header-height:  4rem;      // 64px
-	--app-sidebar-width:  17.5rem;   // 280px
+	--app-header-height:  4rem;                 // 64px
+	--app-sidebar-width:  17.5rem;              // 280px
 
 	// -- Row height ------------------------------------------------------
-	--density-row-h:      3rem;      // 48px
+	--density-row-h:      3rem;                 // 48px
 
-	// -- Interactive controls — WCAG 2.5.5 AAA ≥48px --------------------
-	// btn-padding-y: 2×16px + 20px line-height + 2px borders = 54px
-	// input-padding-y: indirection token read by form-input + pill-outline
-	--btn-padding-y:      var(--size-md);       // 16px → buttons 54px
-	--btn-padding-x:      var(--size-lg);       // 24px — spacious width
+	// -- Interactive controls — generous touch targets -------------------
 	--input-padding-y:    var(--size-md);       // 16px → inputs/pills ≥48px
 }

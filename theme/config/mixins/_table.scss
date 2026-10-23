@@ -129,6 +129,7 @@
 
 	tbody tr {
 		@include transition;
+		height: var(--density-row-h);
 		min-height: var(--density-row-h);
 
 		&:hover {

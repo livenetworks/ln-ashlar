@@ -250,10 +250,41 @@ export const PAGE_SPECS = {
 	'index': {
 		name: 'index',
 		interactive: true,
-		selectors: ['.section-card', '#stats li', 'header', 'aside'],
+		selectors: ['.section-card', '#stats li', 'header', 'aside', '#demo-density-trigger'],
 		interaction: async (page, engine) => {
 			const statCards = await page.$$('#stats li');
 			assert(statCards.length > 0, `${engine}: Dashboard renders stat items`);
+
+			// Test density switching via the dashboard menu popover
+			await page.evaluate(() => {
+				const trigger = document.getElementById('demo-density-trigger');
+				if (trigger) trigger.click();
+				const compactBtn = document.querySelector('[data-demo-density="compact"]');
+				if (compactBtn) compactBtn.click();
+			});
+			await sleep(50);
+			const compactDensity = await page.evaluate(() => document.documentElement.getAttribute('data-density'));
+			assert(compactDensity === 'compact', `${engine}: Density switched to compact via dashboard menu`);
+
+			// Switch to spacious
+			await page.evaluate(() => {
+				const trigger = document.getElementById('demo-density-trigger');
+				if (trigger) trigger.click();
+				const spaciousBtn = document.querySelector('[data-demo-density="spacious"]');
+				if (spaciousBtn) spaciousBtn.click();
+			});
+			await sleep(50);
+			const spaciousDensity = await page.evaluate(() => document.documentElement.getAttribute('data-density'));
+			assert(spaciousDensity === 'spacious', `${engine}: Density switched to spacious via dashboard menu`);
+
+			// Restore to comfortable
+			await page.evaluate(() => {
+				const comfortableBtn = document.querySelector('[data-demo-density="comfortable"]');
+				if (comfortableBtn) comfortableBtn.click();
+			});
+			await sleep(50);
+			const restoredDensity = await page.evaluate(() => document.documentElement.getAttribute('data-density'));
+			assert(restoredDensity === 'comfortable', `${engine}: Density restored to comfortable`);
 		}
 	},
 	'kbd': {

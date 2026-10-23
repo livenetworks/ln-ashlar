@@ -79,6 +79,7 @@
     "test:perf": "node tests/headless/perf-run.mjs",
     "test:perf:history": "node tests/headless/perf-run.mjs --history",
     "test:perf:compare": "node tests/headless/perf-run.mjs --compare",
+    "test:perf:density": "node tests/headless/perf-density.mjs",
     "test:dual": "node tests/headless/dual-run.mjs"
   },
   "devDependencies": {
