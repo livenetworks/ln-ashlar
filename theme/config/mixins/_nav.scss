@@ -196,11 +196,11 @@
 			}
 		}
 
-		&:has(a:hover)::before {
+		&:has(> a:hover)::before {
 			opacity: 0.4;
 		}
 
-		&:has(a.active)::before {
+		&:has(> a.active)::before {
 			transform: scaleY(1);
 			opacity: 1;
 		}
@@ -250,13 +250,13 @@
 			}
 		}
 
-		&:has(a:hover)::before {
+		&:has(> a:hover)::before {
 			left: 20%;
 			right: 20%;
 			opacity: 0.45;
 		}
 
-		&:has(a.active)::before {
+		&:has(> a.active)::before {
 			left: 0;
 			right: 0;
 			opacity: 1;

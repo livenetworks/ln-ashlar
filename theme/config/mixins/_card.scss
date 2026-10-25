@@ -165,8 +165,7 @@
 @mixin panel-body {
 	padding: var(--padding-y) var(--padding-x);
 
-	&:has(> table),
-	&:has(> .table-container) {
+	&:has(> :is(table, .table-container)) {
 		overflow-x: auto;
 		max-width: 100%;
 		-webkit-overflow-scrolling: touch;
@@ -192,9 +191,7 @@
 	// If main has mixed content (intro <p>, demo-split, <h4>,
 	// then <table>), :only-child doesn't match, padding stays,
 	// and the table keeps its own inset.
-	&:has(> table:only-child),
-	&:has(> .table-container:only-child),
-	&:has(> [data-ln-table]:only-child) {
+	&:has(> :is(table, .table-container, [data-ln-table]):only-child) {
 		padding: 0;
 
 		> table,

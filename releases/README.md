@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.1.13](./v2.1.13.md) — October 25, 2026
+SCSS selector performance optimization and CSS Logical Properties modernization: negative `:not(:has(...))` pruning, compound selector consolidation via `:is(...)`, scoped direct-child navigation indicators, and spacing logical properties (`padding-inline`, `margin-inline`).  
+👉 [Read full v2.1.13 release notes](./v2.1.13.md)
+
 ### [v2.1.12](./v2.1.12.md) — October 20, 2026
 Elimination of 3+ second main-thread freeze during DOM mutations and virtual row recycling via scoped lifecycle `onInit` dispatching, `ln-debug` active debug gating (`hasActiveDebug()`), length-difference Levenshtein optimization, and mutation loop guard-clause refactoring.  
 👉 [Read full v2.1.12 release notes](./v2.1.12.md)

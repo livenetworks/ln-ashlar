@@ -77,52 +77,27 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 
-		// Shared header-button stack — keyed off the unprefixed structural filter button
-		// class and the [data-ln-sort] JS-component selector, so table / ln-table /
-		// ln-data-table all share one positioning rule.
+		// Shared header-button stack — cascading single vs double action
+		&:has(:is([data-ln-sort], .table-filter)) {
+			min-width: var(--th-single-action-min-width, 6rem);
+			padding-inline-end: calc(var(--padding-x, var(--size-md)) + 2rem);
+
+			.table-filter,
+			[data-ln-sort] {
+				position: absolute;
+				top: 50%;
+				transform: translateY(-50%);
+				right: var(--padding-x, var(--size-md));
+				margin: 0;
+			}
+		}
+
 		&:has([data-ln-sort]):has(.table-filter) {
 			min-width: var(--th-double-action-min-width, 8.5rem);
 			padding-inline-end: calc(var(--padding-x, var(--size-md)) + 3.75rem);
 
-			.table-filter {
-				position: absolute;
-				top: 50%;
-				transform: translateY(-50%);
-				right: var(--padding-x, var(--size-md));
-				margin: 0;
-			}
 			[data-ln-sort] {
-				position: absolute;
-				top: 50%;
-				transform: translateY(-50%);
 				right: calc(var(--padding-x, var(--size-md)) + 1.75rem);
-				margin: 0;
-			}
-		}
-
-		&:has([data-ln-sort]):not(:has(.table-filter)) {
-			min-width: var(--th-single-action-min-width, 6rem);
-			padding-inline-end: calc(var(--padding-x, var(--size-md)) + 2rem);
-
-			[data-ln-sort] {
-				position: absolute;
-				top: 50%;
-				transform: translateY(-50%);
-				right: var(--padding-x, var(--size-md));
-				margin: 0;
-			}
-		}
-
-		&:has(.table-filter):not(:has([data-ln-sort])) {
-			min-width: var(--th-single-action-min-width, 6rem);
-			padding-inline-end: calc(var(--padding-x, var(--size-md)) + 2rem);
-
-			.table-filter {
-				position: absolute;
-				top: 50%;
-				transform: translateY(-50%);
-				right: var(--padding-x, var(--size-md));
-				margin: 0;
 			}
 		}
 	}

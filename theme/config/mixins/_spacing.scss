@@ -1,16 +1,16 @@
 // Spacing — accepts CSS variable or value
 
 @mixin p($val)  { padding: $val; }
-@mixin px($val) { padding-left: $val; padding-right: $val; }
-@mixin py($val) { padding-top: $val; padding-bottom: $val; }
+@mixin px($val) { padding-inline: $val; }
+@mixin py($val) { padding-block: $val; }
 @mixin pt($val) { padding-top: $val; }
 @mixin pb($val) { padding-bottom: $val; }
 @mixin pl($val) { padding-left: $val; }
 @mixin pr($val) { padding-right: $val; }
 
 @mixin m($val)  { margin: $val; }
-@mixin mx($val) { margin-left: $val; margin-right: $val; }
-@mixin my($val) { margin-top: $val; margin-bottom: $val; }
+@mixin mx($val) { margin-inline: $val; }
+@mixin my($val) { margin-block: $val; }
 @mixin mt($val) { margin-top: $val; }
 @mixin mb($val) { margin-bottom: $val; }
 @mixin ml($val) { margin-left: $val; }

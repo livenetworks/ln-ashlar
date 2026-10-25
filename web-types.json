@@ -1,7 +1,7 @@
 {
 	"$schema": "https://json.schemastore.org/web-types",
 	"name": "@livenetworks/ashlar",
-	"version": "2.1.12",
+	"version": "2.1.13",
 	"framework": "html",
 	"contributions": {
 		"html": {
