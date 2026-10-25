@@ -205,9 +205,7 @@
 	}
 
 	// Propagate disabled states to the parent visual shell
-	&:has(> input:disabled),
-	&:has(> select:disabled),
-	&:has(> button:disabled) {
+	&:has(> :is(input, select, button):disabled) {
 		@include opacity-50;
 		@include cursor-not-allowed;
 		--color-bg: var(--bg-sunken);
@@ -461,16 +459,16 @@
 	// pill's `display: none` when pill-outline is applied as an override.
 	> input { display: revert; }
 
+	&:hover {
+		border-color: var(--color-accent);
+		z-index: 1;
+	}
+
 	&:has(> input:checked) {
 		border-color: var(--color-accent);
 		color: var(--color-accent);
 		// Reset pill's accent fill on checked — outline stays transparent.
 		background: transparent;
-		z-index: 1;
-	}
-
-	&:hover:not(:has(> input:checked)) {
-		border-color: var(--color-accent);
 		z-index: 1;
 	}
 }
@@ -491,17 +489,17 @@
 
 	> input { display: none; }
 
-	&:has(> input:checked) {
-		background-color: var(--color-accent);
-		color: var(--color-accent-fg);
-	}
-
-	&:hover:not(:has(> input:checked)) {
+	&:hover {
 		border-color: var(--color-border);
 	}
 
-	&:hover:has(> input:checked) {
-		background-color: var(--color-accent-hover);
+	&:has(> input:checked) {
+		background-color: var(--color-accent);
+		color: var(--color-accent-fg);
+
+		&:hover {
+			background-color: var(--color-accent-hover);
+		}
 	}
 }
 
@@ -549,24 +547,20 @@
 @mixin pills {
 	@include inline-flex;
 
-	> li > label:has(> input[type="checkbox"]),
-	> li > label:has(> input[type="radio"]) {
+	> li > label:has(> input:is([type="checkbox"], [type="radio"])) {
 		@include pill;
 		border-radius: 0;
 	}
 
-	> li:first-child > label:has(> input[type="checkbox"]),
-	> li:first-child > label:has(> input[type="radio"]) {
+	> li:first-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
 		border-radius: var(--radius) 0 0 var(--radius);
 	}
 
-	> li:last-child > label:has(> input[type="checkbox"]),
-	> li:last-child > label:has(> input[type="radio"]) {
+	> li:last-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
 		border-radius: 0 var(--radius) var(--radius) 0;
 	}
 
-	> li:only-child > label:has(> input[type="checkbox"]),
-	> li:only-child > label:has(> input[type="radio"]) {
+	> li:only-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
 		border-radius: var(--radius);
 	}
 }
@@ -587,24 +581,20 @@
 		}
 	}
 
-	> li > label:has(> input[type="checkbox"]),
-	> li > label:has(> input[type="radio"]) {
+	> li > label:has(> input:is([type="checkbox"], [type="radio"])) {
 		@include pill-outline;
 		border-radius: 0;
 	}
 
-	> li:first-child > label:has(> input[type="checkbox"]),
-	> li:first-child > label:has(> input[type="radio"]) {
+	> li:first-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
 		border-radius: var(--radius) 0 0 var(--radius);
 	}
 
-	> li:last-child > label:has(> input[type="checkbox"]),
-	> li:last-child > label:has(> input[type="radio"]) {
+	> li:last-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
 		border-radius: 0 var(--radius) var(--radius) 0;
 	}
 
-	> li:only-child > label:has(> input[type="checkbox"]),
-	> li:only-child > label:has(> input[type="radio"]) {
+	> li:only-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
 		border-radius: var(--radius);
 	}
 }
@@ -628,8 +618,7 @@
 		display: block;
 	}
 
-	> li > label:has(> input[type="checkbox"]),
-	> li > label:has(> input[type="radio"]) {
+	> li > label:has(> input:is([type="checkbox"], [type="radio"])) {
 		@include flex;
 		@include items-center;
 		@include justify-center;
@@ -799,8 +788,7 @@
 		--padding-y: var(--size-xs-up);
 		padding: var(--padding-y) var(--padding-x);
 
-		// Hover (unchecked) — subtle accent wash (nav hover).
-		&:hover:not(:has(> input:checked)) {
+		&:hover {
 			background-color: color-mix(in srgb, var(--color-accent) var(--tint-hover), transparent);
 		}
 
@@ -809,11 +797,10 @@
 			background-color: var(--color-accent-tint-strong);
 			color: var(--color-accent);
 			@include font-semibold;
-		}
 
-		// Selected + hover — keep the wash, don't darken (nav has no darken).
-		&:hover:has(> input:checked) {
-			background-color: var(--color-accent-tint-strong);
+			&:hover {
+				background-color: var(--color-accent-tint-strong);
+			}
 		}
 	}
 }

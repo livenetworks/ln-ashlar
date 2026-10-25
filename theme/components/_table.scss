@@ -9,8 +9,7 @@ table {
 
 	td.numeric,
 	td.num,
-	td:has(time),
-	td:has([data-ln-number]) {
+	td:has(:is(time, [data-ln-number])) {
 		@include font-tabular;
 	}
 
