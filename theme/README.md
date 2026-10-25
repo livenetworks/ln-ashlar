@@ -31,12 +31,11 @@ theme/
 
 To prevent browser style invalidation storms during interactive DOM mutations, all SCSS mixins and components adhere to the following rules:
 
-1. **Avoid Repeating `:has()` Inside Mixins:**
-   - Never embed complex `:has()` selectors inside mixins that are `@include`d across multiple component variants or classes.
-   - De-duplicate and hoist container-level `:has()` rules to global component scopes using `:is(...)` (e.g. `:is(.card, .section-card, [class*="card"]) > :is(main, a > main):has(...)`).
+1. **Consolidate Compound `:has()` Queries via `:is(...)`:**
+   - Within structural mixins (such as `panel-body` in `_card.scss`, `pills` in `_form.scss`, and numeric table cells in `_table.scss`), collapse chained `:has()` checks into a single `:has(> :is(...))` selector rather than authoring sequential `:has()` rules.
 
 2. **Prefer Natural Cascade over `:not(:has(...))`:**
-   - Negative `:not(:has(...))` selectors force the browser layout engine to traverse ancestor trees repeatedly to prove absence.
+   - Negative `:not(:has(...))` selectors force the browser layout engine into exhaustive negative ancestor traversals.
    - Use CSS source-order cascade instead:
      ```scss
      // ✅ RECOMMENDED: Natural cascade override
@@ -46,12 +45,13 @@ To prevent browser style invalidation storms during interactive DOM mutations, a
        color: var(--color-accent);
      }
      ```
+   - For multi-action stacking (e.g. table header sorting and filtering in `_table.scss`), declare base single-action rules with `:has(:is(...))` and override with double-action `:has(...):has(...)` rather than mutual `:not(:has(...))` exclusions.
 
 3. **Use Logical Properties for Sizing and Spacing:**
    - Mixins for padding and margin use modern CSS logical properties (`padding-inline`, `padding-block`, `margin-inline`, `margin-block`), reducing generated rules by 50% compared to separate physical properties (`-left`, `-right`, `-top`, `-bottom`).
 
-4. **Anchor Pseudo-Elements to Direct Elements:**
-   - Apply active indicators (e.g. `::before`) directly to the target element (`a::before`) with `position: relative`, rather than querying parent containers (`li:has(a.active)::before`).
+4. **Scope Container State Checks to Direct Children:**
+   - For container-level state indicators (e.g. navigation item active/hover lines on `li::before`), scope state queries strictly to direct children using `>` (e.g. `li:has(> a:hover)::before`, `li:has(> a.active)::before`). This avoids recursive descendant tree searches while preserving full-item indicator positioning and animations.
 
 ---
 

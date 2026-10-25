@@ -160,6 +160,7 @@
 
 * **Separation of Concerns:** Clearly separate visual styling (HTML chrome/wrappers and CSS classes, e.g. `.pills`, `.collapsible`) from functional JS triggers (`data-ln-*` attributes). Visual markup classes are recommended globally as design standards even if JS logic is absent.
 * **Styling `data-ln-*` Attributes:** `data-ln-*` attributes — hooks and state alike — are ordinary styling targets. Ashlar styles them through tokens (e.g. `[data-ln-sort][data-ln-sort-state="asc"]` in `theme/components/_sort.scss`). Project CSS may override any of it freely.
+* **CSSOM Performance & Selector Matching:** To eliminate browser style invalidation storms during high-frequency DOM mutations, SCSS stylesheets strictly observe four authoring invariants: (1) compound `:has()` consolidation via `:is(...)` within container mixins, (2) natural CSS source-order cascade over negative `:not(:has())` inversions, (3) CSS Logical Properties (`padding-inline`, `margin-inline`) for spacing mixins, and (4) direct-child scoping (`> a`) for container indicator states. Full doctrine: [`docs-mcp/doctrine/scss-architecture.md`](docs-mcp/doctrine/scss-architecture.md).
 * **Search Debounce:** Debounce is owned by `ln-api-connector` via `data-ln-api-connector-query-debounce` — see `components/ln-api-connector/README.md` for the full contract.
 
 ---

@@ -280,13 +280,13 @@ Certain visual behaviors are fixed library-wide defaults, not per-component choi
 
 To eliminate browser style invalidation storms during high-frequency DOM mutations and interactive events, the following authoring invariants must be preserved:
 
-1. **Mixin Selector De-duplication:**
-   - Complex `:has()` and combinator selectors MUST NOT be nested inside reusable mixins that are `@include`d repeatedly.
-   - Hoist shared structure to global scopes using `:is()` (e.g. `:is(.card, .section-card, [class*="card"]) > :is(main, a > main):has(...)`).
+1. **Compound `:has()` Selector Consolidation:**
+   - Within structural mixins (such as `panel-body` in `_card.scss`, `pills` in `_form.scss`, and numeric table cells in `_table.scss`), collapse chained `:has()` checks into a single `:has(> :is(...))` selector rather than authoring sequential `:has()` rules.
 2. **Natural Cascade Over Inversion (`:not(:has())` Forbidden in States):**
    - Avoid `:hover:not(:has(> input:checked))` or similar inverse selectors; they force browser layout engines into exhaustive negative ancestor traversals.
-   - Instead, declare base `:hover` followed by the state-specific override `&:has(> input:checked):hover`.
+   - Declare base `:hover` followed by the state-specific override `&:has(> input:checked)`.
+   - For multi-action stacking (e.g. table header sorting and filtering in `_table.scss`), declare base single-action rules with `:has(:is(...))` and override with double-action `:has(...):has(...)` rather than mutual `:not(:has(...))` exclusions.
 3. **Modern CSS Logical Properties:**
    - Structural spacing mixins use logical properties (`padding-inline`, `padding-block`, `margin-inline`, `margin-block`), cutting generated rules by 50% compared to physical directional properties.
-4. **Direct Pseudo-Element Attachment:**
-   - Active indicators (e.g. `::before`) must attach directly to the element (`a::before` with `position: relative`), never querying parent containers via `li:has(a.active)::before`.
+4. **Direct Child Scoping for Container Indicators:**
+   - For container-level state indicators (e.g. navigation item active/hover lines on `li::before`), scope state queries strictly to direct children using `>` (e.g. `li:has(> a:hover)::before`, `li:has(> a.active)::before`), avoiding recursive descendant searches while preserving full-item indicator bounds.

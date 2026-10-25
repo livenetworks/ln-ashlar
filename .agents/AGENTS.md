@@ -80,6 +80,7 @@
 
 ## 4. Visual Layer vs. Functional Layer Separation & Search Rules
 - **Separation of Concerns:** Clearly separate visual styling (HTML chrome/wrappers and CSS classes, e.g. `.pills`, `.collapsible`) from functional JS triggers (`data-ln-*` attributes). Visual markup classes are recommended globally as design standards even if JS logic is absent.
+- **CSSOM Performance & Selector Matching:** Follow the four SCSS performance authoring invariants: (1) compound `:has()` consolidation via `:is(...)`, (2) natural cascade over negative `:not(:has())`, (3) CSS Logical Properties (`padding-inline`, `margin-inline`), and (4) direct-child scoping (`> a`) for container indicator states.
 - **Search Debounce:** Debounce is owned by `ln-api-connector` via `data-ln-api-connector-query-debounce` — see `components/ln-api-connector/README.md` for the full contract.
 
 ## 5. UI/UX Confirmation & Gating Guidelines
