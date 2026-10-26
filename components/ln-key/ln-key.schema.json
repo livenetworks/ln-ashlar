@@ -35,6 +35,14 @@
 			"type": "string",
 			"description": "Target element ID that this shortcut badge is displayed for"
 		},
+		"data-ln-key-map": {
+			"direction": "author",
+			"sources": [
+				"src/ln-key.js"
+			],
+			"type": "string",
+			"description": "Container modifier context alias for external shortcut badges"
+		},
 		"data-ln-key-modifier": {
 			"direction": "author",
 			"sources": [

@@ -180,7 +180,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	};
 	const writeLog = function (pre, line) {
 		pre.textContent += '[' + stamp() + '] ' + line + '\n';
-		pre.scrollTop = pre.scrollHeight;
+		requestAnimationFrame(function () {
+			pre.scrollTop = pre.scrollHeight;
+		});
 	};
 
 	// ─── Demo 1 — Search-as-you-type (Path A) ─────────────────────────

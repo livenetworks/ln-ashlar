@@ -127,8 +127,8 @@ run('demo/admin/kbd.html', async ({ page }) => {
 
 		await page.keyboard.press('KeyZ');
 		assert((await triggers()).length === 5, 'An undeclared key (Z) triggers nothing');
-		await chord(['Control'], 'KeyJ');
-		assert((await triggers()).length === 5, 'Ctrl+J (declared only with Ctrl+Shift context) triggers nothing');
+		await chord(['Alt'], 'KeyJ');
+		assert((await triggers()).length === 5, 'Alt+J (declared only with Alt+Shift context) triggers nothing');
 	});
 
 	await section('Live event monitor and Clear Log', async () => {
@@ -231,14 +231,14 @@ run('demo/admin/kbd.html', async ({ page }) => {
 	await section('3. Declarative shortcut map (data-ln-key-map / data-ln-key-for)', async () => {
 		await load();
 
-		// The page states Ctrl+Shift+C / P / J trigger the export buttons.
+		// The page states Alt+Shift+C / P / J trigger the export buttons.
 		const expected = [
-			['KeyC', 'btn-export-csv', 'Ctrl+Shift+C'],
-			['KeyP', 'btn-export-pdf', 'Ctrl+Shift+P'],
-			['KeyJ', 'btn-export-json', 'Ctrl+Shift+J']
+			['KeyC', 'btn-export-csv', 'Alt+Shift+C'],
+			['KeyP', 'btn-export-pdf', 'Alt+Shift+P'],
+			['KeyJ', 'btn-export-json', 'Alt+Shift+J']
 		];
 		for (const [code, id, combo] of expected) {
-			await chord(['Control', 'Shift'], code);
+			await chord(['Alt', 'Shift'], code);
 			const got = await clicks();
 			assert(got[got.length - 1] === id && got.length > 0, `${combo} clicks #${id}`);
 		}

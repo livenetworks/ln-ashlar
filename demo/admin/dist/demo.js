@@ -43,7 +43,7 @@ document.querySelectorAll('.demo-split').forEach(function(split) {
 
 		document.addEventListener('click', function (e) {
 			if (!mq.matches) return;
-			if (!sidebar.classList.contains('open')) return;
+			if (sidebar.getAttribute('data-ln-toggle') !== 'open' && !sidebar.classList.contains('open')) return;
 			const target = e.target;
 			if (!(target instanceof Element)) return;
 			if (target.closest('#' + SIDEBAR_ID)) return;

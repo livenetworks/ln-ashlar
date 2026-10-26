@@ -35,7 +35,8 @@ import { browserAlreadyHandles, composeExternalShortcut, eventToShortcut, inferK
 
 	const FOR_ATTRIBUTES = {
 		'data-ln-key-for':      { type: 'string', effect: _syncKeyFor, description: 'Target element ID that this shortcut badge is displayed for' },
-		'data-ln-key-modifier': { type: 'string', description: 'Platform modifier text representation override' }
+		'data-ln-key-modifier': { type: 'string', description: 'Platform modifier text representation override' },
+		'data-ln-key-map':      { type: 'string', description: 'Container modifier context alias for external shortcut badges' }
 	};
 
 	const instances = new Set();
@@ -147,12 +148,12 @@ import { browserAlreadyHandles, composeExternalShortcut, eventToShortcut, inferK
 	}
 
 	_externalComponent.prototype._modifierContext = function () {
-		return this.dom.closest('[' + MODIFIER_ATTRIBUTE + ']');
+		return this.dom.closest('[' + MODIFIER_ATTRIBUTE + '], [data-ln-key-map]');
 	};
 
 	_externalComponent.prototype.shortcut = function () {
 		const context = this._modifierContext();
-		const modifier = context ? context.getAttribute(MODIFIER_ATTRIBUTE) : '';
+		const modifier = context ? (context.getAttribute(MODIFIER_ATTRIBUTE) || context.getAttribute('data-ln-key-map') || '') : '';
 		return composeExternalShortcut(modifier, this.dom.textContent);
 	};
 
@@ -180,12 +181,14 @@ import { browserAlreadyHandles, composeExternalShortcut, eventToShortcut, inferK
 	function _resolveTarget(selector, attribute) {
 		if (!selector) return null;
 		try {
-			const target = document.querySelector(selector);
+			const target = document.querySelector(selector) || document.getElementById(selector);
 			if (!target) {
-				console.warn('[ln-key] Target not found for ' + attribute + ' selector "' + selector + '".');
+				console.warn('[ln-key] Target not found for ' + attribute + ' selector or ID "' + selector + '".');
 			}
 			return target;
 		} catch (error) {
+			const byId = document.getElementById(selector);
+			if (byId) return byId;
 			console.warn('[ln-key] Invalid ' + attribute + ' selector "' + selector + '".');
 			return null;
 		}

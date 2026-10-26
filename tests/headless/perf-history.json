@@ -3186,6 +3186,96 @@
           }
         }
       }
+    },
+    {
+      "id": "run-2026-10-25T22-42-44-280Z",
+      "timestamp": "2026-10-25T22:42:44.280Z",
+      "git": {
+        "branch": "main",
+        "commit": "2e1f9bd0",
+        "message": "docs: document CSSOM performance, selector matching invariants, and logical properties"
+      },
+      "meta": {
+        "nodeVersion": "v22.21.1",
+        "platform": "win32",
+        "iterations": 1
+      },
+      "summary": {
+        "totalComponents": 1,
+        "fasterInTailwind": 1,
+        "fasterInAshlar": 0,
+        "avgAshlarMs": 740.26,
+        "avgTailwindMs": 322.18,
+        "overallSpeedupPercent": 56.5
+      },
+      "benchmarks": {
+        "validate": {
+          "name": "validate",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 740.26,
+          "tailwindMs": 322.18,
+          "speedupPercent": 56.5,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 4211,
+          "tailwindNodes": 6679,
+          "ashlarHeapMb": 1.8,
+          "tailwindHeapMb": 2.36,
+          "samples": {
+            "ashlar": [
+              740.26
+            ],
+            "tailwind": [
+              322.18
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "run-2026-10-25T22-44-51-002Z",
+      "timestamp": "2026-10-25T22:44:51.002Z",
+      "git": {
+        "branch": "main",
+        "commit": "2e1f9bd0",
+        "message": "docs: document CSSOM performance, selector matching invariants, and logical properties"
+      },
+      "meta": {
+        "nodeVersion": "v22.21.1",
+        "platform": "win32",
+        "iterations": 1
+      },
+      "summary": {
+        "totalComponents": 1,
+        "fasterInTailwind": 1,
+        "fasterInAshlar": 0,
+        "avgAshlarMs": 721.32,
+        "avgTailwindMs": 320.93,
+        "overallSpeedupPercent": 55.5
+      },
+      "benchmarks": {
+        "validate": {
+          "name": "validate",
+          "success": true,
+          "pageErrors": [],
+          "ashlarMs": 721.32,
+          "tailwindMs": 320.93,
+          "speedupPercent": 55.5,
+          "fasterEngine": "tailwind",
+          "ashlarNodes": 6024,
+          "tailwindNodes": 9475,
+          "ashlarHeapMb": 2.38,
+          "tailwindHeapMb": 3.33,
+          "samples": {
+            "ashlar": [
+              721.32
+            ],
+            "tailwind": [
+              320.93
+            ]
+          }
+        }
+      }
     }
   ]
 }
