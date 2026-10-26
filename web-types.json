@@ -944,6 +944,13 @@
 					}
 				},
 				{
+					"name": "data-ln-key-map",
+					"description": "Container modifier context alias for external shortcut badges",
+					"value": {
+						"type": "string"
+					}
+				},
+				{
 					"name": "data-ln-key-modifier",
 					"description": "Platform modifier text representation override",
 					"value": {

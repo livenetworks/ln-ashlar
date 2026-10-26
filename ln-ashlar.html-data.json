@@ -718,6 +718,10 @@
 			"description": "Target element ID that this shortcut badge is displayed for"
 		},
 		{
+			"name": "data-ln-key-map",
+			"description": "Container modifier context alias for external shortcut badges"
+		},
+		{
 			"name": "data-ln-key-modifier",
 			"description": "Platform modifier text representation override"
 		},

@@ -387,7 +387,9 @@ input.lnValidate.destroy();    // Detach listeners</code></pre>
 
 	const appendLog = function (pre, line) {
 		pre.textContent += (pre.textContent ? '\n' : '') + line;
-		pre.scrollTop = pre.scrollHeight;
+		requestAnimationFrame(function () {
+			pre.scrollTop = pre.scrollHeight;
+		});
 	};
 
 	// ─── Custom validation: password confirmation ──────────────

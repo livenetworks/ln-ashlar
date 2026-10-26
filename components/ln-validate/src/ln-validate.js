@@ -45,10 +45,11 @@ import { hasInitialValue, isFieldValid, resolveActiveErrorKeys } from './validat
 			if (!error) return;
 			self._customErrors.add(error);
 			self._touched = true;
-			const parent = dom.closest('.form-element');
-			if (parent) {
-				const el = parent.querySelector('[' + ERROR_SELECTOR + '="' + error + '"]');
-				if (el) el.classList.remove('hidden');
+			const items = self._getErrorItems();
+			if (items) {
+				for (let i = 0; i < items.length; i++) {
+					if (items[i].key === error) items[i].el.classList.remove('hidden');
+				}
 			}
 			dom.classList.remove(CSS_VALID);
 			dom.classList.add(CSS_INVALID);
@@ -57,20 +58,22 @@ import { hasInitialValue, isFieldValid, resolveActiveErrorKeys } from './validat
 
 		this._onClearCustom = function (e) {
 			const error = e.detail && e.detail.error;
-			const parent = dom.closest('.form-element');
+			const items = self._getErrorItems();
 			if (error) {
 				self._customErrors.delete(error);
-				if (parent) {
-					const el = parent.querySelector('[' + ERROR_SELECTOR + '="' + error + '"]');
-					if (el) el.classList.add('hidden');
+				if (items) {
+					for (let i = 0; i < items.length; i++) {
+						if (items[i].key === error) items[i].el.classList.add('hidden');
+					}
 				}
 			} else {
-				self._customErrors.forEach(function (err) {
-					if (parent) {
-						const el = parent.querySelector('[' + ERROR_SELECTOR + '="' + err + '"]');
-						if (el) el.classList.add('hidden');
+				if (items) {
+					for (let i = 0; i < items.length; i++) {
+						if (self._customErrors.has(items[i].key)) {
+							items[i].el.classList.add('hidden');
+						}
 					}
-				});
+				}
 				self._customErrors.clear();
 			}
 			if (self._touched) self.validate();
@@ -127,23 +130,39 @@ import { hasInitialValue, isFieldValid, resolveActiveErrorKeys } from './validat
 		return this;
 	}
 
+	_component.prototype._getErrorItems = function () {
+		if (this._errorItems !== undefined) return this._errorItems;
+		const parent = this.dom.closest('.form-element');
+		if (parent) {
+			const errorList = parent.querySelector('[' + ERRORS_SELECTOR + ']');
+			if (errorList) {
+				const nodeList = errorList.querySelectorAll('[' + ERROR_SELECTOR + ']');
+				this._errorItems = [];
+				for (let i = 0; i < nodeList.length; i++) {
+					this._errorItems.push({
+						el: nodeList[i],
+						key: nodeList[i].getAttribute(ERROR_SELECTOR)
+					});
+				}
+				return this._errorItems;
+			}
+		}
+		this._errorItems = null;
+		return null;
+	};
+
 	_component.prototype.validate = function () {
 		const dom = this.dom;
 		const validity = dom.validity;
 		const isValid = isFieldValid(validity, this._customErrors.size);
 		const activeErrors = resolveActiveErrorKeys(validity, this._customErrors);
 
-		const parent = dom.closest('.form-element');
-		if (parent) {
-			const errorList = parent.querySelector('[' + ERRORS_SELECTOR + ']');
-			if (errorList) {
-				const items = errorList.querySelectorAll('[' + ERROR_SELECTOR + ']');
-				for (let i = 0; i < items.length; i++) {
-					const errorKey = items[i].getAttribute(ERROR_SELECTOR);
-					const shouldHide = !activeErrors.includes(errorKey);
-					if (items[i].classList.contains('hidden') !== shouldHide) {
-						items[i].classList.toggle('hidden', shouldHide);
-					}
+		const items = this._getErrorItems();
+		if (items) {
+			for (let i = 0; i < items.length; i++) {
+				const shouldHide = !activeErrors.includes(items[i].key);
+				if (items[i].el.classList.contains('hidden') !== shouldHide) {
+					items[i].el.classList.toggle('hidden', shouldHide);
 				}
 			}
 		}
@@ -173,12 +192,11 @@ import { hasInitialValue, isFieldValid, resolveActiveErrorKeys } from './validat
 		if (this.dom.classList.contains(CSS_INVALID)) this.dom.classList.remove(CSS_INVALID);
 		if (this.dom.hasAttribute('aria-invalid')) this.dom.removeAttribute('aria-invalid');
 
-		const parent = this.dom.closest('.form-element');
-		if (parent) {
-			const items = parent.querySelectorAll('[' + ERROR_SELECTOR + ']');
+		const items = this._getErrorItems();
+		if (items) {
 			for (let i = 0; i < items.length; i++) {
-				if (!items[i].classList.contains('hidden')) {
-					items[i].classList.add('hidden');
+				if (!items[i].el.classList.contains('hidden')) {
+					items[i].el.classList.add('hidden');
 				}
 			}
 		}
@@ -205,6 +223,7 @@ import { hasInitialValue, isFieldValid, resolveActiveErrorKeys } from './validat
 
 		this.dom.classList.remove(CSS_VALID, CSS_INVALID);
 		this.dom.removeAttribute('aria-invalid');
+		this._errorItems = null;
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

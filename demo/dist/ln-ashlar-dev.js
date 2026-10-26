@@ -931,6 +931,7 @@ const M = /* @__PURE__ */ new Set([
   "data-ln-key",
   "data-ln-key-allow-input",
   "data-ln-key-for",
+  "data-ln-key-map",
   "data-ln-key-modifier",
   "data-ln-key-target",
   "data-ln-link",

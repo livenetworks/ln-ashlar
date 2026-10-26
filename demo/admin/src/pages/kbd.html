@@ -60,20 +60,58 @@
 				Save Draft (<kbd>Ctrl</kbd>+<kbd>S</kbd>)
 			</button>
 
-			<button type="button" class="btn btn-success" id="btn-publish-post" data-ln-key="Alt+P">
+			<button type="button" class="btn btn-success" id="btn-publish-post" data-ln-key="Alt+P" data-ln-popover-for="demo-key-popover">
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-send"></use></svg>
-				Publish (<kbd>Alt</kbd>+<kbd>P</kbd>)
+				Publish Options (<kbd>Alt</kbd>+<kbd>P</kbd>)
 			</button>
 
-			<button type="button" class="btn btn-secondary" id="btn-new-item" data-ln-key="Alt+N">
+			<button type="button" class="btn btn-secondary" id="btn-new-item" data-ln-key="Alt+N" data-ln-modal-for="demo-key-modal">
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
-				New Item (<kbd>Alt</kbd>+<kbd>N</kbd>)
+				New Item Modal (<kbd>Alt</kbd>+<kbd>N</kbd>)
 			</button>
 
 			<button type="button" class="btn btn-outline" id="btn-cancel-action" data-ln-key="Escape">
 				Cancel (<kbd>Esc</kbd>)
 			</button>
 		</div>
+
+		<!-- Popover triggered via Alt+P -->
+		<div data-ln-popover id="demo-key-popover" style="padding: var(--size-md); min-width: 240px;">
+			<header style="margin-bottom: var(--size-sm); border-bottom: 1px solid var(--border-color); padding-bottom: var(--size-xs);">
+				<strong>Publish Actions</strong> (<kbd>Alt</kbd>+<kbd>P</kbd>)
+			</header>
+			<div style="display: flex; flex-direction: column; gap: var(--size-xs);">
+				<button type="button" class="btn btn-sm btn-success" id="btn-popover-publish-now">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-send"></use></svg> Publish Immediately
+				</button>
+				<button type="button" class="btn btn-sm btn-outline" id="btn-popover-schedule">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-calendar"></use></svg> Schedule Post...
+				</button>
+			</div>
+		</div>
+
+		<!-- Modal triggered via Alt+N -->
+		<dialog class="ln-modal" data-ln-modal id="demo-key-modal">
+			<form action="#" onsubmit="return false;">
+				<header>
+					<h3>New Item</h3>
+					<button type="button" data-ln-modal-close aria-label="Close">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+					</button>
+				</header>
+				<main>
+					<p>This modal was opened via the <kbd>Alt</kbd>+<kbd>N</kbd> keyboard shortcut or clicking the New Item button.</p>
+					<div class="form-group" style="margin-top: var(--size-sm);">
+						<label for="demo-modal-title">Item Title</label>
+						<input type="text" id="demo-modal-title" class="form-control" placeholder="Enter title...">
+					</div>
+				</main>
+				<footer>
+					<button type="button" class="btn btn-outline" data-ln-modal-close>Cancel (<kbd>Esc</kbd>)</button>
+					<button type="button" class="btn btn-primary" id="btn-modal-save" data-ln-modal-close>Create Item</button>
+				</footer>
+			</form>
+		</dialog>
 	</main>
 	<script type="text/plain" data-demo-scss>
 	/* Direct shortcut declaration */
@@ -126,10 +164,10 @@
 		<h3>3. Declarative Shortcut Map (<code>data-ln-key-map</code> &amp; <code>data-ln-key-for</code>)</h3>
 	</header>
 	<main>
-		<p>Combine a container's <code>data-ln-key-map="Ctrl+Shift"</code> modifier context with individual <code>&lt;kbd data-ln-key-for="#target"&gt;Key&lt;/kbd&gt;</code> elements to generate composed shortcuts automatically without duplicate attribute boilerplate.</p>
+		<p>Combine a container's <code>data-ln-key-modifier="Alt+Shift"</code> modifier context with individual <code>&lt;kbd data-ln-key-for="#target"&gt;Key&lt;/kbd&gt;</code> elements to generate composed shortcuts automatically without colliding with browser-reserved hotkeys.</p>
 
-		<div data-ln-key-map="Ctrl+Shift" class="alert-box" style="margin-top: var(--size-sm);">
-			<h4>Bulk Export Menu (Parent Modifier: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>)</h4>
+		<div data-ln-key-modifier="Alt+Shift" data-ln-key-map="Alt+Shift" class="alert-box" style="margin-top: var(--size-sm);">
+			<h4>Bulk Export Menu (Parent Modifier: <kbd>Alt</kbd>+<kbd>Shift</kbd>)</h4>
 			
 			<div class="demo-actions" style="margin-top: var(--size-xs);">
 				<button type="button" class="btn btn-secondary" id="btn-export-csv">
@@ -145,7 +183,7 @@
 				</button>
 			</div>
 			<small class="text-muted" style="display: block; margin-top: var(--size-xs);">
-				Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd>, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>, or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>J</kbd> to trigger these actions.
+				Press <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd>, <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>, or <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>J</kbd> to trigger these actions safely across all browsers.
 			</small>
 		</div>
 	</main>
@@ -219,7 +257,7 @@
 					</tr>
 					<tr>
 						<td>Export Package</td>
-						<td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></td>
+						<td><kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></td>
 						<td>Bulk Operations Menu</td>
 					</tr>
 				</tbody>
@@ -237,9 +275,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	let isFirstLog = true;
 
 	function showToast(title, message, type) {
-		document.dispatchEvent(new CustomEvent('ln-toast:show', {
-			detail: { title: title, message: message, type: type || 'info' },
-			bubbles: true
+		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+			detail: { title: title, message: message, type: type || 'info' }
 		}));
 	}
 
@@ -299,14 +336,42 @@ document.addEventListener('DOMContentLoaded', function () {
 	const publishBtn = document.getElementById('btn-publish-post');
 	if (publishBtn) {
 		publishBtn.addEventListener('click', function () {
-			showToast('Post Published', 'Your post was successfully published.', 'success');
+			showToast('Publish Options', 'Publish options popover toggled.', 'info');
 		});
 	}
 
 	const newItemBtn = document.getElementById('btn-new-item');
 	if (newItemBtn) {
 		newItemBtn.addEventListener('click', function () {
-			showToast('New Item', 'New item dialog opened.', 'info');
+			showToast('New Item Modal', 'New item modal opened via Alt+N.', 'info');
+		});
+	}
+
+	const modalSaveBtn = document.getElementById('btn-modal-save');
+	if (modalSaveBtn) {
+		modalSaveBtn.addEventListener('click', function () {
+			const titleInput = document.getElementById('demo-modal-title');
+			const val = titleInput ? titleInput.value.trim() : '';
+			showToast('Item Created', val ? `Item "${val}" created.` : 'New item saved successfully.', 'success');
+			if (titleInput) titleInput.value = '';
+		});
+	}
+
+	const popoverPubBtn = document.getElementById('btn-popover-publish-now');
+	if (popoverPubBtn) {
+		popoverPubBtn.addEventListener('click', function () {
+			showToast('Published', 'Document published immediately!', 'success');
+			const popover = document.getElementById('demo-key-popover');
+			if (popover && popover.lnPopover) popover.lnPopover.close();
+		});
+	}
+
+	const popoverSchedBtn = document.getElementById('btn-popover-schedule');
+	if (popoverSchedBtn) {
+		popoverSchedBtn.addEventListener('click', function () {
+			showToast('Scheduled', 'Publication scheduled for tomorrow at 09:00.', 'info');
+			const popover = document.getElementById('demo-key-popover');
+			if (popover && popover.lnPopover) popover.lnPopover.close();
 		});
 	}
 
