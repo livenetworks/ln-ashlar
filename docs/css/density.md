@@ -57,8 +57,8 @@ form — comfortable IS the default `:root` state (values live in
 | `--text-body-md`, `--lh-body-md` | yes | Body paragraphs, table cells, form inputs, nav link text |
 | `--font-size`, `--line-height` (explicit rebind) | yes | Logical font tokens — mirrored from `--text-body-md` / `--lh-body-md` so form inputs and any mixin reading `var(--font-size)` shrink reliably. See §"Explicit `--font-size` rebind" below. |
 | `--text-body-sm`, `--lh-body-sm` | yes | Small body text, breadcrumbs, nav links |
-| `--text-label-md`, `--lh-label-md` | yes | Form labels (comfortable/spacious), h6 |
-| `--text-label-sm`, `--lh-label-sm` | yes (comfortable + spacious up-tiers only) | Form labels (`form-label`), table column headers (`th`) — dense base inherits `:root` values |
+| `--text-label-md`, `--lh-label-md` | yes | Form labels (`form-label`, all tiers), h6 |
+| `--text-label-sm`, `--lh-label-sm` | yes (comfortable + spacious up-tiers only) | Table column headers (`th`) — dense base inherits `:root` values |
 | `--text-caption`, `--lh-caption` | yes (comfortable + spacious up-tiers only) | Modal subtitle `p`, validation error lists — dense base inherits `:root` values |
 | `--text-title-md/sm`, `--lh-title-md/sm` | yes | h4, h5, panel header h3 |
 | `--text-heading-sm/md/lg`, `--lh-heading-*` | yes | h3, h2, stat-card value |

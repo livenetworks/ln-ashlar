@@ -1,5 +1,8 @@
 # Design Tokens
 
+For the Soft preset and optional `--panel-*` / `--app-content-*` token
+contracts, see [Theming — Soft preset](theming.md#soft-preset).
+
 > **Theming:** see `docs/css/theming.md` for dark mode and
 > consumer theme extensions.
 

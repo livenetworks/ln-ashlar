@@ -104,6 +104,9 @@
 @mixin modal-panel {
 	@include section-card;
 	margin-bottom: 0;
+	// Overlays take the larger radius step — same corner as a resting
+	// card makes the dialog read as another panel, not a layer above.
+	border-radius: var(--modal-radius, var(--radius-lg));
 	// Explicit role-scale read — modals use max elevation (deeper than
 	// the --shadow-floating default used by floating panels).
 	box-shadow: var(--shadow-xl);

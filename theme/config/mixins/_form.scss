@@ -17,8 +17,10 @@
 
 @mixin form-label {
 	@include block;
-	@include typography(label-sm);
-	@include font-semibold;
+	// label-md / medium — a 12px semibold caption over every field reads
+	// as dialog-box chrome; field labels sit one step under body text.
+	@include typography(label-md);
+	@include font-medium;
 	color: var(--color-fg);
 	// Structural label-to-input gap (not shell rhythm).
 	--margin-block: var(--size-xs);
@@ -83,25 +85,40 @@
 
 @mixin _form-focus-style {
 	border-color: var(--color-accent);
-	@include focus-background-shift;
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 20%, transparent);
 }
 
 // ─── Text inputs, textareas, selects ────────────────────────────
 
 @mixin form-input {
 	@include w-full;
-	--padding-y: var(--input-padding-y, var(--size-sm));
-	--padding-x: var(--size-md);
+	--padding-y: var(--input-padding-y, var(--size-xs-up));
+	--padding-x: var(--size-sm-up);
 	padding: var(--padding-y) var(--padding-x);
 	font-size: var(--font-size);
-	line-height: var(--line-height);
+	// Shared control line box — same height as a sibling button.
+	line-height: var(--control-line-height);
 	color: var(--color-fg);
-	--color-bg: var(--input-bg, var(--bg-recessed));
+	// Enabled fields read as writable surfaces: base fill, strong border,
+	// hairline shadow. A grey fill is reserved for :disabled.
+	--color-bg: var(--input-bg, var(--bg-base));
+	--color-border: var(--input-border, var(--border-strong));
 	background: var(--color-bg);
 	@include border;
 	border-radius: var(--radius);
-	@include transition;
+	box-shadow: var(--input-shadow, var(--shadow-xs));
+	// Colour + ring only — `all` would animate padding/font-size when the
+	// density tier switches, making fields visibly "breathe".
+	transition:
+		color var(--transition-base),
+		background-color var(--transition-base),
+		border-color var(--transition-base),
+		box-shadow var(--transition-base);
 	outline: none;
+
+	&:hover:not(:disabled):not(:focus-visible) {
+		--color-border: var(--input-border-hover, var(--border-strong-hover));
+	}
 
 	&:focus-visible {
 		@include _form-focus-style;
@@ -117,6 +134,7 @@
 		@include cursor-not-allowed;
 		--color-bg: var(--bg-sunken);
 		background: var(--color-bg);
+		box-shadow: none;
 	}
 
 	// Hide native UA clear button on <input type="search"> — we never use it;
@@ -128,6 +146,8 @@
 }
 
 @mixin form-textarea {
+	// Multi-line text keeps the reading line-height, not the control box.
+	line-height: var(--line-height);
 	min-height: 6rem;
 	resize: vertical;
 }
@@ -371,7 +391,8 @@
 		border-color: var(--color-accent);
 		// Inline SVG: native <input type="checkbox"> cannot contain child elements,
 		// so a data URI is the only way to embed a checkmark here.
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+		// --form-check-mark: theme hook (dark mode swaps to a dark tick).
+		background-image: var(--form-check-mark, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E"));
 		background-size: 0.75rem;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -416,12 +437,13 @@
 	@include flex;
 	@include items-center;
 	gap: var(--gap);
-	--padding-y: var(--input-padding-y, var(--size-sm));
+	--padding-y: var(--input-padding-y, var(--size-xs-up));
 	--padding-x: var(--size-md);
 	padding: var(--padding-y) var(--padding-x);
 	@include cursor-pointer;
 	@include transition;
 	@include text-sm;
+	line-height: var(--control-line-height);
 	@include font-medium;
 	margin-bottom: 0;
 	border-radius: var(--radius);

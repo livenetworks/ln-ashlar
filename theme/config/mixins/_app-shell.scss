@@ -123,13 +123,13 @@
 
 	// Equalize height across icon-only and text-only siblings AND
 	// search-icon labels. Geometric — locks the border-box chrome to
-	// the icon-content height (1.25rem) plus rebound --padding-y and
+	// the shared control line box (--control-line-height) plus rebound --padding-y and
 	// border-width on both edges. Buttons rebind --padding-y below;
 	// search labels read --padding-y from @mixin form-input-icon-group
 	// (same var(--size-xs) value), so the formula resolves identically
 	// for both. Border-box is the project default (scss/base/_reset.scss).
 	:is(button, label) {
-		min-height: calc(1.25rem + 2 * var(--padding-y) + 2 * var(--border-width));
+		min-height: calc(var(--control-line-height) + 2 * var(--padding-y) + 2 * var(--border-width));
 	}
 
 	button {
@@ -220,10 +220,10 @@
 		// `> *:first-child` / `> *:last-child` margins below — those
 		// margins scroll past with the content, leaving sticky to pin
 		// against the actual section edges.
-		padding-inline: var(--padding-x);
+		padding-inline: var(--app-content-padding-x, var(--padding-x));
 		@include overflow-auto;
 		@include w-full;
-		@include stack(var(--gap));
+		@include stack(var(--app-content-gap, var(--gap)));
 		@include transition;
 
 		// Children keep intrinsic height — wrapper's overflow-auto
@@ -241,11 +241,11 @@
 		// descendants (sticky top:0 toolbar/thead, sticky bottom:0 footer)
 		// to the inside of the padding edge.
 		> *:first-child {
-			margin-block-start: var(--padding-x);
+			margin-block-start: var(--app-content-padding-x, var(--padding-x));
 		}
 
 		> *:last-child {
-			margin-block-end: var(--padding-x);
+			margin-block-end: var(--app-content-padding-x, var(--padding-x));
 		}
 	}
 }
@@ -307,6 +307,6 @@
 	max-width: var(--max-w-container);
 	@include mx(auto);
 	@include w-full;
-	@include stack(var(--gap));
+	@include stack(var(--app-content-gap, var(--gap)));
 }
 

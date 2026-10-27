@@ -75,7 +75,7 @@
 
 	p {
 		margin: 0;
-		font-size: var(--font-size-sm);
+		@include typography(body-sm);
 		line-height: 1.6;
 	}
 }

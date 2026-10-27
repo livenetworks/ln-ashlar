@@ -8,6 +8,12 @@ Complete reference for all `@include` mixins, design tokens, and the icon system
 
 ## How to Use
 
+For cards that must fit the space left by a sidebar, use `@include grid-auto`.
+It creates an auto-fit grid with a preferred minimum of
+`--grid-item-min-width` (14rem), shrinking safely to one column in narrow parents.
+Set `--gap` on the gallery and optionally pass a minimum-width token to
+`grid-auto($min)`. Unlike `grid-4`, it does not use viewport breakpoints.
+
 Every SCSS file starts with:
 ```scss
 @use '../config/mixins' as *;

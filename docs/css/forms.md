@@ -4,7 +4,32 @@ File: `theme/components/_form.scss`.
 
 ## Inputs
 
-All `input`, `textarea`, `select` are styled globally with border, rounded-md, focus ring. Full width by default.
+All `input`, `textarea`, `select` are styled globally. Full width by default.
+
+- **Surface** — enabled fields use the base surface (`--bg-base`), a strong
+  border (`--border-strong`) and a hairline `--shadow-xs`. The sunken grey
+  fill is reserved for `:disabled`, so a writable field never looks disabled.
+  Hover darkens the border (`--border-strong-hover`).
+- **Focus** — accent border plus a 3px accent ring at 20%. Validation states
+  use the same ring geometry in error/success colour.
+- **Theme hooks** (optional, no defaults): `--input-bg`, `--input-border`,
+  `--input-border-hover`, `--input-shadow`.
+
+### Control size contract
+
+Buttons, text inputs, selects and pill labels share one line box
+(`--control-line-height`) and one vertical padding per density tier, so an
+input next to a button always lines up:
+
+| Density | Line box | Padding-y (`--btn-padding-y` / `--input-padding-y`) | Height |
+|---|---|---|---|
+| Base / compact | 22px | 6px | 36px |
+| Comfortable | 26px | 8px | 44px |
+| Spacious | 28px | 12px | 54px |
+
+`textarea` keeps the reading line-height (`--line-height`). Header controls
+(`panel-header`, `app-header-actions`) lock their min-height to the same line
+box. `btn-sm` / `btn-lg` deliberately step off the contract.
 
 ## Icon Groups
 

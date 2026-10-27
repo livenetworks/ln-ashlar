@@ -4,6 +4,14 @@
 
 // Layout — grid, stack, container
 
+// Respond to available parent width, including sidebars and panel gutters.
+// The min() allows a single item to shrink below its preferred minimum.
+@mixin grid-auto($min: var(--grid-item-min-width)) {
+	display: grid;
+	gap: var(--gap);
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, #{$min}), 1fr));
+}
+
 @mixin _grid-base {
 	display: grid;
 	--gap: var(--size-lg);
@@ -106,6 +114,7 @@
 
 	> * {
 		--radius: 0;
+		--panel-radius: 0;
 		--shadow: none;
 	}
 

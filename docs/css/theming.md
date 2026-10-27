@@ -2,6 +2,46 @@
 
 File: `theme/config/_theme.scss`. Added in v1.1.
 
+## Soft preset
+
+```html
+<html data-theme="soft" data-density="comfortable">
+```
+
+Soft takes its visual cues from the MEPSO Blue concept: a slate page canvas,
+white surfaces, blue accents, quieter shadows and generous panel spacing.
+It is the admin demo's initial theme; saved theme and density choices still win.
+Use the palette menu to compare it with Light, Dark, Ocean, Sunset, Midnight
+and Glass. Explicit themes stay selected even when the OS prefers dark mode.
+
+The preset contains **only custom-property declarations**. The library's
+existing recipes render every component, including consumer semantic selectors.
+
+| Token | Soft value / purpose |
+| --- | --- |
+| `--color-primary` | `201 96% 32%` — deeper blue for white button text |
+| `--bg-recessed` | `#f1f5f9` — page canvas |
+| `--bg-base`, `--bg-elevated` | `#ffffff` — surfaces |
+| `--bg-sunken` | `#f8fafc` — quiet table and footer chrome |
+| `--border-subtle` | `#e2e8f0` |
+| `--radius-sm/md/lg/xl` | `6 / 10 / 16 / 22px` at a 16px root size |
+| `--panel-radius` | `var(--radius-lg)` — cards and section cards |
+| `--panel-margin-block` | `0` — shell gap owns section-card spacing |
+| `--card-nested-shadow` | `none` — nested cards stay visually quiet |
+| `--app-content-padding-x` | Fluid `16–32px` gutters and scroll-flow edge margins |
+| `--app-content-gap` | `24px` — content and wrapper stack rhythm |
+
+`--font-sans` prefers Plus Jakarta Sans; the demo loads it. Consumers may
+load that font themselves or use the Inter/system fallback without a request
+from the library. Density remains independent: Comfortable supplies 16px body
+type and roomier controls/cards; Compact and Spacious continue to work.
+
+The optional panel/content tokens above have fallbacks in the card and
+app-shell mixins, so existing themes retain their geometry. `flat-stack`
+resets `--panel-radius` alongside `--radius` to preserve joined panels.
+Change these values in `_theme.scss` to tune the preset; no component CSS
+overrides are needed.
+
 ## Philosophy
 
 ln-ashlar supports a dark-mode variant plus any number of consumer-defined

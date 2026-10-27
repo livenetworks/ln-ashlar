@@ -38,7 +38,7 @@
 
 	// Row hover transition color. Default to a discrete tint of the primary color
 	// mixed with transparent to create a harmonious background shift across themes.
-	--bg-row-hover: var(--color-row-hover, color-mix(in srgb, var(--color-primary) 6%, transparent));
+	--bg-row-hover: var(--color-row-hover, color-mix(in srgb, var(--color-accent) 6%, transparent));
 
 	thead {
 		--color-bg: var(--bg-sunken);

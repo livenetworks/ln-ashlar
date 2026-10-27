@@ -1,60 +1,48 @@
 <!-- ln-page: title="ashlar-gui — Demo" h1="Dashboard" -->
 
-<!-- Philosophy -->
-				<section class="section-card">
-					<header><h3>Philosophy</h3></header>
-					<main class="prose">
-						<h4>An ashlar library.</h4>
-						<p>An <em>ashlar</em> is a finely cut block of stone — small, regular, ready to assemble. Cathedrals are built from ashlars. So are walls.</p>
-						<p>ln-ashlar gives you the blocks. Tokens, mixins, components — small primitives, well-formed, predictable. You stack them into the building you actually need.</p>
+<!-- Dashboard overview -->
+<section id="dashboard-welcome" aria-labelledby="dashboard-title">
+	<div class="dashboard-intro">
+		<p class="dashboard-eyebrow">ASHLAR WORKSPACE</p>
+		<h2 id="dashboard-title">A little space. A clearer view.</h2>
+		<p>Explore the building blocks for your next application.</p>
+	</div>
+	<a class="btn" href="forms.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-right"></use></svg> Explore components</a>
+</section>
 
-						<h4>How</h4>
-						<p><strong>Token-driven.</strong> Spacing, color, radius, shadow — every value lives in <code>--size-*</code>, <code>--color-*</code>, <code>--radius-*</code>. Change one token, every consumer reacts. No hardcoded literals in components.</p>
-						<p><strong>Recipe + application.</strong> Each pattern has two layers: a <code>@mixin</code> (the recipe) and a default selector (the application). Use the default, apply the recipe to your own semantic selector, or rebind the surface tokens. Three first-class paths.</p>
-						<p><strong>Zero dependencies.</strong> Vanilla JS IIFE components, CustomEvent communication, MutationObserver auto-init. No framework, no runtime — drop the SCSS and JS into any project.</p>
-						<p><strong>Themes are palette only.</strong> A theme rebinds vocabulary tokens at its own <code>:root</code>. It never restructures a component. Switching themes is a token swap, not a rewrite.</p>
+<section id="stats" aria-label="Library at a glance">
+	<ul>
+		<li>
+			<header><h3>Design themes</h3><span class="dashboard-stat-icon"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-palette"></use></svg></span></header>
+			<strong><data value="7" data-ln-number>7</data></strong>
+			<p>One system, different personalities</p>
+		</li>
+		<li>
+			<header><h3>Density levels</h3><span class="dashboard-stat-icon"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-adjustments-horizontal"></use></svg></span></header>
+			<strong><data value="3" data-ln-number>3</data></strong>
+			<p>From focused to spacious</p>
+		</li>
+		<li>
+			<header><h3>Runtime dependencies</h3><span class="dashboard-stat-icon"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-code"></use></svg></span></header>
+			<strong><data value="0" data-ln-number>0</data></strong>
+			<p>Built on native web standards</p>
+		</li>
+		<li>
+			<header><h3>Demo pages</h3><span class="dashboard-stat-icon"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-dashboard"></use></svg></span></header>
+			<strong><data value="62" data-ln-number>62</data></strong>
+			<p>Working examples to make your own</p>
+		</li>
+	</ul>
+</section>
 
-						<h4>Why</h4>
-						<p>A library should give you primitives and get out of the way. Most CSS frameworks give you a finished building — beautiful for one project, awkward for the next.</p>
-						<p>ln-ashlar gives you the stones. Stack them however your project needs. The stones are simple. The buildings can be as complicated as you want.</p>
-					</main>
-				</section>
-
-<!-- Stats -->
-				<section id="stats">
-					<ul>
-						<li>
-							<h3>Components</h3>
-							<strong>18</strong>
-							<div class="progress">
-								<div data-ln-progress="18" data-ln-progress-max="20" class="success"></div>
-							</div>
-						</li>
-						<li>
-							<h3>JS Modules</h3>
-							<strong>10</strong>
-							<div class="progress">
-								<div data-ln-progress="10" data-ln-progress-max="12" class="success"></div>
-							</div>
-						</li>
-						<li>
-							<h3>SCSS Files</h3>
-							<strong>22</strong>
-							<div class="progress">
-								<div data-ln-progress="22" data-ln-progress-max="25" class="warning"></div>
-							</div>
-						</li>
-						<li>
-							<h3>Demo Pages</h3>
-							<strong>14</strong>
-							<div class="progress">
-								<div data-ln-progress="14" data-ln-progress-max="14" class="success"></div>
-							</div>
-						</li>
-					</ul>
-				</section>
-
-				<!-- Modal Demo -->
+<nav id="dashboard-shortcuts" aria-label="Explore the library">
+	<ul>
+		<li><a href="cards.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-dashboard"></use></svg><h3>Compose your workspace</h3><p>Cards, sections and layouts that fit together.</p></a></li>
+		<li><a href="tables.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-table"></use></svg><h3>Bring clarity to your data</h3><p>Tables, filters and status indicators in context.</p></a></li>
+		<li><a href="forms.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-forms"></use></svg><h3>Make every input count</h3><p>Forms, validation and accessible controls.</p></a></li>
+	</ul>
+</nav>
+<!-- Modal Demo -->
 				<section class="section-card">
 					<header><h3>Modal</h3></header>
 					<main>
@@ -236,5 +224,25 @@
 &lt;!-- Or as npm module --&gt;
 import 'ln-ashlar';
 import 'ln-ashlar/dist/ln-ashlar.css';</code></pre>
+					</main>
+				</section>
+
+<!-- Philosophy -->
+				<section class="section-card">
+					<header><h3>Philosophy</h3></header>
+					<main class="prose">
+						<h4>An ashlar library.</h4>
+						<p>An <em>ashlar</em> is a finely cut block of stone — small, regular, ready to assemble. Cathedrals are built from ashlars. So are walls.</p>
+						<p>ln-ashlar gives you the blocks. Tokens, mixins, components — small primitives, well-formed, predictable. You stack them into the building you actually need.</p>
+
+						<h4>How</h4>
+						<p><strong>Token-driven.</strong> Spacing, color, radius, shadow — every value lives in <code>--size-*</code>, <code>--color-*</code>, <code>--radius-*</code>. Change one token, every consumer reacts. No hardcoded literals in components.</p>
+						<p><strong>Recipe + application.</strong> Each pattern has two layers: a <code>@mixin</code> (the recipe) and a default selector (the application). Use the default, apply the recipe to your own semantic selector, or rebind the surface tokens. Three first-class paths.</p>
+						<p><strong>Zero dependencies.</strong> Vanilla JS IIFE components, CustomEvent communication, MutationObserver auto-init. No framework, no runtime — drop the SCSS and JS into any project.</p>
+						<p><strong>Themes are palette only.</strong> A theme rebinds vocabulary tokens at its own <code>:root</code>. It never restructures a component. Switching themes is a token swap, not a rewrite.</p>
+
+						<h4>Why</h4>
+						<p>A library should give you primitives and get out of the way. Most CSS frameworks give you a finished building — beautiful for one project, awkward for the next.</p>
+						<p>ln-ashlar gives you the stones. Stack them however your project needs. The stones are simple. The buildings can be as complicated as you want.</p>
 					</main>
 				</section>

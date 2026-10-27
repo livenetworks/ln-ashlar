@@ -18,9 +18,10 @@
 	width: 1rem;
 	height: 1rem;
 	border-radius: var(--radius-full);
-	border: var(--border-width) solid hsl(var(--color-border));
+	border: var(--border-width) solid var(--color-border);
 
 	&[data-preset="light"]    { background: hsl(231 62% 27%); }
+	&[data-preset="soft"]     { background: hsl(201 96% 32%); }
 	&[data-preset="dark"]     { background: hsl(231 62% 50%); }
 	&[data-preset="ocean"]    { background: hsl(190 80% 35%); }
 	&[data-preset="sunset"]   { background: hsl(10 80% 50%); }

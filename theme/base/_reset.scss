@@ -15,3 +15,14 @@ ul, ol, ul li, ol li {
 html {
 	font-size: 16px;
 }
+
+// Form controls do not inherit typography by default — textarea falls back
+// to the UA monospace face and buttons/inputs to the system UI font.
+button,
+input,
+select,
+textarea {
+	font: inherit;
+	letter-spacing: inherit;
+	color: inherit;
+}

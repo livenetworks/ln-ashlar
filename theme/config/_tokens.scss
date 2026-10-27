@@ -35,19 +35,22 @@
 	// -----------------------------------------------------------------------
 	// Colors — Status
 	// -----------------------------------------------------------------------
-	--color-success:         142 76% 36%;
+	// Solid status tones are tuned for >= 4.5:1 against white, so solid
+	// semantic buttons/toasts and status text on -lighter tints pass WCAG AA.
+	// Dark surfaces restore brighter tones in ln-dark-tokens (_theme.scss).
+	--color-success:         142 72% 29%;   // 5.1:1 on white
 	--color-success-light:   142 76% 93%;
 	--color-success-lighter: 142 76% 97%;
 
-	--color-error:           0 84% 50%;
+	--color-error:           0 72% 51%;     // 4.8:1 on white
 	--color-error-light:     0 84% 93%;
 	--color-error-lighter:   0 84% 97%;
 
-	--color-warning:         32 95% 44%;
+	--color-warning:         26 90% 37%;    // 5.0:1 on white
 	--color-warning-light:   32 95% 93%;
 	--color-warning-lighter: 32 95% 97%;
 
-	--color-info:            217 91% 60%;
+	--color-info:            221 83% 53%;   // 5.2:1 on white
 	--color-info-light:      217 91% 93%;
 	--color-info-lighter:    217 91% 97%;
 
@@ -118,6 +121,7 @@
 	--max-w-form:      32rem;
 	--max-w-content:   48rem;
 	--max-w-container: 80rem;
+	--grid-item-min-width: 14rem; // Intrinsic minimum for auto-fit card grids.
 
 	// -----------------------------------------------------------------------
 	// Border Radius
@@ -362,9 +366,31 @@
 	--btn-padding-x:    var(--size-sm-up);
 	--btn-padding-y:    var(--size-xs-up);
 
+	// Control size contract — buttons, text inputs, selects and pills share
+	// one line box and one vertical padding per density tier, so mixed
+	// input + button rows align without local fixes:
+	//   height = --control-line-height + 2 × padding-y + 2 × border
+	//   dense 22 + 2×6 + 2 = 36px · comfortable 44px · spacious 54px
+	// Density rebinds all three in _density.scss.
+	--control-line-height: 1.375rem;              // 22px
+	--input-padding-y:     var(--btn-padding-y);
+
 	// Card padding tokens — roomier than base rhythm; density-reactive via _density.scss
 	--card-padding-y:        var(--size-sm-up);    // 12px dense base
 	--card-padding-x:        var(--size-md);       // 16px dense base
+
+	// Optional panel/shell companions — intentionally no defaults, so
+	// existing primitive overrides continue to work via mixin fallbacks.
+	// --panel-radius: card / section-card radius (fallback: --radius).
+	// --panel-header-bg: panel header surface (fallback: panel surface).
+	// --panel-footer-bg: panel footer surface (fallback: panel surface).
+	// --panel-margin-block: section-card bottom margin (fallback: --size-md).
+	// --card-nested-shadow: nested card depth (fallback: --shadow-floating).
+	// --app-content-padding-x: shell gutters + scroll-flow edge margins
+	//                         (fallback: --padding-x).
+	// --app-content-gap: shell / content-wrapper gap (fallback: --gap).
+	// --app-footer-bg: shell footer surface (fallback: transparent canvas).
+	// Soft opts in at its theme root. See docs/css/theming.md.
 
 	// Table cell padding tokens — roomier than base rhythm; density-reactive via _density.scss
 	--table-cell-padding-y:  var(--size-sm);       // 8px dense base (DocuFlow th: 9px / td: 10px)

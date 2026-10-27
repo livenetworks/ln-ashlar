@@ -1,16 +1,61 @@
 @use '../../../../../theme/config/mixins' as *;
 
-#stats {
-	ul {
-		@include grid-4;
+#dashboard-welcome {
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	@include flex-wrap;
+	@include gap(var(--size-lg));
+
+	h2 { @include typography(display-sm); margin: 0; }
+	p { color: var(--fg-muted); margin: var(--size-sm) 0 0; }
+	.dashboard-eyebrow {
+		@include typography(label-sm);
+		@include font-semibold;
+		color: var(--color-accent);
+		margin: 0 0 var(--size-sm);
+	}
+}
+
+#stats,
+#dashboard-shortcuts {
+	container-type: inline-size;
+
+	> ul {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		@include gap(var(--size-lg));
 		list-style: none;
 		padding: 0;
 		margin: 0;
 	}
+}
+
+#stats {
+	> ul {
+		@include cq-up(narrow) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+		@include cq-up(medium) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+	}
 
 	li {
 		@include card;
-		@include p(var(--size-md));
+		padding: var(--card-padding-x);
+		@include gap(var(--size-sm));
+	}
+
+	header {
+		@include row-between;
+		padding: 0;
+		border: none;
+		background: transparent;
+	}
+
+	.dashboard-stat-icon {
+		@include flex-center;
+		@include size(var(--size-2xl));
+		border-radius: var(--radius-md);
+		background: var(--color-accent-tint);
+		color: var(--color-accent);
 	}
 
 	h3 {
@@ -21,12 +66,26 @@
 	}
 
 	strong {
-		@include text-2xl;
+		@include typography(display-sm);
 		@include font-bold;
 		@include block;
 	}
 
-	.progress {
-		@include mt(var(--size-sm));
+	p {
+		@include typography(body-sm);
+		color: var(--fg-muted);
+		margin: 0;
 	}
+}
+
+#dashboard-shortcuts {
+	> ul {
+		@include cq-up(medium) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+	}
+
+	li { @include card; }
+	a { padding: var(--card-padding-x); @include gap(var(--size-sm)); }
+	h3 { @include typography(title-md); margin: 0; }
+	p { @include typography(body-sm); color: var(--fg-muted); margin: 0; }
+	.ln-icon { color: var(--color-accent); }
 }

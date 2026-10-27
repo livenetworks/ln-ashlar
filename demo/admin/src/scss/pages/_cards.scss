@@ -1,154 +1,74 @@
 @use '../../../../../theme/config/mixins' as *;
 
-// ─── Basic cards grid ──────────────────────────────────
-#demo-basic-cards {
-	@include grid-2;
+// Auto-fit uses the space left by the sidebar and panel gutters.
+#demo-basic-cards,
+#demo-accent-top,
+#demo-accent-left,
+#demo-accent-bottom,
+#demo-tinted,
+#demo-stacked,
+#demo-stat-cards,
+#demo-secondary,
+#demo-full-cards,
+#demo-card-fields > main > div {
+	--gap: var(--size-md);
+	@include grid-auto;
+}
 
+// One card recipe for gallery tiles; variants supply only deltas.
+#demo-basic-cards,
+#demo-accent-top,
+#demo-accent-left,
+#demo-accent-bottom,
+#demo-tinted,
+#demo-stacked,
+#demo-stat-cards,
+#demo-secondary,
+#demo-full-cards,
+#demo-flat-stack {
+	article { @include card; }
+}
+
+#demo-basic-cards,
+#demo-accent-top,
+#demo-accent-left,
+#demo-accent-bottom,
+#demo-tinted,
+#demo-stacked,
+#demo-stat-cards,
+#demo-secondary,
+#demo-flat-stack {
 	article {
-		@include card;
-		@include p(var(--size-md));
-
-		p { margin: 0; }
+		padding: var(--card-padding-y) var(--card-padding-x);
+		gap: var(--size-sm);
+		> h3, > h4 { @include typography(title-sm); margin: 0; }
+		> p { @include typography(body-sm); color: var(--fg-muted); margin: 0; }
 	}
 }
 
-// ─── Accent top variants ───────────────────────────────
-#demo-accent-top {
-	@include grid-4;
+#demo-accent-top article { @include card-accent-top; }
+#demo-accent-left article { @include card-accent-left; }
+#demo-accent-bottom article { @include card-accent-bottom; }
+#demo-tinted article { @include card-bg; }
+#demo-stacked article { @include card-stacked; @include mb(var(--size-md)); }
 
-	article {
-		@include card;
-		@include card-accent-top;
-		@include p(var(--size-md));
-
-		h4 { margin: 0; }
-		p { margin: 0; @include text-sm; color: var(--fg-muted); }
+#demo-stat-cards article {
+	.stat-value {
+		@include typography(heading-lg);
+		@include font-bold;
+		font-variant-numeric: tabular-nums;
 	}
+	.stat-label { @include typography(label-md); color: var(--fg-muted); }
+	.stat-change { @include typography(body-sm); color: var(--color-accent); }
 }
 
-// ─── Accent left / side status ─────────────────────────
-#demo-accent-left {
-	@include grid-4;
-
-	article {
-		@include card;
-		@include card-accent-left;
-		@include p(var(--size-md));
-
-		h4 { margin: 0; }
-		p { margin: 0; @include text-sm; color: var(--fg-muted); }
-	}
-}
-
-// ─── Accent bottom ─────────────────────────────────────
-#demo-accent-bottom {
-	@include grid-4;
-
-	article {
-		@include card;
-		@include card-accent-bottom;
-		@include p(var(--size-md));
-
-		h4 { margin: 0; }
-		p { margin: 0; @include text-sm; color: var(--fg-muted); }
-	}
-}
-
-// ─── Tinted background cards ───────────────────────────
-#demo-tinted {
-	@include grid-4;
-
-	article {
-		@include card;
-		@include card-bg;
-		@include p(var(--size-md));
-
-		h4 { margin: 0; color: hsl(var(--color-primary)); }
-		p { margin: 0; @include text-sm; color: var(--fg-muted); }
-	}
-}
-
-// ─── Stacked card ──────────────────────────────────────
-#demo-stacked {
-	@include grid-2;
-
-	article {
-		@include card;
-		@include card-stacked;
-		@include p(var(--size-md));
-		@include mb(var(--size-md));
-
-		h4 { margin: 0; }
-		p { margin: 0; @include text-sm; color: var(--fg-muted); }
-	}
-}
-
-// ─── Stat cards (number + label) ───────────────────────
-#demo-stat-cards {
-	@include grid-4;
-
-	article {
-		@include card;
-		@include card-accent-top;
-		@include p(var(--size-md));
-		text-align: center;
-
-		.stat-value {
-			@include text-2xl;
-			@include font-bold;
-			@include text-primary;
-			line-height: 1.2;
-		}
-
-		.stat-label {
-			@include text-xs;
-			@include font-medium;
-			color: var(--fg-subtle);
-			@include uppercase;
-			@include tracking-wider;
-			@include mt(var(--size-xs));
-		}
-
-		.stat-change {
-			@include text-sm;
-			@include mt(var(--size-sm));
-			color: hsl(var(--color-primary));
-		}
-	}
-}
-
-// ─── Card with fields ──────────────────────────────────
-#demo-card-fields > main > div { @include grid; }
-
-// --- Secondary brand accent showcase -----------------------
 #demo-secondary {
-	@include grid-4;
-
-	article {
-		@include card;
-		@include p(var(--size-md));
-
-		h4 { margin: 0; }
-		p { margin: 0; @include text-sm; color: var(--fg-muted); }
-	}
-
-	// First card: accent-top with secondary color
-	article:nth-child(1) {
-		@include card-accent-top;
-	}
-
-	// Second card: tinted bg with secondary color
-	article:nth-child(2) {
-		@include card-bg;
-	}
-
-	// Third card: explicit -light background
+	article:nth-child(1) { @include card-accent-top; }
+	article:nth-child(2) { @include card-bg; }
 	article:nth-child(3) {
 		background-color: hsl(var(--color-secondary-light));
 		border-color: hsl(var(--color-secondary) / 0.2);
 	}
-
-	// Fourth card: explicit -lighter background
 	article:nth-child(4) {
 		background-color: hsl(var(--color-secondary-lighter));
 		border-color: hsl(var(--color-secondary) / 0.1);
@@ -157,75 +77,28 @@
 
 #demo-secondary-buttons {
 	@include flex;
+	@include flex-wrap;
 	@include gap(var(--size-sm-up));
 	@include mt(var(--size-md));
-
-	button {
-		@include btn;
-	}
+	button { @include btn; }
 }
 
-// ─── Flat stack demo ───────────────────────────────────
-#demo-flat-stack {
-	ul {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
+#demo-flat-stack ul { list-style: none; padding: 0; margin: 0; }
 
-	article {
-		@include card;
-		@include p(var(--size-md));
-
-		h3 { margin: 0 0 var(--size-xs); }
-		p  { margin: 0; @include text-sm; color: var(--fg-muted); }
-	}
+// Header/body/footer spacing comes from card's existing child bindings.
+#demo-full-cards article {
+	> main p { margin: 0; @include typography(body-sm); color: var(--fg-muted); }
+	> footer button { @include btn-sm; }
 }
 
-// ─── Card with header + body + footer ──────────────────
-#demo-full-cards {
-	@include grid-2;
-
-	article {
-		@include card;
-
-		header {
-			@include panel-header;
-		}
-
-		main {
-			@include p(var(--size-md));
-
-			p { margin: 0; @include text-sm; color: var(--fg-muted); }
-		}
-
-		footer {
-			@include px(var(--size-md));
-			@include py(var(--size-sm-up));
-			@include border-t;
-			background-color: var(--bg-sunken);
-			@include flex;
-			@include justify-end;
-			@include gap(var(--size-sm));
-
-			button { @include btn-sm; }
-		}
-	}
-}
-
-// ─── Stat Card page demo containers ────────────────────
 [data-demo-kpi-grid] {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-	gap: var(--size-md);
+	--gap: var(--size-md);
+	@include grid-auto;
 }
 
 [data-demo-stat-flex] {
-	display: flex;
-	flex-wrap: wrap;
+	@include flex;
+	@include flex-wrap;
 	gap: var(--size-md);
-
-	[data-ln-stat-card] {
-		flex: 1 1 240px;
-	}
+	[data-ln-stat-card] { flex: 1 1 var(--grid-item-min-width); min-width: 0; }
 }

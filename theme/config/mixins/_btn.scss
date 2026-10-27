@@ -61,6 +61,8 @@
 	gap: var(--gap);
 	padding: var(--padding-y) var(--padding-x);
 	@include text-sm;
+	// Shared control line box — aligns with inputs/selects (see _tokens.scss).
+	line-height: var(--control-line-height);
 	@include font-medium;
 	border-radius: var(--radius);
 	white-space: nowrap;

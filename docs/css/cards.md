@@ -16,14 +16,14 @@ File: `theme/config/mixins/_card.scss`. Applied: `theme/components/_card.scss`.
 ## `@mixin card`
 
 Bare container + structured child bindings. Reads the logical
-`--color-bg`, `--color-border`, `--radius`, `--shadow` tokens; rebinds
-`--color-border: var(--border-strong)` on hover.
+`--color-bg`, `--color-border`, `--radius`, `--shadow` tokens.
 
 **Root chrome:** `bg`, `border`, `radius`, `flex-col`,
 `overflow-hidden`, resting shadow.
 
-**Hover:** border-color → `--border-strong`, shadow upgrades to
-`--shadow-floating`.
+**Interaction:** passive cards do not change on hover. A card that is itself
+an anchor/button, or has a direct anchor child filling the card, gets an accent
+border on hover and a focus ring on keyboard focus. Hover does not add elevation.
 
 **Direct-child bindings** (apply on `>`-child only, so nested
 `<header>`/`<main>`/`<footer>` inside card content are NOT rewritten):
@@ -34,7 +34,7 @@ Bare container + structured child bindings. Reads the logical
 | `> main` | `@include panel-body` + `flex-1` + `gap: var(--gap)` (tile rhythm) |
 | `> footer` | `@include panel-footer` |
 | `> a` | `flex-col` + `flex-1` + `text-decoration: none` + `color: inherit` (whole-card-as-link) |
-| `> main h3` | `font-size: var(--text-body-sm)`, `font-semibold`, `margin: 0`, `color: inherit` (tile-title sizing) |
+| `> main h3` | `typography(title-sm)`, `font-semibold`, `margin: 0`, `color: inherit` (tile-title sizing) |
 
 Two common shapes:
 
@@ -60,9 +60,8 @@ Two common shapes:
 article { @include card; }
 ```
 
-The `> main h3` rule keeps tile titles at body-sm size. If a card uses
-a `<header>` wrapper instead, the regular `panel-header` h3 (title-sm)
-applies — hierarchy by structure, not by class.
+The `> main h3` rule and panel headers share the `title-sm` role and
+semibold weight, so a title retains its hierarchy in either structure.
 
 ---
 
@@ -70,7 +69,8 @@ applies — hierarchy by structure, not by class.
 
 To preserve visual depth, cards nested inside other cards, sections, or section-cards climb to an elevated surface:
 - **Background:** shifts to `var(--bg-elevated)`
-- **Shadow:** shifts to `var(--shadow-floating)`
+- **Shadow:** uses `--card-nested-shadow`, falling back to `--shadow-floating`.
+  Soft sets this token to `none` so nested cards do not outshine their container.
 
 ### Automatic Elevation with Classes
 If you are using the standard components `.card`, `.section`, or `.section-card` in your HTML, this elevation is handled automatically:

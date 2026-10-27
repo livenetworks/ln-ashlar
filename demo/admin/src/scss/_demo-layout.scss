@@ -1,5 +1,40 @@
 @use '../../../../theme/config/mixins' as *;
 
+// Page identity is one group; it does not inherit the shell's section gap.
+.demo-page-intro {
+	@include stack(var(--size-sm));
+
+	> h1 { margin: 0; }
+	> p { margin: 0; color: var(--fg-muted); max-width: var(--max-w-prose); }
+}
+
+// A gallery section is framing for examples, not another elevated card.
+.demo-card-example {
+	// Focus rings on edge-to-edge examples must remain visible.
+	overflow: visible;
+	--color-bg: transparent;
+	--color-border: transparent;
+	--shadow: none;
+	--panel-radius: var(--radius-none);
+
+	> header {
+		--color-bg: transparent;
+		padding: 0 0 var(--size-md);
+		gap: var(--size-sm);
+
+		> h2 { @include typography(title-md); }
+	}
+
+	> main {
+		padding: 0;
+		// Reset surface roles at the example boundary so real components
+		// keep their own borders/radii, in every theme and density.
+		--color-bg: var(--bg-base);
+		--color-border: var(--border-subtle);
+		--panel-radius: var(--radius-lg);
+	}
+}
+
 // ==========================================================================
 // Demo Split Layout — 2 columns: left = live demo, right = auto-extracted code
 // ==========================================================================
@@ -145,7 +180,7 @@
 		&.copied {
 			color: hsl(var(--color-success));
 			border-color: hsl(var(--color-success) / 0.5);
-			background-color: color-mix(in srgb, var(--color-success) 10%, transparent);
+			background-color: hsl(var(--color-success) / 0.1);
 		}
 	}
 
@@ -188,7 +223,7 @@
 		&[aria-expanded="true"] {
 			color: hsl(var(--color-primary));
 			border-color: hsl(var(--color-primary) / 0.5);
-			background-color: color-mix(in srgb, var(--color-primary) 8%, transparent);
+			background-color: color-mix(in srgb, var(--color-accent) 8%, transparent);
 		}
 	}
 }
