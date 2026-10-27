@@ -1,0 +1,255 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'sizing' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'transitions' as *;
+@use 'interaction' as *;
+@use 'btn' as *;
+@use 'form-controls' as *;
+@use 'form-validation' as *;
+
+// ─── Field group — generic bordered flex shell ────────────────────
+//
+// One mixin for any control that is a bordered shell wrapping a row of
+// children: a leading/trailing icon, the input (or select), and/or an
+// interactive button (search submit, date-picker trigger).
+//
+//   <label>                    <span data-ln-date-field>
+//     <svg class="ln-icon"/>     <input type="text" …>
+//     <input …>                  <button>…</button>
+//   </label>                   </span>
+//
+// The wrapper is the VISUAL SHELL only: form-input supplies border, bg,
+// radius, transition; the mixin adds flex layout and zeroes the shell's
+// own padding. Each child owns its padding. Children strip only the chrome
+// the shell now owns (border, bg, box-shadow). Focus is handled once on the
+// shell via :focus-within; children suppress their own focus ring.
+//
+// Applied via semantic selectors (no class on the wrapper):
+//   - components/_form.scss → :is(label, div, span, search):has(.ln-icon):has(text input)
+//   - components/_date.scss → [data-ln-date-field]
+
+// Split shell/parts so the binding can emit the wrapper's own chrome at base
+// weight while the child resets and state chrome keep full weight.
+@mixin form-field-group-shell {
+	@include form-input;       // visual shell: border, bg, radius, transition, outline
+	@include inline-flex;      // override form-input's block display
+	@include items-center;
+	position: relative;        // anchors any absolute-positioned children (e.g. native pickers)
+	overflow: hidden;          // clips child corners to the shell's border-radius automatically
+	width: auto;               // cancel form-input's w-full
+	padding: 0;                // shell owns NO padding; children manage their own
+	margin-block-end: 0;       // defensive: wrapping <label> carries form-label margin
+}
+
+@mixin form-field-group-parts {
+	&:focus-within {
+		@include form-focus-style;
+
+		> input,
+		> select {
+			box-shadow: none;  // suppress child's own form-input focus ring
+		}
+	}
+
+	// Propagate validation states to the parent visual shell
+	&:has(> .ln-validate-invalid) {
+		@include form-validate-invalid;
+	}
+	&:has(> .ln-validate-valid) {
+		@include form-validate-valid;
+	}
+
+	// Propagate disabled states to the parent visual shell
+	&:has(> :is(input, select, button):disabled) {
+		@include opacity-50;
+		@include cursor-not-allowed;
+		--color-bg: var(--bg-sunken);
+		background: var(--color-bg);
+
+		* {
+			@include cursor-not-allowed;
+		}
+	}
+
+	> .ln-icon {
+		@include flex-shrink-0;
+		padding: var(--size-xs) var(--size-sm);   // icon provides its own row spacing
+		--color-fg: var(--fg-subtle);
+		color: var(--color-fg);
+		box-sizing: content-box;
+	}
+
+	> input,
+	> select {
+		// form-input is already applied globally — strip only shell-owned chrome.
+		@include border-none;
+		background: transparent;
+		box-shadow: none;
+		width: auto;
+		@include flex-1;
+		min-width: 0;
+
+		// Tighten inner padding when adjacent to icons or buttons inside the group
+		&:not(:first-child) {
+			padding-inline-start: var(--size-xs);
+		}
+		&:not(:last-child) {
+			padding-inline-end: var(--size-xs);
+		}
+	}
+
+	> button {
+		@include button-base;
+		@include flex-shrink-0;
+		@include border-none;
+		align-self: stretch;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding-block: 0;
+		// Tighter horizontal padding for icon-only button inside groups to keep it compact and squarish
+		padding-inline: var(--size-sm);
+		border-radius: 0; // Square the button to sit flush with the input border
+
+		> .ln-icon {
+			--color-fg: var(--fg-subtle);
+			color: var(--color-fg);
+		}
+	}
+}
+
+@mixin form-field-group {
+	@include form-field-group-shell;
+	@include form-field-group-parts;
+}
+
+// ─── Icon input group — search/icon field (thin wrapper) ──────────
+//
+// form-field-group + the search-clear control, which is the only piece
+// unique to this binding.
+
+@mixin form-input-icon-group-parts {
+	@include form-field-group-parts;
+
+	// Visually hide the clear button while the field is empty (visibility:hidden
+	// preserves layout space so the input width stays stable).
+	// Structural target: the only button in this group is the clear control.
+	> input:placeholder-shown ~ button {
+		@include invisible;
+	}
+
+	// Clear control — square hit area, circular highlight on hover only.
+	// Overrides the flush date/submit-button styling inherited from
+	// form-field-group > button (equal specificity, emitted later → wins).
+	> button {
+		align-self: center;                    // cancel inherited stretch
+		aspect-ratio: 1;                       // square hit area
+		padding: var(--size-2xs);              // equal padding all sides (cancels L+R size-sm and T+B 0)
+		border-radius: var(--radius-full);     // circular highlight (square in flat theme)
+		background: transparent;               // transparent idle
+		@include transition-colors;
+
+		> .ln-icon {
+			--color-fg: var(--fg-subtle);      // idle icon color
+			color: var(--color-fg);
+			@include transition-colors;        // icon recolor must animate (parent transition won't drive child color)
+		}
+
+		&:hover {
+			background: var(--btn-bg-hover);   // circle highlight appears
+			> .ln-icon {
+				--color-fg: var(--fg-default);
+			}
+		}
+	}
+
+	// Fix C — pull the leading icon and the input text closer.
+	// Inherited from form-field-group at equal specificity; emitted later → wins per property.
+
+	// 1. Zero the input's OWN adjacent side padding (the user's explicit minimum).
+	//    Mirror form-field-group's :not() structure so the override lands at equal
+	//    specificity and replaces only the horizontal padding it set.
+	> input,
+	> select {
+		&:not(:first-child) {
+			padding-inline-start: 0;
+		}
+		&:not(:last-child) {
+			padding-inline-end: 0;
+		}
+	}
+
+	// 2. Reduce ONLY the leading icon's INNER (right) padding so the magnifier sits
+	//    close to the text. KEEP the left padding (inherited --size-sm outer breathing
+	//    room) and KEEP vertical padding. Set padding-right ONLY — never the `padding`
+	//    shorthand (it would clobber left + vertical).
+	> .ln-icon {
+		padding-inline-end: var(--size-xs);   // 8px → 4px; left + vertical inherited from form-field-group
+	}
+}
+
+@mixin form-input-icon-group {
+	@include form-field-group-shell;
+	@include form-input-icon-group-parts;
+}
+
+// ─── Search field — compact icon-group variant (delta-only) ───────
+//
+// Opt-in refinements layered on top of the icon-group chrome that the
+// global auto-bind (components/_form.scss: :is(label, div, span, search):has(>
+// .ln-icon):has(> search/text input)) already supplies. PREREQUISITE: the
+// consumer is an icon + search-input <search> (or <label>) so the auto-bind
+// provides the base shell; on a plain wrapper this emits only the tweaks
+// below, no chrome.
+//
+// Usage (project/demo SCSS):
+//   search:has(> input[type="search"]) { @include search; }
+
+@mixin search {
+	width: min(100%, 20rem);          // intrinsic capped field width
+	--color-bg: var(--bg-recessed);   // recessed fill so the white clear-hover reads
+	--btn-bg-hover: var(--bg-base);   // clear button highlights white on hover (token rebind, no specificity override)
+
+	// Default size matches standard form inputs (height ~2.375rem, font-size, line-height).
+	// Compact size modifier ("по потреба помал"):
+	&:is(.input-sm, .search-sm, [data-size="sm"], [data-density="compact"], [data-ln-density="compact"]) {
+		@include form-input-sm;
+
+		> input {
+			--padding-y: var(--input-padding-y);
+			--padding-x: var(--input-padding-x);
+		}
+	}
+
+	// Large size modifier:
+	&:is(.input-lg, .search-lg, [data-size="lg"]) {
+		@include form-input-lg;
+
+		> input {
+			--padding-y: var(--input-padding-y);
+			--padding-x: var(--input-padding-x);
+		}
+	}
+}
+
+@mixin search-sm {
+	@include search;
+	@include form-input-sm;
+
+	> input {
+		--padding-y: var(--input-padding-y);
+		--padding-x: var(--input-padding-x);
+	}
+}
+
+@mixin search-lg {
+	@include search;
+	@include form-input-lg;
+
+	> input {
+		--padding-y: var(--input-padding-y);
+		--padding-x: var(--input-padding-x);
+	}
+}

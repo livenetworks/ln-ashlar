@@ -3,15 +3,15 @@
 // ==========================================================================
 // Information density scaling via spatial compression.
 //
-// The :root default is dense base (DocuFlow scale: 36px row height floor,
-// 6px padding-y, 52px header, 232px sidebar). Density scales spacing upward
-// via the [data-density] attribute, mirroring how [data-mode] / [data-theme] works.
+// The :root default provides a balanced, accessible baseline (44px comfortable
+// row floor, 7px input padding, 52px header, 232px sidebar).
+// Density scales either downward via compact or upward via spacious.
 //
 // Activation:
-//   <html>                              ← default: compact base
-//   <html data-density="compact">       ← explicit compact handle (same as base)
-//   <html data-density="comfortable">   ← roomy default (44px row floor, 8px padding)
-//   <html data-density="spacious">      ← generous touch/kiosk density (48px row floor, 16px padding)
+//   <html>                              ← default: comfortable base (44px row floor)
+//   <html data-density="compact">       ← compact enterprise tier (32px row floor, 4px padding)
+//   <html data-density="comfortable">   ← explicit comfortable handle (same as base)
+//   <html data-density="spacious">      ← generous touch/kiosk density (52px row floor, 16px padding)
 //   <main data-density="compact">       ← scope dense within comfortable page
 //
 // Density is an explicit user choice (settings toggle).

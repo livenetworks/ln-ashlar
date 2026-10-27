@@ -398,7 +398,7 @@
 		},
 		{
 			"name": "data-ln-density",
-			"description": "Visual / CSS styling attribute (theme/config/mixins/_form.scss)",
+			"description": "Visual / CSS styling attribute (theme/config/mixins/_form-groups.scss)",
 			"valueSet": "v"
 		},
 		{

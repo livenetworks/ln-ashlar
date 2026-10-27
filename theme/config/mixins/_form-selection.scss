@@ -1,0 +1,464 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'sizing' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'transitions' as *;
+@use 'motion' as *;
+@use 'layout' as *;
+@use 'interaction' as *;
+@use 'focus' as *;
+
+// ─── Checkbox & Radio ───────────────────────────────────────────
+
+@mixin form-check {
+	appearance: none;
+	@include size(1.125rem);
+	padding: 0;
+	@include flex-shrink-0;
+	// Non-standard 1.5px stroke — optical weight at small checkbox size.
+	border: 1.5px solid var(--border-ui);
+	background: var(--bg-sunken);
+	@include cursor-pointer;
+	@include transition;
+	vertical-align: middle;
+	box-shadow: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
+
+	&:hover:not(:disabled) {
+		border-color: var(--color-accent);
+		background-color: var(--bg-base);
+	}
+
+	&:checked {
+		background-color: var(--color-accent);
+		border-color: var(--color-accent);
+		// Inline SVG: native <input type="checkbox"> cannot contain child elements,
+		// so a data URI is the only way to embed a checkmark here. The stroke is
+		// baked in — data URIs can't read custom properties — so the mark ships as
+		// two variants and themes point --check-mark at the one matching their
+		// --color-accent-fg pole. Same pattern as --select-arrow above.
+		background-image: var(--check-mark);
+		background-size: 0.75rem;
+		background-position: center;
+		background-repeat: no-repeat;
+		box-shadow: 0 1px 3px 0 hsl(var(--color-accent-h, 217) var(--color-accent-s, 91%) var(--color-accent-l, 60%) / 0.25);
+
+		&:hover:not(:disabled) {
+			background-color: hsl(from var(--color-accent) h s calc(l - 6));
+			border-color: hsl(from var(--color-accent) h s calc(l - 6));
+		}
+	}
+
+	&:indeterminate {
+		background-color: var(--color-accent);
+		border-color: var(--color-accent);
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round'%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E%3C/svg%3E");
+		background-size: 0.75rem;
+		background-position: center;
+		background-repeat: no-repeat;
+	}
+
+	&:focus-visible {
+		@include focus-ring;
+	}
+
+	&:disabled {
+		@include opacity-50;
+		@include cursor-not-allowed;
+	}
+}
+
+@mixin form-checkbox {
+	@include form-check;
+	@include rounded-xs;
+}
+
+@mixin form-radio {
+	@include form-check;
+	border-radius: 50%;
+
+	&:checked {
+		background-image: none;
+		box-shadow: inset 0 0 0 3px var(--color-bg);
+	}
+}
+
+// ─── Pill outline — base label (structure + visible border) ────
+//
+// Self-contained outline variant: transparent background, visible native
+// input indicator, accent border + accent text on checked.
+//
+// Must be idempotent when re-applied over `@include pill` (the filled
+// default installed globally by components/_form.scss on fieldset pills).
+// Each rule below resets a behavior that `pill` adds: bg-sunken fill,
+// hidden input, accent-fg text on checked.
+
+@mixin pill-outline {
+	@include flex;
+	@include items-center;
+	gap: var(--gap);
+	--padding-y: var(--input-padding-y, 0.4375rem);
+	--padding-x: var(--input-padding-x, 0.75rem);
+	padding: var(--padding-y) var(--padding-x);
+	@include cursor-pointer;
+	@include transition;
+	@include text-sm;
+	@include font-medium;
+	margin-block-end: 0;
+	border-radius: var(--radius);
+	border: var(--border-width) solid var(--color-border);
+	// Reset pill's filled bg. Outline = transparent surface.
+	background: transparent;
+	position: relative;
+
+	// Restore the native input indicator. `display: revert` returns the
+	// UA default (inline-block for checkbox/radio) and cleanly undoes
+	// pill's `display: none` when pill-outline is applied as an override.
+	> input { display: revert; }
+
+	&:hover {
+		border-color: var(--color-accent);
+		z-index: 1;
+	}
+
+	&:has(> input:checked) {
+		border-color: var(--color-accent);
+		color: var(--color-accent);
+		// Reset pill's accent fill on checked — outline stays transparent.
+		background: transparent;
+		z-index: 1;
+	}
+}
+
+// ─── Pill filled — extends pill-outline, hides input ───────────
+
+@mixin pill {
+	@include pill-outline;
+	--color-bg: var(--bg-sunken);
+	// Derive hover from --color-accent at this scope (label element).
+	// Lets .error/.success/.warning/.info parents cascade to the checked-
+	// state hover via the .success { --color-primary } chain. See
+	// _btn.scss for the syntax rationale (number form, not percentage).
+	--color-accent-hover: hsl(from var(--color-accent) h s calc(l - 8));
+
+	background-color: var(--color-bg);
+	border-color: transparent;
+
+	> input { display: none; }
+
+	&:hover {
+		border-color: var(--color-border);
+	}
+
+	&:has(> input:checked) {
+		background-color: var(--color-accent);
+		color: var(--color-accent-fg);
+
+		&:hover {
+			background-color: var(--color-accent-hover);
+		}
+	}
+}
+
+@mixin pill-group {
+	@include inline-flex;
+
+	li label {
+		border-radius: 0;
+	}
+
+	li:first-child label {
+		border-radius: var(--radius) 0 0 var(--radius);
+	}
+
+	li:last-child label {
+		border-radius: 0 var(--radius) var(--radius) 0;
+	}
+
+	li:only-child label {
+		border-radius: var(--radius);
+	}
+}
+
+// ─── Pills — GCD for joined-pill checkbox/radio lists ──────────
+// Joined-group filled pills: pill on each <li><label><input>, with
+// joined-corner border-radius (square middles, partial-radius first/
+// last) inlined here rather than composed via pill-group. Inlining
+// is required because pill-group's `li label` selectors (0,1,5) are
+// out-specificityed by pill's :has selector (0,2,5), which would
+// reassert full radius on every pill. The selectors below match
+// pill's :has shape so source-order/specificity resolves cleanly.
+// Apply to a <ul> whose direct children are <li><label><input> pairs.
+//
+// Usage: project SCSS applies this on its own ul selector:
+//
+//     #my-filter-pills { @include pills; }
+//
+// where the structure is:
+//
+//     <ul id="my-filter-pills">
+//         <li><label><input type="checkbox"> Label</label></li>
+//         ...
+//     </ul>
+
+@mixin pills {
+	@include inline-flex;
+
+	> li > label:has(> input:is([type="checkbox"], [type="radio"])) {
+		@include pill;
+		border-radius: 0;
+	}
+
+	> li:first-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
+		border-radius: var(--radius) 0 0 var(--radius);
+	}
+
+	> li:last-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
+		border-radius: 0 var(--radius) var(--radius) 0;
+	}
+
+	> li:only-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
+		border-radius: var(--radius);
+	}
+}
+
+@mixin pills-outline {
+	@include inline-flex;
+
+	> li {
+		position: relative;
+
+		&:not(:first-child) {
+			margin-inline-start: calc(var(--border-width) * -1);
+		}
+
+		&:hover,
+		&:has(> label > input:checked) {
+			z-index: 1;
+		}
+	}
+
+	> li > label:has(> input:is([type="checkbox"], [type="radio"])) {
+		@include pill-outline;
+		border-radius: 0;
+	}
+
+	> li:first-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
+		border-radius: var(--radius) 0 0 var(--radius);
+	}
+
+	> li:last-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
+		border-radius: 0 var(--radius) var(--radius) 0;
+	}
+
+	> li:only-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
+		border-radius: var(--radius);
+	}
+}
+
+// Segmented track control pills
+@mixin pills-segmented {
+	@include inline-flex;
+	@include items-center;
+	list-style: none;
+	padding: 2px;
+	margin: 0;
+	background-color: var(--bg-recessed);
+	border-radius: var(--radius);
+	border: var(--border-width) solid var(--color-border);
+	width: 100%;
+
+	> li {
+		flex: 1 1 0%;
+		margin: 0;
+		padding: 0;
+		display: block;
+	}
+
+	> li > label:has(> input:is([type="checkbox"], [type="radio"])) {
+		@include flex;
+		@include items-center;
+		@include justify-center;
+		padding: var(--size-xs) var(--size-md);
+		border-radius: calc(var(--radius) - 2px);
+		@include cursor-pointer;
+		@include text-sm;
+		@include font-medium;
+		color: var(--fg-muted);
+		@include transition;
+		user-select: none;
+		margin: 0;
+		text-align: center;
+		border: none;
+		background: transparent;
+
+		> input {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			border: 0;
+		}
+
+		&:hover {
+			color: var(--color-fg);
+		}
+
+		&:has(> input:checked) {
+			background-color: var(--bg-base);
+			color: var(--color-fg);
+			@include font-semibold;
+			box-shadow: var(--shadow-resting);
+		}
+
+		&:has(> input:focus-visible) {
+			@include focus-ring;
+		}
+	}
+}
+
+@mixin toggle-switch {
+	appearance: none;
+	position: relative;
+	width: 2.5rem;
+	height: 1.5rem;
+	--color-bg: var(--border-strong);
+	background: var(--color-bg);
+	border-radius: var(--radius-full);
+	cursor: pointer;
+	vertical-align: middle;
+	flex-shrink: 0;
+	border: none;
+	transition: none;
+
+	@include motion-safe {
+		transition: background-color var(--transition-fast);
+	}
+
+	&::before {
+		content: '';
+		position: absolute;
+		top: 2px;
+		left: 2px;
+		width: 1.25rem;
+		height: 1.25rem;
+		background: hsl(var(--color-white));
+		border-radius: 50%;
+		--shadow: var(--shadow-resting);
+		box-shadow: var(--shadow);
+
+		@include motion-safe {
+			transition: transform var(--transition-fast);
+		}
+	}
+
+	&:checked {
+		background: var(--color-accent);
+
+		&::before {
+			transform: translateX(1rem);
+		}
+	}
+
+	&:focus-visible {
+		@include focus-ring;
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+}
+
+@mixin pill-switch {
+	@include row(var(--size-sm));
+	@include cursor-pointer;
+	@include text-sm;
+	@include font-medium;
+	color: var(--color-fg);
+	margin-block-end: 0;
+
+	> input[type="checkbox"] {
+		@include toggle-switch;
+	}
+}
+
+@mixin pills-switch {
+	@include stack(var(--size-sm));
+	list-style: none;
+	padding: 0;
+	margin: 0;
+
+	> li > label {
+		@include pill-switch;
+	}
+}
+
+// ─── Check list outline — vertical list with outlined labels ───
+// <ul><li><label><input> — same structure as pill-group but vertical.
+// List reset + pill-outline on labels (visible input, bordered).
+//
+// Usage:
+//   #dept-filter { @include check-list-outline; }
+
+@mixin check-list-outline {
+	li label { @include pill-outline; }
+}
+
+// ─── Check list filled — vertical list with filled labels ──────
+// Extends check-list-outline: hides input, fills bg on checked.
+//
+// Usage:
+//   #dept-filter { @include check-list; }
+
+@mixin check-list {
+	@include check-list-outline;
+
+	li label { @include pill; }
+}
+
+// ─── Check list nav — filter list styled with the nav-link vocabulary ──
+// Same checkbox-filter list as check-list, but the selected item uses the
+// sidebar nav-link active treatment (accent-tint wash + accent text +
+// semibold) instead of the solid-accent pill fill. Shared by the filter
+// popover (@mixin popover) and the ln-table column-filter dropdown
+// (@mixin filter-dropdown) so every filter list matches the sidebar nav
+// (nav-links-rounded). Extends check-list to keep the hidden-input filled
+// structure; overrides only color, weight and size. Consumers that need
+// the checkbox kept keyboard-focusable (popover a11y) re-reveal the input
+// themselves after including this.
+@mixin check-list-nav {
+	@include check-list;
+
+	li label {
+		// Smaller — match the nav link (13px).
+		@include typography(body-sm);
+		// Muted idle text, transparent surface (nav idle).
+		--color-fg: var(--fg-muted);
+		color: var(--color-fg);
+		background: transparent;
+		border: none;
+		// Tighter vertical padding — match nav link height (~31px).
+		--padding-y: var(--size-xs-up);
+		padding: var(--padding-y) var(--padding-x);
+
+		&:hover {
+			background-color: color-mix(in srgb, var(--color-accent) var(--tint-hover), transparent);
+		}
+
+		// Selected — nav active vocabulary (replaces solid-accent + white).
+		&:has(> input:checked) {
+			background-color: var(--color-accent-tint-strong);
+			color: var(--color-accent);
+			@include font-semibold;
+
+			&:hover {
+				background-color: var(--color-accent-tint-strong);
+			}
+		}
+	}
+}

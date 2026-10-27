@@ -24,7 +24,7 @@ The design target stays AA because Level AAA conformance turns on many criteria 
 
 ### The Contrast Budget
 
-Three targets, one per surface class, applied as build-time constants in [`theme/config/_contrast.scss`](../../theme/config/_contrast.scss):
+Three targets, one per surface class, defined as design and verification constants in [`theme/config/_contrast.scss`](../../theme/config/_contrast.scss):
 
 | Constant | Ratio | Applies to |
 |---|---|---|
@@ -32,7 +32,7 @@ Three targets, one per surface class, applied as build-time constants in [`theme
 | `$ln-contrast-fill` | 7:1 | Text on solid brand fills — `--color-accent-fg` against `--color-accent` |
 | `$ln-contrast-ui` | 3:1 | Interactive boundaries — `--border-ui` on inputs, selects and checkboxes, per 1.4.11 |
 
-Lightness is solved against these targets, not authored. A fill too light to carry white at 7:1 pairs itself with `--color-ink` instead, which is why the dark brand presets ship dark text on a light fill rather than the reverse.
+Shipped theme palettes are strictly calibrated and verified against these targets. A fill too light to carry white at 7:1 pairs itself with `--color-ink` instead, which is why the dark brand presets ship dark text on a light fill rather than the reverse. The standalone Sass solver in `_contrast.scss` provides the mathematical foundation and algorithmic reference for build-time verification.
 
 Consuming applications may quote this position directly. Conformance is a property of a **delivered page with real content**, never of a component library in isolation. The library ships markup, styling, and behavioral defaults engineered to avoid introducing accessibility barriers; the consuming project retains sole ownership of overall page conformance.
 
@@ -67,7 +67,7 @@ The library provides baseline accessibility mechanisms embedded across its HTML 
 | **Contrast-Solved Theme Vocabularies** | Every `--fg-*` tier clears 7:1 against every `--bg-*` surface it can land on, in both polarities — verified by assertion, not by design intent | [`theme/config/_palette.scss`](../../theme/config/_palette.scss), [`tests/brand-theme-cascade.test.js`](../../tests/brand-theme-cascade.test.js) |
 | **Contrast-Solved Brand Fills** | Each `[data-theme]` preset solves its lightness to 7:1 against the nearer foreground pole and declares the matching `--color-accent-fg`, so a fill never inherits text colour it cannot support | [`theme/config/_theme.scss`](../../theme/config/_theme.scss), [`docs-mcp/css/theming.md`](../css/theming.md) |
 | **Interactive Boundary Contrast** | `--border-ui` carries input, select and checkbox boundaries at 3:1 against `--bg-base` (1.4.11); `--border-subtle` / `--border-strong` stay decorative and exempt | [`theme/config/mixins/_form.scss`](../../theme/config/mixins/_form.scss) |
-| **Target Sizing via Density Tiers** | Explicit `--density-row-h` baseline (`2.25rem` compact base, `2.75rem` comfortable, `3rem` spacious) supporting touch and pointer target requirements | [`theme/config/_density.scss`](../../theme/config/_density.scss), [`docs-mcp/css/density.md`](../css/density.md) |
+| **Target Sizing via Density Tiers** | Explicit `--density-row-h` baseline (`2rem` compact, `2.75rem` comfortable base, `3.25rem` spacious) supporting touch and pointer target requirements | [`theme/config/_density.scss`](../../theme/config/_density.scss), [`docs-mcp/css/density.md`](../css/density.md) |
 | **Defensive Hidden State** | CSS reset enforces `[hidden] { display: none !important; }` preventing author styling overrides from exposing hidden translation lists or panels | [`theme/base/_reset.scss`](../../theme/base/_reset.scss) |
 
 ---

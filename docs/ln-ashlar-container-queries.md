@@ -83,19 +83,19 @@ Child `@container` queries are always written as native CSS — no mixin wrapper
 
 ## Naming Convention
 
-Container names: **noun, singular, lowercase, no hyphens** (CSS custom ident rules).
+Container names follow CSS `<custom-ident>` rules: **noun, singular, lowercase, kebab-case or single-word** (e.g. `card-grid`, `folders-grid`, `sidebar`). Do not name containers by visual styling (colors) or physical screen position.
 
 ```scss
-// RIGHT
-container-name: foldersgrid;
+// RIGHT (semantic, structural purpose)
+container-name: folders-grid;
 container-name: sidebar;
-container-name: cardgrid;
-container-name: searchresults;
+container-name: card-grid;
+container-name: search-results;
 
 // WRONG
 container-name: left-panel;      // named by position
 container-name: blue-section;    // named by color
-container-name: card-grid;       // hyphens not allowed in CSS ident
+container-name: --my-container;   // starts with double hyphen (reserved for CSS variables)
 ```
 
 ---

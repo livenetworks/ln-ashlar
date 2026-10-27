@@ -1,0 +1,55 @@
+@use 'display' as *;
+@use 'spacing' as *;
+@use 'typography' as *;
+
+// ─── Validation states ─────────────────────────────────────────
+// Status colors (error/success) stay raw — no logical --color-status
+// token in scope (see parent plan §6.2).
+
+@mixin form-validate-invalid {
+	border-color: hsl(var(--color-error));
+
+	&:focus-visible {
+		border-color: hsl(var(--color-error));
+		box-shadow: 0 0 0 3px hsl(var(--color-error) / 0.15);
+	}
+}
+
+@mixin form-validate-valid {
+	border-color: hsl(var(--color-success));
+
+	&:focus-visible {
+		border-color: hsl(var(--color-success));
+		box-shadow: 0 0 0 3px hsl(var(--color-success) / 0.15);
+	}
+}
+
+// ─── Field feedback slot (Reserved space for errors, output & hints) ──
+
+@mixin form-slot {
+	@include block;
+	min-height: 1.25rem; // Reserves space to prevent form layout shifts
+	font-size: var(--text-xs);
+	line-height: 1.25rem;
+	--margin-block: var(--size-2xs);
+	margin-block-start: var(--margin-block);
+	margin-block-end: 0;
+}
+
+@mixin form-validate-errors {
+	@include form-slot;
+	// Structural error-list margin (not shell rhythm).
+	--margin-block: var(--size-xs);
+	margin-block-start: var(--margin-block);
+	@include typography(caption);
+	color: hsl(var(--color-error));
+	list-style: none;
+	padding: 0;
+
+	li {
+		margin: 0;
+		&.hidden {
+			display: none;
+		}
+	}
+}

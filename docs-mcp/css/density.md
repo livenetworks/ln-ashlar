@@ -19,8 +19,8 @@ tags: [density, spacing, typography, compact, comfortable, spacious, wcag]
 
 The `ln-ashlar` density architecture (`theme/config/_density.scss`) scales the information density of the UI without altering color semantics or layout structures:
 
-- **Inverted Default (Dense Base):** The default `:root` state is dense (0.875rem body, 3.25rem header, 14.5rem sidebar).
-- **Scale Upward via `[data-density]`:** Density scales upward into roomier tiers: `comfortable` and `spacious`.
+- **Balanced Default (:root Base):** The default `:root` provides an accessible, comfortable base (0.875rem body, 2.75rem row height floor, 3.25rem header, 14.5rem sidebar).
+- **Bidirectional Scaling via `[data-density]`:** Density scales downward into high-density enterprise mode (`compact`: 0.8125rem body, 2rem row height) or upward into generous touch mode (`spacious`: 1rem body, 3.25rem row height).
 - **Cascade-Driven Token Rebinds:** Density does not introduce parallel `--density-*` scales (except `--density-row-h`). It directly rebinds base spacing (`--padding-y`, `--gap`), typography roles (`--font-size`, `--text-body-*`, `--text-heading-*`), and control heights (`--btn-padding-y`, `--input-padding-y`).
 - **WCAG Target Size Invariant:**
   - Base / `compact`: ~2.375rem control height (WCAG 2.5.5 Level AA compliant).

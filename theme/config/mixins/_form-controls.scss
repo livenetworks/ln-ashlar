@@ -1,0 +1,146 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'sizing' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'transitions' as *;
+@use 'interaction' as *;
+@use 'focus' as *;
+
+// ─── Focus treatment (shared by form-input and icon-group) ─────
+
+@mixin form-focus-style {
+	border-color: var(--color-accent);
+	@include focus-background-shift;
+}
+
+@mixin _form-focus-style {
+	@include form-focus-style;
+}
+
+// ─── Text inputs, textareas, selects ────────────────────────────
+
+@mixin form-input {
+	@include w-full;
+	--padding-y: var(--input-padding-y, 0.4375rem);
+	--padding-x: var(--input-padding-x, 0.75rem);
+	padding: var(--padding-y) var(--padding-x);
+	font-size: var(--font-size);
+	line-height: var(--line-height);
+	color: var(--color-fg);
+	--color-bg: var(--bg-sunken);
+	background: var(--color-bg);
+	// Control boundary, not a divider — 1.4.11 wants 3:1 here.
+	--color-border: var(--border-ui);
+	@include border;
+	border-radius: var(--radius);
+	@include transition;
+	outline: none;
+
+	&:focus-visible {
+		@include form-focus-style;
+	}
+
+	&::placeholder {
+		--color-fg: var(--fg-subtle);
+		color: var(--color-fg);
+	}
+
+	&:disabled {
+		@include opacity-50;
+		@include cursor-not-allowed;
+		--color-bg: var(--bg-sunken);
+		background: var(--color-bg);
+	}
+
+	// Hide native UA clear button on <input type="search"> — we never use it;
+	// it's visually inconsistent across browsers and fights our icon-group layout.
+	&[type="search"]::-webkit-search-cancel-button {
+		-webkit-appearance: none;
+		appearance: none;
+	}
+
+	&:is(.input-sm, [data-size="sm"]) {
+		@include form-input-sm;
+	}
+
+	&:is(.input-lg, [data-size="lg"]) {
+		@include form-input-lg;
+	}
+}
+
+// ─── Input Size Modifiers ────────────────────────────────────────
+// Token-driven size scales for form-input, select, textarea, and search.
+// Apply via class (.input-sm, .input-lg), data-size attribute ([data-size="sm"]),
+// or direct SCSS mixin inclusion (@include input-sm, @include input-lg).
+
+@mixin form-input-sm {
+	--input-padding-y: var(--size-xs, 0.25rem);
+	--input-padding-x: var(--size-sm, 0.5rem);
+	--padding-y: var(--input-padding-y);
+	--padding-x: var(--input-padding-x);
+	padding: var(--padding-y) var(--padding-x);
+	font-size: var(--text-xs);
+	line-height: var(--line-height-sm, 1.35);
+
+	.ln-icon {
+		--icon-size: 0.875rem;
+	}
+}
+
+@mixin form-input-md {
+	--input-padding-y: 0.4375rem;
+	--input-padding-x: 0.75rem;
+	--padding-y: var(--input-padding-y);
+	--padding-x: var(--input-padding-x);
+	padding: var(--padding-y) var(--padding-x);
+	font-size: var(--text-sm);
+	line-height: var(--line-height, 1.5);
+
+	.ln-icon {
+		--icon-size: 1.125rem;
+	}
+}
+
+@mixin form-input-lg {
+	--input-padding-y: var(--size-sm-up, 0.625rem);
+	--input-padding-x: var(--size-md, 1rem);
+	--padding-y: var(--input-padding-y);
+	--padding-x: var(--input-padding-x);
+	padding: var(--padding-y) var(--padding-x);
+	font-size: var(--text-base);
+	line-height: var(--line-height, 1.5);
+
+	.ln-icon {
+		--icon-size: 1.25rem;
+	}
+}
+
+// Ergonomic aliases matching @mixin btn-sm / @mixin btn-lg
+@mixin input-sm { @include form-input-sm; }
+@mixin input-md { @include form-input-md; }
+@mixin input-lg { @include form-input-lg; }
+
+@mixin form-textarea {
+	min-height: 6rem;
+	resize: vertical;
+
+	&[data-ln-autoresize] {
+		field-sizing: content;
+		min-height: unset;
+		resize: none;
+	}
+}
+
+@mixin form-select {
+	appearance: none;
+	// Arrow icon — override --select-arrow to change per-theme
+	// (SVG data-URIs can't reference CSS custom properties, so the icon is static)
+	--select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+	background-image: var(--select-arrow);
+	background-repeat: no-repeat;
+	// Intrinsic arrow offset (not shell padding rhythm).
+	background-position: right var(--size-sm-up) center;
+	padding-inline-end: 2.5rem;
+}
