@@ -24,7 +24,7 @@
 		left: 0;
 		right: 0;
 		height: var(--size-sm-up); // Intrinsic shadow-decoration height, not spacing rhythm.
-		background: linear-gradient(to bottom, hsl(var(--color-neutral-200) / 0.5), transparent);
+		background: linear-gradient(to bottom, color-mix(in srgb, var(--color-border) 60%, transparent), transparent);
 		pointer-events: none;
 	}
 }

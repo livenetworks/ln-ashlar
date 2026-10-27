@@ -125,7 +125,7 @@
 	background-color: var(--bg-elevated);
 	border: var(--border-width) solid var(--color-border);
 	border-radius: var(--radius-xl);
-	box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3), var(--shadow-xl);
+	box-shadow: 0 25px 60px -15px hsl(0 0% 0% / 0.3), var(--shadow-xl);
 	overflow: hidden;
 
 	.mockup-bar {
@@ -142,9 +142,9 @@
 			border-radius: var(--radius-full);
 			background-color: var(--color-border);
 
-			&:nth-child(1) { background-color: #ff5f56; }
-			&:nth-child(2) { background-color: #ffbd2e; }
-			&:nth-child(3) { background-color: #27c93f; }
+			&:nth-child(1) { background-color: hsl(var(--color-error)); }
+			&:nth-child(2) { background-color: hsl(var(--color-warning)); }
+			&:nth-child(3) { background-color: hsl(var(--color-success)); }
 		}
 
 		.mockup-url {

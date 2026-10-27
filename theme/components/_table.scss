@@ -38,9 +38,9 @@ table {
 			pointer-events: auto !important;
 			transform: none !important;
 			background: transparent !important;
-			padding-left: 0 !important;
+			padding-inline-start: 0 !important;
 			justify-content: flex-end;
-			margin-top: var(--size-xs);
+			margin-block-start: var(--size-xs);
 
 			&::before {
 				display: none !important;

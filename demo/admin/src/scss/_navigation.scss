@@ -2,30 +2,30 @@
 
 .nav {
 	@include nav;
-	@include nav-links-border-grow;
+	@include nav-links-rounded;
 }
 
 .nav .nav-label {
 	@include truncate;
 }
 
-@container sidebar (max-width: 80px) {
+@container sidebar (max-width: 5rem) {
 	.nav {
 		a {
 			@include justify-center;
-			@include px(0.5rem);
+			padding-inline: 0.5rem;
 		}
 
 		.nav-label,
 		.nav-section {
-			@include hidden;
+			display: none;
 		}
 	}
 }
 
 .app-sidebar header {
 	.logo {
-		border-radius: var(--radius-sm, 4px);
+		border-radius: var(--radius-sm);
 	}
 
 	.logo-dark {
@@ -38,7 +38,8 @@
 }
 
 :root[data-mode="dark"] .app-sidebar header,
-html[data-mode="dark"] .app-sidebar header {
+html[data-mode="dark"] .app-sidebar header,
+.app-sidebar[data-mode="dark"] header {
 	.logo-dark {
 		display: inline-block;
 	}
@@ -59,4 +60,3 @@ html[data-mode="dark"] .app-sidebar header {
 		}
 	}
 }
-

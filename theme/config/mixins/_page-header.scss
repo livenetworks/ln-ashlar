@@ -17,9 +17,9 @@
 	--gap: var(--size-md);
 	gap: var(--gap);
 	--padding-y: var(--size-lg);
-	padding-bottom: var(--padding-y);
+	padding-block-end: var(--padding-y);
 	--margin-block: var(--size-lg);
-	margin-bottom: var(--margin-block);
+	margin-block-end: var(--margin-block);
 	border-block-end: var(--border-block-end, var(--border-width) solid var(--color-border));
 
 	@include cq-up(medium, page-header) {

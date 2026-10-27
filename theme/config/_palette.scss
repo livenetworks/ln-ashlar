@@ -12,24 +12,24 @@
 	--color-secondary-lighter: 160 84% 97%;
 
 	// Status colors
-	--color-success:         142 76% 36%;
-	--color-success-light:   142 71% 94%;
-	--color-success-lighter: 142 71% 97%;
+	--color-success:         158 64% 40%;
+	--color-success-light:   158 60% 94%;
+	--color-success-lighter: 158 60% 97%;
 
 	--color-error:           0 84% 48%;
 	--color-error-light:     0 84% 94%;
 	--color-error-lighter:   0 84% 97%;
 
-	--color-warning:         32 95% 38%;
+	--color-warning:         38 92% 40%;
 	--color-warning-light:   38 92% 94%;
 	--color-warning-lighter: 38 92% 97%;
 
-	--color-info:            200 95% 38%;
+	--color-info:            199 95% 38%;
 	--color-info-light:      199 89% 94%;
 	--color-info-lighter:    199 89% 97%;
 
 	// Neutral scale (canonical greys)
-	--color-neutral-50:  210 20% 98%;
+	--color-neutral-50:  214 32% 95%;
 	--color-neutral-100: 220 14% 96%;
 	--color-neutral-150: 220 13% 93%;
 	--color-neutral-175: 220 13% 91%;
@@ -215,8 +215,8 @@
 // stylesheet load order, which is brand.css's whole guarantee.
 // ---------------------------------------------------------------------------
 :where(:root) {
-	--brand-primary:   221 83% 43%;
-	--brand-secondary: 160 84% 36%;
+	--brand-primary:   199 95% 36%;
+	--brand-secondary: 158 64% 40%;
 }
 
 // ---------------------------------------------------------------------------
@@ -256,8 +256,8 @@
 	// and --check-mark selects one. An ink island must repoint this or its
 	// checkmark stays white on a light fill, well under the 3:1 that 1.4.11
 	// asks of a meaningful graphic.
-	--check-mark-on-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
-	--check-mark-on-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f1729' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+	--check-mark-on-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12.75l6 6 9-13.5'/%3E%3C/svg%3E");
+	--check-mark-on-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f1729' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12.75l6 6 9-13.5'/%3E%3C/svg%3E");
 	--check-mark: var(--check-mark-on-light);
 	--color-accent-tint: var(--brand-primary-tint,
 		color-mix(in srgb, hsl(var(--color-primary)) 8%, var(--bg-base)));

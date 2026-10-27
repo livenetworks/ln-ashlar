@@ -97,8 +97,8 @@ The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand
 | `data-theme="midnight"` | attribute | — | Midnight deep purple brand palette preset (`--brand-primary: 265 70% 50%`; lifts to `75%` with `data-mode="dark"`, pairing ink text) |
 | `data-theme="glass"` | attribute | — | Glass luminous blue brand palette preset (`--brand-primary: 218 95% 71%`, ink text in both polarities) |
 | `data-skin="glass"` | attribute | — | Glass structural preset — flat radius/shadow, translucent button chrome, accent nav/menu rebinds. Polarity-agnostic |
-| `--brand-primary` | token | `221 83% 43%` | Primary brand color bare HSL triplet |
-| `--brand-secondary` | token | `160 84% 36%` | Secondary brand color bare HSL triplet |
+| `--brand-primary` | token | `199 95% 36%` | Primary brand color bare HSL triplet |
+| `--brand-secondary` | token | `158 64% 40%` | Secondary brand color bare HSL triplet |
 | `--bg-base` | token | `hsl(var(--color-white)) (light) / hsl(var(--color-neutral-100)) (dark)` | Base canvas background |
 | `--bg-elevated` | token | `var(--bg-base) (light) / hsl(var(--color-neutral-150)) (dark)` | Elevated card surface (flat in light, +3% in dark) |
 | `--bg-sunken` | token | `hsl(var(--color-neutral-100)) (light) / hsl(var(--color-neutral-175)) (dark)` | Sunken well surface (darker in light, +5% in dark) |

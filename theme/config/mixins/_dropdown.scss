@@ -43,7 +43,7 @@
 	}
 
 	li + li {
-		margin-top: var(--size-2xs);
+		margin-block-start: var(--size-2xs);
 	}
 
 	form {
@@ -117,21 +117,21 @@
 	> search:has(> input[type="search"]) {
 		@include flex;      // block-level — kills the inline-flex baseline gap
 		@include w-full;
-		margin-bottom: var(--size-xs);
+		margin-block-end: var(--size-xs);
 	}
 
 	// Bare input shape (no <search> wrapper) — form-input already gives w-full.
 	> input[type="search"] {
-		margin-bottom: var(--size-xs);
+		margin-block-end: var(--size-xs);
 	}
 
-	// Divider when the search precedes the option list. The margin-top here
-	// collapses with the margin-bottom above (both block-level, same BFC),
+	// Divider when the search precedes the option list. The margin-block-start here
+	// collapses with the margin-block-end above (both block-level, same BFC),
 	// so the border sits in a symmetric size-xs gap — not a doubled one.
 	> :is(search:has(> input[type="search"]), input[type="search"]) + :is(ul, nav) {
-		border-top: var(--border-width) solid var(--color-border);
-		padding-top: var(--size-xs);
-		margin-top: var(--size-xs);
+		border-block-start: var(--border-width) solid var(--color-border);
+		padding-block-start: var(--size-xs);
+		margin-block-start: var(--size-xs);
 	}
 }
 

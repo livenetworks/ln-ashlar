@@ -98,7 +98,7 @@
 // footer, slide-in animation, deeper shadow.
 @mixin modal-panel {
 	@include section-card;
-	margin-bottom: 0;
+	margin-block-end: 0;
 	// Explicit role-scale read — modals use max elevation (deeper than
 	// the --shadow-floating default used by floating panels).
 	box-shadow: var(--shadow-xl);

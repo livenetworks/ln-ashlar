@@ -181,7 +181,7 @@
 @mixin app-main {
 	@include flex-col;
 	@include flex-1;
-	margin-top: var(--app-header-height);
+	margin-block-start: var(--app-header-height);
 	// Bounded inner viewport: exactly the space below the fixed
 	// .app-header. The `> section` child flex-fills and becomes the
 	// scroll surface (its overflow-auto finally activates here).
@@ -196,14 +196,14 @@
 	// avoids the horizontal overflow caused by margin-left on
 	// width:100% children.
 	&:has(.app-sidebar[data-ln-toggle="open"]) {
-		padding-left: var(--app-sidebar-width);
+		padding-inline-start: var(--app-sidebar-width);
 	}
 
 	// On mobile the sidebar overlays (scrim covers content) —
 	// no content shift.
 	@include mq-down(md) {
 		&:has(.app-sidebar[data-ln-toggle="open"]) {
-			padding-left: 0;
+			padding-inline-start: 0;
 		}
 	}
 

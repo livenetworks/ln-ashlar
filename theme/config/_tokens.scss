@@ -58,12 +58,12 @@
 	// Border Radius
 	// -----------------------------------------------------------------------
 	--radius-none: 0;
-	--radius-xs:   0.125rem;   // 2px
-	--radius-sm:   0.25rem;    // 4px
-	--radius-md:   0.375rem;   // 6px
-	--radius-lg:   0.5rem;     // 8px
-	--radius-xl:   0.75rem;    // 12px
-	--radius-2xl:  1rem;       // 16px
+	--radius-xs:   0.25rem;    // 4px
+	--radius-sm:   0.375rem;   // 6px — tight controls, badges, compact items
+	--radius-md:   0.625rem;   // 10px — inputs, standard buttons, tabs, dropdowns
+	--radius-lg:   1rem;       // 16px — cards, tables, panels
+	--radius-xl:   1.375rem;   // 22px — modals, dialogs
+	--radius-2xl:  1.75rem;    // 28px — large floating banners, heroes
 	--radius-full: 9999px;
 
 	// -----------------------------------------------------------------------
@@ -171,8 +171,8 @@
 
 	// -- Structure & rhythm -----------------------------------------------
 	--padding-x:       var(--size-sm-up);
-	--padding-y:       var(--size-xs-up);   // 6px — dense base (DocuFlow 7px rounds to 6px)
-	--gap:             var(--size-xs-up);   // 6px — dense base
+	--padding-y:       var(--size-sm);      // 8px — comfortable base
+	--gap:             var(--size-sm);      // 8px — comfortable base
 	// --radius sits with the other primitives in _palette.scss. Declared here it
 	// would resolve once at <html> and inherit frozen through every theme island.
 

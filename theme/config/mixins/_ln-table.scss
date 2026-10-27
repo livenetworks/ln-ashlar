@@ -32,7 +32,6 @@
 
 @mixin ln-table {
 	@include border;
-	--radius: var(--radius-lg);
 	border-radius: var(--radius);
 	background: var(--color-bg);
 	// `clip` not `auto` — no scroll container, so the sticky thead/footer
@@ -149,8 +148,7 @@
 	width: auto;                    // hug the 10rem input
 
 	> .ln-icon {
-		padding-top: var(--size-2xs);     // tighten leading icon vertical padding (was var(--size-xs))
-		padding-bottom: var(--size-2xs);  // horizontal padding (size-sm) inherited from form-field-group
+		padding-block: var(--size-2xs);   // tighten leading icon vertical padding (was var(--size-xs))
 	}
 
 	> input {
@@ -249,7 +247,7 @@
 			color: var(--color-fg);
 			float: left;
 			--margin-inline: var(--size-sm);
-			margin-right: var(--margin-inline);
+			margin-inline-end: var(--margin-inline);
 			line-height: 1.75rem;
 		}
 
@@ -325,7 +323,7 @@
 		--btn-padding-y: 0;
 		--btn-padding-x: 0;
 		--margin-inline: var(--size-2xs);
-		margin-left: var(--margin-inline);
+		margin-inline-start: var(--margin-inline);
 
 		&:hover {
 			color: hsl(var(--color-error));
@@ -342,7 +340,7 @@
 	border: none;
 	@include cursor-pointer;
 	--margin-inline: var(--size-xs);
-	margin-left: var(--margin-inline);
+	margin-inline-start: var(--margin-inline);
 
 	&:hover {
 		color: hsl(var(--color-error));
@@ -360,7 +358,7 @@
 		@include block;
 		@include mx(auto);
 		--margin-block: var(--size-md);
-		margin-bottom: var(--margin-block);
+		margin-block-end: var(--margin-block);
 		opacity: 0.3;
 	}
 

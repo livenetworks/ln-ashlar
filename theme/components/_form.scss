@@ -73,11 +73,45 @@ $icon-group-test: ':has(> .ln-icon):has(> :is(input[type="text"], input[type="se
 
 // ─── Label & Actions ────────────────────────────────────────────
 
-// Non-wrapping labels only — the label sits above/beside its input, not
-// around it. The icon-group pattern owns its full styling and must not
-// inherit block + margin-bottom from here.
-label:not(:has(> input)) {
+// Natural cascade: all labels receive standard label typography/colors,
+// while labels wrapping input controls (checkboxes/radios/icon-groups)
+// override the block display and margin.
+label {
 	@include form-label;
+}
+
+label:has(> input) {
+	display: inline-flex;
+	margin-block-end: 0;
+}
+
+label:has(> :is(input[type="checkbox"], input[type="radio"])) {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-xs);
+	cursor: pointer;
+	user-select: none;
+	font-size: var(--text-sm);
+	font-weight: 500;
+	color: var(--color-fg);
+	line-height: var(--line-height-normal, 1.5);
+	margin-block-end: 0;
+
+	&:hover {
+		color: var(--color-fg);
+
+		> :is(input[type="checkbox"], input[type="radio"]):not(:disabled) {
+			border-color: var(--color-accent);
+		}
+	}
+}
+
+:is(input, select, textarea, search, #{$icon-group-wrapper}#{$icon-group-test}):is(.input-sm, [data-size="sm"]) {
+	@include form-input-sm;
+}
+
+:is(input, select, textarea, search, #{$icon-group-wrapper}#{$icon-group-test}):is(.input-lg, [data-size="lg"]) {
+	@include form-input-lg;
 }
 
 // ─── Pill groups — radio & checkbox lists ──────────────────────────

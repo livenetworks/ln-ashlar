@@ -20,7 +20,14 @@
 	top: 100%;
 	right: 0;
 	left: auto;
-	margin-top: var(--size-xs);
+	margin-block-start: var(--size-xs);
 	min-width: 14rem;
 	padding: var(--size-sm);
 }
+
+// Standalone and inline filter tracks
+nav[data-ln-filter],
+[data-ln-filter-bar] {
+	@include filter-bar;
+}
+

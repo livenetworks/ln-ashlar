@@ -65,7 +65,7 @@
 		}
 
 		li + li {
-			margin-top: var(--size-2xs);
+			margin-block-start: var(--size-2xs);
 		}
 
 		// When containing interactive actions/buttons (menus, pickers)

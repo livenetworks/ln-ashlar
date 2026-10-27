@@ -51,7 +51,7 @@
 		--btn-padding-y: var(--size-2xs);
 		--btn-padding-x: var(--size-2xs);
 		@include flex-shrink-0;
-		margin-left: auto;
+		margin-inline-start: auto;
 	}
 }
 

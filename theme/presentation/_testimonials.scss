@@ -52,7 +52,7 @@
 		align-items: center;
 		gap: 0.25rem;
 		margin-block-end: var(--size-md);
-		color: #f59e0b; // Warm amber star color
+		color: hsl(var(--color-warning)); // Warm amber star color
 
 		svg,
 		.ln-icon {

@@ -88,3 +88,7 @@ nav[data-ln-filter-col] > ul {
 span[data-ln-filter] label:has(> input[type="checkbox"]) {
 	@include pill;
 }
+
+#filter-dept-list-3 {
+	margin-block-start: var(--size-sm);
+}

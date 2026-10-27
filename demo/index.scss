@@ -36,7 +36,7 @@ header {
 
 		img {
 			border-radius: var(--radius-lg, 0.75rem);
-			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+			box-shadow: 0 10px 30px hsl(0 0% 0% / 0.35);
 			border: 1px solid var(--border-subtle);
 			display: block;
 		}

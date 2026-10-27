@@ -41,13 +41,13 @@
 	color: var(--color-fg);
 	@include cursor-pointer;
 	@include transition;
-	border-bottom: 2px solid transparent;
-	margin-bottom: -1px;
+	border-block-end: 2px solid transparent;
+	margin-block-end: -1px;
 
 	&:hover {
 		color: var(--color-accent);
 		background-color: color-mix(in srgb, var(--color-accent) var(--tint-hover), transparent);
-		border-bottom-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
+		border-block-end-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
 	}
 
 	&:focus,

@@ -54,10 +54,10 @@
 			// Visual separator between groups (not on last)
 			&:not(:last-child) {
 				--padding-x: var(--size-xs);
-				padding-right: var(--padding-x);
-				border-right: var(--border-width) solid var(--color-border);
+				padding-inline-end: var(--padding-x);
+				border-inline-end: var(--border-width) solid var(--color-border);
 				--margin-inline: var(--size-xs);
-				margin-right: var(--margin-inline);
+				margin-inline-end: var(--margin-inline);
 			}
 		}
 

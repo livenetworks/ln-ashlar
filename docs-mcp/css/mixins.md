@@ -10,6 +10,9 @@ tags: [mixins, scss, layout, primitives, components, recipes]
 
 # 🛠️ mixins
 
+> **Mental Model & Architectural Contract:**
+> SCSS mixins provide zero-runtime-cost styling recipes divided strictly into selector-free primitives (layout, typography, surfaces) and semantic component composites. Consumers bind mixins semantically to HTML elements or utility selectors using design tokens in `rem`, avoiding hardcoded properties and utility class soup.
+
 ---
 
 ## 1. Core Behavior & Responsibility
@@ -144,6 +147,8 @@ The `ln-ashlar` mixin architecture powers the **Visual Theme Layer** (`ln-ashlar
 | `section` | mixin | — | Page section vertical rhythm and container constraints |
 | `table-base`, `table-striped` | mixin | `$sticky: false` | Full table styling with sunken header and interactive hover |
 | `form-grid`, `form-input`, `form-label` | mixin | — | Responsive 6-column form grid and input styling |
+| `input-sm`, `input-md`, `input-lg` | mixin | — | Token-driven input size modifiers (~1.75rem compact, ~2.375rem default, ~2.875rem large) |
+| `search`, `search-sm`, `search-lg` | mixin | — | Search widget and size variants |
 | `btn`, `btn-soft`, `btn-ghost` | mixin | — | Turnkey button variants with interaction states |
 | `chip` | mixin | — | Dismissible pill badge with delete action |
 | `badge`, `status-badge` | mixin | — | Status indicator badge with semantic status colors |

@@ -3,17 +3,17 @@
 @mixin p($val)  { padding: $val; }
 @mixin px($val) { padding-inline: $val; }
 @mixin py($val) { padding-block: $val; }
-@mixin pt($val) { padding-top: $val; }
-@mixin pb($val) { padding-bottom: $val; }
-@mixin pl($val) { padding-left: $val; }
-@mixin pr($val) { padding-right: $val; }
+@mixin pt($val) { padding-block-start: $val; }
+@mixin pb($val) { padding-block-end: $val; }
+@mixin pl($val) { padding-inline-start: $val; }
+@mixin pr($val) { padding-inline-end: $val; }
 
 @mixin m($val)  { margin: $val; }
 @mixin mx($val) { margin-inline: $val; }
 @mixin my($val) { margin-block: $val; }
-@mixin mt($val) { margin-top: $val; }
-@mixin mb($val) { margin-bottom: $val; }
-@mixin ml($val) { margin-left: $val; }
-@mixin mr($val) { margin-right: $val; }
+@mixin mt($val) { margin-block-start: $val; }
+@mixin mb($val) { margin-block-end: $val; }
+@mixin ml($val) { margin-inline-start: $val; }
+@mixin mr($val) { margin-inline-end: $val; }
 
 @mixin gap($val) { gap: $val; }

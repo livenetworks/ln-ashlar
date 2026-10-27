@@ -36,7 +36,7 @@
 		--padding-y: var(--size-2xs);
 		--padding-x: var(--size-sm);
 		width: 100%;
-		margin-bottom: var(--size-xs);
+		margin-block-end: var(--size-xs);
 	}
 
 	[data-ln-filter-options] {
@@ -45,3 +45,25 @@
 		li { padding: var(--filter-dropdown-item-pad-y, var(--size-3xs)) 0; }
 	}
 }
+
+// ─── Filter bar — inline/toolbar filter track ──────────────────────
+// Used by nav[data-ln-filter] and standalone toolbar filters to lay out
+// checkbox options with clean flex wrapping, spacing, and label hit targets.
+@mixin filter-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--size-xs) var(--size-md);
+	margin-block-end: var(--size-md);
+
+	> label:has(> input[type="checkbox"]) {
+		padding: var(--size-2xs) var(--size-xs);
+		border-radius: var(--radius-sm);
+		transition: background-color var(--transition-fast);
+
+		&:hover {
+			background-color: var(--bg-hover);
+		}
+	}
+}
+

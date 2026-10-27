@@ -66,7 +66,7 @@
 	}
 
 	// Initials fallback — <abbr class="avatar">SO</abbr>
-	&:not(:has(img, span)) {
+	&:is(abbr, &:not(:has(> :is(img, span)))) {
 		@include _avatar-media;
 		@include flex-center;
 		@include text-sm;
@@ -97,7 +97,7 @@
 // ─── Sizes ─────────────────────────────────────────────
 @mixin _avatar-size($size, $font-size, $line-height) {
 	img { @include size($size); }
-	&:not(:has(img, span)) {
+	&:is(abbr, &:not(:has(> :is(img, span)))) {
 		@include size($size);
 		font-size: $font-size;
 		line-height: $line-height;

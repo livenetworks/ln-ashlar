@@ -22,7 +22,7 @@
 	color: var(--color-fg);
 	// Structural label-to-input gap (not shell rhythm).
 	--margin-block: 0.375rem;
-	margin-bottom: var(--margin-block);
+	margin-block-end: var(--margin-block);
 
 	// Required indicator — red * after label text.
 	// Supports standard wrapping classes/tags (.form-element, .form-group, label)
@@ -60,12 +60,12 @@
 	gap: var(--gap);
 	// Structural margin-top (not shell rhythm).
 	--margin-block: var(--size-lg);
-	margin-top: var(--margin-block);
+	margin-block-start: var(--margin-block);
 	// Structural padding-top (border-t offset). Kept literal to avoid
 	// cascading --padding-y into nested anchors, which use button-standard
 	// --padding-y from :root.
 	--padding-y: var(--size-md);
-	padding-top: var(--padding-y);
+	padding-block-start: var(--padding-y);
 	@include border-t;
 
 	a {
@@ -90,8 +90,8 @@
 
 @mixin form-input {
 	@include w-full;
-	--padding-y: var(--input-padding-y, var(--size-sm));
-	--padding-x: var(--size-md);
+	--padding-y: var(--input-padding-y, 0.4375rem);
+	--padding-x: var(--input-padding-x, 0.75rem);
 	padding: var(--padding-y) var(--padding-x);
 	font-size: var(--font-size);
 	line-height: var(--line-height);
@@ -127,7 +127,67 @@
 		-webkit-appearance: none;
 		appearance: none;
 	}
+
+	&:is(.input-sm, [data-size="sm"]) {
+		@include form-input-sm;
+	}
+
+	&:is(.input-lg, [data-size="lg"]) {
+		@include form-input-lg;
+	}
 }
+
+// ─── Input Size Modifiers ────────────────────────────────────────
+// Token-driven size scales for form-input, select, textarea, and search.
+// Apply via class (.input-sm, .input-lg), data-size attribute ([data-size="sm"]),
+// or direct SCSS mixin inclusion (@include input-sm, @include input-lg).
+
+@mixin form-input-sm {
+	--input-padding-y: var(--size-xs, 0.25rem);
+	--input-padding-x: var(--size-sm, 0.5rem);
+	--padding-y: var(--input-padding-y);
+	--padding-x: var(--input-padding-x);
+	padding: var(--padding-y) var(--padding-x);
+	font-size: var(--text-xs);
+	line-height: var(--line-height-sm, 1.35);
+
+	.ln-icon {
+		--icon-size: 0.875rem;
+	}
+}
+
+@mixin form-input-md {
+	--input-padding-y: 0.4375rem;
+	--input-padding-x: 0.75rem;
+	--padding-y: var(--input-padding-y);
+	--padding-x: var(--input-padding-x);
+	padding: var(--padding-y) var(--padding-x);
+	font-size: var(--text-sm);
+	line-height: var(--line-height, 1.5);
+
+	.ln-icon {
+		--icon-size: 1.125rem;
+	}
+}
+
+@mixin form-input-lg {
+	--input-padding-y: var(--size-sm-up, 0.625rem);
+	--input-padding-x: var(--size-md, 1rem);
+	--padding-y: var(--input-padding-y);
+	--padding-x: var(--input-padding-x);
+	padding: var(--padding-y) var(--padding-x);
+	font-size: var(--text-base);
+	line-height: var(--line-height, 1.5);
+
+	.ln-icon {
+		--icon-size: 1.25rem;
+	}
+}
+
+// Ergonomic aliases matching @mixin btn-sm / @mixin btn-lg
+@mixin input-sm { @include form-input-sm; }
+@mixin input-md { @include form-input-md; }
+@mixin input-lg { @include form-input-lg; }
 
 @mixin form-textarea {
 	min-height: 6rem;
@@ -149,7 +209,7 @@
 	background-repeat: no-repeat;
 	// Intrinsic arrow offset (not shell padding rhythm).
 	background-position: right var(--size-sm-up) center;
-	padding-right: 2.5rem;
+	padding-inline-end: 2.5rem;
 }
 
 // ─── Field group — generic bordered flex shell ────────────────────
@@ -183,7 +243,7 @@
 	overflow: hidden;          // clips child corners to the shell's border-radius automatically
 	width: auto;               // cancel form-input's w-full
 	padding: 0;                // shell owns NO padding; children manage their own
-	margin-bottom: 0;          // defensive: wrapping <label> carries form-label margin
+	margin-block-end: 0;       // defensive: wrapping <label> carries form-label margin
 }
 
 @mixin form-field-group-parts {
@@ -236,10 +296,10 @@
 
 		// Tighten inner padding when adjacent to icons or buttons inside the group
 		&:not(:first-child) {
-			padding-left: var(--size-xs);
+			padding-inline-start: var(--size-xs);
 		}
 		&:not(:last-child) {
-			padding-right: var(--size-xs);
+			padding-inline-end: var(--size-xs);
 		}
 	}
 
@@ -251,11 +311,9 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		padding-top: 0;
-		padding-bottom: 0;
+		padding-block: 0;
 		// Tighter horizontal padding for icon-only button inside groups to keep it compact and squarish
-		padding-left: var(--size-sm);
-		padding-right: var(--size-sm);
+		padding-inline: var(--size-sm);
 		border-radius: 0; // Square the button to sit flush with the input border
 
 		> .ln-icon {
@@ -319,10 +377,10 @@
 	> input,
 	> select {
 		&:not(:first-child) {
-			padding-left: 0;
+			padding-inline-start: 0;
 		}
 		&:not(:last-child) {
-			padding-right: 0;
+			padding-inline-end: 0;
 		}
 	}
 
@@ -331,7 +389,7 @@
 	//    room) and KEEP vertical padding. Set padding-right ONLY — never the `padding`
 	//    shorthand (it would clobber left + vertical).
 	> .ln-icon {
-		padding-right: var(--size-xs);   // 8px → 4px; left + vertical inherited from form-field-group
+		padding-inline-end: var(--size-xs);   // 8px → 4px; left + vertical inherited from form-field-group
 	}
 }
 
@@ -357,35 +415,67 @@
 	--color-bg: var(--bg-recessed);   // recessed fill so the white clear-hover reads
 	--btn-bg-hover: var(--bg-base);   // clear button highlights white on hover (token rebind, no specificity override)
 
-	// Density-immune: pin to the dense base scale so the field is one size
-	// everywhere, regardless of ambient [data-density]. Mirror the values
-	// in config/_density.scss — keep in sync.
-	--size-xs: 0.125rem;
-	--size-sm: 0.375rem;
-	--font-size: 0.875rem;
-	--line-height: 1.5;
+	// Default size matches standard form inputs (height ~2.375rem, font-size, line-height).
+	// Compact size modifier ("по потреба помал"):
+	&:is(.input-sm, .search-sm, [data-size="sm"], [data-density="compact"], [data-ln-density="compact"]) {
+		@include form-input-sm;
 
-	// Compact field — smaller vertical padding. form-input self-declares
-	// --padding-y on the input, so override it on the input directly.
-	> input { --padding-y: var(--size-xs); }
+		> input {
+			--padding-y: var(--input-padding-y);
+			--padding-x: var(--input-padding-x);
+		}
+	}
 
-	// Compact icons via the --icon-size primitive (no ln-icon--sm class in markup).
-	.ln-icon { --icon-size: 1rem; }
+	// Large size modifier:
+	&:is(.input-lg, .search-lg, [data-size="lg"]) {
+		@include form-input-lg;
+
+		> input {
+			--padding-y: var(--input-padding-y);
+			--padding-x: var(--input-padding-x);
+		}
+	}
+}
+
+@mixin search-sm {
+	@include search;
+	@include form-input-sm;
+
+	> input {
+		--padding-y: var(--input-padding-y);
+		--padding-x: var(--input-padding-x);
+	}
+}
+
+@mixin search-lg {
+	@include search;
+	@include form-input-lg;
+
+	> input {
+		--padding-y: var(--input-padding-y);
+		--padding-x: var(--input-padding-x);
+	}
 }
 
 // ─── Checkbox & Radio ───────────────────────────────────────────
 
 @mixin form-check {
 	appearance: none;
-	@include size(1.25rem);
+	@include size(1.125rem);
 	padding: 0;
 	@include flex-shrink-0;
 	// Non-standard 1.5px stroke — optical weight at small checkbox size.
 	border: 1.5px solid var(--border-ui);
-	background: var(--color-bg);
+	background: var(--bg-sunken);
 	@include cursor-pointer;
 	@include transition;
 	vertical-align: middle;
+	box-shadow: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
+
+	&:hover:not(:disabled) {
+		border-color: var(--color-accent);
+		background-color: var(--bg-base);
+	}
 
 	&:checked {
 		background-color: var(--color-accent);
@@ -396,6 +486,21 @@
 		// two variants and themes point --check-mark at the one matching their
 		// --color-accent-fg pole. Same pattern as --select-arrow above.
 		background-image: var(--check-mark);
+		background-size: 0.75rem;
+		background-position: center;
+		background-repeat: no-repeat;
+		box-shadow: 0 1px 3px 0 hsl(var(--color-accent-h, 217) var(--color-accent-s, 91%) var(--color-accent-l, 60%) / 0.25);
+
+		&:hover:not(:disabled) {
+			background-color: hsl(from var(--color-accent) h s calc(l - 6));
+			border-color: hsl(from var(--color-accent) h s calc(l - 6));
+		}
+	}
+
+	&:indeterminate {
+		background-color: var(--color-accent);
+		border-color: var(--color-accent);
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round'%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E%3C/svg%3E");
 		background-size: 0.75rem;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -413,7 +518,7 @@
 
 @mixin form-checkbox {
 	@include form-check;
-	@include rounded-sm;
+	@include rounded-xs;
 }
 
 @mixin form-radio {
@@ -440,14 +545,14 @@
 	@include flex;
 	@include items-center;
 	gap: var(--gap);
-	--padding-y: var(--input-padding-y, var(--size-sm));
-	--padding-x: var(--size-md);
+	--padding-y: var(--input-padding-y, 0.4375rem);
+	--padding-x: var(--input-padding-x, 0.75rem);
 	padding: var(--padding-y) var(--padding-x);
 	@include cursor-pointer;
 	@include transition;
 	@include text-sm;
 	@include font-medium;
-	margin-bottom: 0;
+	margin-block-end: 0;
 	border-radius: var(--radius);
 	border: var(--border-width) solid var(--color-border);
 	// Reset pill's filled bg. Outline = transparent surface.
@@ -572,7 +677,7 @@
 		position: relative;
 
 		&:not(:first-child) {
-			margin-left: calc(var(--border-width) * -1);
+			margin-inline-start: calc(var(--border-width) * -1);
 		}
 
 		&:hover,
@@ -722,7 +827,7 @@
 	@include text-sm;
 	@include font-medium;
 	color: var(--color-fg);
-	margin-bottom: 0;
+	margin-block-end: 0;
 
 	> input[type="checkbox"] {
 		@include toggle-switch;
@@ -835,15 +940,15 @@
 	font-size: var(--text-xs);
 	line-height: 1.25rem;
 	--margin-block: var(--size-2xs);
-	margin-top: var(--margin-block);
-	margin-bottom: 0;
+	margin-block-start: var(--margin-block);
+	margin-block-end: 0;
 }
 
 @mixin form-validate-errors {
 	@include form-slot;
 	// Structural error-list margin (not shell rhythm).
 	--margin-block: var(--size-xs);
-	margin-top: var(--margin-block);
+	margin-block-start: var(--margin-block);
 	@include typography(caption);
 	color: hsl(var(--color-error));
 	list-style: none;

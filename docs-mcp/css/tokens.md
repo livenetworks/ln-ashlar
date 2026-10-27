@@ -99,12 +99,12 @@ Within the theme system, design values flow through four strictly defined layers
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
 | **Brand & Status Triplets (Bare HSL)** | | | |
-| `--brand-primary` | token | `221 83% 43%` | Primary brand bare HSL triplet |
-| `--brand-secondary` | token | `160 84% 36%` | Brand secondary accent bare HSL triplet |
-| `--color-success` | token | `142 76% 36%` | Success status bare HSL triplet |
+| `--brand-primary` | token | `199 95% 36%` | Primary brand bare HSL triplet |
+| `--brand-secondary` | token | `158 64% 40%` | Brand secondary accent bare HSL triplet |
+| `--color-success` | token | `158 64% 40%` | Success status bare HSL triplet |
 | `--color-error` | token | `0 84% 48%` | Error status bare HSL triplet |
-| `--color-warning` | token | `32 95% 38%` | Caution status bare HSL triplet |
-| `--color-info` | token | `200 95% 38%` | Info status bare HSL triplet |
+| `--color-warning` | token | `38 92% 40%` | Caution status bare HSL triplet |
+| `--color-info` | token | `199 95% 38%` | Info status bare HSL triplet |
 | **Vocabulary Tokens (Light vs. Dark)** | | | |
 | `--bg-base` | token | `hsl(var(--color-white)) (light) / hsl(var(--color-neutral-100)) (dark)` | Base canvas background |
 | `--bg-elevated` | token | `var(--bg-base) (light) / hsl(var(--color-neutral-150)) (dark)` | Raised card background |
@@ -138,12 +138,12 @@ Within the theme system, design values flow through four strictly defined layers
 | `--size-2xl` | token | `3rem` | 48px spacing step |
 | `--size-3xl` | token | `4rem` | 64px spacing step |
 | **Radii & Dimensions** | | | |
-| `--radius-xs` | token | `0.125rem` | 2px border radius |
-| `--radius-sm` | token | `0.25rem` | 4px border radius |
-| `--radius-md` | token | `0.375rem` | 6px border radius |
-| `--radius-lg` | token | `0.5rem` | 8px border radius |
-| `--radius-xl` | token | `0.75rem` | 12px border radius |
-| `--radius-2xl` | token | `1rem` | 16px border radius |
+| `--radius-xs` | token | `0.25rem` | 2px border radius |
+| `--radius-sm` | token | `0.375rem` | 4px border radius |
+| `--radius-md` | token | `0.625rem` | 6px border radius |
+| `--radius-lg` | token | `1rem` | 8px border radius |
+| `--radius-xl` | token | `1.375rem` | 12px border radius |
+| `--radius-2xl` | token | `1.75rem` | 16px border radius |
 | `--radius-full` | token | `9999px` | Pill / circular radius |
 | `--border-width` | token | `1px` | Standard 1px border stroke |
 | `--border-width-strong` | token | `2px` | Thick 2px border stroke |

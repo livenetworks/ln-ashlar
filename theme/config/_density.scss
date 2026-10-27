@@ -18,14 +18,10 @@
 // It is NEVER auto-switched by viewport — viewport breakpoints handle
 // layout, density handles information density inside that layout.
 //
-// What reacts: spatial rhythm and layout geometry:
-// --padding-y, --gap, --app-header-height, --app-sidebar-width,
+// What reacts: spatial rhythm, layout geometry, and typography:
+// --font-size, --line-height, --text-sm, --text-xs,
+// --padding-y, --padding-x, --gap, --app-header-height, --app-sidebar-width,
 // --density-row-h, --btn-padding-y, --btn-padding-x, --input-padding-y.
-//
-// Typography (font-size, line-height) remains stable across density modes:
-//   (1) Prevents text disappearing/reappearing (glyph cache drop on variable fonts)
-//   (2) Eliminates layout thrashing during CSS transitions
-//   (3) Enables smooth, gentle CSS transitions on padding and row height
 // ==========================================================================
 
 :root {
@@ -35,21 +31,36 @@
 	// Minimum row height for table rows and data lists. Kept density-named
 	// because it has no analogue in the base token scale.
 	// -----------------------------------------------------------------------
-	--density-row-h:    2.25rem;  // 36px — dense base
+	--density-row-h:    2.75rem;  // 44px — comfortable base
+	--input-padding-y:  0.4375rem; // 7px — sleek modern input height (~38px)
+	--input-padding-x:  0.75rem;   // 12px
+	--btn-padding-y:    0.4375rem;
+	--btn-padding-x:    0.75rem;
 }
 
 // ---------------------------------------------------------------------------
-// [data-density="compact"] — explicit handle for the dense base.
-//
-// Identical to :root. Exists so:
-//   (a) a switcher can write a single attribute across all tiers including
-//       returning to base (rather than removing the attribute)
-//   (b) a region inside a comfortable page can be scoped dense:
-//       <table data-density="compact">
+// [data-density="compact"] — explicit handle for the dense tier.
+// Compresses data views for high-density enterprise/ERP contexts.
 // ---------------------------------------------------------------------------
 [data-density="compact"] {
-	--density-row-h:      2.25rem;            // 36px — restore dense base in scoped context
-	--input-padding-y:    var(--size-xs-up);  // 6px — compact input padding
+	// -- Typography scale ------------------------------------------------
+	--font-size:          0.8125rem;          // 13px — tight enterprise typography
+	--line-height:        1.4;
+	--text-body-md:       0.8125rem;          // 13px
+	--text-sm:            0.8125rem;          // 13px
+	--text-xs:            0.6875rem;          // 11px
+	--text-label-sm:      0.6875rem;          // 11px
+
+	// -- Logical rhythm & layout -----------------------------------------
+	--density-row-h:      2rem;               // 32px — dense row height
+	--padding-y:          var(--size-xs);     // 0.25rem (4px) — dense padding
+	--padding-x:          var(--size-sm);     // 0.5rem (8px)
+	--gap:                var(--size-xs);     // 0.25rem (4px) — tight gap
+	--input-padding-y:    0.25rem;            // 4px — compact input padding
+	--input-padding-x:    0.5rem;             // 8px
+	--btn-padding-y:      0.25rem;            // 4px — compact button padding
+	--btn-padding-x:      0.5rem;             // 8px
+	--radius:             var(--radius-sm);   // 0.375rem (6px) — crisp compact corners
 }
 
 // ---------------------------------------------------------------------------
@@ -61,20 +72,31 @@
 // <aside data-density="comfortable">  ← scoped comfortable sidebar
 // ---------------------------------------------------------------------------
 [data-density="comfortable"] {
+	// -- Typography scale ------------------------------------------------
+	--font-size:          0.875rem;           // 14px — standard balanced reading size
+	--line-height:        1.5;
+	--text-body-md:       0.875rem;           // 14px
+	--text-sm:            0.875rem;           // 14px
+	--text-xs:            0.75rem;            // 12px
+	--text-label-sm:      0.75rem;            // 12px
 
 	// -- Logical rhythm --------------------------------------------------
-	--padding-y:          var(--size-sm);       // 8px (was dense 6px)
-	--gap:                var(--size-sm);       // 8px (was dense 6px)
+	--padding-y:          var(--size-sm);     // 0.5rem (8px)
+	--padding-x:          var(--size-sm-up);  // 0.75rem (12px)
+	--gap:                var(--size-sm);     // 0.5rem (8px)
 
 	// -- App shell -------------------------------------------------------
-	--app-header-height:  3.5rem;               // 56px (was dense 3.25rem)
-	--app-sidebar-width:  16rem;                // 256px (was dense 14.5rem)
+	--app-header-height:  3.5rem;             // 56px
+	--app-sidebar-width:  16rem;              // 256px
 
 	// -- Row height ------------------------------------------------------
-	--density-row-h:      2.75rem;              // 44px (was dense 2.25rem)
+	--density-row-h:      2.75rem;            // 44px
 
-	// -- Interactive controls — roomy 44px inputs ------------------------
-	--input-padding-y:    var(--size-sm-up);    // 12px → inputs/selects roomy
+	// -- Interactive controls — sleek modern inputs ----------------------
+	--input-padding-y:    0.4375rem;          // 7px → sleek inputs (~38px)
+	--input-padding-x:    0.75rem;            // 12px
+	--btn-padding-y:      0.4375rem;
+	--btn-padding-x:      0.75rem;
 }
 
 // ---------------------------------------------------------------------------
@@ -87,18 +109,29 @@
 // <html data-density="spacious">
 // ---------------------------------------------------------------------------
 [data-density="spacious"] {
+	// -- Typography scale ------------------------------------------------
+	--font-size:          1rem;               // 16px — large accessible typography
+	--line-height:        1.6;
+	--text-body-md:       1rem;               // 16px
+	--text-sm:            0.9375rem;          // 15px
+	--text-xs:            0.8125rem;          // 13px
+	--text-label-sm:      0.8125rem;          // 13px
 
 	// -- Logical rhythm --------------------------------------------------
-	--padding-y:          var(--size-md);       // 16px
-	--gap:                var(--size-md);       // 16px
+	--padding-y:          var(--size-md);     // 1rem (16px)
+	--padding-x:          var(--size-lg);     // 1.5rem (24px)
+	--gap:                var(--size-md);     // 1rem (16px)
 
 	// -- App shell -------------------------------------------------------
-	--app-header-height:  4rem;                 // 64px
-	--app-sidebar-width:  17.5rem;              // 280px
+	--app-header-height:  4rem;               // 64px
+	--app-sidebar-width:  17.5rem;            // 280px
 
 	// -- Row height ------------------------------------------------------
-	--density-row-h:      3rem;                 // 48px
+	--density-row-h:      3.25rem;            // 52px
 
 	// -- Interactive controls — generous touch targets -------------------
-	--input-padding-y:    var(--size-md);       // 16px → inputs/pills ≥48px
+	--input-padding-y:    0.625rem;           // 10px
+	--input-padding-x:    1rem;               // 16px
+	--btn-padding-y:      0.625rem;           // 10px
+	--btn-padding-x:      1rem;               // 16px
 }

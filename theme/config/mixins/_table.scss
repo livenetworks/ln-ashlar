@@ -18,7 +18,6 @@
 @mixin table-base($sticky: false) {
 	@include w-full;
 	background: var(--color-bg);
-	--radius: var(--radius-lg);
 	border-radius: var(--radius);
 	// `overflow: clip` not `overflow: hidden` — clips at rounded corners
 	// without establishing a scroll container, so sticky descendants
@@ -175,7 +174,7 @@
 		@include block;
 		// Structural gap between stacked row-cards.
 		--margin-block: var(--size-md);
-		margin-bottom: var(--margin-block);
+		margin-block-end: var(--margin-block);
 		@include border;
 		border-radius: var(--radius);
 		@include overflow-hidden;
@@ -190,7 +189,7 @@
 		padding: var(--padding-y) var(--padding-x);
 		@include border-b;
 		@include relative;
-		padding-left: 50%;
+		padding-inline-start: 50%;
 
 		&:last-child {
 			@include border-none;
@@ -379,7 +378,7 @@
 	visibility: hidden;
 	transition: opacity var(--transition-fast, 0.15s) ease-in-out, visibility var(--transition-fast, 0.15s);
 	background: var(--bg-row-hover, var(--color-bg));
-	padding-left: var(--size-md);
+	padding-inline-start: var(--size-md);
 	margin: 0;
 	list-style: none;
 	z-index: 2;

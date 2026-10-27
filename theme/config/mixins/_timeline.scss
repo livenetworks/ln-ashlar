@@ -20,14 +20,14 @@
 	> li {
 		position: relative;
 		--padding-x: var(--size-xl);
-		padding-left: var(--padding-x);
+		padding-inline-start: var(--padding-x);
 		--padding-y: var(--size-lg);
-		padding-bottom: var(--padding-y);
+		padding-block-end: var(--padding-y);
 		content-visibility: auto;
 		contain-intrinsic-size: auto 5rem;
 
 		&:last-child {
-			padding-bottom: 0;
+			padding-block-end: 0;
 		}
 
 		// Bullet — centered on the first line of <time> (caption role).
@@ -51,7 +51,7 @@
 			--color-fg: var(--fg-subtle);
 			color: var(--color-fg);
 			--margin-block: var(--size-xs);
-			margin-bottom: var(--margin-block);
+			margin-block-end: var(--margin-block);
 		}
 
 		> h4 {

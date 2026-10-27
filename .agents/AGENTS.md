@@ -80,6 +80,11 @@
 
 ## 4. Visual Layer vs. Functional Layer Separation & Search Rules
 - **Separation of Concerns:** Clearly separate visual styling (HTML chrome/wrappers and CSS classes, e.g. `.pills`, `.collapsible`) from functional JS triggers (`data-ln-*` attributes). Visual markup classes are recommended globally as design standards even if JS logic is absent.
+- **Design Tokens & HSL Color Model (Zero Hardcoded Colors):**
+  - **No Hardcoded Colors:** Hardcoding color literals (`#hex`, `rgb()`, `rgba()`) in components, mixins, or application stylesheets is strictly forbidden.
+  - **HSL Engine:** All colors are defined exclusively as HSL triplets (`H S% L%`) in `theme/config/_palette.scss` and referenced via `hsl(var(--color-...))` or `hsl(var(--color-...) / alpha)`.
+  - **Token Consumption:** UI styles MUST consume semantic design tokens (`var(--bg-base)`, `var(--bg-elevated)`, `var(--bg-sunken)`, `var(--bg-recessed)`, `var(--fg-default)`, `var(--fg-muted)`, `var(--fg-subtle)`, `var(--border-subtle)`, `var(--border-strong)`, `var(--color-bg)`, `var(--color-fg)`, `var(--color-accent)`).
+  - **Scoped Theme/Mode Islands:** To render dark or themed containers (e.g. dark sidebar, highlighted cards), use Scoped Theme/Mode Islands (`data-mode="dark"`, `data-theme="..."`). All tokens cascade and rebind automatically without component-specific CSS hacks.
 - **CSSOM Performance & Selector Matching:** Follow the four SCSS performance authoring invariants: (1) compound `:has()` consolidation via `:is(...)`, (2) natural cascade over negative `:not(:has())`, (3) CSS Logical Properties (`padding-inline`, `margin-inline`), and (4) direct-child scoping (`> a`) for container indicator states.
 - **Search Debounce:** Debounce is owned by `ln-api-connector` via `data-ln-api-connector-query-debounce` — see `components/ln-api-connector/README.md` for the full contract.
 

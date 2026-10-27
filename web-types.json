@@ -1,7 +1,7 @@
 {
 	"$schema": "https://json.schemastore.org/web-types",
 	"name": "@livenetworks/ashlar",
-	"version": "2.1.13",
+	"version": "2.1.15",
 	"framework": "html",
 	"contributions": {
 		"html": {
@@ -605,6 +605,13 @@
 					}
 				},
 				{
+					"name": "data-ln-density",
+					"description": "Visual / CSS styling attribute (theme/config/mixins/_form.scss)",
+					"value": {
+						"type": "boolean"
+					}
+				},
+				{
 					"name": "data-ln-dropdown",
 					"description": "Initializes the dropdown container",
 					"value": {
@@ -778,6 +785,13 @@
 					"description": "Target table or list element ID to filter",
 					"value": {
 						"type": "string"
+					}
+				},
+				{
+					"name": "data-ln-filter-bar",
+					"description": "Visual / CSS styling attribute (theme/components/_filter.scss)",
+					"value": {
+						"type": "boolean"
 					}
 				},
 				{

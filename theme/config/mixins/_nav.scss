@@ -39,7 +39,7 @@
 		@include items-center;
 		gap: var(--gap);
 		padding-block: var(--padding-y);
-		@include typography(body-sm);
+		@include typography(body-md);
 		color: var(--color-fg);
 		text-decoration: none;
 		// Always-present 1px border slot. Color defaults to transparent
@@ -71,7 +71,7 @@
 		letter-spacing: normal;
 		// Structural margin above section header.
 		--margin-block: var(--size-md);
-		margin-top: var(--margin-block);
+		margin-block-start: var(--margin-block);
 	}
 
 	.nav-divider {
@@ -116,7 +116,7 @@
 	// Structural spacing between floating pills.
 	li + li {
 		--margin-block: var(--size-2xs);
-		margin-top: var(--margin-block);
+		margin-block-start: var(--margin-block);
 	}
 
 	a {

@@ -40,7 +40,7 @@
 			height: 2.25rem;
 			border-radius: var(--radius-md);
 			background: linear-gradient(135deg, hsl(var(--color-primary)), hsl(var(--color-secondary, var(--color-primary))));
-			color: #fff;
+			color: hsl(var(--color-white));
 			box-shadow: 0 4px 12px hsl(var(--color-primary) / 0.3);
 		}
 
@@ -111,7 +111,7 @@
 	background-color: var(--bg-elevated);
 	border: var(--border-width) solid var(--color-border);
 	border-radius: var(--radius-xl);
-	box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.35), var(--shadow-xl);
+	box-shadow: 0 16px 36px -8px hsl(0 0% 0% / 0.35), var(--shadow-xl);
 	z-index: 1000;
 
 	&:not(:popover-open):not(.open) {

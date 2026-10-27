@@ -10,19 +10,22 @@ tags: [density, spacing, typography, compact, comfortable, spacious, wcag]
 
 # 📏 density
 
+> **Mental Model & Architectural Contract:**
+> Density attaches declaratively via `[data-density]` at any DOM boundary (`compact`, `comfortable`, `spacious`), globally rebinding typography roles (`--font-size`), spacing primitives, and control heights in `rem`. Color semantics, elevation shadows, and component DOM structures remain completely untouched while layout compression adapts dynamically.
+
 ---
 
 ## 1. Core Behavior & Responsibility
 
 The `ln-ashlar` density architecture (`theme/config/_density.scss`) scales the information density of the UI without altering color semantics or layout structures:
 
-- **Inverted Default (Dense Base):** The default `:root` state is dense (14px body, 52px header, 232px sidebar).
+- **Inverted Default (Dense Base):** The default `:root` state is dense (0.875rem body, 3.25rem header, 14.5rem sidebar).
 - **Scale Upward via `[data-density]`:** Density scales upward into roomier tiers: `comfortable` and `spacious`.
-- **Cascade-Driven Token Rebinds:** Density does not introduce parallel `--density-*` scales (except `--density-row-h`). It directly rebinds base spacing (`--padding-y`, `--gap`), typography roles (`--text-body-*`, `--text-heading-*`), and control heights (`--btn-padding-y`, `--input-padding-y`).
+- **Cascade-Driven Token Rebinds:** Density does not introduce parallel `--density-*` scales (except `--density-row-h`). It directly rebinds base spacing (`--padding-y`, `--gap`), typography roles (`--font-size`, `--text-body-*`, `--text-heading-*`), and control heights (`--btn-padding-y`, `--input-padding-y`).
 - **WCAG Target Size Invariant:**
-  - Base / `compact`: ~38px control height (WCAG 2.5.5 Level AA compliant).
-  - `comfortable`: ≥46px control height (WCAG 2.5.5 Level AAA compliant).
-  - `spacious`: ≥54px control height (enhanced touch targets for kiosks/accessibility).
+  - Base / `compact`: ~2.375rem control height (WCAG 2.5.5 Level AA compliant).
+  - `comfortable`: ≥2.875rem control height (WCAG 2.5.5 Level AAA compliant).
+  - `spacious`: ≥3.375rem control height (enhanced touch targets for kiosks/accessibility).
 - **Explicit Scoping:** Works at any DOM boundary (`<html data-density="spacious">` or `<table data-density="compact">`).
 
 ---
@@ -69,14 +72,15 @@ The `ln-ashlar` density architecture (`theme/config/_density.scss`) scales the i
 
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
-| `data-density="compact"` | attribute | — | Explicit dense base (36px row height, 14px body) |
-| `data-density="comfortable"` | attribute | — | Roomier typography (16px body) and larger padding |
-| `data-density="spacious"` | attribute | — | Generous kiosk / touch density with 54px control targets |
-| `--density-row-h` | token | `2.25rem` (compact) / `2.75rem` (comfortable) / `3.25rem` (spacious) | Minimum table row height floor |
-| `--app-header-height` | token | `3.25rem` (compact) / `3.75rem` (comfortable) / `4.5rem` (spacious) | Density-reactive app header height |
-| `--app-sidebar-width` | token | `14.5rem` (compact) / `16rem` (comfortable) / `18rem` (spacious) | Density-reactive sidebar width |
-| `--btn-padding-y` | token | `var(--size-xs-up)` (compact) / `var(--size-sm)` (comfortable) / `var(--size-sm-up)` (spacious) | Button vertical padding |
-| `--input-padding-y` | token | `var(--size-xs-up)` (compact) / `var(--size-sm)` (comfortable) / `var(--size-sm-up)` (spacious) | Input control vertical padding |
+| `data-density="compact"` | attribute | — | Dense enterprise tier: 0.8125rem body, 2rem row height |
+| `data-density="comfortable"` | attribute | — | Standard balanced tier: 0.875rem body, 2.75rem row height |
+| `data-density="spacious"` | attribute | — | Generous touch/kiosk tier: 1rem body, 3.25rem row height |
+| `--font-size` | token | `0.8125rem` (compact) / `0.875rem` (comfortable) / `1rem` (spacious) | Density-reactive typography body font size |
+| `--density-row-h` | token | `2rem` (compact) / `2.75rem` (comfortable) / `3.25rem` (spacious) | Minimum table row height floor |
+| `--app-header-height` | token | `3.25rem` (compact) / `3.5rem` (comfortable) / `4rem` (spacious) | Density-reactive app header height |
+| `--app-sidebar-width` | token | `14.5rem` (compact) / `16rem` (comfortable) / `17.5rem` (spacious) | Density-reactive sidebar width |
+| `--btn-padding-y` | token | `0.25rem` (compact) / `0.4375rem` (comfortable) / `0.625rem` (spacious) | Button vertical padding |
+| `--input-padding-y` | token | `0.25rem` (compact) / `0.4375rem` (comfortable) / `0.625rem` (spacious) | Input control vertical padding |
 
 ---
 

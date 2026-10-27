@@ -1,8 +1,8 @@
 @use '../../theme/config/mixins' as *;
 
 [data-ln-debug] {
-	// 1. Identification Check: circular progress should have an id for identification/linking
-	[data-ln-circular-progress]:not([id]) {
-		@include dev-dom-error("[data-ln-circular-progress] is missing an 'id' attribute.");
+	// 1. Element Tag Check: circular progress injects SVG and label children, so it cannot be placed on void or form input elements
+	[data-ln-circular-progress]:is(input, img, hr, br, textarea, select) {
+		@include dev-inline-error("[data-ln-circular-progress] cannot be placed on void or form input elements");
 	}
 }

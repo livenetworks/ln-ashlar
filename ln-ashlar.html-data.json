@@ -397,6 +397,11 @@
 			"valueSet": "v"
 		},
 		{
+			"name": "data-ln-density",
+			"description": "Visual / CSS styling attribute (theme/config/mixins/_form.scss)",
+			"valueSet": "v"
+		},
+		{
 			"name": "data-ln-dropdown",
 			"description": "Initializes the dropdown container",
 			"valueSet": "v"
@@ -604,6 +609,11 @@
 		{
 			"name": "data-ln-filter",
 			"description": "Target table or list element ID to filter"
+		},
+		{
+			"name": "data-ln-filter-bar",
+			"description": "Visual / CSS styling attribute (theme/components/_filter.scss)",
+			"valueSet": "v"
 		},
 		{
 			"name": "data-ln-filter-col",
