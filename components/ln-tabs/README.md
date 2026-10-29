@@ -118,6 +118,13 @@ document.addEventListener('ln-tabs:change', (e) => {
 
 ## 5. Integration Patterns
 
+### Segmented style
+For a compact switch (e.g. inside a panel header) apply the segmented
+variant to the tab nav in project SCSS:
+```scss
+#register > header > nav { @include tabs-nav-segmented; }
+```
+
 ### A. Hash-Deep-Linkable Tabs (URL-as-State)
 Use **anchor triggers** and give the wrapper a namespace (`id` or `data-ln-tabs-key`). Clicking tabs writes to the URL hash (e.g. `#user-tabs:settings`); sharing, bookmarking, or using back/forward buttons restores the active tab on load.
 ```html

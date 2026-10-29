@@ -7,6 +7,7 @@
 
 @mixin stat-card {
 	--shadow: var(--shadow-resting);
+	position: relative;
 	@include flex-col;
 	--gap: var(--size-xs);
 	gap: var(--gap);
@@ -26,10 +27,29 @@
 	> [data-ln-stat-label] {
 		--color-fg: var(--fg-muted);
 		@include typography(label-md);
+		@include font-medium;
 		color: var(--color-fg);
-		text-transform: uppercase;
-		letter-spacing: var(--tracking-wide);
 		margin: 0;
+	}
+
+	// Icon tile — a direct-child <svg class="ln-icon"> pinned top-right,
+	// tinted with the card's accent (tone).
+	> .ln-icon {
+		position: absolute;
+		inset-block-start: var(--padding-y);
+		inset-inline-end: var(--padding-x);
+		width: 1.25rem;
+		height: 1.25rem;
+		padding: var(--size-xs-up);
+		box-sizing: content-box;
+		border-radius: var(--radius);
+		background: var(--color-accent-tint-strong);
+		color: var(--color-accent);
+	}
+
+	&:has(> .ln-icon) > [data-ln-stat-label] {
+		padding-inline-end: 2.75rem;
+		min-height: 2rem;
 	}
 
 	> [data-ln-stat-value] {
@@ -65,4 +85,14 @@
 			color: var(--color-fg);
 		}
 	}
+}
+
+// ─── Tone ────────────────────────────────────────────────────────
+// Accent strip on the leading edge in the card's accent colour. The
+// tone itself comes from the semantic-color cascade (--color-primary →
+// --color-accent), e.g. [data-ln-stat-card="success"].
+@mixin stat-card-tone {
+	--border-inline-start: var(--size-2xs) solid var(--color-accent);
+	--color-accent:             hsl(var(--color-primary));
+	--color-accent-tint-strong: hsl(var(--color-primary-light));
 }

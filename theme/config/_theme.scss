@@ -55,19 +55,21 @@
 	--color-scrim: hsl(0 0% 0% / 0.6);
 
 	// Primary tint layers — re-tuned for dark surfaces
-	--color-primary-light:   232 60% 22%;
-	--color-primary-lighter: 232 50% 15%;
+	--color-primary-light:   201 60% 22%;
+	--color-primary-lighter: 201 50% 15%;
 
 	// Accent + status tones for dark surfaces. Light mode uses deep tones
 	// with white labels; on dark surfaces the same tones fall to ~2.3:1 as
 	// text. Dark mode flips the pair instead: bright tones (>= 5:1 as text
 	// on base/elevated/tint surfaces) with a dark label on solid fills.
-	--color-primary: 230 94% 74%;   // 5.9:1 on --bg-base, 5.3:1 on its tint
+	--color-primary: 199 89% 64%;   // 8.1:1 on --bg-base, 5.1:1 on its tint
 	--color-success: 142 69% 48%;
 	--color-error:   0 91% 71%;
 	--color-warning: 38 92% 55%;
 	--color-info:    213 94% 68%;
-	--color-accent-fg: hsl(232 47% 11%);   // 6.5:1 on the dark accent fill
+	--color-accent-fg: hsl(222 47% 11%);   // >= 6.5:1 on every dark accent fill
+	// Hover/active move AWAY from the surface: lighter on dark.
+	--accent-hover-shift: 8;
 
 	// Checkbox tick follows --color-accent-fg (data URIs cannot read vars).
 	--form-check-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f1430' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
@@ -130,47 +132,53 @@
 //   <html data-theme="ocean">   <html data-theme="sunset">   etc.
 // ---------------------------------------------------------------------------
 
-// Soft — inspired by the MEPSO Blue reference. Only token rebindings;
-// density continues to own type sizes, controls and card/table padding.
-[data-theme="soft"] {
-	--font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+// Classic — the pre-2.0 default (DocuFlow): Inter, indigo accent, neutral
+// grey scale, tighter radii, dual-layer shadows. Pair with
+// data-density="compact" for the original dense scale.
+//   <html data-theme="classic" data-density="compact">
+// "soft" is accepted as an alias of the default look and needs no rules.
+[data-theme="classic"] {
+	--font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-	// Slightly deeper than the reference blue for white button-label contrast.
-	--color-primary:         201 96% 32%;
-	--color-primary-light:   201 94% 93%;
-	--color-primary-lighter: 204 100% 97%;
+	--color-primary:         232 75% 52%;
+	--color-primary-light:   232 75% 93%;
+	--color-primary-lighter: 232 75% 97%;
 
-	--bg-base:     #ffffff;
-	--bg-elevated: #ffffff;
-	--bg-sunken:   #f8fafc;
-	--bg-recessed: #f1f5f9;
-	--fg-default: #1e293b;
-	--fg-muted:   #52647a;
-	--fg-subtle:  #64748b;
-	--border-subtle:       #e2e8f0;
-	--border-strong:       #cbd5e1;
-	--border-strong-hover: #94a3b8;
+	--color-neutral-50:  220 20% 98%;
+	--color-neutral-100: 220 16% 96%;
+	--color-neutral-150: 220 14% 93%;
+	--color-neutral-200: 220 13% 91%;
+	--color-neutral-300: 220 13% 83%;
+	--color-neutral-400: 218 11% 65%;
+	--color-neutral-500: 220  9% 46%;
+	--color-neutral-600: 220 11% 34%;
+	--color-neutral-700: 220 14% 24%;
+	--color-neutral-800: 220 20% 15%;
+	--color-neutral-900: 221 39% 11%;
 
-	--radius-sm: 0.375rem;
-	--radius-md: 0.625rem;
-	--radius-lg: 1rem;
-	--radius-xl: 1.375rem;
-	--panel-radius: var(--radius-lg);
-	--panel-margin-block: 0;
-	--card-nested-shadow: none;
+	--bg-sunken:   hsl(var(--color-neutral-100));
+	--bg-recessed: hsl(var(--color-neutral-50));
+	--fg-default:  hsl(var(--color-neutral-900));
+	--fg-muted:    hsl(var(--color-neutral-500));
+	--fg-subtle:   hsl(var(--color-neutral-400));
 
-	--shadow-xs: 0 1px 2px hsl(215 40% 20% / 0.025);
-	--shadow-sm: 0 2px 6px hsl(215 40% 20% / 0.035);
-	--shadow-md: 0 4px 16px -4px hsl(215 40% 20% / 0.08);
-	--shadow-lg: 0 12px 32px -8px hsl(215 40% 20% / 0.12);
-	--shadow-xl: 0 24px 48px -12px hsl(215 40% 20% / 0.18);
-	--shadow-2xl: 0 32px 64px -16px hsl(215 40% 20% / 0.22);
+	--radius-sm: 0.25rem;
+	--radius-md: 0.5rem;
+	--radius-lg: 0.75rem;
+	--radius-xl: 1rem;
+	--panel-radius:       var(--radius);
+	--card-nested-shadow: var(--shadow-floating);
+	--app-content-padding-x: var(--padding-x);
+	--app-content-gap:       var(--gap);
 
-	// Structural rhythm is separate from control density. Fluid gutters
-	// retain breathing room on desktop and fit narrow mobile screens.
-	--app-content-padding-x: clamp(var(--size-md), 3vw, var(--size-xl));
-	--app-content-gap: var(--size-lg);
-	--transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+	--shadow-xs: 0 1px 2px 0 hsl(220 40% 15% / 0.04);
+	--shadow-sm: 0 1px 3px 0 hsl(220 40% 15% / 0.08), 0 1px 2px -1px hsl(220 40% 15% / 0.04);
+	--shadow-md: 0 4px 12px -2px hsl(220 40% 15% / 0.10), 0 2px 4px -2px hsl(220 40% 15% / 0.06);
+	--shadow-lg: 0 12px 24px -6px hsl(220 40% 15% / 0.12), 0 8px 12px -4px hsl(220 40% 15% / 0.08);
+	--shadow-xl: 0 24px 48px -12px hsl(220 40% 15% / 0.16), 0 12px 24px -6px hsl(220 40% 15% / 0.10);
+	--shadow-2xl: 0 36px 72px -18px hsl(220 40% 15% / 0.20), 0 18px 36px -9px hsl(220 40% 15% / 0.12);
+
+	--transition-base: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-theme="ocean"] {
@@ -183,6 +191,56 @@
 	--color-primary:         10 80% 50%;
 	--color-primary-light:   10 70% 92%;
 	--color-primary-lighter: 10 60% 96%;
+}
+
+// Brand — deep navy surface for brand regions (MEPSO-style sidebar).
+// Built on the dark tokens; usable on <html> or on a single region:
+//   <aside class="app-sidebar" data-theme="brand">
+[data-theme="brand"] {
+	@include ln-dark-tokens;
+	--bg-base:     hsl(213 74% 11%);
+	--bg-elevated: hsl(213 55% 15%);
+	--bg-sunken:   hsl(213 50% 17%);
+	--bg-recessed: hsl(213 74% 8%);
+	--fg-default:  hsl(210 40% 98%);
+	--fg-muted:    hsl(213 27% 84%);    // 11.9:1 on --bg-base
+	--fg-subtle:   hsl(215 20% 65%);    // 6.6:1 on --bg-base
+	--border-subtle:       hsl(213 45% 18%);
+	--border-strong:       hsl(213 35% 28%);
+	--border-strong-hover: hsl(213 30% 40%);
+	--color-primary-light:   201 70% 24%;
+	--color-primary-lighter: 201 60% 17%;
+}
+
+// ---------------------------------------------------------------------------
+// Scoped themes — data-theme on any element below <html>.
+//
+// Primitives (--color-bg, --color-fg, --color-accent, --btn-*) are declared
+// at :root and inherit as already-resolved values, so re-binding vocabulary
+// on a region is not enough on its own. Re-declaring the primitives here
+// makes them resolve against the region's vocabulary, and the region paints
+// its own surface. Best suited to dark / brand regions; light themes
+// rebind only part of the vocabulary.
+// ---------------------------------------------------------------------------
+[data-theme]:not(:root) {
+	--color-bg:     var(--bg-base);
+	--color-fg:     var(--fg-default);
+	--color-border: var(--border-subtle);
+	--shadow:       var(--shadow-resting);
+
+	--color-accent:             hsl(var(--color-primary));
+	--color-accent-tint:        hsl(var(--color-primary-lighter));
+	--color-accent-tint-strong: hsl(var(--color-primary-light));
+
+	--btn-bg:           var(--color-bg);
+	--btn-fg:           var(--color-fg);
+	--btn-border:       var(--border-strong);
+	--btn-bg-hover:     var(--bg-sunken);
+	--btn-fg-hover:     var(--color-fg);
+	--btn-border-hover: var(--border-strong-hover);
+
+	background-color: var(--color-bg);
+	color: var(--color-fg);
 }
 
 [data-theme="midnight"] {

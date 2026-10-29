@@ -20,11 +20,11 @@
 	border-radius: var(--radius-full);
 	border: var(--border-width) solid var(--color-border);
 
-	&[data-preset="light"]    { background: hsl(231 62% 27%); }
 	&[data-preset="soft"]     { background: hsl(201 96% 32%); }
-	&[data-preset="dark"]     { background: hsl(231 62% 50%); }
+	&[data-preset="classic"]  { background: hsl(232 75% 52%); }
+	&[data-preset="dark"]     { background: hsl(199 89% 64%); }
 	&[data-preset="ocean"]    { background: hsl(190 80% 35%); }
 	&[data-preset="sunset"]   { background: hsl(10 80% 50%); }
-	&[data-preset="midnight"] { background: hsl(265 70% 60%); }
-	&[data-preset="glass"]    { background: hsl(218 95% 62%); }
+	&[data-preset="midnight"] { background: hsl(263 90% 76%); }
+	&[data-preset="glass"]    { background: hsl(214 95% 68%); }
 }

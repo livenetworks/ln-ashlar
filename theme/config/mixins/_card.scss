@@ -115,6 +115,21 @@
 		margin: 0;
 	}
 
+	// Title + description: <hgroup><h3>…</h3><p>…</p></hgroup>
+	hgroup {
+		display: flex;
+		flex-direction: column;
+		gap: var(--size-2xs);
+		min-width: 0;
+		margin: 0;
+
+		> p {
+			@include typography(caption);
+			color: var(--fg-muted);
+			margin: 0;
+		}
+	}
+
 	// Equalize control chrome inside the header. Geometric height lock
 	// matching @mixin app-header-actions: control line box (--control-line-height) + 2 ×
 	// rebound --padding-y + 2 × border-width. Buttons inherit --padding-y

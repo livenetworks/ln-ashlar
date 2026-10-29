@@ -1,248 +1,229 @@
-<!-- ln-page: title="ashlar-gui — Demo" h1="Dashboard" -->
+<!-- ln-page: title="ashlar-gui — Dashboard" h1="Dashboard" -->
 
-<!-- Dashboard overview -->
+<!-- Greeting + primary actions -->
 <section id="dashboard-welcome" aria-labelledby="dashboard-title">
-	<div class="dashboard-intro">
-		<p class="dashboard-eyebrow">ASHLAR WORKSPACE</p>
-		<h2 id="dashboard-title">A little space. A clearer view.</h2>
-		<p>Explore the building blocks for your next application.</p>
-	</div>
-	<a class="btn" href="forms.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-right"></use></svg> Explore components</a>
-</section>
-
-<section id="stats" aria-label="Library at a glance">
-	<ul>
+	<header>
+		<p class="dashboard-eyebrow">Operations overview</p>
+		<h2 id="dashboard-title">Good morning, Ana</h2>
+		<p>Network health, field work and team requests — updated 5 minutes ago.</p>
+	</header>
+	<ul class="dashboard-actions">
 		<li>
-			<header><h3>Design themes</h3><span class="dashboard-stat-icon"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-palette"></use></svg></span></header>
-			<strong><data value="7" data-ln-number>7</data></strong>
-			<p>One system, different personalities</p>
+			<button type="button">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-download"></use></svg>
+				Export report
+			</button>
 		</li>
 		<li>
-			<header><h3>Density levels</h3><span class="dashboard-stat-icon"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-adjustments-horizontal"></use></svg></span></header>
-			<strong><data value="3" data-ln-number>3</data></strong>
-			<p>From focused to spacious</p>
-		</li>
-		<li>
-			<header><h3>Runtime dependencies</h3><span class="dashboard-stat-icon"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-code"></use></svg></span></header>
-			<strong><data value="0" data-ln-number>0</data></strong>
-			<p>Built on native web standards</p>
-		</li>
-		<li>
-			<header><h3>Demo pages</h3><span class="dashboard-stat-icon"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-dashboard"></use></svg></span></header>
-			<strong><data value="62" data-ln-number>62</data></strong>
-			<p>Working examples to make your own</p>
+			<button type="button" class="btn" data-ln-modal-for="demo-form">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
+				New request
+			</button>
 		</li>
 	</ul>
 </section>
 
-<nav id="dashboard-shortcuts" aria-label="Explore the library">
+<!-- Key figures — stat cards with tone -->
+<section id="dashboard-stats" aria-label="Key figures">
 	<ul>
-		<li><a href="cards.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-dashboard"></use></svg><h3>Compose your workspace</h3><p>Cards, sections and layouts that fit together.</p></a></li>
-		<li><a href="tables.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-table"></use></svg><h3>Bring clarity to your data</h3><p>Tables, filters and status indicators in context.</p></a></li>
-		<li><a href="forms.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-forms"></use></svg><h3>Make every input count</h3><p>Forms, validation and accessible controls.</p></a></li>
+		<li>
+			<article data-ln-stat-card="primary">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-users"></use></svg>
+				<p data-ln-stat-label>Employees</p>
+				<p data-ln-stat-value data-ln-number>548</p>
+				<p data-ln-stat-trend="up">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg>
+					4 new this month
+				</p>
+			</article>
+		</li>
+		<li>
+			<article data-ln-stat-card="success">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-router"></use></svg>
+				<p data-ln-stat-label>Network devices</p>
+				<p data-ln-stat-value data-ln-number>142</p>
+				<p data-ln-stat-trend="neutral">141 online · 1 under monitoring</p>
+			</article>
+		</li>
+		<li>
+			<article data-ln-stat-card="warning">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-truck"></use></svg>
+				<p data-ln-stat-label>Field orders</p>
+				<p data-ln-stat-value data-ln-number>24</p>
+				<p data-ln-stat-trend="neutral">6 crews in the field</p>
+			</article>
+		</li>
+		<li>
+			<article data-ln-stat-card="info">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-calendar-event"></use></svg>
+				<p data-ln-stat-label>Leave requests</p>
+				<p data-ln-stat-value data-ln-number>11</p>
+				<p data-ln-stat-trend="neutral">4 awaiting approval</p>
+			</article>
+		</li>
 	</ul>
-</nav>
-<!-- Modal Demo -->
-				<section class="section-card">
-					<header><h3>Modal</h3></header>
-					<main>
-						<nav class="demo-actions">
-							<button data-ln-modal-for="demo-basic" class="btn">Basic Modal</button>
-							<button data-ln-modal-for="demo-form" class="btn">Form Modal</button>
-						</nav>
-					</main>
-				</section>
+</section>
 
-				<!-- Tabs Demo -->
-				<section id="demo-tabs" class="section-card">
-					<header><h3>Tabs</h3></header>
-					<main>
-						<div data-ln-tabs data-ln-tabs-default="overview">
-							<nav class="demo-tabs">
-								<button data-ln-tab="overview">Overview</button>
-								<button data-ln-tab="users">Users</button>
-								<button data-ln-tab="settings">Settings</button>
-							</nav>
+<!-- Register (2/3) + side column (1/3) -->
+<section id="dashboard-main" aria-label="Operations">
 
-							<div data-ln-panel="overview" class="demo-panel">
-								<p>Content of the <strong>Overview</strong> tab. Tabs are synchronized with the URL hash.</p>
-								<p>Change the URL hash to <code>#users</code> to see.</p>
-							</div>
+	<section class="section-card" id="register" data-ln-tabs data-ln-tabs-default="devices">
+		<header>
+			<hgroup>
+				<h3>Operations register</h3>
+				<p>Network equipment and field orders</p>
+			</hgroup>
+			<nav aria-label="Register views">
+				<button type="button" data-ln-tab="devices">Devices</button>
+				<button type="button" data-ln-tab="orders">Field orders</button>
+			</nav>
+		</header>
+		<main>
+			<section data-ln-panel="devices">
+				<div class="table-container">
+				<table>
+					<thead>
+						<tr><th>Device</th><th>Type</th><th>IP address</th><th>Location</th><th>Status</th></tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td data-label="Device"><strong>Core-R01</strong> Cisco 8500</td>
+							<td data-label="Type">Core router</td>
+							<td data-label="IP address"><code>10.10.1.1</code></td>
+							<td data-label="Location">HQ Data Center</td>
+							<td data-label="Status"><span class="badge success">Online</span></td>
+						</tr>
+						<tr>
+							<td data-label="Device"><strong>FW-Edge-01</strong> FortiGate 600F</td>
+							<td data-label="Type">Firewall</td>
+							<td data-label="IP address"><code>10.10.0.1</code></td>
+							<td data-label="Location">HQ Data Center</td>
+							<td data-label="Status"><span class="badge success">Online</span></td>
+						</tr>
+						<tr>
+							<td data-label="Device"><strong>SW-North-02</strong> Cisco 9300</td>
+							<td data-label="Type">Switch</td>
+							<td data-label="IP address"><code>10.20.14.2</code></td>
+							<td data-label="Location">North substation</td>
+							<td data-label="Status"><span class="badge warning">High load</span></td>
+						</tr>
+						<tr>
+							<td data-label="Device"><strong>R-East-07</strong> MikroTik CCR2004</td>
+							<td data-label="Type">Router</td>
+							<td data-label="IP address"><code>10.30.8.1</code></td>
+							<td data-label="Location">East substation</td>
+							<td data-label="Status"><span class="badge error">Offline</span></td>
+						</tr>
+						<tr>
+							<td data-label="Device"><strong>SW-South-01</strong> Huawei CE6800</td>
+							<td data-label="Type">Switch</td>
+							<td data-label="IP address"><code>10.40.5.3</code></td>
+							<td data-label="Location">South substation</td>
+							<td data-label="Status"><span class="badge success">Online</span></td>
+						</tr>
+					</tbody>
+				</table>
+				</div>
+			</section>
+			<section data-ln-panel="orders" class="hidden">
+				<div class="table-container">
+				<table>
+					<thead>
+						<tr><th>Order</th><th>Crew lead</th><th>Site</th><th>Due</th><th>Status</th></tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td data-label="Order"><strong>FO-2026-114</strong> Transformer inspection</td>
+							<td data-label="Crew lead">Marko Petrovski</td>
+							<td data-label="Site">North substation</td>
+							<td data-label="Due"><time datetime="2026-10-30">Oct 30</time></td>
+							<td data-label="Status"><span class="badge info">Scheduled</span></td>
+						</tr>
+						<tr>
+							<td data-label="Order"><strong>FO-2026-112</strong> Fiber splice repair</td>
+							<td data-label="Crew lead">Elena Trajkova</td>
+							<td data-label="Site">East substation</td>
+							<td data-label="Due"><time datetime="2026-10-29">Today</time></td>
+							<td data-label="Status"><span class="badge warning">In progress</span></td>
+						</tr>
+						<tr>
+							<td data-label="Order"><strong>FO-2026-109</strong> Switchgear replacement</td>
+							<td data-label="Crew lead">Ivan Dimitrov</td>
+							<td data-label="Site">South substation</td>
+							<td data-label="Due"><time datetime="2026-10-27">Oct 27</time></td>
+							<td data-label="Status"><span class="badge success">Completed</span></td>
+						</tr>
+					</tbody>
+				</table>
+				</div>
+			</section>
+		</main>
+	</section>
 
-							<div data-ln-panel="users" class="demo-panel hidden">
-								<div class="table-container">
-								<table>
-									<thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
-									<tbody>
-										<tr><td data-label="Name">John Smith</td><td data-label="Email">marko@example.com</td><td data-label="Role">Admin</td></tr>
-										<tr><td data-label="Name">Jane Doe</td><td data-label="Email">ana@example.com</td><td data-label="Role">User</td></tr>
-										<tr><td data-label="Name">Alex Johnson</td><td data-label="Email">ivan@example.com</td><td data-label="Role">Moderator</td></tr>
-									</tbody>
-								</table>
-								</div>
-							</div>
+	<aside id="dashboard-side" aria-label="Quick actions and activity">
+		<section class="section-card" id="quick-order">
+			<header>
+				<hgroup>
+					<h3>Quick field order</h3>
+					<p>Dispatch a crew in under a minute</p>
+				</hgroup>
+			</header>
+			<main>
+				<form id="quick-order-form" data-ln-form>
+					<div class="form-element">
+						<label for="qo-lead">Crew lead</label>
+						<select id="qo-lead" name="lead">
+							<option>Marko Petrovski</option>
+							<option>Elena Trajkova</option>
+							<option>Ivan Dimitrov</option>
+						</select>
+					</div>
+					<div class="form-element">
+						<label for="qo-site">Site</label>
+						<select id="qo-site" name="site">
+							<option>North substation</option>
+							<option>East substation</option>
+							<option>South substation</option>
+						</select>
+					</div>
+					<div class="form-element">
+						<label for="qo-note">Task</label>
+						<input type="text" id="qo-note" name="task" placeholder="e.g. Inspect breaker panel">
+					</div>
+					<ul class="form-actions">
+						<li><button type="submit">Create order</button></li>
+					</ul>
+				</form>
+			</main>
+		</section>
 
-							<div data-ln-panel="settings" class="demo-panel hidden">
-								<form>
-									<div class="form-element">
-										<label for="d-lang">Language</label>
-										<select id="d-lang"><option>English</option><option>Spanish</option></select>
-									</div>
-									<div class="form-element">
-										<label for="d-tz">Timezone</label>
-										<input type="text" id="d-tz" value="America/New_York">
-									</div>
-								</form>
-							</div>
-						</div>
-					</main>
-				</section>
+		<section class="section-card" id="activity">
+			<header>
+				<hgroup>
+					<h3>Recent activity</h3>
+					<p>Last 24 hours</p>
+				</hgroup>
+			</header>
+			<main>
+				<ol class="timeline">
+					<li>
+						<time datetime="2026-10-29T09:32">09:32</time>
+						<h4>R-East-07 went offline</h4>
+						<p>Alert raised, crew notified</p>
+					</li>
+					<li>
+						<time datetime="2026-10-29T08:15">08:15</time>
+						<h4>FO-2026-112 started</h4>
+						<p>Elena Trajkova on site</p>
+					</li>
+					<li>
+						<time datetime="2026-10-28T16:40">Yesterday</time>
+						<h4>Leave request approved</h4>
+						<p>Ivan Dimitrov · Nov 3–7</p>
+					</li>
+				</ol>
+			</main>
+		</section>
+	</aside>
 
-				<!-- Toggle & Progress -->
-				<section id="demo-panels">
-					<section id="demo-toggle" class="section-card">
-						<header><h3>Toggle — Collapsible</h3></header>
-						<main>
-							<article>
-								<header>
-									<strong>Server Status</strong>
-									<button type="button" data-ln-toggle-for="server-status" aria-label="Toggle server status"><svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button>
-								</header>
-								<section id="server-status" data-ln-toggle="open" class="collapsible">
-								<article class="collapsible-body">
-									<div class="table-container">
-									<table>
-										<thead><tr><th>Server</th><th>Status</th><th>Uptime</th></tr></thead>
-										<tbody>
-											<tr><td data-label="Server">web-01</td><td data-label="Status"><span class="badge success">OK</span></td><td data-label="Uptime" class="numeric">99.9%</td></tr>
-											<tr><td data-label="Server">web-02</td><td data-label="Status"><span class="badge success">OK</span></td><td data-label="Uptime" class="numeric">99.7%</td></tr>
-											<tr><td data-label="Server">db-01</td><td data-label="Status"><span class="badge error">Down</span></td><td data-label="Uptime" class="numeric">95.2%</td></tr>
-										</tbody>
-									</table>
-									</div>
-								</article>
-								</section>
-							</article>
-						</main>
-					</section>
-
-					<section id="demo-progress" class="section-card">
-						<header><h3>Progress</h3></header>
-						<main>
-							<ul>
-								<li>
-									<h4>CPU — 72%</h4>
-									<div class="progress">
-										<div data-ln-progress="72" class="warning"></div>
-									</div>
-								</li>
-								<li>
-									<h4>RAM — 45%</h4>
-									<div class="progress">
-										<div data-ln-progress="45" class="success"></div>
-									</div>
-								</li>
-								<li>
-									<h4>Disk — 89%</h4>
-									<div class="progress">
-										<div data-ln-progress="89" class="error"></div>
-									</div>
-								</li>
-							</ul>
-						</main>
-					</section>
-				</section>
-
-				<!-- Toast Demo -->
-				<section class="section-card">
-					<header><h3>Toast Notifications</h3></header>
-					<main>
-						<nav class="demo-actions">
-							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'success', title:'Success', message:'The record has been saved.'}}))" class="btn success">Success</button>
-							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'error', title:'Error', message:'Something went wrong.'}}))" class="btn error">Error</button>
-							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'warn', title:'Warning', message:'Please check the data.'}}))" class="btn warning">Warning</button>
-							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'A new version is available.'}}))" class="btn info">Info</button>
-							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'error', title:'Validation', message:['Name is required','Email format is invalid','Password is too short']}}))" class="btn error">Validation Errors</button>
-						</nav>
-					</main>
-				</section>
-
-				<!-- Upload Demo -->
-				<section class="section-card">
-					<header><h3>Upload</h3></header>
-					<main>
-						<div data-ln-upload="/api/files" data-ln-upload-accept="pdf,doc,docx,jpg,png">
-							<div class="ln-upload__zone">
-								<span>Drop files here or click to upload</span>
-								<small>pdf, doc, docx, jpg, png</small>
-							</div>
-							<ul class="ln-upload__list"></ul>
-						</div>
-					</main>
-				</section>
-
-				<!-- AJAX -->
-				<section class="section-card">
-					<header><h3>ln-ajax — AJAX Navigation</h3></header>
-					<main>
-						<p>Component for AJAX navigation and form submission. Links and forms inside a <code>data-ln-ajax</code> container are automatically processed via fetch.</p>
-						<section id="demo-ajax-info">
-							<figure>
-								<pre><code>&lt;div data-ln-ajax&gt;
-    &lt;a href="/users"&gt;Users&lt;/a&gt;
-    &lt;form method="POST" action="/users"&gt;...&lt;/form&gt;
-&lt;/div&gt;
-
-&lt;!-- JSON response --&gt;
-{
-    "title": "Title",
-    "content": { "main": "&lt;p&gt;HTML&lt;/p&gt;" },
-    "message": { "type": "success", "title": "OK", "body": "Saved!" }
-}</code></pre>
-							</figure>
-							<div class="table-container">
-							<table>
-								<thead><tr><th>Attribute</th><th>Description</th></tr></thead>
-								<tbody>
-									<tr><td><code>data-ln-ajax</code></td><td>Container — all <code>&lt;a&gt;</code> and <code>&lt;form&gt;</code> inside are AJAX</td></tr>
-									<tr><td><code>data-ln-ajax="false"</code></td><td>Exclude a specific element from AJAX processing</td></tr>
-								</tbody>
-							</table>
-							</div>
-							<p>CSRF token automatically from <code>&lt;meta name="csrf-token"&gt;</code>. History pushState for links and GET forms.</p>
-						</section>
-					</main>
-				</section>
-
-				<!-- Quick Integration -->
-				<section class="section-card">
-					<header><h3>Quick Integration</h3></header>
-					<main>
-						<pre><code>&lt;link rel="stylesheet" href="dist/ln-ashlar.css"&gt;
-&lt;script src="dist/ln-ashlar.iife.js" defer&gt;&lt;/script&gt;
-
-&lt;!-- Or as npm module --&gt;
-import 'ln-ashlar';
-import 'ln-ashlar/dist/ln-ashlar.css';</code></pre>
-					</main>
-				</section>
-
-<!-- Philosophy -->
-				<section class="section-card">
-					<header><h3>Philosophy</h3></header>
-					<main class="prose">
-						<h4>An ashlar library.</h4>
-						<p>An <em>ashlar</em> is a finely cut block of stone — small, regular, ready to assemble. Cathedrals are built from ashlars. So are walls.</p>
-						<p>ln-ashlar gives you the blocks. Tokens, mixins, components — small primitives, well-formed, predictable. You stack them into the building you actually need.</p>
-
-						<h4>How</h4>
-						<p><strong>Token-driven.</strong> Spacing, color, radius, shadow — every value lives in <code>--size-*</code>, <code>--color-*</code>, <code>--radius-*</code>. Change one token, every consumer reacts. No hardcoded literals in components.</p>
-						<p><strong>Recipe + application.</strong> Each pattern has two layers: a <code>@mixin</code> (the recipe) and a default selector (the application). Use the default, apply the recipe to your own semantic selector, or rebind the surface tokens. Three first-class paths.</p>
-						<p><strong>Zero dependencies.</strong> Vanilla JS IIFE components, CustomEvent communication, MutationObserver auto-init. No framework, no runtime — drop the SCSS and JS into any project.</p>
-						<p><strong>Themes are palette only.</strong> A theme rebinds vocabulary tokens at its own <code>:root</code>. It never restructures a component. Switching themes is a token swap, not a rewrite.</p>
-
-						<h4>Why</h4>
-						<p>A library should give you primitives and get out of the way. Most CSS frameworks give you a finished building — beautiful for one project, awkward for the next.</p>
-						<p>ln-ashlar gives you the stones. Stack them however your project needs. The stones are simple. The buildings can be as complicated as you want.</p>
-					</main>
-				</section>
+</section>

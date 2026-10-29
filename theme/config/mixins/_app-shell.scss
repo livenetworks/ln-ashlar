@@ -224,6 +224,9 @@
 		@include overflow-auto;
 		@include w-full;
 		@include stack(var(--app-content-gap, var(--gap)));
+		// The stack gap owns vertical rhythm here — section-cards drop
+		// their own bottom margin so the two do not add up.
+		--panel-margin-block: 0;
 		@include transition;
 
 		// Children keep intrinsic height — wrapper's overflow-auto
@@ -308,5 +311,6 @@
 	@include mx(auto);
 	@include w-full;
 	@include stack(var(--app-content-gap, var(--gap)));
+	--panel-margin-block: 0;
 }
 

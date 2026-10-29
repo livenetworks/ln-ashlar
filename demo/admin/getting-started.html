@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Getting started — ln-ashlar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-theme';
+		var VALID = ['soft', 'classic', 'light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-theme', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
+	<!-- Density bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-density';
+		var VALID = ['compact', 'comfortable', 'spacious'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-density', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
+	<link rel="stylesheet" href="dist/admin.css">
+	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css">
+	<script src="../dist/ln-ashlar.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<ul data-ln-toast>
+		<template data-ln-template="ln-toast-item">
+		<li data-ln-toast-item data-ln-attr="class:type">
+			<div class="icon">
+				<ul>
+					<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg></li>
+					<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-x"></use></svg></li>
+					<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg></li>
+					<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg></li>
+				</ul>
+			</div>
+			<section class="content">
+				<header>
+					<strong class="title" data-ln-field="title"></strong>
+					<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+				</header>
+				<main class="body" data-ln-field="message"></main>
+			</section>
+		</li>
+		</template>
+	</ul>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header class="app-header">
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
+				</button>
+				<h1>Getting started</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-palette"></use></svg>
+					</button>
+					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
+						<ul>
+							<li><button type="button" data-demo-theme="soft"><span class="demo-theme-swatch" data-preset="soft" aria-hidden="true"></span>Default</button></li>
+							<li><button type="button" data-demo-theme="classic"><span class="demo-theme-swatch" data-preset="classic" aria-hidden="true"></span>Classic</button></li>
+							<li><button type="button" data-demo-theme="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
+							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
+							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
+							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+							<li><button type="button" data-demo-theme="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
+						</ul>
+					</div>
+					<button type="button" id="demo-density-trigger" data-ln-popover-for="demo-density-picker" aria-label="Choose density">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-adjustments-horizontal"></use></svg>
+					</button>
+					<div class="demo-density-picker" data-ln-popover id="demo-density-picker">
+						<ul>
+							<li><button type="button" data-demo-density="compact">Compact</button></li>
+							<li><button type="button" data-demo-density="comfortable">Comfortable</button></li>
+							<li><button type="button" data-demo-density="spacious">Spacious</button></li>
+						</ul>
+					</div>
+					<button type="button" id="demo-sidebar-tone" aria-pressed="false" aria-label="Brand sidebar">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-sidebar"></use></svg>
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<main class="app-main">
+		<!-- Sidebar -->
+		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
+			<header>
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
+				<span class="app-name">ashlar-gui</span>
+				<label class="search sidebar-search">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+					<input type="search" placeholder="Filter menu…" data-ln-search-for="demo-nav" data-ln-search-debounce="0">
+					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+				</label>
+			</header>
+
+			<main>
+				<nav class="nav" id="demo-nav" data-ln-nav="active" data-ln-search="" data-ln-search-items="li">
+					<ul>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+						<li><a href="getting-started.html" aria-current="page"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-rocket"></use></svg><span class="nav-label">Getting started</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-typography"></use></svg><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-cards"></use></svg><span class="nav-label">Cards</span></a></li>
+						<li><a href="chip.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-tag"></use></svg><span class="nav-label">Chip</span></a></li>
+						<li><a href="density.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-rows"></use></svg><span class="nav-label">Density</span></a></li>
+						<li><a href="tables.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-table"></use></svg><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-forms"></use></svg><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="kbd.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-keyboard"></use></svg><span class="nav-label">Kbd</span></a></li>
+						<li><a href="layout.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-grid"></use></svg><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-list"></use></svg><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-icons"></use></svg><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-tool"></use></svg><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-code"></use></svg><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="page-header.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-heading"></use></svg><span class="nav-label">Page Header</span></a></li>
+						<li><a href="prose.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-article"></use></svg><span class="nav-label">Prose</span></a></li>
+						<li><a href="stat-card.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-chart-bar"></use></svg><span class="nav-label">Stat Card</span></a></li>
+						<li><a href="status-badge.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-badge"></use></svg><span class="nav-label">Status Badge</span></a></li>
+						<li><a href="stepper.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-list-numbers"></use></svg><span class="nav-label">Stepper</span></a></li>
+						<li><a href="timeline.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-timeline"></use></svg><span class="nav-label">Timeline</span></a></li>
+						<li><a href="empty-state.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-mood-empty"></use></svg><span class="nav-label">Empty State</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-bottombar-expand"></use></svg><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-bolt"></use></svg><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autoresize.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-vertical"></use></svg><span class="nav-label">Autoresize</span></a></li>
+						<li><a href="autosave.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-device-floppy"></use></svg><span class="nav-label">Autosave</span></a></li>
+						<li><a href="circular-progress.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-chart-donut"></use></svg><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="confirm.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg><span class="nav-label">Confirm</span></a></li>
+						<li><a href="dropdown.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-selector"></use></svg><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="editor.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-pencil"></use></svg><span class="nav-label">Editor</span></a></li>
+						<li><a href="external-links.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-external-link"></use></svg><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg><span class="nav-label">Filter</span></a></li>
+						<li><a href="http.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg><span class="nav-label">HTTP</span></a></li>
+						<li><a href="include.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-file-import"></use></svg><span class="nav-label">Include</span></a></li>
+						<li><a href="link.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-link"></use></svg><span class="nav-label">Link</span></a></li>
+						<li><a href="modal.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-app-window"></use></svg><span class="nav-label">Modal</span></a></li>
+						<li><a href="nav.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu-2"></use></svg><span class="nav-label">Nav</span></a></li>
+						<li><a href="persist.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-database"></use></svg><span class="nav-label">Persist</span></a></li>
+						<li><a href="popover.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-message-2"></use></svg><span class="nav-label">Popover</span></a></li>
+						<li><a href="progress.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-progress"></use></svg><span class="nav-label">Progress</span></a></li>
+						<li><a href="router.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-route"></use></svg><span class="nav-label">Router</span></a></li>
+						<li><a href="search.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg><span class="nav-label">Search</span></a></li>
+						<li><a href="select.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-select"></use></svg><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg><span class="nav-label">Sortable</span></a></li>
+						<li><a href="store.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-database-cog"></use></svg><span class="nav-label">Store</span></a></li>
+						<li><a href="store-usecase.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-database-share"></use></svg><span class="nav-label">Store — Usecase</span></a></li>
+						<li><a href="list.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-list-details"></use></svg><span class="nav-label">List &amp; Card Grid</span></a></li>
+						<li><a href="coordinator.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-git-merge"></use></svg><span class="nav-label">Data Coordinator</span></a></li>
+						<li><a href="api-connector.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plug"></use></svg><span class="nav-label">API Connector</span></a></li>
+						<li><a href="couchdb-connector.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plug-connected"></use></svg><span class="nav-label">CouchDB Connector</span></a></li>
+						<li><a href="api-queue.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-stack-2"></use></svg><span class="nav-label">API Queue</span></a></li>
+						<li><a href="write-workflow.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-right-bar"></use></svg><span class="nav-label">Write Workflow (Form → Data)</span></a></li>
+						<li><a href="table.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-table-options"></use></svg><span class="nav-label">Table</span></a></li>
+						<li><a href="table-filter.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-table-column"></use></svg><span class="nav-label">Table — Filtering</span></a></li>
+						<li><a href="table-sync.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-refresh"></use></svg><span class="nav-label">Table — Data Sync</span></a></li>
+						<li><a href="tabs.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-navbar"></use></svg><span class="nav-label">Tabs</span></a></li>
+						<li><a href="time.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-clock"></use></svg><span class="nav-label">Time</span></a></li>
+						<li><a href="toast.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-notification"></use></svg><span class="nav-label">Toast</span></a></li>
+						<li><a href="toggle.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-toggle-left"></use></svg><span class="nav-label">Toggle</span></a></li>
+						<li><a href="tooltip.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-tooltip"></use></svg><span class="nav-label">Tooltip</span></a></li>
+						<li><a href="translations.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-language"></use></svg><span class="nav-label">Translations</span></a></li>
+						<li><a href="upload.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-upload"></use></svg><span class="nav-label">Upload</span></a></li>
+						<li><a href="validate.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-shield-check"></use></svg><span class="nav-label">Validate</span></a></li>
+						<li><a href="diagnostics.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-stethoscope"></use></svg><span class="nav-label">Diagnostics (DOM Linter)</span></a></li>
+					</ul>
+				</nav>
+			</main>
+
+			<footer>
+				<small>ashlar-gui v1.2.0</small>
+			</footer>
+		</aside>
+		<script>
+		// Sidebar tone bootstrap — applied before first paint. The library
+		// default is the light sidebar; "brand" is a scoped data-theme.
+		(function () {
+			try {
+				if (localStorage.getItem('ln-demo-sidebar') === 'brand') {
+					document.getElementById('demo-sidebar').setAttribute('data-theme', 'brand');
+				}
+			} catch (e) { /* localStorage unavailable */ }
+		})();
+		</script>
+		<div class="app-scrim"></div>
+
+		<!-- Content -->
+		<section>
+			<div class="app-content-wrapper">
+<header class="demo-page-intro">
+	<h1>Getting started</h1>
+	<p>A quick tour of the interactive building blocks — modals, tabs, toggles, progress, toasts, uploads and AJAX navigation — followed by integration notes and the library philosophy.</p>
+</header>
+
+<!-- Modal Demo -->
+				<section class="section-card">
+					<header><h3>Modal</h3></header>
+					<main>
+						<nav class="demo-actions">
+							<button data-ln-modal-for="demo-basic" class="btn">Basic Modal</button>
+							<button data-ln-modal-for="demo-form" class="btn">Form Modal</button>
+						</nav>
+					</main>
+				</section>
+
+				<!-- Tabs Demo -->
+				<section id="demo-tabs" class="section-card">
+					<header><h3>Tabs</h3></header>
+					<main>
+						<div data-ln-tabs id="getting-started-tabs" data-ln-tabs-default="overview">
+							<nav class="demo-tabs">
+								<button data-ln-tab="overview">Overview</button>
+								<button data-ln-tab="users">Users</button>
+								<button data-ln-tab="settings">Settings</button>
+							</nav>
+
+							<div data-ln-panel="overview" class="demo-panel">
+								<p>Content of the <strong>Overview</strong> tab. Tabs are synchronized with the URL hash.</p>
+								<p>Change the URL hash to <code>#users</code> to see.</p>
+							</div>
+
+							<div data-ln-panel="users" class="demo-panel hidden">
+								<div class="table-container">
+								<table>
+									<thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
+									<tbody>
+										<tr><td data-label="Name">John Smith</td><td data-label="Email">marko@example.com</td><td data-label="Role">Admin</td></tr>
+										<tr><td data-label="Name">Jane Doe</td><td data-label="Email">ana@example.com</td><td data-label="Role">User</td></tr>
+										<tr><td data-label="Name">Alex Johnson</td><td data-label="Email">ivan@example.com</td><td data-label="Role">Moderator</td></tr>
+									</tbody>
+								</table>
+								</div>
+							</div>
+
+							<div data-ln-panel="settings" class="demo-panel hidden">
+								<form>
+									<div class="form-element">
+										<label for="d-lang">Language</label>
+										<select id="d-lang"><option>English</option><option>Spanish</option></select>
+									</div>
+									<div class="form-element">
+										<label for="d-tz">Timezone</label>
+										<input type="text" id="d-tz" value="America/New_York">
+									</div>
+								</form>
+							</div>
+						</div>
+					</main>
+				</section>
+
+				<!-- Toggle & Progress -->
+				<section id="demo-panels">
+					<section id="demo-toggle" class="section-card">
+						<header><h3>Toggle — Collapsible</h3></header>
+						<main>
+							<article>
+								<header>
+									<strong>Server Status</strong>
+									<button type="button" data-ln-toggle-for="server-status" aria-label="Toggle server status"><svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button>
+								</header>
+								<section id="server-status" data-ln-toggle="open" class="collapsible">
+								<article class="collapsible-body">
+									<div class="table-container">
+									<table>
+										<thead><tr><th>Server</th><th>Status</th><th>Uptime</th></tr></thead>
+										<tbody>
+											<tr><td data-label="Server">web-01</td><td data-label="Status"><span class="badge success">OK</span></td><td data-label="Uptime" class="numeric">99.9%</td></tr>
+											<tr><td data-label="Server">web-02</td><td data-label="Status"><span class="badge success">OK</span></td><td data-label="Uptime" class="numeric">99.7%</td></tr>
+											<tr><td data-label="Server">db-01</td><td data-label="Status"><span class="badge error">Down</span></td><td data-label="Uptime" class="numeric">95.2%</td></tr>
+										</tbody>
+									</table>
+									</div>
+								</article>
+								</section>
+							</article>
+						</main>
+					</section>
+
+					<section id="demo-progress" class="section-card">
+						<header><h3>Progress</h3></header>
+						<main>
+							<ul>
+								<li>
+									<h4>CPU — 72%</h4>
+									<div class="progress">
+										<div data-ln-progress="72" class="warning"></div>
+									</div>
+								</li>
+								<li>
+									<h4>RAM — 45%</h4>
+									<div class="progress">
+										<div data-ln-progress="45" class="success"></div>
+									</div>
+								</li>
+								<li>
+									<h4>Disk — 89%</h4>
+									<div class="progress">
+										<div data-ln-progress="89" class="error"></div>
+									</div>
+								</li>
+							</ul>
+						</main>
+					</section>
+				</section>
+
+				<!-- Toast Demo -->
+				<section class="section-card">
+					<header><h3>Toast Notifications</h3></header>
+					<main>
+						<nav class="demo-actions">
+							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'success', title:'Success', message:'The record has been saved.'}}))" class="btn success">Success</button>
+							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'error', title:'Error', message:'Something went wrong.'}}))" class="btn error">Error</button>
+							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'warn', title:'Warning', message:'Please check the data.'}}))" class="btn warning">Warning</button>
+							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'A new version is available.'}}))" class="btn info">Info</button>
+							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'error', title:'Validation', message:['Name is required','Email format is invalid','Password is too short']}}))" class="btn error">Validation Errors</button>
+						</nav>
+					</main>
+				</section>
+
+				<!-- Upload Demo -->
+				<section class="section-card">
+					<header><h3>Upload</h3></header>
+					<main>
+						<div data-ln-upload="/api/files" data-ln-upload-accept="pdf,doc,docx,jpg,png">
+							<div class="ln-upload__zone">
+								<span>Drop files here or click to upload</span>
+								<small>pdf, doc, docx, jpg, png</small>
+							</div>
+							<ul class="ln-upload__list"></ul>
+						</div>
+					</main>
+				</section>
+
+				<!-- AJAX -->
+				<section class="section-card">
+					<header><h3>ln-ajax — AJAX Navigation</h3></header>
+					<main>
+						<p>Component for AJAX navigation and form submission. Links and forms inside a <code>data-ln-ajax</code> container are automatically processed via fetch.</p>
+						<section id="demo-ajax-info">
+							<figure>
+								<pre><code>&lt;div data-ln-ajax&gt;
+    &lt;a href="/users"&gt;Users&lt;/a&gt;
+    &lt;form method="POST" action="/users"&gt;...&lt;/form&gt;
+&lt;/div&gt;
+
+&lt;!-- JSON response --&gt;
+{
+    "title": "Title",
+    "content": { "main": "&lt;p&gt;HTML&lt;/p&gt;" },
+    "message": { "type": "success", "title": "OK", "body": "Saved!" }
+}</code></pre>
+							</figure>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Attribute</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-ajax</code></td><td>Container — all <code>&lt;a&gt;</code> and <code>&lt;form&gt;</code> inside are AJAX</td></tr>
+									<tr><td><code>data-ln-ajax="false"</code></td><td>Exclude a specific element from AJAX processing</td></tr>
+								</tbody>
+							</table>
+							</div>
+							<p>CSRF token automatically from <code>&lt;meta name="csrf-token"&gt;</code>. History pushState for links and GET forms.</p>
+						</section>
+					</main>
+				</section>
+
+				<!-- Quick Integration -->
+				<section class="section-card">
+					<header><h3>Quick Integration</h3></header>
+					<main>
+						<pre><code>&lt;link rel="stylesheet" href="dist/ln-ashlar.css"&gt;
+&lt;script src="dist/ln-ashlar.iife.js" defer&gt;&lt;/script&gt;
+
+&lt;!-- Or as npm module --&gt;
+import 'ln-ashlar';
+import 'ln-ashlar/dist/ln-ashlar.css';</code></pre>
+					</main>
+				</section>
+
+<!-- Philosophy -->
+				<section class="section-card">
+					<header><h3>Philosophy</h3></header>
+					<main class="prose">
+						<h4>An ashlar library.</h4>
+						<p>An <em>ashlar</em> is a finely cut block of stone — small, regular, ready to assemble. Cathedrals are built from ashlars. So are walls.</p>
+						<p>ln-ashlar gives you the blocks. Tokens, mixins, components — small primitives, well-formed, predictable. You stack them into the building you actually need.</p>
+
+						<h4>How</h4>
+						<p><strong>Token-driven.</strong> Spacing, color, radius, shadow — every value lives in <code>--size-*</code>, <code>--color-*</code>, <code>--radius-*</code>. Change one token, every consumer reacts. No hardcoded literals in components.</p>
+						<p><strong>Recipe + application.</strong> Each pattern has two layers: a <code>@mixin</code> (the recipe) and a default selector (the application). Use the default, apply the recipe to your own semantic selector, or rebind the surface tokens. Three first-class paths.</p>
+						<p><strong>Zero dependencies.</strong> Vanilla JS IIFE components, CustomEvent communication, MutationObserver auto-init. No framework, no runtime — drop the SCSS and JS into any project.</p>
+						<p><strong>Themes are palette only.</strong> A theme rebinds vocabulary tokens at its own <code>:root</code>. It never restructures a component. Switching themes is a token swap, not a rewrite.</p>
+
+						<h4>Why</h4>
+						<p>A library should give you primitives and get out of the way. Most CSS frameworks give you a finished building — beautiful for one project, awkward for the next.</p>
+						<p>ln-ashlar gives you the stones. Stack them however your project needs. The stones are simple. The buildings can be as complicated as you want.</p>
+					</main>
+				</section>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<footer class="app-footer">
+			<span>ashlar-gui &copy; 2026 LiveNetworks</span>
+			<span>ln-ashlar v1.2.0</span>
+		</footer>
+		</main>
+	</div><!-- /.app-wrapper -->
+
+	<!-- Modals (outside app-wrapper) -->
+	<dialog class="ln-modal" data-ln-modal id="demo-basic">
+		<form>
+			<header>
+				<h3>Basic Modal</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+			</header>
+			<main>
+				<p>This is a basic modal with a title and content.</p>
+				<p>Press ESC or click close.</p>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Close</button>
+			</footer>
+		</form>
+	</dialog>
+
+	<dialog class="ln-modal" data-ln-modal id="demo-form">
+		<form id="demo-form-el" data-ln-form>
+			<header>
+				<span class="icon">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-user"></use></svg>
+				</span>
+				<hgroup>
+					<h3>Edit User</h3>
+					<p>Update the user's details below.</p>
+				</hgroup>
+				<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+			</header>
+			<main>
+				<div class="form-element">
+					<label for="modal-name">Name</label>
+					<input type="text" id="modal-name" name="name" placeholder="Enter name...">
+				</div>
+				<div class="form-element">
+					<label for="modal-email">Email</label>
+					<input type="email" id="modal-email" name="email" placeholder="email@example.com">
+				</div>
+				<div class="form-element">
+					<label for="modal-role">Role</label>
+					<select id="modal-role" name="role">
+						<option>User</option>
+						<option>Administrator</option>
+						<option>Moderator</option>
+					</select>
+				</div>
+			</main>
+			<footer>
+				<button type="button" class="delete-action">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
+					Delete
+				</button>
+				<button type="button" data-ln-modal-close>Cancel</button>
+				<button type="submit">Save</button>
+			</footer>
+		</form>
+	</dialog>
+
+	<script>
+	(function () {
+		const KEY = 'ln-demo-theme';
+		const VALID = ['soft', 'classic', 'light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-theme') || 'soft';
+			document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-theme') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-theme]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-theme');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-theme', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+
+	(function () {
+		const KEY = 'ln-demo-density';
+		const VALID = ['compact', 'comfortable', 'spacious'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-density') || 'comfortable';
+			document.querySelectorAll('[data-demo-density]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-density') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-density]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-density');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-density', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-density-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+
+	(function () {
+		const KEY = 'ln-demo-sidebar';
+		const sidebar = document.getElementById('demo-sidebar');
+		const btn = document.getElementById('demo-sidebar-tone');
+		if (!sidebar || !btn) return;
+
+		function sync() {
+			btn.setAttribute('aria-pressed', sidebar.getAttribute('data-theme') === 'brand' ? 'true' : 'false');
+		}
+
+		btn.addEventListener('click', function () {
+			const brand = sidebar.getAttribute('data-theme') !== 'brand';
+			if (brand) {
+				sidebar.setAttribute('data-theme', 'brand');
+			} else {
+				sidebar.removeAttribute('data-theme');
+			}
+			try { localStorage.setItem(KEY, brand ? 'brand' : 'light'); } catch (e) { /* ignore */ }
+			sync();
+		});
+
+		sync();
+	})();
+	</script>
+</body>
+</html>

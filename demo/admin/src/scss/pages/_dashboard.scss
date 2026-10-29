@@ -1,91 +1,93 @@
 @use '../../../../../theme/config/mixins' as *;
 
+// ─── Greeting + actions ─────────────────────────────────────────
+
 #dashboard-welcome {
 	@include flex;
-	@include items-center;
+	@include items-end;
 	@include justify-between;
 	@include flex-wrap;
 	@include gap(var(--size-lg));
 
-	h2 { @include typography(display-sm); margin: 0; }
-	p { color: var(--fg-muted); margin: var(--size-sm) 0 0; }
+	h2 { @include typography(display-sm); @include tracking-tight; margin: 0; }
+	p { color: var(--fg-muted); margin: var(--size-xs) 0 0; }
+
 	.dashboard-eyebrow {
 		@include typography(label-sm);
 		@include font-semibold;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
 		color: var(--color-accent);
-		margin: 0 0 var(--size-sm);
+		margin: 0 0 var(--size-xs);
 	}
 }
 
-#stats,
-#dashboard-shortcuts {
+.dashboard-actions {
+	@include flex;
+	@include gap(var(--size-sm));
+}
+
+// ─── Key figures ────────────────────────────────────────────────
+
+#dashboard-stats {
 	container-type: inline-size;
 
 	> ul {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
 		@include gap(var(--size-lg));
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
-}
 
-#stats {
-	> ul {
 		@include cq-up(narrow) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 		@include cq-up(medium) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 	}
 
-	li {
-		@include card;
-		padding: var(--card-padding-x);
-		@include gap(var(--size-sm));
+	> ul > li { display: grid; }
+}
+
+// ─── Register (2/3) + side column (1/3) ─────────────────────────
+
+#dashboard-main {
+	container-type: inline-size;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	@include gap(var(--size-lg));
+	align-items: start;
+
+	@include cq-up(wide) { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+}
+
+#dashboard-side {
+	display: grid;
+	@include gap(var(--size-lg));
+}
+
+// Segmented view switch lives in the panel header; the tables run
+// edge to edge under it.
+#register {
+	> header {
+		@include flex-wrap;
+		@include gap(var(--size-md));
+
+		> nav { @include tabs-nav-segmented; }
 	}
 
-	header {
-		@include row-between;
-		padding: 0;
-		border: none;
-		background: transparent;
-	}
+	> main { padding: 0; }
 
-	.dashboard-stat-icon {
-		@include flex-center;
-		@include size(var(--size-2xl));
-		border-radius: var(--radius-md);
-		background: var(--color-accent-tint);
-		color: var(--color-accent);
-	}
+	[data-ln-panel] { padding: 0; }
 
-	h3 {
-		@include text-sm;
-		color: var(--fg-muted);
-		@include font-normal;
+	table {
 		margin: 0;
+		border: 0;
+		border-radius: 0;
+		box-shadow: none;
 	}
 
-	strong {
-		@include typography(display-sm);
-		@include font-bold;
-		@include block;
-	}
-
-	p {
-		@include typography(body-sm);
-		color: var(--fg-muted);
-		margin: 0;
+	td strong {
+		display: block;
+		color: var(--fg-default);
 	}
 }
 
-#dashboard-shortcuts {
-	> ul {
-		@include cq-up(medium) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-	}
-
-	li { @include card; }
-	a { padding: var(--card-padding-x); @include gap(var(--size-sm)); }
-	h3 { @include typography(title-md); margin: 0; }
-	p { @include typography(body-sm); color: var(--fg-muted); margin: 0; }
-	.ln-icon { color: var(--color-accent); }
+#activity .timeline {
+	margin: 0;
 }

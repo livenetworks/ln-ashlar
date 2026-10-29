@@ -149,6 +149,16 @@ Standalone header mixin — used internally by `section-card` and `ln-modal`. Us
 #my-widget header { @include panel-header; }
 ```
 
+The header shares the panel surface (no tinted caption bar; opt in with
+`--panel-header-bg`). For a title with a description, use `<hgroup>`:
+
+```html
+<header>
+	<hgroup><h3>Operations register</h3><p>Network equipment and field orders</p></hgroup>
+	<nav>…actions or a segmented tab switch…</nav>
+</header>
+```
+
 ---
 
 ## Accent Variants

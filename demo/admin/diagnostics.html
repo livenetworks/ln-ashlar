@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="soft" data-density="comfortable" data-ln-debug>
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,7 @@
 	<script>
 	(function () {
 		var KEY = 'ln-demo-theme';
-		var VALID = ['soft', 'light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
+		var VALID = ['soft', 'classic', 'light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
 		try {
 			var stored = localStorage.getItem(KEY);
 			if (stored && VALID.indexOf(stored) !== -1) {
@@ -81,8 +81,8 @@
 					</button>
 					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
 						<ul>
-							<li><button type="button" data-demo-theme="soft"><span class="demo-theme-swatch" data-preset="soft" aria-hidden="true"></span>Soft</button></li>
-							<li><button type="button" data-demo-theme="light"><span class="demo-theme-swatch" data-preset="light"></span>Light</button></li>
+							<li><button type="button" data-demo-theme="soft"><span class="demo-theme-swatch" data-preset="soft" aria-hidden="true"></span>Default</button></li>
+							<li><button type="button" data-demo-theme="classic"><span class="demo-theme-swatch" data-preset="classic" aria-hidden="true"></span>Classic</button></li>
 							<li><button type="button" data-demo-theme="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
 							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
 							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
@@ -100,8 +100,8 @@
 							<li><button type="button" data-demo-density="spacious">Spacious</button></li>
 						</ul>
 					</div>
-					<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'This is a demo notification.'}}))">
-						<span>Test Toast</span>
+					<button type="button" id="demo-sidebar-tone" aria-pressed="false" aria-label="Brand sidebar">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-sidebar"></use></svg>
 					</button>
 				</div>
 			</div>
@@ -126,75 +126,76 @@
 				<nav class="nav" id="demo-nav" data-ln-nav="active" data-ln-search="" data-ln-search-items="li">
 					<ul>
 						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+						<li><a href="getting-started.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-rocket"></use></svg><span class="nav-label">Getting started</span></a></li>
 					</ul>
 
 					<h6 class="nav-section">CSS Components</h6>
 					<ul>
-						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
-						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
-						<li><a href="chip.html"><span class="nav-label">Chip</span></a></li>
-						<li><a href="density.html"><span class="nav-label">Density</span></a></li>
-						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
-						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
-						<li><a href="kbd.html"><span class="nav-label">Kbd</span></a></li>
-						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
-						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
-						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
-						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
-						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
-						<li><a href="page-header.html"><span class="nav-label">Page Header</span></a></li>
-						<li><a href="prose.html"><span class="nav-label">Prose</span></a></li>
-						<li><a href="stat-card.html"><span class="nav-label">Stat Card</span></a></li>
-						<li><a href="status-badge.html"><span class="nav-label">Status Badge</span></a></li>
-						<li><a href="stepper.html"><span class="nav-label">Stepper</span></a></li>
-						<li><a href="timeline.html"><span class="nav-label">Timeline</span></a></li>
-						<li><a href="empty-state.html"><span class="nav-label">Empty State</span></a></li>
+						<li><a href="typography.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-typography"></use></svg><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-cards"></use></svg><span class="nav-label">Cards</span></a></li>
+						<li><a href="chip.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-tag"></use></svg><span class="nav-label">Chip</span></a></li>
+						<li><a href="density.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-rows"></use></svg><span class="nav-label">Density</span></a></li>
+						<li><a href="tables.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-table"></use></svg><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-forms"></use></svg><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="kbd.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-keyboard"></use></svg><span class="nav-label">Kbd</span></a></li>
+						<li><a href="layout.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-grid"></use></svg><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-list"></use></svg><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-icons"></use></svg><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-tool"></use></svg><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-code"></use></svg><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="page-header.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-heading"></use></svg><span class="nav-label">Page Header</span></a></li>
+						<li><a href="prose.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-article"></use></svg><span class="nav-label">Prose</span></a></li>
+						<li><a href="stat-card.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-chart-bar"></use></svg><span class="nav-label">Stat Card</span></a></li>
+						<li><a href="status-badge.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-badge"></use></svg><span class="nav-label">Status Badge</span></a></li>
+						<li><a href="stepper.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-list-numbers"></use></svg><span class="nav-label">Stepper</span></a></li>
+						<li><a href="timeline.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-timeline"></use></svg><span class="nav-label">Timeline</span></a></li>
+						<li><a href="empty-state.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-mood-empty"></use></svg><span class="nav-label">Empty State</span></a></li>
 					</ul>
 
 					<h6 class="nav-section">JS Components</h6>
 					<ul>
-						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
-						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
-						<li><a href="autoresize.html"><span class="nav-label">Autoresize</span></a></li>
-						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
-						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
-						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
-						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
-						<li><a href="editor.html"><span class="nav-label">Editor</span></a></li>
-						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
-						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
-						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
-						<li><a href="include.html"><span class="nav-label">Include</span></a></li>
-						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
-						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
-						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
-						<li><a href="persist.html"><span class="nav-label">Persist</span></a></li>
-						<li><a href="popover.html"><span class="nav-label">Popover</span></a></li>
-						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
-						<li><a href="router.html"><span class="nav-label">Router</span></a></li>
-						<li><a href="search.html"><span class="nav-label">Search</span></a></li>
-						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
-						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
-						<li><a href="store.html"><span class="nav-label">Store</span></a></li>
-						<li><a href="store-usecase.html"><span class="nav-label">Store — Usecase</span></a></li>
-						<li><a href="list.html"><span class="nav-label">List &amp; Card Grid</span></a></li>
-						<li><a href="coordinator.html"><span class="nav-label">Data Coordinator</span></a></li>
-						<li><a href="api-connector.html"><span class="nav-label">API Connector</span></a></li>
-						<li><a href="couchdb-connector.html"><span class="nav-label">CouchDB Connector</span></a></li>
-						<li><a href="api-queue.html"><span class="nav-label">API Queue</span></a></li>
-						<li><a href="write-workflow.html"><span class="nav-label">Write Workflow (Form → Data)</span></a></li>
-						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
-						<li><a href="table-filter.html"><span class="nav-label">Table — Filtering</span></a></li>
-						<li><a href="table-sync.html"><span class="nav-label">Table — Data Sync</span></a></li>
-						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
-						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
-						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
-						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
-						<li><a href="tooltip.html"><span class="nav-label">Tooltip</span></a></li>
-						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
-						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
-						<li><a href="validate.html"><span class="nav-label">Validate</span></a></li>
-						<li><a href="diagnostics.html" aria-current="page"><span class="nav-label">Diagnostics (DOM Linter)</span></a></li>
+						<li><a href="accordion.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-bottombar-expand"></use></svg><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-bolt"></use></svg><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autoresize.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-vertical"></use></svg><span class="nav-label">Autoresize</span></a></li>
+						<li><a href="autosave.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-device-floppy"></use></svg><span class="nav-label">Autosave</span></a></li>
+						<li><a href="circular-progress.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-chart-donut"></use></svg><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="confirm.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg><span class="nav-label">Confirm</span></a></li>
+						<li><a href="dropdown.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-selector"></use></svg><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="editor.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-pencil"></use></svg><span class="nav-label">Editor</span></a></li>
+						<li><a href="external-links.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-external-link"></use></svg><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg><span class="nav-label">Filter</span></a></li>
+						<li><a href="http.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg><span class="nav-label">HTTP</span></a></li>
+						<li><a href="include.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-file-import"></use></svg><span class="nav-label">Include</span></a></li>
+						<li><a href="link.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-link"></use></svg><span class="nav-label">Link</span></a></li>
+						<li><a href="modal.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-app-window"></use></svg><span class="nav-label">Modal</span></a></li>
+						<li><a href="nav.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu-2"></use></svg><span class="nav-label">Nav</span></a></li>
+						<li><a href="persist.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-database"></use></svg><span class="nav-label">Persist</span></a></li>
+						<li><a href="popover.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-message-2"></use></svg><span class="nav-label">Popover</span></a></li>
+						<li><a href="progress.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-progress"></use></svg><span class="nav-label">Progress</span></a></li>
+						<li><a href="router.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-route"></use></svg><span class="nav-label">Router</span></a></li>
+						<li><a href="search.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg><span class="nav-label">Search</span></a></li>
+						<li><a href="select.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-select"></use></svg><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg><span class="nav-label">Sortable</span></a></li>
+						<li><a href="store.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-database-cog"></use></svg><span class="nav-label">Store</span></a></li>
+						<li><a href="store-usecase.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-database-share"></use></svg><span class="nav-label">Store — Usecase</span></a></li>
+						<li><a href="list.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-list-details"></use></svg><span class="nav-label">List &amp; Card Grid</span></a></li>
+						<li><a href="coordinator.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-git-merge"></use></svg><span class="nav-label">Data Coordinator</span></a></li>
+						<li><a href="api-connector.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plug"></use></svg><span class="nav-label">API Connector</span></a></li>
+						<li><a href="couchdb-connector.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plug-connected"></use></svg><span class="nav-label">CouchDB Connector</span></a></li>
+						<li><a href="api-queue.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-stack-2"></use></svg><span class="nav-label">API Queue</span></a></li>
+						<li><a href="write-workflow.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-right-bar"></use></svg><span class="nav-label">Write Workflow (Form → Data)</span></a></li>
+						<li><a href="table.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-table-options"></use></svg><span class="nav-label">Table</span></a></li>
+						<li><a href="table-filter.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-table-column"></use></svg><span class="nav-label">Table — Filtering</span></a></li>
+						<li><a href="table-sync.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-refresh"></use></svg><span class="nav-label">Table — Data Sync</span></a></li>
+						<li><a href="tabs.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-navbar"></use></svg><span class="nav-label">Tabs</span></a></li>
+						<li><a href="time.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-clock"></use></svg><span class="nav-label">Time</span></a></li>
+						<li><a href="toast.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-notification"></use></svg><span class="nav-label">Toast</span></a></li>
+						<li><a href="toggle.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-toggle-left"></use></svg><span class="nav-label">Toggle</span></a></li>
+						<li><a href="tooltip.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-tooltip"></use></svg><span class="nav-label">Tooltip</span></a></li>
+						<li><a href="translations.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-language"></use></svg><span class="nav-label">Translations</span></a></li>
+						<li><a href="upload.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-upload"></use></svg><span class="nav-label">Upload</span></a></li>
+						<li><a href="validate.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-shield-check"></use></svg><span class="nav-label">Validate</span></a></li>
+						<li><a href="diagnostics.html" aria-current="page"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-stethoscope"></use></svg><span class="nav-label">Diagnostics (DOM Linter)</span></a></li>
 					</ul>
 				</nav>
 			</main>
@@ -203,6 +204,17 @@
 				<small>ashlar-gui v1.2.0</small>
 			</footer>
 		</aside>
+		<script>
+		// Sidebar tone bootstrap — applied before first paint. The library
+		// default is the light sidebar; "brand" is a scoped data-theme.
+		(function () {
+			try {
+				if (localStorage.getItem('ln-demo-sidebar') === 'brand') {
+					document.getElementById('demo-sidebar').setAttribute('data-theme', 'brand');
+				}
+			} catch (e) { /* localStorage unavailable */ }
+		})();
+		</script>
 		<div class="app-scrim"></div>
 
 		<!-- Content -->
@@ -460,7 +472,7 @@ abbr:not([title]) {
 	<script>
 	(function () {
 		const KEY = 'ln-demo-theme';
-		const VALID = ['soft', 'light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
+		const VALID = ['soft', 'classic', 'light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
 		const root = document.documentElement;
 
 		function markActive() {
@@ -524,6 +536,30 @@ abbr:not([title]) {
 
 		document.addEventListener('DOMContentLoaded', markActive);
 		if (document.readyState !== 'loading') markActive();
+	})();
+
+	(function () {
+		const KEY = 'ln-demo-sidebar';
+		const sidebar = document.getElementById('demo-sidebar');
+		const btn = document.getElementById('demo-sidebar-tone');
+		if (!sidebar || !btn) return;
+
+		function sync() {
+			btn.setAttribute('aria-pressed', sidebar.getAttribute('data-theme') === 'brand' ? 'true' : 'false');
+		}
+
+		btn.addEventListener('click', function () {
+			const brand = sidebar.getAttribute('data-theme') !== 'brand';
+			if (brand) {
+				sidebar.setAttribute('data-theme', 'brand');
+			} else {
+				sidebar.removeAttribute('data-theme');
+			}
+			try { localStorage.setItem(KEY, brand ? 'brand' : 'light'); } catch (e) { /* ignore */ }
+			sync();
+		});
+
+		sync();
 	})();
 	</script>
 </body>

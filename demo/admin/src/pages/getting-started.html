@@ -1,0 +1,211 @@
+<!-- ln-page: title="Getting started — ln-ashlar" h1="Getting started" -->
+
+<header class="demo-page-intro">
+	<h1>Getting started</h1>
+	<p>A quick tour of the interactive building blocks — modals, tabs, toggles, progress, toasts, uploads and AJAX navigation — followed by integration notes and the library philosophy.</p>
+</header>
+
+<!-- Modal Demo -->
+				<section class="section-card">
+					<header><h3>Modal</h3></header>
+					<main>
+						<nav class="demo-actions">
+							<button data-ln-modal-for="demo-basic" class="btn">Basic Modal</button>
+							<button data-ln-modal-for="demo-form" class="btn">Form Modal</button>
+						</nav>
+					</main>
+				</section>
+
+				<!-- Tabs Demo -->
+				<section id="demo-tabs" class="section-card">
+					<header><h3>Tabs</h3></header>
+					<main>
+						<div data-ln-tabs id="getting-started-tabs" data-ln-tabs-default="overview">
+							<nav class="demo-tabs">
+								<button data-ln-tab="overview">Overview</button>
+								<button data-ln-tab="users">Users</button>
+								<button data-ln-tab="settings">Settings</button>
+							</nav>
+
+							<div data-ln-panel="overview" class="demo-panel">
+								<p>Content of the <strong>Overview</strong> tab. Tabs are synchronized with the URL hash.</p>
+								<p>Change the URL hash to <code>#users</code> to see.</p>
+							</div>
+
+							<div data-ln-panel="users" class="demo-panel hidden">
+								<div class="table-container">
+								<table>
+									<thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
+									<tbody>
+										<tr><td data-label="Name">John Smith</td><td data-label="Email">marko@example.com</td><td data-label="Role">Admin</td></tr>
+										<tr><td data-label="Name">Jane Doe</td><td data-label="Email">ana@example.com</td><td data-label="Role">User</td></tr>
+										<tr><td data-label="Name">Alex Johnson</td><td data-label="Email">ivan@example.com</td><td data-label="Role">Moderator</td></tr>
+									</tbody>
+								</table>
+								</div>
+							</div>
+
+							<div data-ln-panel="settings" class="demo-panel hidden">
+								<form>
+									<div class="form-element">
+										<label for="d-lang">Language</label>
+										<select id="d-lang"><option>English</option><option>Spanish</option></select>
+									</div>
+									<div class="form-element">
+										<label for="d-tz">Timezone</label>
+										<input type="text" id="d-tz" value="America/New_York">
+									</div>
+								</form>
+							</div>
+						</div>
+					</main>
+				</section>
+
+				<!-- Toggle & Progress -->
+				<section id="demo-panels">
+					<section id="demo-toggle" class="section-card">
+						<header><h3>Toggle — Collapsible</h3></header>
+						<main>
+							<article>
+								<header>
+									<strong>Server Status</strong>
+									<button type="button" data-ln-toggle-for="server-status" aria-label="Toggle server status"><svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button>
+								</header>
+								<section id="server-status" data-ln-toggle="open" class="collapsible">
+								<article class="collapsible-body">
+									<div class="table-container">
+									<table>
+										<thead><tr><th>Server</th><th>Status</th><th>Uptime</th></tr></thead>
+										<tbody>
+											<tr><td data-label="Server">web-01</td><td data-label="Status"><span class="badge success">OK</span></td><td data-label="Uptime" class="numeric">99.9%</td></tr>
+											<tr><td data-label="Server">web-02</td><td data-label="Status"><span class="badge success">OK</span></td><td data-label="Uptime" class="numeric">99.7%</td></tr>
+											<tr><td data-label="Server">db-01</td><td data-label="Status"><span class="badge error">Down</span></td><td data-label="Uptime" class="numeric">95.2%</td></tr>
+										</tbody>
+									</table>
+									</div>
+								</article>
+								</section>
+							</article>
+						</main>
+					</section>
+
+					<section id="demo-progress" class="section-card">
+						<header><h3>Progress</h3></header>
+						<main>
+							<ul>
+								<li>
+									<h4>CPU — 72%</h4>
+									<div class="progress">
+										<div data-ln-progress="72" class="warning"></div>
+									</div>
+								</li>
+								<li>
+									<h4>RAM — 45%</h4>
+									<div class="progress">
+										<div data-ln-progress="45" class="success"></div>
+									</div>
+								</li>
+								<li>
+									<h4>Disk — 89%</h4>
+									<div class="progress">
+										<div data-ln-progress="89" class="error"></div>
+									</div>
+								</li>
+							</ul>
+						</main>
+					</section>
+				</section>
+
+				<!-- Toast Demo -->
+				<section class="section-card">
+					<header><h3>Toast Notifications</h3></header>
+					<main>
+						<nav class="demo-actions">
+							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'success', title:'Success', message:'The record has been saved.'}}))" class="btn success">Success</button>
+							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'error', title:'Error', message:'Something went wrong.'}}))" class="btn error">Error</button>
+							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'warn', title:'Warning', message:'Please check the data.'}}))" class="btn warning">Warning</button>
+							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'A new version is available.'}}))" class="btn info">Info</button>
+							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'error', title:'Validation', message:['Name is required','Email format is invalid','Password is too short']}}))" class="btn error">Validation Errors</button>
+						</nav>
+					</main>
+				</section>
+
+				<!-- Upload Demo -->
+				<section class="section-card">
+					<header><h3>Upload</h3></header>
+					<main>
+						<div data-ln-upload="/api/files" data-ln-upload-accept="pdf,doc,docx,jpg,png">
+							<div class="ln-upload__zone">
+								<span>Drop files here or click to upload</span>
+								<small>pdf, doc, docx, jpg, png</small>
+							</div>
+							<ul class="ln-upload__list"></ul>
+						</div>
+					</main>
+				</section>
+
+				<!-- AJAX -->
+				<section class="section-card">
+					<header><h3>ln-ajax — AJAX Navigation</h3></header>
+					<main>
+						<p>Component for AJAX navigation and form submission. Links and forms inside a <code>data-ln-ajax</code> container are automatically processed via fetch.</p>
+						<section id="demo-ajax-info">
+							<figure>
+								<pre><code>&lt;div data-ln-ajax&gt;
+    &lt;a href="/users"&gt;Users&lt;/a&gt;
+    &lt;form method="POST" action="/users"&gt;...&lt;/form&gt;
+&lt;/div&gt;
+
+&lt;!-- JSON response --&gt;
+{
+    "title": "Title",
+    "content": { "main": "&lt;p&gt;HTML&lt;/p&gt;" },
+    "message": { "type": "success", "title": "OK", "body": "Saved!" }
+}</code></pre>
+							</figure>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Attribute</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-ajax</code></td><td>Container — all <code>&lt;a&gt;</code> and <code>&lt;form&gt;</code> inside are AJAX</td></tr>
+									<tr><td><code>data-ln-ajax="false"</code></td><td>Exclude a specific element from AJAX processing</td></tr>
+								</tbody>
+							</table>
+							</div>
+							<p>CSRF token automatically from <code>&lt;meta name="csrf-token"&gt;</code>. History pushState for links and GET forms.</p>
+						</section>
+					</main>
+				</section>
+
+				<!-- Quick Integration -->
+				<section class="section-card">
+					<header><h3>Quick Integration</h3></header>
+					<main>
+						<pre><code>&lt;link rel="stylesheet" href="dist/ln-ashlar.css"&gt;
+&lt;script src="dist/ln-ashlar.iife.js" defer&gt;&lt;/script&gt;
+
+&lt;!-- Or as npm module --&gt;
+import 'ln-ashlar';
+import 'ln-ashlar/dist/ln-ashlar.css';</code></pre>
+					</main>
+				</section>
+
+<!-- Philosophy -->
+				<section class="section-card">
+					<header><h3>Philosophy</h3></header>
+					<main class="prose">
+						<h4>An ashlar library.</h4>
+						<p>An <em>ashlar</em> is a finely cut block of stone — small, regular, ready to assemble. Cathedrals are built from ashlars. So are walls.</p>
+						<p>ln-ashlar gives you the blocks. Tokens, mixins, components — small primitives, well-formed, predictable. You stack them into the building you actually need.</p>
+
+						<h4>How</h4>
+						<p><strong>Token-driven.</strong> Spacing, color, radius, shadow — every value lives in <code>--size-*</code>, <code>--color-*</code>, <code>--radius-*</code>. Change one token, every consumer reacts. No hardcoded literals in components.</p>
+						<p><strong>Recipe + application.</strong> Each pattern has two layers: a <code>@mixin</code> (the recipe) and a default selector (the application). Use the default, apply the recipe to your own semantic selector, or rebind the surface tokens. Three first-class paths.</p>
+						<p><strong>Zero dependencies.</strong> Vanilla JS IIFE components, CustomEvent communication, MutationObserver auto-init. No framework, no runtime — drop the SCSS and JS into any project.</p>
+						<p><strong>Themes are palette only.</strong> A theme rebinds vocabulary tokens at its own <code>:root</code>. It never restructures a component. Switching themes is a token swap, not a rewrite.</p>
+
+						<h4>Why</h4>
+						<p>A library should give you primitives and get out of the way. Most CSS frameworks give you a finished building — beautiful for one project, awkward for the next.</p>
+						<p>ln-ashlar gives you the stones. Stack them however your project needs. The stones are simple. The buildings can be as complicated as you want.</p>
+					</main>
+				</section>

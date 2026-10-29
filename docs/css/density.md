@@ -19,37 +19,25 @@ class, the cascade does the rest.
 
 ## Activation
 
-Three activation paths:
-
-### 1. Global
-
-```html
-<html class="density-compact">
-```
-
-The whole document switches to compact spacing. Persist the user's
-choice client-side (`localStorage`, cookie); the library does not
-persist.
-
-### 2. Scoped
+Since v3 the default (`<html>` without `data-density`) is **comfortable**:
+16px body text, 44px controls, 56px header, 256px sidebar.
 
 ```html
-<main class="density-compact">
-	<!-- only this region is compact -->
-</main>
+<html>                              <!-- comfortable (default) -->
+<html data-density="compact">       <!-- dense DocuFlow scale: 14px, 36px controls -->
+<html data-density="spacious">      <!-- 18px, 54px controls -->
+<table data-density="compact">      <!-- scoped: dense region in a comfortable page -->
 ```
 
-Density is a normal CSS custom property cascade — it works at any
-DOM scope, not just `<html>`. Use this for "compact data table on a
-comfortable page" layouts.
+`[data-density="compact"]` carries the full dense set (type roles, rhythm,
+shell sizes, control contract, card/table padding), so it works both on
+`<html>` and on a region. Persist the user's choice client-side; the library
+does not persist.
 
-### 3. Default (comfortable)
+The mobile rhythm block at the end of `_density.scss` tightens `--padding-y`
+/ `--gap` at ≤ md viewports on top of every tier.
 
-No class = comfortable mode. There is no `.density-comfortable`
-form — comfortable IS the default `:root` state (values live in
-`_tokens.scss`).
-
-## What tokens the compact class overrides
+## What tokens the compact tier overrides
 
 | Token group | Overridden | Effect |
 |---|---|---|

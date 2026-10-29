@@ -134,7 +134,7 @@
 	// the anchor hover in _global.scss, and @mixin semantic-color's
 	// status-family cascade. -light / -lighter remain explicit tokens
 	// (theme-controlled, not derivable from base).
-	--color-accent-hover: hsl(from var(--color-accent) h s calc(l - 8));
+	--color-accent-hover: hsl(from var(--color-accent) h s calc(l + var(--accent-hover-shift, -8)));
 
 	// --btn-bg / --btn-fg read translucent companions via fallback.
 	// Default theme: companions unset → falls back to --color-accent

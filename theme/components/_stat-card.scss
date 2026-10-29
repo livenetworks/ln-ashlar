@@ -3,3 +3,13 @@
 [data-ln-stat-card] {
 	@include stat-card;
 }
+
+// Tone — data-ln-stat-card="primary | success | warning | error | info"
+[data-ln-stat-card]:not([data-ln-stat-card=""]) {
+	@include stat-card-tone;
+}
+
+[data-ln-stat-card="success"] { @include semantic-color(success); }
+[data-ln-stat-card="warning"] { @include semantic-color(warning); }
+[data-ln-stat-card="error"]   { @include semantic-color(error); }
+[data-ln-stat-card="info"]    { @include semantic-color(info); }

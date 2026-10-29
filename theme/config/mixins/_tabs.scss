@@ -57,6 +57,37 @@
 	}
 }
 
+// ─── Segmented variant ──────────────────────────────────────────
+// Pill track for compact panel-level switches (e.g. in a panel header).
+// Usage: #register-tabs > nav { @include tabs-nav-segmented; }
+@mixin tabs-nav-segmented {
+	display: inline-flex;
+	gap: var(--size-2xs);
+	padding: var(--size-2xs);
+	border: 0;
+	border-radius: var(--radius);
+	background: var(--bg-recessed);
+
+	[data-ln-tab] {
+		--padding-y: var(--size-xs);
+		--padding-x: var(--size-sm-up);
+		margin: 0;
+		border-bottom: 0;
+		border-radius: calc(var(--radius) - var(--size-2xs));
+
+		&:hover {
+			background: transparent;
+			color: var(--fg-default);
+		}
+	}
+
+	[data-ln-tab][data-active] {
+		background: var(--bg-elevated);
+		color: var(--color-accent);
+		box-shadow: var(--shadow-xs);
+	}
+}
+
 @mixin tabs-panel {
 	--padding-y: var(--size-lg);
 	--padding-x: var(--size-lg);

@@ -26,6 +26,27 @@ optional trend indicator.
 | `data-ln-stat-trend="down"` | Error (red) |
 | `data-ln-stat-trend="neutral"` | Muted grey |
 
+## Tone and icon
+
+```html
+<article data-ln-stat-card="success">
+	<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-router"></use></svg>
+	<p data-ln-stat-label>Network devices</p>
+	<p data-ln-stat-value data-ln-number>142</p>
+	<p data-ln-stat-trend="neutral">141 online</p>
+</article>
+```
+
+| Value | Effect |
+|---|---|
+| *(empty)* | Neutral card, no accent strip |
+| `primary` | Accent strip + icon tile in the brand accent |
+| `success` / `warning` / `error` / `info` | Same, via the `semantic-color` cascade |
+
+A direct-child `<svg class="ln-icon">` becomes a tinted icon tile pinned
+top-right. In project SCSS: `@include stat-card; @include stat-card-tone;`
+plus `@include semantic-color(success)` for a status tone.
+
 ## Layout
 
 Stat cards are typically displayed in a grid. Use container queries

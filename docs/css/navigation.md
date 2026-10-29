@@ -37,8 +37,10 @@ Sidebar navigation component. File: `theme/config/mixins/_nav.scss`.
 | Element | Description |
 |---------|-------------|
 | `<nav>` | Container — full height, flex column |
-| `.nav-section` | Section header — xs uppercase muted text |
+| `.nav-section` | Section header — xs uppercase, tracked, semibold, subtle |
+| `svg.ln-icon` (in `a`) | Leading icon — 20px, inherits link colour |
 | `.nav-label` | Link text — flex-1 with truncate |
+| `.nav-count` | Trailing counter pill — accent-filled on the active link |
 | `.nav-divider` | Horizontal border separator |
 | `a.active` | Active link — styled by the active link preset |
 

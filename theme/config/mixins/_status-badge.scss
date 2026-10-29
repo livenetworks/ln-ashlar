@@ -28,6 +28,7 @@
 	font-weight: var(--font-medium);
 	@include tinted-surface(0.12);
 	line-height: 1.5;
+	white-space: nowrap;   // a status is one token — never wrap mid-label
 
 	// Colored dot
 	&::before {

@@ -40,8 +40,15 @@
 		gap: var(--gap);
 		padding-block: var(--padding-y);
 		@include typography(body-sm);
+		@include font-medium;
 		color: var(--color-fg);
 		text-decoration: none;
+
+		// Leading icon — an <svg class="ln-icon"> placed before the label.
+		> .ln-icon {
+			@include flex-shrink-0;
+			@include size(1.25rem);
+		}
 		// Always-present 1px border slot. Color defaults to transparent
 		// (default theme = invisible). Themes that opt in (Glass) rebind
 		// --nav-link-border-color* at theme :root. Negative margin
@@ -60,15 +67,36 @@
 		@include truncate;
 	}
 
+	// Trailing counter — <span class="nav-count">24</span> after the label.
+	.nav-count {
+		@include flex-shrink-0;
+		margin-inline-start: auto;
+		padding: 0 var(--size-xs-up);
+		min-width: 1.5rem;
+		text-align: center;
+		border-radius: var(--radius-full);
+		@include text-xs;
+		@include font-semibold;
+		font-variant-numeric: tabular-nums;
+		background: color-mix(in srgb, var(--color-fg) 12%, transparent);
+	}
+
+	a.active .nav-count {
+		background: var(--color-accent);
+		color: var(--color-accent-fg);
+	}
+
+	// Section heading — small uppercase eyebrow, clearly not a link.
 	.nav-section {
 		--color-fg: var(--fg-subtle);
 		--padding-y: var(--size-sm);
 		padding-block: var(--padding-y);
+		padding-inline: var(--padding-x);
 		@include text-xs;
-		@include font-medium;
+		@include font-semibold;
 		color: var(--color-fg);
-		@include normal-case;
-		letter-spacing: normal;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
 		// Structural margin above section header.
 		--margin-block: var(--size-md);
 		margin-top: var(--margin-block);
