@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.2.0](./v2.2.0.md) — October 30, 2026
+A new default look, ported from Stefan Nikolic's UI refresh: Plus Jakarta Sans, a sky accent, a slate ramp and soft radii and shadows, with density owning typography. Also new: the `relaxed` design bundle, page-sticky table headers, and record cards for tables below `md`.  
+👉 [Read full v2.2.0 release notes](./v2.2.0.md)
+
 ### [v2.1.13](./v2.1.13.md) — October 25, 2026
 SCSS selector performance optimization and CSS Logical Properties modernization: negative `:not(:has(...))` pruning, compound selector consolidation via `:is(...)`, scoped direct-child navigation indicators, and spacing logical properties (`padding-inline`, `margin-inline`).  
 👉 [Read full v2.1.13 release notes](./v2.1.13.md)
