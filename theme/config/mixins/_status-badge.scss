@@ -29,6 +29,7 @@
 	border: var(--border-width) solid color-mix(in srgb, var(--color-accent) 20%, transparent);
 	@include tinted-surface(0.09);
 	line-height: 1.5;
+	white-space: nowrap;   // a status is one token — never wrap mid-label
 
 	// Colored dot
 	&::before {

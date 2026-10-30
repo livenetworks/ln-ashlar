@@ -62,6 +62,7 @@ function compileSassFiles() {
 		{ src: 'ln-ashlar-theme.scss', out: 'ln-ashlar-theme.css' },
 		{ src: 'ln-ashlar-landing.scss', out: 'ln-ashlar-landing.css' },
 		{ src: 'ln-ashlar.scss', out: 'ln-ashlar.css' },
+		{ src: 'ln-ashlar-relaxed.scss', out: 'ln-ashlar-relaxed.css' },
 		{ src: 'ln-ashlar-dev.scss', out: 'ln-ashlar-dev.css' }
 	];
 

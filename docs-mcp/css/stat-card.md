@@ -16,7 +16,9 @@ tags: [stat-card, kpi, metrics, dashboard, trends, numbers]
 
 The `stat-card` module (`theme/config/mixins/_stat-card.scss` and `theme/components/_stat-card.scss`) formats dashboard KPI metric tiles:
 
-- **Metric Hierarchy:** Structured rhythm with uppercase label, prominent numeric value with tabular numerals (`tnum`), and an optional trend indicator (`up`, `down`, `neutral`).
+- **Metric Hierarchy:** Structured rhythm with a medium-weight label, prominent numeric value with tabular numerals (`tnum`), and an optional trend indicator (`up`, `down`, `neutral`).
+- **Tone:** Every card carries an accent strip on its leading edge. The default tone is primary; a semantic class on the card (`success`, `warning`, `error`, `info`) re-tones the strip and the icon tile. No attribute values are involved.
+- **Icon Tile:** A direct-child `<svg class="ln-icon">` is pinned top-right on an accent-tinted tile.
 - **Trend Indicators:** Colored directional indicators displaying status colors (success green for `up`, error red for `down`).
 - **Responsive Layout:** Grid layout adapting via container query breakpoints (`$cq-compact`, `$cq-medium`).
 
@@ -57,8 +59,9 @@ The `stat-card` module (`theme/config/mixins/_stat-card.scss` and `theme/compone
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
 | `stat-card` | mixin | — | KPI card container layout with tabular numeral styling |
+| `stat-card-tone` | mixin | — | Leading accent strip and icon tint from the semantic-color cascade |
 | `data-ln-stat-card` | attribute | — | Binds the `stat-card` mixin to the container |
-| `data-ln-stat-label` | attribute | — | Uppercase muted caption; direct child |
+| `data-ln-stat-label` | attribute | — | Muted medium-weight caption; direct child |
 | `data-ln-stat-value` | attribute | — | Tabular-numeral metric value; direct child |
 | `data-ln-stat-trend` | attribute | `up` \| `down` \| `neutral` | Directional trend row; direct child |
 

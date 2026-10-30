@@ -161,13 +161,13 @@
 			<!-- Row Template -->
 			<template data-ln-template="demo-docs-row">
 				<tr data-ln-table-row>
-					<td>{{ title }}</td>
-					<td>{{ department }}</td>
-					<td>{{ status }}</td>
-					<td>{{ size_display }}</td>
-					<td>{{ author_name }}</td>
-					<td>{{ updated_display }}</td>
-					<td>
+					<td data-label="Title">{{ title }}</td>
+					<td data-label="Department">{{ department }}</td>
+					<td data-label="Status">{{ status }}</td>
+					<td data-label="Size">{{ size_display }}</td>
+					<td data-label="Author">{{ author_name }}</td>
+					<td data-label="Last Updated">{{ updated_display }}</td>
+					<td data-label="Actions">
 						<ul class="row-actions">
 							<li><button data-ln-table-row-action="edit" aria-label="Edit"
 						data-ln-modal-for="doc-modal"

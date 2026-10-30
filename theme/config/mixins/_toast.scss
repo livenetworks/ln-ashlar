@@ -106,7 +106,6 @@
 
 @mixin toast-icon {
 	--color-accent:    hsl(var(--color-primary));
-	--color-accent-fg: hsl(var(--color-white));
 	flex: 0 0 44px;
 	@include flex;
 	align-items: flex-start;

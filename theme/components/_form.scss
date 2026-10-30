@@ -71,6 +71,17 @@ $icon-group-test: ':has(> .ln-icon):has(> :is(input[type="text"], input[type="se
 	@include form-input-icon-group-parts;
 }
 
+// ─── Stacked field rhythm ───────────────────────────────────────
+// Field wrappers stacked outside a form-grid (modal bodies, settings
+// panels) otherwise touch: input → next label is only the label margin.
+// :where() keeps specificity at zero so form-grid's `> * { margin: 0 }`
+// (and any project layout) still wins.
+
+:where(.form-element, .form-group, .form-field) + :where(.form-element, .form-group, .form-field) {
+	--margin-block: var(--size-md);
+	margin-top: var(--margin-block);
+}
+
 // ─── Label & Actions ────────────────────────────────────────────
 
 // Non-wrapping labels only — the label sits above/beside its input, not

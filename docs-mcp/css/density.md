@@ -3,7 +3,7 @@ name: density
 classification: css
 status: active
 domain: frontend
-summary: Inverted density system scaling spacing, typography, control heights, and table row heights via data-density attribute.
+summary: Density system scaling type roles, spacing, control heights, and card/table padding via the data-density attribute.
 source: theme/config/_density.scss
 tags: [density, spacing, typography, compact, comfortable, spacious, wcag]
 ---
@@ -16,13 +16,14 @@ tags: [density, spacing, typography, compact, comfortable, spacious, wcag]
 
 The `ln-ashlar` density architecture (`theme/config/_density.scss`) scales the information density of the UI without altering color semantics or layout structures:
 
-- **Inverted Default (Dense Base):** The default `:root` state is dense (14px body, 52px header, 232px sidebar).
-- **Scale Upward via `[data-density]`:** Density scales upward into roomier tiers: `comfortable` and `spacious`.
-- **Cascade-Driven Token Rebinds:** Density does not introduce parallel `--density-*` scales (except `--density-row-h`). It directly rebinds base spacing (`--padding-y`, `--gap`), typography roles (`--text-body-*`, `--text-heading-*`), and control heights (`--btn-padding-y`, `--input-padding-y`).
+- **Comfortable Default:** The default `:root` state is `comfortable` (16px body, 44px controls, 56px header, 256px sidebar).
+- **Three Tiers via `[data-density]`:** `compact` (14px body, 36px controls, 52px header, 232px sidebar), `comfortable`, and `spacious` (18px body, 54px controls).
+- **Cascade-Driven Token Rebinds:** Density does not introduce parallel `--density-*` scales (except `--density-row-h`). Each tier owns its type roles (`--text-body-*`, `--text-label-*`, `--text-title-*`, `--text-heading-*`), base spacing (`--padding-y`, `--gap`), control sizing (`--control-line-height`, `--btn-padding-y`, `--input-padding-y`), and structural padding (`--card-padding-x/y`, `--table-cell-padding-x/y`).
 - **WCAG Target Size Invariant:**
-  - Base / `compact`: ~38px control height (WCAG 2.5.5 Level AA compliant).
-  - `comfortable`: ≥46px control height (WCAG 2.5.5 Level AAA compliant).
-  - `spacious`: ≥54px control height (enhanced touch targets for kiosks/accessibility).
+  - Every control shares one contract: height = `--control-line-height` + 2 × padding-y + 2 × border.
+  - `compact`: 22 + 2×6 + 2 = 36px (WCAG 2.5.5 Level AA).
+  - `comfortable`: 26 + 2×8 + 2 = 44px (WCAG 2.5.5 Level AAA).
+  - `spacious`: 28 + 2×12 + 2 = 54px (enhanced touch targets for kiosks/accessibility).
 - **Explicit Scoping:** Works at any DOM boundary (`<html data-density="spacious">` or `<table data-density="compact">`).
 
 ---
@@ -69,21 +70,24 @@ The `ln-ashlar` density architecture (`theme/config/_density.scss`) scales the i
 
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
-| `data-density="compact"` | attribute | — | Explicit dense base (36px row height, 14px body) |
-| `data-density="comfortable"` | attribute | — | Roomier typography (16px body) and larger padding |
+| `data-density="compact"` | attribute | — | Dense DocuFlow scale (36px controls and rows, 14px body) |
+| `data-density="comfortable"` | attribute | — | The default: 16px body, 44px controls and rows |
 | `data-density="spacious"` | attribute | — | Generous kiosk / touch density with 54px control targets |
-| `--density-row-h` | token | `2.25rem` (compact) / `2.75rem` (comfortable) / `3.25rem` (spacious) | Minimum table row height floor |
-| `--app-header-height` | token | `3.25rem` (compact) / `3.75rem` (comfortable) / `4.5rem` (spacious) | Density-reactive app header height |
-| `--app-sidebar-width` | token | `14.5rem` (compact) / `16rem` (comfortable) / `18rem` (spacious) | Density-reactive sidebar width |
+| `--density-row-h` | token | `2.25rem` (compact) / `2.75rem` (comfortable) / `3rem` (spacious) | Minimum table row height floor |
+| `--app-header-height` | token | `3.25rem` (compact) / `3.5rem` (comfortable) / `4rem` (spacious) | Density-reactive app header height |
+| `--app-sidebar-width` | token | `14.5rem` (compact) / `16rem` (comfortable) / `17.5rem` (spacious) | Density-reactive sidebar width |
+| `--control-line-height` | token | `1.375rem` (compact) / `1.625rem` (comfortable) / `1.75rem` (spacious) | Shared line box of buttons, inputs, selects, and pills |
 | `--btn-padding-y` | token | `var(--size-xs-up)` (compact) / `var(--size-sm)` (comfortable) / `var(--size-sm-up)` (spacious) | Button vertical padding |
 | `--input-padding-y` | token | `var(--size-xs-up)` (compact) / `var(--size-sm)` (comfortable) / `var(--size-sm-up)` (spacious) | Input control vertical padding |
+| `--card-padding-x` / `--card-padding-y` | token | `1rem` / `0.75rem` (compact), `1.5rem` / `1rem` (comfortable), `2rem` / `1.5rem` (spacious) | Panel header, body, and footer padding |
+| `--table-cell-padding-x` / `--table-cell-padding-y` | token | `1rem` / `0.5rem` (compact), `1.5rem` / `0.75rem` (comfortable), `2rem` / `1rem` (spacious) | Table cell padding |
 
 ---
 
 ## 4. Accessibility & Common Pitfalls
 
 > [!CAUTION]
-> 1. **Density Never Changes Color Semantics:** Density tiers rebind only geometric and typographic properties. Colors, shadows, and borders remain identical across density modes.
+> 1. **Density Never Changes Color Semantics:** Density tiers rebind only geometric and typographic properties (type roles, spacing, control sizing). Colors, shadows, and borders remain identical across density modes.
 > 2. **Do Not Switch Density by Viewport:** Density is an explicit user preference toggle, not a viewport breakpoint mechanism. Responsive viewport changes are handled via `@container` and `@media`.
 > 3. **Preserve Explicit `--font-size` Rebinds:** When creating custom form controls, always read `var(--font-size)` and `var(--line-height)` rather than hardcoding rem units so the control scales across density modes.
 

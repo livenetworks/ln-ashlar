@@ -16,7 +16,12 @@ tags: [cards, containers, surfaces, elevation, layout, panels]
 
 The `cards` module (`theme/config/mixins/_card.scss` and `theme/components/_card.scss`) provides primary content surface containers:
 
-- **`card`:** Bare content container applying `--color-bg`, `--color-border`, `--radius`, and resting shadow. Automatically elevates nested child cards to `--bg-elevated` and `--shadow-floating`.
+- **`card`:** Bare content container applying `--color-bg`, `--color-border`, `--panel-radius`, and resting shadow. Nested child cards climb to `--bg-elevated` and stay flat (`--shadow: none`).
+- **Passive Cards:** Only whole-card links and buttons (`a.card`, `button.card`, or a card with a direct `> a`) react to hover and focus. A card that merely contains content does not respond to the pointer.
+- **Panel Radius:** `--panel-radius` (default `--radius-lg`) is the corner of cards, section-cards, and modals; control radii stay on `--radius`. A skin that zeroes `--radius-lg` flattens panels too.
+- **Panel Header:** The header shares the panel surface. Title and description are an `<hgroup>` (`<h3>` plus `<p>`); `--panel-header-bg` and `--panel-footer-bg` opt in to a tint.
+- **Body Lists:** Unclassed direct-child `<ul>`/`<ol>` of the body get bullets or numbers; nested and classed lists (form actions, pill groups) get none.
+- **Padding:** Header, body, and footer read `--card-padding-x/y`, which density rebinds.
 - **`section-card`:** Composed layout card featuring pre-structured `<header>`, `<main>`, and `<footer>` sections with unified borders and paddings.
 - **Direct Child Bindings:** Automatically formats direct child `> header` (`panel-header`), `> main` (`panel-body`), and `> footer` (`panel-footer`) without interfering with nested content components.
 - **Whole-Card Links:** Wrapping content in a direct `> a` child converts the card into a clickable tile while preserving internal layout and inheriting colors.
@@ -62,8 +67,8 @@ The `cards` module (`theme/config/mixins/_card.scss` and `theme/components/_card
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
 | `card` | mixin | — | Base container card with resting shadow and border |
-| `section-card` | mixin | — | Composed layout card with structured header, body, and footer |
-| `panel-header` | mixin | — | Card header region with title-sm typography and border |
+| `section-card` | mixin | `$group: false` | Composed layout card with structured header, body, and footer. `$group: true` renders a transparent titled group on the canvas (bound to `.section-card` in the `relaxed` design) |
+| `panel-header` | mixin | `$group: false` | Card header region with title-sm typography and border. `$group: true` drops the divider, surface, and inline padding |
 | `panel-body` | mixin | — | Card content body with standard padding and flex rhythm |
 | `panel-footer` | mixin | — | Card footer region with border-t and action alignment |
 | `.card` | class | — | Prototyping class for `card` |

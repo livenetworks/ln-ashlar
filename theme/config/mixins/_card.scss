@@ -7,6 +7,7 @@
 @use 'shadows' as *;
 @use 'transitions' as *;
 @use 'position' as *;
+@use 'focus' as *;
 
 // Card & Section — composite mixins
 
@@ -18,14 +19,25 @@
 	@include border;
 	@include w-full;
 	@include flex-col;
-	border-radius: var(--radius);
-	@include overflow-hidden;
+	border-radius: var(--panel-radius, var(--radius));
+	// `clip`, not `hidden`: no scroll container, so a table's sticky thead
+	// binds to the page scroller. min-inline-size keeps the grid/flex shrink
+	// that `hidden` gave for free.
+	overflow: clip;
+	min-inline-size: 0;
 	@include transition;
 	box-shadow: var(--shadow), var(--surface-highlight, inset 0 0 0 0 transparent);
 
-	&:hover {
+	// Only whole-card links/buttons signal interaction. Passive containers
+	// must not respond merely because the pointer crosses their content.
+	&:is(a, button):hover:not(:disabled),
+	&:has(> a:hover) {
 		--color-border: color-mix(in srgb, var(--color-accent) 35%, transparent);
-		--shadow: var(--nested-card-shadow-hover, var(--shadow-floating));
+	}
+
+	&:is(a, button):focus-visible,
+	&:has(> a:focus-visible) {
+		@include focus-ring;
 	}
 
 	// Nesting ladder: when nested inside a section-card or another card,
@@ -34,15 +46,14 @@
 	.section &,
 	.card & {
 		--color-bg: var(--bg-elevated);
-		--shadow:   var(--shadow-floating);
+		--shadow:   none;
 	}
 
 	// Bulletproof nesting support for custom/semantic selectors:
 	// sets the elevated background variables on all descendants.
 	& * {
 		--nested-card-bg: var(--bg-elevated);
-		--nested-card-shadow: var(--shadow-floating);
-		--nested-card-shadow-hover: var(--shadow-floating);
+		--nested-card-shadow: none;
 	}
 
 	// Direct-child selectors only — nested <header>/<main>/<footer>
@@ -81,37 +92,65 @@
 	// without a <header> wrapper, the global h3 cascade (heading-sm)
 	// is too large for tile context. Tighten to tile-title sizing.
 	> main h3 {
-		@include typography(body-sm);
+		@include typography(title-sm);
 		@include font-semibold;
 		color: inherit;
 		margin: 0;
 	}
 }
 
-@mixin panel-header {
+// $group: true — title row of a transparent group: no inline padding, no
+// divider, no surface (it sits on the canvas).
+@mixin panel-header($group: false) {
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	padding: var(--size-xs-up) var(--padding-x);
+	@if $group {
+		padding: var(--card-padding-y) 0;
+	} @else {
+		padding: var(--card-padding-y) var(--card-padding-x);
+	}
 	min-height: 2.5rem;
-	@include border-b;
-	--color-bg: var(--bg-sunken);
-	background: var(--color-bg);
+	@if $group {
+		background: transparent;
+	} @else {
+		@include border-b;
+		// Header shares the panel surface (inherited --color-bg) — a tinted
+		// caption bar reads as legacy window chrome. Themes may opt in to a
+		// tint via --panel-header-bg. Opaque, so sticky toolbars stay solid.
+		background: var(--panel-header-bg, var(--color-bg));
+	}
 	@include transition;
 	margin-bottom: 0;
 
 	:is(h1, h2, h3, h4, h5, h6) {
-		@include typography(body-sm);
-		@include font-medium;
+		@include typography(title-sm);
+		@include font-semibold;
 		color: var(--color-fg);
 		margin: 0;
 	}
 
-	label {
-		--padding-y: var(--size-xs);
+	// Title + description: <hgroup><h3>…</h3><p>…</p></hgroup>
+	hgroup {
+		@include flex-col;
+		gap: var(--size-2xs);
+		min-inline-size: 0;
+		margin: 0;
+
+		> p {
+			@include typography(caption);
+			color: var(--fg-muted);
+			margin: 0;
+		}
 	}
 
-	// Header actions compact to a 28px button. This is a DESCENDANT selector,
+	label {
+		--padding-y: var(--size-xs);
+		min-height: calc(var(--control-line-height) + 2 * var(--padding-y) + 2 * var(--border-width));
+	}
+
+	// Header actions lock to the control height: --control-line-height +
+	// 2 × --padding-y + 2 × border-width. This is a DESCENDANT selector,
 	// so it also reaches a button that belongs to a nested field — that button
 	// is the field's own chrome, not a header action, and form-field-group
 	// stretches it to the field's full height. An explicit height beats
@@ -141,13 +180,8 @@
 	// Unscoped it would also catch .btn-group and stop compacting a segmented
 	// group in a header — a regression, and those buttons already outrank this.
 	button:where(:not(:where([data-ln-date-field]) > button)) {
-		--btn-padding-y: var(--size-2xs);
-		--btn-padding-x: var(--size-xs);
-		font-size: var(--text-xs);
-		height: 1.75rem;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
+		--btn-padding-y: var(--size-xs);
+		min-height: calc(var(--control-line-height) + 2 * var(--padding-y) + 2 * var(--border-width));
 	}
 
 	// Close/dismiss and toggle buttons inside the header should be tight and flat.
@@ -157,23 +191,44 @@
 		--btn-padding-y: var(--size-2xs);
 		--btn-padding-x: var(--size-2xs);
 		--shadow: none;
+		min-height: 0;
 		height: 1.75rem;
 		width: 1.75rem;
 	}
 }
 
 @mixin panel-body {
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--card-padding-y) var(--card-padding-x);
 
-	&:has(> :is(table, .table-container)) {
-		overflow-x: auto;
-		max-width: 100%;
-		-webkit-overflow-scrolling: touch;
+	// Content lists only — unclassed direct children of the panel body.
+	// Component lists (form actions, validation errors, pill groups,
+	// button groups) are ul/li by doctrine and must not receive bullets;
+	// they are either nested deeper or carry a class/semantic hook.
+	> ul:not([class]), > ol:not([class]) {
+		padding-left: 1.5em;
+		margin-bottom: var(--size-md);
+
+		li {
+			margin-bottom: var(--size-xs);
+			line-height: 1.7;
+			list-style: inherit;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
 	}
 
-	// ln-table brings its own chrome and sticky thead/footer — `clip` keeps
-	// this cell from becoming the scroll container that would trap them.
-	&:has(> [data-ln-table]) {
+	> ul:not([class]) {
+		list-style-type: disc;
+	}
+
+	> ol:not([class]) {
+		list-style-type: decimal;
+	}
+
+	// `clip`, not `auto` — a scrolling cell would trap the sticky thead.
+	&:has(> :is(table, .table-container, [data-ln-table])) {
 		overflow-x: clip;
 		max-width: 100%;
 	}
@@ -205,10 +260,10 @@
 }
 
 @mixin panel-footer {
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--card-padding-y) var(--card-padding-x);
 	@include border-t;
-	--color-bg: var(--bg-sunken);
-	background: var(--color-bg);
+	// Same surface as the panel; opt-in tint via --panel-footer-bg.
+	background: var(--panel-footer-bg, var(--color-bg));
 	@include flex;
 	@include justify-end;
 	gap: var(--gap);
@@ -251,7 +306,8 @@
 // Usage: #my-card { @include card; @include card-accent-top; }
 
 @mixin _card-accent-base {
-	&:hover {
+	&:is(a, button):hover:not(:disabled),
+	&:has(> a:hover) {
 		background-color: color-mix(in srgb, var(--color-accent) var(--tint-hover), transparent);
 	}
 }
@@ -309,27 +365,35 @@
 	}
 }
 
-@mixin section-card {
-	background: var(--color-bg);
-	@include border;
-	border-radius: var(--radius);
-	// `overflow: clip` not `overflow: hidden` — clips at rounded corners
-	// without establishing a scroll container, so sticky descendants
-	// (e.g. ln-table's <thead>) bind to the outer .app-main > section
-	// scroll surface instead of being trapped inside this card.
-	overflow: clip;
-	@include transition;
-	--shadow: var(--shadow-resting);
-	box-shadow: var(--shadow);
-	--margin-block: var(--size-md);
+// $group: true — a transparent titled group: no surface, border, shadow or
+// radius; content sits directly on the canvas.
+@mixin section-card($group: false) {
+	@if not $group {
+		background: var(--color-bg);
+		@include border;
+		border-radius: var(--panel-radius, var(--radius));
+		// `overflow: clip` not `overflow: hidden` — clips at rounded corners
+		// without establishing a scroll container, so sticky descendants
+		// (e.g. ln-table's <thead>) bind to the outer .app-main > section
+		// scroll surface instead of being trapped inside this card.
+		overflow: clip;
+		@include transition;
+		--shadow: var(--shadow-resting);
+		box-shadow: var(--shadow);
+	}
+	--margin-block: var(--panel-margin-block, var(--size-md));
 	margin-bottom: var(--margin-block);
 
 	// Direct-child selectors only — nested <header>/<main>/<footer>
 	// elements inside the card's content are consumer-owned and
 	// must not inherit the card's own chrome styles.
-	> header { @include panel-header; }
+	> header { @include panel-header($group); }
 	> main   { @include panel-body; }
 	> footer { @include panel-footer; }
+
+	@if $group {
+		> main { padding: 0; }
+	}
 }
 
 // ─── Frosted Glass ──────────────────────────────────────

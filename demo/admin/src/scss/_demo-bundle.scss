@@ -1,0 +1,41 @@
+// ==========================================================================
+// Admin Demo — shared demo layers
+// ==========================================================================
+// Shell, demo infrastructure and page styles. Consumed by admin.scss and
+// admin-relaxed.scss on top of their respective design bundle.
+// ==========================================================================
+
+// Admin shell (layout)
+@use 'navigation';
+
+// Demo infrastructure
+@use 'demo-layout';
+@use 'theme-picker';
+@use 'density-picker';
+@use 'demo-utilities';
+
+// Page-specific styles
+@use 'pages/dashboard';
+@use 'pages/cards';
+@use 'pages/density';
+@use 'pages/forms';
+@use 'pages/layout';
+@use 'pages/toggle';
+@use 'pages/icons';
+@use 'pages/external-links';
+@use 'pages/nav';
+@use 'pages/progress';
+@use 'pages/select';
+@use 'pages/ajax';
+@use 'pages/filter';
+@use 'pages/sortable';
+@use 'pages/modal';
+@use 'pages/tables';
+@use 'pages/status-badge';
+@use 'pages/tooltip';
+@use 'pages/page-header';
+@use 'pages/table-filter';
+@use 'pages/chip';
+@use 'pages/list';
+@use 'pages/localization';
+@use 'pages/websocket-connector';

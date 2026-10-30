@@ -22,10 +22,10 @@ The `ln-ashlar` design token architecture lives within the **Visual Theme Layer*
 Within the theme system, design values flow through four strictly defined layers (see [`scss-architecture`](../doctrine/scss-architecture.md) for the complete doctrine):
 
 ```
-1. Brand Tokens          ->  --brand-primary: 221 83% 48%; --brand-secondary: 160 84% 36%;
+1. Brand Tokens          ->  --brand-primary: 201 96% 32%; --brand-secondary: 160 84% 36%;
                              (Bare HSL numbers; enables slash-syntax alpha opacity composition)
             ↓
-2. Scale Tokens          ->  --size-md: 1rem; --color-neutral-100: 220 14% 96%; --color-success: 142 76% 36%;
+2. Scale Tokens          ->  --size-md: 1rem; --color-neutral-100: 210 40% 96%; --color-success: 142 72% 29%;
                              (Back-end scale plumbing; NEVER read directly inside mixin bodies)
             ↓ wired at theme scope (ln-values-light / ln-values-dark)
 3. Vocabulary Tokens     ->  --bg-base, --bg-elevated, --bg-sunken, --bg-recessed,
@@ -99,25 +99,25 @@ Within the theme system, design values flow through four strictly defined layers
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
 | **Brand & Status Triplets (Bare HSL)** | | | |
-| `--brand-primary` | token | `221 83% 43%` | Primary brand bare HSL triplet |
+| `--brand-primary` | token | `201 96% 32%` | Primary brand bare HSL triplet |
 | `--brand-secondary` | token | `160 84% 36%` | Brand secondary accent bare HSL triplet |
-| `--color-success` | token | `142 76% 36%` | Success status bare HSL triplet |
-| `--color-error` | token | `0 84% 48%` | Error status bare HSL triplet |
-| `--color-warning` | token | `32 95% 38%` | Caution status bare HSL triplet |
-| `--color-info` | token | `200 95% 38%` | Info status bare HSL triplet |
+| `--color-success` | token | `142 72% 29%` | Success status bare HSL triplet |
+| `--color-error` | token | `0 72% 51%` | Error status bare HSL triplet |
+| `--color-warning` | token | `26 90% 37%` | Caution status bare HSL triplet |
+| `--color-info` | token | `221 83% 53%` | Info status bare HSL triplet |
 | **Vocabulary Tokens (Light vs. Dark)** | | | |
 | `--bg-base` | token | `hsl(var(--color-white)) (light) / hsl(var(--color-neutral-100)) (dark)` | Base canvas background |
 | `--bg-elevated` | token | `var(--bg-base) (light) / hsl(var(--color-neutral-150)) (dark)` | Raised card background |
-| `--bg-sunken` | token | `hsl(var(--color-neutral-100)) (light) / hsl(var(--color-neutral-175)) (dark)` | Static sunken well and table header fill (flips lighter in dark) |
-| `--bg-recessed` | token | `hsl(var(--color-neutral-50)) (light) / hsl(var(--color-neutral-50)) (dark)` | Recessed ground and input fill |
+| `--bg-sunken` | token | `hsl(var(--color-neutral-50)) (light) / hsl(var(--color-neutral-175)) (dark)` | Static sunken well and table header fill (flips lighter in dark) |
+| `--bg-recessed` | token | `hsl(var(--color-neutral-100)) (light) / hsl(var(--color-neutral-50)) (dark)` | Recessed ground and input fill |
 | `--bg-hover` | token | `hsl(var(--color-neutral-100)) (light) / hsl(var(--color-neutral-175)) (dark)` | Neutral interactive hover background |
 | `--bg-active` | token | `hsl(var(--color-neutral-150)) (light) / hsl(var(--color-neutral-200)) (dark)` | Neutral interactive active/pressed background |
-| `--fg-default` | token | `hsl(var(--color-neutral-900)) (light) / hsl(var(--color-neutral-900)) (dark)` | High-contrast primary text |
-| `--fg-muted` | token | `hsl(var(--color-neutral-800)) (light) / hsl(var(--color-neutral-700)) (dark)` | Muted secondary text and captions |
-| `--fg-subtle` | token | `hsl(var(--color-neutral-700)) (light) / hsl(var(--color-neutral-600)) (dark)` | Subtle secondary text |
+| `--fg-default` | token | `hsl(var(--color-neutral-800)) (light) / hsl(var(--color-neutral-900)) (dark)` | High-contrast primary text |
+| `--fg-muted` | token | `hsl(213 20% 40%) (light) / hsl(var(--color-neutral-700)) (dark)` | Muted secondary text and captions |
+| `--fg-subtle` | token | `hsl(var(--color-neutral-500)) (light) / hsl(var(--color-neutral-600)) (dark)` | Subtle secondary text |
 | `--border-subtle` | token | `hsl(var(--color-neutral-200)) (light) / hsl(var(--color-neutral-175)) (dark)` | Subtle separator border |
 | `--border-strong` | token | `hsl(var(--color-neutral-300)) (light) / hsl(var(--color-neutral-300)) (dark)` | Focused and high-contrast border |
-| `--border-ui` | token | `hsl(var(--color-neutral-400)) (light) / hsl(var(--color-neutral-400)) (dark)` | Interactive control boundary — input, select, checkbox. Solved to 3:1 against `--bg-base` per WCAG 1.4.11; decorative borders use `--border-subtle` / `--border-strong` instead |
+| `--border-ui` | token | `hsl(215 20% 58%) (light) / hsl(var(--color-neutral-400)) (dark)` | Interactive control boundary — input, select, checkbox. Solved to 3:1 against `--bg-base` per WCAG 1.4.11; decorative borders use `--border-subtle` / `--border-strong` instead |
 | `--color-ink` | token | `222 47% 11%` | Dark foreground pole for fills too light to carry white at 7:1. A polarity-independent literal — never bind it to `--color-neutral-900`, which inverts to near-white in dark mode |
 | **Interaction State Tokens** | | | |
 | `--tint-hover` | token | `7%` | Accent-wash ratio for interactive hover |
@@ -138,12 +138,12 @@ Within the theme system, design values flow through four strictly defined layers
 | `--size-2xl` | token | `3rem` | 48px spacing step |
 | `--size-3xl` | token | `4rem` | 64px spacing step |
 | **Radii & Dimensions** | | | |
-| `--radius-xs` | token | `0.125rem` | 2px border radius |
-| `--radius-sm` | token | `0.25rem` | 4px border radius |
-| `--radius-md` | token | `0.375rem` | 6px border radius |
-| `--radius-lg` | token | `0.5rem` | 8px border radius |
-| `--radius-xl` | token | `0.75rem` | 12px border radius |
-| `--radius-2xl` | token | `1rem` | 16px border radius |
+| `--radius-xs` | token | `0.25rem` | 4px border radius |
+| `--radius-sm` | token | `0.375rem` | 6px border radius |
+| `--radius-md` | token | `0.625rem` | 10px border radius — controls |
+| `--radius-lg` | token | `1rem` | 16px border radius — panels, modals |
+| `--radius-xl` | token | `1.375rem` | 22px border radius |
+| `--radius-2xl` | token | `1.75rem` | 28px border radius |
 | `--radius-full` | token | `9999px` | Pill / circular radius |
 | `--border-width` | token | `1px` | Standard 1px border stroke |
 | `--border-width-strong` | token | `2px` | Thick 2px border stroke |
@@ -153,8 +153,8 @@ Within the theme system, design values flow through four strictly defined layers
 | `--text-heading-lg` | token | `1.75rem` | Large heading font size |
 | `--text-heading-md` | token | `1.25rem` | Medium heading font size |
 | `--text-title-md` | token | `1rem` | Title / card header font size |
-| `--text-body-md` | token | `0.875rem` | Primary body font size (14px) |
-| `--text-caption` | token | `0.75rem` | Small caption font size (12px) |
+| `--text-body-md` | token | `0.875rem` | Compact-base body font size (14px; 16px at the default density) |
+| `--text-caption` | token | `0.75rem` | Compact-base caption font size (12px; 13px at the default density) |
 | **Z-Index Layer Scale** | | | |
 | `--z-sticky` | token | `10` | Sticky elements |
 | `--z-dropdown` | token | `20` | Dropdown menus (non-top-layer fallback) |
@@ -167,7 +167,7 @@ Within the theme system, design values flow through four strictly defined layers
 | `--color-border` | token | `var(--border-subtle)` | Active border color |
 | `--shadow` | token | `var(--shadow-resting)` | Active surface elevation shadow |
 | `--padding-x` | token | `var(--size-sm-up)` | Horizontal padding primitive |
-| `--padding-y` | token | `var(--size-xs)` | Vertical padding primitive |
+| `--padding-y` | token | `var(--size-xs-up)` | Vertical padding primitive |
 | `--gap` | token | `var(--size-xs-up)` | Layout gap primitive |
 | `--radius` | token | `var(--radius-md)` | Component corner radius primitive |
 <!-- sync:css-tokens:end -->

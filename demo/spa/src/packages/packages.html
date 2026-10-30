@@ -83,12 +83,12 @@
 
 			<template data-ln-template="packages-row">
 				<tr data-ln-table-row>
-					<td>{{ name }}</td>
-					<td data-ln-table-cell-attr="max_users:data-ln-value">{{ max_users_display }}</td>
-					<td>{{ max_documents }}</td>
-					<td data-ln-table-cell-attr="max_storage:data-ln-value">{{ max_storage }} GB</td>
-					<td><span data-ln-table-cell-attr="status_class:class">{{ status_display }}</span></td>
-					<td>
+					<td data-label="Name">{{ name }}</td>
+					<td data-label="Max users" data-ln-table-cell-attr="max_users:data-ln-value">{{ max_users_display }}</td>
+					<td data-label="Documents">{{ max_documents }}</td>
+					<td data-label="Storage" data-ln-table-cell-attr="max_storage:data-ln-value">{{ max_storage }} GB</td>
+					<td data-label="Status"><span data-ln-table-cell-attr="status_class:class">{{ status_display }}</span></td>
+					<td data-label="Actions">
 						<ul class="row-actions">
 							<li><a href="#package-modal:{{ id }}" aria-label="Edit package" data-ln-tooltip="Edit"
 								data-ln-modal-for="package-modal"

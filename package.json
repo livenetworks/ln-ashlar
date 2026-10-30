@@ -59,7 +59,7 @@
     "build:dev-css": "sass theme/ln-ashlar-dev.scss demo/dist/ln-ashlar-dev.css --no-source-map --style=compressed",
     "generate:brand-assets": "powershell -ExecutionPolicy Bypass -File scripts/generate-brand-assets.ps1 && node scripts/generate-svg-favicon.mjs",
     "build:demo-index": "sass demo/index.scss demo/index.css --no-source-map --style=compressed",
-    "build:demo-admin": "sass demo/admin/src/admin.scss demo/admin/dist/admin.css --no-source-map --style=compressed && node -e \"const fs = require('fs'); fs.copyFileSync('demo/admin/src/demo.js', 'demo/admin/dist/demo.js')\" && node demo/admin/src/build-pages.mjs",
+    "build:demo-admin": "sass demo/admin/src/admin.scss demo/admin/dist/admin.css --no-source-map --style=compressed && sass demo/admin/src/admin-relaxed.scss demo/admin/dist/admin-relaxed.css --no-source-map --style=compressed && node -e \"const fs = require('fs'); fs.copyFileSync('demo/admin/src/demo.js', 'demo/admin/dist/demo.js')\" && node demo/admin/src/build-pages.mjs",
     "build:demo-docuflow": "sass demo/docuflow/docuflow.scss demo/docuflow/dist/docuflow.css --no-source-map --style=compressed",
     "build:demo-spa": "node demo/spa/build.mjs",
     "build:demo-landing": "sass demo/landing/landing.scss demo/landing/landing.css --no-source-map --style=compressed",

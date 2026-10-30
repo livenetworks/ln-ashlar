@@ -11,64 +11,51 @@
 	--color-secondary-light:   160 84% 94%;
 	--color-secondary-lighter: 160 84% 97%;
 
-	// Status colors
-	--color-success:         142 76% 36%;
+	// Status colors — solid tones sit below the 7:1 text/fill target;
+	// ratios are against white (D2: design values kept exact).
+	--color-success:         142 72% 29%;   // 5.07:1
 	--color-success-light:   142 71% 94%;
 	--color-success-lighter: 142 71% 97%;
 
-	--color-error:           0 84% 48%;
+	--color-error:           0 72% 51%;     // 4.80:1
 	--color-error-light:     0 84% 94%;
 	--color-error-lighter:   0 84% 97%;
 
-	--color-warning:         32 95% 38%;
+	--color-warning:         26 90% 37%;    // 5.04:1
 	--color-warning-light:   38 92% 94%;
 	--color-warning-lighter: 38 92% 97%;
 
-	--color-info:            200 95% 38%;
+	--color-info:            221 83% 53%;   // 5.20:1
 	--color-info-light:      199 89% 94%;
 	--color-info-lighter:    199 89% 97%;
 
-	// Neutral scale (canonical greys)
-	--color-neutral-50:  210 20% 98%;
-	--color-neutral-100: 220 14% 96%;
-	--color-neutral-150: 220 13% 93%;
-	--color-neutral-175: 220 13% 91%;
-	--color-neutral-200: 220 13% 90%;
-	--color-neutral-300: 216 12% 84%;
-	--color-neutral-400: 218 11% 58%;
-	--color-neutral-500: 220 10% 40%;
-	--color-neutral-600: 215 14% 34%;
-	--color-neutral-700: 217 19% 27%;
-	--color-neutral-800: 215 28% 17%;
+	// Neutral scale — cool slate greys
+	--color-neutral-50:  210 40% 98%;
+	--color-neutral-100: 210 40% 96%;
+	--color-neutral-150: 214 35% 93%;
+	--color-neutral-175: 214 33% 92%;
+	--color-neutral-200: 214 32% 91%;
+	--color-neutral-300: 213 27% 84%;
+	--color-neutral-400: 215 20% 65%;
+	--color-neutral-500: 215 16% 47%;
+	--color-neutral-600: 215 19% 35%;
+	--color-neutral-700: 215 25% 27%;
+	--color-neutral-800: 217 33% 17%;
 	--color-neutral-900: 222 47% 11%;
 
 	// Base canvas background
 	--color-white: 0 0% 100%;
 
-	// Shadows — cool-tinted, dual-layer (ambient + key light)
+	// Shadows — soft, diffuse, single layer. Resting surfaces are defined by
+	// their border; depth is reserved for floating layers.
 	--shadow-none: none;
 
-	--shadow-xs:
-		0 1px 2px 0 hsl(220 40% 10% / 0.05);
-
-	--shadow-sm:
-		0 1px 3px 0 hsl(220 40% 10% / 0.07),
-		0 1px 2px -1px hsl(220 40% 10% / 0.05);
-
-	--shadow-md:
-		0 4px 6px -1px hsl(220 40% 10% / 0.08),
-		0 2px 4px -2px hsl(220 40% 10% / 0.05);
-
-	--shadow-lg:
-		0 10px 15px -3px hsl(220 40% 10% / 0.08),
-		0 4px 6px -4px hsl(220 40% 10% / 0.04);
-
-	--shadow-xl:
-		0 20px 25px -5px hsl(220 40% 10% / 0.09),
-		0 8px 10px -6px hsl(220 40% 10% / 0.04);
-
-	--shadow-2xl:
-		0 25px 50px -12px hsl(220 40% 10% / 0.18);
+	--shadow-xs:  0 1px 2px hsl(215 40% 20% / 0.04);
+	--shadow-sm:  0 2px 6px hsl(215 40% 20% / 0.05);
+	--shadow-md:  0 4px 16px -4px hsl(215 40% 20% / 0.10);
+	--shadow-lg:  0 12px 32px -8px hsl(215 40% 20% / 0.14);
+	--shadow-xl:  0 24px 48px -12px hsl(215 40% 20% / 0.18);
+	--shadow-2xl: 0 32px 64px -16px hsl(215 40% 20% / 0.22);
 
 	--shadow-inner:
 		inset 0 2px 4px 0 hsl(220 40% 15% / 0.06);
@@ -79,24 +66,29 @@
 	// Value vocabulary — what bg/fg/border/shadow values exist
 	--bg-base:     hsl(var(--color-white));
 	--bg-elevated: var(--bg-base);
-	--bg-sunken:   hsl(var(--color-neutral-100));
-	--bg-recessed: hsl(var(--color-neutral-50));
+	--bg-sunken:   hsl(var(--color-neutral-50));    // quiet chrome (thead, tracks)
+	--bg-recessed: hsl(var(--color-neutral-100));   // page canvas
 
 	--bg-hover:  hsl(var(--color-neutral-100));
 	--bg-active: hsl(var(--color-neutral-150));
 
-	// Bound low on the ramp so every tier clears 7:1 against --bg-active,
-	// the lightest surface any of them lands on (8.02 / 11.52 / 14.11).
-	--fg-default: hsl(var(--color-neutral-900));
-	--fg-muted:   hsl(var(--color-neutral-800));
-	--fg-subtle:  hsl(var(--color-neutral-700));
+	// fg-muted and fg-subtle are below the 7:1 target (D2: design values kept).
+	--fg-default: hsl(var(--color-neutral-800));
+	--fg-muted:   hsl(213 20% 40%);                 // 6.07:1 on white
+	--fg-subtle:  hsl(var(--color-neutral-500));    // 4.72:1 on white, 4.30:1 on the canvas
 
 	--border-subtle:       hsl(var(--color-neutral-200));
 	--border-strong:       hsl(var(--color-neutral-300));
+	--border-strong-hover: hsl(var(--color-neutral-500));   // 4.72:1 on white; one ramp step darker than --border-ui
 
 	// Interactive boundaries only (input/select/checkbox). 1.4.11 wants 3:1
 	// for these; --border-subtle/-strong stay decorative and exempt.
-	--border-ui:           hsl(var(--color-neutral-400));
+	// Solved literal: slate-300 is 1.48:1, slate-400 is 2.57:1.
+	--border-ui:           hsl(215 20% 58%);        // 3.24:1 on white
+
+	// Lightness step for accent hover/active (relative colour syntax,
+	// unitless). Light surfaces darken; dark values flip the sign.
+	--accent-hover-shift: -8;
 
 	--color-scrim:  hsl(var(--color-neutral-900) / 0.5);
 
@@ -143,13 +135,22 @@
 
 	--border-subtle:       hsl(var(--color-neutral-175));
 	--border-strong:       hsl(var(--color-neutral-300));
+	--border-strong-hover: hsl(var(--color-neutral-400));
 
 	--border-ui:           hsl(var(--color-neutral-400));
+
+	// Dark surfaces lighten on hover.
+	--accent-hover-shift: 8;
 
 	// Scrims — anchored to black, not the ramp: dark --color-neutral-900 is
 	// near-white, so binding either to it would need an index flip.
 	--color-scrim:  hsl(0 0% 0% / 0.6);
 	--app-scrim-bg: hsl(0 0% 0% / 0.4);
+
+	// Status tones — brighter on dark surfaces
+	--color-success:         142 69% 48%;
+	--color-warning:         38 92% 55%;
+	--color-info:            213 94% 68%;
 
 	// Status tint layers — re-tuned for dark surfaces
 	--color-success-light:   142 50% 18%;
@@ -159,7 +160,7 @@
 	--color-info-light:      217 55% 22%;
 	--color-info-lighter:    217 45% 15%;
 	
-	--color-error:           0 84% 65%; // Lighter red for text contrast in dark mode
+	--color-error:           0 91% 71%; // Lighter red for text contrast in dark mode
 	--color-error-light:     0 50% 20%;
 	--color-error-lighter:   0 40% 14%;
 
@@ -215,7 +216,7 @@
 // stylesheet load order, which is brand.css's whole guarantee.
 // ---------------------------------------------------------------------------
 :where(:root) {
-	--brand-primary:   221 83% 43%;
+	--brand-primary:   201 96% 32%;   // 5.94:1 on white (D2: design value kept)
 	--brand-secondary: 160 84% 36%;
 }
 
@@ -239,6 +240,8 @@
 	--color-border: var(--border-subtle);
 	--shadow:       var(--shadow-resting);
 	--radius:       var(--radius-md);
+	// Indirection so a skin that zeroes --radius-lg (glass) reaches panels.
+	--panel-radius: var(--radius-lg);
 
 	// accent — tints computed against the LOCAL --bg-base, so one
 	// formula serves both themes. The two override slots are
@@ -271,4 +274,23 @@
 	--btn-bg-hover:     var(--bg-hover);
 	--btn-fg-hover:     var(--color-fg);
 	--btn-border-hover: var(--border-strong);
+}
+
+// ---------------------------------------------------------------------------
+// Default dark lift — brighter accent with an ink label on dark surfaces.
+// Zero specificity; [data-theme] subtrees are excluded so an ancestor theme's
+// declaration is not clobbered (Declaration-Site Invariant).
+// ---------------------------------------------------------------------------
+:where([data-mode="dark"]:not([data-theme], [data-theme] *)) {
+	--brand-primary:   199 89% 64%;   // 8.79:1 vs ink
+	--color-accent-fg: hsl(var(--color-ink));
+	--check-mark:      var(--check-mark-on-dark);
+}
+
+@media (prefers-color-scheme: dark) {
+	:where(:root:not([data-mode="light"]):not([data-theme])) {
+		--brand-primary:   199 89% 64%;
+		--color-accent-fg: hsl(var(--color-ink));
+		--check-mark:      var(--check-mark-on-dark);
+	}
 }

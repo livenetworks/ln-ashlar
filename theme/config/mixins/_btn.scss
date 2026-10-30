@@ -37,6 +37,8 @@
 	--padding-x: var(--btn-padding-x, var(--size-md));
 	padding: var(--padding-y) var(--padding-x);
 	@include text-sm;
+	// Shared control line box — aligns with inputs/selects (see _tokens.scss).
+	line-height: var(--control-line-height);
 	@include font-medium;
 	border-radius: var(--radius);
 	white-space: nowrap;
@@ -69,14 +71,14 @@
 @mixin btn {
 	// Accent variant — rebinds the --btn-* token surface to accent values.
 	--color-accent:       hsl(var(--color-primary));
-	--color-accent-hover: hsl(from var(--color-accent) h s calc(l - 6));
+	--color-accent-hover: hsl(from var(--color-accent) h s calc(l + var(--accent-hover-shift)));
 
 	--btn-bg:           var(--color-accent-bg,       var(--color-accent));
 	--btn-fg:           var(--color-accent-bg-fg,    var(--color-accent-fg));
 	--btn-border:       hsl(from var(--color-accent) h s calc(l - 4));
 	--btn-bg-hover:     var(--color-accent-bg-hover, var(--color-accent-hover));
 	--btn-fg-hover:     var(--color-accent-bg-fg,    var(--color-accent-fg));
-	--btn-border-hover: hsl(from var(--color-accent) h s calc(l - 6));
+	--btn-border-hover: hsl(from var(--color-accent) h s calc(l + var(--accent-hover-shift)));
 }
 
 @mixin btn-soft {

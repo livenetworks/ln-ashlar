@@ -427,6 +427,10 @@ at `:root` alone it did not.
 
 ---
 
+## Designs
+
+A design is an alternative binding layer compiled as its own bundle (`theme/ln-ashlar-relaxed.scss` -> `ln-ashlar-relaxed.css`): same markup, mixins, tokens and axes, different composition. A design adds no tokens. See the "Designs" section of `docs-mcp/doctrine/scss-architecture.md`.
+
 ## Size Tokens — Single Source of Truth
 
 All spacing values (padding, margin, gap, inset, positional offsets used

@@ -2,4 +2,5 @@
 
 [data-ln-stat-card] {
 	@include stat-card;
+	@include stat-card-tone;
 }

@@ -53,10 +53,10 @@
 		min-width: var(--table-min-width, 768px);
 	}
 
-	// Whole thead sticky as one unit (toolbar row + column-headers row).
-	// Solid opaque background prevents underlying scrolled rows from bleeding through.
+	// Pinned under the sibling toolbar when one exists (ln-table-toolbar-stack).
+	// Opaque so scrolled rows never bleed through.
 	thead {
-		@include sticky-top;
+		@include sticky-top(var(--table-toolbar-block-size, 0));
 		background: var(--color-bg);
 		isolation: isolate;
 	}
@@ -89,7 +89,8 @@
 	gap: var(--size-md);
 	position: sticky;
 	top: 0;
-	z-index: var(--z-sticky);
+	// One step above the thead: at the table's end the thead slides under it.
+	z-index: calc(var(--z-sticky) + 1);
 	border-radius: 0;
 	background: var(--color-bg);
 	border-bottom: var(--border-width) solid var(--border-subtle);
@@ -99,6 +100,22 @@
 		font-size: 1rem;
 		font-weight: 600;
 		color: var(--color-fg);
+		// Single line keeps the toolbar at its token block-size.
+		@include truncate;
+		min-inline-size: 0;
+	}
+}
+
+// ─── Toolbar + sticky thead stack ─────────────────────────
+// Applied to the toolbar's parent. The toolbar is one control row, so its
+// block-size is known from tokens; every sticky thead below pins under it.
+// Declared on the parent: the thead is in a sibling subtree.
+
+@mixin ln-table-toolbar-stack {
+	--table-toolbar-block-size: calc(2 * var(--card-padding-y) + var(--control-line-height) + 2 * var(--size-xs) + 3 * var(--border-width));
+
+	> :has(+ table) {
+		min-block-size: var(--table-toolbar-block-size);
 	}
 }
 
@@ -172,16 +189,6 @@
 		@include font-semibold;
 	}
 }
-
-// ─── Card mode container query ────────────────────────────
-
-@mixin ln-table-card-mode {
-	@container table (max-width: 640px) {
-		colgroup { display: none; }
-		table { table-layout: auto !important; }
-	}
-}
-
 
 // ─── Footer ───────────────────────────────────────────────
 

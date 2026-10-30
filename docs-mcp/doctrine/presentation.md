@@ -44,7 +44,7 @@ Presentation sites in `ln-ashlar` strictly preserve the **3-Axis Orthogonal Them
   - `aurora`: Vivid emerald teal.
   - `violet`: Electric violet and deep indigo.
   - `cyber`: High-contrast cyber cyan.
-- **Axis 3: Structural Skin (`data-skin`):** `default` | `soft` | `glass` | `outline` (controls border-radii, elevation shadows, and backdrop filters).
+- **Axis 3: Structural Skin (`data-skin`):** `default` | `glass` | `outline` (controls border-radii, elevation shadows, and backdrop filters).
 
 ### Scoped Theme Islands
 Presentation pages frequently require localized theme contrasts (e.g. an illuminated dark CTA card or a vibrant violet testimonial strip embedded inside a light page).
