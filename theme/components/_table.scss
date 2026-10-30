@@ -25,27 +25,13 @@ table {
 
 .table-container {
 	@include container(table);
-	overflow-x: auto;
-	overscroll-behavior-x: contain;
+	// `clip`, not `auto` — keeps the thead pinned to the page scroller;
+	// narrow containers stack records instead (below).
+	overflow-x: clip;
 
-	@container table (max-width: 640px) {
+	// Narrow container (e.g. a side column on desktop) — same card mode.
+	@include cq-down(md, table) {
 		table { @include table-responsive; }
-
-		.table-row-actions {
-			position: static !important;
-			opacity: 1 !important;
-			visibility: visible !important;
-			pointer-events: auto !important;
-			transform: none !important;
-			background: transparent !important;
-			padding-left: 0 !important;
-			justify-content: flex-end;
-			margin-top: var(--size-xs);
-
-			&::before {
-				display: none !important;
-			}
-		}
 	}
 }
 
@@ -69,8 +55,9 @@ th:hover .table-filter { opacity: 0.7; }
 
 // ─── Data Table JS-State Classes ───────────────────────────────
 // JS-added state classes only. Row chrome (clickable cursor/hover, action
-// buttons, sticky header) is a CONSUMER concern — applied via semantic
-// selectors in project SCSS, never keyed off the data-ln-* JS hooks.
+// buttons) is a CONSUMER concern — applied via semantic selectors in project
+// SCSS, never keyed off the data-ln-* JS hooks. The sticky header is library
+// default (table-base).
 
 .ln-row-selected {
 	@include table-row-selected;

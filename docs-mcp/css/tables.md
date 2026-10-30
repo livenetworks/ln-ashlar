@@ -3,7 +3,7 @@ name: tables
 classification: css
 status: active
 domain: frontend
-summary: Semantic data table styling, sunken thead headers, row hover washes, striped variants, and sticky headers.
+summary: Semantic data table styling, sunken thead headers, row hover washes, striped variants, and page-sticky headers.
 source: theme/config/mixins/_table.scss
 tags: [tables, data, thead, tbody, striped, sticky, tabular-nums]
 ---
@@ -19,7 +19,7 @@ The `tables` module (`theme/config/mixins/_table.scss` and `theme/components/_ta
 - **Global Baseline:** Standard `<table>` elements automatically receive `@include table-base` (sunken header fill `--bg-sunken`, borders, row hover highlights, and tabular numerals for numbers).
 - **Sunken Headers:** Header `<th>` cells use `--bg-sunken` with high-contrast text and subtle bottom borders.
 - **Interactive Row Hover:** Hovering over `<tbody> <tr>` rows activates `--bg-hover` and accent row tints.
-- **Sticky Headers (`$sticky: true`):** Mixin option for sticky `<thead>` elements in scrollable card containers.
+- **Sticky Headers:** Every `<thead>` pins to the top of the page scroller while its rows scroll (`table-base` default). Table wrappers — `.card`, `.section-card`, panel bodies, `.table-container`, `[data-ln-table]` — use `overflow: clip`, never a scrolling overflow, so none of them becomes the header's scroll container. `table-base($sticky: false)` opts a table out. A sticky search toolbar placed directly before the table (`.ln-table__toolbar`, `[data-ln-table] > header`) pins with it as one unit: the parent declares `--table-toolbar-block-size` from tokens (one control row) and the `<thead>` pins at that offset, under the toolbar. Override the property on the parent for a taller toolbar.
 - **Striped Table Variant (`table-striped`):** Alternates row fills using subtle neutral tints.
 
 ---
@@ -49,11 +49,11 @@ The `tables` module (`theme/config/mixins/_table.scss` and `theme/components/_ta
 </table>
 ```
 
-### Variant 1: Striped Table with Sticky Header
+### Variant 1: Striped Table
 
 ```scss
 #audit-table {
-    @include table-base($sticky: true);
+    @include table-base;
     @include table-striped;
 }
 ```
@@ -64,9 +64,9 @@ The `tables` module (`theme/config/mixins/_table.scss` and `theme/components/_ta
 
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
-| `table-base` | mixin | `$sticky: false` | Base table recipe (borders, header fill, row hover) |
+| `table-base` | mixin | `$sticky: true` | Base table recipe (borders, header fill, row hover, sticky `<thead>`) |
 | `table-striped` | mixin | — | Alternating row background fills |
-| `table-responsive` | mixin | — | Mobile stacked table layout using `data-label` |
+| `table-responsive` | mixin | — | Stacked record cards: label column from `td[data-label]`; unlabeled cells span the card |
 | `table-section-header` | mixin | — | Section divider row styling |
 | `.table` | class | — | Prototyping class for `table-base` |
 | `.numeric` | class | — | Right-aligns numbers and enables tabular numerals (`tnum`) |
@@ -80,7 +80,7 @@ The `tables` module (`theme/config/mixins/_table.scss` and `theme/components/_ta
 > [!CAUTION]
 > 1. **Numeric Column Alignment:** Always use `.numeric` or apply `font-variant-numeric: tabular-nums` and `text-align: right` on currency, scores, and timestamps to ensure decimal alignment.
 > 2. **Header Semantics:** Always structure tables with explicit `<thead>`, `<tbody>`, and `<th>` elements for screen readers.
-> 3. **Horizontal Scrolling Wrappers:** For wide tables, wrap the table in an `overflow-x: auto` container rather than forcing table elements to shrink.
+> 3. **Narrow Screens:** Below the `md` viewport breakpoint every table renders one record per card (`table-base`'s `$responsive`, via `table-responsive`). Put `data-label` on each `<td>` — unlabeled cells span the card without a label. `.table-container` also switches by its own width (`cq-down(md)`) for narrow desktop columns. Column sort/filter controls live in the hidden `<thead>`. Never give a table ancestor `overflow: auto`/`hidden`: it becomes the header's scroll container.
 
 ---
 

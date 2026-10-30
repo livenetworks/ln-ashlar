@@ -17,7 +17,9 @@
 
 @mixin form-label {
 	@include block;
-	@include typography(label-sm);
+	// label-md / medium — a 12px semibold caption over every field reads
+	// as dialog-box chrome; field labels sit one step under body text.
+	@include typography(label-md);
 	@include font-medium;
 	color: var(--color-fg);
 	// Structural label-to-input gap (not shell rhythm).
@@ -83,27 +85,41 @@
 
 @mixin _form-focus-style {
 	border-color: var(--color-accent);
-	@include focus-background-shift;
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 20%, transparent);
 }
 
 // ─── Text inputs, textareas, selects ────────────────────────────
 
 @mixin form-input {
 	@include w-full;
-	--padding-y: var(--input-padding-y, var(--size-sm));
-	--padding-x: var(--size-md);
+	--padding-y: var(--input-padding-y, var(--size-xs-up));
+	--padding-x: var(--size-sm-up);
 	padding: var(--padding-y) var(--padding-x);
 	font-size: var(--font-size);
-	line-height: var(--line-height);
+	// Shared control line box — same height as a sibling button.
+	line-height: var(--control-line-height);
 	color: var(--color-fg);
-	--color-bg: var(--bg-sunken);
+	// Enabled fields read as writable surfaces: base fill, hairline shadow.
+	// A grey fill is reserved for :disabled.
+	--color-bg: var(--input-bg, var(--bg-base));
 	background: var(--color-bg);
 	// Control boundary, not a divider — 1.4.11 wants 3:1 here.
-	--color-border: var(--border-ui);
+	--color-border: var(--input-border, var(--border-ui));
 	@include border;
 	border-radius: var(--radius);
-	@include transition;
+	box-shadow: var(--input-shadow, var(--shadow-xs));
+	// Colour + ring only — `all` would animate padding/font-size when the
+	// density tier switches, making fields visibly "breathe".
+	transition:
+		color var(--transition-base),
+		background-color var(--transition-base),
+		border-color var(--transition-base),
+		box-shadow var(--transition-base);
 	outline: none;
+
+	&:hover:not(:disabled):not(:focus-visible) {
+		--color-border: var(--input-border-hover, var(--border-strong-hover));
+	}
 
 	&:focus-visible {
 		@include _form-focus-style;
@@ -119,6 +135,7 @@
 		@include cursor-not-allowed;
 		--color-bg: var(--bg-sunken);
 		background: var(--color-bg);
+		box-shadow: none;
 	}
 
 	// Hide native UA clear button on <input type="search"> — we never use it;
@@ -130,6 +147,8 @@
 }
 
 @mixin form-textarea {
+	// Multi-line text keeps the reading line-height, not the control box.
+	line-height: var(--line-height);
 	min-height: 6rem;
 	resize: vertical;
 
@@ -440,12 +459,13 @@
 	@include flex;
 	@include items-center;
 	gap: var(--gap);
-	--padding-y: var(--input-padding-y, var(--size-sm));
+	--padding-y: var(--input-padding-y, var(--size-xs-up));
 	--padding-x: var(--size-md);
 	padding: var(--padding-y) var(--padding-x);
 	@include cursor-pointer;
 	@include transition;
 	@include text-sm;
+	line-height: var(--control-line-height);
 	@include font-medium;
 	margin-bottom: 0;
 	border-radius: var(--radius);
@@ -482,7 +502,7 @@
 	// Lets .error/.success/.warning/.info parents cascade to the checked-
 	// state hover via the .success { --color-primary } chain. See
 	// _btn.scss for the syntax rationale (number form, not percentage).
-	--color-accent-hover: hsl(from var(--color-accent) h s calc(l - 8));
+	--color-accent-hover: hsl(from var(--color-accent) h s calc(l + var(--accent-hover-shift)));
 
 	background-color: var(--color-bg);
 	border-color: transparent;

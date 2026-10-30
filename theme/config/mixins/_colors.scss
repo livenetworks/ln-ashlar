@@ -33,7 +33,8 @@
 	// Re-declare accent vocabulary at this scope so var() resolves
 	// here instead of staying frozen at an ancestor scope. Without this, descendants
 	// reading --color-accent get the ancestor's primary blue regardless of the
-	// semantic class. --color-accent-fg resolves to white from the derivation chain.
+	// semantic class. --color-accent-fg stays inherited — white in light
+	// polarity, ink in the dark lift.
 	--color-accent:             hsl(var(--color-primary));
 	--color-accent-tint:        hsl(var(--color-#{$family}-lighter));
 	--color-accent-tint-strong: hsl(var(--color-#{$family}-light));

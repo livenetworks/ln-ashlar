@@ -114,6 +114,10 @@ The `ln-ashlar` mixin architecture powers the **Visual Theme Layer** (`ln-ashlar
 | `m`, `mx`, `my`, `mt`, `mb`, `ml`, `mr` | mixin | `$val: CSS length` | Margin shorthand recipes |
 | `gap` | mixin | `$val: CSS length` | Flexbox / CSS Grid gap |
 | `stack` | mixin | `$gap: var(--gap)` | Vertical flex column with gap |
+| `grid-auto` | mixin | `$min: var(--grid-item-min-width)` | Auto-fit grid: columns of at least `$min`, shrinking below it for a single item |
+| `tabs-nav-segmented` | mixin | — | Pill-track variant of the tabs nav for compact panel-header switches |
+| `stat-card-tone` | mixin | — | Leading accent strip and icon tint from the semantic-color cascade |
+| `section-card`, `panel-header` | mixin | `$group: false` | `$group: true` renders a transparent titled group: no surface, border, shadow, or radius, and a title row without divider or inline padding |
 | `row` | mixin | `$gap: var(--gap)` | Horizontal flex row with gap |
 | `row-between` | mixin | `$gap: var(--gap)` | Flex row with `justify-content: space-between` |
 | `row-center` | mixin | `$gap: var(--gap)` | Flex row with `align-items: center` |
@@ -142,7 +146,7 @@ The `ln-ashlar` mixin architecture powers the **Visual Theme Layer** (`ln-ashlar
 | `card` | mixin | — | Standard container card with border, resting shadow, and `--color-bg` |
 | `card-header`, `card-body`, `card-footer` | mixin | — | Internal card structural regions with standard padding |
 | `section` | mixin | — | Page section vertical rhythm and container constraints |
-| `table-base`, `table-striped` | mixin | `$sticky: false` | Full table styling with sunken header and interactive hover |
+| `table-base`, `table-striped` | mixin | `$sticky: true`, `$responsive: true` | Full table styling with sunken, page-sticky header and interactive hover |
 | `form-grid`, `form-input`, `form-label` | mixin | — | Responsive 6-column form grid and input styling |
 | `btn`, `btn-soft`, `btn-ghost` | mixin | — | Turnkey button variants with interaction states |
 | `chip` | mixin | — | Dismissible pill badge with delete action |

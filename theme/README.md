@@ -22,6 +22,7 @@ theme/
 │   ├── components.css         # Component utility recipes
 │   └── entry.css              # Entrypoint bundle
 ├── ln-ashlar.scss             # Master bundle (Core + Theme)
+├── ln-ashlar-relaxed.scss     # Relaxed design bundle (Core + Theme + designs/relaxed/*)
 └── ln-ashlar-theme.scss       # Theme-only visual design system bundle
 ```
 

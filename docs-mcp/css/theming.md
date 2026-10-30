@@ -14,11 +14,14 @@ tags: [theming, dark-mode, colors, tokens, brand, scoped-theme]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand.css`), named theme presets (`ocean`, `sunset`, `midnight`, `glass`), and arbitrary **Scoped Mode/Theme Islands** by decoupling raw theme **values** (`_palette.scss`) from the unified **derivation chain** (`_theme.scss`):
+The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand.css`), named theme presets (`ocean`, `sunset`, `midnight`, `glass`), a dark `navy` brand region, and arbitrary **Scoped Mode/Theme Islands** by decoupling raw theme **values** (`_palette.scss`) from the unified **derivation chain** (`_theme.scss`):
 
 - **Scoped Mode/Theme Islands:** Any element at any DOM depth can declare `data-mode="dark"` (polarity) or `data-theme="glass"` (palette). Descendant elements render fully in that axis — including background, text, borders, shadows, buttons, and hover/active states — without requiring component-specific overrides.
 - **Surface Elevation Inversion:** In dark mode, elevated surfaces become *lighter* (`--bg-elevated: hsl(var(--color-neutral-150))`, 10%) than the root canvas (`--bg-base: hsl(var(--color-neutral-100))`, 7%), while recessed areas (`--bg-recessed: hsl(var(--color-neutral-50))`, 5%) become darker. In light mode, surfaces are flat by design and separated by shadow. Both polarities bind to the neutral ramp, so rebinding `--color-neutral-*` moves them together. The dark surfaces sit this low deliberately: the three `--fg-*` tiers need the luminance headroom to clear 7:1, and raising the surfaces collapses the ladder.
 - **Zero-Specificity Values (`:where()`):** Ashlar's default values are declared with `:where(:root)` and `:where([data-mode="..."])` (specificity 0,0,0). A consumer's `brand.css` at `:root` (0,1,0) always wins, regardless of stylesheet loading order.
+- **Default Dark Lift:** On dark surfaces outside any `[data-theme]` subtree, the accent lifts to `199 89% 64%` with an ink label (`--color-accent-fg: hsl(var(--color-ink))`) and the dark checkmark. The block is zero-specificity and excludes `[data-theme]` subtrees so an ancestor theme is never clobbered.
+- **Navy Region:** `<aside data-mode="dark" data-theme="navy">` re-seats the dark neutral ramp on navy and lifts the accent. The theme is region-only: always pair it with `data-mode="dark"`; the dark vocabulary derives from the ramp.
+- **Hover Direction:** `--accent-hover-shift` (`-8` light, `8` dark) is the lightness step buttons, links, and pills take on hover, so hover always moves away from the surface.
 - **Computed Accent Tints:** `--color-accent-tint` and `--color-accent-tint-strong` are computed dynamically via `color-mix()` against the local `--bg-base`.
 - **Activation Paths:**
   1. Root level override: `<html data-mode="dark">`, `<html data-theme="glass">`, or `<html data-skin="glass">`.
@@ -96,15 +99,16 @@ The `ln-ashlar` theming system enables Dark Mode, custom client branding (`brand
 | `data-theme="sunset"` | attribute | — | Sunset warm coral brand palette preset (`--brand-primary: 10 80% 36%`; lifts to `69%` with `data-mode="dark"`, pairing ink text) |
 | `data-theme="midnight"` | attribute | — | Midnight deep purple brand palette preset (`--brand-primary: 265 70% 50%`; lifts to `75%` with `data-mode="dark"`, pairing ink text) |
 | `data-theme="glass"` | attribute | — | Glass luminous blue brand palette preset (`--brand-primary: 218 95% 71%`, ink text in both polarities) |
+| `data-theme="navy"` | attribute | — | Dark navy brand region; always paired with `data-mode="dark"` (`<aside data-mode="dark" data-theme="navy">`). Re-seats the dark neutral ramp on navy and lifts the accent (`--brand-primary: 199 89% 64%`, ink text) |
 | `data-skin="glass"` | attribute | — | Glass structural preset — flat radius/shadow, translucent button chrome, accent nav/menu rebinds. Polarity-agnostic |
-| `--brand-primary` | token | `221 83% 43%` | Primary brand color bare HSL triplet |
+| `--brand-primary` | token | `201 96% 32%` | Primary brand color bare HSL triplet (sky blue; lifts to `199 89% 64%` with an ink label on dark surfaces outside a `[data-theme]`) |
 | `--brand-secondary` | token | `160 84% 36%` | Secondary brand color bare HSL triplet |
 | `--bg-base` | token | `hsl(var(--color-white)) (light) / hsl(var(--color-neutral-100)) (dark)` | Base canvas background |
 | `--bg-elevated` | token | `var(--bg-base) (light) / hsl(var(--color-neutral-150)) (dark)` | Elevated card surface (flat in light, +3% in dark) |
-| `--bg-sunken` | token | `hsl(var(--color-neutral-100)) (light) / hsl(var(--color-neutral-175)) (dark)` | Sunken well surface (darker in light, +5% in dark) |
-| `--bg-recessed` | token | `hsl(var(--color-neutral-50)) (light) / hsl(var(--color-neutral-50)) (dark)` | Page ground and recessed fill (darker in both themes) |
-| `--fg-default` | token | `hsl(var(--color-neutral-900)) (light) / hsl(var(--color-neutral-900)) (dark)` | Primary text color |
-| `--fg-muted` | token | `hsl(var(--color-neutral-800)) (light) / hsl(var(--color-neutral-700)) (dark)` | Muted text color |
+| `--bg-sunken` | token | `hsl(var(--color-neutral-50)) (light) / hsl(var(--color-neutral-175)) (dark)` | Quiet chrome surface (thead, tracks) |
+| `--bg-recessed` | token | `hsl(var(--color-neutral-100)) (light) / hsl(var(--color-neutral-50)) (dark)` | Page canvas and recessed fill |
+| `--fg-default` | token | `hsl(var(--color-neutral-800)) (light) / hsl(var(--color-neutral-900)) (dark)` | Primary text color |
+| `--fg-muted` | token | `hsl(213 20% 40%) (light) / hsl(var(--color-neutral-700)) (dark)` | Muted text color |
 <!-- sync:css-tokens:end -->
 
 ---

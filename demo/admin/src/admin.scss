@@ -9,37 +9,4 @@
 // Framework (includes full ln-ashlar CSS)
 @use '../../../theme/ln-ashlar';
 
-// Admin shell (layout)
-@use 'scss/navigation';
-
-// Demo infrastructure
-@use 'scss/demo-layout';
-@use 'scss/theme-picker';
-@use 'scss/density-picker';
-@use 'scss/demo-utilities';
-
-// Page-specific styles
-@use 'scss/pages/dashboard';
-@use 'scss/pages/cards';
-@use 'scss/pages/density';
-@use 'scss/pages/forms';
-@use 'scss/pages/layout';
-@use 'scss/pages/toggle';
-@use 'scss/pages/icons';
-@use 'scss/pages/external-links';
-@use 'scss/pages/nav';
-@use 'scss/pages/progress';
-@use 'scss/pages/select';
-@use 'scss/pages/ajax';
-@use 'scss/pages/filter';
-@use 'scss/pages/sortable';
-@use 'scss/pages/modal';
-@use 'scss/pages/tables';
-@use 'scss/pages/status-badge';
-@use 'scss/pages/tooltip';
-@use 'scss/pages/page-header';
-@use 'scss/pages/table-filter';
-@use 'scss/pages/chip';
-@use 'scss/pages/list';
-@use 'scss/pages/localization';
-@use 'scss/pages/websocket-connector';
+@use 'scss/demo-bundle';

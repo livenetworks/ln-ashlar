@@ -113,6 +113,9 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, tog
 		this._vEnd = -1;
 		this._rafId = null;
 		this._scrollHandler = null;
+		this._resizeHandler = null;
+		this._vResized = false;
+		this._vTop = 0;
 		this._scrollContainer = null;
 		this._colgroup = null;
 		this._rowPool = null;
@@ -479,6 +482,8 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, tog
 
 	_component.prototype._lockColumnWidths = function () {
 		if (!this.table || !this.thead || this._colgroup) return;
+		// Header row has no box (card mode, hidden ancestor): don't lock 0px columns; retried on resize.
+		if (this.ths.length && !this.ths[0].offsetWidth) return;
 
 		const colgroup = document.createElement('colgroup');
 		this.ths.forEach(function (th) {
@@ -618,8 +623,16 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, tog
 			});
 		};
 
+		// Resize shares the scroll rAF; the flag scopes re-measuring to resize frames.
+		// A lock deferred while the header row had no box happens here, before the re-measure.
+		this._resizeHandler = function () {
+			self._lockColumnWidths();
+			self._vResized = true;
+			self._scrollHandler();
+		};
+
 		scrollTarget.addEventListener('scroll', this._scrollHandler, { passive: true });
-		window.addEventListener('resize', this._scrollHandler, { passive: true });
+		window.addEventListener('resize', this._resizeHandler, { passive: true });
 	};
 
 	_component.prototype._disableVirtualScroll = function () {
@@ -629,8 +642,9 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, tog
 		if (this._scrollHandler) {
 			const scrollTarget = this._scrollContainer || window;
 			scrollTarget.removeEventListener('scroll', this._scrollHandler);
-			window.removeEventListener('resize', this._scrollHandler);
+			window.removeEventListener('resize', this._resizeHandler);
 			this._scrollHandler = null;
+			this._resizeHandler = null;
 		}
 		this._scrollContainer = null;
 		if (this._rafId) {
@@ -835,8 +849,7 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, tog
 	_component.prototype._renderVirtual = function () {
 		const data = this._filteredData;
 		const total = data.length;
-		const rowH = this._rowHeight;
-		if (!rowH || !total) return;
+		if (!this._rowHeight || !total) return;
 
 		const theadH = this.thead ? this.thead.offsetHeight : 0;
 		const sc = this._scrollContainer;
@@ -857,7 +870,25 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, tog
 			viewportH = window.innerHeight;
 		}
 
-		const vw = calculateVirtualWindow(scrollIntoData, viewportH, rowH, total, BUFFER_ROWS);
+		// After a resize a media query may have restyled rows (e.g. stacked cards):
+		// re-measure the rendered block's pitch (read before any write) and keep the
+		// record that was at the viewport top in place.
+		let target = scrollIntoData;
+		if (this._vResized) {
+			this._vResized = false;
+			const n = this._vEnd - this._vStart;
+			const last = this._rowPool && this._rowPool[n - 1];
+			const pitch = last ? (last.getBoundingClientRect().bottom - this._rowPool[0].getBoundingClientRect().top) / n : 0;
+			if (pitch && pitch !== this._rowHeight) {
+				this._rowHeight = pitch;
+				this._vStart = -1;
+				if (this._vTop > 0) target = this._vTop * pitch;
+			}
+		}
+		const rowH = this._rowHeight;
+		this._vTop = target / rowH;
+
+		const vw = calculateVirtualWindow(target, viewportH, rowH, total, BUFFER_ROWS);
 		const startRow = vw.start;
 		const endRow = vw.end;
 
@@ -911,6 +942,11 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, tog
 		}
 
 		if (this._selectable) this._updateSelectAll();
+
+		if (target !== scrollIntoData) {
+			if (sc) sc.scrollTop += target - scrollIntoData;
+			else window.scrollTo(window.scrollX, window.scrollY + target - scrollIntoData);
+		}
 	};
 
 

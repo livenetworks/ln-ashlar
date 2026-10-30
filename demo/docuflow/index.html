@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-density="compact">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -189,12 +189,12 @@
 
 				<template data-ln-template="packages-row">
 					<tr data-ln-table-row>
-						<td>{{ name }}</td>
-						<td data-ln-value="{{ max_users }}">{{ max_users_display }}</td>
-						<td>{{ max_documents }}</td>
-						<td>{{ max_storage }} GB</td>
-						<td>{{ status_display }}</td>
-						<td>
+						<td data-label="Name">{{ name }}</td>
+						<td data-label="Max users" data-ln-value="{{ max_users }}">{{ max_users_display }}</td>
+						<td data-label="Max docs">{{ max_documents }}</td>
+						<td data-label="Max storage">{{ max_storage }} GB</td>
+						<td data-label="Status">{{ status_display }}</td>
+						<td data-label="Actions">
 							<ul class="row-actions">
 								<li><button type="button" data-ln-table-row-action="edit" aria-label="Edit package"
 						data-ln-modal-for="package-modal"
@@ -300,12 +300,12 @@
 
 				<template data-ln-template="tenants-row">
 					<tr data-ln-table-row>
-						<td>{{ name }}</td>
-						<td>{{ slug }}</td>
-						<td>{{ package_name }}</td>
-						<td>{{ auth_method }}</td>
-						<td>{{ status_display }}</td>
-						<td>
+						<td data-label="Name">{{ name }}</td>
+						<td data-label="Slug">{{ slug }}</td>
+						<td data-label="Package">{{ package_name }}</td>
+						<td data-label="Auth method">{{ auth_method }}</td>
+						<td data-label="Status">{{ status_display }}</td>
+						<td data-label="Actions">
 							<ul class="row-actions">
 								<li><button type="button" data-ln-table-row-action="edit" aria-label="Edit tenant"
 						data-ln-modal-for="tenant-modal"

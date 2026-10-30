@@ -2,7 +2,6 @@
 
 .nav {
 	@include nav;
-	@include nav-links-border-grow;
 }
 
 .nav .nav-label {

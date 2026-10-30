@@ -158,7 +158,9 @@ export function parseTokenSources(root) {
 	const tokensVars = extractCssVariables(tokensRaw);
 	const lightVars = extractCssVariables(extractMixinBody(paletteRaw, 'ln-values-light'));
 	const darkVars = extractCssVariables(extractMixinBody(paletteRaw, 'ln-values-dark'));
-	const colorChainVars = extractCssVariables(paletteRaw);
+	// The default dark lift closes the file; its values are not the documented defaults.
+	const liftIdx = paletteRaw.indexOf('// Default dark lift');
+	const colorChainVars = extractCssVariables(liftIdx === -1 ? paletteRaw : paletteRaw.slice(0, liftIdx));
 
 	return {
 		tokensVars,
@@ -231,12 +233,12 @@ export function generateTokensTable(sources) {
 		row('--size-2xl', 'token', requireVar(tokensVars, '--size-2xl', '_tokens.scss'), '48px spacing step'),
 		row('--size-3xl', 'token', requireVar(tokensVars, '--size-3xl', '_tokens.scss'), '64px spacing step'),
 		'| **Radii & Dimensions** | | | |',
-		row('--radius-xs', 'token', requireVar(tokensVars, '--radius-xs', '_tokens.scss'), '2px border radius'),
-		row('--radius-sm', 'token', requireVar(tokensVars, '--radius-sm', '_tokens.scss'), '4px border radius'),
-		row('--radius-md', 'token', requireVar(tokensVars, '--radius-md', '_tokens.scss'), '6px border radius'),
-		row('--radius-lg', 'token', requireVar(tokensVars, '--radius-lg', '_tokens.scss'), '8px border radius'),
-		row('--radius-xl', 'token', requireVar(tokensVars, '--radius-xl', '_tokens.scss'), '12px border radius'),
-		row('--radius-2xl', 'token', requireVar(tokensVars, '--radius-2xl', '_tokens.scss'), '16px border radius'),
+		row('--radius-xs', 'token', requireVar(tokensVars, '--radius-xs', '_tokens.scss'), '4px border radius'),
+		row('--radius-sm', 'token', requireVar(tokensVars, '--radius-sm', '_tokens.scss'), '6px border radius'),
+		row('--radius-md', 'token', requireVar(tokensVars, '--radius-md', '_tokens.scss'), '10px border radius — controls'),
+		row('--radius-lg', 'token', requireVar(tokensVars, '--radius-lg', '_tokens.scss'), '16px border radius — panels, modals'),
+		row('--radius-xl', 'token', requireVar(tokensVars, '--radius-xl', '_tokens.scss'), '22px border radius'),
+		row('--radius-2xl', 'token', requireVar(tokensVars, '--radius-2xl', '_tokens.scss'), '28px border radius'),
 		row('--radius-full', 'token', requireVar(tokensVars, '--radius-full', '_tokens.scss'), 'Pill / circular radius'),
 		row('--border-width', 'token', requireVar(tokensVars, '--border-width', '_tokens.scss'), 'Standard 1px border stroke'),
 		row('--border-width-strong', 'token', requireVar(tokensVars, '--border-width-strong', '_tokens.scss'), 'Thick 2px border stroke'),
@@ -246,8 +248,8 @@ export function generateTokensTable(sources) {
 		row('--text-heading-lg', 'token', requireVar(tokensVars, '--text-heading-lg', '_tokens.scss'), 'Large heading font size'),
 		row('--text-heading-md', 'token', requireVar(tokensVars, '--text-heading-md', '_tokens.scss'), 'Medium heading font size'),
 		row('--text-title-md', 'token', requireVar(tokensVars, '--text-title-md', '_tokens.scss'), 'Title / card header font size'),
-		row('--text-body-md', 'token', requireVar(tokensVars, '--text-body-md', '_tokens.scss'), 'Primary body font size (14px)'),
-		row('--text-caption', 'token', requireVar(tokensVars, '--text-caption', '_tokens.scss'), 'Small caption font size (12px)'),
+		row('--text-body-md', 'token', requireVar(tokensVars, '--text-body-md', '_tokens.scss'), 'Compact-base body font size (14px; 16px at the default density)'),
+		row('--text-caption', 'token', requireVar(tokensVars, '--text-caption', '_tokens.scss'), 'Compact-base caption font size (12px; 13px at the default density)'),
 		'| **Z-Index Layer Scale** | | | |',
 		row('--z-sticky', 'token', requireVar(tokensVars, '--z-sticky', '_tokens.scss'), 'Sticky elements'),
 		row('--z-dropdown', 'token', requireVar(tokensVars, '--z-dropdown', '_tokens.scss'), 'Dropdown menus (non-top-layer fallback)'),
@@ -288,13 +290,14 @@ export function generateThemingTable(sources) {
 		'| `data-theme="sunset"` | attribute | — | Sunset warm coral brand palette preset (`--brand-primary: 10 80% 36%`; lifts to `69%` with `data-mode="dark"`, pairing ink text) |',
 		'| `data-theme="midnight"` | attribute | — | Midnight deep purple brand palette preset (`--brand-primary: 265 70% 50%`; lifts to `75%` with `data-mode="dark"`, pairing ink text) |',
 		'| `data-theme="glass"` | attribute | — | Glass luminous blue brand palette preset (`--brand-primary: 218 95% 71%`, ink text in both polarities) |',
+		'| `data-theme="navy"` | attribute | — | Dark navy brand region; always paired with `data-mode="dark"` (`<aside data-mode="dark" data-theme="navy">`). Re-seats the dark neutral ramp on navy and lifts the accent (`--brand-primary: 199 89% 64%`, ink text) |',
 		'| `data-skin="glass"` | attribute | — | Glass structural preset — flat radius/shadow, translucent button chrome, accent nav/menu rebinds. Polarity-agnostic |',
-		row('--brand-primary', 'token', requireVar(colorChainVars, '--brand-primary', '_palette.scss (:where(:root) brand block)'), 'Primary brand color bare HSL triplet'),
+		row('--brand-primary', 'token', requireVar(colorChainVars, '--brand-primary', '_palette.scss (:where(:root) brand block)'), 'Primary brand color bare HSL triplet (sky blue; lifts to `199 89% 64%` with an ink label on dark surfaces outside a `[data-theme]`)'),
 		row('--brand-secondary', 'token', requireVar(colorChainVars, '--brand-secondary', '_palette.scss (:where(:root) brand block)'), 'Secondary brand color bare HSL triplet'),
 		row('--bg-base', 'token', `${requireVar(lightVars, '--bg-base', '_palette.scss (ln-values-light)')} (light) / ${requireVar(darkVars, '--bg-base', '_palette.scss (ln-values-dark)')} (dark)`, 'Base canvas background'),
 		row('--bg-elevated', 'token', `${requireVar(lightVars, '--bg-elevated', '_palette.scss (ln-values-light)')} (light) / ${requireVar(darkVars, '--bg-elevated', '_palette.scss (ln-values-dark)')} (dark)`, 'Elevated card surface (flat in light, +3% in dark)'),
-		row('--bg-sunken', 'token', `${requireVar(lightVars, '--bg-sunken', '_palette.scss (ln-values-light)')} (light) / ${requireVar(darkVars, '--bg-sunken', '_palette.scss (ln-values-dark)')} (dark)`, 'Sunken well surface (darker in light, +5% in dark)'),
-		row('--bg-recessed', 'token', `${requireVar(lightVars, '--bg-recessed', '_palette.scss (ln-values-light)')} (light) / ${requireVar(darkVars, '--bg-recessed', '_palette.scss (ln-values-dark)')} (dark)`, 'Page ground and recessed fill (darker in both themes)'),
+		row('--bg-sunken', 'token', `${requireVar(lightVars, '--bg-sunken', '_palette.scss (ln-values-light)')} (light) / ${requireVar(darkVars, '--bg-sunken', '_palette.scss (ln-values-dark)')} (dark)`, 'Quiet chrome surface (thead, tracks)'),
+		row('--bg-recessed', 'token', `${requireVar(lightVars, '--bg-recessed', '_palette.scss (ln-values-light)')} (light) / ${requireVar(darkVars, '--bg-recessed', '_palette.scss (ln-values-dark)')} (dark)`, 'Page canvas and recessed fill'),
 		row('--fg-default', 'token', `${requireVar(lightVars, '--fg-default', '_palette.scss (ln-values-light)')} (light) / ${requireVar(darkVars, '--fg-default', '_palette.scss (ln-values-dark)')} (dark)`, 'Primary text color'),
 		row('--fg-muted', 'token', `${requireVar(lightVars, '--fg-muted', '_palette.scss (ln-values-light)')} (light) / ${requireVar(darkVars, '--fg-muted', '_palette.scss (ln-values-dark)')} (dark)`, 'Muted text color')
 	];

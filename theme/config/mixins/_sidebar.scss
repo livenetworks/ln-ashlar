@@ -60,7 +60,8 @@
 		> .app-name {
 			@include text-lg;
 			@include font-bold;
-			@include text-primary;
+			@include tracking-tight;
+			color: var(--color-fg);
 			@include truncate;
 		}
 

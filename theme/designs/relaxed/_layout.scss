@@ -1,0 +1,24 @@
+@use '../../config/mixins' as *;
+
+// Relaxed groupings — grid/flex layouts bound on markup the demo already
+// uses. Composition only: no tokens are declared here.
+
+// Cards placed directly in a section's body flow into an auto-fit grid.
+.section-card > main:has(> .card) {
+	@include grid-auto;
+}
+
+// Stat-card lists flow as a wrapping row; the cards drop their elevation.
+ul:has(> li > [data-ln-stat-card]) {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--size-lg);
+
+	> li {
+		flex: 1 1 var(--grid-item-min-width);
+	}
+
+	[data-ln-stat-card] {
+		--shadow: none;
+	}
+}

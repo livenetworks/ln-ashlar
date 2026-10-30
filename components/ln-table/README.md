@@ -330,6 +330,12 @@ the same target: `ln-table` calls `preventDefault()` unconditionally on
 
 A single observer on `document.body`: new `data-ln-table` root injected → `new lnTable(node)`; elements injected inside a live root → local rescan (no full re-init); `data-ln-table-source`/`-window` attribute set on an existing element → re-evaluated live (see Windowed Mode below).
 
+### Virtual scroll row height
+
+`_rowHeight` is measured once, from the first rows that exist (`_parseRows`, else `_enableVirtualScroll`). While virtual scrolling is active, a window `resize` sets a flag and goes through the same rAF as scroll. The next `_renderVirtual` re-measures the pitch of the rendered block (first to last pool row) before it writes anything. If the pitch changed, for example because a media query turned rows into stacked cards, the window is recomputed and the scroll position moves so the record at the top of the viewport stays there. `calculateVirtualWindow` still assumes uniform rows, so the pitch is an average. Changes in container width that do not resize the window are not observed.
+
+Column widths are locked once (`<colgroup>` + inline `table-layout: fixed`), from the column-header row, and only while that row has a box. A header that is hidden at bootstrap (stacked-card mode, or a hidden ancestor) defers the lock. A virtual table retries it on each window `resize` until it succeeds. A non-virtual table stays on automatic layout.
+
 ### Windowed cache mechanics
 
 Backed by `ln-core.createWindowCache` — the table owns the cache instance, not the full dataset:

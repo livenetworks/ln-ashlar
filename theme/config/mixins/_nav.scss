@@ -40,6 +40,7 @@
 		gap: var(--gap);
 		padding-block: var(--padding-y);
 		@include typography(body-sm);
+		@include font-medium;
 		color: var(--color-fg);
 		text-decoration: none;
 		// Always-present 1px border slot. Color defaults to transparent
@@ -50,7 +51,8 @@
 		margin: calc(-1 * var(--border-width));
 	}
 
-	.nav-icon {
+	.nav-icon,
+	a > .ln-icon {
 		@include flex-shrink-0;
 		@include size(1.25rem);
 	}
@@ -60,15 +62,36 @@
 		@include truncate;
 	}
 
+	// Trailing counter — <data value="24">24</data> as the last child of a.
+	a > data {
+		@include flex-shrink-0;
+		margin-inline-start: auto;
+		padding: 0 var(--size-xs-up);
+		min-width: 1.5rem;
+		text-align: center;
+		border-radius: var(--radius-full);
+		@include text-xs;
+		@include font-semibold;
+		font-variant-numeric: tabular-nums;
+		background: color-mix(in srgb, var(--color-fg) 12%, transparent);
+	}
+
+	a[aria-current="page"] > data {
+		background: var(--color-accent);
+		color: var(--color-accent-fg);
+	}
+
+	// Section heading — small uppercase eyebrow, clearly not a link.
 	.nav-section {
 		--color-fg: var(--fg-muted);
 		--padding-y: var(--size-sm);
 		padding-block: var(--padding-y);
+		padding-inline: var(--padding-x);
 		@include text-xs;
-		@include font-medium;
+		@include font-semibold;
 		color: var(--color-fg);
-		@include normal-case;
-		letter-spacing: normal;
+		@include uppercase;
+		letter-spacing: var(--tracking-wider);
 		// Structural margin above section header.
 		--margin-block: var(--size-md);
 		margin-top: var(--margin-block);

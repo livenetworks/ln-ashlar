@@ -1615,7 +1615,7 @@
 				},
 				{
 					"name": "data-ln-stat-card",
-					"description": "Visual / CSS styling attribute (theme/components/_stat-card.scss)",
+					"description": "Visual / CSS styling attribute (theme/components/_stat-card.scss, theme/designs/relaxed/_layout.scss)",
 					"value": {
 						"type": "boolean"
 					}

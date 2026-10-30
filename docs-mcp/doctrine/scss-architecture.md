@@ -276,6 +276,16 @@ Certain visual behaviors are fixed library-wide defaults, not per-component choi
 
 ---
 
+## Designs - alternative binding layers
+
+- Ashlar is recipes (mixins), a binding layer (`theme/components/*`), and three runtime axes (`data-mode`, `data-theme`, `data-skin`).
+- A design is an alternative binding layer compiled as its own bundle: same markup, mixins, tokens and axes; only the composition differs. A design adds no tokens and rebinds none.
+- Designs vs skins: a skin rebinds tokens at runtime on an element; a design swaps bindings at build time.
+- `relaxed`: the entry `theme/ln-ashlar-relaxed.scss` mirrors `ln-ashlar-theme.scss`, swaps `components/card` for `designs/relaxed/card`, and adds `designs/relaxed/layout` after it. It shares the base palette and tokens. `.section-card` is a transparent titled group on the canvas (`section-card($group: true)`: no surface, border, shadow, or radius; header as a title row). It also adds grid/flex groupings (`.section-card > main:has(> .card)` as an auto-fit grid, stat-card lists as a wrapping flat row). `section-card($group: true)` and `panel-header($group: true)` render a transparent titled group on the canvas.
+- Loading: the demo admin loads exactly one engine bundle as a render-blocking `<link>` and swaps it atomically on a pick (`ln-demo-engine`: `ashlar` | `tailwind` | `relaxed`; `data-css-engine` on `<html>`).
+
+---
+
 ## 11. CSSOM Performance & Selector Matching Doctrines
 
 To eliminate browser style invalidation storms during high-frequency DOM mutations and interactive events, the following authoring invariants must be preserved:

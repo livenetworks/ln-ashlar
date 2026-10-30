@@ -196,13 +196,13 @@
 				<template data-ln-template="seed-docs-row" data-ln-table-row>
 					<tr data-ln-table-row data-ln-table-row-id="{{ id }}">
 						<td><input type="checkbox" data-ln-table-row-select></td>
-						<td><strong>{{ title }}</strong></td>
-						<td><span>{{ department }}</span></td>
-						<td><span class="badge {{ status_badge }}">{{ status }}</span></td>
-						<td><span>{{ priority }}</span></td>
-						<td><span>{{ owner }}</span></td>
-						<td data-ln-value="{{ file_size }}"><span>{{ file_size_display }}</span></td>
-						<td data-ln-value="{{ updated_at }}"><time datetime="{{ updated_at }}">{{ updated_display }}</time></td>
+						<td data-label="Title"><strong>{{ title }}</strong></td>
+						<td data-label="Department"><span>{{ department }}</span></td>
+						<td data-label="Status"><span class="badge {{ status_badge }}">{{ status }}</span></td>
+						<td data-label="Priority"><span>{{ priority }}</span></td>
+						<td data-label="Owner"><span>{{ owner }}</span></td>
+						<td data-label="Size" data-ln-value="{{ file_size }}"><span>{{ file_size_display }}</span></td>
+						<td data-label="Updated" data-ln-value="{{ updated_at }}"><time datetime="{{ updated_at }}">{{ updated_display }}</time></td>
 					</tr>
 				</template>
 

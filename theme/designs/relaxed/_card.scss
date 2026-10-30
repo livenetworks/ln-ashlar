@@ -1,0 +1,12 @@
+@use '../../config/mixins' as *;
+
+// Same bindings as components/_card.scss, except .section-card renders a
+// transparent titled group on the canvas (header = title row, no frame).
+.card {
+	@include card;
+	@include card-field-list;
+}
+
+.section-card {
+	@include section-card($group: true);
+}

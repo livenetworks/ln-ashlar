@@ -1,0 +1,9 @@
+// The code panel is appended inside the section-card; its top border is the card frame's
+// lower edge in the framed design and a stray line on a chrome-less group.
+.collapsible > .demo-code-container {
+	border-block-start: none;
+}
+
+.collapsible[data-ln-toggle="open"] > .demo-code-container {
+	border-block-start: var(--border-width) solid var(--border-subtle);
+}

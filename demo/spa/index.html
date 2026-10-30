@@ -505,12 +505,12 @@
 
 			<template data-ln-template="packages-row">
 				<tr data-ln-table-row>
-					<td>{{ name }}</td>
-					<td data-ln-table-cell-attr="max_users:data-ln-value">{{ max_users_display }}</td>
-					<td>{{ max_documents }}</td>
-					<td data-ln-table-cell-attr="max_storage:data-ln-value">{{ max_storage }} GB</td>
-					<td><span data-ln-table-cell-attr="status_class:class">{{ status_display }}</span></td>
-					<td>
+					<td data-label="Name">{{ name }}</td>
+					<td data-label="Max users" data-ln-table-cell-attr="max_users:data-ln-value">{{ max_users_display }}</td>
+					<td data-label="Documents">{{ max_documents }}</td>
+					<td data-label="Storage" data-ln-table-cell-attr="max_storage:data-ln-value">{{ max_storage }} GB</td>
+					<td data-label="Status"><span data-ln-table-cell-attr="status_class:class">{{ status_display }}</span></td>
+					<td data-label="Actions">
 						<ul class="row-actions">
 							<li><a href="#package-modal:{{ id }}" aria-label="Edit package" data-ln-tooltip="Edit"
 								data-ln-modal-for="package-modal"
@@ -791,13 +791,13 @@
 			<template data-ln-template="tenants-row">
 				<tr data-ln-table-row>
 					<td><input type="checkbox" data-ln-table-row-select></td>
-					<td>{{ name }}</td>
-					<td>{{ slug }}</td>
-					<td>{{ custom_domain }}</td>
-					<td><span class="ln-chip">{{ package_name }}</span></td>
-					<td>{{ auth_method }}</td>
-					<td><span data-ln-table-cell-attr="status_class:class">{{ status_display }}</span></td>
-					<td>
+					<td data-label="Name">{{ name }}</td>
+					<td data-label="Slug">{{ slug }}</td>
+					<td data-label="Domain">{{ custom_domain }}</td>
+					<td data-label="Package"><span class="ln-chip">{{ package_name }}</span></td>
+					<td data-label="Auth">{{ auth_method }}</td>
+					<td data-label="Status"><span data-ln-table-cell-attr="status_class:class">{{ status_display }}</span></td>
+					<td data-label="Actions">
 						<ul class="row-actions">
 							<li><a href="tenants/{{ id }}" aria-label="Edit tenant" data-ln-tooltip="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg></a></li>
 							<li><button type="button" data-ln-table-row-action="delete" aria-label="Delete tenant" data-ln-tooltip="Delete" data-ln-confirm="Delete tenant?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg></button></li>

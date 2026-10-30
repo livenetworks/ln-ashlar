@@ -1,0 +1,10 @@
+// ==========================================================================
+// Admin Demo — Relaxed design bundle
+// ==========================================================================
+// Same demo layers as admin.scss on top of the relaxed design; output is
+// dist/admin-relaxed.css.
+// ==========================================================================
+
+@use '../../../theme/ln-ashlar-relaxed';
+@use 'scss/demo-bundle';
+@use 'scss/demo-relaxed';

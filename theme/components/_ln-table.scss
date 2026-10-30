@@ -13,6 +13,12 @@
 	@include ln-table-toolbar;
 }
 
+// Toolbar sibling of the table: pin the thead under the toolbar.
+:is(main, section, article):has(> .ln-table__toolbar + table),
+[data-ln-table]:has(> header + table) {
+	@include ln-table-toolbar-stack;
+}
+
 .ln-table__toolbar :is(label, search):has(> input[type="search"]) {
 	@include ln-table-toolbar-search;
 }
@@ -21,9 +27,6 @@
 	@include ln-table-count;
 }
 
-.table-container {
-	@include ln-table-card-mode;
-}
 [data-ln-table] > footer,
 .ln-table__footer {
 	@include ln-table-footer;

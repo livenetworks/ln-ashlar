@@ -17,6 +17,7 @@ tags: [navigation, nav, sidebar, links, presets, active-state]
 The `navigation` module (`theme/config/mixins/_nav.scss` and `theme/components/_nav.scss`) coordinates sidebar and header navigation:
 
 - **Semantic HTML Hierarchy:** Navigation lists use `<nav>`, `<ul>`, `<li>`, and `<a>` with `<h6>` group section headers and `<hr>` separators.
+- **Icons, Counts, Eyebrow:** A leading `<svg class="ln-icon">` is a direct child of the link. A trailing count is `<data value="24">24</data>` as the last child of the link; on `a[aria-current="page"]` it takes the accent fill. `.nav-section` headings render as uppercase semibold eyebrows.
 - **Link Visual Presets:**
   - `nav-links-rounded` (Default): Floating pill-shaped navigation links with margins.
   - `nav-links-border-left`: Full-width links with an inset left indicator border.
@@ -72,7 +73,7 @@ The `navigation` module (`theme/config/mixins/_nav.scss` and `theme/components/_
 | `nav-links-border-grow` | mixin | — | Full-width links with spring-animated growing indicator |
 | `nav-links-border-top` | mixin | — | Horizontal navbar links with top indicator line |
 | `.nav` | class | — | Prototyping class for `nav` |
-| `.nav-section` | class | — | Section heading styling for `<h6>` |
+| `.nav-section` | class | — | Section heading eyebrow (uppercase, semibold) |
 | `.nav-label` | class | — | Truncated link label container |
 | `.nav-divider` | class | — | Semantic divider `<hr>` in navigation |
 

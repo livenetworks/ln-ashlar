@@ -141,12 +141,12 @@
 			<template data-ln-template="documents-row">
 				<tr data-ln-table-row>
 					<td><input type="checkbox" data-ln-table-row-select></td>
-					<td>{{ title }}</td>
-					<td>{{ department }}</td>
-					<td>{{ status }}</td>
-					<td data-ln-value="{{ file_size }}"><data value="{{ file_size }}" data-ln-value="{{ file_size }}" data-ln-number>{{ file_size }}</data> KB</td>
-					<td data-ln-value="{{ updated_at }}"><time datetime="{{ updated_at }}" data-ln-value="{{ updated_at }}" data-ln-date="medium">{{ updated_at }}</time></td>
-					<td>
+					<td data-label="Title">{{ title }}</td>
+					<td data-label="Department">{{ department }}</td>
+					<td data-label="Status">{{ status }}</td>
+					<td data-label="Size" data-ln-value="{{ file_size }}"><data value="{{ file_size }}" data-ln-value="{{ file_size }}" data-ln-number>{{ file_size }}</data> KB</td>
+					<td data-label="Updated" data-ln-value="{{ updated_at }}"><time datetime="{{ updated_at }}" data-ln-value="{{ updated_at }}" data-ln-date="medium">{{ updated_at }}</time></td>
+					<td data-label="Actions">
 						<ul class="row-actions">
 							<li><button data-ln-table-row-action="edit" aria-label="Edit"
 								data-ln-modal-for="document-modal"
@@ -436,10 +436,10 @@
 
 			<template data-ln-template="people-row">
 				<tr data-ln-table-row>
-					<td>{{ title }}</td>
-					<td>{{ department }}</td>
-					<td>{{ status }}</td>
-					<td data-ln-value="{{ updated_at }}"><time datetime="{{ updated_at }}" data-ln-value="{{ updated_at }}" data-ln-date="medium">{{ updated_at }}</time></td>
+					<td data-label="Title">{{ title }}</td>
+					<td data-label="Department">{{ department }}</td>
+					<td data-label="Status">{{ status }}</td>
+					<td data-label="Updated" data-ln-value="{{ updated_at }}"><time datetime="{{ updated_at }}" data-ln-value="{{ updated_at }}" data-ln-date="medium">{{ updated_at }}</time></td>
 				</tr>
 			</template>
 

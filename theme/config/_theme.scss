@@ -16,6 +16,7 @@
 //   :root:not([data-mode="light"])          ← opt-out of auto
 //   <html data-skin="glass">                ← structural preset (flat, borderless)
 //   <html data-theme="ocean">               ← brand palette preset
+//   <aside data-mode="dark" data-theme="navy"> ← dark navy brand region
 //
 // See docs-mcp/css/theming.md for the full guide.
 // ==========================================================================
@@ -153,6 +154,28 @@
 	}
 }
 
+// Brand region — a dark-navy surface island, e.g. a sidebar. Always paired
+// with data-mode="dark": the ramp re-seats the dark vocabulary on navy.
+//   <aside data-mode="dark" data-theme="navy">
+[data-theme="navy"] {
+	&[data-mode="dark"],
+	:where([data-mode="dark"]) & {
+		--color-neutral-50:  213 74% 8%;
+		--color-neutral-100: 213 74% 11%;
+		--color-neutral-150: 213 55% 15%;
+		--color-neutral-175: 213 50% 17%;
+		--color-neutral-200: 213 45% 20%;
+		--color-neutral-300: 213 35% 28%;
+		--color-neutral-400: 213 30% 40%;   // 2.82:1 on navy-100, under the 3:1 ui target
+		--color-neutral-600: 215 20% 65%;   // 6.80:1 on navy-100 (fg-subtle)
+		--color-neutral-700: 213 27% 84%;   // 11.79:1
+		--color-neutral-900: 210 40% 98%;   // 16.70:1
+		--brand-primary: 199 89% 64%;       // 8.59:1 on navy-100
+		--color-accent-fg: hsl(var(--color-ink));
+		--check-mark: var(--check-mark-on-dark);
+	}
+}
+
 // ---------------------------------------------------------------------------
 // Named skins — structural/physics presets. Polarity-agnostic. Activation:
 //   <html data-skin="glass">
@@ -185,9 +208,10 @@
 	--btn-bg-hover: var(--bg-hover);
 	--btn-border: var(--color-accent);
 	// --color-accent-hover is declared only below <html> (a, mixin bodies);
-	// invalid at computed-value time here — derive locally. l - 6 matches
-	// @mixin btn's own accent-hover so neutral and accent buttons agree.
-	--btn-border-hover: hsl(from var(--color-accent) h s calc(l - 6));
+	// invalid at computed-value time here — derive locally. Follows
+	// --accent-hover-shift like @mixin btn's own accent-hover, so neutral
+	// and accent buttons agree.
+	--btn-border-hover: hsl(from var(--color-accent) h s calc(l + var(--accent-hover-shift)));
 
 	// ── Accent buttons — translucent fill via consumer-scope rebind
 	// Rebind --btn-* on the button itself (not at skin :root) so
@@ -262,32 +286,4 @@
 		--btn-fg-hover: hsl(var(--color-primary));
 		--btn-border-hover: hsl(var(--color-primary));
 	}
-}
-
-[data-skin="soft"] {
-	// Soft — playful, maximum radius, heavily shadow-based, no borders.
-	--radius-xs: 0.5rem;
-	--radius-sm: 0.75rem;
-	--radius-md: 1rem;
-	--radius-lg: 1.5rem;
-	--radius-xl: 2rem;
-	--radius-2xl: 2.5rem;
-
-	// Override shadows to be much larger and softer (volumetric look)
-	--shadow-sm: 0 8px 16px -2px rgba(0, 0, 0, 0.08);
-	--shadow-md: 0 12px 24px -4px rgba(0, 0, 0, 0.12);
-	--shadow-lg: 0 24px 48px -4px rgba(0, 0, 0, 0.16);
-
-	// Floating elements are more pronounced
-	--shadow-resting: var(--shadow-sm);
-	--shadow-floating: var(--shadow-lg);
-
-	// Remove default subtle borders (cards, panels) so they rely solely on shadows
-	--border-subtle: transparent;
-
-	// ── Buttons — pill shapes, floating, no borders
-	--btn-border: transparent;
-	--btn-border-hover: transparent;
-	--btn-bg: var(--bg-elevated);
-	--btn-bg-hover: var(--bg-hover);
 }

@@ -6,16 +6,16 @@
 @use 'borders' as *;
 @use 'transitions' as *;
 @use 'position' as *;
+@use 'breakpoints' as *;
 @use 'motion' as *;
 @use 'interaction' as *;
 @use 'form' as *;
 @use 'btn' as *;
 @use 'card' as *;
-@use 'ln-table';
 
 // ─── Base table ─────────────────────────────────────────────────
 
-@mixin table-base($sticky: false) {
+@mixin table-base($sticky: true, $responsive: true) {
 	@include w-full;
 	background: var(--color-bg);
 	--radius: var(--radius-lg);
@@ -46,23 +46,23 @@
 	thead {
 		--color-bg: var(--bg-sunken);
 		background: var(--color-bg);
-		border-block-end: var(--border-block-end, var(--border-width) solid var(--border-subtle));
-		
-		@if $sticky {
-			@include sticky-top;
-		}
-	}
 
-	// Support for in-thead toolbar inside sticky tables
-	@if $sticky {
-		thead > tr:first-child:has(> th[colspan]) > th {
-			@include ln-table.ln-table-thead-toolbar;
+		@if $sticky {
+			@include sticky-top(var(--table-toolbar-block-size, 0));
+		}
+
+		// Opaque, so scrolled rows never show through the pinned header.
+		th { background: var(--color-bg); }
+
+		// On the cells: the separate border model ignores row-group borders.
+		> tr:last-child > th {
+			border-block-end: var(--border-block-end, var(--border-width) solid var(--border-subtle));
 		}
 	}
 
 	th {
 		@include text-left;
-		padding: var(--padding-y) var(--padding-x);
+		padding: var(--table-cell-padding-y) var(--table-cell-padding-x);
 		@include font-semibold;
 		font-size: var(--text-xs);
 		letter-spacing: 0.05em;
@@ -119,7 +119,7 @@
 	}
 
 	td {
-		padding: var(--padding-y) var(--padding-x);
+		padding: var(--table-cell-padding-y) var(--table-cell-padding-x);
 		border-block-end: var(--border-width) solid var(--border-subtle);
 		font-size: var(--text-sm);
 		line-height: var(--line-height);
@@ -150,7 +150,7 @@
 	// Sticky section footer inside sticky/enhanced tables
 	@if $sticky {
 		> footer {
-			padding: var(--padding-y) var(--padding-x);
+			padding: var(--table-cell-padding-y) var(--table-cell-padding-x);
 			border-block-start: var(--border-block-start, var(--border-width) solid var(--color-border));
 			--color-bg: var(--bg-sunken);
 			background: var(--color-bg);
@@ -161,58 +161,94 @@
 			z-index: var(--z-sticky);
 		}
 	}
+
+	// Narrow viewports: one record per card. Viewport, not container — a table
+	// box cannot be a size container (inner display type table).
+	@if $responsive {
+		@include mq-down(md) {
+			@include table-responsive;
+		}
+	}
 }
 
-// ─── Responsive (mobile stacked layout) ─────────────────────────
-// Requires data-label attribute on <td> for column headers.
+// ─── Responsive (stacked record cards) ──────────────────────────
+// Applied ON the table. Label column comes from td[data-label]; cells
+// without it span the card (section headers, empty state, checkboxes).
 
 @mixin table-responsive {
-	th {
+	// Drop column geometry: wrapper min-widths, row-height clamp, and
+	// ln-table's inline fixed layout + locked colgroup.
+	--table-min-width: 0px;
+	--density-row-h: auto;
+	table-layout: auto !important;
+
+	// Column-header row only: an in-thead toolbar row (first row) stays.
+	> colgroup,
+	> thead > tr:last-child {
 		@include hidden;
 	}
 
-	tbody tr {
+	// Flush records: separation lives inside offsetHeight, so ln-table's
+	// virtual row-height maths stays exact.
+	> tbody > tr {
 		@include block;
-		// Structural gap between stacked row-cards.
-		--margin-block: var(--size-md);
-		margin-bottom: var(--margin-block);
-		@include border;
-		border-radius: var(--radius);
-		@include overflow-hidden;
+		border-block-end: var(--border-width-strong) solid var(--color-border);
+
+		&:last-child {
+			border-block-end: none;
+		}
 	}
 
 	td {
 		@include block;
-		@include text-right;
-		// Stacked rows need taller vertical rhythm than desktop table cells.
+		text-align: start;
 		--padding-y: var(--size-sm-up);
 		--padding-x: var(--size-md);
 		padding: var(--padding-y) var(--padding-x);
-		@include border-b;
+		border-block-end: none;
 		@include relative;
-		padding-left: 50%;
+	}
 
-		&:last-child {
-			@include border-none;
-		}
+	// Outranks table-base's `tr:last-child td` by source order.
+	tr > td:not(:last-child) {
+		@include border-b;
+	}
+
+	td[data-label] {
+		text-align: end;
+		padding-inline-start: 50%;
 
 		&::before {
 			content: attr(data-label);
 			@include absolute;
-			top: 0;
-			bottom: 0;
-			left: var(--size-md); // Geometric — ::before label inset matches td padding-x.
-			// Geometric — label width less the gutter to value column.
-			width: calc(50% - var(--size-lg));
+			inset-block: 0;
+			inset-inline-start: var(--padding-x);
+			inline-size: calc(50% - var(--size-lg));
 			@include flex;
 			@include items-center;
-			@include text-left;
+			text-align: start;
 			@include font-semibold;
 			--color-fg: var(--fg-muted);
 			color: var(--color-fg);
 			@include text-xs;
 			@include uppercase;
 			@include truncate;
+		}
+	}
+
+	.table-row-actions {
+		position: static !important;
+		opacity: 1 !important;
+		visibility: visible !important;
+		pointer-events: auto !important;
+		transform: none !important;
+		background: transparent !important;
+		padding-inline-start: 0 !important;
+		justify-content: flex-end;
+		margin-block-start: var(--size-xs);
+
+		&::before {
+			display: none !important;
 		}
 	}
 }

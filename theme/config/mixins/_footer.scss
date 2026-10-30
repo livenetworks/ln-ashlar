@@ -24,7 +24,9 @@
 	--color-border: var(--border-subtle);
 	padding: var(--padding-y) var(--padding-x);
 	border-block-start: var(--border-block-start, var(--border-width) solid var(--color-border));
-	background: var(--color-bg);
+	// Sits on the surrounding canvas — an opaque white strip pinned to the
+	// bottom edge reads as a desktop status bar. Opt in via --app-footer-bg.
+	background: var(--app-footer-bg, transparent);
 	@include typography(body-sm);
 	color: var(--color-fg);
 	@include flex;
