@@ -55,3 +55,4 @@
 |---|---|---|---|
 | Oct 25, 2026 | v2.1.13 Release & SCSS Matching | Completed | Reduced negative `:not(:has())`, adopted CSS Logical Properties, 239/239 tests green |
 | Current | Roadmap & Clean Optimization | Completed | ROADMAP.md created, eliminated demo log layout thrash, cached DOM error queries in ln-validate |
+| Oct 30, 2026 | v2.2.0 Release & UI Refresh | Completed | Stefan's design as the default look, `relaxed` bundle, sticky + mobile-card tables, ln-table resize re-measure, 239/239 tests green |
