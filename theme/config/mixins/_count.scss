@@ -1,0 +1,48 @@
+@use 'display' as *;
+@use 'typography' as *;
+@use 'position' as *;
+
+// ─── Count ──────────────────────────────────────────────────────────────────
+// Numeric counter pill — unread items, queue sizes, list totals. The
+// element is <data value="24">24</data>: the value attribute carries the
+// machine-readable number, the text the formatted one.
+//
+//   @include count;          ← neutral pill, tinted from --color-fg
+//   @include count-solid;    ← delta: solid accent fill. Tone follows the
+//                              semantic-color cascade — <data class="error">
+//   @include count-overlay;  ← delta: pinned over the top-end corner of the
+//                              nearest positioned ancestor (icon buttons).
+//                              The host must be positioned.
+//
+// Bound structurally by @mixin nav (a > data) and @mixin app-header-actions
+// (button > data).
+// ────────────────────────────────────────────────────────────────────────────
+
+@mixin count {
+	@include flex-shrink-0;
+	padding: 0 var(--size-xs-up);
+	min-width: 1.5rem;
+	text-align: center;
+	border-radius: var(--radius-full);
+	@include text-xs;
+	@include font-semibold;
+	font-variant-numeric: tabular-nums;
+	background: color-mix(in srgb, var(--color-fg) 12%, transparent);
+}
+
+@mixin count-solid {
+	background: var(--color-accent);
+	color: var(--color-accent-fg);
+}
+
+@mixin count-overlay {
+	@include absolute;
+	// em, not rem — the offsets and the circle track the counter's own
+	// font-size, so a rebound size keeps the same geometry.
+	inset-block-start: -0.5em;
+	inset-inline-end: -0.5em;
+	min-width: 1.5em;
+	padding-inline: var(--size-2xs);
+	line-height: 1.5em;
+	pointer-events: none;
+}

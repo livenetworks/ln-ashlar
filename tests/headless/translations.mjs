@@ -16,7 +16,7 @@ const EX1 = 0;
 const EX2 = 1;
 const EX3 = 2;
 // DEFAULT_LOCALES in source: { en: 'English', sq: 'Shqip', sr: 'Srpski' }
-const LOCALES = { en: 'English', sq: 'Shqip', sr: 'Srpski' };
+const LOCALES = { sq: 'Shqip', sr: 'Srpski', de: 'Deutsch', mk: 'Македонски' };
 
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -281,7 +281,7 @@ run('demo/admin/translations.html', async ({ page }) => {
 		assert(!(await names(EX1)).some(x => x.startsWith('trans[sr]')), 'sr clones gone after request-remove');
 	});
 
-	// ─── [source] sections expected to expose the missing page templates ─────────
+	// â”€â”€â”€ [source] sections expected to expose the missing page templates â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 	await check('[source] No "template not found" warnings for ln-translations templates', async () => {
 		await load();
@@ -296,7 +296,7 @@ run('demo/admin/translations.html', async ({ page }) => {
 			.map(b => [b.getAttribute('data-ln-translations-lang'), b.textContent]));
 		assert(same(await menu(), Object.entries(LOCALES)), `menu lists en/sq/sr with labels (got ${JSON.stringify(await menu())})`);
 		await onForm(EX1, form => form.lnTranslations.addLanguage('sq'));
-		assert(same((await menu()).map(m => m[0]), ['en', 'sr']), 'after adding sq the menu no longer lists sq');
+		assert(same((await menu()).map(m => m[0]), ['sr', 'de', 'mk']), 'after adding sq the menu no longer lists sq');
 	});
 
 	await check('[source] Menu item click adds the language', async () => {
@@ -320,6 +320,32 @@ run('demo/admin/translations.html', async ({ page }) => {
 		assert(badge.aria === 'Remove Shqip', `remove button aria-label "Remove Shqip" (got "${badge.aria}")`);
 		await onForm(EX1, form => form.querySelector('[data-ln-translations-active] [data-ln-translations-lang="sq"] button').click());
 		assert((await active(EX1)).length === 0, 'clicking the badge button removes sq');
+	});
+
+	
+	await check('Cycle: add multiple, remove all, re-add cleanly preserves original inputs', async () => {
+		await load();
+		await onForm(EX1, form => {
+			form.lnTranslations.addLanguage('sq');
+			form.lnTranslations.addLanguage('sr');
+		});
+		assert(same(await active(EX1), ['sq', 'sr']), 'sq and sr added');
+		await onForm(EX1, form => {
+			form.lnTranslations.removeLanguage('sq');
+			form.lnTranslations.removeLanguage('sr');
+		});
+		assert((await active(EX1)).length === 0, 'all active languages removed');
+		assert(await onForm(EX1, form => !!form.querySelector('[name="scope"]')), 'original scope input preserved');
+		assert(await onForm(EX1, form => !!form.querySelector('[name="address"]')), 'original address input preserved');
+
+		// Re-add again
+		await onForm(EX1, form => {
+			form.lnTranslations.addLanguage('sq');
+			form.lnTranslations.addLanguage('de');
+		});
+		assert(same(await active(EX1), ['sq', 'de']), 're-add sq and de succeeded');
+		assert(await onForm(EX1, form => !!form.querySelector('[name="trans[sq][scope]"]')), 'trans[sq][scope] created on re-add');
+		assert(await onForm(EX1, form => !!form.querySelector('[name="trans[de][scope]"]')), 'trans[de][scope] created on re-add');
 	});
 
 	if (failures.length) {

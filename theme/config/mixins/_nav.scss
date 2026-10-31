@@ -8,6 +8,7 @@
 @use 'motion' as *;
 @use 'interaction' as *;
 @use 'position' as *;
+@use 'count' as *;
 
 // ─── Nav ────────────────────────────────────────────────────────────────────
 // Navigation structure reset. Layout (flex-col, h-full) and background come
@@ -64,21 +65,12 @@
 
 	// Trailing counter — <data value="24">24</data> as the last child of a.
 	a > data {
-		@include flex-shrink-0;
+		@include count;
 		margin-inline-start: auto;
-		padding: 0 var(--size-xs-up);
-		min-width: 1.5rem;
-		text-align: center;
-		border-radius: var(--radius-full);
-		@include text-xs;
-		@include font-semibold;
-		font-variant-numeric: tabular-nums;
-		background: color-mix(in srgb, var(--color-fg) 12%, transparent);
 	}
 
 	a[aria-current="page"] > data {
-		background: var(--color-accent);
-		color: var(--color-accent-fg);
+		@include count-solid;
 	}
 
 	// Section heading — small uppercase eyebrow, clearly not a link.

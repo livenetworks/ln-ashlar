@@ -19,10 +19,10 @@
 @mixin translations-flag-input {
 	// Intrinsic flag-icon decoration math — pad-left + bg-pos + bg-size
 	// composed against the icon's own dimensions, not shell rhythm.
-	padding-left: calc(var(--size-sm-up) + var(--size-md-up) + var(--size-sm-up));
+	padding-inline-start: calc(var(--size-sm-up) + var(--size-md-up) + var(--size-sm-up));
 	background-repeat: no-repeat;
 	background-size: var(--size-md-up) auto;
-	background-position: var(--size-sm-up) calc(var(--size-sm) + (var(--size-lg) - var(--size-md-up) * 3 / 4) / 2);
+	background-position: var(--size-sm-up) center;
 }
 
 // ─── Dropdown menu item: flag via ::before ───────────────────────
@@ -30,6 +30,7 @@
 @mixin translations-dropdown-flag {
 	@include flex;
 	@include items-center;
+	--gap: var(--size-xs);
 	gap: var(--gap);
 
 	&::before {
@@ -51,7 +52,7 @@
 	@include items-center;
 	--gap: var(--size-xs);
 	gap: var(--gap);
-	margin-left: auto;
+	margin-inline-start: auto;
 }
 
 // ─── Active translations list ────────────────────────────────────
@@ -72,7 +73,8 @@
 	gap: var(--gap);
 	--padding-y: var(--size-2xs);
 	--padding-x: var(--size-xs);
-	padding: var(--padding-y) var(--padding-x);
+	padding-block: var(--padding-y);
+	padding-inline: var(--padding-x);
 	@include text-xs;
 	@include font-semibold;
 	@include rounded-sm;
@@ -83,7 +85,7 @@
 	background-position: var(--size-xs) center; // Intrinsic flag-icon position, not shell rhythm.
 	background-size: 1rem auto;
 	--padding-x: var(--size-lg);
-	padding-left: var(--padding-x);
+	padding-inline-start: var(--padding-x);
 }
 
 // ─── Badge remove button ─────────────────────────────────────────

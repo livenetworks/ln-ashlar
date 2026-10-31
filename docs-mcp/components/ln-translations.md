@@ -8,9 +8,9 @@ source: components/ln-translations/src/ln-translations.js
 tags: [i18n, forms, translation, localization, clone]
 ---
 
-# 🔤 ln-translations
+# ðŸ”¤ ln-translations
 
-> **Classification:** 🟢 Simple component  
+> **Classification:** ðŸŸ¢ Simple component  
 > Applied to a form element (`<form data-ln-translations data-ln-translations-default="en">`). It coordinates translatable input containers (`[data-ln-translatable="field"]`), dynamically cloning the inner form controls with deterministic nested names (`trans[lang][field]`) when languages are added, and synchronizes active language badges and dropdown menus via `<template>` elements. It manages no network transport or validation, submitting cloned fields natively through the standard `<form>` submission pipeline.
 
 ---
@@ -20,9 +20,9 @@ tags: [i18n, forms, translation, localization, clone]
 - **Inline field cloning:** wraps translatable form fields via `data-ln-translatable`; when a language is activated (`addLanguage`), scans for translatable fields in the DOM, clones the wrapper's original `<input>`/`<textarea>`/`<select>` and appends the clone flagged with `data-ln-translatable-lang="{lang}"`.
 - **Deterministic name generation:** cloned inputs get a nested array `name`, e.g. `trans[en][title]`, or `product[trans][en][title]` when the wrapper declares `data-ln-translations-prefix="product"`.
 - **Menu & badge synchronization:** renders the available-language dropdown menu and the active-language badge list from two `<template>` elements (`ln-translations-menu-item`, `ln-translations-badge`), keeping both in sync on every add/remove.
-- **Server-rendered hydration:** on init, scans the container for existing `[data-ln-translatable-lang]` elements and treats any language found there (other than the default) as already active, rebuilding the menu and badges accordingly — no `addLanguage()` call required.
+- **Server-rendered hydration:** on init, scans the container for existing `[data-ln-translatable-lang]` elements and treats any language found there (other than the default) as already active, rebuilding the menu and badges accordingly â€” no `addLanguage()` call required.
 
-The JavaScript source is located at [ln-translations.js](../../components/ln-translations/src/ln-translations.js).
+The JavaScript source follows the Two-Tier Archetype: domain logic and algorithms are isolated in [translations-model.js](../../components/ln-translations/src/translations-model.js), while the DOM coordinator shell is implemented in [ln-translations.js](../../components/ln-translations/src/ln-translations.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
@@ -69,7 +69,7 @@ The JavaScript source is located at [ln-translations.js](../../components/ln-tra
 	</main>
 </form>
 
-<!-- Required global templates — declare once per page -->
+<!-- Required global templates â€” declare once per page -->
 <template data-ln-template="ln-translations-badge">
 	<li>
 		<p data-ln-translations-lang>
@@ -88,7 +88,7 @@ The JavaScript source is located at [ln-translations.js](../../components/ln-tra
 
 ### Variant 1: Server-Rendered / Pre-Hydrated Translations
 
-When translations are already rendered server-side, mark each pre-rendered field with `data-ln-translatable-lang="{lang}"`. On init the component scans for these attributes, treats every non-default language found as already active, and renders the matching menu/badge state — no `addLanguage()` call needed.
+When translations are already rendered server-side, mark each pre-rendered field with `data-ln-translatable-lang="{lang}"`. On init the component scans for these attributes, treats every non-default language found as already active, and renders the matching menu/badge state â€” no `addLanguage()` call needed.
 
 #### HTML Markup
 ```html
@@ -124,15 +124,15 @@ When translations are already rendered server-side, mark each pre-rendered field
 
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
-| `data-ln-translations` | Container (`<form>` or any element) | Flag | — | Initializes the translations coordinator on the container element. |
+| `data-ln-translations` | Container (`<form>` or any element) | Flag | â€” | Initializes the translations coordinator on the container element. |
 | `data-ln-translations-default` | Container | `String` | `""` | Default language code. When set, flags the original (non-cloned) translatable inputs with `data-ln-translatable-lang="{default}"` on init. |
-| `data-ln-translations-locales` | Container | `JSON` | `{"en":"English","sq":"Shqip","sr":"Srpski"}` | JSON object mapping language codes to display labels. Invalid JSON logs a `console.warn` and falls back to the default locale set. |
-| `data-ln-translations-active` | `<ul>` | Flag | — | Marks the mount container where active-language badges are rendered. |
-| `data-ln-translations-add` | `<button>` | Flag | — | Marks the trigger button that opens the language menu; `style.display = 'none'` is set automatically once every configured language is active. |
-| `data-ln-translatable` | Field wrapper | `String` (field name) | — *(required)* | Marks a translatable field group; the value is the field name used in generated `name` attributes. |
+| `data-ln-translations-locales` | Container | `JSON` | `null` | JSON object mapping language codes to display labels. Auto-parsed via `attrJson`. |
+| `data-ln-translations-active` | `<ul>` | Flag | â€” | Marks the mount container where active-language badges are rendered. |
+| `data-ln-translations-add` | `<button>` | Flag | â€” | Marks the trigger button that opens the language menu; `style.display = 'none'` is set automatically once every configured language is active. |
+| `data-ln-translatable` | Field wrapper | `String` (field name) | â€” *(required)* | Marks a translatable field group; the value is the field name used in generated `name` attributes. |
 | `data-ln-translations-prefix` | Field wrapper | `String` | `""` | Optional name prefix for nested entities, e.g. `items[1]` produces `items[1][trans][en][title]`. |
-| `data-ln-translatable-lang` | `<input>`, `<textarea>`, `<select>` | `String` (language code) | — | Marks a cloned or server-rendered translation field for a specific language; written by the component and also readable on server-rendered markup for hydration. |
-| `data-ln-translations-lang` | Inside `<template data-ln-template="ln-translations-badge">` and `<template data-ln-template="ln-translations-menu-item">` | Flag (contract attribute) | — *(required)* | Required anchor attribute inside both templates — the component locates it via `querySelector` to populate the language code, label and event bindings. Templates without it fail to render. |
+| `data-ln-translatable-lang` | `<input>`, `<textarea>`, `<select>` | `String` (language code) | â€” | Marks a cloned or server-rendered translation field for a specific language; written by the component and also readable on server-rendered markup for hydration. |
+| `data-ln-translations-lang` | Inside `<template data-ln-template="ln-translations-badge">` and `<template data-ln-template="ln-translations-menu-item">` | Flag (contract attribute) | â€” *(required)* | Required anchor attribute inside both templates â€” the component locates it via `querySelector` to populate the language code, label and event bindings. Templates without it fail to render. |
 
 ### Programmatic JS API
 
@@ -158,7 +158,7 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 | `ln-translations:removed` | Emits | No | Fires after a language's cloned fields are removed and the menu/badges are updated. | `{ target: HTMLElement, lang: String }` |
 
 > [!NOTE]
-> Both `request-add` and `request-remove` listeners are bound directly on the container element (the one carrying `data-ln-translations`), never on `document`. Dispatch the event on the container itself or on a bubbling descendant — a `document`-level dispatch never reaches the component.
+> Both `request-add` and `request-remove` listeners are bound directly on the container element (the one carrying `data-ln-translations`), never on `document`. Dispatch the event on the container itself or on a bubbling descendant â€” a `document`-level dispatch never reaches the component.
 
 ---
 
@@ -237,7 +237,7 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 
 ### Behavioral Concept
 
-1. **Per-language flag icons (pure CSS, data-driven):** every `[data-ln-translatable-lang]` field, every active-badge root, and every dropdown menu-item button gets a `background-image` flag icon keyed by its language code, resolved to a country flag through an ISO 639-1 → ISO 3166-1 lookup table (e.g. `en` → `gb`, `sq` → `al`, `sr` → `rs` via an explicit override map; other codes map to their own country code automatically). Assets are expected at `/assets/flags/{country}.svg`. This is entirely CSS-driven — the JS layer never touches flags. Because `data-ln-translations-default` also flags the *original* fields with `data-ln-translatable-lang="{default}"`, the flag icon applies uniformly to originals and clones alike, not just clones.
+1. **Per-language flag icons (pure CSS, data-driven):** every `[data-ln-translatable-lang]` field, every active-badge root, and every dropdown menu-item button gets a `background-image` flag icon keyed by its language code, resolved to a country flag through an ISO 639-1 â†’ ISO 3166-1 lookup table (e.g. `en` â†’ `gb`, `sq` â†’ `al`, `sr` â†’ `rs` via an explicit override map; other codes map to their own country code automatically). Assets are expected at `/assets/flags/{country}.svg`. This is entirely CSS-driven â€” the JS layer never touches flags. Because `data-ln-translations-default` also flags the *original* fields with `data-ln-translatable-lang="{default}"`, the flag icon applies uniformly to originals and clones alike, not just clones.
 2. **Cloning semantics:** `cloneNode(false)` is used for all translatable control elements (`input`, `textarea`, `select`). Event listeners are never copied (they do not exist on the clone). The `id` attribute IS copied and then explicitly stripped (`removeAttribute('id')`) to avoid duplicate IDs.
 3. **Name syntax:** `trans[lang][field]` without a prefix, `prefix[trans][lang][field]` when the wrapper declares `data-ln-translations-prefix`.
 4. **Add-button auto-hide:** once every configured locale is active, `data-ln-translations-add` has its `style.display` set to `'none'`.
@@ -248,16 +248,16 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 
 ### ARIA & Keyboard
 
-- **Dynamic labels & placeholders:** every cloned field's `placeholder` is automatically set to `${langName} translation` (e.g. `English translation`), and every badge remove button's `aria-label` is set to `Remove ${langName}` — screen reader users always get a language-specific label.
+- **Dynamic labels & placeholders:** every cloned field's `placeholder` is automatically set to `${langName} translation` (e.g. `English translation`), and every badge remove button's `aria-label` is set to `Remove ${langName}` â€” screen reader users always get a language-specific label.
 - **Keyboard-native controls:** every interactive element (menu item, add trigger, badge remove button) is a native `<button>`, so `Tab` / `Enter` / `Space` work without extra JS wiring.
-- **Icon-only add trigger:** `[data-ln-translations-add]` renders only an SVG icon — it MUST carry an explicit `aria-label` (e.g. `"Add translation"`); the component does not supply one automatically.
+- **Icon-only add trigger:** `[data-ln-translations-add]` renders only an SVG icon â€” it MUST carry an explicit `aria-label` (e.g. `"Add translation"`); the component does not supply one automatically.
 
 ### Common Pitfalls & Anti-patterns
 
 > [!CAUTION]
-> 1. **Invalid JSON in `data-ln-translations-locales`:** malformed JSON (e.g. single quotes instead of double quotes) triggers a `console.warn` and the component silently falls back to the default locale set (`en`, `sq`, `sr`).
+> 1. **Invalid JSON in `data-ln-translations-locales`:** malformed JSON (e.g. single quotes instead of double quotes) falls back to an empty dictionary, so the language menu only populates from valid declared JSON or dictionary elements.
 > 2. **Manually re-adding `id` to a clone:** the component strips `id` from every cloned field on purpose to avoid duplicate IDs in the document; re-adding it defeats that safeguard and breaks `<label for>` associations.
-> 3. **Missing `ln-translations-badge` / `ln-translations-menu-item` templates:** without both global `<template>` elements present on the page, `cloneTemplate` warns and returns `null` — no badges render and the language menu stays empty.
+> 3. **Missing `ln-translations-badge` / `ln-translations-menu-item` templates:** without both global `<template>` elements present on the page, `cloneTemplate` warns and returns `null` â€” no badges render and the language menu stays empty.
 
 ---
 
@@ -277,7 +277,7 @@ sequenceDiagram
 	Menu->>Comp: addLanguage(lang)
 	Comp->>Comp: Emit ln-translations:before-add (cancelable)
 	alt Prevented
-		Comp->>Comp: Abort — no clones created
+		Comp->>Comp: Abort â€” no clones created
 	else Approved
 		Comp->>Comp: Add lang to activeLanguages Set
 		loop For each [data-ln-translatable] wrapper
@@ -287,8 +287,8 @@ sequenceDiagram
 			Comp->>Comp: Set placeholder = `${langName} translation`
 			Comp->>Wrapper: Insert clone after original
 		end
-		Comp->>Dropdown: _updateDropdown() — remove lang from available items, hide add button if none remain (display:none)
-		Comp->>Badges: _updateBadges() — render badge from template
+		Comp->>Dropdown: _updateDropdown() â€” remove lang from available items, hide add button if none remain (display:none)
+		Comp->>Badges: _updateBadges() â€” render badge from template
 		Comp->>Comp: Emit ln-translations:added
 	end
 
@@ -297,12 +297,12 @@ sequenceDiagram
 	Badges->>Comp: removeLanguage(lang)
 	Comp->>Comp: Emit ln-translations:before-remove (cancelable)
 	alt Prevented
-		Comp->>Comp: Abort — clones remain
+		Comp->>Comp: Abort â€” clones remain
 	else Approved
 		Comp->>Wrapper: Remove all [data-ln-translatable-lang="lang"] clones
 		Comp->>Comp: Delete lang from activeLanguages Set
-		Comp->>Dropdown: _updateDropdown() — lang becomes available again
-		Comp->>Badges: _updateBadges() — badge removed
+		Comp->>Dropdown: _updateDropdown() â€” lang becomes available again
+		Comp->>Badges: _updateBadges() â€” badge removed
 		Comp->>Comp: Emit ln-translations:removed
 	end
 ```
@@ -311,7 +311,7 @@ sequenceDiagram
 
 ## 7. Related Components
 
-- [`ln-form`](./ln-form.md) — the enclosing form coordinator that submits the generated `trans[lang][field]` fields as native form data.
-- [`ln-dropdown`](./ln-dropdown.md) — provides the overlay positioning and dismissal behavior for the language-selection menu.
-- [`ln-toggle`](./ln-toggle.md) — the binary open/close state primitive that `ln-dropdown` observes to drive the menu.
-- [`ln-validate`](./ln-validate.md) — validates cloned translation fields the same way it validates the originals, since clones inherit `required`/`pattern` attributes.
+- [`ln-form`](./ln-form.md) â€” the enclosing form coordinator that submits the generated `trans[lang][field]` fields as native form data.
+- [`ln-dropdown`](./ln-dropdown.md) â€” provides the overlay positioning and dismissal behavior for the language-selection menu.
+- [`ln-toggle`](./ln-toggle.md) â€” the binary open/close state primitive that `ln-dropdown` observes to drive the menu.
+- [`ln-validate`](./ln-validate.md) â€” validates cloned translation fields the same way it validates the originals, since clones inherit `required`/`pattern` attributes.

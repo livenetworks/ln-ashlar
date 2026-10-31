@@ -54,6 +54,25 @@ function getComponentConfig(entryName, srcPath) {
 	};
 }
 
+
+function copyFlags() {
+	const srcDir = resolve(__dirname, 'assets/flags');
+	if (!fs.existsSync(srcDir)) return;
+
+	const targetDirs = [
+		resolve(__dirname, 'dist/flags'),
+		resolve(__dirname, 'demo/assets/flags'),
+		resolve(__dirname, 'demo/dist/flags'),
+		resolve(__dirname, 'demo/admin/dist/flags')
+	];
+
+	for (const target of targetDirs) {
+		if (!fs.existsSync(target)) fs.mkdirSync(target, { recursive: true });
+		fs.cpSync(srcDir, target, { recursive: true });
+	}
+	console.log('✓ Copied flag assets to distribution and demo targets');
+}
+
 function compileSassFiles() {
 	console.log('Compiling Modular SCSS bundles (Core, Theme, Full, Dev)...');
 
@@ -125,6 +144,7 @@ async function run() {
 	}
 
 	compileSassFiles();
+	copyFlags();
 
 	console.log('Building Standalone Components (sequentially to prevent resource issues)...');
 	

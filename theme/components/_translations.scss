@@ -1,10 +1,17 @@
 @use '../config/mixins' as *;
 
+// Configurable base path for flags (resolves relative to compiled CSS)
+$flag-base-path: '../../assets/flags' !default;
+
 [data-ln-translatable-lang] {
 	@include translations-flag-input;
 }
 
-[data-ln-toggle] button[data-ln-translations-lang] {
+textarea[data-ln-translatable-lang] {
+	background-position: var(--size-sm-up) calc(var(--size-sm) + (var(--size-lg) - var(--size-md-up) * 3 / 4) / 2);
+}
+
+button[data-ln-translations-lang] {
 	@include translations-dropdown-flag;
 }
 
@@ -66,16 +73,16 @@ $lang-auto: mk, de, fr, it, bg, pt, ro, nl, pl, fi, hu, lt, lv, tr, az, is, mt, 
 @each $lang, $country in $lang-flag-overrides {
 	[data-ln-translatable-lang="#{$lang}"],
 	[data-ln-translations-active] [data-ln-translations-lang="#{$lang}"],
-	[data-ln-toggle] button[data-ln-translations-lang="#{$lang}"]::before {
-		background-image: url('/assets/flags/#{$country}.svg');
+	button[data-ln-translations-lang="#{$lang}"]::before {
+		background-image: var(--ln-flag-#{$lang}, url('#{$flag-base-path}/#{$country}.svg'));
 	}
 }
 
 @each $lang in $lang-auto {
 	[data-ln-translatable-lang="#{$lang}"],
 	[data-ln-translations-active] [data-ln-translations-lang="#{$lang}"],
-	[data-ln-toggle] button[data-ln-translations-lang="#{$lang}"]::before {
-		background-image: url('/assets/flags/#{$lang}.svg');
+	button[data-ln-translations-lang="#{$lang}"]::before {
+		background-image: var(--ln-flag-#{$lang}, url('#{$flag-base-path}/#{$lang}.svg'));
 	}
 }
 

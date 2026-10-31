@@ -12,6 +12,7 @@
 @use 'interaction' as *;
 @use 'sidebar' as *;
 @use 'card' as *;
+@use 'count' as *;
 
 // ─── App Shell ──────────────────────────────────────────────────────────────
 // Mobile-ready application shell: fixed header, sidebar drawer, scrim overlay.
@@ -158,6 +159,19 @@
 				white-space: nowrap;
 				border: 0;
 			}
+		}
+
+		// Unread counter — <data value="3">3</data> as a direct child,
+		// pinned over the corner. Solid accent; tone via status class
+		// (<data value="3" class="error">3</data>).
+		&:has(> data) {
+			@include relative;
+		}
+
+		> data {
+			@include count;
+			@include count-solid;
+			@include count-overlay;
 		}
 	}
 }
