@@ -22,7 +22,7 @@
 //   .ln-table__toolbar { @include ln-table-toolbar; }
 //
 // Sort/filter button styling is SHARED via scss/components/_table.scss
-// (.table-sort / .table-filter structural helper classes + the :has() stack
+// (.table-sort helper class, [data-ln-table-col-filter] binding + the :has() stack
 // in @mixin table-base). No ln-table-specific sort/filter button mixins here.
 // Under D1 (Option A) the <th> is no longer the sort click target, so no
 // ln-table-specific cursor:pointer / select-none on the <th> is needed.

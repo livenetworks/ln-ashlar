@@ -95,6 +95,7 @@ run('demo/admin/coordinator.html', async ({ page }) => {
 		assert(mapped === 7, 'coordinator resolved the "demo-docs" mapper (ingress maps doc_id to id)');
 		await waitTitles(SEED_ORDER);
 		assert(same(await titles(), SEED_ORDER), 'the 3 seeded server documents are cached and rendered in the table');
+		await waitTelemetry('connector fetched');
 	}
 
 	// Skips the 600 ms artificial latency (the default-on state is asserted separately).

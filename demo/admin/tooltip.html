@@ -326,7 +326,7 @@
 <!-- Overview / philosophy -->
 				<section class="section-card">
 					<header><h3>Overview &amp; Philosophy</h3></header>
-					<main>
+					<main class="prose">
 						<p><strong><code>ln-tooltip</code></strong> is applied to any HTML element via <code>data-ln-tooltip="text"</code>. In its baseline CSS-first mode, tooltips display instantly on <code>:hover</code> and <code>:focus</code> via styled <code>::after</code> pseudo-elements with zero JavaScript overhead. Adding <code>data-ln-tooltip-enhance</code> activates the JS top-layer engine: on mouse enter or keyboard focus, it mounts a tooltip bubble into a shared portal (<code>#ln-tooltip-portal</code>), promotes it via the native Popover API (<code>popover="manual"</code>) to escape ancestor overflow clipping, and calculates viewport boundary-aware coordinates.</p>
 
 						<p>It is engineered on a progressive enhancement model, allowing simple tooltips to remain 100% CSS-driven while complex layouts upgrade to top-layer collision avoidance on demand.</p>
@@ -342,7 +342,7 @@
 						</div>
 
 						<h4>Architectural Design Features</h4>
-						<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+						<ol>
 							<li>
 								<strong>CSS Baseline (Pure CSS, Zero JS):</strong> Triggers instantly on hover or keyboard focus using standard pseudo-elements. Super-lightweight, zero bundle size impact.
 							</li>

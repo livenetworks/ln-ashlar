@@ -26,17 +26,29 @@
 	--margin-block: 0.375rem;
 	margin-bottom: var(--margin-block);
 
-	// Required indicator — red * after label text.
-	// Supports standard wrapping classes/tags (.form-element, .form-group, label)
-	// and general siblings preceding a required input.
-	:is(.form-element, .form-group, .form-field):has([required]) > &,
-	label:has([required]) &,
-	&:has(~ :is(input, select, textarea)[required]) {
+	// Required indicator — red * when any control under the label's parent is required
+	// (siblings, nested field shells).
+	:has([required]) > & {
 		&::after {
 			content: ' *';
 			color: hsl(var(--color-error));
 			@include font-bold;
 		}
+	}
+}
+
+// Field wrapper — zero-specificity rules so form-grid's `> * { margin: 0 }` wins.
+@mixin form-element {
+	// Stacked outside a form-grid (modal bodies, settings panels).
+	:where(&) + :where(&) {
+		--margin-block: var(--size-md);
+		margin-top: var(--margin-block);
+	}
+
+	// Trailing feedback after the control gets slot treatment.
+	:where(& > :is(input, select, textarea, [data-ln-date-field], search) ~ :not(input)) {
+		@include form-slot;
+		color: var(--fg-muted);
 	}
 }
 

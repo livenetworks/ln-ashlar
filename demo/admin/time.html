@@ -326,7 +326,7 @@
 <!-- Overview / philosophy -->
 				<section class="section-card">
 					<header><h3>Overview &amp; Philosophy</h3></header>
-					<main>
+					<main class="prose">
 						<p><strong><code>ln-time</code></strong> is applied to semantic HTML5 <code>&lt;time data-ln-time="..." datetime="..."&gt;</code> elements, where <code>datetime</code> contains a Unix timestamp in seconds. On boot and whenever attributes change, it formats the timestamp into a localized string using native browser <code>Intl.DateTimeFormat</code> or <code>Intl.RelativeTimeFormat</code> APIs without external date libraries. When configured for relative display (e.g. <code>data-ln-time="relative"</code>), a shared, single-interval timer periodically updates visible text in place without polling the server.</p>
 
 						<p>In <code>ln-ashlar</code>, this zero-dependency progressive enhancement layer upgrades native HTML <code>&lt;time&gt;</code> elements into timezone-aware, localized date displays.</p>
@@ -342,7 +342,7 @@
 							</div>
 
 							<h4>Key Architectural Advantages</h4>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>
 									<strong>Standard-Based Concurrency (Zero Bloat):</strong> Offloads formatting entirely to native <code>Intl.DateTimeFormat</code> and <code>Intl.RelativeTimeFormat</code> APIs. Bypasses heavy parsing packages to maintain a zero-bloat footprint.
 								</li>

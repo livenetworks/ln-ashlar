@@ -233,7 +233,8 @@ goes straight to the connector. **Absence of a participant is a topology, not an
 - **Error Taxonomy & Conflict Policy:**
   - `401` / `419` Auth -> Pauses the queue, triggers auth required toast.
   - `409` Conflict (Update) -> Server-wins rule: replaces local cache entry with `remote` document data from response.
-  - Deterministic `4xx` -> Drop mutation (rejected): create error deletes the optimistic temp record.
+  - Non-queued Connector Errors (`!meta.queued`) -> Automatic optimistic rollback: `update` restores `meta.snapshot` via `ln-data-store:request-update`, `create` deletes the optimistic `tempId` via `ln-data-store:request-delete`, and `delete` restores `meta.snapshot` via `ln-data-store:request-create`.
+  - Deterministic `4xx` (Queued) -> Drop mutation (rejected): create error deletes the optimistic temp record.
   - Transient network errors -> Outbox queue retries.
 
 ---

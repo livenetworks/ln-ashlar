@@ -3,7 +3,7 @@
 <!-- Overview / philosophy -->
 <section class="section-card">
 	<header><h3>Overview &amp; Decoupled Architecture</h3></header>
-	<main>
+	<main class="prose">
 		<p><strong><code>ln-data-coordinator</code></strong> is applied to a parent container (e.g. <code>&lt;ul data-ln-data-coordinator hidden&gt;</code>) enclosing an <code>ln-data-store</code> and a data transport connector (<code>ln-api-connector</code>, <code>ln-couchdb-connector</code>, or <code>ln-websocket-connector</code>). It catches store staleness and query requests to dispatch fetch events to the connector, delivering responses back to the store. On store mutations, it computes local queries and routes structured <code>set-data</code> events directly to bound presentation components (such as <code>ln-table</code>, <code>ln-list</code>, or <code>ln-stat</code>) without custom glue code.</p>
 
 		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
@@ -17,7 +17,7 @@
 		</div>
 
 		<h4>Decoupled Setup Advantages</h4>
-		<ul style="margin-bottom: var(--size-md); line-height: 1.7;">
+		<ul>
 			<li><strong>Zero-Coupling Code:</strong> You can completely swap the transport network layer (e.g. from REST API to CouchDB or WebSockets) without touching a single line of your database cache, forms, or data table markup.</li>
 			<li><strong>Secure JS Mappers:</strong> Register mappers securely via <code>window.lnCore.registerDataMapper()</code> to map, flatten, or transform server schemas to clean local database schemas on the fly, keeping markup 100% CSP-compliant.</li>
 		</ul>
@@ -29,7 +29,7 @@
 	<header><h3>Declarative 3-Tier Markup (Copy/Paste)</h3></header>
 	<main>
 		<!-- 3-Tier Data Layer: Parent Coordinator enclosing store cache, REST connector, and inline JS mapper -->
-		<div data-ln-data-coordinator="demo-docs" data-ln-data-mapper="demo-docs" id="demo-coordinator">
+		<div data-ln-data-coordinator="demo-docs" data-ln-data-coordinator-mapper="demo-docs" id="demo-coordinator">
 			
 			<!-- Tier 1: Local Cache Store (IndexedDB backed) -->
 			<div data-ln-data-store="demo-docs"
@@ -140,8 +140,8 @@
 							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
-						</ul> <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-demo-table-dept" aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button></th>
-						<th data-ln-table-col="status" data-ln-table-filter-col="status">Status <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-demo-table-status" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button></th>
+						</ul> <button type="button" data-ln-table-col-filter data-ln-popover-for="filter-demo-table-dept" aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button></th>
+						<th data-ln-table-col="status" data-ln-table-filter-col="status">Status <button type="button" data-ln-table-col-filter data-ln-popover-for="filter-demo-table-status" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button></th>
 						<th data-ln-table-col="file_size">Size</th>
 						<th data-ln-table-col="author_name">Author</th>
 						<th data-ln-table-col="updated_at">Last Updated <ul data-ln-sort="demo-docs" data-ln-sort-field="updated_at">

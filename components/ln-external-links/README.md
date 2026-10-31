@@ -2,7 +2,7 @@
 
 > Runs globally across `document.body` watching all `<a>` and `<area>` elements. When an element's `href` host
 > differs from `window.location.host`, it sets `target="_blank"`, merges `rel="noopener noreferrer"`,
-> appends a `<span class="sr-only">(opens in new tab)</span>`, and marks it with `data-ln-external-link="processed"` to prevent redundant mutations.
+> appends a `<span data-ln-external-links-hint>(opens in new tab)</span>`, and marks it with `data-ln-external-link="processed"` to prevent redundant mutations.
 
 ## Markup anatomy
 
@@ -20,7 +20,7 @@ story:
    rel="noopener noreferrer"
    data-ln-external-link="processed">
     Read more
-    <span class="sr-only">(opens in new tab)</span>
+    <span data-ln-external-links-hint>(opens in new tab)</span>
 </a>
 
 <!-- Internal links — no change at all -->
@@ -34,7 +34,7 @@ Four edits happen on each external link, in this order:
 
 1. `target="_blank"` — opens in a new tab.
 2. `rel="noopener noreferrer"` — security + privacy.
-3. A `<span class="sr-only">(opens in new tab)</span>` is appended
+3. A `<span data-ln-external-links-hint>(opens in new tab)</span>` is appended
    inside the anchor as the last child. Sighted users see no
    change; assistive tech announces "Read more, opens in new tab"
    when the link receives focus. WCAG 2.4.4 ("Link Purpose")
@@ -51,15 +51,15 @@ Four edits happen on each external link, in this order:
 | Has this link been processed? | `data-ln-external-link="processed"` on the `<a>` / `<area>` | ln-external-links (writes once, reads on every pass) |
 | Should it open in a new tab? | `target="_blank"` on the link | ln-external-links (writes) |
 | Security / privacy posture | `rel="noopener noreferrer"` on the link | ln-external-links (writes — merges with prior `rel`) |
-| Screen-reader hint | `<span class="sr-only">` appended inside the link | ln-external-links (creates and appends) |
+| Screen-reader hint | `<span data-ln-external-links-hint>` appended inside the link | ln-external-links (creates and appends) |
 | Click event delivery | `document.body` click delegate | ln-external-links (one listener for the whole page) |
 | Decoration of new DOM | `MutationObserver` on `document.body`, `childList: true, subtree: true, attributes: true, attributeFilter: ['href']` | ln-external-links |
 
 ## States & visual feedback
 
 There is no visual state. Decoration is invisible to sighted users
-(target/rel are non-rendering attributes, the sr-only span is hidden
-by the utility class). The "before/after" is purely the four mutations
+(target/rel are non-rendering attributes, the hint span is hidden
+by the rule shipped in `ln-ashlar-core.css`). The "before/after" is purely the four mutations
 listed above.
 
 | Trigger | What JS does | What the user sees |
@@ -85,6 +85,7 @@ that doubles as an opt-out hatch.
 | Attribute | On | Direction | Description |
 |---|---|---|---|
 | `data-ln-external-link="processed"` | `<a>` / `<area>` | written by component, read on each pass | Idempotency marker. Set after a link is decorated. The processing function early-returns on links that already carry it. **Pre-setting it manually** in your markup makes the component skip the link entirely — the unofficial opt-out path. |
+| `data-ln-external-links-hint` | `<span>` | written | Marks the visually hidden "(opens in new tab)" hint span appended inside a processed link. |
 | `target` | `<a>` / `<area>` | written | Set to `_blank` on every external link. **Overwrites** any pre-existing `target` value. |
 | `rel` | `<a>` / `<area>` | written | Merged: `noopener` and `noreferrer` are added if not already present. Pre-existing tokens (`me`, `author`, `license`, `nofollow`, `ugc`, `sponsored`) survive on the link. |
 
@@ -99,7 +100,7 @@ itself.
 
 | Event | Bubbles | Cancelable | `detail` | Dispatched when | Common consumer |
 |---|---|---|---|---|---|
-| `ln-external-links:processed` | yes | no | `{ link: HTMLAnchorElement, href: string }` | A link finishes decoration (after `target`, `rel`, sr-only span, and the marker attribute are all written) | Auditing / debug logging; verifying decoration coverage |
+| `ln-external-links:processed` | yes | no | `{ link: HTMLAnchorElement, href: string }` | A link finishes decoration (after `target`, `rel`, hint span, and the marker attribute are all written) | Auditing / debug logging; verifying decoration coverage |
 | `ln-external-links:clicked` | yes | no | `{ link, href: string, text: string }` | The user clicks anywhere inside a processed external link. `text` is `link.textContent || link.title || ''` — the visible label, falling back to the title attribute, falling back to empty string | Analytics / outbound-link tracking |
 
 The `:clicked` event is a **notification, not a hook**. The component does not call `preventDefault()` and does not honor a consumer's `preventDefault()` on the CustomEvent. To intercept navigation, attach a click listener on the link or a parent in the **capture phase**, and `preventDefault()` the platform `click` event. The demo page shows a working interstitial.
@@ -222,7 +223,7 @@ feature.
 The component **merges** `noopener` and `noreferrer` into any pre-existing
 `rel` token list. Authoring `rel="me"` on a personal-website link in your
 bio is enough — no pre-marking required. After decoration, the link
-carries `rel="me noopener noreferrer"` and the auto sr-only hint span:
+carries `rel="me noopener noreferrer"` and the auto hint span:
 
 ```html
 <!-- Before (your authored HTML) -->
@@ -234,13 +235,13 @@ carries `rel="me noopener noreferrer"` and the auto sr-only hint span:
    target="_blank"
    data-ln-external-link="processed">
     Live Networks
-    <span class="sr-only">(opens in new tab)</span>
+    <span data-ln-external-links-hint>(opens in new tab)</span>
 </a>
 ```
 
 ## Common mistakes
 
-### Mistake 1 — Reading `link.textContent` for analytics and getting the sr-only hint string
+### Mistake 1 — Reading `link.textContent` for analytics and getting the hint string
 
 ```js
 document.addEventListener('ln-external-links:clicked', function (e) {
@@ -252,7 +253,7 @@ document.addEventListener('ln-external-links:clicked', function (e) {
 `detail.text` is `link.textContent || link.title || ''`, evaluated at
 click time *after* the hint span has been appended.
 `link.textContent` returns the concatenated text of all descendants,
-including the sr-only span. If your analytics dashboard collects
+including the hint span. If your analytics dashboard collects
 `event_label`, you'll see the hint suffix on every entry.
 
 Two workarounds:
@@ -265,7 +266,7 @@ const cleanLabel = label.replace(/\s*\(opens in new tab\)\s*$/, '');
 //          The hint is always the LAST child of the link.
 const link = e.detail.link;
 const labelOnly = Array.prototype.filter.call(link.childNodes, function (n) {
-    return !(n.nodeType === 1 && n.classList.contains('sr-only'));
+    return !(n.nodeType === 1 && n.hasAttribute && n.hasAttribute('data-ln-external-links-hint'));
 }).map(function (n) { return n.textContent; }).join('').trim();
 ```
 
@@ -323,10 +324,9 @@ This self-contained script executes immediately and sets up the necessary hooks 
 - **`@mixin ln-icon`** is unused here — there's no icon decoration on
   external links by default. If you want a "↗" indicator, add it in
   project SCSS via `a[data-ln-external-link="processed"]::after`.
-- **`.sr-only`** (`theme/utilities/_utilities.scss`) — the
-  visually-hidden utility used by the appended hint span. If your
-  project does not include ln-ashlar utilities, supply your own
-  `.sr-only` definition or the hint will be visible.
+- **`[data-ln-external-links-hint]`** (`components/ln-external-links/ln-external-links.scss`) — the
+  visually-hidden rule for the appended hint span. It ships in
+  `ln-ashlar-core.css`; no `.sr-only` utility is needed.
 - **[`ln-modal`](../ln-modal/README.md)** — the demo page composes
   `ln-modal` with this component to show a "leaving the site"
   interstitial. The composition is project code, not library code;
@@ -359,7 +359,7 @@ Both the click delegate and the observer are wrapped in `guardBody` (`ln-core`):
 2. `!_isExternalLink(link)` → return.
 3. `target = '_blank'` (clobbers any pre-existing value).
 4. `rel` tokens merged: `noopener` + `noreferrer` added, existing tokens (`me`, `nofollow`, etc.) survive.
-5. `<span class="sr-only">(opens in new tab)</span>` appended as last child.
+5. `<span data-ln-external-links-hint>(opens in new tab)</span>` appended as last child.
 6. `data-ln-external-link="processed"` written (the marker for future passes).
 7. `ln-external-links:processed` dispatched (bubbles, not cancelable).
 
@@ -371,11 +371,11 @@ Watches `document.body` with `childList: true, subtree: true, attributes: true, 
 
 ### Click delegation
 
-One delegate on `document.body`, resolving `e.target.closest('a, area')`. No `preventDefault()` — the browser's default action and all modifier-key semantics (Ctrl/Cmd/middle/Shift-click) pass through untouched. Firing of `:clicked` is gated on the `processed` marker, **not** a fresh `_isExternalLink` re-check — a link pre-marked `processed` in markup (the opt-out hatch) fires `:clicked` even if it's actually internal. `detail.text` reads `link.textContent`, which includes the appended sr-only span text.
+One delegate on `document.body`, resolving `e.target.closest('a, area')`. No `preventDefault()` — the browser's default action and all modifier-key semantics (Ctrl/Cmd/middle/Shift-click) pass through untouched. Firing of `:clicked` is gated on the `processed` marker, **not** a fresh `_isExternalLink` re-check — a link pre-marked `processed` in markup (the opt-out hatch) fires `:clicked` even if it's actually internal. `detail.text` reads `link.textContent`, which includes the appended hint span text.
 
 ### Accessibility
 
-The sr-only hint has no i18n hook — the string is hard-coded English. Projects needing localization must patch the compiled bundle or pre-mark every link to skip the component.
+The hint has no i18n hook — the string is hard-coded English. Projects needing localization must patch the compiled bundle or pre-mark every link to skip the component.
 
 ### Cross-component coordination
 

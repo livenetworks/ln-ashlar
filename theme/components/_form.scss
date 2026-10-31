@@ -71,15 +71,10 @@ $icon-group-test: ':has(> .ln-icon):has(> :is(input[type="text"], input[type="se
 	@include form-input-icon-group-parts;
 }
 
-// ─── Stacked field rhythm ───────────────────────────────────────
-// Field wrappers stacked outside a form-grid (modal bodies, settings
-// panels) otherwise touch: input → next label is only the label margin.
-// :where() keeps specificity at zero so form-grid's `> * { margin: 0 }`
-// (and any project layout) still wins.
+// ─── Field wrapper ──────────────────────────────────────────────
 
-:where(.form-element, .form-group, .form-field) + :where(.form-element, .form-group, .form-field) {
-	--margin-block: var(--size-md);
-	margin-top: var(--margin-block);
+.form-element {
+	@include form-element;
 }
 
 // ─── Label & Actions ────────────────────────────────────────────
@@ -147,11 +142,5 @@ search:has(> input[type="search"]) {
 
 [data-ln-validate-errors] {
 	@include form-validate-errors;
-}
-
-// Any trailing feedback/metadata element inside .form-element automatically gets slot treatment with zero-specificity base styling
-:where(.form-element > :is(input, select, textarea, [data-ln-date-field], search, [class*="group"]) ~ :not(input)) {
-	@include form-slot;
-	color: var(--fg-muted);
 }
 

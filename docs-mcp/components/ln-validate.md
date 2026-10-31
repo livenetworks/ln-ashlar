@@ -11,7 +11,7 @@ tags: [forms, validation, accessibility]
 # 🛡️ ln-validate
 
 > **Classification:** 🟢 Simple component / Validity State Adapter  
-> Applied to form controls (`<input data-ln-validate>`, `<select>`, `<textarea>`) inside a `.form-element` wrapper.
+> Applied to form controls (`<input data-ln-validate>`, `<select>`, `<textarea>`); messages are read from the nearest ancestor that directly contains `[data-ln-validate-errors]`, and the list is optional.
 > On initialization, it injects `novalidate` on the parent `<form>` and intercepts the form `submit` event.
 > On field `blur` or `input` (after touched), it checks native `input.validity`, toggles the `.hidden` class on matching
 > `[data-ln-validate-error="rule"]` elements, and sets `aria-invalid`; on submit with errors, it calls `e.preventDefault()` and focuses the first invalid field.
@@ -29,7 +29,7 @@ tags: [forms, validation, accessibility]
 > **What the component does NOT do (Orthogonality Doctrine):**
 > - **Does NOT claim or process valid forms** — it prevents submission of invalid forms, but claiming a valid submit event is the responsibility of [`ln-data-coordinator`](./ln-data-coordinator.md).
 > - **Does NOT maintain custom validation rules** — relies entirely on standard HTML5 validity constraints (`required`, `pattern`, etc.).
-> - **Does NOT spawn toasts or modals** — visual updates are strictly scoped to the parent `.form-element` container.
+> - **Does NOT spawn toasts or modals** — visual updates are strictly scoped to the nearest ancestor that directly contains `[data-ln-validate-errors]`.
 
 ---
 
@@ -37,7 +37,7 @@ tags: [forms, validation, accessibility]
 
 ### Base HTML Markup
 
-Every input field must be wrapped inside a `.form-element` container to correctly associate errors.
+`ln-validate` reads its messages from the nearest ancestor that directly contains `[data-ln-validate-errors]`. The list is optional.
 
 ```html
 <div class="form-element">
@@ -158,7 +158,7 @@ To support validation errors returned from the backend (e.g. "username taken").
 ### Common Pitfalls & Anti-patterns
 
 > [!CAUTION]
-> 1. **Missing `.form-element` wrapper:** `ln-validate` looks up the DOM tree to locate the error container. If the `.form-element` parent wrapper is missing, associated error messages will not be shown.
+> 1. **Error list placement:** `ln-validate` looks up the DOM tree for the nearest ancestor that directly contains `[data-ln-validate-errors]`. A field without an error list shows no messages.
 > 2. **Initializing on the `<form>` element:** `data-ln-validate` must only be attached to individual input elements. For the form scope, use `data-ln-data-coordinator-scope`.
 
 ---

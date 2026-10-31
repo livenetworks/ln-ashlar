@@ -111,7 +111,7 @@ import { guardBody, cloneTemplateScoped, fill, registerComponent, defineAttrs, a
 		// pre-added .ln-enter would be wiped. Add the transient enter flag now.
 		li.classList.add('ln-enter');
 
-		const bodyEl = li.querySelector('.body');
+		const bodyEl = li.querySelector('[data-ln-field="message"]');
 		if (bodyEl) _renderBody(bodyEl, opts);
 
 		const closeBtn = li.querySelector('[data-ln-toast-close]');

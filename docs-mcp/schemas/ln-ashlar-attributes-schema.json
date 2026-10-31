@@ -816,6 +816,13 @@
 					"consumed_by": "js",
 					"role": "state",
 					"description": "Internal reflected state attribute set automatically by JS after processing a cross-host link."
+				},
+				"data-ln-external-links-hint": {
+					"type": "boolean",
+					"read_by": "ln-obfuscator",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Set by JS on the visually hidden hint span appended inside a processed link; read by ln-obfuscator; hidden by co-located core CSS."
 				}
 			}
 		},
@@ -914,6 +921,13 @@
 					"consumed_by": "js",
 					"role": "input",
 					"description": "Opt-in. Enables localStorage persistence of data-ln-filter-values, keyed by the container's id or by this attribute's string value."
+				},
+				"data-ln-table-empty": {
+					"type": "boolean",
+					"read_by": "ln-filter",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Rows carrying this attribute (written by ln-table on its placeholder row) are excluded from table filtering."
 				}
 			}
 		},
@@ -1598,6 +1612,13 @@
 					"consumed_by": "js",
 					"role": "input",
 					"description": "Identifies which sort action a trigger <button> performs."
+				},
+				"data-ln-table-empty": {
+					"type": "boolean",
+					"read_by": "ln-sort",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Rows carrying this attribute (written by ln-table on its placeholder row) are excluded from sorting."
 				}
 			}
 		},
@@ -1785,7 +1806,7 @@
 					"read_by": "ln-table",
 					"consumed_by": "js",
 					"role": "input",
-					"description": "Empty state container selector or template."
+					"description": "Empty-state content (on a <template>) and the marker ln-table writes on the rendered empty/loading placeholder <tr>. ln-sort and ln-filter skip rows carrying it."
 				},
 				"data-ln-table-empty-when": {
 					"type": "string",

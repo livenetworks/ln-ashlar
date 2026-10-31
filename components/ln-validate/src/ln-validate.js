@@ -132,7 +132,7 @@ import { hasInitialValue, isFieldValid, resolveActiveErrorKeys } from './validat
 
 	_component.prototype._getErrorItems = function () {
 		if (this._errorItems !== undefined) return this._errorItems;
-		const parent = this.dom.closest('.form-element');
+		const parent = this.dom.closest(':has(> [' + ERRORS_SELECTOR + '])');
 		if (parent) {
 			const errorList = parent.querySelector('[' + ERRORS_SELECTOR + ']');
 			if (errorList) {

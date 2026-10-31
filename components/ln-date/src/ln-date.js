@@ -126,7 +126,7 @@ import {
 		const name = dom.name;
 
 		// Check for declarative HTML dictionary nearby
-		const container = dom.closest('.form-element, form') || dom.parentNode;
+		const container = dom.parentNode;
 		if (container) {
 			const dictEls = container.querySelectorAll('[data-ln-date-dict]');
 			for (let i = 0; i < dictEls.length; i++) {

@@ -13,6 +13,15 @@
 				"processed"
 			],
 			"description": "Marker indicating link was identified and processed as external"
+		},
+		"data-ln-external-links-hint": {
+			"direction": "runtime",
+			"sources": [
+				"ln-external-links.scss",
+				"src/ln-external-links.js"
+			],
+			"type": "marker",
+			"description": "Marks the visually hidden "
 		}
 	}
 }

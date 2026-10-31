@@ -1,0 +1,12 @@
+// ==========================================================================
+// ln-external-links — Functional Hiding Contract
+// ==========================================================================
+
+// The injected "(opens in new tab)" hint is a screen-reader-only span. This file
+// ships in the CORE bundle and the theme `.sr-only` utility does not, so the
+// hiding cannot be delegated to the theme.
+@use '../../theme/config/mixins/display' as *;
+
+[data-ln-external-links-hint] {
+	@include sr-only;
+}

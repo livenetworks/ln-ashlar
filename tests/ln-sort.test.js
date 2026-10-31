@@ -110,19 +110,7 @@ test('isExcludedSortItem detects non-data, hidden, and empty-state elements', as
 	assert.equal(isExcludedSortItem({
 		nodeType: 1,
 		tagName: 'TR',
-		matches: (s) => s.includes('.empty-state')
-	}), true);
-
-	assert.equal(isExcludedSortItem({
-		nodeType: 1,
-		tagName: 'TR',
-		matches: (s) => s.includes('.ln-table__empty')
-	}), true);
-
-	assert.equal(isExcludedSortItem({
-		nodeType: 1,
-		tagName: 'TR',
-		matches: (s) => s.includes('[data-ln-empty]')
+		hasAttribute: (a) => a === 'data-ln-table-empty'
 	}), true);
 
 	// Regular data item

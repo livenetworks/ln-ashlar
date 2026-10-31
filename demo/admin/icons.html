@@ -326,7 +326,7 @@
 <!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
-						<main>
+						<main class="prose">
 							<p><strong><code>ln-icon</code></strong> is applied to standard SVG elements via <code>&lt;svg class="ln-icon"&gt;&lt;use href="#ln-icon-name"&gt;&lt;/use&gt;&lt;/svg&gt;</code>. A central <code>MutationObserver</code> observes the DOM for icon references, automatically fetches missing vector glyphs on-demand from a CDN or local repository, and caches them in <code>localStorage</code>. It compiles icons into a single hidden <code>#ln-icon-sprite</code> sheet at the top of the document, rendering crisply with zero JavaScript footprint after load while inheriting colors dynamically via CSS <code>currentColor</code>.</p>
 
 							<p>In <code>ln-ashlar</code>, this on-demand sprite generator keeps production bundle sizes at zero by fetching only the icons actively present on the page.</p>
@@ -342,7 +342,7 @@
 							</div>
 
 							<h4>Key Architectural Advantages</h4>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>
 									<strong>Dual CDN Routing Channels:</strong> Automatically detects the prefix on the icon reference. <code>#ln-{name}</code> loads outline icons from the global <a href="https://tabler.io/icons" target="_blank" rel="noopener">Tabler Icons</a> suite, while <code>#lnc-{name}</code> routes to a customizable corporate asset server for specialized brand icons.
 								</li>

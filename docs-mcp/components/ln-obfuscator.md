@@ -110,7 +110,7 @@ The component is purely behavioral and requires no dedicated stylesheet. It oper
 ### ARIA & Semantics
 
 - **Transparent Screen Reader Experience:** Because deobfuscation completes synchronously during page boot, screen readers encounter clean, semantic text and real URLs (`mailto:`, `tel:`) without any synthetic ARIA overrides.
-- **`.sr-only` Preservation:** Any existing `.sr-only` accessibility hints inside elements are bypassed by the TreeWalker to avoid text corruption.
+- **Hint Preservation:** The `[data-ln-external-links-hint]` hint span injected by `ln-external-links` is bypassed by the TreeWalker to avoid text corruption. Author-written `.sr-only` content is treated like any other content.
 
 ### Common Pitfalls & Anti-patterns
 
@@ -136,7 +136,7 @@ sequenceDiagram
     alt Already processed
         Obf-->>DOM: Early return (Idempotent)
     else Unprocessed
-        Obf->>DOM: Reset premature .sr-only & data-ln-external-link
+        Obf->>DOM: Reset premature [data-ln-external-links-hint] & data-ln-external-link
         Obf->>DOM: Parse codec (rot, base64, xor) & key
         Obf->>DOM: Deobfuscate text nodes (TreeWalker)
         Obf->>DOM: Deobfuscate href attribute (if link)

@@ -52,7 +52,7 @@ run('demo/admin/diagnostics.html', async ({ page }) => {
 	section('Dev diagnostics are active');
 
 	assert(await page.evaluate(() => document.body.hasAttribute('data-ln-debug')), '<body> carries data-ln-debug');
-	assert(await page.evaluate(() => !!document.querySelector('link[href$="ln-ashlar-dev.css"]')), 'ln-ashlar-dev.css is linked');
+	assert(await page.evaluate(() => !!document.querySelector('link[href*="ln-ashlar-dev.css"]')), 'ln-ashlar-dev.css is linked');
 
 	// ─── Demo 1: table wrapper without id ──────────────────────
 	section('1. Missing table wrapper id');

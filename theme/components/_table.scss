@@ -36,20 +36,10 @@ table {
 }
 
 // ─── Shared Column Filter Button ─────────────────────────────────
-// CSS targets the unprefixed structural helper class on the button, NOT the data-ln-* JS
-// hook. .table-filter is a thin binding that mirrors the mixin; a consumer may instead
-// @include table-filter on their own selector (the class is a convenience, not a mandate).
+// Binding of @mixin table-filter to the column-filter hook; the th stack keys on the same attribute.
 // Sort lives in scss/components/_sort.scss — see [data-ln-sort].
 
-.table-filter { @include table-filter; }
-th:hover .table-filter { opacity: 0.7; }
-
-// Active filter — JS-state class set DIRECTLY on the button (self-selector), combined with
-// the structural helper class. Fixes the latent ln-data-table bug: JS toggles
-// .ln-filter-active on the button itself, but the old CSS used a descendant combinator
-// (.ln-filter-active [data-ln-col-filter]) that never matched, so the dot never rendered.
-// See D2.
-.table-filter.ln-filter-active { @include table-filter-active; }
+[data-ln-table-col-filter] { @include table-filter; }
 
 
 

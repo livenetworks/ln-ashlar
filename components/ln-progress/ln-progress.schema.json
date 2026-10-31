@@ -3,16 +3,9 @@
 	"component": "ln-progress",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
-		"data-ln-debug": {
-			"direction": null,
-			"sources": [
-				"ln-progress-dev.scss"
-			]
-		},
 		"data-ln-progress": {
 			"direction": "author",
 			"sources": [
-				"ln-progress-dev.scss",
 				"src/ln-progress.js"
 			],
 			"type": "float",
@@ -29,12 +22,6 @@
 			"fallback": 100,
 			"min": 0,
 			"description": "Maximum progress scale value"
-		},
-		"data-ln-upload-progress": {
-			"direction": null,
-			"sources": [
-				"ln-progress-dev.scss"
-			]
 		}
 	}
 }

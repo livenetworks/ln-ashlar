@@ -20,7 +20,7 @@ The `cards` module (`theme/config/mixins/_card.scss` and `theme/components/_card
 - **Passive Cards:** Only whole-card links and buttons (`a.card`, `button.card`, or a card with a direct `> a`) react to hover and focus. A card that merely contains content does not respond to the pointer.
 - **Panel Radius:** `--panel-radius` (default `--radius-lg`) is the corner of cards, section-cards, and modals; control radii stay on `--radius`. A skin that zeroes `--radius-lg` flattens panels too.
 - **Panel Header:** The header shares the panel surface. Title and description are an `<hgroup>` (`<h3>` plus `<p>`); `--panel-header-bg` and `--panel-footer-bg` opt in to a tint.
-- **Body Lists:** Unclassed direct-child `<ul>`/`<ol>` of the body get bullets or numbers; nested and classed lists (form actions, pill groups) get none.
+- **Body Lists:** The panel body styles no lists. A bulleted or numbered content list sits inside `.prose` (`@include prose`) on the text region of the body; a classless component list keeps the global list reset.
 - **Padding:** Header, body, and footer read `--card-padding-x/y`, which density rebinds.
 - **`section-card`:** Composed layout card featuring pre-structured `<header>`, `<main>`, and `<footer>` sections with unified borders and paddings.
 - **Direct Child Bindings:** Automatically formats direct child `> header` (`panel-header`), `> main` (`panel-body`), and `> footer` (`panel-footer`) without interfering with nested content components.

@@ -105,9 +105,9 @@
 			</div>
 
 			<div class="card p-sm">
-				<span class="raw-code-badge">Authored: &lt;p data-ln-obfuscator data-ln-obfuscator-codec="xor" data-ln-obfuscator-key="тајна"&gt;...&lt;/p&gt;</span>
-				<h4>Keyed Symmetric XOR (Cyrillic + Symbols)</h4>
-				<p data-ln-obfuscator data-ln-obfuscator-codec="xor" data-ln-obfuscator-key="тајна">ARgADgElAT8AAAE4ATLruLPSvsSw4aTwtOCx0KDctKyz37y4+GxSYGRSa4rxqOeN8IHjsfCE5K75</p>
+				<span class="raw-code-badge">Authored: &lt;p data-ln-obfuscator data-ln-obfuscator-codec="xor" data-ln-obfuscator-key="secret"&gt;...&lt;/p&gt;</span>
+				<h4>Keyed Symmetric XOR (Custom Key)</h4>
+				<p data-ln-obfuscator data-ln-obfuscator-codec="xor" data-ln-obfuscator-key="secret">MAoNBgQXB19DEQoaBwQABiURCwQOAgkRXQYMH0VcBwAPSEVERFVDQ1dHU1FWREw=</p>
 			</div>
 		</div>
 	</main>
@@ -137,7 +137,7 @@
 		<form id="obf-playground-form" action="#" method="post" onsubmit="return false;" class="stack gap-sm">
 			<div class="form-element">
 				<label for="obf-input-text">Text to Obfuscate / Deobfuscate (Supports Latin, Cyrillic, CJK, etc.)</label>
-				<input type="text" id="obf-input-text" value="Контакт: contact@example.com (тел: 070 123 456)" placeholder="Enter text here...">
+				<input type="text" id="obf-input-text" value="Contact: contact@example.com (tel: 070 123 456)" placeholder="Enter text here...">
 			</div>
 
 			<div class="grid grid-3 gap-sm">
@@ -151,7 +151,7 @@
 				</div>
 				<div class="form-element" id="obf-key-wrap">
 					<label for="obf-key-input">XOR Secret Key</label>
-					<input type="text" id="obf-key-input" value="тајна" placeholder="Enter key...">
+					<input type="text" id="obf-key-input" value="secret" placeholder="Enter key...">
 				</div>
 				<div class="form-element hidden" id="obf-shift-wrap">
 					<label for="obf-shift-select">ROT Cipher Shift</label>

@@ -34,9 +34,9 @@
 <!-- Overview / Philosophy -->
 <section class="section-card">
 	<header><h3>How Injected Seed + Virtual Row Recycling Works</h3></header>
-	<main>
+	<main class="prose">
 		<p>Unlike traditional client-side SPAs that display loading spinners while fetching remote JSON after mount, the <strong>Injected Seed pattern</strong> allows backend engines (Laravel, Symfony, Django, Rails, Go, ASP.NET) to embed datasets directly into HTML:</p>
-		<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+		<ol>
 			<li><strong>Zero Network Roundtrip (0ms latency):</strong> 10,000 enterprise records arrive embedded inside <code>&lt;script type="application/json"&gt;</code> nested directly inside <code>&lt;li data-ln-data-store&gt;</code> (or externally referenced via <code>data-ln-data-store-seed</code>). Zero secondary fetch requests.</li>
 			<li><strong>Instant ln-data-store Ingestion:</strong> <code>ln-data-store</code> automatically parses the JSON, builds query indexes, and immediately serves read queries from memory or IndexedDB.</li>
 			<li><strong>Cheetah / Glide-Style DOM Pool:</strong> Instead of creating 10,000 <code>&lt;tr&gt;</code> elements (which consumes 150MB+ of DOM heap and causes catastrophic browser freezing), <code>ln-table</code> creates a fixed pool of ~35-60 recycled rows. As the user scrolls, cell texts and attributes update in-place with zero element allocation.</li>
@@ -125,7 +125,7 @@
 							</th>
 							<th data-ln-table-col="department" data-ln-table-filter-col="department">
 								Department
-								<button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-seed-dept" aria-label="Filter department">
+								<button type="button" data-ln-table-col-filter data-ln-popover-for="filter-seed-dept" aria-label="Filter department">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 								</button>
 								<ul data-ln-sort="seed-docs" data-ln-sort-field="department" data-ln-sort-state="none" data-ln-query="sort">
@@ -136,7 +136,7 @@
 							</th>
 							<th data-ln-table-col="status" data-ln-table-filter-col="status">
 								Status
-								<button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-seed-status" aria-label="Filter status">
+								<button type="button" data-ln-table-col-filter data-ln-popover-for="filter-seed-status" aria-label="Filter status">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 								</button>
 								<ul data-ln-sort="seed-docs" data-ln-sort-field="status" data-ln-sort-state="none" data-ln-query="sort">

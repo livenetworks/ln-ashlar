@@ -326,7 +326,7 @@
 <!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
-						<main>
+						<main class="prose">
 							<p><strong><code>ln-validate</code></strong> is applied to form controls (<code>&lt;input data-ln-validate&gt;</code>, <code>&lt;select&gt;</code>, <code>&lt;textarea&gt;</code>) inside a <code>.form-element</code> wrapper. On initialization, it automatically sets <code>novalidate</code> on the host form to take control of validation messaging. On field blur or input (after touched), it evaluates the browser's native C++ <code>ValidityState</code> API, dynamically unhiding matching error messages (<code>[data-ln-validate-error="rule"]</code>) and updating <code>aria-invalid</code>. If validation errors exist on form submit, it cancels submission and automatically focuses the first invalid input.</p>
 
 							<p>In <code>ln-ashlar</code>, validation is handled as a pure validity primitive (~160 lines of JavaScript) that wraps native browser APIs instead of relying on heavy client-side schema engines.</p>
@@ -343,7 +343,7 @@
 
 							<h4>The Mindset: Three Isolated Concerns</h4>
 							<p>Each validated field on this page is a perfect synchronization of three isolated concerns, layered gracefully on top of each other:</p>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>
 									<strong>The Browser Engine (Native Constraints):</strong> Constraints are declared directly in native HTML attributes (like <code>required</code>, <code>type="email"</code>, <code>minlength="5"</code>, or <code>pattern="..."</code>). The browser's native C++ engine handles the complex parsing and validation matching instantly.
 								</li>
@@ -357,7 +357,7 @@
 
 							<h4>How the Interaction Flows</h4>
 							<p>When a user starts typing in a validated input:</p>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>The component intercepts the <code>input</code> or <code>change</code> event and instantly flips the field's internal state to <code>_touched = true</code>.</li>
 								<li>The component queries <code>dom.checkValidity()</code>. If it fails, it adds <code>.ln-validate-invalid</code> to the input, matches the browser's active <code>ValidityState</code> key (e.g. <code>valueMissing</code>) to the target HTML element (<code>data-ln-validate-error="required"</code>), removes its <code>.hidden</code> class, and dispatches a bubbled <code>ln-validate:invalid</code> CustomEvent.</li>
 								<li>If validation passes, it cleans up all visual error classes, restores the <code>.hidden</code> state on all message elements, and dispatches a bubbled <code>ln-validate:valid</code> CustomEvent.</li>

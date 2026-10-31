@@ -394,11 +394,9 @@ import { arraysDiffer, decodeFilterValues, deriveActiveFilters, encodeFilterValu
 	function _isSkipRow(row) {
 		if (!row || typeof row !== 'object') return true;
 		if (row.tagName === 'TEMPLATE') return true;
-		if (typeof row.hasAttribute === 'function' && (row.hasAttribute('data-ln-sort-exclude') || row.hasAttribute('hidden'))) return true;
+		if (typeof row.hasAttribute === 'function' && (row.hasAttribute('data-ln-sort-exclude') || row.hasAttribute('data-ln-table-empty') || row.hasAttribute('hidden'))) return true;
 		if (row.classList && row.classList.contains('hidden')) return true;
 		if (row.style && row.style.display === 'none') return true;
-		if (typeof row.matches === 'function' && row.matches('.empty-state, .ln-table__empty, .ln-table__empty-state, [data-ln-empty], [data-ln-empty-state], [data-ln-table-empty]')) return true;
-		if (typeof row.querySelector === 'function' && row.querySelector('.empty-state, [data-ln-empty], [data-ln-empty-state]')) return true;
 		return false;
 	}
 

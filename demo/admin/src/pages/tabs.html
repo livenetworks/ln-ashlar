@@ -3,7 +3,7 @@
 					<!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
-						<main>
+						<main class="prose">
 							<p><strong><code>ln-tabs</code></strong> is applied to a wrapper element via <code>&lt;section data-ln-tabs&gt;</code> enclosing trigger buttons (<code>data-ln-tab="key"</code>) and content panels (<code>data-ln-panel="key"</code>). When a user clicks a tab, it sets <code>data-ln-tabs-active="key"</code> on the wrapper. A <code>MutationObserver</code> instantly synchronizes the DOM: toggling <code>.hidden</code> and <code>aria-hidden</code> on panels and updating <code>aria-selected</code> on tab controls. When configured with an <code>id</code> and anchor triggers (<code>&lt;a href="#id:key"&gt;</code>), it synchronizes tab state with the URL hash for effortless deep-linking and browser back/forward history navigation.</p>
 
 							<p>In <code>ln-ashlar</code>, this paradigm provides an N-way exclusive view without cluttering the screen or loading separate pages, keeping state, ARIA, and visual styles strictly orthogonal.</p>
@@ -20,7 +20,7 @@
 
 							<h4>Why ln-tabs is NOT built on ln-toggle</h4>
 							<p>It is common in frontend frameworks to squeeze tabs into N coordinated toggles. In <code>ln-ashlar</code>, we intentionally avoid this due to three major architectural differences:</p>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>
 									<strong>Exclusive by Design:</strong> <code>ln-toggle</code> is a binary open/closed primitive. Squeezing tabs into it would require a complex coordinator layer to handle mutual exclusivity. <code>ln-tabs</code> enforces N-way exclusive selection by construction at the root wrapper level.
 								</li>

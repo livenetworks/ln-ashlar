@@ -709,9 +709,9 @@
 				},
 				{
 					"name": "data-ln-empty-state",
-					"description": "data-ln-empty-state attribute",
+					"description": "Visual / CSS styling attribute (theme/components/_empty-state.scss)",
 					"value": {
-						"type": "string"
+						"type": "boolean"
 					}
 				},
 				{
@@ -736,6 +736,13 @@
 						"items": [
 							"processed"
 						]
+					}
+				},
+				{
+					"name": "data-ln-external-links-hint",
+					"description": "Marks the visually hidden ",
+					"value": {
+						"type": "boolean"
 					}
 				},
 				{

@@ -424,7 +424,7 @@
 				</header>
 				<main>
 					<p>This modal was opened via the <kbd>Alt</kbd>+<kbd>N</kbd> keyboard shortcut or clicking the New Item button.</p>
-					<div class="form-group" style="margin-top: var(--size-sm);">
+					<div class="form-element" style="margin-top: var(--size-sm);">
 						<label for="demo-modal-title">Item Title</label>
 						<input type="text" id="demo-modal-title" class="form-control" placeholder="Enter title...">
 					</div>
@@ -453,7 +453,7 @@
 		<p>Use <code>data-ln-key-target="#id"</code> to route a shortcut to another DOM element (e.g. focusing a search bar or filter dropdown).</p>
 		
 		<div class="form-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--size-md); margin-top: var(--size-sm);">
-			<div class="form-group">
+			<div class="form-element">
 				<label for="demo-search-input">Global Search Input:</label>
 				<div class="demo-actions">
 					<input type="search" id="demo-search-input" class="form-control" placeholder="Search items or commands..." style="flex: 1;">
@@ -464,7 +464,7 @@
 				<small class="text-muted">Pressing <kbd>Ctrl</kbd>+<kbd>K</kbd> automatically focuses this input box.</small>
 			</div>
 
-			<div class="form-group">
+			<div class="form-element">
 				<label for="demo-filter-select">Status Filter Dropdown:</label>
 				<div class="demo-actions">
 					<select id="demo-filter-select" class="form-select" data-ln-key="Alt+F" style="flex: 1;">
@@ -521,7 +521,7 @@
 		<p>By default, <code>ln-key</code> ignores single-character hotkeys when the user is typing inside text inputs, textareas, or contenteditables. Use <code>data-ln-key-allow-input</code> to explicitly permit submission shortcuts (like <kbd>Ctrl</kbd>+<kbd>Enter</kbd>).</p>
 
 		<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--size-md); margin-top: var(--size-sm);">
-			<div class="form-group">
+			<div class="form-element">
 				<label>Standard Input (Protected)</label>
 				<p class="text-muted" style="font-size: var(--font-size-xs);">
 					Pressing hotkeys like <kbd>Alt</kbd>+<kbd>N</kbd> or <kbd>Esc</kbd> while typing in this box will NOT fire background actions.
@@ -529,7 +529,7 @@
 				<input type="text" class="form-control" placeholder="Type here to test hotkey isolation...">
 			</div>
 
-			<div class="form-group">
+			<div class="form-element">
 				<label for="demo-comment-box">Form Comment Textarea (Override)</label>
 				<p class="text-muted" style="font-size: var(--font-size-xs);">
 					Pressing <kbd>Ctrl</kbd>+<kbd>Enter</kbd> inside this comment box submits the form directly.

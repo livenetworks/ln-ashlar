@@ -326,7 +326,7 @@
 <!-- Overview / philosophy -->
 				<section class="section-card">
 					<header><h3>Overview &amp; Philosophy</h3></header>
-					<main>
+					<main class="prose">
 						<p><strong><code>ln-sortable</code></strong> is applied to list containers via <code>&lt;ul data-ln-sortable&gt;</code> or <code>&lt;ol data-ln-sortable&gt;</code>. Built on high-performance native Pointer Events, it listens for pointer interactions on list items or dedicated drag handles (<code>[data-ln-sortable-handle]</code>). During drag operations, it assigns <code>.ln-sortable--dragging</code>, inserts an interactive placeholder, and dynamically reorders items in the DOM via <code>insertBefore</code>. Upon release, it cleans up placeholders and dispatches an <code>ln-sortable:change</code> CustomEvent with the reordered DOM sequence.</p>
 
 						<p>In <code>ln-ashlar</code>, this zero-dependency primitive handles drag-and-drop reordering natively across mouse and touch devices without heavy third-party libraries.</p>
@@ -342,7 +342,7 @@
 						</div>
 
 						<h4>Architectural Design Features</h4>
-						<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+						<ol>
 							<li>
 								<strong>Pointer API Concurrency:</strong> Unified mouse and touch track tracking. The component locks screen scrolling on drag handles using <code>touch-action: none</code> to prevent drag delays or stuttering on mobile screens.
 							</li>

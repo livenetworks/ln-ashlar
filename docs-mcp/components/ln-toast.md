@@ -160,6 +160,7 @@ Visual layer implementation using SCSS mixins:
 
 ### ARIA & Semantics
 
+- **Message element:** The message element is addressed by `data-ln-field="message"`; array and error-map messages render as a list inside it.
 - **Notification Region:** Container MUST specify `aria-live="polite"` and `aria-atomic="false"` for screen readers to announce new messages without interrupting user flow.
 - **Close Action:** Close buttons require explicit `aria-label="Close"`.
 

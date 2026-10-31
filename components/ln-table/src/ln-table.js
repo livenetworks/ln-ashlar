@@ -980,13 +980,13 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, tog
 				td.setAttribute('colspan', String(colSpan));
 				td.appendChild(clone);
 				const tr = document.createElement('tr');
-				tr.className = 'table-empty ln-table__empty';
 				tr.appendChild(td);
 				loadingEl = tr;
 			}
 		}
 
 		if (loadingEl) {
+			loadingEl.setAttribute('data-ln-table-empty', '');
 			this.tbody.replaceChildren(loadingEl);
 		} else {
 			this.tbody.replaceChildren();
@@ -1047,13 +1047,13 @@ import { calculateSelectionState, calculateVirtualWindow, calculatePoolSize, tog
 				td.setAttribute('colspan', String(colSpan));
 				td.appendChild(clone);
 				const tr = document.createElement('tr');
-				tr.className = 'ln-table__empty';
 				tr.appendChild(td);
 				emptyEl = tr;
 			}
 		}
 
 		if (emptyEl) {
+			emptyEl.setAttribute('data-ln-table-empty', '');
 			this.tbody.replaceChildren(emptyEl);
 		} else {
 			this.tbody.replaceChildren();

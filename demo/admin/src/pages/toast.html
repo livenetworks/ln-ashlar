@@ -13,7 +13,7 @@
 					<!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
-						<main>
+						<main class="prose">
 							<p><strong><code>ln-toast</code></strong> is applied to a <code>&lt;ul data-ln-toast&gt;</code> live region container. It listens globally on <code>window</code> for <code>ln-toast:enqueue</code> CustomEvents: upon receiving an event, it clones the toast template (<code>&lt;template data-ln-template="ln-toast-item"&gt;</code>), appends the notification item to the container, and initiates an automatic dismiss countdown. On timeout or dismiss button click, it animates out with <code>.closing</code> and removes the element from the DOM upon animation completion.</p>
 
 							<p>It is a service-style, zero-markup component that handles a dynamic queue of alert cards without requiring components to import or know about toast internals.</p>
@@ -29,7 +29,7 @@
 							</div>
 
 							<h4>Dynamic Features &amp; Sizing</h4>
-							<ul style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ul>
 								<li><strong>Automatic Dismissal:</strong> Every toast card automatically triggers its close animation after 6 seconds. If a user hovers over a toast, the timer is paused, resuming once the mouse leaves.</li>
 								<li><strong>Validation Lists:</strong> If the <code>message</code> detail is an array of strings, the toast automatically renders it as an unordered list, perfect for displaying multiple form validation errors in a single compact card.</li>
 								<li><strong>Categorized Types:</strong> Supports <code>success</code> (green accent), <code>error</code> (red accent), <code>warn</code> (yellow accent), and <code>info</code> (blue accent) with matching icon sprites dynamically loaded.</li>

@@ -9,6 +9,12 @@
 				"src/ln-obfuscator.js"
 			]
 		},
+		"data-ln-external-links-hint": {
+			"direction": "author",
+			"sources": [
+				"src/ln-obfuscator.js"
+			]
+		},
 		"data-ln-obfuscator": {
 			"direction": "author",
 			"sources": [

@@ -562,7 +562,8 @@
 		},
 		{
 			"name": "data-ln-empty-state",
-			"description": "data-ln-empty-state attribute"
+			"description": "Visual / CSS styling attribute (theme/components/_empty-state.scss)",
+			"valueSet": "v"
 		},
 		{
 			"name": "data-ln-empty-when",
@@ -580,6 +581,11 @@
 					"name": "processed"
 				}
 			]
+		},
+		{
+			"name": "data-ln-external-links-hint",
+			"description": "Marks the visually hidden ",
+			"valueSet": "v"
 		},
 		{
 			"name": "data-ln-field",

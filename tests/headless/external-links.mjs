@@ -38,7 +38,7 @@ run('demo/admin/external-links.html', async ({ page }) => {
 	const linkInfo = selector => page.evaluate(sel => {
 		const a = document.querySelector(sel);
 		if (!a) return null;
-		const hints = a.querySelectorAll(':scope > span.sr-only');
+		const hints = a.querySelectorAll(':scope > span[data-ln-external-links-hint]');
 		const last = a.lastElementChild;
 		return {
 			target: a.getAttribute('target'),
@@ -46,7 +46,7 @@ run('demo/admin/external-links.html', async ({ page }) => {
 			marker: a.getAttribute('data-ln-external-link'),
 			hintCount: hints.length,
 			hintText: hints.length ? hints[0].textContent : null,
-			hintIsLast: !!last && last.classList.contains('sr-only')
+			hintIsLast: !!last && last.hasAttribute('data-ln-external-links-hint')
 		};
 	}, selector);
 
@@ -62,8 +62,8 @@ run('demo/admin/external-links.html', async ({ page }) => {
 			target: a.getAttribute('target'),
 			rel: a.getAttribute('rel'),
 			marker: a.getAttribute('data-ln-external-link'),
-			hints: Array.from(a.querySelectorAll(':scope > span.sr-only')).map(s => s.textContent),
-			lastIsHint: !!a.lastElementChild && a.lastElementChild.classList.contains('sr-only')
+			hints: Array.from(a.querySelectorAll(':scope > span[data-ln-external-links-hint]')).map(s => s.textContent),
+			lastIsHint: !!a.lastElementChild && a.lastElementChild.hasAttribute('data-ln-external-links-hint')
 		}));
 	});
 	assert(external.length === EXTERNAL_HREFS.length, `${EXTERNAL_HREFS.length} external demo links`);
@@ -76,7 +76,7 @@ run('demo/admin/external-links.html', async ({ page }) => {
 
 	section('Live demo: sr-only hint is visually clipped');
 	const hintBox = await page.evaluate(() => {
-		const s = document.querySelector('#external-links-demo article a > span.sr-only');
+		const s = document.querySelector('#external-links-demo article a > span[data-ln-external-links-hint]');
 		const r = s.getBoundingClientRect();
 		return { w: r.width, h: r.height };
 	});
@@ -89,7 +89,7 @@ run('demo/admin/external-links.html', async ({ page }) => {
 			target: a.getAttribute('target'),
 			rel: a.getAttribute('rel'),
 			marker: a.getAttribute('data-ln-external-link'),
-			hints: a.querySelectorAll('.sr-only').length
+			hints: a.querySelectorAll('[data-ln-external-links-hint]').length
 		}));
 	});
 	assert(internal.length === INTERNAL_COUNT, `${INTERNAL_COUNT} internal demo links`);
@@ -175,7 +175,7 @@ run('demo/admin/external-links.html', async ({ page }) => {
 	await page.waitForFunction(() => document.querySelectorAll('#demo-insert-target article').length === 2, { timeout: 5000 });
 	await page.waitForFunction(() => Array.from(document.querySelectorAll('#demo-insert-target a[href="https://duckduckgo.com"]'))
 		.every(a => a.getAttribute('data-ln-external-link') === 'processed'), { timeout: 5000 });
-	assert(await page.$$eval('#demo-insert-target a[href="https://duckduckgo.com"] > span.sr-only', els => els.length) === 2,
+	assert(await page.$$eval('#demo-insert-target a[href="https://duckduckgo.com"] > span[data-ln-external-links-hint]', els => els.length) === 2,
 		'Second batch decorated; each link has exactly one hint (idempotent)');
 
 	await page.click('#demo-insert-clear');
@@ -201,7 +201,7 @@ run('demo/admin/external-links.html', async ({ page }) => {
 	assert(flipped.includes('rel:     noopener noreferrer'), 'After flip rel is noopener noreferrer');
 	assert(flipped.includes('marker:  processed'), 'After flip marker is processed');
 	assert(flipped.includes('sr-only: present'), 'After flip sr-only hint is present');
-	assert(await page.$$eval('#demo-mutating-link > span.sr-only', els => els.length) === 1, 'Exactly one hint span on the flipped link');
+	assert(await page.$$eval('#demo-mutating-link > span[data-ln-external-links-hint]', els => els.length) === 1, 'Exactly one hint span on the flipped link');
 
 	section('Reset restores internal state');
 	await page.click('#demo-href-reset');
@@ -214,7 +214,7 @@ run('demo/admin/external-links.html', async ({ page }) => {
 	await page.click('#demo-href-flip');
 	await page.waitForFunction(() => {
 		const a = document.getElementById('demo-mutating-link');
-		return a.getAttribute('data-ln-external-link') === 'processed' && a.querySelectorAll('.sr-only').length === 1;
+		return a.getAttribute('data-ln-external-link') === 'processed' && a.querySelectorAll('[data-ln-external-links-hint]').length === 1;
 	}, { timeout: 5000 });
 	assert(true, 'Second flip decorates again with a single hint');
 
@@ -232,11 +232,28 @@ run('demo/admin/external-links.html', async ({ page }) => {
 		return {
 			marker: a.getAttribute('data-ln-external-link'),
 			target: a.getAttribute('target'),
-			hints: a.querySelectorAll('.sr-only').length
+			hints: a.querySelectorAll('[data-ln-external-links-hint]').length
 		};
 	});
 	assert(reprocessed.marker === 'processed' && reprocessed.target === '_blank', 'process(container) decorates links in a detached subtree synchronously');
 	assert(reprocessed.hints === 1, 'process() twice is idempotent (one hint)');
+
+	section('Obfuscator: author .sr-only content is kept, only the marked hint is managed');
+	await page.evaluate(() => {
+		document.body.insertAdjacentHTML('beforeend', '<a id="obf-sr-regression" href="https://example.org/x" data-ln-obfuscator>Text<span class="sr-only">keep</span></a>');
+	});
+	await page.evaluate(() => new Promise(r => setTimeout(r, 300)));
+	const obfSr = await page.evaluate(() => {
+		const a = document.getElementById('obf-sr-regression');
+		const authored = a.querySelectorAll('span.sr-only');
+		return {
+			hints: a.querySelectorAll('[data-ln-external-links-hint]').length,
+			authored: authored.length,
+			authoredText: authored.length ? authored[0].textContent : null
+		};
+	});
+	assert(obfSr.hints === 1, 'Obfuscated link carries exactly one marked hint');
+	assert(obfSr.authored === 1 && obfSr.authoredText === 'keep', 'Author-written .sr-only content is preserved');
 
 	// ─── Confirm-before-leaving interstitial ───────────────────
 

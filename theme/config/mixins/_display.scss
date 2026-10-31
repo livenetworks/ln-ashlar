@@ -7,6 +7,18 @@
 @mixin hidden        { display: none; }
 @mixin invisible     { visibility: hidden; }
 
+@mixin sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border-width: 0;
+}
+
 @mixin flex-col      { display: flex; flex-direction: column; }
 @mixin flex-row      { display: flex; flex-direction: row; }
 @mixin flex-wrap     { flex-wrap: wrap; }

@@ -5,8 +5,8 @@ import { run, assert, BASE_URL } from './_harness.mjs';
 
 const PAGE_URL = BASE_URL + 'obfuscator.html';
 const STATIC_COUNT = 5; // 2 links + 2 <p> + 1 <div> carrying data-ln-obfuscator in the static showcase
-const DEFAULT_INPUT = 'Контакт: contact@example.com (тел: 070 123 456)';
-const DEFAULT_KEY = 'тајна';
+const DEFAULT_INPUT = 'Contact: contact@example.com (tel: 070 123 456)';
+const DEFAULT_KEY = 'secret';
 
 run('demo/admin/obfuscator.html', async ({ page }) => {
 
@@ -164,10 +164,10 @@ run('demo/admin/obfuscator.html', async ({ page }) => {
 		assert(b64Round === DEFAULT_INPUT, 'Base64 output decodes back to input');
 
 		const rot = await encode({ codec: 'rot', shift: '7' });
-		assert(rot === 'Контакт: jvuahja@lehtwsl.jvt (тел: 747 890 123)', 'ROT 7 output rotates letters and digits, leaves Cyrillic');
+		assert(rot === 'Jvuahja: jvuahja@lehtwsl.jvt (als: 747 890 123)', 'ROT 7 output rotates letters and digits');
 
 		const rot13 = await encode({ codec: 'rot', shift: '13' });
-		assert(rot13 === 'Контакт: pbagnpg@rknzcyr.pbz (тел: 303 456 789)', 'ROT 13 output rotates letters and digits (mod 10)');
+		assert(rot13 === 'Pbagnpg: pbagnpg@rknzcyr.pbz (gry: 303 456 789)', 'ROT 13 output rotates letters and digits (mod 10)');
 	});
 
 	// ─── Playground: dynamic injection ─────────────────────────
@@ -214,7 +214,7 @@ run('demo/admin/obfuscator.html', async ({ page }) => {
 		const lines = await page.$$eval('#obf-event-log li', els => els.map(li => li.textContent));
 		assert(lines.some(l => l.includes('Injected <p> with obfuscated payload')), 'Log records the injected <p>');
 		assert(lines.some(l => l.includes('Injected <a> with obfuscated payload')), 'Log records the injected <a>');
-		assert(lines.some(l => l.includes('ln-obfuscator:deobfuscated on <p> (codec: xor key="тајна")')), 'Log records deobfuscated event for xor <p> with key');
+		assert(lines.some(l => l.includes('ln-obfuscator:deobfuscated on <p> (codec: xor key="secret")')), 'Log records deobfuscated event for xor <p> with key');
 		assert(lines.some(l => l.includes('ln-obfuscator:deobfuscated on <span> (codec: base64)')), 'Log records deobfuscated event for base64 <span>');
 		assert(lines.some(l => l.includes('ln-obfuscator:deobfuscated on <a> (codec: rot, shift: 7)')), 'Log records deobfuscated event for rot shift 7 <a>');
 	});

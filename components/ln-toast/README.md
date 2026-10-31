@@ -144,7 +144,7 @@ root `<li>` carries `data-ln-toast-item` (eviction, clear, and hydration
 address items by it; the JS stamps it defensively if omitted) plus
 `data-ln-attr="class:type"` and NO static class (fill
 sets the class via setAttribute, which would clobber an authored one);
-`data-ln-field="title"` / `data-ln-field="message"` for text; a
+`data-ln-field="title"` / `data-ln-field="message"` for text (the message element is addressed by `data-ln-field="message"`; array and error-map messages render as a list inside it); a
 `data-ln-toast-when="{type}"` icon list if you want per-type icons. A missing
 template fails loudly — `console.warn('[ln-toast] Template "ln-toast-item"
 not found')` at clone time, no silent fallback.

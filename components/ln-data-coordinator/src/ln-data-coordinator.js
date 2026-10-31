@@ -126,14 +126,30 @@ import { MutationReceipts } from './mutation-receipts';
 	};
 
 	_component.prototype._fanOutUpdate = function (c, id, data, v, action) {
-		const payload = this.mapper.egress(data);
-		if (c.storeEl) dispatch(c.storeEl, 'ln-data-store:request-update', { id, data: payload });
-		this._fanOutRemote(c, 'update', { chainKey: id, op: 'update', targetId: id, payload, expectedVersion: v, meta: { id, action } }, { id, data: payload, expected_version: v, url: action, meta: { entryId: uuid(), queued: false, op: 'update', id } });
+		const self = this;
+		const apply = snapshot => {
+			const payload = self.mapper.egress(data);
+			if (c.storeEl) dispatch(c.storeEl, 'ln-data-store:request-update', { id, data: payload });
+			self._fanOutRemote(c, 'update', { chainKey: id, op: 'update', targetId: id, payload, expectedVersion: v, meta: { id, action, snapshot } }, { id, data: payload, expected_version: v, url: action, meta: { entryId: uuid(), queued: false, op: 'update', id, snapshot } });
+		};
+		if (c.store && typeof c.store.getById === 'function') {
+			c.store.getById(id).then(rec => apply(rec ? Object.assign({}, rec) : null)).catch(() => apply(null));
+		} else {
+			apply(null);
+		}
 	};
 
 	_component.prototype._fanOutDelete = function (c, id) {
-		if (c.storeEl) dispatch(c.storeEl, 'ln-data-store:request-delete', { id });
-		this._fanOutRemote(c, 'delete', { chainKey: id, op: 'delete', targetId: id, payload: null, expectedVersion: null, meta: { id } }, { id, meta: { entryId: uuid(), queued: false, op: 'delete', id } });
+		const self = this;
+		const apply = snapshot => {
+			if (c.storeEl) dispatch(c.storeEl, 'ln-data-store:request-delete', { id });
+			self._fanOutRemote(c, 'delete', { chainKey: id, op: 'delete', targetId: id, payload: null, expectedVersion: null, meta: { id, snapshot } }, { id, meta: { entryId: uuid(), queued: false, op: 'delete', id, snapshot } });
+		};
+		if (c.store && typeof c.store.getById === 'function') {
+			c.store.getById(id).then(rec => apply(rec ? Object.assign({}, rec) : null)).catch(() => apply(null));
+		} else {
+			apply(null);
+		}
 	};
 
 	_component.prototype._fanOutBulkDelete = function (c, ids) {
@@ -400,6 +416,15 @@ import { MutationReceipts } from './mutation-receipts';
 			}
 			if (c.storeEl) {
 				dispatch(c.storeEl, 'ln-data-store:request-sync-failed', { error: d.error || d, status });
+				if (!meta.queued) {
+					if (meta.op === 'update' && meta.snapshot) {
+						dispatch(c.storeEl, 'ln-data-store:request-update', { id: meta.id, data: meta.snapshot });
+					} else if (meta.op === 'create' && meta.tempId) {
+						dispatch(c.storeEl, 'ln-data-store:request-delete', { id: meta.tempId });
+					} else if (meta.op === 'delete' && meta.snapshot) {
+						dispatch(c.storeEl, 'ln-data-store:request-create', { tempId: meta.id, data: meta.snapshot });
+					}
+				}
 			}
 			this._reportError('connector-error', d.error || d, meta);
 		}

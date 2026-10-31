@@ -267,6 +267,7 @@ Use when the backend embeds the entire dataset (e.g. 10,000 records) into `<scri
 | `data-ln-table-selected` | `<span>`, `<data>` | - | - | Holds selection count in footer, setting machine-readable `data-ln-value` and delegating formatting to `data-ln-number`. The immediate parent element is automatically shown/hidden when selection > 0. |
 | `data-ln-table-filter-col` | `<th>` | `String` | - | Maps column header to a filter key. Required for column filtering. |
 | `data-ln-table-loading` | Indicator element (in footer) / Template | `Marker` | - | Marks a background loading indicator element (automatically toggled during re-fetch) or a generic loading template (`template[data-ln-table-loading]`). |
+| `data-ln-table-empty` | `<tr>` / Template | `Marker` | - | Written by ln-table on the rendered empty and loading placeholder row. ln-sort and ln-filter skip rows that carry it. Author it on a hand-written placeholder row in a plain table. On a `<template>` it holds the empty-state content. |
 | `data-ln-table-clear` | `<button>` | - | - | Resets local search inputs and column filters in SSR mode. |
 | `data-ln-table-clear-all` | `<button>` | - | - | Resets all active filters and triggers a new data request in Data-Driven mode. |
 | `data-ln-table-cell-attr` | Template element | `String` | - | List of `field:attribute` mappings for attribute interpolation. *(Processed externally via `ln-core.js` / `fillTemplate()`)* |

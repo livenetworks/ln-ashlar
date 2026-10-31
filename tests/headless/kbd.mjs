@@ -117,6 +117,10 @@ run('demo/admin/kbd.html', async ({ page }) => {
 
 		await chord(['Alt'], 'KeyN');
 		assert((await clicks()).pop() === 'btn-new-item', 'Alt+N clicks #btn-new-item');
+		await page.evaluate(() => {
+			const m = document.getElementById('demo-key-modal');
+			if (m && m.open) m.close();
+		});
 
 		await page.keyboard.press('Escape');
 		assert((await clicks()).pop() === 'btn-cancel-action', 'Escape clicks #btn-cancel-action');

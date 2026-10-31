@@ -326,7 +326,7 @@
 <!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
-						<main>
+						<main class="prose">
 							<p>Applied to a hidden element via <code>data-ln-data-store id="name"</code>, <code>ln-data-store</code> initializes and queries an IndexedDB database (<code>ln_app_cache</code>) with schema indexing and optional AES-GCM encryption. It is completely blind to the network: it listens for request CustomEvents (<code>ln-data-store:request-query</code>, <code>request-save</code>, <code>request-delete</code>), resolves results against local records, and emits <code>ln-data-store:stale</code> when cached data exceeds its configured timeout.</p>
 							<p>Understanding local-first architecture in isolation is difficult. True appreciation comes from seeing a fully-wired CRUD application working flawlessly in real-world scenarios: syncing data instantly across tabs, queuing actions while offline, and automatically resolving server version conflicts (409) without freezing the UI.</p>
 							<p>This demo page illustrates the ultimate <strong>Local-First CRUD Pipeline</strong> in <code>ln-ashlar</code>, orchestrating five independent, highly-specialized components through standard DOM event channels:</p>
@@ -342,7 +342,7 @@
 							</div>
 
 							<h4>Five Interlocking Primitive Players</h4>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>
 									<strong>The Cache Store (<code>ln-store</code>):</strong> Renders nothing. Manages local IndexedDB storage, outbox write queues, delta sync loops, and optimistic states.
 								</li>
@@ -440,8 +440,8 @@
 							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
-						</ul> <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-documents-table-dept" aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button></th>
-						<th data-ln-table-col="status" data-ln-table-filter-col="status">Status <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-documents-table-status" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button></th>
+						</ul> <button type="button" data-ln-table-col-filter data-ln-popover-for="filter-documents-table-dept" aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button></th>
+						<th data-ln-table-col="status" data-ln-table-filter-col="status">Status <button type="button" data-ln-table-col-filter data-ln-popover-for="filter-documents-table-status" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button></th>
 						<th data-ln-table-col="file_size">Size <ul data-ln-sort="documents" data-ln-sort-field="file_size">
 							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
@@ -742,8 +742,8 @@
 							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
-						</ul> <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-people-dept" aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button></th>
-						<th data-ln-table-col="status" data-ln-table-filter-col="status">Status <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-people-status" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button></th>
+						</ul> <button type="button" data-ln-table-col-filter data-ln-popover-for="filter-people-dept" aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button></th>
+						<th data-ln-table-col="status" data-ln-table-filter-col="status">Status <button type="button" data-ln-table-col-filter data-ln-popover-for="filter-people-status" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg></button></th>
 						<th data-ln-table-col="updated_at">Updated <ul data-ln-sort="people" data-ln-sort-field="updated_at">
 							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>

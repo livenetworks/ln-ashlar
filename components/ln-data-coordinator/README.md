@@ -446,6 +446,8 @@ There is no `ln-data-store:sync-conflict` event and no `forceSync()` error
 backstop — both were removed as part of this refactor (no grep-verified
 consumer existed for either).
 
+**Non-queued direct connector rollback (`!meta.queued`)** — When an offline queue is not present and a direct connector request fails, `ln-data-coordinator` automatically rolls back the optimistic local store mutation to keep the client cache consistent: an `update` failure restores the pre-mutation `meta.snapshot` (`ln-data-store:request-update`), a `create` failure deletes the optimistic record via `meta.tempId` (`ln-data-store:request-delete`), and a `delete` failure re-creates the deleted record from `meta.snapshot` (`ln-data-store:request-create`).
+
 ---
 
 ---

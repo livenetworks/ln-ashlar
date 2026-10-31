@@ -181,6 +181,7 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
 | `data-ln-table-row-select` | `<input>` | Selection checkbox in row templates. |
 | `data-ln-table-row-action="name"`| `<button>` | Action button trigger in row templates. |
 | `data-ln-table-loading` | Indicator / Template | Loading indicator element in footer (revealed during background re-fetch) or loading state template. |
+| `data-ln-table-empty` | `<tr>` / Template | Written by ln-table on the rendered empty and loading placeholder row. ln-sort and ln-filter skip rows that carry it. Author it on a hand-written placeholder row in a plain table. On a `<template>` it holds the empty-state content. |
 
 ---
 
@@ -234,7 +235,7 @@ Column filters use static authored markup — a `[data-ln-popover]` block contai
 <!-- th attribute maps filter key → column -->
 <th data-ln-table-filter-col="department">
 	Department
-	<button class="table-filter" type="button"
+	<button type="button"
 	        data-ln-table-col-filter
 	        data-ln-popover-for="filter-dept"
 	        aria-label="Filter department">

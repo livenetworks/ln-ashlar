@@ -5,7 +5,7 @@
 	<header>
 		<h3>Overview &amp; Philosophy</h3>
 	</header>
-	<main>
+	<main class="prose">
 		<p><strong><code>ln-modal</code></strong> is applied to a native
 			<code>&lt;dialog data-ln-modal id="..."&gt;</code> element, paired with trigger buttons
 			(<code>data-ln-modal-for="..."</code>) and dismiss controls (<code>data-ln-modal-close</code>). When
@@ -41,7 +41,7 @@
 		</div>
 
 		<h4>Focus Trapping &amp; Accessibility (WAI-ARIA)</h4>
-		<ul style="margin-bottom: var(--size-md); line-height: 1.7;">
+		<ul>
 			<li><strong>Native Focus Trap:</strong> Tabbing cycles keyboard focus strictly inside the native
 				<code>&lt;dialog&gt;</code> when opened via <code>showModal()</code>.
 			</li>
@@ -310,25 +310,27 @@
 		<h3>Hash addressing &amp; coexistence</h3>
 	</header>
 	<main>
-		<p>Demonstrates codec isolation: <code>ln-tabs</code> and <code>ln-modal</code> share the same URL hash using
-			the <code>ln-core</code> hash codec. Each component reads and writes ONLY its own namespace segment —
-			foreign segments are preserved on every write. The modal's namespace is its <code>id</code>
-			(<code>demo-hash-modal</code>).</p>
+		<article class="prose">
+			<p>Demonstrates codec isolation: <code>ln-tabs</code> and <code>ln-modal</code> share the same URL hash using
+				the <code>ln-core</code> hash codec. Each component reads and writes ONLY its own namespace segment —
+				foreign segments are preserved on every write. The modal's namespace is its <code>id</code>
+				(<code>demo-hash-modal</code>).</p>
 
-		<p><strong>Manual tests:</strong></p>
-		<ol>
-			<li>Click <em>Edit #5</em>, switch to the <em>Members</em> tab. The URL becomes
-				<code>#demo-hash-modal:5&amp;demo-tab:members</code>, the modal STAYS open, and the
-				<strong>Title</strong> field is filled by the <code>ln-ui-coordinator</code>.
-			</li>
-			<li><strong>Reverse order (regression direction):</strong> switch to the <em>Members</em> tab FIRST, then
-				click <em>Edit #5</em>. The URL becomes <code>#demo-tab:members&amp;demo-hash-modal:5</code> and the tab
-				STAYS on <em>Members</em> — the modal anchor click MERGES its segment instead of replacing the whole
-				fragment.</li>
-			<li>Reload with <code>#demo-tab:members&amp;demo-hash-modal:42</code> in the URL. The <em>Members</em> tab
-				should be active AND the modal open with Title "Internal audit log" filled.</li>
-			<li>With the modal open, press Back → modal closes, tab state intact.</li>
-		</ol>
+			<p><strong>Manual tests:</strong></p>
+			<ol>
+				<li>Click <em>Edit #5</em>, switch to the <em>Members</em> tab. The URL becomes
+					<code>#demo-hash-modal:5&amp;demo-tab:members</code>, the modal STAYS open, and the
+					<strong>Title</strong> field is filled by the <code>ln-ui-coordinator</code>.
+				</li>
+				<li><strong>Reverse order (regression direction):</strong> switch to the <em>Members</em> tab FIRST, then
+					click <em>Edit #5</em>. The URL becomes <code>#demo-tab:members&amp;demo-hash-modal:5</code> and the tab
+					STAYS on <em>Members</em> — the modal anchor click MERGES its segment instead of replacing the whole
+					fragment.</li>
+				<li>Reload with <code>#demo-tab:members&amp;demo-hash-modal:42</code> in the URL. The <em>Members</em> tab
+					should be active AND the modal open with Title "Internal audit log" filled.</li>
+				<li>With the modal open, press Back → modal closes, tab state intact.</li>
+			</ol>
+		</article>
 
 		<!-- Hash tabset -->
 		<div data-ln-tabs id="demo-tab" data-ln-tabs-default="overview">

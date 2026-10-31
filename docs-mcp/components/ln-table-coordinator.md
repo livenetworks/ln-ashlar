@@ -86,7 +86,7 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
                     </th>
                     <th data-ln-table-filter-col="dept">
                         <span>Department</span>
-                        <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-dept-popover" aria-label="Filter department">
+                        <button type="button" data-ln-table-col-filter data-ln-popover-for="filter-dept-popover" aria-label="Filter department">
                             <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
                         </button>
                         <ul data-ln-sort="employee-table" data-ln-sort-state="none">
@@ -97,7 +97,7 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
                     </th>
                     <th data-ln-table-filter-col="status">
                         <span>Status</span>
-                        <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-status-popover" aria-label="Filter status">
+                        <button type="button" data-ln-table-col-filter data-ln-popover-for="filter-status-popover" aria-label="Filter status">
                             <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
                         </button>
                     </th>
@@ -167,7 +167,7 @@ Multiple `data-ln-table-coordinator` wrappers can safely exist on the same page.
             <tr>
                 <th data-ln-table-filter-col="category">
                     Category
-                    <button class="table-filter" type="button" data-ln-table-col-filter data-ln-popover-for="filter-cat" aria-label="Filter category">
+                    <button type="button" data-ln-table-col-filter data-ln-popover-for="filter-cat" aria-label="Filter category">
                         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
                     </button>
                 </th>

@@ -357,7 +357,7 @@
 					<!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
-						<main>
+						<main class="prose">
 							<p>Applied to a table container via <code>&lt;div data-ln-table id="..."&gt;</code> or <code>&lt;table&gt;</code>, <code>ln-table</code> operates in two distinct modes. In SSR mode, it indexes server-rendered <code>&lt;tbody&gt;</code> rows, intercepting <code>ln-search</code>, <code>ln-filter</code>, and <code>ln-sort</code> CustomEvents to toggle <code>.hidden</code> on <code>&lt;tr&gt;</code> elements or reorder rows in the DOM. In data-driven mode (<code>data-ln-table-source="store"</code>), it listens for <code>ln-data-store:data</code> events, clones <code>&lt;template data-ln-table-row&gt;</code>, populates cells via <code>fill()</code>, and mounts rendered rows into <code>&lt;tbody&gt;</code> with sliding-window virtual scrolling.</p>
 							<p>In web application design, data grids can often be pre-rendered completely on the server. In these scenarios, introducing a heavy client-side JSON-to-HTML template rendering pipeline is unnecessary overhead. The DOM already contains the correct HTML rows on initial load.</p>
 							<p>Instead of generating rows dynamically, <code>ln-table</code> parses existing DOM rows directly on paint. It layers ultra-fast, in-memory client-side sorting, column filtering, text searches, and virtual scroll on top of standard pre-rendered HTML, providing a fluid desktop-grid experience with zero database fetching overhead.</p>
@@ -373,7 +373,7 @@
 							</div>
 
 							<h4>Three Orthogonal Layers of HTML Table Enhancements</h4>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>
 									<strong>The Pre-Rendered Markup (HTML DOM):</strong> Rows arrive completely rendered from the server. Cells can contain rich markup (links, pills, or custom badges) natively on initial paint.
 								</li>
@@ -386,7 +386,7 @@
 							</ol>
 
 							<h4>How the Local Search and Sort Coherence Works</h4>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>On load, the script parses every row, mapping text strings or custom <code>data-ln-value</code> targets into highly-optimized search and sort indexes in memory.</li>
 								<li>When a user types in a connected search bar (<code>data-ln-search-for</code>) or clicks a sort header (<code>data-ln-sort</code>), the component executes in-memory, local array filters instantly.</li>
 								<li>The component updates table rows in-place (toggling visibility or re-ordering nodes in the DOM). If the visible row count exceeds 200, it automatically activates virtual scrolling.</li>
@@ -464,7 +464,7 @@
 										</th>
 										<th data-ln-table-filter-col="category">
 											Category
-											<button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-category" aria-label="Filter category">
+											<button type="button" data-ln-table-col-filter data-ln-popover-for="filter-category" aria-label="Filter category">
 												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 											</button>
 											<div id="filter-category" data-ln-popover>
@@ -502,7 +502,7 @@
 										</th>
 										<th data-ln-table-filter-col="status">
 											Status
-											<button type="button" class="table-filter" data-ln-popover-for="filter-status" aria-label="Filter status">
+											<button type="button" data-ln-table-col-filter data-ln-popover-for="filter-status" aria-label="Filter status">
 												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 											</button>
 											<div id="filter-status" data-ln-popover>

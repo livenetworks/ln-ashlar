@@ -87,7 +87,7 @@ run('demo/admin/density.html', async ({ page }) => {
 	assert(await checked(GLOBAL_CB) === true, 'global checkbox stays checked');
 	assert(px(await pad('#density-name')) < comfInputPad, 'input padding-top shrinks in compact');
 	assert(await rowH() < comfRowH, 'demo table row height shrinks in compact (--density-row-h)');
-	assert(px(await pad('button[type="submit"]')) === comfButtonPad, 'button padding-top unchanged in compact (buttons do not react)');
+	assert(px(await pad('button[type="submit"]')) < comfButtonPad, 'button padding-top shrinks in compact');
 
 	await toggle(GLOBAL_CB);
 	await page.waitForFunction(() => document.documentElement.getAttribute('data-density') === 'comfortable', { timeout: 5000 });

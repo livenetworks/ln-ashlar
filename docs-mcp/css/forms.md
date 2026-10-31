@@ -19,7 +19,7 @@ The `forms` styling system (`theme/config/mixins/_form.scss` and `theme/componen
 - **Global Baseline:** Inputs, textareas, selects, and buttons receive standardized padding, typography (`var(--font-size)` / `var(--control-line-height)`), focus rings, and border radii out of the box. Buttons, inputs, selects, and pills share one control height per density tier.
 - **White Fields:** Enabled fields sit on the base surface with a hairline shadow and the `--border-ui` boundary (3:1); the border changes on hover and a 3px accent ring marks focus. A grey fill is reserved for `:disabled`.
 - **Labels:** `form-label` uses the `label-md` role in medium weight.
-- **Stacked Rhythm:** Field wrappers (`.form-element`, `.form-group`, `.form-field`) stacked outside a form-grid keep a `--size-md` gap through a zero-specificity sibling rule.
+- **Stacked Rhythm:** Adjacent field wrappers bound with `form-element` keep a `--size-md` gap outside a form-grid through a zero-specificity sibling rule.
 - **Icon Groups & Search:** A `<label>` (or `<search>` for the dedicated search field) wrapping an SVG icon and an input combines them into a seamless single control (`form-input-icon-group` and `search`).
 - **Responsive 6-Column Form Grid (`form-grid`):** A CSS Grid layout with column spanning utilities (`.col-span-1` through `.col-span-6`) collapsing smoothly on small viewports.
 - **Required Indicator via CSS `:has()`:** Mandatory inputs with the HTML `required` attribute automatically display an indicator without manual asterisk characters.
@@ -74,7 +74,7 @@ The `forms` styling system (`theme/config/mixins/_form.scss` and `theme/componen
 | `form-grid` | mixin | — | 6-column responsive CSS Grid form layout |
 | `form-input` | mixin | — | Base control styling for inputs, selects, textareas |
 | `form-label` | mixin | — | Form field label typography (`label-md`, medium) and spacing |
-| `form-element` | mixin | — | Vertical container stacking label, input, and error list |
+| `form-element` | mixin | — | Field wrapper: sibling rhythm outside a form-grid and slot treatment for feedback elements trailing the control |
 | `form-actions` | mixin | — | Horizontal row container for form submit and cancel buttons |
 | `form-input-icon-group` | mixin | — | Composite wrapper for inline icon + input control |
 | `search` | mixin | — | Compact search field with recessed fill and clear button |

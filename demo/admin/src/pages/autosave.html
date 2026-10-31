@@ -3,7 +3,7 @@
 					<!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
-						<main>
+						<main class="prose">
 							<p><strong><code>ln-autosave</code></strong> is applied to forms via <code>&lt;form id="..." data-ln-autosave&gt;</code> to protect form drafts against accidental reloads or tab closures. On initialization, it reads stored draft JSON from <code>localStorage</code> and restores field values, dispatching synthetic <code>input</code> and <code>change</code> events so dependent primitives (like <code>ln-validate</code> and <code>ln-autoresize</code>) update in sync. On field <code>focusout</code> or <code>change</code>, it serializes non-sensitive fields—strictly excluding passwords and excluded inputs—and saves the draft, automatically purging storage when the form is submitted or reset.</p>
 
 							<p>In <code>ln-ashlar</code>, this draft buffer primitive handles data persistence entirely on the client without heavy network streaming or concurrency conflicts.</p>
@@ -20,7 +20,7 @@
 
 							<h4>Concerns Scoped Strictly by Layer</h4>
 							<p>Automatic draft persistence and lifecycle synchronization are achieved by layering separate, orthogonal concerns:</p>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>
 									<strong>The Storage Layer (Browser <code>localStorage</code>):</strong> A synchronous, origin-isolated browser storage engine. It persists values perfectly across tab restarts and system reboots, and automatically cleans up after successful form submissions.
 								</li>
@@ -33,7 +33,7 @@
 							</ol>
 
 							<h4>How the Persistence Flows</h4>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>When a user interacts with a form, fields fire <code>focusout</code> or <code>change</code>. The component intercepts these events, serializes the active form values, and writes them instantly to the resolved <code>localStorage</code> key.</li>
 								<li>On document load, the component initializes, detects any matching localStorage entry, parses the JSON payload, populates form fields, and dispatches synthetic events.</li>
 								<li>When the form is submitted successfully or reset via standard buttons, the component automatically deletes the draft from local storage, leaving a clean workspace.</li>
