@@ -40,22 +40,6 @@
 		@include focus-ring;
 	}
 
-	// Nesting ladder: when nested inside a section-card or another card,
-	// climb to elevated surface to preserve visual depth.
-	.section-card &,
-	.section &,
-	.card & {
-		--color-bg: var(--bg-elevated);
-		--shadow:   none;
-	}
-
-	// Bulletproof nesting support for custom/semantic selectors:
-	// sets the elevated background variables on all descendants.
-	& * {
-		--nested-card-bg: var(--bg-elevated);
-		--nested-card-shadow: none;
-	}
-
 	// Direct-child selectors only — nested <header>/<main>/<footer>
 	// inside card content are consumer-owned and must not inherit the
 	// card's chrome. Same rationale as @mixin section-card.
@@ -174,11 +158,6 @@
 	//           rule to (0,1,3) and silently outrank consumers that override it
 	//           at equal weight by source order.
 	// Wrapped, the rule stays exactly (0,1,2); only its match set narrows.
-	//
-	// NOT written as [class*="group"]: that spelling means "field group" in
-	// components/_form.scss only because it is scoped under .form-element there.
-	// Unscoped it would also catch .btn-group and stop compacting a segmented
-	// group in a header — a regression, and those buttons already outrank this.
 	button:where(:not(:where([data-ln-date-field]) > button)) {
 		--btn-padding-y: var(--size-xs);
 		min-height: calc(var(--control-line-height) + 2 * var(--padding-y) + 2 * var(--border-width));
@@ -200,32 +179,9 @@
 @mixin panel-body {
 	padding: var(--card-padding-y) var(--card-padding-x);
 
-	// Content lists only — unclassed direct children of the panel body.
-	// Component lists (form actions, validation errors, pill groups,
-	// button groups) are ul/li by doctrine and must not receive bullets;
-	// they are either nested deeper or carry a class/semantic hook.
-	> ul:not([class]), > ol:not([class]) {
-		padding-left: 1.5em;
-		margin-bottom: var(--size-md);
-
-		li {
-			margin-bottom: var(--size-xs);
-			line-height: 1.7;
-			list-style: inherit;
-
-			&:last-child {
-				margin-bottom: 0;
-			}
-		}
-	}
-
-	> ul:not([class]) {
-		list-style-type: disc;
-	}
-
-	> ol:not([class]) {
-		list-style-type: decimal;
-	}
+	// A card in a panel body sits on a surface — climb to elevated.
+	--nested-card-bg:     var(--bg-elevated);
+	--nested-card-shadow: none;
 
 	// `clip`, not `auto` — a scrolling cell would trap the sticky thead.
 	&:has(> :is(table, .table-container, [data-ln-table])) {

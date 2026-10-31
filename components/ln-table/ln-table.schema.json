@@ -77,7 +77,7 @@
 			]
 		},
 		"data-ln-table-empty": {
-			"direction": "author",
+			"direction": "both",
 			"sources": [
 				"src/ln-table.js"
 			],

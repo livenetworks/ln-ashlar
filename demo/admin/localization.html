@@ -326,7 +326,7 @@
 <!-- Overview / philosophy -->
 <section class="section-card">
 	<header><h2>Overview &amp; Philosophy</h2></header>
-	<main>
+	<main class="prose">
 		<p><strong><code>ln-date</code></strong> and <strong><code>ln-number</code></strong> provide localized date and numeric input masks. <code>ln-date</code> (applied via <code>&lt;input type="date" data-ln-date&gt;</code>) wraps date inputs into a visible locale-formatted text input while synchronizing with a hidden native calendar picker and an ISO-formatted hidden input for clean form submissions. <code>ln-number</code> (applied via <code>data-ln-number</code>) parses digits in real time, formats currency and thousand separators using native <code>Intl.NumberFormat</code> while preserving cursor position, and serializes the raw numeric value for the backend.</p>
 
 		<p>In <code>ln-ashlar</code>, these zero-dependency enhancers operate directly on standard HTML inputs without heavy date/math libraries.</p>

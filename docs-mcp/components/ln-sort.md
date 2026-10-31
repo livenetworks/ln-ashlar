@@ -125,6 +125,7 @@ Target a generic `<ul>`/`<li>` container by `id`. Set `data-ln-sort-items` for d
 | `data-ln-persist-scope` | Same as root | `"page"` | Absent (global) | Opt-in, independent attribute. Scopes the persisted key to the current URL pathname. |
 | `data-ln-hash` | Same as root | `String` (Optional) | - | Opt-in. Synchronizes sort state to URL hash fragment (e.g. `#users-sort:price.asc`). Value is the custom namespace; if empty defaults to `[targetId]-sort`. |
 | `data-ln-query` | Same as root | `String` (Optional) | - | Opt-in. Synchronizes sort column and direction to URL query parameter (e.g. `?sort=price.asc` or `?sort=amount.desc`). Value specifies parameter name (defaults to `'sort'`). Interoperable with browser back/forward history (`popstate`). |
+| `data-ln-table-empty` | Table rows | `Marker` | - | Rows carrying this attribute are excluded from sorting, alongside `hidden` rows and `data-ln-sort-exclude`. ln-table writes it on its empty and loading placeholder row; author it on a hand-written placeholder row in a plain table. |
 
 ### Programmatic JS API (`element.lnSort`)
 
@@ -197,9 +198,9 @@ th:hover [data-ln-sort] { opacity: 0.7; }
 `sort-active` applies the accent color only while the state is `asc`/`desc` (an active sort), not
 `none` — the visual cue for "this column currently drives ordering."
 
-`<th>` header-button positioning is shared with `.table-filter` — a `<th>` containing both a
-`[data-ln-sort]` and a `.table-filter` button auto-repositions each absolutely (sort to the left of
-filter) via `table-base`'s `&:has([data-ln-sort]):has(.table-filter)` selector.
+`<th>` header-button positioning is shared with the column-filter button — a `<th>` containing both a
+`[data-ln-sort]` and a `[data-ln-table-col-filter]` button repositions each absolutely (sort to the left of
+filter) via `table-base`'s `&:has([data-ln-sort]):has([data-ln-table-col-filter])` selector.
 
 ---
 

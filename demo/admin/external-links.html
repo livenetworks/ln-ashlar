@@ -345,7 +345,7 @@
 					<section class="section-card">
 						<header><h3>Overview</h3></header>
 						<main>
-							<p><strong><code>ln-external-links</code></strong> runs globally across <code>document.body</code> watching all <code>&lt;a&gt;</code> and <code>&lt;area&gt;</code> elements. When an element's <code>href</code> hostname differs from <code>window.location.host</code>, it sets <code>target="_blank"</code>, merges <code>rel="noopener noreferrer"</code>, appends an accessible <code>&lt;span class="sr-only"&gt;(opens in new tab)&lt;/span&gt;</code>, and marks it with <code>data-ln-external-link="processed"</code> to prevent redundant mutations.</p>
+							<p><strong><code>ln-external-links</code></strong> runs globally across <code>document.body</code> watching all <code>&lt;a&gt;</code> and <code>&lt;area&gt;</code> elements. When an element's <code>href</code> hostname differs from <code>window.location.host</code>, it sets <code>target="_blank"</code>, merges <code>rel="noopener noreferrer"</code>, appends an accessible <code>&lt;span data-ln-external-links-hint&gt;(opens in new tab)&lt;/span&gt;</code>, and marks it with <code>data-ln-external-link="processed"</code> to prevent redundant mutations.</p>
 							<p>There is no opt-in attribute and no imperative init call — the decorator runs autonomously, safely handling initial server-rendered markup and dynamic links added via AJAX.</p>
 							<p>The component exists because external-link hardening is a tiny, everywhere concern. The project that gets it right does it once, in one place, and forgets it. The project that gets it wrong scatters one-off hand-decorations across templates, misses the dynamic ones loaded by AJAX, and ships the day a new contributor adds an <code>&lt;a href="https://..."&gt;</code> without thinking about <code>rel</code>.</p>
 							<p>"External" is defined precisely as <em>hostname inequality</em>: the link's <code>hostname</code> is non-empty AND differs from <code>window.location.hostname</code>. That single test rejects <code>mailto:</code>, <code>tel:</code>, <code>javascript:</code>, relative paths, and same-page anchors in one line. It does <strong>not</strong> distinguish ports or protocols — different ports on the same host are "internal." Subdomains of the same root are "external."</p>
@@ -367,7 +367,7 @@
    rel="noopener noreferrer"
    data-ln-external-link="processed"&gt;
     Read more
-    &lt;span class="sr-only"&gt;(opens in new tab)&lt;/span&gt;
+    &lt;span data-ln-external-links-hint&gt;(opens in new tab)&lt;/span&gt;
 &lt;/a&gt;
 
 &lt;!-- Internal links — no change --&gt;
@@ -376,13 +376,13 @@
 &lt;a href="mailto:hello@livenetworks.mk"&gt;Email&lt;/a&gt;</code></pre>
 
 							<h4>The four mutations</h4>
-							<p>For each external link, the component performs four DOM writes in this order: <code>target="_blank"</code>, <code>rel="noopener noreferrer"</code>, append a <code>&lt;span class="sr-only"&gt;(opens in new tab)&lt;/span&gt;</code> as the link's last child, and set the marker attribute <code>data-ln-external-link="processed"</code>. The marker is the idempotency gate — every subsequent processing pass early-returns on links that already carry it.</p>
+							<p>For each external link, the component performs four DOM writes in this order: <code>target="_blank"</code>, <code>rel="noopener noreferrer"</code>, append a <code>&lt;span data-ln-external-links-hint&gt;(opens in new tab)&lt;/span&gt;</code> as the link's last child, and set the marker attribute <code>data-ln-external-link="processed"</code>. The marker is the idempotency gate — every subsequent processing pass early-returns on links that already carry it.</p>
 
 							<h4>What <code>rel="noopener noreferrer"</code> buys you</h4>
 							<p><code>noopener</code> strips <code>window.opener</code> in the new tab — without it, the destination site can call <code>window.opener.location = '...'</code> and silently navigate the source tab to a phishing page (the classic "tabnabbing" exploit). Modern browsers already apply this semantics to <code>target="_blank"</code> by default since 2021, but <code>rel="noopener"</code> remains recommended as defense-in-depth and for older browsers — it costs nothing to set. <code>noreferrer</code> additionally suppresses the <code>Referer</code> header on the outgoing request — a privacy posture, not a security primitive.</p>
 
-							<h4>Accessibility — the sr-only hint</h4>
-							<p>WCAG 2.4.4 ("Link Purpose") expects a verbal cue when <code>target="_blank"</code> opens a link in a new tab. The component appends an English-language hint span (<code>(opens in new tab)</code>) inside every processed link. Sighted users see no change because <code>.sr-only</code> clips the span to a 1×1 box; screen readers announce the suffix when the link receives focus.</p>
+							<h4>Accessibility — the hidden hint</h4>
+							<p>WCAG 2.4.4 ("Link Purpose") expects a verbal cue when <code>target="_blank"</code> opens a link in a new tab. The component appends an English-language hint span (<code>(opens in new tab)</code>) inside every processed link. Sighted users see no change because a rule in <code>ln-ashlar-core.css</code> clips the <code>data-ln-external-links-hint</code> span to a 1×1 box; screen readers announce the suffix when the link receives focus.</p>
 						</main>
 					</section>
 
@@ -494,7 +494,7 @@
 						<main>
 							<p>The component reads the link's existing <code>rel</code> token list, ensures <code>noopener</code> and <code>noreferrer</code> are present, and writes the result back. Microformat values authored on the link survive the decoration pass. Inspect the link below in DevTools — the authored <code>rel="me"</code> is preserved alongside the added flags.</p>
 							<p><a href="https://livenetworks.mk" rel="me">Live Networks (rel="me")</a></p>
-							<p><small>Expected post-decoration: <code>rel="me noopener noreferrer"</code>, <code>target="_blank"</code>, marker set, sr-only hint appended.</small></p>
+							<p><small>Expected post-decoration: <code>rel="me noopener noreferrer"</code>, <code>target="_blank"</code>, marker set, hint appended.</small></p>
 						</main>
 					</section>
 
@@ -565,7 +565,7 @@ window.lnExternalLinks.process(link.parentElement);</code></pre>
 										<td>yes</td>
 										<td>no</td>
 										<td><code>{ link, href, text }</code></td>
-										<td>The user clicks anywhere inside a processed external link. <code>text</code> includes the sr-only hint suffix.</td>
+										<td>The user clicks anywhere inside a processed external link. <code>text</code> includes the hint suffix.</td>
 									</tr>
 								</tbody>
 							</table>
@@ -584,7 +584,7 @@ window.lnExternalLinks.process(link.parentElement);</code></pre>
 							<h4>2. Different ports treated as cross-host</h4>
 							<p>The host comparison uses <code>hostname</code>, which strips ports. <code>localhost:3000</code> and <code>localhost:8080</code> are "internal" to the component. Same with different protocols on the same host.</p>
 
-							<h4>3. Reading <code>:clicked.detail.text</code> for analytics and getting the sr-only hint suffix</h4>
+							<h4>3. Reading <code>:clicked.detail.text</code> for analytics and getting the hint suffix</h4>
 							<p><code>link.textContent</code> includes the appended <code>(opens in new tab)</code> hint span. Strip it with <code>label.replace(/\s*\(opens in new tab\)\s*$/, '')</code> or read non-hint child nodes manually.</p>
 						</main>
 					</section>
@@ -659,7 +659,7 @@ window.lnExternalLinks.process(link.parentElement);</code></pre>
 			'target:  ' + (mutLink.getAttribute('target') || '(unset)') + '\n' +
 			'rel:     ' + (mutLink.getAttribute('rel') || '(unset)') + '\n' +
 			'marker:  ' + (mutLink.getAttribute('data-ln-external-link') || '(unset)') + '\n' +
-			'sr-only: ' + (mutLink.querySelector('.sr-only') ? 'present' : 'absent');
+			'sr-only: ' + (mutLink.querySelector('[data-ln-external-links-hint]') ? 'present' : 'absent');
 	}
 	if (mutFlip && mutLink) {
 		mutFlip.addEventListener('click', function () {
@@ -679,7 +679,7 @@ window.lnExternalLinks.process(link.parentElement);</code></pre>
 			mutLink.removeAttribute('target');
 			mutLink.removeAttribute('rel');
 			mutLink.removeAttribute('data-ln-external-link');
-			const hint = mutLink.querySelector('.sr-only');
+			const hint = mutLink.querySelector('[data-ln-external-links-hint]');
 			if (hint) hint.remove();
 			showState('reset');
 		});

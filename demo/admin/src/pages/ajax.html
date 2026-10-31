@@ -4,7 +4,7 @@
 					<!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
-						<main>
+						<main class="prose">
 							<p><strong><code>ln-ajax</code></strong> is applied to containers, links, or forms via <code>data-ln-ajax</code>. It intercepts same-origin anchor clicks and form submissions via <code>e.preventDefault()</code> and issues asynchronous requests with <code>X-Requested-With: XMLHttpRequest</code> headers. When the server responds with targeted HTML fragments (such as <code>{ content: { "#target": "&lt;html&gt;" } }</code>), <code>ln-ajax</code> replaces those DOM regions in-place and updates the browser history via <code>history.pushState()</code>, enabling SPA-speed page transitions while preserving server-rendered markup.</p>
 
 							<p>In <code>ln-ashlar</code>, this navigation and swapping primitive avoids client-side template bloat by letting the server remain the authoritative source for markup.</p>
@@ -20,7 +20,7 @@
 							</div>
 
 							<h4>Three Orthogonal Layers of the Navigation Lifecycle</h4>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>
 									<strong>The Navigation Trigger (Native HTML Links &amp; Forms):</strong> Elements declare AJAX capabilities declaratively using the <code>data-ln-ajax</code> attribute. Clicking a link or submitting a form initiates the asynchronous lifecycle.
 								</li>
@@ -33,7 +33,7 @@
 							</ol>
 
 							<h4>How the Page Swapping Flows</h4>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>A user clicks an AJAX-marked link. The component intercepts the event, adds the loading class <code>.ln-ajax--loading</code> to the container, and dispatches a bubbled <code>ln-ajax:before-start</code> event.</li>
 								<li>It fires a background GET request. The server intercepts the request and responds with a JSON payload specifying which parts of the page to replace.</li>
 								<li>The component swaps the HTML segments in-place, updates the browser's address history, dispatches `ln-ajax:success`, and clears loading classes. Newly loaded forms are immediately upgraded.</li>

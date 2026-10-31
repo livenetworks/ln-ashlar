@@ -1,6 +1,6 @@
 # ln-validate
 
-> Applied to form controls (`<input data-ln-validate>`, `<select>`, `<textarea>`) inside a `.form-element` wrapper.
+> Applied to form controls (`<input data-ln-validate>`, `<select>`, `<textarea>`); messages are read from the nearest ancestor that directly contains `[data-ln-validate-errors]`, and the list is optional.
 > On initialization, it injects `novalidate` on the parent `<form>` and intercepts the form `submit` event.
 > On field `blur` or `input` (after touched), it checks native `input.validity`, toggles the `.hidden` class on matching
 > `[data-ln-validate-error="rule"]` elements, and sets `aria-invalid`; on submit with errors, it calls `e.preventDefault()` and focuses the first invalid field.
@@ -49,7 +49,7 @@
 ```
 
 > [!IMPORTANT]
-> The surrounding wrapper **must** carry the class `.form-element` for the sibling error lookup to succeed.
+> The surrounding wrapper does not require any specific CSS class — `ln-validate` reads from the nearest ancestor that directly contains `[data-ln-validate-errors]`.
 
 ---
 
@@ -120,7 +120,7 @@ input.lnValidate.destroy();
 
 ## ⚠️ Common Pitfalls
 
-- **Skipping the `.form-element` wrapper:** `ln-validate` locates sibling error elements relative to the closest `.form-element` ancestor. If you omit the wrapper class, no error lists will be toggled.
+- **Error list placement:** `ln-validate` locates sibling error elements relative to the nearest ancestor that directly contains `[data-ln-validate-errors]`. If you place `[data-ln-validate-errors]` outside that ancestor, no error lists will be toggled.
 - **Relying on Native browser CSS (`:invalid`):** The browser applies `:invalid` to empty required fields on page load. **Always** use our custom classes `.ln-validate-valid` and `.ln-validate-invalid` for visual borders and focus states.
 - **Injecting custom errors without validating:** Dispatching `ln-validate:set-custom` updates visual classes, but it **does not** bubble an `:invalid` event. If you need form-level coordinators (`ln-form`) to react immediately, call `input.lnValidate.validate()` right after injecting.
 - **Expecting `novalidate` in your own markup:** Don't write it by hand
@@ -136,7 +136,7 @@ Source: `components/ln-validate/ln-validate.js` (~160 lines). Imports only `disp
 
 ### State & Constructor Initialization
 
-Three fields per instance (`dom.lnValidate`): `dom`, `_touched` (bool), `_customErrors` (Set). No cached error-`<li>` array, no cached `.form-element` ancestor reference, no debounce — every `validate()` call re-queries `parent.querySelectorAll` and recomputes from `dom.checkValidity()`. Cheap because the query is scoped to one field's wrapper and validity checks are microsecond-fast.
+Internal instance state (`dom.lnValidate`): `dom`, `_touched` (bool), `_customErrors` (Set), and lazily cached `_errorItems`. No debounce — every `validate()` call checks `dom.validity` and updates matching error elements. Scoped to the field's wrapper and validity checks are microsecond-fast.
 
 **Initial Value Instantiation Check:** Upon component construction, if an input field already contains a non-empty value (`dom.value` is non-empty or `dom.checked`), `ln-validate` immediately marks `_touched = true` and invokes `this.validate()` to synchronize its visual state and error elements in the DOM without requiring initial user interaction. Pristine empty fields remain `_touched = false`.
 
@@ -147,9 +147,9 @@ Three fields per instance (`dom.lnValidate`): `dom`, `_touched` (bool), `_custom
 ### `validate()` flow
 
 1. `nativeValid = dom.checkValidity()`; `isValid = nativeValid && _customErrors.size === 0`.
-2. Walks the field's `.form-element`'s `[data-ln-validate-error]` `<li>`s; keys present in `ERROR_MAP` (`required`/`typeMismatch`/`tooShort`/`tooLong`/`patternMismatch`/`rangeUnderflow`/`rangeOverflow`) toggle `hidden` off `validity[prop]`; keys NOT in the map are skipped — that's the mechanism that lets native and custom errors share one `<ul>` without conflict.
+2. Walks the field ancestor's `[data-ln-validate-error]` `<li>`s; keys present in `ERROR_MAP` (`required`/`typeMismatch`/`tooShort`/`tooLong`/`patternMismatch`/`rangeUnderflow`/`rangeOverflow`) toggle `hidden` off `validity[prop]`; keys NOT in the map are skipped — that's the mechanism that lets native and custom errors share one `<ul>` without conflict.
 3. Toggles `.ln-validate-valid`/`.ln-validate-invalid`, dispatches `:valid`/`:invalid` `{ target, field: dom.name }`.
-4. If the field has no `.form-element` ancestor, error rendering is skipped but the class toggle and dispatch still run.
+4. If the field has no ancestor containing `[data-ln-validate-errors]`, error rendering is skipped but the class toggle and dispatch still run.
 
 `validate()` never reads `_touched` — it always renders. `_touched` instead gates whether the *listener handlers* call it, so the submit gate can force-validate an untouched field on demand.
 

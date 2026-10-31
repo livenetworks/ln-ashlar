@@ -74,15 +74,10 @@ export function isExcludedSortItem(el) {
 	if (!el || typeof el !== 'object' || el.nodeType !== 1) return true;
 	if (el.tagName === 'TEMPLATE') return true;
 	if (typeof el.hasAttribute === 'function') {
-		if (el.hasAttribute('data-ln-sort-exclude') || el.hasAttribute('hidden')) return true;
+		if (el.hasAttribute('data-ln-sort-exclude') || el.hasAttribute('data-ln-table-empty') || el.hasAttribute('hidden')) return true;
 	}
 	if (el.classList && el.classList.contains('hidden')) return true;
 	if (el.style && el.style.display === 'none') return true;
-	if (typeof el.matches === 'function') {
-		if (el.matches('.empty-state, .ln-table__empty, .ln-table__empty-state, [data-ln-empty], [data-ln-empty-state], [data-ln-table-empty]')) {
-			return true;
-		}
-	}
 	return false;
 }
 

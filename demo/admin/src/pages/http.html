@@ -11,7 +11,7 @@
 					<!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
-						<main>
+						<main class="prose">
 							<p><strong><code>ln-http</code></strong> is a window-level HTTP concurrency supervisor (<code>window.lnHttp</code>). It transparently intercepts browser <code>fetch()</code> requests to automatically abort superseded in-flight GET/HEAD queries targeting the exact same URL via <code>AbortController.abort()</code>. It also provides an event-driven channel listening for <code>ln-http:request</code> CustomEvents with unique keys, instantly canceling stale requests with matching keys before executing the network call and broadcasting <code>ln-http:response</code> or <code>ln-http:error</code>.</p>
 
 							<p>In <code>ln-ashlar</code>, this coordinator prevents race conditions and stale UI states by handling socket cancellations automatically on two parallel channels.</p>
@@ -27,7 +27,7 @@
 							</div>
 
 							<h4>Two Parallel Concurrency Channels</h4>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>
 									<strong>Path A (Transparent URL-Keyed GET de-duplication):</strong> Wraps the global <code>window.fetch</code> natively. Whenever a GET or HEAD request is fired, it scans in-flight records. If it finds a matching URL (e.g. during fast keystroke searches), it automatically aborts the previous request. POST, PUT, and DELETE methods are **never** auto-canceled here to prevent dropping user intent.
 								</li>
@@ -38,7 +38,7 @@
 
 							<h4>How the Cancellation Flow Coheres</h4>
 							<p>When a de-duplicated request is canceled:</p>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>A new request arrives on Path A or B, matching the active URL or key.</li>
 								<li>The coordinator calls <code>.abort()</code> on the older request's `AbortController` instantly, and wipes its cache pointer.</li>
 								<li>The browser terminates the older network socket immediately. The initial fetch promise rejects with an <code>AbortError</code>, which is safely captured and ignored by presenters, while the new request runs cleanly.</li>

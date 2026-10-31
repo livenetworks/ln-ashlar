@@ -160,7 +160,7 @@ ${jsonSeed}
 							</th>
 							<th data-ln-table-col="department" data-ln-table-filter-col="department">
 								Department
-								<button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-seed-dept" aria-label="Filter department">
+								<button type="button" data-ln-table-col-filter data-ln-popover-for="filter-seed-dept" aria-label="Filter department">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 								</button>
 								<ul data-ln-sort="seed-docs" data-ln-sort-field="department" data-ln-sort-state="none" data-ln-query="sort">
@@ -171,7 +171,7 @@ ${jsonSeed}
 							</th>
 							<th data-ln-table-col="status" data-ln-table-filter-col="status">
 								Status
-								<button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-seed-status" aria-label="Filter status">
+								<button type="button" data-ln-table-col-filter data-ln-popover-for="filter-seed-status" aria-label="Filter status">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 								</button>
 								<ul data-ln-sort="seed-docs" data-ln-sort-field="status" data-ln-sort-state="none" data-ln-query="sort">

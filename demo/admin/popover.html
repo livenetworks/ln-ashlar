@@ -326,7 +326,7 @@
 <!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
-						<main>
+						<main class="prose">
 							<p><strong><code>ln-popover</code></strong> is applied to a popup container via <code>data-ln-popover id="..."</code>, paired with trigger buttons anywhere in the DOM via <code>data-ln-popover-for="..."</code>. When triggered, it sets <code>popover="manual"</code>, invokes <code>showPopover()</code> to elevate into the browser's top layer without clipping or z-index issues, calculates boundary-aware anchor coordinates, and writes <code>data-ln-popover="open"</code>. On outside clicks or pressing <kbd>Escape</kbd>, it calls <code>hidePopover()</code>, writes <code>data-ln-popover="closed"</code>, and restores keyboard focus to the trigger.</p>
 
 							<p>It provides viewport-aware positioning, automatic boundary flip placement, and full LIFO (Last-In, First-Out) keyboard dismissal for rich contextual cards, action menus, and filter flyouts.</p>
@@ -342,7 +342,7 @@
 							</div>
 
 							<h4>Key Features &amp; Viewport Awareness</h4>
-							<ul style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ul>
 								<li><strong>Automatic Flipping (Auto-Flip):</strong> You can set a preferred position (<code>data-ln-popover-position="top|bottom|left|right"</code>). If there isn't enough room in the viewport, the positioning engine automatically flips the popover to the opposite side to keep it fully visible.</li>
 								<li><strong>Focus Management:</strong> When a popover opens, focus moves automatically into the popover dialog. When closed, focus is returned back to the triggering element, maintaining a smooth accessibility path.</li>
 								<li><strong>Dismissal Rules:</strong> Clicking anywhere outside the popover (or its trigger button) closes it. Additionally, pressing <code>ESC</code> closes the most recently opened popover in a LIFO stack.</li>

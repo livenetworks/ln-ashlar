@@ -7,7 +7,8 @@ import { dispatch, guardBody, observeAttributes, observeLifecycle } from '../../
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
 	const ATTRIBUTES = {
-		'data-ln-external-link': { type: 'enum', values: ['processed'], description: 'Marker indicating link was identified and processed as external' }
+		'data-ln-external-link': { type: 'enum', values: ['processed'], description: 'Marker indicating link was identified and processed as external' },
+		'data-ln-external-links-hint': { type: 'marker', description: 'Marks the visually hidden "(opens in new tab)" hint span appended inside a processed link' }
 	};
 
 	function _isExternalLink(link) {
@@ -25,7 +26,7 @@ import { dispatch, guardBody, observeAttributes, observeLifecycle } from '../../
 		link.rel = existing.join(' ');
 
 		const hint = document.createElement('span');
-		hint.className = 'sr-only';
+		hint.setAttribute('data-ln-external-links-hint', '');
 		hint.textContent = '(opens in new tab)';
 		link.appendChild(hint);
 

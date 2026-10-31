@@ -326,7 +326,7 @@
 <!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
-						<main>
+						<main class="prose">
 							<p><strong><code>ln-confirm</code></strong> is applied directly to action controls via <code>&lt;button data-ln-confirm&gt;</code> or <code>&lt;a data-ln-confirm&gt;</code>. On the first click, it intercepts the event via <code>e.preventDefault()</code>, transitions the control to <code>data-ln-confirm-state="confirming"</code>, reveals the armed confirmation prompt (or activates <code>[data-ln-confirm-active]</code>), and starts an auto-revert timer. If the user clicks a second time before timeout, it releases the native platform event—allowing the form to submit, link to navigate, or AJAX handler to execute naturally—while reverting to idle if the timer expires.</p>
 
 							<p>In <code>ln-ashlar</code>, this serves as an in-place interaction gate for single-element, low-impact actions, avoiding disruptive modals or blocking browser dialogue windows.</p>
@@ -343,7 +343,7 @@
 
 							<h4>Orthogonal Layers of Danger Gating</h4>
 							<p>Destructive confirmation is achieved by separating visual morphs, automatic timing, and platform defaults:</p>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>
 									<strong>The Platform Default (Trigger Action):</strong> The core action — standard form submits (<code>type="submit"</code>) or link targets (<code>href</code>) — is declared natively on the HTML button or link, untouched by the component.
 								</li>
@@ -356,7 +356,7 @@
 							</ol>
 
 							<h4>How the Interaction Flows</h4>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>The user clicks a destructive button. The component intercepts the event, calls <code>e.preventDefault()</code> and <code>e.stopImmediatePropagation()</code>, transitions the button to <code>data-ln-confirm-state="confirming"</code>, replaces its label/icon with the armed prompt, schedules an auto-revert timer, and dispatches <code>ln-confirm:waiting</code>.</li>
 								<li>If the user clicks the armed button again before the timer expires, the component intercepts the second click, runs cleanups synchronously, calls <code>stopPropagation()</code> so the click stays on the button, and lets the default action proceed. The browser executes the natural submit, navigate, or AJAX handler.</li>
 								<li>If the timer expires before a second click arrives, the button automatically clears the armed state, restores its original text or icon, and disarms.</li>
@@ -369,7 +369,7 @@
 					<!-- Anatomy -->
 					<section class="section-card">
 						<header><h3>Anatomy &amp; Three Usage Variants</h3></header>
-						<main>
+						<main class="prose">
 							<p><code>ln-confirm</code> acts as an in-place micro-component gate. It supports three distinct usage modes:</p>
 							<ul>
 								<li><strong>1. Two-Element Mode (Recommended &amp; HTML-First):</strong> Separates idle and active contents using <code>[data-ln-confirm-idle]</code> and <code>[data-ln-confirm-active]</code>. Zero string replacement in JS, preserving complex child nodes (icons, badges) and ensuring 100% translatable HTML.</li>
@@ -714,7 +714,7 @@ window.lnConfirm(root);         // re-run init scan over `root`. Only needed for
 					</section>
 
 <script>
-	(function () {
+	document.addEventListener('DOMContentLoaded', function () {
 		// Form submit demo — toast on submit instead of POST navigation
 		const form = document.getElementById('demo-form-submit');
 		if (form) {
@@ -771,7 +771,7 @@ window.lnConfirm(root);         // re-run init scan over `root`. Only needed for
 				logLine('DELETE fired — and the card surface stayed silent.');
 			});
 		}
-	})();
+	});
 </script>
 			</div>
 		</section>

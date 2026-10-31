@@ -78,11 +78,11 @@
 		text-overflow: ellipsis;
 
 		// Shared header-button stack — cascading single vs double action
-		&:has(:is([data-ln-sort], .table-filter)) {
+		&:has(:is([data-ln-sort], [data-ln-table-col-filter])) {
 			min-width: var(--th-single-action-min-width, 6rem);
 			padding-inline-end: calc(var(--padding-x, var(--size-md)) + 2rem);
 
-			.table-filter,
+			[data-ln-table-col-filter],
 			[data-ln-sort] {
 				position: absolute;
 				top: 50%;
@@ -92,7 +92,11 @@
 			}
 		}
 
-		&:has([data-ln-sort]):has(.table-filter) {
+		&:hover [data-ln-table-col-filter] {
+			opacity: 0.7;
+		}
+
+		&:has([data-ln-sort]):has([data-ln-table-col-filter]) {
 			min-width: var(--th-double-action-min-width, 8.5rem);
 			padding-inline-end: calc(var(--padding-x, var(--size-md)) + 3.75rem);
 
@@ -329,6 +333,8 @@
 	@include table-header-btn-base;
 	vertical-align: middle;
 	position: relative;
+
+	&.ln-filter-active { @include table-filter-active; }
 }
 
 @mixin table-filter-active {

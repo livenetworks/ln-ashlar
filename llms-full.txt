@@ -1972,7 +1972,7 @@ All events bubble from the parent container (`this.dom`):
 > **Classification:** 🟢 Simple component / Global Behavior (Layer 1 - Security & Accessibility)  
 > Runs globally across `document.body` watching all `<a>` and `<area>` elements. When an element's `href` host
 > differs from `window.location.host`, it sets `target="_blank"`, merges `rel="noopener noreferrer"`,
-> appends a `<span class="sr-only">(opens in new tab)</span>`, and marks it with `data-ln-external-link="processed"` to prevent redundant mutations.
+> appends a `<span data-ln-external-links-hint>(opens in new tab)</span>`, and marks it with `data-ln-external-link="processed"` to prevent redundant mutations.
 
 #### Minimal HTML Markup & Usage:
 Works automatically on all links within `document.body` without requiring manual trigger attributes.
@@ -1997,7 +1997,7 @@ After processing by `ln-external-links`:
        rel="noopener noreferrer" 
        data-ln-external-link="processed">
        Google
-       <span class="sr-only">(opens in new tab)</span>
+       <span data-ln-external-links-hint>(opens in new tab)</span>
     </a>
     
     <!-- Internal link remains untouched -->
@@ -2013,6 +2013,7 @@ After processing by `ln-external-links`:
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-external-link` | `<a>`, `<area>` | `String` | — | Automatically stamped as `processed` after sanitization to prevent duplicate processing. |
+| `data-ln-external-links-hint` | `<span>` | `Marker` | — | Marks the visually hidden "(opens in new tab)" hint span appended inside a processed link. |
 
 ### Programmatic JS API (`window.lnExternalLinks`)
 
@@ -2227,7 +2228,7 @@ The canonical composition for table per-column filters. `ln-filter` dispatches e
 <!-- Table Header column with filter button -->
 <th data-ln-table-filter-col="department">
   Department
-  <button class="table-filter" type="button"
+  <button type="button"
           data-ln-table-col-filter
           data-ln-popover-for="filter-dept-popover"
           aria-label="Filter department">
@@ -2263,6 +2264,7 @@ The canonical composition for table per-column filters. `ln-filter` dispatches e
 | `data-ln-query` | Container root | Flag \| `String` | — | Opt-in. Synchronizes active filters to URL query parameter (e.g. `?category=design,dev` or `?status=active`). Value specifies parameter name (defaults to column name or filter key). Interoperable with browser back/forward history (`popstate`). |
 | `data-ln-filter-values` | Container root | `String` | — | Component-written state attribute: the comma-joined, percent-encoded list of currently active filter values. Read by `ln-persist` for restore/save. |
 | `data-ln-filter-hide` | Target children / rows | `"true"` | — | Written by the component on elements that fail the active filters. |
+| `data-ln-table-empty` | Table rows | `Marker` | - | Rows carrying this attribute are skipped when filtering plain-table rows. ln-table writes it on its empty and loading placeholder row; author it on a hand-written placeholder row in a plain table. |
 
 > [!NOTE]
 > `data-ln-filter-hide` is a component-written **state marker**, not a consumer configuration attribute — never author it in markup. It is listed here only to document the DOM the component produces.
@@ -4461,6 +4463,7 @@ Target a generic `<ul>`/`<li>` container by `id`. Set `data-ln-sort-items` for d
 | `data-ln-persist-scope` | Same as root | `"page"` | Absent (global) | Opt-in, independent attribute. Scopes the persisted key to the current URL pathname. |
 | `data-ln-hash` | Same as root | `String` (Optional) | - | Opt-in. Synchronizes sort state to URL hash fragment (e.g. `#users-sort:price.asc`). Value is the custom namespace; if empty defaults to `[targetId]-sort`. |
 | `data-ln-query` | Same as root | `String` (Optional) | - | Opt-in. Synchronizes sort column and direction to URL query parameter (e.g. `?sort=price.asc` or `?sort=amount.desc`). Value specifies parameter name (defaults to `'sort'`). Interoperable with browser back/forward history (`popstate`). |
+| `data-ln-table-empty` | Table rows | `Marker` | - | Rows carrying this attribute are excluded from sorting, alongside `hidden` rows and `data-ln-sort-exclude`. ln-table writes it on its empty and loading placeholder row; author it on a hand-written placeholder row in a plain table. |
 
 ### Programmatic JS API (`element.lnSort`)
 
@@ -4771,7 +4774,7 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
                     </th>
                     <th data-ln-table-filter-col="dept">
                         <span>Department</span>
-                        <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-dept-popover" aria-label="Filter department">
+                        <button type="button" data-ln-table-col-filter data-ln-popover-for="filter-dept-popover" aria-label="Filter department">
                             <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
                         </button>
                         <ul data-ln-sort="employee-table" data-ln-sort-state="none">
@@ -4782,7 +4785,7 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
                     </th>
                     <th data-ln-table-filter-col="status">
                         <span>Status</span>
-                        <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-status-popover" aria-label="Filter status">
+                        <button type="button" data-ln-table-col-filter data-ln-popover-for="filter-status-popover" aria-label="Filter status">
                             <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
                         </button>
                     </th>
@@ -4852,7 +4855,7 @@ Multiple `data-ln-table-coordinator` wrappers can safely exist on the same page.
             <tr>
                 <th data-ln-table-filter-col="category">
                     Category
-                    <button class="table-filter" type="button" data-ln-table-col-filter data-ln-popover-for="filter-cat" aria-label="Filter category">
+                    <button type="button" data-ln-table-col-filter data-ln-popover-for="filter-cat" aria-label="Filter category">
                         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
                     </button>
                 </th>
@@ -5142,6 +5145,7 @@ Use when the backend embeds the entire dataset (e.g. 10,000 records) into `<scri
 | `data-ln-table-selected` | `<span>`, `<data>` | - | - | Holds selection count in footer, setting machine-readable `data-ln-value` and delegating formatting to `data-ln-number`. The immediate parent element is automatically shown/hidden when selection > 0. |
 | `data-ln-table-filter-col` | `<th>` | `String` | - | Maps column header to a filter key. Required for column filtering. |
 | `data-ln-table-loading` | Indicator element (in footer) / Template | `Marker` | - | Marks a background loading indicator element (automatically toggled during re-fetch) or a generic loading template (`template[data-ln-table-loading]`). |
+| `data-ln-table-empty` | `<tr>` / Template | `Marker` | - | Written by ln-table on the rendered empty and loading placeholder row. ln-sort and ln-filter skip rows that carry it. Author it on a hand-written placeholder row in a plain table. On a `<template>` it holds the empty-state content. |
 | `data-ln-table-clear` | `<button>` | - | - | Resets local search inputs and column filters in SSR mode. |
 | `data-ln-table-clear-all` | `<button>` | - | - | Resets all active filters and triggers a new data request in Data-Driven mode. |
 | `data-ln-table-cell-attr` | Template element | `String` | - | List of `field:attribute` mappings for attribute interpolation. *(Processed externally via `ln-core.js` / `fillTemplate()`)* |
@@ -6022,7 +6026,7 @@ All events bubble up (`bubbles: true`).
 - **Summary:** A validation wrapper that adapts browser ValidityState and gates form submission.
 
 > **Classification:** 🟢 Simple component / Validity State Adapter  
-> Applied to form controls (`<input data-ln-validate>`, `<select>`, `<textarea>`) inside a `.form-element` wrapper.
+> Applied to form controls (`<input data-ln-validate>`, `<select>`, `<textarea>`); messages are read from the nearest ancestor that directly contains `[data-ln-validate-errors]`, and the list is optional.
 > On initialization, it injects `novalidate` on the parent `<form>` and intercepts the form `submit` event.
 > On field `blur` or `input` (after touched), it checks native `input.validity`, toggles the `.hidden` class on matching
 > `[data-ln-validate-error="rule"]` elements, and sets `aria-invalid`; on submit with errors, it calls `e.preventDefault()` and focuses the first invalid field.
@@ -6030,7 +6034,7 @@ All events bubble up (`bubbles: true`).
 #### Minimal HTML Markup & Usage:
 ### Base HTML Markup
 
-Every input field must be wrapped inside a `.form-element` container to correctly associate errors.
+`ln-validate` reads its messages from the nearest ancestor that directly contains `[data-ln-validate-errors]`. The list is optional.
 
 ```html
 <div class="form-element">

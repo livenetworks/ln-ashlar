@@ -326,7 +326,7 @@
 <!-- Overview / philosophy -->
 				<section class="section-card">
 					<header><h3>Overview &amp; Philosophy</h3></header>
-					<main>
+					<main class="prose">
 						<p><strong><code>ln-filter</code></strong> is applied to a filter control via <code>&lt;nav data-ln-filter="targetId"&gt;</code> containing standard checkbox inputs (<code>data-ln-filter-value="..."</code>) and an "All" reset sentinel (<code>data-ln-filter-reset</code>). On checkbox <code>change</code> events, it updates active filter criteria and maintains sentinel synchronization automatically. It evaluates target items or table rows by dataset attributes or column text, applies <code>data-ln-filter-hide</code> and <code>.hidden</code> to non-matching elements, and dispatches cancelable <code>ln-filter:change</code> CustomEvents for active coordinators to claim.</p>
 
 						<p>In <code>ln-ashlar</code>, this zero-dependency primitive operates as an event-driven layer upgrading standard HTML checkboxes into reactive multi-column and list filter controls.</p>
@@ -342,7 +342,7 @@
 						</div>
 
 						<h4>Architectural Design Features</h4>
-						<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+						<ol>
 							<li>
 								<strong>Attribute &amp; Tabular Modes:</strong> Toggles visibility of generic list items matching <code>data-{key}="{value}"</code> attributes, or filters standard HTML <code>&lt;table&gt;</code> rows by parsing cell text inside Column Index <code>N</code>.
 							</li>

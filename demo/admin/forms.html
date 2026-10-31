@@ -326,7 +326,7 @@
 <!-- Overview / philosophy -->
 				<section class="section-card">
 					<header><h3>Overview &amp; Philosophy</h3></header>
-					<main>
+					<main class="prose">
 						<p><strong><code>ln-form</code></strong> is applied to standard HTML forms via <code>&lt;form data-ln-form action="..." method="..."&gt;</code>. It listens for <code>ln-fill</code> events carrying record payloads to populate matching controls (<code>[name="key"]</code>) and dispatches synthetic <code>input</code> and <code>change</code> events so reactive components (like <code>ln-validate</code> and <code>ln-autoresize</code>) update in sync. In edit workflows, it automatically ensures an <code>&lt;input type="hidden" name="_method" value="PUT"&gt;</code> exists for RESTful method spoofing, without intercepting native form submission.</p>
 
 						<p>In <code>ln-ashlar</code>, forms are built on a strict, platform-first **Coordinator &amp; Primitive** doctrine: upgrading native HTML forms instead of inventing a custom JavaScript state engine.</p>

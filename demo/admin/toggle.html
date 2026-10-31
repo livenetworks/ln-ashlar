@@ -326,7 +326,7 @@
 <!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
-						<main>
+						<main class="prose">
 							<p><strong><code>ln-toggle</code></strong> is applied to any collapsible panel element via <code>data-ln-toggle</code>, with trigger buttons bound from anywhere in the DOM via <code>data-ln-toggle-for="id"</code>. It listens for trigger clicks and reacts to direct attribute mutations to toggle binary <code>open</code> / <code>close</code> state. The <code>data-ln-toggle</code> DOM attribute is the single source of truth—automatically keeping <code>aria-expanded</code> and the <code>.open</code> CSS class in sync with zero JavaScript height calculations or private shadow state.</p>
 
 							<p>Every complex open/close user interface element in a modern web application—whether a sidebar drawer, a dropdown menu, a collapsible section, a dismissible alert, or an accordion—shares this common state machine.</p>
@@ -343,7 +343,7 @@
 
 							<h4>Orthogonality: Pure State vs Pure Layout</h4>
 							<p>To keep the codebase modular, <code>ln-toggle</code> enforces a strict separation of concerns. It operates at three completely orthogonal layers:</p>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>
 									<strong>The State Machine (JavaScript):</strong> The <code>ln-toggle</code> script (only 145 lines) handles two things: maintaining state in the DOM via the <code>data-ln-toggle</code> attribute, and synchronizing <code>aria-expanded</code> and <code>aria-controls</code> attributes across all associated trigger buttons. It does not touch layout, dimensions, or animations.
 								</li>
@@ -673,7 +673,7 @@ fetch('/partial').then(r =&gt; r.text()).then(html =&gt; {
 					<!-- Practical uses -->
 					<section class="section-card">
 						<header><h3>Practical uses</h3></header>
-						<main>
+						<main class="prose">
 							<ul>
 								<li><strong>Sidebar drawer</strong> — pair with <code>@mixin sidebar-drawer</code>; persist with <code>data-ln-persist</code>; close button uses <code>data-ln-toggle-action="close"</code>.</li>
 								<li><strong>Inline collapsibles</strong> — pair with <code>@mixin collapsible</code>; chevron icon rotates via <code>aria-expanded</code> automatically.</li>

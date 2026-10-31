@@ -903,6 +903,7 @@ const M = /* @__PURE__ */ new Set([
   "data-ln-empty-when",
   "data-ln-error",
   "data-ln-external-link",
+  "data-ln-external-links-hint",
   "data-ln-field",
   "data-ln-fill-as",
   "data-ln-fill-form",

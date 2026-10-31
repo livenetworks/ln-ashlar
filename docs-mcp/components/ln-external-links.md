@@ -13,7 +13,7 @@ tags: [security, accessibility, telemetry, links]
 > **Classification:** 🟢 Simple component / Global Behavior (Layer 1 - Security & Accessibility)  
 > Runs globally across `document.body` watching all `<a>` and `<area>` elements. When an element's `href` host
 > differs from `window.location.host`, it sets `target="_blank"`, merges `rel="noopener noreferrer"`,
-> appends a `<span class="sr-only">(opens in new tab)</span>`, and marks it with `data-ln-external-link="processed"` to prevent redundant mutations.
+> appends a `<span data-ln-external-links-hint>(opens in new tab)</span>`, and marks it with `data-ln-external-link="processed"` to prevent redundant mutations.
 
 ---
 
@@ -23,7 +23,7 @@ The `ln-external-links` component is an automated utility that scans and secures
 
 *   **Outbound Detection:** Automatically checks link hostnames against `window.location.hostname`. Any link targeting a different domain is identified as an external link.
 *   **Security Sanitization (Reverse Tabnabbing Prevention):** Appends `target="_blank"` and ensures `rel` contains `noopener noreferrer` to protect against security vulnerabilities.
-*   **Accessibility Enhancement (A11y Hint):** Appends a visually hidden `<span>` containing `(opens in new tab)` with class `.sr-only` for screen reader users.
+*   **Accessibility Enhancement (A11y Hint):** Appends a visually hidden `<span>` containing `(opens in new tab)` marked with `data-ln-external-links-hint` for screen reader users.
 *   **Dynamic DOM Observation:** Manages a document-level `MutationObserver` to process newly added links (e.g. injected via AJAX/templates) and monitor `href` attribute changes dynamically.
 *   **Telemetry Events:** Listens for global clicks on processed external links and dispatches `ln-external-links:clicked` for easy analytics integration.
 
@@ -58,7 +58,7 @@ After processing by `ln-external-links`:
        rel="noopener noreferrer" 
        data-ln-external-link="processed">
        Google
-       <span class="sr-only">(opens in new tab)</span>
+       <span data-ln-external-links-hint>(opens in new tab)</span>
     </a>
     
     <!-- Internal link remains untouched -->
@@ -75,6 +75,7 @@ After processing by `ln-external-links`:
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-external-link` | `<a>`, `<area>` | `String` | — | Automatically stamped as `processed` after sanitization to prevent duplicate processing. |
+| `data-ln-external-links-hint` | `<span>` | `Marker` | — | Marks the visually hidden "(opens in new tab)" hint span appended inside a processed link. |
 
 ### Programmatic JS API (`window.lnExternalLinks`)
 
@@ -93,20 +94,12 @@ After processing by `ln-external-links`:
 
 ## 4. CSS Styling & Behavioral Concept
 
-The component only injects accessible hidden text relying on standard `.sr-only` rules:
+The injected hint is hidden by a rule that ships in `ln-ashlar-core.css`; no `.sr-only` utility is needed:
 
 ```scss
-// SCSS visual layer implementation for accessible hidden text
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+// components/ln-external-links/ln-external-links.scss
+[data-ln-external-links-hint] {
+    @include sr-only;
 }
 ```
 
@@ -121,7 +114,7 @@ The component only injects accessible hidden text relying on standard `.sr-only`
 ### Common Pitfalls & Anti-patterns
 
 > [!CAUTION]
-> 1. **Missing `.sr-only` CSS Class:** Omitting `.sr-only` CSS utility rules will cause the hidden text `(opens in new tab)` to render visibly on the page.
+> 1. **Missing core stylesheet:** Omitting `ln-ashlar-core.css` (which carries the `[data-ln-external-links-hint]` rule) will cause the hidden text `(opens in new tab)` to render visibly on the page.
 > 2. **Subdomain Links Treated as External:** Links pointing to different subdomains (e.g. `api.domain.com` vs `domain.com`) are correctly recognized as external because hostnames differ.
 
 ---
@@ -141,7 +134,7 @@ sequenceDiagram
     
     loop for each external link
         JS->>DOM: target="_blank", rel="noopener noreferrer"
-        JS->>DOM: Append span.sr-only (opens in new tab)
+        JS->>DOM: Append span[data-ln-external-links-hint] (opens in new tab)
         JS->>DOM: data-ln-external-link="processed"
         JS->>DOM: dispatch ln-external-links:processed
     end

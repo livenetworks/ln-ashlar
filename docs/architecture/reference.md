@@ -798,7 +798,7 @@ See [components/ln-core/README.md](../../components/ln-core/README.md) for the r
 <!-- .ln-filter-active on button = filter is active (JS-toggled; SCSS dot)   -->
 <th data-ln-table-filter-col="department">
 	Department
-	<button class="table-filter" type="button"
+	<button type="button"
 	        data-ln-table-col-filter
 	        data-ln-popover-for="filter-my-table-dept"
 	        aria-label="Filter department">

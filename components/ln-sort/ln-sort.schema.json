@@ -9,18 +9,6 @@
 				"ln-sort-dev.scss"
 			]
 		},
-		"data-ln-empty": {
-			"direction": "author",
-			"sources": [
-				"src/sort-model.js"
-			]
-		},
-		"data-ln-empty-state": {
-			"direction": "author",
-			"sources": [
-				"src/sort-model.js"
-			]
-		},
 		"data-ln-field": {
 			"direction": "author",
 			"sources": [

@@ -958,22 +958,22 @@ table th, [data-ln-table] th {
 }
 
 /* Allocate header space when sort and/or filter controls are present */
-table th:has(:is([data-ln-sort], .table-filter, [data-ln-table-col-filter])),
-[data-ln-table] th:has(:is([data-ln-sort], .table-filter, [data-ln-table-col-filter])) {
+table th:has(:is([data-ln-sort], [data-ln-table-col-filter])),
+[data-ln-table] th:has(:is([data-ln-sort], [data-ln-table-col-filter])) {
 	min-width: 6.25rem;
 	padding-inline-end: 2.75rem;
 }
 
-table th:has([data-ln-sort]):has(:is(.table-filter, [data-ln-table-col-filter])),
-[data-ln-table] th:has([data-ln-sort]):has(:is(.table-filter, [data-ln-table-col-filter])) {
+table th:has([data-ln-sort]):has([data-ln-table-col-filter]),
+[data-ln-table] th:has([data-ln-sort]):has([data-ln-table-col-filter]) {
 	min-width: 8.5rem;
 	padding-inline-end: 4.5rem;
 }
 
 /* Position action buttons inside th */
-table th :is(.table-filter, [data-ln-table-col-filter]),
+table th [data-ln-table-col-filter],
 table th [data-ln-sort],
-[data-ln-table] th :is(.table-filter, [data-ln-table-col-filter]),
+[data-ln-table] th [data-ln-table-col-filter],
 [data-ln-table] th [data-ln-sort] {
 	position: absolute;
 	top: 50%;
@@ -983,8 +983,8 @@ table th [data-ln-sort],
 }
 
 /* When both sort and filter exist: sort button sits to the left of the filter button */
-table th:has(:is(.table-filter, [data-ln-table-col-filter])) [data-ln-sort],
-[data-ln-table] th:has(:is(.table-filter, [data-ln-table-col-filter])) [data-ln-sort] {
+table th:has([data-ln-table-col-filter]) [data-ln-sort],
+[data-ln-table] th:has([data-ln-table-col-filter]) [data-ln-sort] {
 	right: 2.5rem;
 }
 
@@ -1074,9 +1074,8 @@ th:hover [data-ln-sort] button,
 }
 
 /* --------------------------------------------------------------------------
-   Table Column Filter Button (.table-filter / [data-ln-table-col-filter])
+   Table Column Filter Button ([data-ln-table-col-filter])
    -------------------------------------------------------------------------- */
-.table-filter,
 [data-ln-table-col-filter] {
 	width: 1.75rem;
 	height: 1.75rem;
@@ -1096,44 +1095,36 @@ th:hover [data-ln-sort] button,
 	position: relative;
 }
 
-[data-mode="dark"] .table-filter,
 [data-mode="dark"] [data-ln-table-col-filter] {
 	color: #94a3b8;
 }
 
-th:hover .table-filter,
 th:hover [data-ln-table-col-filter],
-[data-ln-table] th:hover .table-filter,
 [data-ln-table] th:hover [data-ln-table-col-filter] {
 	opacity: 0.75;
 }
 
-.table-filter:hover,
 [data-ln-table-col-filter]:hover {
 	opacity: 1 !important;
 	background-color: rgba(79, 70, 229, 0.1);
 	color: #4f46e5;
 }
 
-[data-mode="dark"] .table-filter:hover,
 [data-mode="dark"] [data-ln-table-col-filter]:hover {
 	background-color: rgba(129, 140, 248, 0.15);
 	color: #818cf8;
 }
 
 /* Active filter state indicator */
-.table-filter.ln-filter-active,
 [data-ln-table-col-filter].ln-filter-active {
 	opacity: 1;
 	color: #4f46e5;
 }
 
-[data-mode="dark"] .table-filter.ln-filter-active,
 [data-mode="dark"] [data-ln-table-col-filter].ln-filter-active {
 	color: #818cf8;
 }
 
-.table-filter.ln-filter-active::after,
 [data-ln-table-col-filter].ln-filter-active::after {
 	content: '';
 	position: absolute;
@@ -1145,12 +1136,10 @@ th:hover [data-ln-table-col-filter],
 	background-color: #4f46e5;
 }
 
-[data-mode="dark"] .table-filter.ln-filter-active::after,
 [data-mode="dark"] [data-ln-table-col-filter].ln-filter-active::after {
 	background-color: #818cf8;
 }
 
-.table-filter .ln-icon,
 [data-ln-table-col-filter] .ln-icon {
 	width: 1.125rem;
 	height: 1.125rem;

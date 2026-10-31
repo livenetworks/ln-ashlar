@@ -9,6 +9,12 @@
 				"ln-toast-dev.scss"
 			]
 		},
+		"data-ln-field": {
+			"direction": "author",
+			"sources": [
+				"src/ln-toast.js"
+			]
+		},
 		"data-ln-toast": {
 			"direction": "author",
 			"sources": [

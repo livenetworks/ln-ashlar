@@ -15,18 +15,6 @@
 				"ln-filter-dev.scss"
 			]
 		},
-		"data-ln-empty": {
-			"direction": "author",
-			"sources": [
-				"src/ln-filter.js"
-			]
-		},
-		"data-ln-empty-state": {
-			"direction": "author",
-			"sources": [
-				"src/ln-filter.js"
-			]
-		},
 		"data-ln-field": {
 			"direction": "author",
 			"sources": [

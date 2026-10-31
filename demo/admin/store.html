@@ -326,7 +326,7 @@
 <!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
-						<main>
+						<main class="prose">
 							<p><strong><code>ln-data-store</code></strong> is applied to a hidden element via <code>data-ln-data-store id="name"</code> to provide client-side IndexedDB persistence with automatic schema indexing and optional AES-GCM encryption. It is completely decoupled from the network: responding to request events (<code>ln-data-store:request-query</code>, <code>request-save</code>, <code>request-delete</code>) against local records and broadcasting <code>ln-data-store:stale</code> when cached data expires, allowing applications to function offline and render cached data instantly.</p>
 
 							<p>In <code>ln-ashlar</code>, this local-first cache layer decouples UI responsiveness from network latency, treating IndexedDB as the immediate source of truth for presentation components.</p>
@@ -342,7 +342,7 @@
 							</div>
 
 							<h4>Three Orthogonal Layers of the Data Pipeline</h4>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>
 									<strong>The Cache Storage (IndexedDB):</strong> A native, highly-performant browser database capable of storing megabytes of structured JSON data. It supports indexing, fast text-based search queries, and stays persisted fully across app restarts and offline sessions.
 								</li>
@@ -356,7 +356,7 @@
 
 							<h4>How the Data Flow Coherence Works</h4>
 							<p>When a record is created or mutated by the user:</p>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>The coordinator claims the form submit and dispatches a local write event (e.g. <code>ln-data-store:request-create</code>) with the form payload and a temporary ID.</li>
 								<li>The store saves the record locally and instantly dispatches <code>ln-data-store:created</code>. Sibling views receive the event and display the new record immediately.</li>
 								<li>In the background, the coordinator pushes the network request via the connector or outbox queue. On server confirmation, the coordinator dispatches an ordinary <code>ln-data-store:request-update</code> to rekey the temporary ID to the server ID (emitting <code>ln-data-store:updated</code>). On a 4xx create rejection, it dispatches <code>ln-data-store:request-delete</code> (emitting <code>ln-data-store:deleted</code>).</li>

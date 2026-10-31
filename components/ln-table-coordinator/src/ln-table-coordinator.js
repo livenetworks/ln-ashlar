@@ -110,7 +110,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 					               ths[i].getAttribute('data-ln-filter-key') ||
 					               ths[i].getAttribute('data-ln-field');
 					if (colKey === key) {
-						const btn = ths[i].querySelector('[data-ln-table-col-filter], .table-filter');
+						const btn = ths[i].querySelector('[data-ln-table-col-filter]');
 						if (btn) btn.classList.toggle('ln-filter-active', values.length > 0);
 						break;
 					}
@@ -130,7 +130,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 
 				const ths = table.querySelectorAll('th');
 				for (let i = 0; i < ths.length; i++) {
-					const filterBtn = ths[i].querySelector('[data-ln-table-col-filter], .table-filter');
+					const filterBtn = ths[i].querySelector('[data-ln-table-col-filter]');
 					if (filterBtn) filterBtn.classList.remove('ln-filter-active');
 				}
 

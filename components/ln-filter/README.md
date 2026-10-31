@@ -78,6 +78,7 @@ Filters plain `<table>` rows by Column Index `2` (Department) and saves state to
 | `data-ln-query` | Container root | Opt-in. Synchronizes active filter values to URL query parameter (e.g. `?category=design,dev` or `?status=active`). Value is parameter name (if omitted, falls back to `data-ln-filter-col` or `data-ln-filter-key`). Interoperable with browser back/forward history (`popstate`). |
 | `data-ln-filter-values` | Container root | *State*. Comma-joined, percent-encoded list of currently active filter values. Written by the component, read by `ln-persist` for restore/save. |
 | `data-ln-filter-hide` | Children of target | *State*. Automatically toggled on non-matching elements (`display: none !important`). |
+| `data-ln-table-empty` | Table rows | Rows carrying this attribute are skipped when filtering plain-table rows. ln-table writes it on its empty and loading placeholder row; author it on a hand-written placeholder row in a plain table. |
 
 
 ---
@@ -102,7 +103,7 @@ The canonical composition for table per-column filters.
 ```html
 <th data-ln-table-filter-col="department">
 	Department
-	<button class="table-filter" type="button"
+	<button type="button"
 	        data-ln-table-col-filter
 	        data-ln-popover-for="filter-my-table-dept"
 	        aria-label="Filter department">

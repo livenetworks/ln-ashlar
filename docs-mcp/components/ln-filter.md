@@ -124,7 +124,7 @@ The canonical composition for table per-column filters. `ln-filter` dispatches e
 <!-- Table Header column with filter button -->
 <th data-ln-table-filter-col="department">
   Department
-  <button class="table-filter" type="button"
+  <button type="button"
           data-ln-table-col-filter
           data-ln-popover-for="filter-dept-popover"
           aria-label="Filter department">
@@ -161,6 +161,7 @@ The canonical composition for table per-column filters. `ln-filter` dispatches e
 | `data-ln-query` | Container root | Flag \| `String` | — | Opt-in. Synchronizes active filters to URL query parameter (e.g. `?category=design,dev` or `?status=active`). Value specifies parameter name (defaults to column name or filter key). Interoperable with browser back/forward history (`popstate`). |
 | `data-ln-filter-values` | Container root | `String` | — | Component-written state attribute: the comma-joined, percent-encoded list of currently active filter values. Read by `ln-persist` for restore/save. |
 | `data-ln-filter-hide` | Target children / rows | `"true"` | — | Written by the component on elements that fail the active filters. |
+| `data-ln-table-empty` | Table rows | `Marker` | - | Rows carrying this attribute are skipped when filtering plain-table rows. ln-table writes it on its empty and loading placeholder row; author it on a hand-written placeholder row in a plain table. |
 
 > [!NOTE]
 > `data-ln-filter-hide` is a component-written **state marker**, not a consumer configuration attribute — never author it in markup. It is listed here only to document the DOM the component produces.

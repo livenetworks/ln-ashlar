@@ -366,7 +366,7 @@
 									</th>
 									<th data-ln-table-filter-col="dept">
 										Department
-										<button class="table-filter" type="button" data-ln-table-col-filter data-ln-popover-for="filter-dept" aria-label="Filter department">
+										<button type="button" data-ln-table-col-filter data-ln-popover-for="filter-dept" aria-label="Filter department">
 											<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 										</button>
 										<ul data-ln-sort="employee-table">
@@ -377,7 +377,7 @@
 									</th>
 									<th data-ln-table-filter-col="role">
 										Role
-										<button class="table-filter" type="button" data-ln-table-col-filter data-ln-popover-for="filter-role" aria-label="Filter role">
+										<button type="button" data-ln-table-col-filter data-ln-popover-for="filter-role" aria-label="Filter role">
 											<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 										</button>
 										<ul data-ln-sort="employee-table">
@@ -388,7 +388,7 @@
 									</th>
 									<th data-ln-table-filter-col="status">
 										Status
-										<button class="table-filter" type="button" data-ln-table-col-filter data-ln-popover-for="filter-status" aria-label="Filter status">
+										<button type="button" data-ln-table-col-filter data-ln-popover-for="filter-status" aria-label="Filter status">
 											<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 										</button>
 										<ul data-ln-sort="employee-table">
@@ -611,7 +611,7 @@
 				<!-- How It Works -->
 				<section class="section-card">
 					<header><h3>How It Works</h3></header>
-					<main>
+					<main class="prose">
 						<ul>
 							<li><strong>Global search</strong> — <code>ln-search</code> dispatches <code>ln-search:change</code> on the <code>data-ln-table</code> wrapper. <code>ln-table</code> intercepts and filters rows in-memory — no custom script needed.</li>
 							<li><strong>Per-column filters</strong> — <code>ln-filter</code> dispatches <code>ln-filter:change</code> on the table wrapper. <code>ln-table</code> maps filter keys to columns via <code>data-ln-table-filter-col</code> on <code>&lt;th&gt;</code>. Multiple columns combine with AND; within a column, values use OR. When active, <code>.ln-filter-active</code> is toggled on the filter <code>&lt;button&gt;</code> — the funnel icon turns accent color.</li>
@@ -629,7 +629,7 @@
 						<pre><code>&lt;!-- th: data-ln-table-filter-col maps the filter key to this column --&gt;
 &lt;th data-ln-table-filter-col="dept"&gt;
     Department
-    &lt;button class="table-filter" type="button"
+    &lt;button type="button"
             data-ln-table-col-filter
             data-ln-popover-for="filter-dept"
             aria-label="Filter department"&gt;

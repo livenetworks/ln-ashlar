@@ -1,10 +1,6 @@
 @use '../../theme/config/mixins' as *;
 
 [data-ln-debug] {
-	[data-ln-chart]:not(.chart) {
-		@include dev-dom-error("[data-ln-chart] is missing the required .chart visual class.");
-	}
-
 	[data-ln-chart]:not([data-ln-chart-x]),
 	[data-ln-chart]:not([data-ln-chart-y]) {
 		@include dev-dom-error("[data-ln-chart] requires data-ln-chart-x and data-ln-chart-y.");

@@ -20,7 +20,7 @@ tags: [component, chart, svg, data, coordinator]
 `ln-chart` renders one ordered numeric dataset as a responsive SVG line or area chart. It is a pure renderer: data arrives through `ln-chart:set-data`, and `ln-data-coordinator` resolves `data-ln-chart-store` against its child store/connector.
 
 - Authored SVG and templates are preserved; JS updates geometry attributes and bound text only.
-- `.chart` owns visual chrome through `theme/config/mixins/_chart.scss`.
+- `.chart` is the prototype binding of the `chart` mixin (`theme/config/mixins/_chart.scss`); production may bind the mixin on its own selector. The component does not require the class.
 - Instance customization rebinds `--chart-*` custom properties.
 - Store/API knowledge remains exclusively in `ln-data-coordinator`.
 - Scaling is category-based on x and linear numeric on y; the zero baseline is included by default to avoid misleading magnitude.

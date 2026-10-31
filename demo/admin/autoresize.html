@@ -337,7 +337,7 @@
 					<!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
-						<main>
+						<main class="prose">
 							<p><strong><code>data-ln-autoresize</code></strong> is applied directly to multi-line input fields via <code>&lt;textarea data-ln-autoresize rows="1"&gt;</code>. In <code>ln-ashlar</code>, this is a <strong>100% Pure CSS UX utility</strong> powered natively by the browser's <code>field-sizing: content</code> property.</p>
 
 							<p>By leveraging the platform's native rendering engine, textareas expand and contract dynamically during typing, pasting, content deletions, and programmatic value updates with <strong>zero JavaScript, zero event listeners, and zero layout thrashing</strong>.</p>
@@ -354,7 +354,7 @@
 
 							<h4>Concerns Scoped Strictly by Layer</h4>
 							<p>The growing input experience is achieved by decoupling layout ceilings, browser defaults, and active styling:</p>
-							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<ol>
 								<li>
 									<strong>The Content Shell (HTML <code>rows</code> Attribute):</strong> Standard inputs default to <code>rows="2"</code>. Explicitly declaring <code>rows="1"</code> sets the intrinsic single-line baseline for an empty input.
 								</li>

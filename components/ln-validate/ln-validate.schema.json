@@ -15,12 +15,6 @@
 				"ln-validate.scss"
 			]
 		},
-		"data-ln-form": {
-			"direction": null,
-			"sources": [
-				"ln-validate-dev.scss"
-			]
-		},
 		"data-ln-validate": {
 			"direction": null,
 			"sources": [

@@ -94,6 +94,7 @@ cannot substitute for this — these icons are an SVG sprite via `<use href>`, n
 | `data-ln-persist` | Same as root | Opt-in. Persists `{ field, column, direction }` to `localStorage`. Give each `[data-ln-sort]` its own value (or `id`) — persistence is per-instance, not per-table. |
 | `data-ln-hash` | Same as root | Opt-in. Synchronizes sort state to URL hash fragment (e.g. `#users-sort:price.asc`). Value is custom namespace; if empty defaults to `[targetId]-sort`. |
 | `data-ln-query` | Same as root | Opt-in. Synchronizes sort column and direction to URL query parameter (e.g. `?sort=price.asc` or `?sort=amount.desc`). Value specifies query parameter name (defaults to `'sort'`). Interoperable with browser back/forward history (`popstate`). |
+| `data-ln-table-empty` | Table rows | Rows carrying this attribute are excluded from sorting, alongside `hidden` rows and `data-ln-sort-exclude`. ln-table writes it on its empty and loading placeholder row; author it on a hand-written placeholder row in a plain table. |
 
 ### JavaScript API (`el.lnSort`)
 

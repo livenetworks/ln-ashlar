@@ -55,7 +55,7 @@ import {
 			if (typeof document !== 'undefined' && document.createTreeWalker) {
 				const walker = document.createTreeWalker(this.dom, NodeFilter.SHOW_TEXT, {
 					acceptNode: function (node) {
-						if (node.parentElement && node.parentElement.classList && node.parentElement.classList.contains('sr-only')) {
+						if (node.parentElement && node.parentElement.hasAttribute('data-ln-external-links-hint')) {
 							return NodeFilter.FILTER_REJECT;
 						}
 						return NodeFilter.FILTER_ACCEPT;
@@ -89,7 +89,7 @@ import {
 
 		// Reset premature ln-external-links decoration if present
 		if (isLink && this.dom.getAttribute('data-ln-external-link') === 'processed') {
-			const hints = this.dom.querySelectorAll('.sr-only');
+			const hints = this.dom.querySelectorAll('[data-ln-external-links-hint]');
 			for (let i = 0; i < hints.length; i++) {
 				hints[i].remove();
 			}

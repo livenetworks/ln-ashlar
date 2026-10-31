@@ -19,7 +19,7 @@ The `app-shell` mixin set (`theme/config/mixins/_app-shell.scss` and `theme/comp
 - **Fixed Header (`app-header`):** Fixed top bar with resting elevation shadow, height set via `--app-header-height`, and default ghost button styling.
 - **Responsive Sidebar Drawer (`sidebar` + `sidebar-drawer`):** Persistent desktop sidebar shifting to a slide-out overlay drawer below `$bp-md` (768px).
 - **Zero-JS Scrim Activation (`app-scrim`):** The scrim overlay activates via CSS sibling combinator (`aside[data-ln-toggle="open"] ~ &`) without requiring dedicated JS scripts.
-- **Desktop Content Shift:** On desktop (`mq-up(md)`), `.app-main` uses `:has(.app-sidebar[data-ln-toggle="open"])` to pad the content column and footer by `--app-sidebar-width` without viewport overflow.
+- **Desktop Content Shift:** On desktop (`mq-up(md)`), while the direct-child `<aside>` of `.app-main` is `data-ln-toggle="open"`, `.app-main` pads the content column and footer by `--app-sidebar-width` without viewport overflow.
 
 ---
 
@@ -100,7 +100,7 @@ The `app-shell` mixin set (`theme/config/mixins/_app-shell.scss` and `theme/comp
 ## 4. Accessibility & Common Pitfalls
 
 > [!CAUTION]
-> 1. **Do Not Put Page Scroll on `<body>`:** In an application shell, the outer viewport is locked (`overflow: hidden`), and scrolling occurs inside `.app-content-wrapper` or direct `<section>` children of `.app-main`.
+> 1. **Do Not Put Page Scroll on `<body>`:** In an application shell, the app wrapper bounds itself to the viewport (`100dvh`, `overflow: hidden`), so the document never scrolls, and scrolling occurs inside `.app-content-wrapper` or direct `<section>` children of `.app-main`.
 > 2. **Mobile Drawer Scrim Wiring:** Always ensure the `.app-scrim` element is wired with `data-ln-toggle-for` so clicking outside dismisses the mobile drawer.
 > 3. **App Shell Breakpoints Use `@media`:** App shell is the explicit exception to container queries; it queries `@media` directly because it governs the root viewport.
 
