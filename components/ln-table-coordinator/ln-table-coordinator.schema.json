@@ -21,6 +21,12 @@
 				"src/ln-table-coordinator.js"
 			]
 		},
+		"data-ln-filter-hide": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
 		"data-ln-filter-key": {
 			"direction": "author",
 			"sources": [
@@ -40,6 +46,12 @@
 			]
 		},
 		"data-ln-search-for": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
+		"data-ln-search-hide": {
 			"direction": "author",
 			"sources": [
 				"src/ln-table-coordinator.js"
@@ -76,6 +88,12 @@
 			],
 			"type": "marker",
 			"description": "Mounts table coordinator mediating between table, search, filter, and pagination"
+		},
+		"data-ln-table-empty": {
+			"direction": "both",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
 		},
 		"data-ln-table-filter-col": {
 			"direction": "author",
