@@ -1633,8 +1633,7 @@
 		},
 		{
 			"name": "data-ln-translatable",
-			"description": "Marks form control as translatable into multiple languages",
-			"valueSet": "v"
+			"description": "Marks form control container as translatable, value is field name"
 		},
 		{
 			"name": "data-ln-translatable-lang",
@@ -1642,7 +1641,7 @@
 		},
 		{
 			"name": "data-ln-translations",
-			"description": "Mounts multi-language translation manager on form container",
+			"description": "Mounts multi-language translation coordinator on form container",
 			"valueSet": "v"
 		},
 		{
@@ -1652,19 +1651,28 @@
 		},
 		{
 			"name": "data-ln-translations-add",
-			"description": "Trigger button action to add specified language translation fields"
+			"description": "Trigger button to open translation language menu"
 		},
 		{
 			"name": "data-ln-translations-default",
 			"description": "Default primary language code (e.g. en)"
 		},
 		{
+			"name": "data-ln-translations-dict",
+			"description": "Dictionary key prefix mapping for translatable labels"
+		},
+		{
 			"name": "data-ln-translations-lang",
-			"description": "Language code associated with active language badge"
+			"description": "Language code associated with active language badge or menu item"
 		},
 		{
 			"name": "data-ln-translations-locales",
 			"description": "JSON dictionary of supported locale codes and display labels"
+		},
+		{
+			"name": "data-ln-translations-menu",
+			"description": "Menu container holding available language items",
+			"valueSet": "v"
 		},
 		{
 			"name": "data-ln-translations-placeholder",
@@ -1672,7 +1680,7 @@
 		},
 		{
 			"name": "data-ln-translations-prefix",
-			"description": "Prefix format pattern for cloned translated field names"
+			"description": "Prefix format pattern for nested translatable field names"
 		},
 		{
 			"name": "data-ln-translations-remove-label",

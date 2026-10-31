@@ -1,7 +1,7 @@
 {
 	"$schema": "https://json.schemastore.org/web-types",
 	"name": "@livenetworks/ashlar",
-	"version": "2.2.0",
+	"version": "2.2.1",
 	"framework": "html",
 	"contributions": {
 		"html": {
@@ -2079,9 +2079,9 @@
 				},
 				{
 					"name": "data-ln-translatable",
-					"description": "Marks form control as translatable into multiple languages",
+					"description": "Marks form control container as translatable, value is field name",
 					"value": {
-						"type": "boolean"
+						"type": "string"
 					}
 				},
 				{
@@ -2093,7 +2093,7 @@
 				},
 				{
 					"name": "data-ln-translations",
-					"description": "Mounts multi-language translation manager on form container",
+					"description": "Mounts multi-language translation coordinator on form container",
 					"value": {
 						"type": "boolean"
 					}
@@ -2107,7 +2107,7 @@
 				},
 				{
 					"name": "data-ln-translations-add",
-					"description": "Trigger button action to add specified language translation fields",
+					"description": "Trigger button to open translation language menu",
 					"value": {
 						"type": "string"
 					}
@@ -2120,8 +2120,15 @@
 					}
 				},
 				{
+					"name": "data-ln-translations-dict",
+					"description": "Dictionary key prefix mapping for translatable labels",
+					"value": {
+						"type": "string"
+					}
+				},
+				{
 					"name": "data-ln-translations-lang",
-					"description": "Language code associated with active language badge",
+					"description": "Language code associated with active language badge or menu item",
 					"value": {
 						"type": "string"
 					}
@@ -2134,6 +2141,13 @@
 					}
 				},
 				{
+					"name": "data-ln-translations-menu",
+					"description": "Menu container holding available language items",
+					"value": {
+						"type": "boolean"
+					}
+				},
+				{
 					"name": "data-ln-translations-placeholder",
 					"description": "Placeholder label pattern for cloned translation inputs",
 					"value": {
@@ -2142,7 +2156,7 @@
 				},
 				{
 					"name": "data-ln-translations-prefix",
-					"description": "Prefix format pattern for cloned translated field names",
+					"description": "Prefix format pattern for nested translatable field names",
 					"value": {
 						"type": "string"
 					}

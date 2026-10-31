@@ -20,6 +20,7 @@ The `app-shell` mixin set (`theme/config/mixins/_app-shell.scss` and `theme/comp
 - **Responsive Sidebar Drawer (`sidebar` + `sidebar-drawer`):** Persistent desktop sidebar shifting to a slide-out overlay drawer below `$bp-md` (768px).
 - **Zero-JS Scrim Activation (`app-scrim`):** The scrim overlay activates via CSS sibling combinator (`aside[data-ln-toggle="open"] ~ &`) without requiring dedicated JS scripts.
 - **Desktop Content Shift:** On desktop (`mq-up(md)`), while the direct-child `<aside>` of `.app-main` is `data-ln-toggle="open"`, `.app-main` pads the content column and footer by `--app-sidebar-width` without viewport overflow.
+- **Header Action Counters:** A `<data value="3">3</data>` direct child of a `.header-actions` button renders as a solid [`count`](./count.md) pinned over the button's corner; a status class on the `<data>` (e.g. `class="error"`) sets its tone.
 
 ---
 
@@ -80,7 +81,7 @@ The `app-shell` mixin set (`theme/config/mixins/_app-shell.scss` and `theme/comp
 | `app-header` | mixin | — | Fixed header bar with resting shadow, border, and ghost button defaults |
 | `app-header-left` | mixin | — | Flex row with logo/title and `.menu-toggle` button |
 | `app-header-right` | mixin | — | Flex row container for search, actions, and user menu |
-| `app-header-actions` | mixin | — | Action button group hiding labels below `$bp-sm` |
+| `app-header-actions` | mixin | — | Action button group hiding labels below `$bp-sm`; `button > data` becomes a corner counter |
 | `header-avatar` | mixin | — | 2rem circular image thumbnail popover trigger |
 | `app-main` | mixin | — | Inner scrollable viewport with sidebar / content flexbox |
 | `sidebar-drawer` | mixin | — | Responsive drawer positioning & transform below `$bp-md` (768px) |

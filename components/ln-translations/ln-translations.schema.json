@@ -27,8 +27,8 @@
 				"ln-translations-dev.scss",
 				"src/ln-translations.js"
 			],
-			"type": "marker",
-			"description": "Marks form control as translatable into multiple languages"
+			"type": "string",
+			"description": "Marks form control container as translatable, value is field name"
 		},
 		"data-ln-translatable-lang": {
 			"direction": "both",
@@ -45,7 +45,7 @@
 				"src/ln-translations.js"
 			],
 			"type": "marker",
-			"description": "Mounts multi-language translation manager on form container"
+			"description": "Mounts multi-language translation coordinator on form container"
 		},
 		"data-ln-translations-active": {
 			"direction": "author",
@@ -61,8 +61,8 @@
 			"sources": [
 				"src/ln-translations.js"
 			],
-			"type": "string",
-			"description": "Trigger button action to add specified language translation fields"
+			"type": "trigger",
+			"description": "Trigger button to open translation language menu"
 		},
 		"data-ln-translations-default": {
 			"direction": null,
@@ -73,13 +73,21 @@
 			"fallback": "",
 			"description": "Default primary language code (e.g. en)"
 		},
+		"data-ln-translations-dict": {
+			"direction": null,
+			"sources": [
+				"src/ln-translations.js"
+			],
+			"type": "string",
+			"description": "Dictionary key prefix mapping for translatable labels"
+		},
 		"data-ln-translations-lang": {
 			"direction": "both",
 			"sources": [
 				"src/ln-translations.js"
 			],
 			"type": "string",
-			"description": "Language code associated with active language badge"
+			"description": "Language code associated with active language badge or menu item"
 		},
 		"data-ln-translations-locales": {
 			"direction": null,
@@ -89,6 +97,14 @@
 			"type": "json",
 			"fallback": "",
 			"description": "JSON dictionary of supported locale codes and display labels"
+		},
+		"data-ln-translations-menu": {
+			"direction": "author",
+			"sources": [
+				"src/ln-translations.js"
+			],
+			"type": "marker",
+			"description": "Menu container holding available language items"
 		},
 		"data-ln-translations-placeholder": {
 			"direction": null,
@@ -105,7 +121,7 @@
 				"src/ln-translations.js"
 			],
 			"type": "string",
-			"description": "Prefix format pattern for cloned translated field names"
+			"description": "Prefix format pattern for nested translatable field names"
 		},
 		"data-ln-translations-remove-label": {
 			"direction": null,

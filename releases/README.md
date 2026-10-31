@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.2.1](./v2.2.1.md) — October 31, 2026
+Architectural modernization of `ln-translations` following the Two-Tier model, zero hardcoded display text in JS, resilient primary field preservation, event delegation for dynamic menu/badges, data-driven CSS SVG flag pipeline, and server-rendered hydration fixes.  
+👉 [Read full v2.2.1 release notes](./v2.2.1.md)
+
 ### [v2.2.0](./v2.2.0.md) — October 30, 2026
 A new default look, ported from Stefan Nikolic's UI refresh: Plus Jakarta Sans, a sky accent, a slate ramp and soft radii and shadows, with density owning typography. Also new: the `relaxed` design bundle, page-sticky table headers, and record cards for tables below `md`.  
 👉 [Read full v2.2.0 release notes](./v2.2.0.md)

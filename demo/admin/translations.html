@@ -327,7 +327,8 @@
 				<section class="section-card">
 					<header><h3>Overview &amp; Philosophy</h3></header>
 					<main class="prose">
-						<p><strong><code>ln-translations</code></strong> is applied to form elements via <code>&lt;form data-ln-translations data-ln-translations-default="en"&gt;</code> to coordinate multi-lingual field editing. It identifies translatable input containers (<code>[data-ln-translatable="field"]</code>), dynamically cloning form controls with deterministic nested naming (e.g. <code>trans[lang][field]</code>) as languages are added. It synchronizes active locale badges and selection menus using <code>&lt;template&gt;</code> elements, submitting localized values natively through the standard HTML form submission pipeline without custom network logic.</p>
+						<p><strong><code>ln-translations</code></strong> is applied to form elements via <code>&lt;form data-ln-translations data-ln-translations-default="en"
+							      data-ln-translations-locales='{"en":"English","sq":"Shqip","sr":"Srpski","de":"Deutsch","mk":"Македонски"}'&gt;</code> to coordinate multi-lingual field editing. It identifies translatable input containers (<code>[data-ln-translatable="field"]</code>), dynamically cloning form controls with deterministic nested naming (e.g. <code>trans[lang][field]</code>) as languages are added. It synchronizes active locale badges and selection menus using <code>&lt;template&gt;</code> elements, submitting localized values natively through the standard HTML form submission pipeline without custom network logic.</p>
 
 						<p>In <code>ln-ashlar</code>, this zero-dependency coordinator manages inline multi-lingual inputs by dynamically cloning translatable fields on-demand.</p>
 
@@ -386,7 +387,8 @@
 							<form data-ln-translations
 							      action="#"
 							      method="post"
-							      data-ln-translations-default="en">
+							      data-ln-translations-default="en"
+							      data-ln-translations-locales='{"en":"English","sq":"Shqip","sr":"Srpski","de":"Deutsch","mk":"Македонски"}'>
 								<header>
 									<h3>Company Info</h3>
 									<div class="ln-translations__actions">
@@ -422,7 +424,8 @@
 							<form data-ln-translations
 							      action="#"
 							      method="post"
-							      data-ln-translations-default="en">
+							      data-ln-translations-default="en"
+							      data-ln-translations-locales='{"en":"English","sq":"Shqip","sr":"Srpski","de":"Deutsch","mk":"Македонски"}'>
 								<header>
 									<h3>Standard Details</h3>
 									<div class="ln-translations__actions">
@@ -454,7 +457,8 @@
 							<form data-ln-translations
 							      action="#"
 							      method="post"
-							      data-ln-translations-default="en">
+							      data-ln-translations-default="en"
+							      data-ln-translations-locales='{"en":"English","sq":"Shqip","sr":"Srpski","de":"Deutsch","mk":"Македонски"}'>
 								<header>
 									<h3>Checklist Items</h3>
 									<div class="ln-translations__actions">
@@ -519,6 +523,24 @@ name="items[5][trans][en][title]"</code></pre>
 							</article>
 						</main>
 					</section>
+
+
+
+<!-- Required templates for translations badges and menu items -->
+<template data-ln-template="ln-translations-badge">
+	<li>
+		<p data-ln-translations-lang>
+			<span></span>
+			<button type="button" aria-label="Remove">
+				<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+			</button>
+		</p>
+	</li>
+</template>
+
+<template data-ln-template="ln-translations-menu-item">
+	<li><button type="button" data-ln-translations-lang></button></li>
+</template>
 			</div>
 		</section>
 
