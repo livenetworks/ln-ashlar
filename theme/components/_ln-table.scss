@@ -14,7 +14,7 @@
 }
 
 // Toolbar sibling of the table: pin the thead under the toolbar.
-:is(main, section, article):has(> .ln-table__toolbar + table),
+:is(main, section, article):has(> .ln-table__toolbar + :is(table, [data-ln-table])),
 [data-ln-table]:has(> header + table) {
 	@include ln-table-toolbar-stack;
 }

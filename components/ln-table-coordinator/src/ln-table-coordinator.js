@@ -39,11 +39,99 @@ import { registerComponent, dispatch } from '../../ln-core';
 		}
 	});
 
+	// ─── Empty State Mediation (Plain SSR Tables) ───────────
+
+	function _isRowVisible(tr) {
+		if (tr.hasAttribute('data-ln-search-hide') || tr.hasAttribute('data-ln-filter-hide')) return false;
+		if (tr.hidden || (tr.classList && tr.classList.contains('hidden'))) return false;
+		if (tr.style && tr.style.display === 'none') return false;
+		return true;
+	}
+
+	function _ensureEmptyElement(self) {
+		if (self._emptyEl) return self._emptyEl;
+		const template = self.dom.querySelector('template[data-ln-table-empty]');
+		if (!template) return null;
+		const subEl = template.content.firstElementChild;
+		if (!subEl) return null;
+
+		const clone = document.importNode(subEl, true);
+		clone.setAttribute('data-ln-table-empty', '');
+		clone.classList.add('hidden');
+		clone.hidden = true;
+
+		const table = self.dom.querySelector('table');
+		if (!table) return null;
+		const mountTarget = table.closest('.table-container') || table;
+		mountTarget.insertAdjacentElement('afterend', clone);
+		self._emptyEl = clone;
+		return clone;
+	}
+
+	function _syncEmptyState(self) {
+		const table = self.dom.querySelector('table');
+		if (!table) return;
+		if (table.hasAttribute('data-ln-table') || (table.parentElement && table.parentElement.hasAttribute('data-ln-table'))) return;
+
+		const template = self.dom.querySelector('template[data-ln-table-empty]');
+		if (!template) return;
+
+		const emptyEl = _ensureEmptyElement(self);
+		if (!emptyEl) return;
+
+		const rows = table.querySelectorAll('tbody tr');
+		let hasVisible = false;
+		for (let i = 0; i < rows.length; i++) {
+			const tr = rows[i];
+			if (tr.hasAttribute('data-ln-table-empty')) continue;
+			if (_isRowVisible(tr)) {
+				hasVisible = true;
+				break;
+			}
+		}
+
+		const shouldShow = rows.length > 0 && !hasVisible;
+		if (shouldShow) {
+			emptyEl.classList.remove('hidden');
+			emptyEl.hidden = false;
+		} else {
+			emptyEl.classList.add('hidden');
+			emptyEl.hidden = true;
+		}
+	}
+
+	function _setupEmptyState(self) {
+		const table = self.dom.querySelector('table');
+		if (!table) return;
+		if (table.hasAttribute('data-ln-table') || (table.parentElement && table.parentElement.hasAttribute('data-ln-table'))) return;
+
+		const template = self.dom.querySelector('template[data-ln-table-empty]');
+		if (!template) return;
+
+		const tbody = table.querySelector('tbody') || table;
+		const observer = new MutationObserver(function () {
+			_syncEmptyState(self);
+		});
+
+		observer.observe(tbody, {
+			attributes: true,
+			attributeFilter: ['data-ln-search-hide', 'data-ln-filter-hide', 'hidden', 'class', 'style'],
+			subtree: true,
+			childList: true
+		});
+
+		self._emptyObserver = observer;
+		_syncEmptyState(self);
+	}
+
 	// ─── Component Constructor ─────────────────────────────
 
 	function _component(dom) {
 		this.dom = dom;
+		this._emptyEl = null;
+		this._emptyObserver = null;
 		_bindEvents(this);
+		_setupEmptyState(this);
 		return this;
 	}
 
@@ -115,6 +203,8 @@ import { registerComponent, dispatch } from '../../ln-core';
 						break;
 					}
 				}
+
+				_syncEmptyState(self);
 			},
 
 			// Clear-all has no ID binding of its own — resolve structurally,
@@ -166,6 +256,8 @@ import { registerComponent, dispatch } from '../../ln-core';
 				if (table.lnTable && !table.hasAttribute('data-ln-table-source')) {
 					dispatch(table, 'ln-table:request-clear-filters', { table: name });
 				}
+
+				_syncEmptyState(self);
 			}
 		};
 
@@ -177,6 +269,16 @@ import { registerComponent, dispatch } from '../../ln-core';
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
+
+		if (this._emptyObserver) {
+			this._emptyObserver.disconnect();
+			this._emptyObserver = null;
+		}
+
+		if (this._emptyEl) {
+			if (this._emptyEl.parentNode) this._emptyEl.remove();
+			this._emptyEl = null;
+		}
 
 		if (this._handlers) {
 			this.dom.removeEventListener('ln-filter:change', this._handlers.filter);
