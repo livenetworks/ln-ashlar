@@ -68,6 +68,7 @@ The `tables` module (`theme/config/mixins/_table.scss` and `theme/components/_ta
 | `table-striped` | mixin | — | Alternating row background fills |
 | `table-responsive` | mixin | — | Stacked record cards: label column from `td[data-label]`; unlabeled cells span the card |
 | `table-section-header` | mixin | — | Section divider row styling |
+| `table-filter`, `table-filter-active` | mixin | — | Circular column filter header button recipe and active indicator dot |
 | `.table` | class | — | Prototyping class for `table-base` |
 | `.numeric` | class | — | Right-aligns numbers and enables tabular numerals (`tnum`) |
 | `.nowrap` | class | — | Disables text wrapping for tight columns |
