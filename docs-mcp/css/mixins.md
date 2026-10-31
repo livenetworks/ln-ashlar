@@ -147,7 +147,7 @@ The `ln-ashlar` mixin architecture powers the **Visual Theme Layer** (`ln-ashlar
 | `card-header`, `card-body`, `card-footer` | mixin | — | Internal card structural regions with standard padding |
 | `section` | mixin | — | Page section vertical rhythm and container constraints |
 | `table-base`, `table-striped` | mixin | `$sticky: true`, `$responsive: true` | Full table styling with sunken, page-sticky header and interactive hover |
-| `form-grid`, `form-input`, `form-label` | mixin | — | Responsive 6-column form grid and input styling |
+| `form-grid`, `form-input`, `form-label`, `form-element` | mixin | — | Responsive 6-column form grid, input, and field wrapper styling |
 | `btn`, `btn-soft`, `btn-ghost` | mixin | — | Turnkey button variants with interaction states |
 | `chip` | mixin | — | Dismissible pill badge with delete action |
 | `badge`, `status-badge` | mixin | — | Status indicator badge with semantic status colors |
