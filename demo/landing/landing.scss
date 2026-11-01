@@ -5,8 +5,21 @@
 // Pure semantic HTML in #bento-id-showcase without any component or utility classes!
 // ==========================================================================
 
+@use '../../theme/config/mixins' as *;
 @use '../../theme/presentation/bento' as *;
 @use '../../theme/presentation/effects' as *;
+
+// ─── Collapsed header: keep the action row inside a phone viewport ────────
+// Below the `nav` breakpoint the links move into #site-menu; the text CTA
+// and the Theme label give way so .menu-toggle stays on screen.
+.site-header .nav-actions {
+	@include mq-down(nav) {
+		> a.btn,
+		#landing-theme-trigger span {
+			display: none;
+		}
+	}
+}
 
 // ─── Semantic Bento Showcase via ID & Mixin Composition ───────────────────
 #bento-id-showcase {

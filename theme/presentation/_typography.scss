@@ -161,3 +161,16 @@
 		text-decoration-color: hsl(var(--color-primary));
 	}
 }
+
+// A link inside a heading is a title link (card, article, news item), not an
+// inline text link: it keeps the heading color and only tints on hover. Same
+// specificity as the rule above and declared after it, so it wins for
+// `li h3 a` without touching inline links in the same list item.
+.landing-section :is(h1, h2, h3, h4, h5, h6) a:not(.btn) {
+	color: inherit;
+	text-decoration: none;
+
+	&:hover {
+		color: hsl(var(--color-primary));
+	}
+}

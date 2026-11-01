@@ -16,7 +16,7 @@ tags: [breakpoints, media-queries, container-queries, responsive, layout]
 
 The `breakpoints` system (`theme/config/_breakpoints.scss`) defines two distinct and independent responsive scales:
 
-1. **App-Shell Media Breakpoints (`@media`):** Governs macro viewport layout (app-shell, header, desktop vs mobile sidebar drawer).
+1. **App-Shell Media Breakpoints (`@media`):** Governs macro viewport layout (app-shell, header, desktop vs mobile sidebar drawer). The presentation header has its own viewport key, `nav` (820px): below it `.site-header` collapses `.nav-menu` behind `.menu-toggle`.
 2. **Container Query Breakpoints (`@container`):** Governs component-level responsive styling based on the width of the parent container rather than the screen viewport.
 
 All breakpoint values are exposed via Sass variables, CSS custom properties at `:root`, and dedicated mixins (`mq-up`, `mq-down`, `cq-up`, `cq-down`).
@@ -76,8 +76,8 @@ All breakpoint values are exposed via Sass variables, CSS custom properties at `
 
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
-| `mq-up` | mixin | `$bp: sm\|md\|lg\|xl\|2xl\|3xl` | Media query `(min-width: ...)` block |
-| `mq-down` | mixin | `$bp: sm\|md\|lg\|xl\|2xl\|3xl` | Media query `(max-width: ... - 1px)` block |
+| `mq-up` | mixin | `$bp: sm\|md\|lg\|xl\|2xl\|3xl\|nav` | Media query `(min-width: ...)` block |
+| `mq-down` | mixin | `$bp: sm\|md\|lg\|xl\|2xl\|3xl\|nav` | Media query `(max-width: ... - 1px)` block |
 | `cq-up` | mixin | `$cq: narrow\|compact\|medium\|wide, $name: null` | Container query `(min-width: ...)` block |
 | `cq-down` | mixin | `$cq: narrow\|compact\|medium\|wide, $name: null` | Container query `(max-width: ... - 1px)` block |
 | `--bp-sm` | token | `480px` | Small mobile-to-phablet viewport threshold |
@@ -86,6 +86,7 @@ All breakpoint values are exposed via Sass variables, CSS custom properties at `
 | `--bp-xl` | token | `1280px` | Large desktop viewport threshold |
 | `--bp-2xl` | token | `1536px` | Wide desktop viewport threshold |
 | `--bp-3xl` | token | `1920px` | Ultra-wide viewport threshold |
+| `--bp-nav` | token | `820px` | Presentation header collapse — `.nav-menu` hides, `.menu-toggle` shows below it |
 | `--cq-narrow` | token | `480px` | Tight component container threshold |
 | `--cq-compact` | token | `580px` | Standard 2-column component container threshold |
 | `--cq-medium` | token | `880px` | Standard 3-column component container threshold |

@@ -141,7 +141,6 @@
 	@include fixed;
 	inset: auto;
 	margin: 0;
-	padding: var(--padding-y);
 	min-width: var(--dropdown-min-width, 14rem);
 	@include enter-scale-fade;
 
@@ -167,4 +166,9 @@
 	}
 
 	@include menu-items;
+
+	// Panel inset — after menu-items on purpose: the panel IS the <ul>,
+	// and menu-items' list reset (padding: 0) would otherwise zero it,
+	// leaving the item highlight flush against the panel border.
+	padding: var(--padding-y);
 }

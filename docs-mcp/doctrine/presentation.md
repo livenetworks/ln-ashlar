@@ -90,6 +90,9 @@ The presentation layer strictly enforces semantic HTML5 landmarks and structural
    - **Pricing Tiers:** MUST use `<li>` (with `data-popular` for highlighted plans), `<span data-badge>` (badge), `<h3>`, `<p>`, `<data value="..." class="pricing-amount">`, nested `<ul>` (features), `<footer>` (action).
    - **Actions & Navigation:** MUST use `<nav>`, `<footer>`, `<button>`, `<a>`.
 
+4. **Inline Links vs. Title Links:**  
+   Inside `.landing-section`, a link in running text (`<p>`, `<li>`) is an inline link — primary color, underlined. A link inside a heading (`<h1>`–`<h6>`) is a title link (news item, card, project) — it keeps the heading color, no underline, and tints to primary on hover. Mark title links up as `<h3><a href="…">Title</a></h3>`; never restyle them with a class.
+
 #### Canonical Semantic Examples:
 
 **Testimonial Card:**
@@ -146,6 +149,8 @@ Every presentation module exports functional SCSS mixins:
 - `@mixin stat-grid` and `@mixin stat-item`
 - `@mixin pricing-grid` and `@mixin pricing-card`
 - `@mixin cta-box`
+- `@mixin glass-panel`, `@mixin glow-hover`
+- `@mixin photo-backdrop($scrim: photo-scrim())` and `@function photo-scrim($angle: 90deg, $from: 92%, $to: 30%)`
 
 Project developers can compose these mixins against completely custom semantic IDs without placing a single component class in their HTML:
 
@@ -173,6 +178,27 @@ When classes are used for layouts in HTML, they must be **generic and reusable p
 
 Creating single-use classes like `.testimonial-grid`, `.stat-grid`, or `.feature-grid` is forbidden.
 
+### C. Photo Backdrops (Full-Bleed Photography Behind Content)
+A region whose **first child** is `<figure><img></figure>` gets the photograph stretched behind all following content with `@include photo-backdrop` (prototype class: `.photo-backdrop`). The scrim is mixed from the region's own `--bg-base`, so declare the polarity on the region (`data-mode`, `data-theme`) and the text tokens follow — never hardcode a text color over a photo.
+
+```html
+<section id="hero" class="hero-section" data-mode="dark">
+    <figure><img src="hero.jpg" alt="Transmission towers at dusk"></figure>
+    <div class="landing-container">
+        <h1 class="hero-title">…</h1>
+    </div>
+</section>
+```
+
+```scss
+#hero    { @include photo-backdrop; }                                   // default left-to-right scrim
+#careers { @include photo-backdrop(photo-scrim(180deg, 85%, 40%)); }    // top-to-bottom, lighter
+#story   { @include photo-backdrop(linear-gradient(…brand tint…)); }    // project-owned gradient
+#banner  { @include photo-backdrop(null); }                             // photo only, no scrim
+```
+
+`photo-scrim()` arguments are the share of `--bg-base` at the start and end of the gradient (`100%` = opaque surface).
+
 ---
 
 ## 5. Zero Inline Styles & GPU Compositor Performance
@@ -199,3 +225,29 @@ Presentation marketing pages in `ln-ashlar` use the exact same Layer 1 component
 - **Lead Capture & Inquiries:** Use [`ln-modal`](../components/ln-modal.md) (`<dialog data-ln-modal>`) for high-converting contact and demo modals.
 - **Billing Period Switches:** Use [`ln-tabs`](../components/ln-tabs.md) or accessible button groups for monthly / annual pricing toggles.
 - **Live Theme & Appearance Pickers:** Use [`ln-popover`](../components/ln-popover.md) (`popover` API with graceful polyfill) for non-modal floating control panels.
+- **Collapsed Header Menu:** Below the `nav` breakpoint (`$bp-nav`, 820px) `.site-header` hides `.nav-menu` and shows `.menu-toggle`. The toggle opens a `<nav>` that is a **direct child** of `.site-header`, driven by [`ln-toggle`](../components/ln-toggle.md) + `.collapsible`. Above the breakpoint, both the toggle and the panel are hidden.
+
+```html
+<header class="site-header">
+    <div class="landing-container">
+        <nav class="site-nav" aria-label="Main navigation">
+            <a href="/" class="nav-brand">…</a>
+            <ul class="nav-menu">
+                <li><a href="#features" class="nav-link">Features</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button type="button" class="btn btn-ghost btn-sm menu-toggle" data-ln-toggle-for="site-menu" aria-label="Menu">
+                    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu-2"></use></svg>
+                </button>
+            </div>
+        </nav>
+    </div>
+    <nav id="site-menu" data-ln-toggle class="collapsible" aria-label="Menu">
+        <div class="collapsible-body">
+            <ul>
+                <li><a href="#features">Features</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+```

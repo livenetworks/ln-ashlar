@@ -5,6 +5,7 @@
 @use 'form' as *;
 @use 'focus' as *;
 @use 'dropdown' as *;
+@use 'typography' as *;
 
 @mixin popover {
 	@include floating-panel;
@@ -37,7 +38,17 @@
 		margin: var(--size-xs) 0;
 	}
 
-	> ul {
+	// Menu popover caption (profile menu: <p> + <hr> + <nav><ul>) — sits on
+	// the item labels' inline grid instead of the bare panel inset.
+	&:has(> ul > li > :is(a, button), > nav > ul > li > :is(a, button)) > p {
+		margin: 0;
+		padding: var(--padding-y) var(--padding-x);
+		@include typography(body-sm);
+	}
+
+	// `nav > ul` is the canonical profile-menu shape (see ln-popover markup).
+	> ul,
+	> nav > ul {
 		list-style: none;
 		padding: 0;
 		margin: 0;

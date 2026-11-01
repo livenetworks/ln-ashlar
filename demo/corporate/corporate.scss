@@ -7,6 +7,7 @@
 
 @use '../../theme/config/tokens' as *;
 @use '../../theme/config/mixins' as *;
+@use '../../theme/presentation/effects' as *;
 
 // ─── Corporate Design Tokens ──────────────────────────────────────────────
 :root {
@@ -197,36 +198,15 @@ body {
 
 // ─── Photographic Hero Section ─────────────────────────────────────────────
 #hero {
-	position: relative;
+	// Photo behind the content; the scrim is mixed from the region's --bg-base.
+	@include photo-backdrop(photo-scrim(to right, 95%, 35%));
 	min-height: clamp(38rem, 85vh, 52rem);
 	display: flex;
 	align-items: center;
 	overflow: hidden;
 
-	.hero-backdrop {
-		position: absolute;
-		inset: 0;
-		z-index: 0;
-
-		img {
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-			object-position: center;
-			filter: brightness(0.72) contrast(1.05);
-		}
-
-		&::after {
-			content: '';
-			position: absolute;
-			inset: 0;
-			background: linear-gradient(
-				to right,
-				hsl(var(--bg-base) / 0.95) 0%,
-				hsl(var(--bg-base) / 0.82) 45%,
-				hsl(var(--bg-base) / 0.35) 100%
-			);
-		}
+	> figure img {
+		filter: brightness(0.72) contrast(1.05);
 	}
 
 	.hero-content {

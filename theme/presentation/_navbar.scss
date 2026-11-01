@@ -2,7 +2,28 @@
 // Presentation Header & Navigation — ln-ashlar
 // ==========================================================================
 // Sticky frosted glass header, brand mark, navigation links, and action bar.
+//
+// Below the `nav` breakpoint the inline .nav-menu collapses: .menu-toggle
+// in .nav-actions opens a <nav> that is a direct child of .site-header
+// (ln-toggle + .collapsible). Above it, the toggle and the panel are hidden.
+//
+//   <header class="site-header">
+//       <div class="landing-container">
+//           <nav class="site-nav">
+//               …brand, ul.nav-menu…
+//               <div class="nav-actions">
+//                   <button type="button" class="btn btn-ghost btn-sm menu-toggle"
+//                           data-ln-toggle-for="site-menu" aria-label="Menu">…</button>
+//               </div>
+//           </nav>
+//       </div>
+//       <nav id="site-menu" data-ln-toggle class="collapsible" aria-label="Menu">
+//           <div class="collapsible-body"><ul><li><a href="…">…</a></li></ul></div>
+//       </nav>
+//   </header>
 // ==========================================================================
+
+@use '../config/mixins' as *;
 
 .site-header {
 	position: sticky;
@@ -60,7 +81,7 @@
 		margin: 0;
 		padding: 0;
 
-		@media (max-width: 820px) {
+		@include mq-down(nav) {
 			display: none;
 		}
 
@@ -96,6 +117,56 @@
 		display: flex;
 		align-items: center;
 		gap: var(--size-sm);
+	}
+
+	// Collapsed-menu trigger — only while .nav-menu is hidden.
+	.menu-toggle {
+		@include mq-up(nav) {
+			display: none;
+		}
+	}
+
+	// Collapsed-menu panel. The .collapsible parent stays padding-free;
+	// the list inside .collapsible-body carries the spacing.
+	> nav {
+		@include mq-up(nav) {
+			display: none;
+		}
+
+		ul {
+			display: flex;
+			flex-direction: column;
+			gap: var(--size-2xs);
+			list-style: none;
+			margin: 0;
+			padding: var(--size-sm) var(--container-padding-x) var(--size-md);
+			border-top: var(--border-width) solid color-mix(in srgb, var(--color-border) 60%, transparent);
+		}
+
+		li {
+			margin: 0;
+			padding: 0;
+		}
+
+		a {
+			display: block;
+			padding: var(--size-sm-up) var(--size-sm);
+			border-radius: var(--radius-md);
+			font-weight: 600;
+			color: var(--color-fg);
+			text-decoration: none;
+			transition: color var(--transition-fast), background-color var(--transition-fast);
+
+			&:hover {
+				background-color: var(--bg-hover);
+			}
+
+			&.active,
+			&[aria-current="page"] {
+				color: hsl(var(--color-primary));
+				background-color: color-mix(in srgb, hsl(var(--color-primary)) 10%, transparent);
+			}
+		}
 	}
 }
 

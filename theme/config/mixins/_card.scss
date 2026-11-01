@@ -30,13 +30,16 @@
 
 	// Only whole-card links/buttons signal interaction. Passive containers
 	// must not respond merely because the pointer crosses their content.
+	// A whole-card link is the card's ONLY child (`> a:only-child`); a link
+	// that sits next to other content (a "Read more" under a paragraph) is
+	// an ordinary link and leaves the card alone.
 	&:is(a, button):hover:not(:disabled),
-	&:has(> a:hover) {
+	&:has(> a:only-child:hover) {
 		--color-border: color-mix(in srgb, var(--color-accent) 35%, transparent);
 	}
 
 	&:is(a, button):focus-visible,
-	&:has(> a:focus-visible) {
+	&:has(> a:only-child:focus-visible) {
 		@include focus-ring;
 	}
 
@@ -56,7 +59,7 @@
 	}
 
 	// Whole-card-as-link: <a> wraps card content and fills the card.
-	> a {
+	> a:only-child {
 		@include flex-col;
 		@include flex-1;
 		text-decoration: none;
@@ -263,7 +266,7 @@
 
 @mixin _card-accent-base {
 	&:is(a, button):hover:not(:disabled),
-	&:has(> a:hover) {
+	&:has(> a:only-child:hover) {
 		background-color: color-mix(in srgb, var(--color-accent) var(--tint-hover), transparent);
 	}
 }

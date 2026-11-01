@@ -98,6 +98,74 @@
 }
 
 // ---------------------------------------------------------------------------
+// Photo Backdrop (full-bleed photograph behind a region's content)
+// ---------------------------------------------------------------------------
+// The region's FIRST child is a <figure><img></figure>; it fills the region
+// behind everything that follows. The scrim is mixed from the region's own
+// --bg-base, so the region's text tokens stay legible in light mode, dark
+// mode and scoped theme islands — set data-mode / data-theme on the region,
+// never a hardcoded text color.
+//
+//   <section id="hero" class="hero-section photo-backdrop" data-mode="dark">
+//       <figure><img src="…" alt="…"></figure>
+//       <div class="landing-container">…</div>
+//   </section>
+//
+//   #hero  { @include photo-backdrop; }                              // default scrim
+//   #cta   { @include photo-backdrop(photo-scrim(180deg, 85%, 40%)); }
+//   #story { @include photo-backdrop(linear-gradient(…brand tint…)); }
+//   #plain { @include photo-backdrop(null); }                        // no scrim
+//
+// photo-scrim($angle, $from, $to): $from / $to are the --bg-base share at
+// the start / end of the gradient (100% = opaque surface).
+// ---------------------------------------------------------------------------
+@function photo-scrim($angle: 90deg, $from: 92%, $to: 30%) {
+	$mid: ($from + $to) * 0.5;
+
+	@return linear-gradient(
+		$angle,
+		color-mix(in srgb, var(--bg-base) #{$from}, transparent) 0%,
+		color-mix(in srgb, var(--bg-base) #{$mid}, transparent) 45%,
+		color-mix(in srgb, var(--bg-base) #{$to}, transparent) 100%
+	);
+}
+
+@mixin photo-backdrop($scrim: photo-scrim()) {
+	position: relative;
+	isolation: isolate;
+	// [data-mode] re-derives --color-fg on the region, but `color` itself is
+	// inherited already resolved from <body>; re-read it here.
+	color: var(--color-fg);
+
+	> figure:first-child {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		margin: 0;
+
+		img {
+			display: block;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		@if $scrim {
+			&::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				background: $scrim;
+			}
+		}
+	}
+}
+
+.photo-backdrop {
+	@include photo-backdrop;
+}
+
+// ---------------------------------------------------------------------------
 // Hover Glow & Elevation
 // ---------------------------------------------------------------------------
 @mixin glow-hover {

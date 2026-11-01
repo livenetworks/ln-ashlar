@@ -86,9 +86,28 @@
 					</div>
 
 					<a href="#pricing" class="btn btn-sm">Get Started</a>
+
+					<!-- Collapsed-menu trigger (visible below the `nav` breakpoint) -->
+					<button type="button" class="btn btn-ghost btn-sm menu-toggle" data-ln-toggle-for="site-menu" aria-label="Menu">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu-2"></use></svg>
+					</button>
 				</div>
 			</nav>
 		</div>
+
+		<!-- Collapsed menu panel (ln-toggle + .collapsible) -->
+		<nav id="site-menu" data-ln-toggle class="collapsible" aria-label="Menu">
+			<div class="collapsible-body">
+				<ul>
+					<li><a href="#features">Features</a></li>
+					<li><a href="#bento">Bento Grid</a></li>
+					<li><a href="#showcase">Scoped Islands</a></li>
+					<li><a href="#pricing">Pricing</a></li>
+					<li><a href="#testimonials">Reviews</a></li>
+					<li><a href="#faq">FAQ</a></li>
+				</ul>
+			</div>
+		</nav>
 	</header>
 
 	<main>

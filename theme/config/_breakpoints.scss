@@ -29,6 +29,12 @@ $bp-2xl: 1536px;
 $bp-3xl: 1920px;
 
 // -----------------------------------------------------------------------
+// Presentation navbar collapse (for @media — presentation/_navbar.scss)
+// -----------------------------------------------------------------------
+// Below this width .site-header hides .nav-menu and shows .menu-toggle.
+$bp-nav: 820px;
+
+// -----------------------------------------------------------------------
 // Container-query breakpoints (for @container — components)
 // -----------------------------------------------------------------------
 $cq-narrow:  480px;
@@ -46,6 +52,7 @@ $cq-wide:    1120px;
 	--bp-xl:  #{$bp-xl};
 	--bp-2xl: #{$bp-2xl};
 	--bp-3xl: #{$bp-3xl};
+	--bp-nav: #{$bp-nav};
 
 	--cq-narrow:  #{$cq-narrow};
 	--cq-compact: #{$cq-compact};
@@ -65,6 +72,7 @@ $breakpoints: (
 	xl:      $bp-xl,
 	2xl:     $bp-2xl,
 	3xl:     $bp-3xl,
+	nav:     $bp-nav,
 	narrow:  $cq-narrow,
 	compact: $cq-compact,
 	medium:  $cq-medium,

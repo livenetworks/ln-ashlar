@@ -17,7 +17,7 @@ tags: [cards, containers, surfaces, elevation, layout, panels]
 The `cards` module (`theme/config/mixins/_card.scss` and `theme/components/_card.scss`) provides primary content surface containers:
 
 - **`card`:** Bare content container applying `--color-bg`, `--color-border`, `--panel-radius`, and resting shadow. Nested child cards climb to `--bg-elevated` and stay flat (`--shadow: none`).
-- **Passive Cards:** Only whole-card links and buttons (`a.card`, `button.card`, or a card with a direct `> a`) react to hover and focus. A card that merely contains content does not respond to the pointer.
+- **Passive Cards:** Only whole-card links and buttons (`a.card`, `button.card`, or a card whose **only** child is an `<a>` — `> a:only-child`) react to hover and focus. A card that merely contains content does not respond to the pointer, and a link that sits next to other content (a "Read more" under a paragraph) stays an ordinary link: it neither stretches nor lights up the card.
 - **Panel Radius:** `--panel-radius` (default `--radius-lg`) is the corner of cards, section-cards, and modals; control radii stay on `--radius`. A skin that zeroes `--radius-lg` flattens panels too.
 - **Panel Header:** The header shares the panel surface. Title and description are an `<hgroup>` (`<h3>` plus `<p>`); `--panel-header-bg` and `--panel-footer-bg` opt in to a tint.
 - **Body Lists:** The panel body styles no lists. A bulleted or numbered content list sits inside `.prose` (`@include prose`) on the text region of the body; a classless component list keeps the global list reset.
