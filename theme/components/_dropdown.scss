@@ -4,8 +4,11 @@
 	@include dropdown;
 }
 
+// The ln-dropdown coordinator marks its menu [data-ln-dropdown-menu] at
+// init; .dropdown is the same panel + items as a class (visual hook in
+// markup, or a menu the coordinator doesn't own).
 [data-ln-dropdown-menu],
-.menu-panel {
+.dropdown {
 	@include dropdown-menu;
 }
 

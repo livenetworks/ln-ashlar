@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.2.3](./v2.2.3.md) — November 7, 2026
+Decoupled `.dropdown` presentation class, geometry and typography normalization across interactive dropdown/popover menu items, embedded action form detection, semantic action statuses, and refreshed documentation manifests.  
+👉 [Read full v2.2.3 release notes](./v2.2.3.md)
+
 ### [v2.2.2](./v2.2.2.md) — November 1, 2026
 Presentation Layer architecture doctrine, responsive presentation navbar with collapsible mobile drawer, photo backdrop mixin with dynamic scrims, scoped card interaction gating, and refined popover/dropdown metrics.  
 👉 [Read full v2.2.2 release notes](./v2.2.2.md)

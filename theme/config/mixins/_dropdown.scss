@@ -13,7 +13,8 @@
 //
 // Usage:
 //   [data-ln-dropdown] { @include dropdown; }
-//   [data-ln-dropdown-menu] { @include dropdown-menu; }
+//   [data-ln-dropdown-menu], .dropdown { @include dropdown-menu; }
+//   (both global bindings in components/_dropdown.scss)
 //
 // Open/close state (display:none ↔ display:block + .open) is JS-driven
 // and lives in the co-located JS SCSS, not here.
@@ -53,6 +54,16 @@
 	}
 
 	:is(li, form) > :is(a, button, input[type="submit"], input[type="reset"], input[type="button"]) {
+		// One row recipe, whatever the element. <button> rebinds --padding-*
+		// and --gap on itself (base/_global.scss), and ancestor scopes rebind
+		// them for their own buttons (@mixin app-header zeroes --btn-padding-*
+		// and mutes --color-fg; a popover inside .app-header is still in its
+		// DOM). Taking these from the list keeps a <form> submit row on the
+		// same geometry and ink as an <a> row.
+		--padding-y: inherit;
+		--padding-x: inherit;
+		--gap:       inherit;
+		--color-fg:  inherit;
 		width: 100%;
 		box-sizing: border-box;
 		display: flex;
@@ -67,11 +78,20 @@
 		box-shadow: none;
 		text-align: left;
 		text-decoration: none;
+		white-space: normal;    // button-base: nowrap
 		cursor: pointer;
 		font-family: inherit;
 		@include typography(body-sm);
+		@include font-normal;   // button-base: medium
 		color: var(--color-fg);
 		transition: background-color 120ms ease, color 120ms ease;
+
+		// Semantic item (e.g. a destructive "Delete"): ink and wash both
+		// follow the status color. Same shape as btn-ghost / btn-outline.
+		&:is(.success, .error, .warning, .info) {
+			--color-accent: hsl(var(--color-primary));
+			--color-fg:     var(--color-accent);
+		}
 
 		&:hover:not(:disabled) {
 			background-color: color-mix(in srgb, var(--color-accent) var(--tint-hover), transparent);

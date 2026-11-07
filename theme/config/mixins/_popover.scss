@@ -39,8 +39,14 @@
 	}
 
 	// Menu popover caption (profile menu: <p> + <hr> + <nav><ul>) — sits on
-	// the item labels' inline grid instead of the bare panel inset.
-	&:has(> ul > li > :is(a, button), > nav > ul > li > :is(a, button)) > p {
+	// the item labels' inline grid instead of the bare panel inset. An item
+	// may sit in a <form> (POST/DELETE action), as @mixin menu-items allows.
+	&:has(
+		> ul > li > :is(a, button),
+		> ul > li > form > button,
+		> nav > ul > li > :is(a, button),
+		> nav > ul > li > form > button
+	) > p {
 		margin: 0;
 		padding: var(--padding-y) var(--padding-x);
 		@include typography(body-sm);
@@ -79,8 +85,12 @@
 			margin-top: var(--size-2xs);
 		}
 
-		// When containing interactive actions/buttons (menus, pickers)
-		&:has(> li > :is(a, button, input[type="submit"], input[type="reset"], input[type="button"])) {
+		// When containing interactive actions/buttons (menus, pickers),
+		// directly or inside a <form> (POST/DELETE action).
+		&:has(
+			> li > :is(a, button, input[type="submit"], input[type="reset"], input[type="button"]),
+			> li > form > :is(button, input[type="submit"], input[type="reset"], input[type="button"])
+		) {
 			@include menu-items;
 		}
 

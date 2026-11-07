@@ -247,6 +247,7 @@
 	// because --border-block-start is read by ~10 other mixins
 	// (cards, tables, accordions) where the divider should NOT appear.
 	[data-ln-dropdown-menu],
+	.dropdown,
 	.menu-items {
 		--border-block-start: var(--border-width) solid var(--color-border);
 	}

@@ -39,7 +39,7 @@ Key responsibilities include:
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-To preserve the **Separation of Concerns**, visual layout and presentation are handled strictly by the `.dropdown-menu` CSS classes and SCSS mixins, while the JavaScript coordinator interacts only via the functional `data-ln-*` attributes.
+To preserve the **Separation of Concerns**, visual layout and presentation come from the `.dropdown` class (bound to `@mixin dropdown-menu`, as is the `[data-ln-dropdown-menu]` marker the coordinator writes at init), while the JavaScript coordinator interacts only via the functional `data-ln-*` attributes.
 
 ### Base HTML Markup
 
@@ -55,7 +55,7 @@ Below is a standard copy-paste template for an actions dropdown:
     </button>
     
     <!-- Dropdown Menu (State Primitive) -->
-    <ul id="options-menu" data-ln-toggle class="dropdown-menu">
+    <ul id="options-menu" data-ln-toggle class="dropdown">
         <li><a href="/profile">Profile</a></li>
         <li><a href="/settings">Settings</a></li>
         <li><hr></li>
@@ -74,11 +74,11 @@ When using a dropdown to pick a single value, use the native `aria-current="true
 
 ```html
 <div data-ln-dropdown>
-    <button type="button" data-ln-toggle-for="lang-menu" class="btn-select">
+    <button type="button" data-ln-toggle-for="lang-menu">
         English
         <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-chevron-down"></use></svg>
     </button>
-    <ul id="lang-menu" data-ln-toggle class="dropdown-menu">
+    <ul id="lang-menu" data-ln-toggle class="dropdown">
         <li><button type="button">Македонски</button></li>
         <li><button type="button" aria-current="true">English</button></li>
         <li><button type="button">Deutsch</button></li>
@@ -93,10 +93,10 @@ The dropdown menu can accommodate avatars, dividers (`<hr>`), and complex action
 ```html
 <div data-ln-dropdown>
     <!-- Avatar Trigger -->
-    <button type="button" data-ln-toggle-for="account-menu" class="btn-avatar">
+    <button type="button" data-ln-toggle-for="account-menu">
         <img src="avatar.png" alt="User Profile">
     </button>
-    <ul id="account-menu" data-ln-toggle class="dropdown-menu">
+    <ul id="account-menu" data-ln-toggle class="dropdown">
         <li><a href="/profile">My Profile</a></li>
         <li><a href="/billing">Billing</a></li>
         <li><hr></li>
@@ -173,121 +173,33 @@ All coordinator events are dispatched from the **main wrapper element (`[data-ln
 The visual layer is separated from JavaScript logic. Custom styles are provided via reusable mixins in `theme/config/mixins/_dropdown.scss` and selector bindings in `theme/components/_dropdown.scss`.
 
 ### SCSS Mixins Reference
-```scss
-// In theme/config/mixins/_dropdown.scss
-@mixin dropdown {
-	@include relative;
-}
 
-@mixin menu-items {
-	li {
-		margin: 0;
-		padding: 0;
-	}
+Source: [theme/config/mixins/_dropdown.scss](../../theme/config/mixins/_dropdown.scss). Read the mixin bodies there; they are not copied here.
 
-	form {
-		margin: 0;
-		padding: 0;
-		display: contents;
-	}
-
-	a,
-	button,
-	input[type="submit"],
-	input[type="reset"],
-	input[type="button"] {
-		@include w-full;
-		@include flex;
-		@include items-center;
-		justify-content: flex-start;
-		gap: var(--gap);
-		@include text-left;
-		@include text-sm;
-		@include cursor-pointer;
-		@include transition-fast;
-		background: none;
-		border: none;
-		border-radius: 0;
-		color: var(--color-fg);
-		text-decoration: none;
-
-		&:hover:not(:disabled),
-		&:active:not(:disabled) {
-			--color-bg: var(--bg-sunken);
-			background: var(--color-bg);
-			color: var(--color-fg);
-		}
-
-		&:focus {
-			box-shadow: none;
-		}
-
-		&[aria-current="true"] {
-			background: var(--color-accent-tint);
-			color: var(--color-accent);
-		}
-	}
-
-	a {
-		--padding-y: var(--size-xs);
-		--padding-x: var(--size-sm);
-		padding: var(--padding-y) var(--padding-x);
-	}
-
-	:is(button, input[type="submit"], input[type="reset"], input[type="button"]) {
-		--btn-padding-y: var(--size-xs);
-		--btn-padding-x: var(--size-sm);
-	}
-
-	li + li {
-		border-block-start: var(--border-block-start, none);
-	}
-
-	hr {
-		border: none;
-		border-block-start: var(--border-block-start, var(--border-width) solid var(--color-border));
-		--margin-block: var(--size-xs);
-		margin-block: var(--margin-block);
-	}
-}
-
-@mixin dropdown-menu {
-	@include floating-panel;
-	@include fixed;
-	inset: auto;
-	margin: 0;
-	--padding-y: var(--size-xs);
-	padding-block: var(--padding-y);
-	min-width: 10rem;
-
-	@include menu-items;
-}
-```
+| Mixin | What it gives |
+|---|---|
+| `dropdown` | The wrapper: `position: relative`. |
+| `dropdown-menu` | The floating panel (`floating-panel`, `position: fixed`, enter animation, panel inset), plus `panel-search` and `menu-items`. |
+| `menu-items` | The item rows, shared with `ln-popover` menus. `<a>`, `<button>` and `<input type="submit\|reset\|button">`, directly in an `<li>` or inside an `<li><form>` (a POST/DELETE action), render as one identical row. Rows take `--padding-*`, `--gap` and `--color-fg` from the list, so button-only rebinds (the `<button>` padding tokens, the ghost buttons of `@mixin app-header`) do not leak in. States: hover and active wash, `aria-current="true"` / `.active` for the selected item. A semantic class on an item (`.error`, `.success`, `.warning`, `.info`) tints its text and wash. |
 
 ### SCSS Component Selector Bindings
 ```scss
 // In theme/components/_dropdown.scss
-@use '../config/mixins' as *;
-
 [data-ln-dropdown] {
 	@include dropdown;
 }
 
-[data-ln-dropdown-menu] {
+[data-ln-dropdown-menu],
+.dropdown {
 	@include dropdown-menu;
 }
 
-@keyframes ln-dropdown-in {
-	from {
-		opacity: 0;
-		transform: translateY(-4px) scale(0.98);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0) scale(1);
-	}
+.menu-items {
+	@include menu-items;
 }
 ```
+
+`.dropdown` is the visual hook in markup. The coordinator also writes `data-ln-dropdown-menu` on its menu at init, which carries the same look, so an ln-dropdown menu without the class is styled once the JS runs. `.menu-items` gives the rows alone, for a list on some other surface.
 
 ### Behavioral Concept
 
