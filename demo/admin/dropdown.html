@@ -344,7 +344,7 @@
 							<h4>Top-Layer Promotion &amp; Positioning</h4>
 							<p>When a dropdown menu is activated, <code>ln-dropdown</code> promotes the menu element to the top layer using the native Popover API (<code>popover="manual"</code>, <code>showPopover()</code>) to prevent clipping under scrollable containers or nested cards. It then measures the trigger element and matches its position right-aligned below the trigger (or according to <code>data-ln-dropdown-position</code>). It automatically flips above if vertical space is restricted, and removes positioning styles when closed.</p>
 
-							<p>For the complete developer reference, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-dropdown/README.md"><code>ln-dropdown</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-dropdown/README.md">architecture reference</a>.</p>
+							<p>For the complete developer reference, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/components/ln-dropdown/README.md"><code>ln-dropdown</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/architecture/coordinator.md">architecture reference</a>.</p>
 						</main>
 					</section>
 
@@ -373,23 +373,23 @@
 						<main>
 							<p>Click the button or press <code>ArrowDown</code> on it to open. Use <code>ArrowDown</code>, <code>ArrowUp</code>, <code>Home</code>, and <code>End</code> to navigate through the menu items. Press <code>Escape</code> to close and return focus to the trigger.</p>
 							<div data-ln-dropdown>
-								<button data-ln-toggle-for="demo-menu-1" type="button">Options</button>
-								<ul id="demo-menu-1" data-ln-toggle>
+								<button data-ln-toggle-for="demo-menu-1" type="button" class="btn">Options</button>
+								<ul id="demo-menu-1" data-ln-toggle class="dropdown">
 									<li><button type="button">Edit</button></li>
 									<li><button type="button">Duplicate</button></li>
 									<li><button type="button">Archive</button></li>
-									<li><button type="button">Delete</button></li>
+									<li><button type="button" class="error">Delete</button></li>
 								</ul>
 							</div>
 						</main>
 						<script type="text/plain" data-demo-scss>
 						[data-ln-dropdown] {
 							@include dropdown;
+						}
 
-							// The dropdown menu/list
-							[data-ln-toggle] {
-								@include dropdown-menu;
-							}
+						[data-ln-dropdown-menu],
+						.dropdown {
+							@include dropdown-menu;
 						}
 						</script>
 					</section>
@@ -401,16 +401,16 @@
 							<p>Use <code>data-ln-dropdown-position</code> to specify the desired alignment (e.g. <code>bottom-start</code> for left-aligned buttons).</p>
 							<div style="display: flex; gap: var(--size-md);">
 								<div data-ln-dropdown data-ln-dropdown-position="bottom-start">
-									<button data-ln-toggle-for="demo-menu-start" type="button">Left Aligned (bottom-start)</button>
-									<ul id="demo-menu-start" data-ln-toggle>
+									<button data-ln-toggle-for="demo-menu-start" type="button" class="btn">Left Aligned (bottom-start)</button>
+									<ul id="demo-menu-start" data-ln-toggle class="dropdown">
 										<li><button type="button">Action 1</button></li>
 										<li><button type="button">Action 2</button></li>
 										<li><button type="button">Action 3</button></li>
 									</ul>
 								</div>
 								<div data-ln-dropdown data-ln-dropdown-position="bottom-end">
-									<button data-ln-toggle-for="demo-menu-end" type="button">Right Aligned (bottom-end)</button>
-									<ul id="demo-menu-end" data-ln-toggle>
+									<button data-ln-toggle-for="demo-menu-end" type="button" class="btn">Right Aligned (bottom-end)</button>
+									<ul id="demo-menu-end" data-ln-toggle class="dropdown">
 										<li><button type="button">Action 1</button></li>
 										<li><button type="button">Action 2</button></li>
 										<li><button type="button">Action 3</button></li>
@@ -421,10 +421,11 @@
 						<script type="text/plain" data-demo-scss>
 						[data-ln-dropdown] {
 							@include dropdown;
+						}
 
-							[data-ln-toggle] {
-								@include dropdown-menu;
-							}
+						[data-ln-dropdown-menu],
+						.dropdown {
+							@include dropdown-menu;
 						}
 						</script>
 					</section>

@@ -45,7 +45,7 @@
   footer > small                                   ×68
   article.collapsible-body.prose > ul > li > a     ×14
   article.collapsible-body > p                     ×13
-  li > button                                      ×10
+  li > button                                      ×9
   article.collapsible-body > p > code              ×8
   svg.ln-icon > use                                ×5
   состојби: [open]  .open
@@ -270,12 +270,12 @@
 [data-ln-stat]                                     ×8
 
 [data-ln-dropdown]                                 ×7
-  [data-ln-toggle] > li > button                   ×10
-  button[data-ln-toggle-for]                       ×3
+  [data-ln-toggle] > li > button                   ×9
+  button.btn[data-ln-toggle-for]                   ×4
   [data-ln-toggle] > li > a                        ×3
   button[data-ln-translations-add][data-ln-toggle-for] > svg.ln-icon > use ×3
   [data-ln-toggle]                                 ×3
-  button.btn[data-ln-toggle-for]                   ×1
+  [data-ln-toggle] > li > button.error             ×1
   состојби: [open]  .open
 
 [data-ln-time]                                     ×6

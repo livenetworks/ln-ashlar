@@ -89,13 +89,13 @@ sequenceDiagram
     Note over Sibling: Panel 1 handles its own<br/>close pipeline cleanly.
 ```
 
-#### 2. `ln-dropdown` (Orchestrating Teleportation & Positioning)
-* **Children:** A single trigger button and a standard `data-ln-toggle` menu.
+#### 2. `ln-dropdown` (Orchestrating Top-Layer Promotion & Positioning)
+* **Children:** A single trigger button and a standard `data-ln-toggle` menu carrying `class="dropdown"`.
 * **The Rule:** The menu must float precisely below the trigger without being clipped by parent overflow containers.
 * **Flow:**
   1. The menu opens and bubbles `ln-toggle:open`.
-  2. `ln-dropdown` catches it, teleports the menu element to `<body>` to escape parent `overflow: hidden` restrictions, and sets `position: fixed`.
-  3. It measures the trigger and places the menu right-aligned beneath it.
+  2. `ln-dropdown` catches it, promotes the menu element to the browser's top layer via the native Popover API (`showPopover()`, `popover="manual"`) to escape parent `overflow: hidden` restrictions and stacking contexts without DOM moves, and sets `position: fixed`.
+  3. It measures the trigger and places the menu aligned beneath it (configured via `data-ln-dropdown-position`).
   4. It listens for viewport resizes and outside clicks to safely write `data-ln-toggle="close"` back to the menu when needed.
 
 #### 3. `ln-ui-coordinator` (Bridging Hash Navigation, Fill, AJAX, and Submit)

@@ -153,6 +153,7 @@ The `ln-ashlar` mixin architecture powers the **Visual Theme Layer** (`ln-ashlar
 | `badge`, `status-badge` | mixin | — | Status indicator badge with semantic status colors |
 | `count`, `count-solid`, `count-overlay` | mixin | — | Numeric counter pill (`<data>`), solid accent delta, and corner overlay delta for icon buttons |
 | `modal-backdrop`, `modal-panel` | mixin | — | Modal overlay backdrop and centered dialog panel |
+| `dropdown`, `dropdown-menu`, `menu-items` | mixin | — | Relative dropdown wrapper, fixed floating menu panel, and uniform interactive item rows with semantic status states |
 | `popover-panel`, `tooltip-bubble` | mixin | — | Floating overlays with elevation shadows |
 | `toast-container`, `toast-card` | mixin | — | Fixed toast notification stack and toast item card |
 | `app-wrapper`, `app-header`, `app-main`, `app-scrim`, `app-footer` | mixin | — | Full viewport application shell scaffolding |

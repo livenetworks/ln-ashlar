@@ -12,26 +12,30 @@ In `ln-ashlar`, the core design principle is **orthogonality**. Rather than crea
 
 1. **State Primitive (`ln-toggle`)**: Open/close state lives entirely on the inner `data-ln-toggle` attribute on the menu. `ln-dropdown` does not re-implement state; it is a thin behavior layer on top.
 2. **Behavior & Positioning (JavaScript)**: The `ln-dropdown` coordinator handles click-outside detection, viewport resize closures (which makes absolute positioning unreliable), top-layer promotion via the native Popover API (`popover="manual"`) to escape parent `overflow: hidden` clips and stacking contexts, and scroll position tracking.
-3. **Visual Presentation (CSS)**: Visual layouts, background shadows, and borders are handled in Vanilla CSS. The library ships mixins like `@include dropdown` and `@include dropdown-menu` to style the wrapper and popup elements.
+3. **Visual Presentation (CSS)**: Visual layouts, background shadows, and borders are handled in Vanilla CSS. The library ships mixins like `@include dropdown`, `@include dropdown-menu`, and `@include menu-items` to style the wrapper, floating popup, and menu rows, mapped directly to `.dropdown` and `.menu-items` classes.
 
 ---
 
 ## 2. Minimal Blueprint
 
-Triggers and dropdown menus are paired by ID inside a wrapper container. Inactive menus are hidden via `ln-toggle` default rules.
+Triggers and dropdown menus are paired by ID inside a wrapper container. Inactive menus are hidden via `ln-toggle` default rules. Visual presentation comes from the `.dropdown` class (bound to `@mixin dropdown-menu` in SCSS).
 
 ```html
 <!-- The Wrapper -->
 <div data-ln-dropdown>
     <!-- The Trigger -->
-    <button type="button" data-ln-toggle-for="options-menu">Options</button>
+    <button type="button" data-ln-toggle-for="options-menu" class="btn">Options</button>
     
     <!-- The Menu (State Primitive) -->
-    <ul id="options-menu" data-ln-toggle>
+    <ul id="options-menu" data-ln-toggle class="dropdown">
         <li><a href="/profile">Profile</a></li>
         <li><a href="/settings">Settings</a></li>
         <li><hr></li>
-        <li><a href="/logout">Log out</a></li>
+        <li>
+            <form action="/logout" method="POST">
+                <button type="submit">Sign Out</button>
+            </form>
+        </li>
     </ul>
 </div>
 ```
@@ -39,7 +43,8 @@ Triggers and dropdown menus are paired by ID inside a wrapper container. Inactiv
 ### Key Anatomy Rules
 - **The Wrapper (`data-ln-dropdown`)**: Creates the dropdown coordinator instance.
 - **The Trigger (`data-ln-toggle-for="id"`)**: Standard `ln-toggle` button. ARIA attributes `aria-haspopup="menu"` and `aria-expanded` are synced automatically.
-- **The Menu (`data-ln-toggle`)**: Standard `ln-toggle` element. Value `open` represents open; anything else is closed. Role `menu` is auto-injected on `<ul>`, `role="none"` on `<li>`, and `role="menuitem"` with roving `tabindex` on interactive child buttons/anchors.
+- **The Menu (`data-ln-toggle class="dropdown"`)**: Standard `ln-toggle` element carrying the `.dropdown` class (bound to `@mixin dropdown-menu`, as is the `[data-ln-dropdown-menu]` marker auto-injected by JS at init). Value `open` represents open; anything else is closed. Role `menu` is auto-injected on `<ul>`, `role="none"` on `<li>`, and `role="menuitem"` with roving `tabindex` on interactive child buttons/anchors.
+- **Action Forms & Menu Items**: Menu rows (`<a>`, `<button>`, or `<form action="..." method="POST"><button type="submit">`) share identical geometry, padding (`--padding-y`, `--padding-x`), gap, and hover ink via `@mixin menu-items`. Semantic status classes (`.success`, `.error`, `.warning`, `.info`) tint item text and hover washes automatically.
 
 ---
 
@@ -117,7 +122,7 @@ document.addEventListener('ln-dropdown:open', (e) => {
   ```html
   <script src="components/ln-dropdown/ln-dropdown.js" defer></script>
   ```
-- **Active Source (ESM)**: Development source is located at [components/ln-dropdown/src/ln-dropdown.js](file:///c:/laragon/www/ln-ashlar/components/ln-dropdown/src/ln-dropdown.js).
+- **Active Source (ESM)**: Development source is located at [src/ln-dropdown.js](./src/ln-dropdown.js).
 
 ---
 
