@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.2.4](./v2.2.4.md) — November 7, 2026
+Dynamic expanded workspace container on sidebar collapse, smooth layout transitions, fluid workspace modifier, and `--max-w-container-expanded` design token.  
+👉 [Read full v2.2.4 release notes](./v2.2.4.md)
+
 ### [v2.2.3](./v2.2.3.md) — November 7, 2026
 Decoupled `.dropdown` presentation class, geometry and typography normalization across interactive dropdown/popover menu items, embedded action form detection, semantic action statuses, and refreshed documentation manifests.  
 👉 [Read full v2.2.3 release notes](./v2.2.3.md)

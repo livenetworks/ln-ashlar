@@ -204,12 +204,22 @@
 	height: calc(100dvh - var(--app-header-height));
 	overflow: hidden;
 
+	// Smoothly transition content area layout when sidebar drawer toggles
+	@include motion-safe {
+		transition: padding-left var(--transition);
+	}
+
+	// Dynamic content width: expands when sidebar is closed so the user gains working surface
+	--app-content-max-w: var(--max-w-container-expanded, 96rem);
+
 	// Open drawer on desktop: reserve its width on the parent so content
 	// and footer shift together (padding, not child margin — no overflow).
+	// Restricts content max width back to standard container when sidebar is open.
 	// On mobile the drawer overlays the content instead.
 	@include mq-up(md) {
 		&:has(> aside[data-ln-toggle="open"]) {
 			padding-left: var(--app-sidebar-width);
+			--app-content-max-w: var(--max-w-container);
 		}
 	}
 
@@ -315,10 +325,20 @@
 // and `<aside> > footer` (via @mixin sidebar in _sidebar.scss).
 
 @mixin app-content-wrapper {
-	max-width: var(--max-w-container);
+	max-width: var(--app-content-max-w, var(--max-w-container));
 	@include mx(auto);
 	@include w-full;
 	@include stack(var(--size-lg));
 	--panel-margin-block: 0;
+
+	@include motion-safe {
+		transition: max-width var(--transition);
+	}
+
+	// Opt-in full-width workspace for data-dense views (grids, tables, kanban)
+	&.fluid,
+	&[data-ln-fluid] {
+		max-width: 100%;
+	}
 }
 

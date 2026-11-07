@@ -10656,6 +10656,7 @@ const rn = /* @__PURE__ */ new Set([
   "data-ln-filter-target",
   "data-ln-filter-value",
   "data-ln-filter-values",
+  "data-ln-fluid",
   "data-ln-form",
   "data-ln-form-action-edit",
   "data-ln-form-action-method",

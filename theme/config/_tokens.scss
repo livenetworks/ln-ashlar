@@ -47,11 +47,12 @@
 	// Content widths
 	// -----------------------------------------------------------------------
 	// Public API surface — full scale exposed; internal usage may skip levels.
-	--max-w-prose:     65ch;
-	--max-w-form:      32rem;
-	--max-w-content:   48rem;
-	--max-w-container: 80rem;
-	--grid-item-min-width: 14rem;   // intrinsic minimum for auto-fit card grids
+	--max-w-prose:              65ch;
+	--max-w-form:               32rem;
+	--max-w-content:            48rem;
+	--max-w-container:          80rem;
+	--max-w-container-expanded: 96rem;
+	--grid-item-min-width:      14rem;   // intrinsic minimum for auto-fit card grids
 
 	// -----------------------------------------------------------------------
 	// Border Radius

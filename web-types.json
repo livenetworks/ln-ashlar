@@ -1,7 +1,7 @@
 {
 	"$schema": "https://json.schemastore.org/web-types",
 	"name": "@livenetworks/ashlar",
-	"version": "2.2.3",
+	"version": "2.2.4",
 	"framework": "html",
 	"contributions": {
 		"html": {
@@ -852,6 +852,13 @@
 					"description": "Encoded active filter values",
 					"value": {
 						"type": "string"
+					}
+				},
+				{
+					"name": "data-ln-fluid",
+					"description": "Visual / CSS styling attribute (theme/config/mixins/_app-shell.scss)",
+					"value": {
+						"type": "boolean"
 					}
 				},
 				{

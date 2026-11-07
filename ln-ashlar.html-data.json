@@ -659,6 +659,11 @@
 			"description": "Encoded active filter values"
 		},
 		{
+			"name": "data-ln-fluid",
+			"description": "Visual / CSS styling attribute (theme/config/mixins/_app-shell.scss)",
+			"valueSet": "v"
+		},
+		{
 			"name": "data-ln-form",
 			"description": "Identifies the form element as an enhanced ln-form",
 			"valueSet": "v"
