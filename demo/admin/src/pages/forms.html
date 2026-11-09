@@ -1193,6 +1193,31 @@ input:focus-visible {
 	</script>
 </section>
 
+<!-- ==========================================
+     FORM GRID IN A MODAL
+     ========================================== -->
+<section class="section-card" data-demo-html>
+	<header><h3>Form grid in a modal</h3></header>
+	<main>
+		<p>A <code>form &gt; main</code> with <code>@include form-grid</code> holds a hidden input first and then <code>.form-element</code> fields. Each field spans 3 of 6 columns, so two fields share a row; below the <code>md</code> breakpoint the grid becomes one column.</p>
+		<nav class="demo-actions">
+			<button type="button" class="btn" data-ln-modal-for="demo-grid-modal">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
+				Open form-grid modal
+			</button>
+		</nav>
+	</main>
+	<script type="text/plain" data-demo-scss>
+// Two fields per row inside a modal form
+#demo-grid-modal > form { @include modal-lg; }
+#demo-grid-modal > form > main {
+	@include form-grid;
+
+	> .form-element { grid-column: span 3; }
+}
+	</script>
+</section>
+
 <!-- REST action-routing demo modal (outside section — document-level overlay) -->
 <dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="demo-rest-modal">
 	<form id="demo-rest-form"
@@ -1238,3 +1263,45 @@ input:focus-visible {
 	</form>
 </dialog>
 
+
+<!-- Form-grid demo modal (outside section — document-level overlay) -->
+<dialog class="ln-modal" data-ln-modal id="demo-grid-modal">
+	<form action="#">
+		<header>
+			<h3>Form grid in a modal</h3>
+			<button type="button" data-ln-modal-close aria-label="Close">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+			</button>
+		</header>
+		<main>
+			<input type="hidden" name="id">
+			<div class="form-element">
+				<label for="grid-modal-fname">First name</label>
+				<input type="text" id="grid-modal-fname" name="fname">
+			</div>
+			<div class="form-element">
+				<label for="grid-modal-lname">Last name</label>
+				<input type="text" id="grid-modal-lname" name="lname">
+			</div>
+			<div class="form-element">
+				<label for="grid-modal-email">Email</label>
+				<input type="email" id="grid-modal-email" name="email">
+			</div>
+			<div class="form-element">
+				<label for="grid-modal-phone">Phone</label>
+				<input type="tel" id="grid-modal-phone" name="phone">
+			</div>
+			<div class="form-element">
+				<label for="grid-modal-city">City</label>
+				<input type="text" id="grid-modal-city" name="city">
+			</div>
+			<div class="form-element">
+				<label for="grid-modal-zip">Postal code</label>
+				<input type="text" id="grid-modal-zip" name="zip">
+			</div>
+		</main>
+		<footer>
+			<button type="button" data-ln-modal-close>Close</button>
+		</footer>
+	</form>
+</dialog>

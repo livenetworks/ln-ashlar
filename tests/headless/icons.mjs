@@ -254,27 +254,115 @@ run('demo/admin/icons.html', async ({ page }) => {
 		assert(cdnRequests.every(u => u.indexOf('custom') === -1), 'No fetch attempted for custom icons');
 	});
 
-	await guarded('ln-icon: MutationObserver picks up runtime icons', async () => {
+	// ln-icon lifecycle: <use> nodes inserted after the initial scan.
+	// Icon names below are absent from demo/admin/icons.html (shell included), so a symbol can
+	// only appear if the lifecycle observer reacts to the injected node. Do not reuse names that
+	// the page already references (bolt is in the shell sidebar, calendar/rocket in the gallery).
+	const hasSymbol = id => page.evaluate(i => !!document.querySelector('#ln-icon-sprite defs symbol[id="' + i + '"]'), id);
+	const symbolAppears = id => waitSymbol(id).then(() => true, () => false);
+	const cleanupInjected = () => page.evaluate(() => {
+		document.querySelectorAll('[id^="lc-test-"]').forEach(n => n.remove());
+	});
+
+	async function lifecycleVariant(title, names, inject) {
+		await guarded(title, async () => {
+			try {
+				for (const name of names) {
+					assert(!(await hasSymbol('ln-icon-' + name)), `#ln-icon-${name} is not in the sprite before injection`);
+				}
+				await inject();
+				for (const name of names) {
+					assert(await symbolAppears('ln-icon-' + name), `Injected <use href="#ln-icon-${name}"> gets a symbol`);
+					assert(await hasSymbol('ln-icon-' + name), `#ln-icon-${name} is in the sprite after injection`);
+					assert(cdnRequests.indexOf(CDN_PREFIX + name + '.svg') !== -1, `${name}.svg fetched from CDN`);
+				}
+			} finally {
+				await cleanupInjected();
+			}
+		});
+	}
+
+	// (a) createElementNS + appendChild: added node is the <svg>, the <use> is a descendant.
+	await lifecycleVariant('ln-icon lifecycle: createElementNS + appendChild', ['anchor'], () => page.evaluate(() => {
+		const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		svg.setAttribute('class', 'ln-icon');
+		svg.setAttribute('id', 'lc-test-a');
+		const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+		use.setAttribute('href', '#ln-icon-anchor');
+		svg.appendChild(use);
+		document.body.appendChild(svg);
+	}));
+
+	// (b) innerHTML on a detached container, then the container is appended to body.
+	await lifecycleVariant('ln-icon lifecycle: innerHTML on detached container', ['puzzle'], () => page.evaluate(() => {
+		const host = document.createElement('section');
+		host.id = 'lc-test-b';
+		host.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-puzzle"></use></svg>';
+		document.body.appendChild(host);
+	}));
+
+	// (c) innerHTML on a container that is already attached. The container is attached in a
+	// separate evaluate so the observer drains before the innerHTML mutation happens.
+	await lifecycleVariant('ln-icon lifecycle: innerHTML on attached container', ['camera'], async () => {
+		await page.evaluate(() => {
+			const host = document.createElement('section');
+			host.id = 'lc-test-c';
+			document.body.appendChild(host);
+		});
+		await page.evaluate(() => {
+			document.getElementById('lc-test-c').innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-camera"></use></svg>';
+		});
+	});
+
+	// (d) insertAdjacentElement of the <use> itself into an attached <svg>: the added node
+	// matches the query directly (no descendants).
+	await lifecycleVariant('ln-icon lifecycle: insertAdjacentElement of the <use> itself', ['bookmark'], async () => {
 		await page.evaluate(() => {
 			const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 			svg.setAttribute('class', 'ln-icon');
-			svg.setAttribute('id', 'test-added-icon');
-			const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-			use.setAttribute('href', '#ln-icon-bolt');
-			svg.appendChild(use);
+			svg.setAttribute('id', 'lc-test-d');
 			document.body.appendChild(svg);
 		});
-		await waitSymbol('ln-icon-bolt');
-		assert(true, 'Dynamically added <use href="#ln-icon-bolt"> gets a symbol');
-		assert(cdnRequests.indexOf(CDN_PREFIX + 'bolt.svg') !== -1, 'bolt.svg fetched from CDN');
-
 		await page.evaluate(() => {
-			document.querySelector('#test-added-icon use').setAttribute('href', '#ln-icon-flag');
+			const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+			use.setAttribute('href', '#ln-icon-bookmark');
+			document.getElementById('lc-test-d').insertAdjacentElement('beforeend', use);
 		});
-		await waitSymbol('ln-icon-flag');
-		assert(true, 'Swapping a <use> href at runtime loads the new icon (#ln-icon-flag)');
-		assert(cdnRequests.indexOf(CDN_PREFIX + 'flag.svg') !== -1, 'flag.svg fetched from CDN');
-		await page.evaluate(() => document.getElementById('test-added-icon').remove());
+	});
+
+	// (e) one fragment with several distinct new icons at once (simulates an ajax content swap).
+	await lifecycleVariant('ln-icon lifecycle: fragment with several new icons', ['flame', 'leaf', 'globe'], () => page.evaluate(() => {
+		const frag = document.createRange().createContextualFragment(
+			'<ul id="lc-test-e">'
+			+ '<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-flame"></use></svg></li>'
+			+ '<li><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-leaf"></use></svg></li>'
+			+ '</ul>'
+			+ '<svg id="lc-test-e2" class="ln-icon" aria-hidden="true"><use href="#ln-icon-globe"></use></svg>'
+		);
+		document.body.appendChild(frag);
+	}));
+
+	// href swap on a live <use> goes through the attribute observer, not the lifecycle observer.
+	await guarded('ln-icon: runtime href swap loads the new icon', async () => {
+		try {
+			await page.evaluate(() => {
+				const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+				svg.setAttribute('class', 'ln-icon');
+				svg.setAttribute('id', 'lc-test-swap');
+				const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+				use.setAttribute('href', '#ln-icon-bolt');
+				svg.appendChild(use);
+				document.body.appendChild(svg);
+			});
+			assert(!(await hasSymbol('ln-icon-flag')), '#ln-icon-flag is not in the sprite before the swap');
+			await page.evaluate(() => {
+				document.querySelector('#lc-test-swap use').setAttribute('href', '#ln-icon-flag');
+			});
+			assert(await symbolAppears('ln-icon-flag'), 'Swapping a <use> href at runtime loads the new icon (#ln-icon-flag)');
+			assert(cdnRequests.indexOf(CDN_PREFIX + 'flag.svg') !== -1, 'flag.svg fetched from CDN');
+		} finally {
+			await cleanupInjected();
+		}
 	});
 
 	await guarded('ln-icon: localStorage cache on reload', async () => {

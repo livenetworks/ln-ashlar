@@ -21,7 +21,7 @@ The `forms` styling system (`theme/config/mixins/_form.scss` and `theme/componen
 - **Labels:** `form-label` uses the `label-md` role in medium weight.
 - **Stacked Rhythm:** Adjacent field wrappers bound with `form-element` keep a `--size-md` gap outside a form-grid through a zero-specificity sibling rule.
 - **Icon Groups & Search:** A `<label>` (or `<search>` for the dedicated search field) wrapping an SVG icon and an input combines them into a seamless single control (`form-input-icon-group` and `search`).
-- **Responsive 6-Column Form Grid (`form-grid`):** A CSS Grid layout with column spanning utilities (`.col-span-1` through `.col-span-6`) collapsing smoothly on small viewports.
+- **Responsive 6-Column Form Grid (`form-grid`):** A CSS Grid mixin applied to a semantic selector. Children set their width with `grid-column: span N` in SCSS (`span 3` is half a row, `span 6` a full row). Below the `md` breakpoint the grid becomes a single flex column and the spans are ignored.
 - **Required Indicator via CSS `:has()`:** Mandatory inputs with the HTML `required` attribute automatically display an indicator without manual asterisk characters.
 - **Button Variants:** Primary fill defaults automatically on `<button type="submit">`, while `.btn-ghost` and `.btn-soft` provide secondary actions.
 - **Pills & Segmented Controls:** `.pills`, `.pills-outline`, and `.pills-segmented` style checkbox/radio lists with connected border radii, driving checked states with optimized CSS `:has(> input:checked)` cascades.
@@ -33,25 +33,36 @@ The `forms` styling system (`theme/config/mixins/_form.scss` and `theme/componen
 ### Base HTML Markup (Form Grid with Actions)
 
 ```html
-<form class="form-grid">
-    <div class="form-element col-span-3">
+<form id="user-form">
+    <div class="form-element">
         <label for="user-email">Email Address</label>
         <input type="email" id="user-email" name="email" required>
         <ul data-ln-validate-errors></ul>
     </div>
-    <div class="form-element col-span-3">
+    <div class="form-element">
         <label for="user-role">Account Role</label>
         <select id="user-role" name="role">
             <option value="member">Member</option>
             <option value="admin">Administrator</option>
         </select>
     </div>
-    <ul class="form-actions col-span-6">
+    <ul class="form-actions">
         <li><button type="button" class="btn btn-ghost">Cancel</button></li>
         <li><button type="submit" class="btn">Save User</button></li>
     </ul>
 </form>
 ```
+
+```scss
+#user-form {
+    @include form-grid;
+
+    .form-element { grid-column: span 3; }   // two fields per row
+    .form-actions { grid-column: span 6; }   // full row
+}
+```
+
+Below the `md` breakpoint (768px) the mixin lays the children out as one flex column, so the `grid-column` spans have no effect and each field takes the full width.
 
 ### Variant 1: Compact Search Field
 
@@ -65,13 +76,63 @@ The `forms` styling system (`theme/config/mixins/_form.scss` and `theme/componen
 </search>
 ```
 
+### Variant 2: Two-Column Modal Form
+
+```html
+<dialog class="ln-modal" data-ln-modal id="user-modal">
+    <form action="#">
+        <header>
+            <h3>Edit user</h3>
+            <button type="button" data-ln-modal-close aria-label="Close">
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+            </button>
+        </header>
+        <main>
+            <input type="hidden" name="id">
+            <div class="form-element">
+                <label for="user-fname">First name</label>
+                <input type="text" id="user-fname" name="fname">
+            </div>
+            <div class="form-element">
+                <label for="user-lname">Last name</label>
+                <input type="text" id="user-lname" name="lname">
+            </div>
+            <div class="form-element">
+                <label for="user-modal-email">Email</label>
+                <input type="email" id="user-modal-email" name="email">
+            </div>
+            <div class="form-element">
+                <label for="user-notes">Notes</label>
+                <textarea id="user-notes" name="notes"></textarea>
+            </div>
+        </main>
+        <footer>
+            <button type="button" data-ln-modal-close>Cancel</button>
+            <button type="submit">Save</button>
+        </footer>
+    </form>
+</dialog>
+```
+
+```scss
+#user-modal > form { @include modal-lg; }
+#user-modal > form > main {
+    @include form-grid;
+
+    > .form-element { grid-column: span 3; }
+    > .form-element:has([name="notes"]) { grid-column: span 6; }
+}
+```
+
+The hidden input generates no box and takes no grid cell; every `.form-element` fills one cell, so both fields of a row share the same top.
+
 ---
 
 ## 3. SCSS API (Mixins, Classes & Tokens)
 
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
-| `form-grid` | mixin | — | 6-column responsive CSS Grid form layout |
+| `form-grid` | mixin | — | 6-column CSS Grid form layout; children span columns with `grid-column`; one flex column below `md` |
 | `form-input` | mixin | — | Base control styling for inputs, selects, textareas |
 | `form-label` | mixin | — | Form field label typography (`label-md`, medium) and spacing |
 | `form-element` | mixin | — | Field wrapper: sibling rhythm outside a form-grid and slot treatment for feedback elements trailing the control |
@@ -81,7 +142,7 @@ The `forms` styling system (`theme/config/mixins/_form.scss` and `theme/componen
 | `btn` | mixin | — | Base button recipe (solid primary fill on `type="submit"`) |
 | `btn-soft` | mixin | — | Soft accent-tinted secondary button |
 | `btn-ghost` | mixin | — | Transparent ghost button with subtle hover background |
-| `.form-grid`, `.form-element`, `.form-actions` | class | — | Prototyping classes for form layouts |
+| `.form-element`, `.form-actions` | class | — | Prototyping classes for form layouts |
 | `--input-padding-y` | token | `var(--size-xs-up)` (compact) / `var(--size-sm)` (comfortable) | Vertical input padding |
 | `--btn-padding-y` | token | `var(--size-xs-up)` (compact) / `var(--size-sm)` (comfortable) | Vertical button padding |
 
@@ -92,6 +153,7 @@ The `forms` styling system (`theme/config/mixins/_form.scss` and `theme/componen
 > [!CAUTION]
 > 1. **Explicit Label-Input Association:** Always associate labels with inputs using matching `for` and `id` attributes or by nesting the input inside the `<label>`.
 > 2. **Never Author Asterisks for Required Fields:** Do not write `<label>Email *</label>` in HTML. CSS handles the required marker automatically from `[required]` using `:has()`.
+> 3. **Sibling Margin Stacking:** `.form-element` stacks fields through a sibling margin. A parent that lays out `.form-element` children itself (a hand-written grid or flex container) must reset `> * { margin: 0 }` and set its own gap, or apply `form-grid`, which does both. Otherwise every field after the first carries an extra top margin: the first row misaligns and each row gap grows by one margin.
 
 ---
 

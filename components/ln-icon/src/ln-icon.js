@@ -147,6 +147,7 @@ import { guardBody, observeAttributes, observeLifecycle } from '../../ln-core';
 		_scan(document);
 		guardBody(function () {
 			observeLifecycle({
+				query: 'use[href^="#ln-icon-"]',
 				onInit: function (node) {
 					_scan(node);
 				}

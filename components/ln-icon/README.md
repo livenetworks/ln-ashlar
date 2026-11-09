@@ -97,7 +97,7 @@ Source: `components/ln-icon/ln-icon.js`. Routing is purely prefix-based — no c
 
 ### Scan
 
-`_scan(root)` runs on init (`document`) and on every MutationObserver batch (each added node), matching `use[href^="#ln-icon-"], use[href^="#ln-icon-custom-"]` — the root node itself is also checked via `matches()` to cover single-node mutations. Each match calls `_load(href)`.
+`_scan(root)` runs once on init against `document`, and again from the `onInit` hook that ln-icon registers with the shared ln-core lifecycle observer (`observeLifecycle`, query `use[href^="#ln-icon-"]`) for every matching `<use>` that enters the DOM, whether it is the added node itself or a descendant of an added subtree. `_scan` matches `use[href^="#ln-icon-"], use[href^="#ln-icon-custom-"]`; the root node itself is also checked via `matches()` to cover a single added `<use>`. Each match calls `_load(href)`.
 
 ### Dedup + caching
 
@@ -111,9 +111,9 @@ On a cache miss: resolve the CDN URL (`#ln-icon-custom-` → `LN_ICON_CUSTOM_CDN
 
 Created lazily on first icon load, inserted as `document.body`'s first child: `<svg id="ln-icon-sprite" hidden aria-hidden="true"><defs>...</defs></svg>`.
 
-### MutationObserver
+### Lifecycle observer
 
-Observes `document.body` with `{ childList: true, subtree: true }`, firing `_scan(node)` per added element — covers modals, dynamic lists, and any JS-rendered content (e.g. `ln-ajax`/`ln-store` swaps).
+Registered through ln-core `observeLifecycle` with `query: 'use[href^="#ln-icon-"]'` (the prefix also covers `#ln-icon-custom-`); `onInit` calls `_scan(node)`. Covers modals, dynamic lists, `innerHTML` renders, ajax swaps, and components that inject icons such as `ln-date`'s calendar button. A second hook, `observeAttributes(['href'])`, loads the icon when a live `<use>`'s `href` is swapped.
 
 ### Color inheritance
 

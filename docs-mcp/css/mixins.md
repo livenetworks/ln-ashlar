@@ -86,7 +86,7 @@ The `ln-ashlar` mixin architecture powers the **Visual Theme Layer** (`ln-ashlar
 
 ```html
 <form class="user-form">
-    <div class="field col-span-3">
+    <div class="form-element">
         <label for="fname">First Name</label>
         <input id="fname" type="text" required>
     </div>
@@ -96,6 +96,8 @@ The `ln-ashlar` mixin architecture powers the **Visual Theme Layer** (`ln-ashlar
 ```scss
 .user-form {
     @include form-grid;
+
+    .form-element { grid-column: span 3; }
 
     input[type="text"] {
         @include form-input;

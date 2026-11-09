@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.2.5](./v2.2.5.md) — November 9, 2026
+Dynamic `<use>` lifecycle detection in `ln-icon`, responsive breakpoint collapse and sibling margin reset in `@mixin form-grid`, modal form grid demo, and regression test suites.  
+👉 [Read full v2.2.5 release notes](./v2.2.5.md)
+
 ### [v2.2.4](./v2.2.4.md) — November 7, 2026
 Dynamic expanded workspace container on sidebar collapse, smooth layout transitions, fluid workspace modifier, and `--max-w-container-expanded` design token.  
 👉 [Read full v2.2.4 release notes](./v2.2.4.md)

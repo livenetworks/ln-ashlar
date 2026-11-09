@@ -706,9 +706,13 @@ code.
 - **`mq-*` (viewport)** — app-shell patterns only: `.container`
   utility, sidebar-drawer, page columns, modal backdrop sizing.
   Anything directly coupled to viewport geometry.
-- **`cq-*` (container)** — reusable components: grids, form-grid,
+- **`cq-*` (container)** — reusable components: grids,
   page-header, cards, any mixin a project might drop into a
   sidebar / main / card / modal.
+- **Exception: `form-grid`** collapses on the viewport (`mq-down(md)`).
+  The collapse has to change the grid element's own layout, an element
+  cannot query its own container, and a container breakpoint at `md`
+  would put every modal form in one column.
 
 **Container registration is the mixin's job.** A mixin that uses
 `cq-*` internally must declare `container-type: inline-size` (and

@@ -9,6 +9,10 @@ const PAGE_URL = BASE_URL + 'forms.html';
 const FORM = '#demo-form-grid';
 const REST_FORM = '#demo-rest-form';
 const REST_MODAL = '#demo-rest-modal';
+const GRID_MODAL_TRIGGER = 'button[data-ln-modal-for="demo-grid-modal"]';
+const GRID_MODAL_MAIN = '#demo-grid-modal > form > main';
+const DESKTOP = { width: 1280, height: 900 };
+const NARROW = { width: 400, height: 900 };
 
 // Declarative record on the "Fill (Declarative ln-fill)" button.
 const DECLARATIVE = {
@@ -138,6 +142,53 @@ run('demo/admin/forms.html', async ({ page }) => {
 
 	const readout = () => page.evaluate(() => document.getElementById('rest-action-readout').textContent);
 	const taHeight = () => page.evaluate(() => document.getElementById('demo-ta-auto').getBoundingClientRect().height);
+
+	// Opens the form-grid demo modal the way a user does (trigger click) and waits for its slide-in to settle.
+	async function openGridModal() {
+		await waitFor(() => {
+			const m = document.getElementById('demo-grid-modal');
+			return !!m && !!m.lnModal;
+		});
+		await page.click(GRID_MODAL_TRIGGER);
+		await waitFor(() => document.getElementById('demo-grid-modal').open === true);
+		await page.evaluate(() => Promise.all(
+			document.querySelector('#demo-grid-modal > form').getAnimations().map(a => a.finished)
+		));
+	}
+
+	// Layout facts of a grid host and its direct children, read from computed layout.
+	const gridMetrics = (hostSel, childSel) => page.evaluate((hSel, cSel) => {
+		const host = document.querySelector(hSel);
+		const cs = getComputedStyle(host);
+		const padL = parseFloat(cs.paddingLeft);
+		const padR = parseFloat(cs.paddingRight);
+		const items = Array.from(host.querySelectorAll(':scope > ' + cSel)).map(el => {
+			const r = el.getBoundingClientRect();
+			return { left: r.left, top: r.top, bottom: r.bottom, width: r.width, marginTop: getComputedStyle(el).marginTop };
+		});
+		return {
+			display: cs.display,
+			rowGap: cs.rowGap,
+			contentLeft: host.getBoundingClientRect().left + host.clientLeft + padL,
+			contentWidth: host.clientWidth - padL - padR,
+			items
+		};
+	}, hostSel, childSel);
+
+	// One column: every field starts at the content-box left, spans its width, and sits below the previous one.
+	function assertStacked(m, label) {
+		assert(m.items.length > 1, `${label}: has several .form-element children (${m.items.length})`);
+		for (const [i, f] of m.items.entries()) {
+			assert(Math.abs(f.left - m.contentLeft) < 0.5,
+				`${label}: field ${i + 1} starts at the content-box left (${f.left} vs ${m.contentLeft})`);
+			assert(Math.abs(f.width - m.contentWidth) < 0.5,
+				`${label}: field ${i + 1} spans the content-box width (${f.width} vs ${m.contentWidth})`);
+			if (i > 0) {
+				assert(f.top > m.items[i - 1].top,
+					`${label}: field ${i + 1} sits below field ${i} (${f.top} > ${m.items[i - 1].top})`);
+			}
+		}
+	}
 
 	// ─── 1. Page structure ─────────────────────────────────────
 
@@ -470,6 +521,57 @@ run('demo/admin/forms.html', async ({ page }) => {
 		await waitFor(() => document.getElementById('demo-rest-modal').open === false, undefined, 2000).catch(() => {});
 		assert(await page.evaluate(() => document.getElementById('demo-rest-modal').open) === false,
 			'Page closes the modal from ln-ajax:before-start');
+	});
+
+	// ─── 14. form-grid layout (modal alignment + collapse below md) ──
+
+	// Documented path: mixin + grid-column spans, hidden input first. Guards the working layout.
+	await part('form-grid in a modal: aligned rows (desktop)', async () => {
+		await page.setViewport(DESKTOP);
+		await load();
+		await openGridModal();
+		const m = await gridMetrics(GRID_MODAL_MAIN, '.form-element');
+		const gap = parseFloat(m.rowGap);
+		assert(m.items.length === 6, 'Modal main has 6 .form-element fields');
+		assert(m.display === 'grid', 'Modal main is a grid at desktop width');
+		assert(gap > 0, `Row gap resolves to a length (${m.rowGap})`);
+		for (const [i, f] of m.items.entries()) {
+			assert(f.marginTop === '0px', `Field ${i + 1}: margin-top is 0px (got ${f.marginTop})`);
+		}
+		for (const r of [0, 1, 2]) {
+			const a = m.items[2 * r];
+			const b = m.items[2 * r + 1];
+			assert(a.top === b.top, `Row ${r + 1}: both fields share the same top (${a.top} vs ${b.top})`);
+		}
+		for (const r of [0, 1]) {
+			const prevBottom = Math.max(m.items[2 * r].bottom, m.items[2 * r + 1].bottom);
+			const d = m.items[2 * r + 2].top - prevBottom;
+			assert(Math.abs(d - gap) < 0.01, `Row ${r + 1} to row ${r + 2}: distance equals the grid gap (${d} vs ${gap})`);
+		}
+		assert(m.items[0].left !== m.items[1].left,
+			`Row 1: the two fields sit in different columns (${m.items[0].left} vs ${m.items[1].left})`);
+	});
+
+	// Below md the grid is one column. Must fail while the collapse is a dead container query.
+	await part('form-grid collapses below md: #demo-form-grid', async () => {
+		await page.setViewport(NARROW);
+		try {
+			await load();
+			assertStacked(await gridMetrics(FORM, '.form-element'), '#demo-form-grid');
+		} finally {
+			await page.setViewport(DESKTOP);
+		}
+	});
+
+	await part('form-grid collapses below md: demo modal', async () => {
+		await page.setViewport(NARROW);
+		try {
+			await load();
+			await openGridModal();
+			assertStacked(await gridMetrics(GRID_MODAL_MAIN, '.form-element'), '#demo-grid-modal main');
+		} finally {
+			await page.setViewport(DESKTOP);
+		}
 	});
 
 	if (failures.length > 0) {

@@ -54,16 +54,15 @@
 
 @mixin form-grid {
 	--gap: var(--size-md);
-	container-type: inline-size;
-	container-name: form-grid;
 	display: grid;
 	grid-template-columns: repeat(6, minmax(0, 1fr));
 	gap: var(--gap);
 
 	> * { margin: 0; }
 
-	@include cq-down(md, form-grid) {
-		grid-template-columns: repeat(1, minmax(0, 1fr));
+	// Flex ignores grid-column, so consumer span rules cannot break the single column.
+	@include mq-down(md) {
+		@include flex-col;
 	}
 }
 

@@ -10532,6 +10532,7 @@ function No(t) {
   function _() {
     d(document), ft(function() {
       ee({
+        query: 'use[href^="#ln-icon-"]',
         onInit: function(b) {
           d(b);
         }

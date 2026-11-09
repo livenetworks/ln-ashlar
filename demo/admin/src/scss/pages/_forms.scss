@@ -40,6 +40,14 @@
 	.form-element { grid-column: span 3; }
 }
 
+// ─── Form grid in a modal ──────────────────────────────
+#demo-grid-modal > form { @include modal-lg; }
+#demo-grid-modal > form > main {
+	@include form-grid;
+
+	> .form-element { grid-column: span 3; }
+}
+
 // ─── Checkbox & Radio demo ─────────────────────────────
 #demo-checks {
 	@include flex;
