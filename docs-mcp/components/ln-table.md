@@ -49,7 +49,7 @@ In SSR mode, the table is functional immediately with the server-rendered markup
   <template data-ln-table-empty>
     <div class="ln-table__empty-state">
       <h3>No matches found</h3>
-      <button type="button" data-ln-table-clear>Clear Filters</button>
+      <button type="button" class="btn btn-ghost" data-ln-table-clear>Clear Filters</button>
     </div>
   </template>
 

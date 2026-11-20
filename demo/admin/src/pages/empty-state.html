@@ -1,39 +1,51 @@
 <!-- ln-page: title="Empty State — ln-ashlar" h1="Empty State" -->
 
-				<!-- Overview / philosophy -->
-				<section class="section-card">
-					<header><h3>Overview &amp; Philosophy</h3></header>
-					<main>
-						<p>Centered, icon-led placeholder for lists and views with no data. Two semantic sub-types: <code>no-data</code> (first-time/onboarding state where no items exist yet) and <code>no-results</code> (filter or search returned zero matches, offering a clear filter action).</p>
-					</main>
-				</section>
+<!-- Overview / philosophy -->
+<section class="section-card">
+	<header>
+		<h3>Overview &amp; Philosophy</h3>
+	</header>
+	<main>
+		<p>Centered, icon-led placeholder for lists and views with no data. Two semantic sub-types: <code>no-data</code>
+			(first-time/onboarding state where no items exist yet) and <code>no-results</code> (filter or search
+			returned zero matches, offering a clear filter action).</p>
+	</main>
+</section>
 
-				<!-- Both variants side by side -->
-				<section class="section-card" data-demo-html>
-					<header><h3>Both Variants</h3></header>
-					<main>
-						<div id="demo-empty-variants">
-							<div>
-								<div data-ln-empty-state="no-data">
-									<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-folder"></use></svg>
-									<h3>No documents yet</h3>
-									<p>Upload your first document to get started.</p>
-									<button type="button">Upload document</button>
-								</div>
-								<small><strong>no-data</strong> — the list has never had items. Show the primary "create" action to guide the user toward the first entry.</small>
-							</div>
-							<div>
-								<div data-ln-empty-state="no-results">
-									<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-									<h3>No matches</h3>
-									<p>Try a different search or clear your filters.</p>
-									<button type="button">Clear filters</button>
-								</div>
-								<small><strong>no-results</strong> — data exists but the current filter or search returned zero rows. Show a clear-filter action rather than a create action.</small>
-							</div>
-						</div>
-					</main>
-					<script type="text/plain" data-demo-scss>
+<!-- Both variants side by side -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>Both Variants</h3>
+	</header>
+	<main>
+		<div id="demo-empty-variants">
+			<div>
+				<div data-ln-empty-state="no-data">
+					<svg class="ln-icon ln-icon--xl" aria-hidden="true">
+						<use href="#ln-icon-folder"></use>
+					</svg>
+					<h3>No documents yet</h3>
+					<p>Upload your first document to get started.</p>
+					<button type="button" class="btn">Upload document</button>
+				</div>
+				<small><strong>no-data</strong> — the list has never had items. Show the primary "create" action to
+					guide the user toward the first entry.</small>
+			</div>
+			<div>
+				<div data-ln-empty-state="no-results">
+					<svg class="ln-icon ln-icon--xl" aria-hidden="true">
+						<use href="#ln-icon-search"></use>
+					</svg>
+					<h3>No matches</h3>
+					<p>Try a different search or clear your filters.</p>
+					<button type="button" class="btn btn-ghost">Clear filters</button>
+				</div>
+				<small><strong>no-results</strong> — data exists but the current filter or search returned zero rows.
+					Show a clear-filter action rather than a create action.</small>
+			</div>
+		</div>
+	</main>
+	<script type="text/plain" data-demo-scss>
 // Default attribute — zero SCSS needed
 // <div data-ln-empty-state="no-data">...</div>
 // <div data-ln-empty-state="no-results">...</div>
@@ -43,65 +55,83 @@
     @include empty-state;
 }
 					</script>
-				</section>
+</section>
 
-				<!-- no-data standalone -->
-				<section class="section-card" data-demo-html>
-					<header><h3>no-data — Full Table Context</h3></header>
-					<main>
-						<div class="table-container">
-						<table>
-							<thead>
-								<tr><th>Name</th><th>Type</th><th>Date</th><th>Size</th></tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td data-label="Attribute" colspan="4">
-										<div data-ln-empty-state="no-data">
-											<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-inbox"></use></svg>
-											<h3>No files uploaded</h3>
-											<p>Drag and drop files here or click Upload to add your first file.</p>
-											<button type="button">Upload file</button>
-										</div>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						</div>
-					</main>
-					<script type="text/plain" data-demo-scss>
+<!-- no-data standalone -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>no-data — Full Table Context</h3>
+	</header>
+	<main>
+		<div class="table-container">
+			<table>
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Type</th>
+						<th>Date</th>
+						<th>Size</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td data-label="Attribute" colspan="4">
+							<div data-ln-empty-state="no-data">
+								<svg class="ln-icon ln-icon--xl" aria-hidden="true">
+									<use href="#ln-icon-inbox"></use>
+								</svg>
+								<h3>No files uploaded</h3>
+								<p>Drag and drop files here or click Upload to add your first file.</p>
+								<button type="button" class="btn">Upload file</button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</main>
+	<script type="text/plain" data-demo-scss>
 // Add empty-state styling to a table-nested container:
 .table-empty-container {
     @include empty-state;
 }
 					</script>
-				</section>
+</section>
 
-				<!-- no-results standalone -->
-				<section class="section-card" data-demo-html>
-					<header><h3>no-results — Full Table Context</h3></header>
-					<main>
-						<div class="table-container">
-						<table>
-							<thead>
-								<tr><th>Name</th><th>Type</th><th>Date</th><th>Size</th></tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td colspan="4">
-										<div data-ln-empty-state="no-results">
-											<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-											<h3>No matches for "contract"</h3>
-											<p>Try broadening your search or removing active filters.</p>
-											<button type="button">Clear search</button>
-										</div>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						</div>
-					</main>
-					<script type="text/plain" data-demo-scss>
+<!-- no-results standalone -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>no-results — Full Table Context</h3>
+	</header>
+	<main>
+		<div class="table-container">
+			<table>
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Type</th>
+						<th>Date</th>
+						<th>Size</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td colspan="4">
+							<div data-ln-empty-state="no-results">
+								<svg class="ln-icon ln-icon--xl" aria-hidden="true">
+									<use href="#ln-icon-search"></use>
+								</svg>
+								<h3>No matches for "contract"</h3>
+								<p>Try broadening your search or removing active filters.</p>
+								<button type="button" class="btn btn-ghost">Clear search</button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</main>
+	<script type="text/plain" data-demo-scss>
 // Sub-type styling custom override example:
 [data-ln-empty-state="no-results"] {
     @include empty-state;
@@ -111,22 +141,25 @@
     }
 }
 					</script>
-				</section>
+</section>
 
-				<!-- Icon-only minimal variant -->
-				<section class="section-card" data-demo-html>
-					<header><h3>Minimal — Icon + Title Only</h3></header>
-					<main>
-						<div data-ln-empty-state>
-							<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-folder"></use></svg>
-							<h3>Nothing here yet</h3>
-						</div>
-					</main>
-					<script type="text/plain" data-demo-scss>
+<!-- Icon-only minimal variant -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>Minimal — Icon + Title Only</h3>
+	</header>
+	<main>
+		<div data-ln-empty-state>
+			<svg class="ln-icon ln-icon--xl" aria-hidden="true">
+				<use href="#ln-icon-folder"></use>
+			</svg>
+			<h3>Nothing here yet</h3>
+		</div>
+	</main>
+	<script type="text/plain" data-demo-scss>
 // Minimal empty state without description/button
 .minimal-empty {
     @include empty-state;
 }
 					</script>
-				</section>
-
+</section>

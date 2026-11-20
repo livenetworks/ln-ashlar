@@ -386,6 +386,12 @@
 		--margin-block: var(--size-lg);
 		margin: 0 0 var(--margin-block);
 	}
+
+	button,
+	a {
+		--margin-block: var(--size-sm);
+		margin-top: var(--margin-block);
+	}
 }
 
 // Virtual-scroll spacer rows (JS-injected) — neutralize cell chrome including bg.
