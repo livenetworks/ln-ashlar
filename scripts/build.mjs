@@ -59,18 +59,10 @@ function copyFlags() {
 	const srcDir = resolve(__dirname, 'assets/flags');
 	if (!fs.existsSync(srcDir)) return;
 
-	const targetDirs = [
-		resolve(__dirname, 'dist/flags'),
-		resolve(__dirname, 'demo/assets/flags'),
-		resolve(__dirname, 'demo/dist/flags'),
-		resolve(__dirname, 'demo/admin/dist/flags')
-	];
-
-	for (const target of targetDirs) {
-		if (!fs.existsSync(target)) fs.mkdirSync(target, { recursive: true });
-		fs.cpSync(srcDir, target, { recursive: true });
-	}
-	console.log('✓ Copied flag assets to distribution and demo targets');
+	const target = resolve(__dirname, 'demo/assets/flags');
+	if (!fs.existsSync(target)) fs.mkdirSync(target, { recursive: true });
+	fs.cpSync(srcDir, target, { recursive: true });
+	console.log('✓ Copied flag assets to demo/assets/flags');
 }
 
 function compileSassFiles() {
