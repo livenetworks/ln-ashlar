@@ -12,23 +12,24 @@ export function normalizeDataQuery(detail) {
 
 export function selectDataSource(store, connector) {
 	const storeUnavailable = !store || !!store.initializationError;
-	// A store told to leave queries to the server can still serve a windowed read:
-	// those rows are the server's own answer, held by position. Without a window a
-	// local query is the only thing it could do, which is exactly what it was told
-	// not to do — so the read goes remote.
-	const declinesRead = !!(store && store.noLocalQuery && !store.windowed);
+	// A store told to leave queries to the server declines the read — the read goes remote.
+	const declinesRead = !!(store && store.noLocalQuery);
 	if (connector && (storeUnavailable || !store.canServe || declinesRead)) return 'remote';
 	if (store && !store.initializationError) return 'store';
 	return 'none';
 }
 
-
-export function composeQuery(viewQuery, storeQuery) {
-	const q = Object.assign({}, viewQuery);
-	if (storeQuery) {
-		q.filters = storeQuery.filters;
-		q.search  = storeQuery.search;
-		q.sort    = storeQuery.sort;
-	}
-	return q;
+export function composeQuery(viewQuery, coordQuery) {
+	const v = viewQuery || {};
+	const c = coordQuery || {};
+	const vf = (v.filters && typeof v.filters === 'object') ? v.filters : {};
+	const cf = (c.filters && typeof c.filters === 'object') ? c.filters : {};
+	return {
+		offset: v.offset,
+		limit: v.limit,
+		queryGen: v.queryGen,
+		filters: Object.assign({}, vf, cf),
+		search: c.search || v.search || '',
+		sort: c.sort || v.sort || null
+	};
 }

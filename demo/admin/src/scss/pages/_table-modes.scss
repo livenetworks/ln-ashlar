@@ -1,0 +1,15 @@
+@use '../../../../../theme/config/mixins' as *;
+
+// Banner shared by table.html, table-api.html and table-seed.html.
+#table-modes {
+	@include grid-auto;
+	@include mt(var(--size-md));
+	--gap: var(--size-md);
+
+	> li {
+		@include card;
+
+		// Accent marks the current page only; the other cards stay neutral.
+		&[aria-current="page"] { @include card-accent-top; }
+	}
+}

@@ -3,6 +3,18 @@
 	"component": "ln-table-coordinator",
 	"generator": "scripts/sync-ln-schemas.mjs",
 	"attributes": {
+		"data-ln-data-coordinator": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
+		"data-ln-data-coordinator-search": {
+			"direction": "both",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
 		"data-ln-field": {
 			"direction": "author",
 			"sources": [

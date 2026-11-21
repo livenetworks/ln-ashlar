@@ -361,4 +361,50 @@ run('demo/admin/coordinator.html', async ({ page }) => {
 	const failed = await backend();
 	assert(!failed || failed.find(r => r.doc_id === 1).title === ISO, 'mock server record is unchanged after the failed PUT');
 	await expectTitles(SEED_ORDER, 'failed mutation is reverted in the table (original title restored)');
+
+	// ═══ 10. No store child ═══════════════════════════════════
+
+	section('Store-less coordinator: read, write and post-write refresh go through the connector alone');
+	await load();
+	await disableLatency();
+	await page.evaluate(() => {
+		const host = document.createElement('div');
+		host.id = 'nostore-coordinator';
+		host.setAttribute('data-ln-data-coordinator', 'nostore');
+		host.innerHTML = '<div data-ln-api-connector data-ln-api-base-url="/api" data-ln-api-path="/documents"></div>';
+		const view = document.createElement('div');
+		view.id = 'nostore-view';
+		view.setAttribute('data-ln-table-source', 'nostore');
+		window.__nostore = { sets: [], loading: [] };
+		view.addEventListener('ln-table:set-data', e => window.__nostore.sets.push(e.detail.data.map(r => r.doc_id)));
+		view.addEventListener('ln-table:set-loading', e => window.__nostore.loading.push(e.detail.loading));
+		document.body.append(host, view);
+	});
+	await page.waitForFunction(() => {
+		const host = document.getElementById('nostore-coordinator');
+		return !!(host.lnDataCoordinator && host.firstElementChild.lnApiConnector);
+	}, { timeout: 10000 });
+	assert(await page.evaluate(() => !document.getElementById('nostore-coordinator').querySelector('[data-ln-data-store]')),
+		'the injected coordinator has no store child');
+
+	await page.evaluate(() => document.getElementById('nostore-view')
+		.dispatchEvent(new CustomEvent('ln-table:request-data', { bubbles: true, detail: {} })));
+	await page.waitForFunction(() => window.__nostore.sets.length >= 1, { timeout: 8000 }).catch(() => {});
+	const noStoreRead = await page.evaluate(() => window.__nostore);
+	assert(noStoreRead.sets.length >= 1 && same(noStoreRead.sets[noStoreRead.sets.length - 1], [1, 2, 3]),
+		'read: the connector answer reaches the view as set-data (records 1, 2, 3, identity mapper)');
+	assert(noStoreRead.loading[0] === true && noStoreRead.loading[noStoreRead.loading.length - 1] === false,
+		'read: set-loading true, then false');
+
+	await page.evaluate(() => {
+		window.__nostore.sets.length = 0;
+		document.getElementById('nostore-coordinator').dispatchEvent(new CustomEvent('ln-data-coordinator:request-create',
+			{ bubbles: true, detail: { data: { title: 'No Store Doc' } } }));
+	});
+	await page.waitForFunction(() => window.__nostore.sets.some(s => s.length === 4), { timeout: 8000 }).catch(() => {});
+	assert(await page.evaluate(() => window.__nostore.sets.some(s => s.length === 4)),
+		'write: the connector confirmation re-serves the view (4 records) with no store event involved');
+	const noStoreSaved = await backend();
+	assert(noStoreSaved && noStoreSaved.length === 4 && noStoreSaved[3].title === 'No Store Doc',
+		'write: the mock server persisted the record created through the connector alone');
 });

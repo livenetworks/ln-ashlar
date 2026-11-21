@@ -49,8 +49,6 @@ Embed authoritative server data directly in a `<script type="application/json">`
 | `data-ln-data-store-stale="N"` | Seconds before cache is considered stale. Set to `never` or `-1` to disable staleness. | `300` |
 | `data-ln-data-store-indexes="…"` | Comma-separated list of IndexedDB index fields. | `""` |
 | `data-ln-data-store-search-fields="…"` | Comma-separated list of text-search fields for local query search matching. | `""` |
-| `data-ln-data-store-window="N"` | Enables windowed residency mode. Caps how many records stay resident — both the LRU position index and the records held in IndexedDB. | *Disabled* |
-| `data-ln-data-store-window-page="N"` | Page size of slices requested from the server. | `200` |
 | `data-ln-data-store-no-local-query` | Leave queries to the server: the store stops answering reads from its own records. Read live, so it can be flipped per situation. | *Absent* |
 | `data-ln-data-store-frozen` | **Runtime-written, dev-only.** Set by the component itself when `data-ln-data-store` or `-indexes` is edited after init; surfaced as a dev-only diagnostic banner (`[data-ln-debug]`). Not authored. | *Absent* |
 
@@ -120,7 +118,6 @@ store.setPresenters({
 
 | Property/Method | Type / Return Type | Description |
 |---|---|---|
-| `query` | `Object` | Active query filters and search terms: `{ filters: {}, search: '' }`. |
 | `getAll(options)` | `Promise<Object>` | Retrieves records. Options support `sort` (`{ field, direction }`), `filters` (`{ field: Array }`), `search` (`String`), `offset`, `limit`. Returns `{ data, total, filtered }`. |
 | `getById(id)` | `Promise<Object\|null>` | Returns a single record (decorated with presenters) or `null`. |
 | `count(filters)` | `Promise<Number>` | Returns the total count of records. If filters are provided, returns the filtered count. |
@@ -131,26 +128,11 @@ store.setPresenters({
 | `fullReload()` | `Promise<void>` | Clears the IndexedDB store, resets sync metadata, and triggers a sync. |
 | `destroy()` | `void` | Cleans up the instance, removes event listeners, and deletes the DOM reference. |
 
-### 4. Windowed Residency (Virtualization)
-
-When `data-ln-data-store-window` is present, the store operates in windowed residency mode. The server is the authority on record order: the store keeps a memory index of logical positions to record IDs (`Map<position, id>`) capped at the window size. A view's range request is resolved through that index and materialised from IndexedDB; a missing page dispatches `ln-data-store:request-page`. Records the index evicts are deleted from IndexedDB too, so the window bounds what is stored, not only what is positioned. Only IDs the index itself placed can be evicted, so a locally created record the server has not positioned is never dropped.
-
-A query change resets the index — positions are query-relative and become meaningless. Until the server's first page for the new query lands, the store answers from the records it already holds and marks the answer **provisional**: rows only, no totals. Counts and scroll geometry hold at whatever the last authoritative answer established, and the server's answer supersedes the provisional one at the next generation. The local pass stops as soon as the requested slice is full, so its cost tracks the viewport rather than the store.
-
-`data-ln-data-store-no-local-query` turns that off: the store reports the window as unresolved and the view waits for the server. Already-positioned rows are still served from cache — those are the server's own answer, only materialised locally.
-
-Windowed residency and coordinator autosync are mutually exclusive in practice: a full sync inserts records the index never positioned, which the window cannot bound.
-
 ---
 
 ## ⚡ DOM Events
 
-### Commands & Query Events (Listened to by the Store)
-
-| Event | `e.detail` payload | Description |
-|---|---|---|
-| `ln-search:change` | `{ term }` | Updates the active `query.search` term and dispatches `ln-data-store:query-changed`. |
-| `ln-filter:change` | `{ key, values, targetId }` | Updates the active `query.filters[key]` and dispatches `ln-data-store:query-changed`. |
+### Mutation Commands (Listened to by the Store)
 
 All mutations must be routed via DOM events. **Never invoke write methods directly.** The caller is responsible for supplying a `tempId` (e.g. `'_temp_' + crypto.randomUUID()`) when creating records:
 
@@ -201,8 +183,6 @@ These events bubble up and can be listened to by coordinators or rendering views
 
 | Event | `e.detail` payload | Description |
 |---|---|---|
-| `ln-data-store:request-page` | `{ store, offset, limit, query, queryGen }` | Dispatched in windowed residency when pages within the sliding window are missing and must be fetched from the server. |
-| `ln-data-store:query-changed` | `{ store, query }` | Emitted when store search query or column filters change. |
 | `ln-data-store:initialized` | `{ store, hasCache, lastSyncedAt, count }` | Emitted once after IndexedDB connection opens. The instance's `ready` promise resolves after this state is committed. |
 | `ln-data-store:initialization-error` | `{ store, error }` | IndexedDB could not be initialized. `ready` still resolves after `initializationError` is set, allowing a coordinator to route reads to its connector. |
 | `ln-data-store:ready` | `{ store, count, source }` | Emitted when data is ready. `source` is `'cache'` (init) or `'server'` (first sync). |

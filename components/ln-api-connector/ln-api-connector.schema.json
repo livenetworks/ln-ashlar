@@ -89,7 +89,7 @@
 				"src/ln-api-connector.js"
 			],
 			"type": "string",
-			"fallback": "sort_by",
+			"fallback": "sort_field",
 			"description": "Query parameter name for sort field"
 		},
 		"data-ln-api-path": {

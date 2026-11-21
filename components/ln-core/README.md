@@ -499,8 +499,7 @@ registerComponent('data-ln-example', 'lnExample', _component, 'ln-example', {
   existing `this.prop = ...` assignment to a `defineAttrs` getter, grep for
   every place the codebase assigns to that property after construction — a
   hit means the property is not a pure attribute mirror and does not belong
-  in the spec. (`ln-data-store`'s `windowed` is excluded for exactly this
-  reason: `destroy()` assigns `this.windowed = false`.)
+  in the spec.
 - **Attribute names must be inline string literals or a `const` bound to a
   literal — never concatenated or templated.**
   `scripts/sync-ln-schemas.mjs:22-23` is a raw regex over file text; a

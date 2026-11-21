@@ -639,20 +639,6 @@
 					"role": "input",
 					"description": "Fields to index for local client-side store search queries."
 				},
-				"data-ln-data-store-window": {
-					"type": "number",
-					"read_by": "ln-data-store",
-					"consumed_by": "js",
-					"role": "input",
-					"description": "Enables server-side windowing and sets how many record positions stay resident. Presence activates windowed mode."
-				},
-				"data-ln-data-store-window-page": {
-					"type": "number",
-					"read_by": "ln-data-store",
-					"consumed_by": "js",
-					"role": "input",
-					"description": "Page size the windowed store requests from the backend. Becomes the limit on each ln-data-store:request-page event."
-				},
 				"data-ln-data-store-no-local-query": {
 					"type": "boolean",
 					"read_by": "ln-data-store",

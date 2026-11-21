@@ -71,7 +71,7 @@ tags: [network, REST, sync, fetch, debounce]
 | `element.lnApiConnector.refreshConfig` | `()` | `void` | Reloads URL, path, and header configurations. |
 | `element.lnApiConnector.cancel` | `(key?: String)` | `Boolean` | Aborts active in-flight request for the given key/element. |
 | `element.lnApiConnector.fetchDelta` | `(since: String, targetEl?: Element)` | `Promise` | Fetches delta updates since sequence tag. |
-| `element.lnApiConnector.query` | `(queryParams: Object, targetEl?: Element)` | `Promise` | Sends query request with pagination and filters. |
+| `element.lnApiConnector.query` | `(queryParams: Object, targetEl?: Element)` | `Promise` | Sends query request with pagination and filters. A call with `queryParams.offset` and a `targetEl` is tracked per `(targetEl, offset)`. |
 | `element.lnApiConnector.create` | `(payload: Object, url?: String, idempotencyKey?: String)` | `Promise` | Sends POST request. |
 | `element.lnApiConnector.update` | `(id: ID, payload: Object, expectedVersion?: Int, url?: String, idempotencyKey?: String)` | `Promise` | Sends PUT update. |
 | `element.lnApiConnector.delete` | `(id: ID, url?: String, idempotencyKey?: String)` | `Promise` | Sends DELETE request. |
@@ -83,8 +83,8 @@ tags: [network, REST, sync, fetch, debounce]
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-api-connector:request-sync` | Listens | No | Triggers delta updates query. | `{ since?: String, meta?: Object }` |
-| `ln-api-connector:request-query` | Listens | No | Triggers structured query/pagination fetch. | `{ query?: Object, meta?: Object }` |
-| `ln-api-connector:request-cancel` | Listens | No | Aborts in-flight fetch or query for the target element/key. | `{ targetEl?: Element, key?: String, meta?: Object }` |
+| `ln-api-connector:request-query` | Listens | No | Triggers structured query/pagination fetch. Debounce and in-flight cancellation are keyed per `meta.targetEl`; a query with `query.offset` set is keyed per `(targetEl, offset)`, so distinct pages of one view never supersede each other. | `{ query?: Object, meta?: Object }` |
+| `ln-api-connector:request-cancel` | Listens | No | Aborts in-flight fetch or query for the target element/key. A paged request (`query.offset` set) is tracked per `(targetEl, offset)` and is not reached by `targetEl` alone. | `{ targetEl?: Element, key?: String, meta?: Object }` |
 | `ln-api-connector:request-create` | Listens | No | Triggers document create request. | `{ data: Object, tempId: String, url?: String, idempotencyKey?: String, meta?: Object }` |
 | `ln-api-connector:request-update` | Listens | No | Triggers document PUT edit. | `{ id: ID, data: Object, expected_version?: Int, url?: String, idempotencyKey?: String, meta?: Object }` |
 | `ln-api-connector:request-delete` | Listens | No | Triggers document DELETE. | `{ id: ID, url?: String, idempotencyKey?: String, meta?: Object }` |
@@ -94,7 +94,7 @@ tags: [network, REST, sync, fetch, debounce]
 | `ln-api-connector:updated` | Emits | No | Dispatched upon successful document edit. | `{ record: Object, id: ID, message: String, meta: Object }` |
 | `ln-api-connector:deleted` | Emits | No | Dispatched upon successful document deletion. | `{ response: Object, id: ID, message: String, meta: Object }` |
 | `ln-api-connector:bulk-deleted` | Emits | No | Dispatched upon successful bulk deletion. | `{ response: Object, ids: Array, message: String, meta: Object }` |
-| `ln-api-connector:error` | Emits | No | Dispatched upon HTTP or network errors (silent on AbortError). | `{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }` |
+| `ln-api-connector:error` | Emits | No | Dispatched upon HTTP or network errors (silent on AbortError). A failed page query carries the request's `meta` (including `kind` and `offset`). | `{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }` |
 | `ln-api-connector:config-changed` | Emits | No | Dispatched whenever `refreshConfig()` reloads URL, path, and header configuration (including on init). | `{ baseUrl: String, path: String, headers: Object, paramKeys: Object }` |
 
 ---

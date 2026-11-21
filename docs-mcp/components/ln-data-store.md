@@ -110,8 +110,6 @@ Use when backend pre-populates dataset into the initial page response. The store
 | `data-ln-data-store-stale` | Root | `Integer` \| `"never"` \| `-1` | `300` | Seconds before data is considered stale. |
 | `data-ln-data-store-indexes` | Root | `String` | `""` | Comma-separated IndexedDB index fields. |
 | `data-ln-data-store-search-fields` | Root | `String` | `""` | Comma-separated list of text fields for search. |
-| `data-ln-data-store-window` | Root | `Integer` | `1000` | Enables server-side windowing. Presence activates windowed mode; the value bounds how many record positions stay resident. |
-| `data-ln-data-store-window-page` | Root | `Integer` | `200` | Page size the windowed store requests from the backend. Becomes the `limit` on each `ln-data-store:request-page` event. |
 | `data-ln-data-store-no-local-query` | Root | Flag / Valueless | *Absent* | Opts out of answering reads from the local cache; queries wait for the server. |
 | `data-ln-data-store-frozen` | Root | `String` | *Absent* | **Runtime-written, dev-only.** Set by the component when `data-ln-data-store` or `-indexes` is edited after init, naming the attribute that was touched. Surfaced as a diagnostic under `[data-ln-debug]`. Never authored. |
 
@@ -147,10 +145,6 @@ Exposed on the root element via `el.lnDataStore`:
 | `ln-data-store:request-delete` | Listens | No | Optimistically deletes a record. | `{ id: ID }` |
 | `ln-data-store:request-bulk-delete` | Listens | No | Optimistically deletes multiple records. | `{ ids: Array }` |
 | `ln-data-store:request-sync-failed` | Listens | No | The coordinator reports a failed connector sync. Clears `isSyncing` and re-emits it as `ln-data-store:sync-error`. | `{ error: String, status: Number }` |
-| `ln-search:change` | Listens | Yes (`preventDefault`) | Updates `query.search` and dispatches `ln-data-store:query-changed`. | `{ term: String }` |
-| `ln-filter:change` | Listens | Yes (`preventDefault`) | Updates `query.filters[key]` and dispatches `ln-data-store:query-changed`. | `{ key: String, values: Array, targetId: String }` |
-| `ln-sort:change` | Listens | Yes (`preventDefault`) | Updates `query.sort` and dispatches `ln-data-store:query-changed`. | `{ field: String, direction: String }` |
-| `ln-data-store:query-changed` | Emits | No | Emitted when store filters, search, or sort are modified. | `{ store: String, query: { filters: Object, search: String, sort: Object\|null } }` |
 | `ln-data-store:request-remote-sync` | Emits | No | Triggers network sync request. | `{ since: Number\|null }` |
 | `ln-data-store:initialized` | Emits | No | Emitted when store IndexedDB is configured. | `{ store: String, hasCache: Boolean, lastSyncedAt: Number\|null, count: Number }` |
 | `ln-data-store:ready` | Emits | No | Emitted when data is ready for viewing. | `{ store: String, count: Number, source: 'cache'\|'server' }` |
@@ -164,7 +158,6 @@ Exposed on the root element via `el.lnDataStore`:
 | `ln-data-store:sync-error` | Emits | No | A connector sync or local cache commit failed; `isSyncing` is cleared so a later retry can run. | `{ store: String, error: String, status?: Number }` |
 | `ln-data-store:blocked` | Emits | No | Emitted on `document` if an IndexedDB version upgrade is blocked by open connections in other tabs. | `{ db: String }` |
 | `ln-data-store:mutation-error` | Emits | No | A local mutation failed. `requestId` correlates it with the coordinator's request. | `{ store: String, action: String, requestId: String, error: Error }` |
-| `ln-data-store:request-page` | Emits | No | Windowed residency: pages inside the sliding window are missing and must be fetched from the server. | `{ store: String, offset: Number, limit: Number, query: Object, queryGen: Number }` |
 
 ---
 

@@ -1,25 +1,26 @@
 # `data-ln-data-coordinator`
 
-> Applied to a parent container (`<ul data-ln-data-coordinator hidden>`) enclosing a `data-ln-data-store` and a
-> `data-ln-api-connector`. It catches store staleness and pagination requests to dispatch fetch events to the connector,
-> populating the store with server responses (`request-populate`). On store data mutations, it executes local queries and
-> dispatches `set-data` events directly to bound view elements (`data-ln-table-source`, `data-ln-list-source`).
+> Applied to a parent container (`<ul data-ln-data-coordinator hidden>`) enclosing a `data-ln-api-connector` and, optionally, a
+> `data-ln-data-store`. With a store it catches store staleness and pagination requests to dispatch fetch events to the connector,
+> populating the store with server responses (`request-populate`); on store data mutations it executes local queries. Without a store,
+> views are served from the connector's answers alone. In both topologies it dispatches `set-data` events directly to bound view
+> elements (`data-ln-table-source`, `data-ln-list-source`).
 
 ---
 
 ## Declarative View Binding
 
-Add these attributes to view elements to bind them to this coordinator's child store. No app JS needed.
+Add these attributes to view elements to bind them to this coordinator. No app JS needed.
 
 | Attribute | Applied To | Description |
 |---|---|---|
-| `data-ln-table-source="<storeName>"` | `[data-ln-table]` | Binds a table — receives `ln-table:set-data` automatically. |
-| `data-ln-list-source="<storeName>"` | `[data-ln-list]` | Binds a list — receives `ln-list:set-data` automatically. |
-| `data-ln-chart-source="<storeName>"` | `[data-ln-chart]` | Binds a chart; receives `ln-chart:set-data` automatically. |
-| `data-ln-options="<storeName>"` | `<select>` | Populated by `ln-options` via `ln-options:set-data`. |
-| `data-ln-stat="<storeName>"` | Inline element | Receives count via `ln-stat:set-count`. |
+| `data-ln-table-source="<name>"` | `[data-ln-table]` | Binds a table — receives `ln-table:set-data` automatically. |
+| `data-ln-list-source="<name>"` | `[data-ln-list]` | Binds a list — receives `ln-list:set-data` automatically. |
+| `data-ln-chart-source="<name>"` | `[data-ln-chart]` | Binds a chart; receives `ln-chart:set-data` automatically. |
+| `data-ln-options="<name>"` | `<select>` | Populated by `ln-options` via `ln-options:set-data`. |
+| `data-ln-stat="<name>"` | Inline element | Receives count via `ln-stat:set-count`. |
 
-`<storeName>` = the `id` of the coordinator's child store element. The presentation layer always addresses the **store**, never the coordinator. Multiple coordinators on one page each serve only their own store — isolated by the `_ownsStore(name)` guard.
+`<name>` = the coordinator's name (see `data-ln-data-coordinator` in Attributes). A view addresses the coordinator, never a child, so the same attribute works whether or not a store child exists. Multiple coordinators on one page each serve only their own views — isolated by the `_owns(name)` check.
 
 ### Presenter / Binder Split
 
@@ -28,7 +29,9 @@ Add these attributes to view elements to bind them to this coordinator's child s
 
 Use `setPresenters` for fields like `updated_display`, `size_display`, `status_label`. The binder delivers them as-is.
 
-The coordinator listens on `this.dom` for `ln-data-store:ready`, `loaded`, `created`, `updated`, `deleted`, `synced` (only when `changed`), `ln-data-store:query-changed`, and `ln-data-store:request-page`. On request-page, it converts page offsets into a `request-query` call on the paired connector's namespace (`ln-api-connector:request-query` or `ln-websocket-connector:request-query`, depending on which connector is present). On other store-change events, `_refreshAll()` re-queries all bound view elements using their last cached query parameters.
+Presenters live in the store. A coordinator without a store has none: records reach the view through `mapper.ingress` alone, so a computed field a template needs (`updated_display`, `status_label`, …) is produced by the mapper.
+
+The coordinator listens on `this.dom` for `ln-data-store:ready`, `created`, `updated`, `deleted`, and `synced` (only when `changed`). On these store-change events, `_refreshAll()` re-queries all bound view elements using their last cached query parameters. Without a store child, the connector's `:created`, `:updated`, `:deleted` and `:bulk-deleted` confirmations trigger the same `_refreshAll()`. With a store child they do not: the store's own events already do.
 
 ### Zero-JS Example
 
@@ -149,7 +152,7 @@ clearing a sort (two attribute removals) re-queries once, not twice.
 The coordinator is built to be highly dynamic, reacting to runtime modifications in its DOM subtree.
 
 1. **Child Discovery**: The coordinator automatically locates its child components by querying its DOM subtree:
-   * **Store Cache**: Looks for `[data-ln-data-store]` and accesses `el.lnDataStore`.
+   * **Store Cache**: Looks for `[data-ln-data-store]` and accesses `el.lnDataStore`. Optional: when absent, reads and writes go through the connector alone.
    * **Transport Connector**: The request connector is `[data-ln-api-connector]` or `[data-ln-couchdb-connector]` when present, otherwise `[data-ln-websocket-connector]`; the coordinator accesses the matching instance (`el.lnApiConnector`, `el.lnCouchDbConnector` or `el.lnWebsocketConnector`). The request event namespace (`ln-api-connector:*`, `ln-couchdb-connector:*` or `ln-websocket-connector:*`) is derived from whichever selector matched, not hardcoded. Responses are heard from all three namespaces, so a socket beside a REST connector still delivers its pushes (`:fetched`) to the store.
    * **Live Socket Catch-up**: On every `ln-websocket-connector:connected` the coordinator runs `store.forceSync()` — a delta since `lastSyncedAt` over the request connector — so changes missed while the socket was down are fetched.
    * **Offline Outbox (optional Child 3)**: Looks for `[data-ln-api-queue]` and accesses `el.lnApiQueue`. When present, write routing (below) enqueues instead of calling the connector directly. When absent, behavior is byte-for-byte the direct-connector path described in this document.
@@ -260,7 +263,7 @@ sequenceDiagram
     participant Gateway as data-ln-*-connector / ln-api-queue
 
     Intake->>Coord: _fanOutCreate(children, data, action)
-    par Local (always)
+    par Local (only if a store child is present)
         Coord->>Store: Event: ln-data-store:request-create { tempId, data }
         Store-->>Coord: Event: ln-data-store:created (bubbles, refreshes bound views)
     and Remote (only if connector or queue child present)
@@ -272,13 +275,7 @@ sequenceDiagram
     end
 ```
 
-The only guard on all four write paths is `!children.storeEl` (console
-warning + no-op). There is no `!children.connector` guard — **a
-store-only coordinator (no connector, no queue child) is a valid,
-supported offline-only setup**: the fan-out dispatches the local
-`ln-data-store:request-*` event and stops there. No remote call, no toast; the
-record simply keeps its `_temp_`-prefixed id until a connector is added
-later.
+The local half is dispatched only when a store child exists; the remote half only when a queue or connector child exists. A store with no connector or queue is a valid offline-only setup: the fan-out dispatches the local `ln-data-store:request-*` event and stops there. No remote call, no toast; the record keeps its `_temp_`-prefixed id until a connector is added. A connector with no store is a valid transport-only setup: the remote request is the whole write (see Transport-only mode).
 
 ### 2. Sync (`ln-data-store:request-remote-sync`) — unchanged
 
@@ -318,7 +315,6 @@ sequenceDiagram
     Note over Coord: mapper.ingress(record)
     Coord->>Store: Event: ln-data-store:request-update { id: meta.tempId, data: serverRecord }
     Note over Store: data.id !== tempId -> rekey (id-swap), fires ln-data-store:updated
-    Coord->>Coord: _toastFromMessage(message) — success toast if the server sent one
 ```
 
 Update/delete/bulk-delete confirmations follow the same shape (ordinary
@@ -375,9 +371,6 @@ identity. The coordinator does not fall back to a possibly stale `meta.id`.
 > substring (string replace) — keeps a persisted per-record URL in sync
 > after a create resolves. See `components/ln-api-queue/README.md`.
 
-Every success path also calls `_toastFromMessage(e.detail.message)` — see
-Toasts below.
-
 Create resolution waits for the correlated store update before advancing the
 outbox. `resolve-create` then deletes the create entry and remaps all queued
 siblings in one IndexedDB transaction, so no sibling can advance with the
@@ -423,17 +416,36 @@ connector later requires no change to the write intake side.
 
 ---
 
+## 🧭 Transport-only mode (no store child)
+
+A coordinator wrapping a connector and no `[data-ln-data-store]` is a first-class configuration:
+
+```html
+<ul data-ln-data-coordinator="people" hidden>
+  <li data-ln-api-connector data-ln-api-path="/api/people"></li>
+</ul>
+```
+
+- **Name.** The coordinator's name is required: a nameless coordinator falls back to its store child's `id`, and with no store child it owns no view.
+- **Read.** A view's `request-data` is answered by the connector alone: the coordinator dispatches `ln-{kind}:set-loading {loading:true}` and `<connector>:request-query`; the `:fetched` answer passes through `mapper.ingress` and is delivered to the requesting view (`set-loading false` + `set-data` for table/list/chart, `ln-options:set-data` for options, `ln-stat:set-count` for stat).
+- **Write.** The fan-out dispatches the remote request only. A view changes when the server confirms: the connector's `:created`, `:updated`, `:deleted` or `:bulk-deleted` makes the coordinator re-serve every bound view.
+- **Queue.** `ln-api-queue:send` is executed against the connector without a store.
+- **Records.** They pass through `mapper.ingress` only; computed display fields come from the mapper.
+- A store whose IndexedDB initialization failed (`initializationError`) is treated the same way for reads, server answers and the post-write refresh.
+
+---
+
 ## ⚠️ Error reconciliation policy
 
 `connError` classifies every non-2xx connector response into exactly one
 of three buckets by `detail.status` (never a fourth "unknown" bucket —
 `status === 0` is treated as transient, the same as a 5xx):
 
-| Bucket | Status | Store action | Queue action (if queued) | Toast |
-|---|---|---|---|---|
-| **Auth** | `401` / `419` | none — optimistic write stays | `nack {reason:'auth'}` (pauses that scope) | `auth` dict key |
-| **Transient** | `0` (network) / `5xx` | none — optimistic write stays; never deleted | `nack {reason:'retry'}` (backoff ladder) | none immediately; on **terminal** failure (`ln-api-queue:failed`) → `network` dict key. Non-queued: `network` dict key fires immediately (single attempt already spent). |
-| **Deterministic** | `409` (update) / other `4xx` / `3xx` | `409` update: ordinary `ln-data-store:request-update` with the server's `remote` record (server wins). `create`: `ln-data-store:request-delete` for the temp id (server rejected it outright). Other 4xx update/delete/bulk: left as-is, next sync reconciles. | `nack {reason:'drop'}` (never retried) | `conflict` (409 update) or `rejected` (everything else deterministic) |
+| Bucket | Status | Store action | Queue action (if queued) |
+|---|---|---|---|
+| **Auth** | `401` / `419` | none — optimistic write stays | `nack {reason:'auth'}` (pauses that scope) |
+| **Transient** | `0` (network) / `5xx` | none — optimistic write stays; never deleted | `nack {reason:'retry'}` (backoff ladder) |
+| **Deterministic** | `409` (update) / other `4xx` / `3xx` | `409` update: ordinary `ln-data-store:request-update` with the server's `remote` record (server wins). `create`: `ln-data-store:request-delete` for the temp id (server rejected it outright). Other 4xx update/delete/bulk: left as-is, next sync reconciles. | `nack {reason:'drop'}` (never retried) |
 
 **Never retried** = deterministic errors always `nack 'drop'` on the queued
 path — a 4xx is never re-attempted, only sync eventually catches up.
@@ -460,6 +472,8 @@ The coordinator emits `ln-data-coordinator:error` whenever a connector or reconc
 ```
 Displaying toast notifications or user-facing messages is the responsibility of the UI layer (`ln-ui-coordinator` or the component initiating the action). The data coordinator remains purely headless and does not manage UI dictionaries or dispatch toasts.
 
+A failed windowed page is also reported to its view: when a connector `:error` carries `meta.kind` and `meta.offset`, the coordinator dispatches `ln-{kind}:page-failed { offset }` on `meta.targetEl`. `ln-table` and `ln-list` release that offset from their window cache; there is no automatic retry.
+
 ### Sync ownership
 
 The coordinator — not the store — decides WHEN to sync:
@@ -468,32 +482,20 @@ The coordinator — not the store — decides WHEN to sync:
   `!detail.hasCache` → `store.forceSync()` (initial load); else if the
   store is stale → `store.forceSync()`.
 * **Race guard.** `ln-data-store:initialized` can fire before the coordinator
-  finishes binding (async `_initStore`, SPA-injected subtree). When
-  children resolve, if `store.isLoaded` is already true, the coordinator
-  evaluates the same condition directly from instance state instead of
-  relying on the event alone.
-* A module-level singleton wires **one shared** `window 'online'`,
-  `window 'offline'`, and `document 'visibilitychange'` listener set across
-  every coordinator instance on the page (not one per instance). On
-  `online`, dispatches `ln-data-coordinator:online` on `document` once, then for each
-  coordinator with a loaded, non-syncing store: `store.forceSync()`. On
-  `offline`, dispatches `ln-data-coordinator:offline` on `document` once. On
-  `visibilitychange` (tab visible again), for each coordinator whose store
-  is stale: `store.forceSync()`.
+  finishes binding (async `_initStore`, SPA-injected subtree). During initialization,
+  `_checkInitialSync()` awaits `store.ready` and evaluates the same condition
+  directly from instance state instead of relying on the event alone.
 
 If IndexedDB initialization fails, the coordinator does not start a cache sync.
 The store exposes the failure as `initializationError`, and connector-backed
 view reads use the remote source directly.
 
-**New attributes:**
+**Staleness & Autosync attributes:**
 
 | Attribute | Description |
 |---|---|
 | `data-ln-data-coordinator-stale` | Seconds threshold before the store is considered stale; falls back to the store's own `data-ln-data-store-stale`; default 300; `-1` / `never` = never stale. |
-| `data-ln-data-coordinator-no-autosync` | Presence opts the coordinator out of online/visibility auto-sync; falls back to the store's own `data-ln-data-store-no-autosync`. |
-
-`ln-data-coordinator:online` / `ln-data-coordinator:offline` indicate network status
-for data coordination across the page.
+| `data-ln-data-coordinator-no-autosync` | Presence opts the coordinator out of automatic synchronization; falls back to the store's own `data-ln-data-store-no-autosync`. |
 
 ---
 
@@ -504,8 +506,8 @@ Access the coordinator instance programmatically via the `lnDataCoordinator` pro
 ```javascript
 const coordinator = document.getElementById('documents-module').lnDataCoordinator;
 
-// Force a remote configuration refresh
-coordinator.refreshConfig();
+// Refresh the resolved data mapper from the registry
+coordinator.refreshMapper();
 
 // Retrieve children objects (queue is null when no [data-ln-api-queue] child exists)
 const { store, connector, queue } = coordinator.findChildren();
@@ -530,7 +532,7 @@ Source: `components/ln-data-coordinator/src/ln-data-coordinator.js`. The write p
 | `data-ln-options="<name>"` | `<select>` | `ln-options:set-data` |
 | `data-ln-stat="<name>"` | inline element | `ln-stat:set-count` |
 
-`<name>` must match the coordinator's own child store's `id` value. Every document-level handler guards with `_ownsStore(name)` first (`children.store && children.store._name === name`), so multiple coordinators on one page coexist without cross-talk.
+`<name>` must match the coordinator's name (`_owns(name)`; a coordinator carrying no name falls back to its child store's `id`, so without a store child the name is required). Every document-level handler checks `_owns(name)` first, so multiple coordinators on one page coexist without cross-talk.
 
 ### Presenter / binder split
 
@@ -538,11 +540,11 @@ Presenters (`store.setPresenters({computed})`) are registered once per store; co
 
 When querying, the coordinator composes the final query payload: the view element provides pagination and sorting (`offset`, `limit`, `sort`), while the store cache provides the active filters and search terms (`filters`, `search`).
 
-The binder awaits `store.ready` before choosing a source. If the store is loaded and has no initialization error, reads use the local store; otherwise, connector-backed stores route remote. When IndexedDB is unavailable, table/list/chart/options/stat responses are delivered directly to the requesting view instead of being forced through the failed store. Query failures clear loading and emit `ln-data-coordinator:error {operation:'query', kind, store, target, error}`.
+The binder awaits `store.ready` when a store child exists, then picks a source with `selectDataSource(store, connector)`: the local store when it is loaded and has no initialization error, otherwise the connector. With no store child, or a store whose IndexedDB initialization failed, the connector's answer is delivered directly to the requesting view (table/list/chart: `set-loading false` + `set-data`; options: `set-data`; stat: `set-count`) and is never forced through the store. Query failures clear loading and emit `ln-data-coordinator:error {operation:'query', kind, store, target, error}`.
 
 ### Refresh trigger
 
-On `ln-data-store:ready`/`loaded`/`created`/`updated`/`deleted`, `synced` (only when `e.detail.changed`), and `ln-data-store:query-changed`, `_refreshAll()` re-queries every bound view element using its last cached query parameters (or defaults) — so a filter/sort/search a user set on a table survives a background sync.
+On `ln-data-store:ready`/`created`/`updated`/`deleted`, `synced` (only when `e.detail.changed`), and query attribute mutations on the coordinator, `_refreshAll()` re-queries every bound view element using its last cached query parameters (or defaults) — so a filter/sort/search a user set on a table survives a background sync. Without a store child the same re-query runs on the connector's `:created` / `:updated` / `:deleted` / `:bulk-deleted` confirmations.
 
 ### `data-ln-table-filter-options` — removed
 

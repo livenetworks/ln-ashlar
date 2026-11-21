@@ -1,8 +1,8 @@
 @use '../../theme/config/mixins' as *;
 
 [data-ln-debug] {
-	// 1. Child Store Check: data-ln-data-coordinator must contain a child [data-ln-data-store]
-	[data-ln-data-coordinator]:not(:has([data-ln-data-store])) {
-		@include dev-dom-error("[data-ln-data-coordinator] must contain a child [data-ln-data-store].");
+	// 1. Child Participant Check: data-ln-data-coordinator must contain at least a store or a connector
+	[data-ln-data-coordinator]:not(:has([data-ln-data-store], [data-ln-connector], [data-ln-api-connector], [data-ln-couchdb-connector], [data-ln-websocket-connector])) {
+		@include dev-dom-error("[data-ln-data-coordinator] must contain a child [data-ln-data-store] or [data-ln-*-connector].");
 	}
 }

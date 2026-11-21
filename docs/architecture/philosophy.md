@@ -30,7 +30,7 @@ This document elaborates on the philosophical and technical background behind th
 | Tier | Lives in | Examples | Inspectable via |
 | :--- | :--- | :--- | :--- |
 | **Control state** | DOM attributes | open/closed, active tab, sort direction, mode, filter, current page | DevTools HTML inspector |
-| **Application data** | `ln-data-store` + IndexedDB | records, row caches, sync queue, window index | DevTools → Application → IndexedDB |
+| **Application data** | `ln-data-store` + IndexedDB | records, row caches, sync queue | DevTools → Application → IndexedDB |
 | **Operational mechanics** | JS memory | in-flight requests, `MutationObserver` instances, query generations, render batchers, route registry | Not inspectable — by design |
 
 The third tier is deliberate. In-flight promises and observer instances are runtime

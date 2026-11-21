@@ -162,6 +162,32 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
 > at clone time. `data-ln-field` is **not** processed in rows (the row
 > pipeline never calls `fill()`); it would sit inert in the DOM.
 
+### 4. Windowed Data-Driven Mode
+
+A bounded sliding window over a large remote dataset. The table sits in a bounded `overflow-y: auto` scroll container.
+
+```html
+<section id="docs-table" data-ln-table="docs" data-ln-table-source="docs"
+         data-ln-table-selectable
+         data-ln-table-window="1000" data-ln-table-window-page="200" data-ln-table-count="10000">
+  <table>
+    <thead>
+      <tr>
+        <th data-ln-table-col-select></th>
+        <th data-ln-table-col="title">Title</th>
+      </tr>
+    </thead>
+    <tbody data-ln-table-body></tbody>
+  </table>
+  <template data-ln-template="docs-row">
+    <tr data-ln-table-row>
+      <td><input type="checkbox" data-ln-table-row-select></td>
+      <td>{{ title }}</td>
+    </tr>
+  </template>
+</section>
+```
+
 ---
 
 ## 🛠️ Attributes Reference
@@ -171,6 +197,10 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
 | `data-ln-table` | Root wrapper | Component identifier. Target must carry a unique `id`. |
 | `data-ln-table-source` | Root wrapper | Opt-in indicator for Data-Driven Mode (maps to `ln-data-store` ID). |
 | `data-ln-table-selectable` | Root wrapper | Enables checkbox-based row selections. |
+| `data-ln-table-window` | Root wrapper | Opt-in sliding window for Data-Driven Mode; value = resident-row cap (default 1000). Requires `data-ln-table-source`. |
+| `data-ln-table-window-page` | Root wrapper | Rows requested per page in windowed mode (default 200). |
+| `data-ln-table-window-threshold` | Root wrapper | Prefetch margin in rows before an unloaded page boundary (default 25). |
+| `data-ln-table-count` | Root wrapper | Declared unfiltered grand total for a windowed table. |
 | ~~`data-ln-table-search`~~ | — | **Removed.** Drive the search input with `data-ln-search-for="<tableId>"` — `ln-table` consumes `ln-search:change` directly in SSR mode only; data-driven mode relies on `ln-table-coordinator` to translate it into `ln-table:set-search`. |
 | `data-ln-table-col="field"` | `<th>` | Maps column header to data object field keys. |
 | `data-ln-value` | `<td>` | Raw machine value behind a formatted cell — sorting/filtering operate on this, not the displayed text. Read via `ln-core.readValue`. |
@@ -191,7 +221,7 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
 
 - **`ln-table:ready`** `{ total }`  
   Fired after the initial DOM rows are parsed.
-- **`ln-table:request-data`** `{ table, sort, filters, search }`  
+- **`ln-table:request-data`** `{ table, sort, filters, search }` (windowed: also `{ offset, limit, queryGen }`)  
   Requests a fresh dataset when sort, filter, or search is changed (Data-Driven mode).
 - **`ln-table:rendered`** `{ table, total, visible }`  
   Fired after a dynamic template render finishes drawing.
@@ -204,10 +234,17 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
 
 ### Received Events
 
-- **`ln-table:set-data`** `{ data, total, filtered, filterOptions }`  
+- **`ln-table:set-data`** `{ data, total, filtered, filterOptions }` (windowed: also `offset`, `queryGen`)  
   Applies the payload array and triggers rendering.
 - **`ln-table:set-loading`** `{ loading }`  
   Toggles the visual loading dimmed state overlay.
+- **`ln-table:request-invalidate`** `{ query }`  
+  Sent by `ln-data-coordinator` to windowed tables when the query changed; restarts the window at page 0.
+- **`ln-table:request-revalidate`** `{ query }`  
+  Sent by `ln-data-coordinator` to windowed tables when the data changed; re-requests the current page.
+
+- **`ln-table:page-failed`** `{ offset }`  
+  Sent by `ln-data-coordinator` to windowed tables when a page query failed; releases that offset from the window cache so the next scroll or resize pass can request it again (no automatic retry).
 
 
 ---
@@ -270,7 +307,7 @@ Options come from the domain (backend enum or lookup), never derived from the da
 
 For large datasets, `ln-table` automatically activates DOM row virtualization (`calculateVirtualWindow`) when the row count exceeds `VIRTUAL_THRESHOLD` (200 rows). It mounts top/bottom spacer elements and maintains a recycled pool of ~35–50 rows in the DOM corresponding to the active scroll viewport, providing smooth 60fps scrolling over tens of thousands of records.
 
-For remote sliding-window caching, windowing is handled at the data layer by `ln-data-store` (`data-ln-data-store-window` and `data-ln-data-store-window-page`). The table consumes the streamed records cleanly via `ln-table:set-data` without needing private table-level window caches.
+For remote datasets, an opt-in sliding window is available — see Windowed cache mechanics. The window lives in the table (`ln-core.createWindowCache`), not in `ln-data-store`: the table requests pages from its source by position and evicts rows that leave the window.
 
 ---
 
@@ -329,7 +366,7 @@ the same target: `ln-table` calls `preventDefault()` unconditionally on
 
 ### MutationObserver flow (`ln-table.js`)
 
-A single observer on `document.body`: new `data-ln-table` root injected → `new lnTable(node)`; elements injected inside a live root → local rescan (no full re-init); `data-ln-table-source`/`-window` attribute set on an existing element → re-evaluated live (see Windowed Mode below).
+A single observer on `document.body`: new `data-ln-table` root injected → `new lnTable(node)`; elements injected inside a live root → local rescan (no full re-init); `data-ln-table-window`, `-window-page`, `-window-threshold` and `-count` changes on a live table are applied through the shared attribute observer (see Windowed cache mechanics).
 
 ### Virtual scroll row height
 
@@ -342,9 +379,14 @@ Column widths are locked once (`<colgroup>` + inline `table-layout: fixed`), fro
 Backed by `ln-core.createWindowCache` — the table owns the cache instance, not the full dataset:
 
 - LRU eviction by touch-recency (not viewport distance) once resident rows exceed `windowSize`.
-- `_renderWindowed()` calls `cache.ensure(startRow, endRow)` on every scroll pass; unresident logical rows render as blank placeholder `<tr>`s (no shimmer) until their page arrives.
+- `_renderWindowed()` builds the visible slice on every pass whose range changed (spacer rows, `tr.ln-table__placeholder` rows for non-resident logical rows, `_buildRow` rows for resident ones), then calls `cache.ensure(startRow, endRow)`. Placeholders are blank static rows, no shimmer.
 - `requestPage` dispatches `ln-table:request-data` with `{offset, limit, queryGen}`; `cache.ingest()` consumes the matching `ln-table:set-data {offset, queryGen}` and splices the page in. A response whose `queryGen` doesn't match the cache's current generation is dropped — the guard against a stale sort/filter/search response landing after a newer query superseded it.
 - Live reconfiguration routes through `configure()`/`setGrandTotal()`: enabling `data-ln-table-window` on an initialized non-windowed table seeds the cache from resident rows (honoring `data-ln-table-count` if present, else the resident count); removing it destroys the cache and re-issues a full `ln-table:request-data` (no `offset`/`limit`) to repopulate non-windowed.
+- **Query changes**: `ln-sort:change`, `ln-search:change`/`ln-table:set-search`, `ln-table:request-clear-filters` and `ln-table:request-invalidate` call `cache.invalidate(query)`. New `queryGen`, page 0 requested, current rows stay visible (`.ln-table--loading`) until the first accepted response swaps them. `ln-table:request-revalidate` re-requests the page at the current scroll position.
+- **Failed page**: `ln-table:page-failed {offset}` calls `cache.release(offset)`. No render, no automatic retry; the next `ensure()` pass over that range re-requests the page.
+- **Selection**: per-row selection is keyed by record id and survives eviction. The header select-all is hidden (`hidden`) in windowed mode because only resident rows exist.
+- **Footer**: `data-ln-table-total` = grand total, `data-ln-table-filtered` = logical (filtered) total.
+- **Requires** data-driven mode; a `data-ln-table-window` on an SSR table is ignored.
 
 ### Filter options — `{value, label}` shape
 

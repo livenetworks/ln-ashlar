@@ -337,6 +337,7 @@ import {
 			const iso = formatDateToISO(date);
 			this._rawValue = iso;
 			if (dom.tagName !== 'TIME' && !dom.hasAttribute('data-ln-value')) {
+				this._autoValue = true;
 				dom.setAttribute('data-ln-value', iso);
 			}
 			this._formatTextContent();
@@ -359,7 +360,11 @@ import {
 				}
 				const locale = getLocale(this.dom);
 				const fallback = getLocaleFallback(locale);
-				this.dom.textContent = formatDateValue(date, format || 'medium', locale, fallback);
+				const formatted = formatDateValue(date, format || 'medium', locale, fallback);
+				this._formattedText = formatted;
+				if (this.dom.textContent !== formatted) {
+					this.dom.textContent = formatted;
+				}
 			}
 		}
 	};
@@ -486,11 +491,21 @@ import {
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
+	function _onSubtreeChange(el) {
+		const inst = el[DOM_ATTRIBUTE];
+		if (!inst || !inst.isTextElement) return;
+		if (el.textContent !== inst._formattedText) {
+			if (inst._autoValue) el.removeAttribute('data-ln-value');
+			inst._initTextElement();
+		}
+	}
+
 	// ─── Init ─────────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-date', {
 		attributes: ATTRIBUTES,
 		extraAttributes: ['datetime', 'lang'],
-		onAttributeChange: _syncAttribute
+		onAttributeChange: _syncAttribute,
+		onSubtreeChange: _onSubtreeChange
 	});
 })();

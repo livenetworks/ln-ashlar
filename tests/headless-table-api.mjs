@@ -45,18 +45,13 @@ async function run() {
 	} catch (e) {
 		const diag = await page.evaluate(() => {
 			const t = document.getElementById('hybrid-table')?.lnTable;
-			const s = document.getElementById('hybrid-docs')?.lnDataStore;
-			const c = document.getElementById('hybrid-table-coordinator')?.lnDataCoordinator;
+			const c = document.getElementById('hybrid-docs')?.lnDataCoordinator;
 			return {
 				tableLoaded: t?.isLoaded,
 				windowed: t?._windowed,
 				cacheLogical: t?._cache?.logicalTotal,
 				cacheGrand: t?._cache?.grandTotal,
 				cacheSize: t?._cache?.size,
-				storeLoaded: s?.isLoaded,
-				storeCanServe: s?.canServe,
-				storeHasCache: s?.hasCache,
-				storeTotal: s?.totalCount,
 				coordinatorName: c?._name
 			};
 		});

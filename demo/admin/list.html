@@ -23,7 +23,7 @@
 	(function () {
 		var config = [
 			{ key: 'ln-demo-mode', attr: 'data-mode', valid: ['light', 'dark'] },
-			{ key: 'ln-demo-skin', attr: 'data-skin', valid: ['glass', 'outline'] },
+			{ key: 'ln-demo-skin', attr: 'data-skin', valid: ['glass', 'outline', 'hairline'] },
 			{ key: 'ln-demo-theme', attr: 'data-theme', valid: ['ocean', 'sunset', 'midnight', 'glass'] },
 			{ key: 'ln-demo-density', attr: 'data-density', valid: ['compact', 'comfortable', 'spacious'] }
 		];
@@ -154,6 +154,7 @@
 							<ul>
 								<li><button type="button" data-demo-skin="default">Solid</button></li>
 								<li><button type="button" data-demo-skin="outline"><span class="demo-theme-swatch" data-preset="outline"></span>Outline</button></li>
+								<li><button type="button" data-demo-skin="hairline"><span class="demo-theme-swatch" data-preset="hairline"></span>Hairline</button></li>
 								<li><button type="button" data-demo-skin="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
 							</ul>
 						</section>
@@ -327,12 +328,12 @@
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>Applied to a list or grid container via <code>data-ln-list="name"</code>, <code>ln-list</code> renders and manages repeating item collections. In SSR mode, it coordinates direct DOM search, filter, and sort interactions on its child items. In data-driven mode (<code>data-ln-list-source="store"</code>), it listens for <code>ln-data-store:data</code> CustomEvents, clones <code>&lt;template data-ln-template="name-row"&gt;</code>, populates fields via <code>fill()</code>, and mounts rendered items into <code>[data-ln-list-body]</code> with optional virtual scroll windowing.</p>
+							<p>Applied to a list or grid container via <code>data-ln-list="name"</code>, <code>ln-list</code> renders and manages repeating item collections. In SSR mode, it coordinates direct DOM search, filter, and sort interactions on its child items. In data-driven mode (<code>data-ln-list-source="name"</code>), it requests data with <code>ln-list:request-data</code>, receives <code>ln-list:set-data</code> from <code>ln-data-coordinator</code>, clones <code>&lt;template data-ln-template="name-row"&gt;</code>, populates fields via <code>fill()</code>, and mounts rendered items into <code>[data-ln-list-body]</code> with optional virtual scroll windowing.</p>
 							<p>For datasets too large to cache entirely client-side, <code>ln-list</code> provides a high-performance <strong>SSR Hydration &amp; Windowed Sync</strong> pipeline matching the <code>ln-table</code> synchronization protocol: an instant paint from server-rendered items, followed by a bounded sliding-window cache that fetches pages from the server as the user scrolls.</p>
 
 							<div class="alert" role="alert">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg>
-								<p><strong>Lifecycle Mechanics.</strong> 1. Instant SSR paint: the list loads a fast pre-rendered subset (e.g. 100 items printed by the server, matching the server-declared <code>data-ln-list-count</code> grand total). 2. Local hydration: the JS layer parses those items on load, enabling immediate client-side search over the hydrated subset. 3. Windowed sync: <code>data-ln-list-window="1000"</code> caps the resident cache at 1,000 items — as the user scrolls, the list requests pages from the PHP backend API and LRU-evicts the least-recently-touched items to stay under the cap; the full 10,000-record dataset never loads client-side. No fetch fires on load: the first 100 SSR items seed the resident window directly; the backend is queried only once scrolling moves past the seeded items, or a sort/search/filter changes the query. 4. Continuous scroll: items outside the resident window render as blank placeholders until their page arrives — there are no pagination controls, scrolling stays continuous over the full server-side dataset.</p>
+								<p><strong>Lifecycle Mechanics.</strong> 1. Instant SSR paint: the list loads a fast pre-rendered subset (e.g. 100 items printed by the server, matching the server-declared <code>data-ln-list-count</code> grand total). 2. Local hydration: the JS layer parses those items on load, enabling immediate client-side search over the hydrated subset. 3. Windowed sync: <code>data-ln-list-window="1000"</code> caps the resident cache at 1,000 items — as the user scrolls, the list requests pages through <code>ln-data-coordinator</code> and <code>ln-api-connector</code> from the PHP backend API (<code>api.php</code>) and LRU-evicts the least-recently-touched items to stay under the cap; the full 10,000-record dataset never loads client-side. No fetch fires on load: the first 100 SSR items seed the resident window directly; the backend is queried only once scrolling moves past the seeded items, or a sort/search/filter changes the query. 4. Continuous scroll: items outside the resident window render as blank placeholders until their page arrives — there are no pagination controls, scrolling stays continuous over the full server-side dataset.</p>
 							</div>
 
 							<h4>Remote Full-Text Search Integration</h4>
@@ -354,15 +355,8 @@
 						</main>
 					</section>
 
-					<!-- Declarative 3-Tier Data Layer -->
-					<div data-ln-data-coordinator="hybrid-docs" data-ln-data-coordinator-no-autosync id="hybrid-list-coordinator">
-						<div data-ln-data-store="hybrid-docs"
-						     data-ln-data-store-indexes="department,status,priority,updated_at"
-						     data-ln-data-store-search-fields="title,department,owner,tags,status,priority"
-						     data-ln-data-store-window="1000"
-						     data-ln-data-store-window-page="200"
-						     data-ln-search=""
-						     id="hybrid-docs"></div>
+					<!-- Declarative Data Layer (coordinator + connector, no store) -->
+					<div data-ln-data-coordinator="hybrid-docs" data-ln-search="" id="hybrid-docs">
 						<div data-ln-api-connector
 						     data-ln-api-base-url="data"
 						     data-ln-api-path="/api.php"
@@ -374,9 +368,9 @@
 						<header><h3>Interactive List Demo</h3></header>
 						<main>
 							<!-- Search Bar -->
-							<search aria-label="Search cache or server">
+							<search aria-label="Search documents">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-								<input type="search" placeholder="Search cache or server..." data-ln-search-for="hybrid-docs">
+								<input type="search" placeholder="Search documents..." data-ln-search-for="hybrid-docs">
 								<button type="button" data-ln-search-clear aria-label="Clear search">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 								</button>
@@ -1563,7 +1557,7 @@
 
 	document.addEventListener('DOMContentLoaded', function() {
 		log("Page loaded. 100 SSR pre-rendered items visible in list.", 'var(--color-primary)');
-		log("Declarative 3-Tier architecture active: data-ln-data-coordinator <-> data-ln-api-connector <-> data-ln-list-source.", 'var(--color-primary)');
+		log("Declarative architecture active: data-ln-list-source <-> data-ln-data-coordinator <-> data-ln-api-connector (windowed list, no store).", 'var(--color-primary)');
 	});
 
 	listEl.addEventListener('ln-list:request-data', function (e) {
@@ -1662,7 +1656,7 @@
 
 	(function () {
 		const KEY = 'ln-demo-skin';
-		const VALID = ['glass', 'outline'];
+		const VALID = ['glass', 'outline', 'hairline'];
 		const root = document.documentElement;
 
 		function markActive() {

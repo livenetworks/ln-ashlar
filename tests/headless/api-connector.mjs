@@ -1,4 +1,4 @@
-import { run, assert, BASE_URL } from './_harness.mjs';
+import { run, assert, sleep, BASE_URL } from './_harness.mjs';
 
 // Every fact below is read from demo/admin/src/pages/api-connector.html (#demo-api-connector,
 // playground triggers, telemetry <pre>) and components/ln-api-connector/src/*.js.
@@ -256,4 +256,40 @@ run('demo/admin/api-connector.html', async ({ page }) => {
 	assert(req.url === NEW_API_ORIGIN + '/comments', 'Next request uses the hot-reloaded base URL and path (' + req.url + ')');
 	assert(req.headers['x-other'] === 'v2', 'Next request carries the hot-reloaded header');
 	assert(req.headers['x-test-header'] === undefined, 'Old header is no longer sent');
+
+	// ─── 10. Paged queries: one slot per (view, offset) ────────
+
+	section('Paged queries: distinct pages of one view never supersede each other');
+	await load();
+	// A fresh element carries no component expando, so the event-capture JSON.stringify in load() cannot recurse.
+	await page.evaluate(() => { window.__view = document.createElement('output'); });
+	const queryFor = (offsets) => page.evaluate((list) => {
+		const el = document.getElementById('demo-api-connector');
+		list.forEach(off => el.dispatchEvent(new CustomEvent('ln-api-connector:request-query', {
+			bubbles: true,
+			detail: {
+				query: off === null ? {} : { offset: off, limit: 100, queryGen: 0 },
+				meta: off === null ? { targetEl: window.__view, kind: 'table' } : { targetEl: window.__view, kind: 'table', offset: off, limit: 100, queryGen: 0 }
+			}
+		})));
+	}, offsets);
+	const offsetsSeen = () => requests.filter(r => r.method === 'GET').map(r => new URL(r.url).searchParams.get('offset'));
+
+	await queryFor([0, 100]);
+	await waitEvent('fetched', 2);
+	assert(JSON.stringify(offsetsSeen().sort()) === JSON.stringify(['0', '100']), 'two pages of one view in the same tick: both are fetched (' + offsetsSeen().join(',') + ')');
+	const pageOffsets = await page.evaluate(() => window.__events.filter(e => e.name === 'fetched').map(e => e.detail.offset).sort((a, b) => a - b));
+	assert(JSON.stringify(pageOffsets) === JSON.stringify([0, 100]), 'both pages emit fetched with their own offset');
+
+	await queryFor([200, 200]);
+	await waitEvent('fetched', 3);
+	await sleep(600);
+	assert(offsetsSeen().filter(o => o === '200').length === 1, 'the same page requested twice still coalesces into one request');
+	assert((await page.evaluate(() => window.__events.filter(e => e.name === 'fetched').length)) === 3, 'the coalesced page emits one fetched');
+
+	await queryFor([null, null]);
+	await waitEvent('fetched', 4);
+	await sleep(600);
+	assert(offsetsSeen().filter(o => o === null).length === 1, 'non-paged queries for the same view still coalesce into one request (unchanged)');
+	assert((await page.evaluate(() => window.__events.filter(e => e.name === 'fetched').length)) === 4, 'the coalesced non-paged query emits one fetched');
 });

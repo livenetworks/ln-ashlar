@@ -27,7 +27,7 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 		'data-ln-api-param-offset':             { effect: _syncAttribute, type: 'string', fallback: 'offset', description: 'Query parameter name for pagination offset' },
 		'data-ln-api-param-limit':              { effect: _syncAttribute, type: 'string', fallback: 'limit', description: 'Query parameter name for pagination page size' },
 		'data-ln-api-param-search':             { effect: _syncAttribute, type: 'string', fallback: 'search', description: 'Query parameter name for text search filter' },
-		'data-ln-api-param-sort-field':         { effect: _syncAttribute, type: 'string', fallback: 'sort_by', description: 'Query parameter name for sort field' },
+		'data-ln-api-param-sort-field':         { effect: _syncAttribute, type: 'string', fallback: 'sort_field', description: 'Query parameter name for sort field' },
 		'data-ln-api-param-sort-dir':           { effect: _syncAttribute, type: 'string', fallback: 'sort_dir', description: 'Query parameter name for sort direction' },
 		'data-ln-api-connector-query-debounce': { effect: _syncAttribute, type: 'integer', fallback: 200, min: 0, description: 'Debounce delay in milliseconds before dispatching query requests' }
 	};
@@ -43,6 +43,20 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 			err.data = body;
 			throw err;
 		});
+	}
+
+	// ─── Query Slot Key ─────────────────────────────────────
+
+	// Debounce timers and in-flight fetches are keyed per view. A paged query (offset set) is keyed per
+	// (view, offset) instead: a second page of the same view must not replace the first one's timer or
+	// abort its fetch. A query without offset keeps the view-level key.
+	const _viewIds = new WeakMap();
+	let _viewSeq = 0;
+
+	function _queryKey(targetEl, offset) {
+		if (!targetEl || offset == null) return targetEl || 'query';
+		if (!_viewIds.has(targetEl)) _viewIds.set(targetEl, ++_viewSeq);
+		return 'page:' + _viewIds.get(targetEl) + ':' + offset;
 	}
 
 	// ─── Component Constructor ─────────────────────────────
@@ -85,7 +99,7 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 		this.paramKeys = paramKeys;
 
 		const qd = dom.getAttribute('data-ln-api-connector-query-debounce');
-		this.queryDebounce = qd !== null ? +qd : 300;
+		this.queryDebounce = qd !== null ? +qd : 200;
 
 		dispatch(this.dom, 'ln-api-connector:config-changed', {
 			baseUrl: this.baseUrl,
@@ -159,7 +173,7 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 		const qs = buildQueryParams(queryParams, self.paramKeys);
 		const url = buildQueryUrl(self.baseUrl, self.path, qs);
 
-		const key = targetEl || 'query';
+		const key = _queryKey(targetEl, queryParams && queryParams.offset);
 		if (self._inflight.has(key)) {
 			self._inflight.get(key).abort();
 		}
@@ -257,7 +271,7 @@ import { buildQueryParams, buildQueryUrl, joinUrl, unwrapEnvelope } from './conn
 				const detail = e.detail || {};
 				const queryParams = detail.query || detail;
 				const targetEl = (detail.meta && detail.meta.targetEl) ? detail.meta.targetEl : null;
-				const key = targetEl || 'query';
+				const key = _queryKey(targetEl, queryParams.offset);
 				const delay = self.queryDebounce;
 
 				function _doQuery(d, qp, tel) {

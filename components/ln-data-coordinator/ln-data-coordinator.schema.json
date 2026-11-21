@@ -6,6 +6,7 @@
 		"data-ln-api-connector": {
 			"direction": "author",
 			"sources": [
+				"ln-data-coordinator-dev.scss",
 				"src/ln-data-coordinator.js"
 			]
 		},
@@ -24,12 +25,14 @@
 		"data-ln-connector": {
 			"direction": "author",
 			"sources": [
+				"ln-data-coordinator-dev.scss",
 				"src/ln-data-coordinator.js"
 			]
 		},
 		"data-ln-couchdb-connector": {
 			"direction": "author",
 			"sources": [
+				"ln-data-coordinator-dev.scss",
 				"src/ln-data-coordinator.js"
 			]
 		},
@@ -116,8 +119,8 @@
 			"sources": [
 				"src/ln-data-coordinator.js"
 			],
-			"type": "marker",
-			"description": "Flag indicating data needs re-synchronization"
+			"type": "string",
+			"description": "Staleness threshold in seconds, or never/-1"
 		},
 		"data-ln-data-store": {
 			"direction": "author",
@@ -162,6 +165,12 @@
 				"src/ln-data-coordinator.js"
 			]
 		},
+		"data-ln-search": {
+			"direction": "both",
+			"sources": [
+				"src/ln-data-coordinator.js"
+			]
+		},
 		"data-ln-stat": {
 			"direction": null,
 			"sources": [
@@ -189,6 +198,7 @@
 		"data-ln-websocket-connector": {
 			"direction": "author",
 			"sources": [
+				"ln-data-coordinator-dev.scss",
 				"src/ln-data-coordinator.js"
 			]
 		}

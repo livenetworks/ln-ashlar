@@ -158,9 +158,9 @@
 				"src/ln-list.js"
 			],
 			"type": "integer",
-			"fallback": 50,
+			"fallback": 25,
 			"min": 0,
-			"description": "Scroll threshold margin in pixels to trigger page fetch"
+			"description": "Scroll threshold margin in items to trigger page fetch"
 		}
 	}
 }

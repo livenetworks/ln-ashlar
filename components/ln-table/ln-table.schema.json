@@ -10,6 +10,18 @@
 				"src/ln-table.js"
 			]
 		},
+		"data-ln-filter-col": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-filter-key": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
 		"data-ln-sort": {
 			"direction": null,
 			"sources": [
@@ -70,6 +82,15 @@
 				"ln-table-dev.scss"
 			]
 		},
+		"data-ln-table-count": {
+			"direction": null,
+			"sources": [
+				"src/ln-table.js"
+			],
+			"type": "integer",
+			"min": 0,
+			"description": "Declared unfiltered grand total for a windowed table"
+		},
 		"data-ln-table-dict": {
 			"direction": "author",
 			"sources": [
@@ -85,6 +106,12 @@
 			"description": "Container for table empty state"
 		},
 		"data-ln-table-empty-when": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-filter-col": {
 			"direction": "author",
 			"sources": [
 				"src/ln-table.js"
@@ -178,6 +205,33 @@
 			"sources": [
 				"src/ln-table.js"
 			]
+		},
+		"data-ln-table-window": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			],
+			"type": "integer",
+			"min": 10,
+			"description": "Opt-in server-side sliding window (data-driven mode); value is the resident-row cap"
+		},
+		"data-ln-table-window-page": {
+			"direction": null,
+			"sources": [
+				"src/ln-table.js"
+			],
+			"type": "integer",
+			"min": 5,
+			"description": "Rows requested per page in windowed mode"
+		},
+		"data-ln-table-window-threshold": {
+			"direction": null,
+			"sources": [
+				"src/ln-table.js"
+			],
+			"type": "integer",
+			"min": 0,
+			"description": "Prefetch margin in rows before an unloaded page boundary in windowed mode"
 		},
 		"data-ln-template": {
 			"direction": null,

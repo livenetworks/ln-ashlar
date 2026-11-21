@@ -13,46 +13,47 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	// ─── Attribute Contract (SSOT) ──────────────────────────
-	function _applyWindow(inst, val) {
+	// The shared observer calls effect(el, name, oldValue): the first argument is the host element.
+	function _applyWindow(el) {
+		const inst = el[DOM_ATTRIBUTE];
 		if (!inst || !inst.isDataDriven) return;
-		const present = inst.dom.hasAttribute('data-ln-list-window');
+		const present = el.hasAttribute('data-ln-list-window');
 		if (present && !inst._windowed) {
 			inst._enterWindowedMode();
 			inst._kickWindowInitial();
 		} else if (!present && inst._windowed) {
 			inst._exitWindowedMode();
 		} else if (present && inst._windowed) {
-			const v = parseInt(val, 10);
-			if (v > 0) inst._cache.configure({ windowSize: v });
+			inst._cache.configure({ windowSize: inst._windowSize });
 		}
 	}
 
-	function _applyWindowPage(inst, val) {
+	function _applyWindowPage(el) {
+		const inst = el[DOM_ATTRIBUTE];
 		if (!inst || !inst.isDataDriven || !inst._windowed || !inst._cache) return;
-		const v = parseInt(val, 10);
-		if (v > 0) inst._cache.configure({ pageSize: v });
+		inst._cache.configure({ pageSize: inst._windowPage });
 	}
 
-	function _applyWindowThreshold(inst, val) {
+	function _applyWindowThreshold(el) {
+		const inst = el[DOM_ATTRIBUTE];
 		if (!inst || !inst.isDataDriven || !inst._windowed || !inst._cache) return;
-		const v = parseInt(val, 10);
-		if (v >= 0) inst._cache.configure({ threshold: v });
+		inst._cache.configure({ threshold: inst._windowThreshold });
 	}
 
-	function _applyCount(inst, val) {
-		if (!inst || !inst.isDataDriven || !inst._windowed || !inst._cache) return;
-		const v = parseInt(val, 10);
-		if (v >= 0) inst._cache.setGrandTotal(v);
+	function _applyCount(el) {
+		const inst = el[DOM_ATTRIBUTE];
+		if (!inst || !inst.isDataDriven || !inst._windowed || !inst._cache || !(inst._declaredTotal >= 0)) return;
+		inst._cache.setGrandTotal(inst._declaredTotal);
 	}
 
 	const ATTRIBUTES = {
 		'data-ln-list':                  { prop: 'name', type: 'string', read: attrStr, fallback: '', description: 'List instance name or identifier' },
 		'data-ln-list-source':           { prop: 'source', type: 'string', read: attrStr, fallback: '', description: 'Source store or coordinator addressing' },
 		'data-ln-list-selectable':       { prop: '_selectable', type: 'boolean', read: attrBool, description: 'Enables item selection controls' },
-		'data-ln-list-window':           { type: 'integer', fallback: WINDOW_DEFAULT, min: 10, effect: _applyWindow, description: 'Virtual scrolling window size in items' },
-		'data-ln-list-window-page':      { type: 'integer', fallback: WINDOW_PAGE, min: 5, effect: _applyWindowPage, description: 'Virtual scrolling slice page size' },
-		'data-ln-list-window-threshold': { type: 'integer', fallback: 50, min: 0, effect: _applyWindowThreshold, description: 'Scroll threshold margin in pixels to trigger page fetch' },
-		'data-ln-list-count':            { type: 'integer', min: 0, effect: _applyCount, description: 'Total item count override for virtual scrollbar calculation' },
+		'data-ln-list-window':           { prop: '_windowSize',      type: 'integer', fallback: WINDOW_DEFAULT, min: 10, effect: _applyWindow,          description: 'Virtual scrolling window size in items' },
+		'data-ln-list-window-page':      { prop: '_windowPage',      type: 'integer', fallback: WINDOW_PAGE,    min: 5,  effect: _applyWindowPage,      description: 'Virtual scrolling slice page size' },
+		'data-ln-list-window-threshold': { prop: '_windowThreshold', type: 'integer', fallback: 25,             min: 0,  effect: _applyWindowThreshold, description: 'Scroll threshold margin in items to trigger page fetch' },
+		'data-ln-list-count':            { prop: '_declaredTotal',   type: 'integer', min: 0, effect: _applyCount,                                      description: 'Total item count override for virtual scrollbar calculation' },
 		'data-ln-list-empty':            { type: 'marker', description: 'Container for list empty state' },
 		'data-ln-list-field':            { type: 'string', description: 'Field name mapping for list item binding' }
 	};
@@ -241,11 +242,8 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				}
 
 				if (self._windowed) {
-					// Only an accepted, authoritative page ends the refresh. A declined
-					// one means the source has not resolved the new query yet; a
-					// provisional one is the store's own answer, rendered while the
-					// server query is still out.
-					if (self._cache.ingest(detail) && !detail.provisional) dom.classList.remove('ln-list--loading');
+					// Only an accepted page ends the refresh; a declined one leaves it running.
+					if (self._cache.ingest(detail)) dom.classList.remove('ln-list--loading');
 					return;
 				}
 				self._data = newData;

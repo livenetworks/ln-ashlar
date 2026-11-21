@@ -15,6 +15,7 @@
 //   @media (prefers-color-scheme: dark)     ← system preference (auto)
 //   :root:not([data-mode="light"])          ← opt-out of auto
 //   <html data-skin="glass">                ← structural preset (flat, borderless)
+//   <html data-skin="hairline">             ← structural preset (flat, quiet borders, fast motion)
 //   <html data-theme="ocean">               ← brand palette preset
 //   <aside data-mode="dark" data-theme="navy"> ← dark navy brand region
 //
@@ -287,4 +288,25 @@
 		--btn-fg-hover: hsl(var(--color-primary));
 		--btn-border-hover: hsl(var(--color-primary));
 	}
+}
+
+[data-skin="hairline"] {
+	// Hairline — no elevation shadows, default borders kept. --shadow-inner
+	// stays for recessed tracks.
+	--shadow-xs: none;
+	--shadow-sm: none;
+	--shadow-md: none;
+	--shadow-lg: none;
+	--shadow-xl: none;
+	--shadow-2xl: none;
+	--shadow-resting: none;
+	--shadow-floating: none;
+
+	// Hover/micro 80-120ms, components <=150ms, no overshoot (visual-language.md "Duration").
+	--transition-fast: 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+	--transition-base: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+	--transition-slow: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	// Re-declared: var() resolves where declared, so :root's copy would keep 0.25s.
+	--transition: var(--transition-base);
+	--easing-spring: var(--easing-standard);
 }

@@ -104,7 +104,7 @@
 				{
 					"name": "ln-api-connector:error",
 					"cancelable": false,
-					"description": "Dispatched upon HTTP or network errors (silent on AbortError).",
+					"description": "Dispatched upon HTTP or network errors (silent on AbortError). A failed page query carries the request's `meta` (including `kind` and `offset`).",
 					"detail": "{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }",
 					"source": "static"
 				},
@@ -134,7 +134,7 @@
 				{
 					"name": "ln-api-connector:request-cancel",
 					"cancelable": false,
-					"description": "Aborts in-flight fetch or query for the target element/key.",
+					"description": "Aborts in-flight fetch or query for the target element/key. A paged request (`query.offset` set) is tracked per `(targetEl, offset)` and is not reached by `targetEl` alone.",
 					"detail": "{ targetEl?: Element, key?: String, meta?: Object }",
 					"source": "static"
 				},
@@ -155,7 +155,7 @@
 				{
 					"name": "ln-api-connector:request-query",
 					"cancelable": false,
-					"description": "Triggers structured query/pagination fetch.",
+					"description": "Triggers structured query/pagination fetch. Debounce and in-flight cancellation are keyed per `meta.targetEl`; a query with `query.offset` set is keyed per `(targetEl, offset)`, so distinct pages of one view never supersede each other.",
 					"detail": "{ query?: Object, meta?: Object }",
 					"source": "static"
 				},
@@ -548,7 +548,7 @@
 				{
 					"name": "ln-api-connector:request-query",
 					"cancelable": false,
-					"description": "Triggers structured query/pagination fetch.",
+					"description": "Triggers structured query/pagination fetch. Debounce and in-flight cancellation are keyed per `meta.targetEl`; a query with `query.offset` set is keyed per `(targetEl, offset)`, so distinct pages of one view never supersede each other.",
 					"detail": "{ query?: Object, meta?: Object }",
 					"source": "dynamic-allowlist"
 				},
@@ -737,35 +737,35 @@
 				{
 					"name": "ln-table:page-failed",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Windowed mode only. Sent by [`ln-data-coordinator`](./ln-data-coordinator.md) when a page query failed at the connector: the table releases that offset from its window cache's in-flight set so a later scroll pass can request it again; there is no automatic retry.",
+					"detail": "{ offset: Number }",
 					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-table:request-invalidate",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Windowed mode only. Sent by [`ln-data-coordinator`](./ln-data-coordinator.md) on a query change: the window restarts at page 0 under a new `queryGen`; current rows stay visible until the first accepted page.",
+					"detail": "{ query: Object }",
 					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-table:request-revalidate",
 					"cancelable": false,
-					"description": "",
-					"detail": "",
+					"description": "Windowed mode only. Sent by `ln-data-coordinator` on a data change: re-requests the page at the current scroll position under a new `queryGen`; rows stay visible until the swap.",
+					"detail": "{ query: Object }",
 					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-table:set-data",
 					"cancelable": false,
-					"description": "Populates the table with a raw dataset (Data-Driven mode). Triggers rendering and updates total/filtered counts.",
-					"detail": "{ data: Array, total: Number, filtered: Number }",
+					"description": "Populates the table with a raw dataset (Data-Driven mode). Triggers rendering and updates total/filtered counts. Windowed mode splices the page into the window cache at `offset`; a page whose `queryGen` is stale is dropped.",
+					"detail": "{ data: Array, total: Number, filtered: Number }`; windowed: also `{ offset: Number, queryGen: Number }",
 					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-table:set-loading",
 					"cancelable": false,
-					"description": "Updates loading state (Data-Driven mode). Prior to initial data load, renders the loading template into `<tbody>` and sets `aria-busy=\"true\"`. During subsequent queries, preserves existing rows, toggles `.ln-table--loading`, and reveals the `[data-ln-table-loading]` footer spinner.",
+					"description": "Updates loading state (Data-Driven mode). Prior to initial data load, renders the loading template into `<tbody>` and sets `aria-busy=\"true\"`. During subsequent queries, preserves existing rows, toggles `.ln-table--loading`, and reveals the `[data-ln-table-loading]` footer spinner. Windowed mode ignores `{ loading: true }` after the first load: a scroll page fetch is shown by placeholder rows, and a query change dims the table itself.",
 					"detail": "{ loading: Boolean }",
 					"source": "dynamic-allowlist"
 				},
@@ -837,14 +837,14 @@
 				{
 					"name": "ln-api-connector:error",
 					"cancelable": false,
-					"description": "Dispatched upon HTTP or network errors (silent on AbortError).",
+					"description": "Dispatched upon HTTP or network errors (silent on AbortError). A failed page query carries the request's `meta` (including `kind` and `offset`).",
 					"detail": "{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }",
 					"source": "dynamic-allowlist"
 				},
 				{
 					"name": "ln-api-connector:fetched",
 					"cancelable": false,
-					"description": "Connector response handling (also namespaced under `ln-couchdb-connector:...` and `ln-websocket-connector:...` — generalized across concrete connector implementations). Reconciles the store, fires toasts, and drives queue ack/nack. A socket beside a REST connector delivers its pushes here as `:fetched`.",
+					"description": "Connector response handling (also namespaced under `ln-couchdb-connector:...` and `ln-websocket-connector:...` — generalized across concrete connector implementations). Reconciles the store, fires toasts, and drives queue ack/nack. A socket beside a REST connector delivers its pushes here as `:fetched`. With no store child, a view query's `:fetched` answer is delivered straight to the requesting view and `:created` / `:updated` / `:deleted` / `:bulk-deleted` confirmations re-serve all bound views. An `:error` whose `meta` carries `kind` and `offset` is additionally reported to that view as `ln-{kind}:page-failed`.",
 					"detail": "*(shape per response — see [`ln-api-connector.md`](./ln-api-connector.md) Events API)*",
 					"source": "dynamic-allowlist"
 				},
@@ -858,7 +858,7 @@
 				{
 					"name": "ln-api-queue:failed",
 					"cancelable": false,
-					"description": "Terminal retry-exhaustion notification from the queue — surfaces a `network` toast via the dict.",
+					"description": "Terminal retry-exhaustion notification from the queue — emits `ln-data-coordinator:error` with `operation: 'queue-failed'`.",
 					"detail": "{ entryId: ID, chainKey: String, attempts: Number }",
 					"source": "static"
 				},
@@ -975,24 +975,10 @@
 					"source": "static"
 				},
 				{
-					"name": "ln-data-store:query-changed",
-					"cancelable": false,
-					"description": "Emitted when store filters, search, or sort are modified.",
-					"detail": "{ store: String, query: { filters: Object, search: String, sort: Object|null } }",
-					"source": "static"
-				},
-				{
 					"name": "ln-data-store:ready",
 					"cancelable": false,
-					"description": "Store change notifications — on any of these, re-queries and re-serves all non-windowed bound view elements using their last cached query. Windowed views (carrying `data-ln-table-window` / `data-ln-list-window`) instead receive `ln-{kind}:request-revalidate` and refresh through their own window cache, since a partial store cannot answer an offset-based slice.",
+					"description": "Store change notifications — on any of these, re-queries and re-serves all non-windowed bound view elements using their last cached query. Windowed views (carrying `data-ln-table-window` / `data-ln-list-window`) instead receive `ln-{kind}:request-revalidate` and refresh through their own window cache.",
 					"detail": "*(handler-internal; no detail consumed)*",
-					"source": "static"
-				},
-				{
-					"name": "ln-data-store:request-page",
-					"cancelable": false,
-					"description": "Windowed store residency: forwards the missing page to the connector as `request-query`.",
-					"detail": "{ store: String, offset: Number, limit: Number, query: Object, queryGen: Number }",
 					"source": "static"
 				},
 				{
@@ -1168,13 +1154,6 @@
 					"source": "static"
 				},
 				{
-					"name": "ln-data-store:query-changed",
-					"cancelable": false,
-					"description": "Emitted when store filters, search, or sort are modified.",
-					"detail": "{ store: String, query: { filters: Object, search: String, sort: Object|null } }",
-					"source": "static"
-				},
-				{
 					"name": "ln-data-store:quota-exceeded",
 					"cancelable": false,
 					"description": "Emitted on `document` if database storage runs out of quota.",
@@ -1186,13 +1165,6 @@
 					"cancelable": false,
 					"description": "Emitted when data is ready for viewing.",
 					"detail": "{ store: String, count: Number, source: 'cache'|'server' }",
-					"source": "static"
-				},
-				{
-					"name": "ln-data-store:request-page",
-					"cancelable": false,
-					"description": "Windowed residency: pages inside the sliding window are missing and must be fetched from the server.",
-					"detail": "{ store: String, offset: Number, limit: Number, query: Object, queryGen: Number }",
 					"source": "static"
 				},
 				{
@@ -1259,27 +1231,6 @@
 					"description": "Optimistically updates a record or rekeys ID.",
 					"detail": "{ id: ID, data: Object }",
 					"source": "dynamic-allowlist"
-				},
-				{
-					"name": "ln-filter:change",
-					"cancelable": false,
-					"description": "Updates `query.filters[key]` and dispatches `ln-data-store:query-changed`.",
-					"detail": "{ key: String, values: Array, targetId: String }",
-					"source": "static"
-				},
-				{
-					"name": "ln-search:change",
-					"cancelable": false,
-					"description": "Updates `query.search` and dispatches `ln-data-store:query-changed`.",
-					"detail": "{ term: String }",
-					"source": "static"
-				},
-				{
-					"name": "ln-sort:change",
-					"cancelable": false,
-					"description": "Updates `query.sort` and dispatches `ln-data-store:query-changed`.",
-					"detail": "{ field: String, direction: String }",
-					"source": "static"
 				}
 			]
 		},
@@ -2124,8 +2075,8 @@
 				{
 					"name": "ln-table:request-data",
 					"cancelable": false,
-					"description": "Requests a fresh data payload from the coordinator whenever sort/filter/search state changes, including the initial mount (Data-Driven mode).",
-					"detail": "{ table: String, sort: Object|null, filters: Object, search: String }",
+					"description": "Requests a fresh data payload from the coordinator whenever sort/filter/search state changes, including the initial mount (Data-Driven mode). Windowed mode emits one request per page.",
+					"detail": "{ table: String, sort: Object|null, filters: Object, search: String }`; windowed: also `{ offset: Number, limit: Number, queryGen: Number }",
 					"source": "static"
 				},
 				{
@@ -2194,6 +2145,13 @@
 					"source": "static"
 				},
 				{
+					"name": "ln-table:page-failed",
+					"cancelable": false,
+					"description": "Windowed mode only. Sent by [`ln-data-coordinator`](./ln-data-coordinator.md) when a page query failed at the connector: the table releases that offset from its window cache's in-flight set so a later scroll pass can request it again; there is no automatic retry.",
+					"detail": "{ offset: Number }",
+					"source": "static"
+				},
+				{
 					"name": "ln-table:request-clear-filters",
 					"cancelable": false,
 					"description": "Dispatched to child SSR `[data-ln-table]` element on clear button click.",
@@ -2201,16 +2159,30 @@
 					"source": "static"
 				},
 				{
+					"name": "ln-table:request-invalidate",
+					"cancelable": false,
+					"description": "Windowed mode only. Sent by [`ln-data-coordinator`](./ln-data-coordinator.md) on a query change: the window restarts at page 0 under a new `queryGen`; current rows stay visible until the first accepted page.",
+					"detail": "{ query: Object }",
+					"source": "static"
+				},
+				{
+					"name": "ln-table:request-revalidate",
+					"cancelable": false,
+					"description": "Windowed mode only. Sent by `ln-data-coordinator` on a data change: re-requests the page at the current scroll position under a new `queryGen`; rows stay visible until the swap.",
+					"detail": "{ query: Object }",
+					"source": "static"
+				},
+				{
 					"name": "ln-table:set-data",
 					"cancelable": false,
-					"description": "Populates the table with a raw dataset (Data-Driven mode). Triggers rendering and updates total/filtered counts.",
-					"detail": "{ data: Array, total: Number, filtered: Number }",
+					"description": "Populates the table with a raw dataset (Data-Driven mode). Triggers rendering and updates total/filtered counts. Windowed mode splices the page into the window cache at `offset`; a page whose `queryGen` is stale is dropped.",
+					"detail": "{ data: Array, total: Number, filtered: Number }`; windowed: also `{ offset: Number, queryGen: Number }",
 					"source": "static"
 				},
 				{
 					"name": "ln-table:set-loading",
 					"cancelable": false,
-					"description": "Updates loading state (Data-Driven mode). Prior to initial data load, renders the loading template into `<tbody>` and sets `aria-busy=\"true\"`. During subsequent queries, preserves existing rows, toggles `.ln-table--loading`, and reveals the `[data-ln-table-loading]` footer spinner.",
+					"description": "Updates loading state (Data-Driven mode). Prior to initial data load, renders the loading template into `<tbody>` and sets `aria-busy=\"true\"`. During subsequent queries, preserves existing rows, toggles `.ln-table--loading`, and reveals the `[data-ln-table-loading]` footer spinner. Windowed mode ignores `{ loading: true }` after the first load: a scroll page fetch is shown by placeholder rows, and a query change dims the table itself.",
 					"detail": "{ loading: Boolean }",
 					"source": "static"
 				},

@@ -74,12 +74,14 @@ test('store initialization failure routes remote when possible', () => {
 	assert.equal(selectDataSource(store, null, false), 'none');
 });
 
-test('declinesRead when store has noLocalQuery and not windowed', () => {
-	const unwindowedNoLocal = { canServe: true, noLocalQuery: true, windowed: false };
-	assert.equal(selectDataSource(unwindowedNoLocal, {}), 'remote');
+test('absent store routes remote when a connector exists, none otherwise', () => {
+	assert.equal(selectDataSource(null, {}), 'remote');
+	assert.equal(selectDataSource(null, null), 'none');
+});
 
-	const windowedNoLocal = { canServe: true, noLocalQuery: true, windowed: true };
-	assert.equal(selectDataSource(windowedNoLocal, {}), 'store');
+test('declinesRead when store has noLocalQuery', () => {
+	const noLocal = { canServe: true, noLocalQuery: true };
+	assert.equal(selectDataSource(noLocal, {}), 'remote');
 });
 
 test('query normalization is detail-null safe', () => {

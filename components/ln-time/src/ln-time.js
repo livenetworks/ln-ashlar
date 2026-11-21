@@ -133,7 +133,10 @@ import { calculateRelativeTime, resolveDateFormatOptions } from './time-model.js
 			default:         text = _formatShort(date, locale);    break;
 		}
 
-		instance.dom.textContent = text;
+		instance._formattedText = text;
+		if (instance.dom.textContent !== text) {
+			instance.dom.textContent = text;
+		}
 		if (mode !== 'full') {
 			instance.dom.title = _formatFull(date, locale);
 		}
@@ -206,11 +209,20 @@ import { calculateRelativeTime, resolveDateFormatOptions } from './time-model.js
 		}
 	}
 
+	function _onSubtreeChange(el) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+		if (el.textContent !== instance._formattedText) {
+			_render(instance);
+		}
+	}
+
 	// ─── Registration ─────────────────────────────────────────
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _constructor, 'ln-time', {
 		attributes: ATTRIBUTES,
 		extraAttributes: ['datetime', 'lang'],
 		onAttributeChange: _onAttributeChange,
+		onSubtreeChange: _onSubtreeChange,
 		onInit: _onInit
 	});
 })();

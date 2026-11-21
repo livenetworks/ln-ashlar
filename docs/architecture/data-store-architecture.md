@@ -2,7 +2,7 @@
 
 This document outlines the core architecture of the 3-Tier Local-First Data Layer in `ln-ashlar`. It defines how data storage, transport, and schema mapping are decoupled and orchestrated using the **`ln-ashlar` Coordinator Doctrine**. For a comprehensive guide on what coordinators are and how they operate across the entire library, see the [Coordinator Doctrine Reference](coordinator.md).
 
-In this model, a parent **Data Coordinator Component (`data-ln-data-coordinator`)** wraps its child components—a pure **Storage Cache (`data-ln-data-store`)** and a **Transport Gateway (`data-ln-*-connector`)**—and coordinates the entire data lifecycle.
+In this model, a parent **Data Coordinator Component (`data-ln-data-coordinator`)** wraps its child components—a pure **Storage Cache (`data-ln-data-store`, optional)** and a **Transport Gateway (`data-ln-*-connector`)**—and coordinates the entire data lifecycle with whichever of them are present.
 
 ---
 
@@ -20,9 +20,9 @@ Below is the visual structure representing how elements are nested in the DOM, i
 │  - Executes JS Ingress/Egress data restructuring                       │
 │                                                                        │
 │     ┌────────────────────────────────────────────────────────────┐     │
-│     │  DOM: <li id="documents" data-ln-data-store>               │     │
+│     │  DOM: <li id="documents" data-ln-data-store>  (OPTIONAL)   │     │
 │     │                                                            │     │
-│     │  [STORAGE CACHE DATABASE (Child 1)]                        │     │
+│     │  [STORAGE CACHE DATABASE (Child 1, optional)]              │     │
 │     │  - Standard IndexedDB storage, schemas, & indexes          │     │
 │     │  - Pure local queries (filter, sort, search)               │     │
 │     │  - Reactive event dispatching to UI tables & lists         │     │

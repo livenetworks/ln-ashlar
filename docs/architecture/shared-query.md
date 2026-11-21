@@ -110,8 +110,8 @@ Reads address the **source** (`data-ln-table-source`, `data-ln-list-source`,
 | Concern | Owner | Why |
 |---|---|---|
 | `filters`, `search` | source | Record scope is a property of the data, identical for every consumer. |
-| `offset`, `limit`, `queryGen` | store / view | Page positions are cached in the store's `window-index` (which owns `queryGen` and invalidation), while each view requests and holds a single active page slice. |
-| `sort` | source | Windowed mode forces it: `window-index` maps absolute positions to IDs, so a single mapping can encode only one ordering. A view sorting privately leaves those cached positions in place — `ensure()` finds nothing missing, returns without fetching, and the rows stay in the previous order. The only invalidation is `_windowIndex.reset()`, which fires when the store's own query changes. The control (a `<th>` button, a sidebar) dispatches intent via `ln-sort:change` and nothing more. |
+| `offset`, `limit`, `queryGen` | view | A windowed view holds the page positions in its own window cache (which owns `queryGen` and invalidation) and requests the pages it is missing. |
+| `sort` | source | Windowed mode forces it: the window cache maps absolute positions to rows, so a single cache can encode only one ordering. A view sorting privately leaves those cached positions in place — `ensure()` finds nothing missing, returns without fetching, and the rows stay in the previous order. The only invalidation is a query change on the source (`cache.invalidate`). The control (a `<th>` button, a sidebar) dispatches intent via `ln-sort:change` and nothing more. |
 
 `store.getAll(options)` stays a pure query engine — it does not read the stored
 query. The store holds the query; the coordinator composes it with each view's

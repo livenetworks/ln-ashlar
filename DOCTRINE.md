@@ -41,6 +41,8 @@
   Must remain completely isolated, managing only their own DOM state and ARIA properties. They have **zero awareness** of other components.
 * **Coordinators** (e.g. `ln-table-coordinator`, `ln-data-coordinator`, `ln-ui-coordinator`):
   Listen to events bubbling from simple components and orchestrate state across components strictly via `setAttribute` or request events.
+* **Present Children Only:**
+  A coordinator over **independent participants** (`ln-data-coordinator` over store / connector / queue, `ln-ui-coordinator`) works with whichever children are present, including none. An absent child is a topology, not an error: nothing is dispatched to it and nothing is awaited from it. The exception is a coordinator **defined by** its children (`ln-accordion` over `ln-toggle`): without them it has nothing to coordinate, so it requires them.
 * **Commands (Mutations):**
   Coordinators **MUST NOT** call prototype mutation methods directly (e.g. `el.lnProfile.create()`). They **ALWAYS** dispatch request events (e.g. `ln-profile:request-create`).
 * **Queries (Reading State):**
@@ -134,7 +136,7 @@
     1. In-flight network requests MUST be aborted immediately (`this._abortController.abort()`).
     2. Active timers/intervals MUST be cleared (`clearTimeout` / `clearInterval`).
     3. Outstanding pending receipts/promises MUST be rejected or safely discarded.
-  - **Generation Tracking (`queryGen`):** Data-consuming components (`ln-table`, `ln-list`, `ln-data-store`, `createWindowIndex`) MUST track request generation counters (`queryGen` / `requestId`) to silently drop stale asynchronous responses that arrive after a subsequent reset or query transition.
+  - **Generation Tracking (`queryGen`):** Data-consuming components (`ln-table`, `ln-list`, `createWindowCache`) MUST track request generation counters (`queryGen` / `requestId`) to silently drop stale asynchronous responses that arrive after a subsequent reset or query transition.
 * **`destroy()` Removes Every Trace:** Teardown removes everything the component made. The test: *would this exist if the component had never run?* If not, it goes — ARIA it set (`aria-busy`, `aria-expanded`), attributes and classes it added, DOM nodes it created, listeners, timers, observers, in-flight requests. This includes traces on **foreign** elements: `aria-expanded` left on external `[data-ln-toggle-for]` triggers after the panel is destroyed is an accessibility bug.
   - *Authored attribute edge:* an attribute the author wrote (e.g. `data-ln-toggle`) stays, with its current value. The component stops managing it; it neither deletes it nor restores the authored value.
 

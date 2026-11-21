@@ -227,7 +227,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 				// Query controls address the source (docs/architecture/shared-query.md);
 				// only an SSR table is its own source.
 				const sourceId = table.getAttribute('data-ln-table-source') || table.id;
-				const sourceEl = sourceId ? document.getElementById(sourceId) : null;
+				const sourceEl = sourceId ? (document.getElementById(sourceId) || dom.querySelector('[data-ln-data-coordinator="' + sourceId + '"]')) : null;
 				if (sourceEl && sourceEl.hasAttribute('data-ln-search')) {
 					// State component syncs input controls and emits ln-search:change
 					sourceEl.setAttribute('data-ln-search', '');
@@ -237,6 +237,12 @@ import { registerComponent, dispatch } from '../../ln-core';
 						input.value = '';
 						input.dispatchEvent(new Event('input', { bubbles: true }));
 					}
+				}
+				const coordEl = (sourceEl && sourceEl.hasAttribute('data-ln-data-coordinator'))
+					? sourceEl
+					: (sourceEl && sourceEl.closest ? sourceEl.closest('[data-ln-data-coordinator]') : null);
+				if (coordEl && coordEl.getAttribute('data-ln-data-coordinator-search')) {
+					coordEl.setAttribute('data-ln-data-coordinator-search', '');
 				}
 
 				const filterEls = _findFilterElements(dom, sourceId);

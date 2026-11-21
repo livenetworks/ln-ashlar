@@ -254,6 +254,10 @@ Use when the backend embeds the entire dataset (e.g. 10,000 records) into `<scri
 | `data-ln-table` | Root container | `String` | - | Identifies the table. The value names generated events. Must have a unique `id`. |
 | `data-ln-table-source` | Root container | `String` | - | Enables Data-Driven mode. Value maps to the target data store ID. |
 | `data-ln-table-selectable` | Root container | `Boolean` | `false` | Enables row multi-selection and checkboxes. |
+| `data-ln-table-window` | Root container | `Integer` (min 10) | `1000` (bare attribute) | Opt-in server-side sliding window (Data-Driven mode only; ignored on an SSR table). Value is the resident-row cap: the table requests pages by position and evicts rows that leave the window. Header select-all is hidden (`hidden`); per-row selection survives eviction. |
+| `data-ln-table-window-page` | Root container | `Integer` (min 5) | `200` | Rows requested per page in windowed mode. |
+| `data-ln-table-window-threshold` | Root container | `Integer` (min 0) | `25` | Prefetch margin in rows before an unloaded page boundary in windowed mode. |
+| `data-ln-table-count` | Root container | `Integer` (min 0) | - | Declared unfiltered grand total for a windowed table seeded with resident rows. |
 | `data-ln-table-col` | `<th>` | `String` | - | Maps a table header to a JSON payload field. |
 | `data-ln-value` | `<td>` | `String` | - | Raw computer-readable sorting value, ignoring HTML formatting. *(Processed externally via `ln-core.js` / `fill()`)* |
 | `data-ln-table-col-filter` | `<button>` | - | - | Receives `.ln-filter-active` styling when filters are active on the column. |
@@ -279,15 +283,18 @@ Use when the backend embeds the entire dataset (e.g. 10,000 records) into `<scri
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-table:set-data` | Listens | No | Populates the table with a raw dataset (Data-Driven mode). Triggers rendering and updates total/filtered counts. | `{ data: Array, total: Number, filtered: Number }` |
-| `ln-table:set-loading` | Listens | No | Updates loading state (Data-Driven mode). Prior to initial data load, renders the loading template into `<tbody>` and sets `aria-busy="true"`. During subsequent queries, preserves existing rows, toggles `.ln-table--loading`, and reveals the `[data-ln-table-loading]` footer spinner. | `{ loading: Boolean }` |
+| `ln-table:set-data` | Listens | No | Populates the table with a raw dataset (Data-Driven mode). Triggers rendering and updates total/filtered counts. Windowed mode splices the page into the window cache at `offset`; a page whose `queryGen` is stale is dropped. | `{ data: Array, total: Number, filtered: Number }`; windowed: also `{ offset: Number, queryGen: Number }` |
+| `ln-table:set-loading` | Listens | No | Updates loading state (Data-Driven mode). Prior to initial data load, renders the loading template into `<tbody>` and sets `aria-busy="true"`. During subsequent queries, preserves existing rows, toggles `.ln-table--loading`, and reveals the `[data-ln-table-loading]` footer spinner. Windowed mode ignores `{ loading: true }` after the first load: a scroll page fetch is shown by placeholder rows, and a query change dims the table itself. | `{ loading: Boolean }` |
+| `ln-table:request-invalidate` | Listens | No | Windowed mode only. Sent by [`ln-data-coordinator`](./ln-data-coordinator.md) on a query change: the window restarts at page 0 under a new `queryGen`; current rows stay visible until the first accepted page. | `{ query: Object }` |
+| `ln-table:request-revalidate` | Listens | No | Windowed mode only. Sent by `ln-data-coordinator` on a data change: re-requests the page at the current scroll position under a new `queryGen`; rows stay visible until the swap. | `{ query: Object }` |
+| `ln-table:page-failed` | Listens | No | Windowed mode only. Sent by [`ln-data-coordinator`](./ln-data-coordinator.md) when a page query failed at the connector: the table releases that offset from its window cache's in-flight set so a later scroll pass can request it again; there is no automatic retry. | `{ offset: Number }` |
 | `ln-table:set-search` | Listens | No | Applies a search term. Data-Driven mode emits `ln-table:search` and requests fresh data; SSR mode filters in memory and emits `ln-table:filter`. | `{ query: String }` (`term` is read when `query` is absent) |
 | `ln-search:change` | Listens | Yes (`preventDefault`) | Consumed directly on itself in SSR mode only, triggering local in-memory search matching. In Data-Driven mode `ln-table-coordinator` intercepts this event on the search input's target and dispatches `ln-table:set-search` instead. | `{ term: String }` |
 | `ln-filter:change` | Listens | Yes (`preventDefault`) | Consumed directly on itself in SSR mode only (`!this.isDataDriven`), applying column filters to the in-memory `_data` cache. | `{ key: String, values: Array, targetId: String }` |
 | `ln-sort:change` | Listens | No | Column sort intent from [`ln-sort`](./ln-sort.md). SSR mode re-orders in-memory rows locally and dispatches `ln-table:sorted`; Data-Driven mode sets `currentSort` and dispatches a fresh `ln-table:request-data`. `ln-table` always calls `preventDefault()`, superseding `ln-sort`'s own default DOM-reorder fallback. | `{ field: String\|null, column: Number\|null, direction: 'asc'\|'desc'\|'none', targetId: String }` |
 | `ln-table:ready` | Emits | No | Fired once after initial row hydration/parsing completes (SSR and Data-Driven modes). | `{ total: Number }` |
 | `ln-table:rendered` | Emits | No | Fired after `ln-table:set-data` finishes rendering (Data-Driven mode). | `{ table: String, total: Number, visible: Number }` |
-| `ln-table:request-data` | Emits | No | Requests a fresh data payload from the coordinator whenever sort/filter/search state changes, including the initial mount (Data-Driven mode). | `{ table: String, sort: Object\|null, filters: Object, search: String }` |
+| `ln-table:request-data` | Emits | No | Requests a fresh data payload from the coordinator whenever sort/filter/search state changes, including the initial mount (Data-Driven mode). Windowed mode emits one request per page. | `{ table: String, sort: Object\|null, filters: Object, search: String }`; windowed: also `{ offset: Number, limit: Number, queryGen: Number }` |
 | `ln-table:sorted` | Emits | No | Emitted after applying a local sort (SSR mode). | `{ column: Number, direction: String\|null, matched: Number, total: Number }` |
 | `ln-table:filter` | Emits | No | Emitted after applying search, column filter, or clear actions locally (SSR mode). | `{ term: String, matched: Number, total: Number }` |
 | `ln-table:search` | Emits | No | Emitted when receiving an `ln-table:set-search` command (dispatched by `ln-table-coordinator` in response to `ln-search:change`), before requesting fresh data (Data-Driven mode). | `{ table: String, query: String }` |
@@ -352,14 +359,9 @@ Text comparisons utilize `Intl.Collator` read from the document `<html lang>` ta
 
 ### ARIA & Keyboard Navigation
 
-* **Semantic Structure:** Leverages native `<table>` semantics for screen readers.
-* **Keyboard Focus (Data-Driven Mode Only):** When focused inside the table:
-  * `ArrowDown` / `ArrowUp` — Focuses adjacent rows, adding `.ln-row-focused` and `tabindex="0"`, calling `scrollIntoView({ block: 'nearest' })` automatically.
-  * `Home` / `End` — Jumps directly to the first or last row.
-  * `Enter` — Executes click action (emits `ln-table:row-click`).
-  * `Space` — Toggles selection checkbox on active row.
-  * `/` (Forward slash) — Moves focus instantly to the associated search input.
-* **Ignored Spacers:** Spacer elements are hidden via `aria-hidden="true"`.
+* **Semantic Structure:** Leverages native `<table>` semantics for screen readers, updating `aria-busy` on the table host during loading transitions.
+* **Search Focus Shortcut:** When wrapped in `[data-ln-table-coordinator]`, pressing `/` (Forward slash) moves focus instantly to the associated search input.
+* **Ignored Spacers:** Virtual scroll spacer and placeholder elements are hidden from assistive technology via `aria-hidden="true"`.
 
 ---
 
@@ -401,9 +403,6 @@ sequenceDiagram
     User->>DOM: Scroll table viewport
     DOM->>Table: Fire scroll listener (throttled via requestAnimationFrame)
     Table->>DOM: Recalculate visible indices and update spacer heights / rows
-
-    User->>DOM: Press ArrowDown key
-    Table->>DOM: Toggle .ln-row-focused style class on adjacent row
 ```
 
 ### Lifecycle Sequence (Windowed Mode)

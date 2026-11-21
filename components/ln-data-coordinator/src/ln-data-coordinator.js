@@ -18,12 +18,12 @@ import { MutationReceipts } from './mutation-receipts';
 		'data-ln-data-coordinator':                { prop: '_name', type: 'string', description: 'Coordinator name or identifier for data routing' },
 		'data-ln-data-coordinator-scope':          { type: 'string', description: 'Scope name addressing the bound data store and connector' },
 		'data-ln-data-coordinator-connector':      { type: 'string', description: 'Selector, identifier, or namespace of the bound connector' },
-		'data-ln-data-coordinator-mapper':         { type: 'string', description: 'Name of the registered data mapper transform' },
-		'data-ln-data-coordinator-search':         { prop: '_searchAttr', type: 'string', description: 'Active search query term' },
-		'data-ln-data-coordinator-filters':        { prop: '_filtersAttr', type: 'string', description: 'Active encoded filter parameters' },
-		'data-ln-data-coordinator-sort-field':     { prop: '_sortFieldAttr', type: 'string', description: 'Sort field name' },
-		'data-ln-data-coordinator-sort-direction': { prop: '_sortDirAttr', type: 'enum', values: ['asc', 'desc'], fallback: 'asc', description: 'Sort direction' },
-		'data-ln-data-coordinator-stale':          { type: 'marker', description: 'Flag indicating data needs re-synchronization' },
+		'data-ln-data-coordinator-mapper':         { type: 'string', effect: _syncAttribute, description: 'Name of the registered data mapper transform' },
+		'data-ln-data-coordinator-search':         { prop: '_searchAttr', type: 'string', effect: _syncAttribute, description: 'Active search query term' },
+		'data-ln-data-coordinator-filters':        { prop: '_filtersAttr', type: 'string', effect: _syncAttribute, description: 'Active encoded filter parameters' },
+		'data-ln-data-coordinator-sort-field':     { prop: '_sortFieldAttr', type: 'string', effect: _syncAttribute, description: 'Sort field name' },
+		'data-ln-data-coordinator-sort-direction': { prop: '_sortDirAttr', type: 'enum', values: ['asc', 'desc'], fallback: 'asc', effect: _syncAttribute, description: 'Sort direction' },
+		'data-ln-data-coordinator-stale':          { type: 'string', description: 'Staleness threshold in seconds, or never/-1' },
 		'data-ln-data-coordinator-no-autosync':    { type: 'boolean', description: 'Disables automatic synchronization upon state changes' }
 	};
 
@@ -197,13 +197,12 @@ import { MutationReceipts } from './mutation-receipts';
 
 	_component.prototype._serveElement = function (el, kind, reqQuery, syncMeta) {
 		const c = this.findChildren(), store = c.store;
-		if (!store) return;
 		if (reqQuery) this._boundQueries.set(el, reqQuery);
 		const cached = this._boundQueries.get(el) || { sort: null, filters: {}, search: '' };
 		const effective = composeQuery(cached, this._currentQuery());
 
 		const self = this;
-		return Promise.resolve(store.ready).then(() => {
+		return Promise.resolve(store?.ready).then(() => {
 			if (self._destroyed) return;
 			const source = selectDataSource(store, c.connector);
 			if (kind === 'table' || kind === 'list' || kind === 'chart') {
@@ -215,7 +214,7 @@ import { MutationReceipts } from './mutation-receipts';
 				return store.getAll(effective).then(r => {
 					if (self._destroyed || !self._boundDelivered) return;
 					dispatch(el, 'ln-' + kind + ':set-loading', { loading: false });
-					dispatch(el, 'ln-' + kind + ':set-data', { data: r.data, total: syncMeta?.total ?? r.total, filtered: syncMeta?.filtered ?? r.filtered, offset: r.offset ?? syncMeta?.offset ?? cached.offset, queryGen: cached.queryGen !== undefined ? cached.queryGen : (syncMeta?.queryGen ?? r.queryGen), provisional: r.provisional === true });
+					dispatch(el, 'ln-' + kind + ':set-data', { data: r.data, total: syncMeta?.total ?? r.total, filtered: syncMeta?.filtered ?? r.filtered, offset: cached.offset, queryGen: cached.queryGen });
 					self._boundDelivered.set(el, true);
 				});
 			}
@@ -229,9 +228,8 @@ import { MutationReceipts } from './mutation-receipts';
 					const raw = el.getAttribute('data-ln-stat-filter');
 					if (raw?.includes(':')) { const p = raw.split(':'); filters = { [p[0].trim()]: [p.slice(1).join(':').trim()] }; }
 				}
-				const statSource = (c.connector && store && ((store.windowed && filters && Object.keys(filters).length) || store.noLocalQuery)) ? 'remote' : source;
-				if (statSource === 'remote') return dispatch(c.connectorEl, _connNs(c.connectorEl) + ':request-query', { query: { filters }, meta: { targetEl: el, kind } });
-				if (statSource === 'store') return store.count(filters).then(n => !self._destroyed && dispatch(el, 'ln-stat:set-count', { count: n }));
+				if (source === 'remote') return dispatch(c.connectorEl, _connNs(c.connectorEl) + ':request-query', { query: { filters }, meta: { targetEl: el, kind } });
+				if (source === 'store') return store.count(filters).then(n => !self._destroyed && dispatch(el, 'ln-stat:set-count', { count: n }));
 			}
 		}).catch(err => {
 			if (self._destroyed) return;
@@ -249,15 +247,6 @@ import { MutationReceipts } from './mutation-receipts';
 			self.refreshMapper();
 			const c = self.findChildren();
 			if (c.store && c.connector) dispatch(c.connectorEl, _connNs(c.connectorEl) + ':request-sync', { since: e.detail.since, meta: { op: 'sync' } });
-		});
-
-		addEventListener(self.dom, 'ln-data-store:request-page', e => {
-			const c = self.findChildren(), d = e.detail || {};
-			if (!c.connectorEl) return;
-			const effective = composeQuery(d.query || {}, self._currentQuery());
-			dispatch(c.connectorEl, _connNs(c.connectorEl) + ':request-query', {
-				query: Object.assign({}, effective, { offset: d.offset, limit: d.limit, queryGen: d.queryGen })
-			});
 		});
 
 		addEventListener(self.dom, 'ln-data-coordinator:request-create', e => self._fanOutCreate(self.findChildren(), e.detail.data || {}, e.detail.action));
@@ -295,7 +284,6 @@ import { MutationReceipts } from './mutation-receipts';
 		addEventListener(self.dom, 'ln-data-store:deleted', refresh);
 		addEventListener(self.dom, 'ln-data-store:mutation-error', e => self._mutationReceipts.reject(e.detail));
 		addEventListener(self.dom, 'ln-data-store:synced', e => { if (e.detail?.changed) self._refreshAll(e.detail.meta, false); });
-		addEventListener(self.dom, 'ln-data-store:query-changed', () => self._refreshAll(null, true));
 
 		addEventListener(self.dom, 'ln-search:change', e => {
 			e.preventDefault();
@@ -328,12 +316,17 @@ import { MutationReceipts } from './mutation-receipts';
 		const connNamespaces = new Set(['ln-api-connector', 'ln-couchdb-connector', 'ln-websocket-connector', 'ln-connector']);
 		const childConn = self.findChildren().connectorEl;
 		if (childConn) { const customNs = _connNs(childConn); connNamespaces.add(customNs); addEventListener(self.dom, customNs + ':connected', onConnected); }
+		const refreshWithoutStore = () => { const s = self.findChildren().store; if (!s || s.initializationError) self._refreshAll(null, false); };
 		connNamespaces.forEach(ns => {
 			addEventListener(self.dom, ns + ':fetched', e => self._reconcileServerFetch(e.detail));
 			addEventListener(self.dom, ns + ':created', e => self._reconcileServerMutation('create', e.detail));
 			addEventListener(self.dom, ns + ':updated', e => self._reconcileServerMutation('update', e.detail));
 			addEventListener(self.dom, ns + ':deleted', e => self._reconcileServerMutation('ack', e.detail));
 			addEventListener(self.dom, ns + ':bulk-deleted', e => self._reconcileServerMutation('ack', e.detail));
+			addEventListener(self.dom, ns + ':created', refreshWithoutStore);
+			addEventListener(self.dom, ns + ':updated', refreshWithoutStore);
+			addEventListener(self.dom, ns + ':deleted', refreshWithoutStore);
+			addEventListener(self.dom, ns + ':bulk-deleted', refreshWithoutStore);
 			addEventListener(self.dom, ns + ':error', e => self._reconcileServerMutation('error', e.detail));
 		});
 	}
@@ -341,7 +334,7 @@ import { MutationReceipts } from './mutation-receipts';
 	_component.prototype._onQueueSend = function (d) {
 		this.refreshMapper();
 		const c = this.findChildren();
-		if (!c.store || !c.connector || !c.queue) return;
+		if (!c.connector || !c.queue) return;
 		const m = d.meta || {}, ns = _connNs(c.connectorEl), key = d.idempotencyKey || d.entryId;
 		const actions = {
 			create: () => dispatch(c.connectorEl, ns + ':request-create', { data: d.payload, url: m.action || null, idempotencyKey: key, meta: { entryId: d.entryId, queued: true, op: 'create', tempId: m.tempId } }),
@@ -376,17 +369,19 @@ import { MutationReceipts } from './mutation-receipts';
 		const deleted = Array.isArray(raw?.deleted) ? raw.deleted : [];
 		const syncedAt = Array.isArray(raw) ? Math.floor(Date.now() / 1000) : (raw?.synced_at ?? raw?.since ?? Math.floor(Date.now() / 1000));
 		const records = fetched.map(r => this.mapper.ingress(r));
-		if (!c.store || c.store.initializationError) return;
+		const noStore = !c.store || c.store.initializationError;
+		if (noStore && !meta.kind) return;
 
-		if (!meta.kind) return c.store.applySync(records, deleted, syncedAt, { total: d.total, filtered: d.filtered, offset: d.offset, queryGen: d.queryGen, targetEl: meta.targetEl });
-		c.store.applyQuery(records, { total: d.total }).then(dec => {
+		if (!meta.kind) return c.store.applySync(records, deleted, syncedAt, { total: d.total, filtered: d.filtered });
+		(noStore ? Promise.resolve(records) : c.store.applyQuery(records, { total: d.total })).then(dec => {
 			const k = meta.kind;
 			if (k === 'table' || k === 'list' || k === 'chart') {
 				dispatch(meta.targetEl, 'ln-' + k + ':set-loading', { loading: false });
 				dispatch(meta.targetEl, 'ln-' + k + ':set-data', { data: dec, total: d.total ?? dec.length, filtered: d.filtered ?? dec.length, offset: d.offset, queryGen: meta.queryGen });
 				this._boundDelivered.set(meta.targetEl, true);
 			} else if (k === 'options') {
-				c.store.getAll({}).then(r => dispatch(meta.targetEl, 'ln-options:set-data', { data: r.data }));
+				if (noStore) dispatch(meta.targetEl, 'ln-options:set-data', { data: dec });
+				else c.store.getAll({}).then(r => dispatch(meta.targetEl, 'ln-options:set-data', { data: r.data }));
 			} else if (k === 'stat') {
 				dispatch(meta.targetEl, 'ln-stat:set-count', { count: d.filtered ?? d.total ?? records.length });
 			}
@@ -411,6 +406,8 @@ import { MutationReceipts } from './mutation-receipts';
 			if (meta.queued && c.queue) dispatch(c.queueEl, 'ln-api-queue:ack', { entryId: meta.entryId });
 		} else if (type === 'error') {
 			const status = d.status || d.error?.status || 0;
+			// A failed window page: tell its view, so the view releases the offset for a later request.
+			if (meta.kind && meta.offset != null) dispatch(meta.targetEl, 'ln-' + meta.kind + ':page-failed', { offset: meta.offset });
 			if (meta.queued && c.queue) {
 				dispatch(c.queueEl, 'ln-api-queue:nack', { entryId: meta.entryId, reason: (status === 401 || status === 419) ? 'auth' : ((status === 0 || status >= 500) ? 'retry' : 'drop') });
 			}
@@ -445,12 +442,19 @@ import { MutationReceipts } from './mutation-receipts';
 		const inst = el[DOM_ATTRIBUTE];
 		if (!inst) return;
 		if (attrName === 'data-ln-data-coordinator-mapper') inst.refreshMapper();
-		else if (attrName === SEARCH_ATTR || attrName === FILTERS_ATTR || attrName === SORT_FIELD_ATTR || attrName === SORT_DIR_ATTR) inst._queueQueryRefresh();
+		else if (attrName === SEARCH_ATTR || attrName === FILTERS_ATTR || attrName === SORT_FIELD_ATTR || attrName === SORT_DIR_ATTR) {
+			if (attrName === SEARCH_ATTR) {
+				const term = el.getAttribute(SEARCH_ATTR) || '';
+				if (el.hasAttribute('data-ln-search') && el.getAttribute('data-ln-search') !== term) {
+					el.setAttribute('data-ln-search', term);
+				}
+			}
+			inst._queueQueryRefresh();
+		}
 	}
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-data-coordinator', {
-		extraAttributes: ['data-ln-data-coordinator-mapper', SEARCH_ATTR, FILTERS_ATTR, SORT_FIELD_ATTR, SORT_DIR_ATTR],
-		onAttributeChange: _syncAttribute
+		attributes: ATTRIBUTES
 	});
 
 	window[DOM_ATTRIBUTE].init = window[DOM_ATTRIBUTE];

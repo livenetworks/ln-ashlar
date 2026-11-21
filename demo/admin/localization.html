@@ -23,7 +23,7 @@
 	(function () {
 		var config = [
 			{ key: 'ln-demo-mode', attr: 'data-mode', valid: ['light', 'dark'] },
-			{ key: 'ln-demo-skin', attr: 'data-skin', valid: ['glass', 'outline'] },
+			{ key: 'ln-demo-skin', attr: 'data-skin', valid: ['glass', 'outline', 'hairline'] },
 			{ key: 'ln-demo-theme', attr: 'data-theme', valid: ['ocean', 'sunset', 'midnight', 'glass'] },
 			{ key: 'ln-demo-density', attr: 'data-density', valid: ['compact', 'comfortable', 'spacious'] }
 		];
@@ -154,6 +154,7 @@
 							<ul>
 								<li><button type="button" data-demo-skin="default">Solid</button></li>
 								<li><button type="button" data-demo-skin="outline"><span class="demo-theme-swatch" data-preset="outline"></span>Outline</button></li>
+								<li><button type="button" data-demo-skin="hairline"><span class="demo-theme-swatch" data-preset="hairline"></span>Hairline</button></li>
 								<li><button type="button" data-demo-skin="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
 							</ul>
 						</section>
@@ -741,7 +742,7 @@ input[data-ln-number] {
 
 	(function () {
 		const KEY = 'ln-demo-skin';
-		const VALID = ['glass', 'outline'];
+		const VALID = ['glass', 'outline', 'hairline'];
 		const root = document.documentElement;
 
 		function markActive() {

@@ -299,8 +299,7 @@
 		},
 		{
 			"name": "data-ln-data-coordinator-stale",
-			"description": "Flag indicating data needs re-synchronization",
-			"valueSet": "v"
+			"description": "Staleness threshold in seconds, or never/-1"
 		},
 		{
 			"name": "data-ln-data-store",
@@ -336,14 +335,6 @@
 		{
 			"name": "data-ln-data-store-stale",
 			"description": "Cache staleness threshold in seconds, or -1/never"
-		},
-		{
-			"name": "data-ln-data-store-window",
-			"description": "Virtual scrolling cache window size in records"
-		},
-		{
-			"name": "data-ln-data-store-window-page",
-			"description": "Virtual scrolling slice page size"
 		},
 		{
 			"name": "data-ln-date",
@@ -801,7 +792,7 @@
 		},
 		{
 			"name": "data-ln-list-window-threshold",
-			"description": "Scroll threshold margin in pixels to trigger page fetch"
+			"description": "Scroll threshold margin in items to trigger page fetch"
 		},
 		{
 			"name": "data-ln-modal",
@@ -1361,6 +1352,10 @@
 			"valueSet": "v"
 		},
 		{
+			"name": "data-ln-table-count",
+			"description": "Declared unfiltered grand total for a windowed table"
+		},
+		{
 			"name": "data-ln-table-dict",
 			"description": "data-ln-table-dict attribute"
 		},
@@ -1428,7 +1423,15 @@
 		},
 		{
 			"name": "data-ln-table-window",
-			"description": "data-ln-table-window attribute"
+			"description": "Opt-in server-side sliding window (data-driven mode); value is the resident-row cap"
+		},
+		{
+			"name": "data-ln-table-window-page",
+			"description": "Rows requested per page in windowed mode"
+		},
+		{
+			"name": "data-ln-table-window-threshold",
+			"description": "Prefetch margin in rows before an unloaded page boundary in windowed mode"
 		},
 		{
 			"name": "data-ln-tabs",

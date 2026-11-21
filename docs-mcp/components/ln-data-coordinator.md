@@ -11,10 +11,11 @@ tags: [data, synchronization, local-first]
 # 🌐 ln-data-coordinator
 
 > **Classification:** ⚙️ Coordinator (Coordinator / Orchestrator)  
-> Applied to a parent container (`<ul data-ln-data-coordinator hidden>`) enclosing a `data-ln-data-store` and a
-> `data-ln-api-connector`. It catches store staleness and pagination requests to dispatch fetch events to the connector,
-> populating the store with server responses (`request-populate`). On store data mutations, it executes local queries and
-> dispatches `set-data` events directly to bound view elements (`data-ln-table-source`, `data-ln-list-source`).
+> Applied to a parent container (`<ul data-ln-data-coordinator hidden>`) enclosing a `data-ln-api-connector` and, optionally, a
+> `data-ln-data-store`. With a store it catches store staleness and pagination requests to dispatch fetch events to the connector,
+> populating the store with server responses (`request-populate`); on store data mutations it executes local queries. Without a store,
+> views are served from the connector's answers alone. In both topologies it dispatches `set-data` events directly to bound view
+> elements (`data-ln-table-source`, `data-ln-list-source`).
 
 ---
 
@@ -23,7 +24,7 @@ tags: [data, synchronization, local-first]
 - Serves as the central mediator of the Local-First data layer (offline-ready database synchronization).
 - Orchestrates and binds child database/transport components within its DOM sub-graph (e.g. [`ln-data-store`](./ln-data-store.md), [`ln-api-connector`](./ln-api-connector.md) / [`ln-couchdb-connector`](./ln-couchdb-connector.md), [`ln-api-queue`](./ln-api-queue.md)).
 - Intercepts native form submit actions globally on forms with a matching `data-ln-data-coordinator-scope` to route writes.
-- Dispatches write operations in a **parallel fan-out** layout: triggers local database mutations and remote connector/queue uploads simultaneously.
+- Dispatches write operations in a **parallel fan-out** layout: triggers the local database mutation (when a store child exists) and the remote connector/queue upload (when one exists) simultaneously.
 - Located in [`components/ln-data-coordinator/src/ln-data-coordinator.js`](../../components/ln-data-coordinator/src/ln-data-coordinator.js).
 
 > [!IMPORTANT]
@@ -173,14 +174,14 @@ When users type, filter, or sort, `ln-search`/`ln-filter`/`ln-sort` update the U
 | `ln-chart:request-data` | Listens | No | Query from a chart to fetch an ordered dataset. | `{ target: HTMLElement, sort, filters, search }` |
 | `ln-options:request-data` | Listens | No | Query from an `<select>`/options binder to fetch all records. | `{ target: HTMLElement }` |
 | `ln-stat:request-count` | Listens | No | Query from a stat/counter binder to fetch a record count. | `{ target: HTMLElement, filters?: Object }` |
-| `ln-{kind}:set-data` | Emits | No | Pattern row — `{kind}` is `table`, `list`, or `chart`, matching the requesting view's own namespace. Delivers the resolved query result. When a cache **and** a transport are both present, this is dispatched **twice** for one query: the cache answers immediately with `provisional: true`, then the transport's authoritative answer supersedes it with `provisional: false`. See *The two-phase answer* below. | `{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number, provisional?: Boolean }` |
+| `ln-{kind}:set-data` | Emits | No | Pattern row — `{kind}` is `table`, `list`, or `chart`, matching the requesting view's own namespace. Delivers the resolved query result: from the store when it can serve the read, otherwise the connector's `:fetched` answer. | `{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }` |
 | `ln-{kind}:set-loading` | Emits | No | Pattern row — `{kind}` is `table`, `list`, or `chart`. Dispatched instead of `set-data` while the store hasn't finished loading yet. | `{ loading: Boolean }` |
-| `ln-{kind}:page-failed` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Reports that a windowed page query failed, so the view can release that offset for a later retry. | `{ offset: Number }` |
+| `ln-{kind}:page-failed` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Dispatched to the requesting view when a connector `:error` arrives for a view query whose `meta` carries `offset` (a windowed page), so the view can release that offset for a later request. There is no automatic retry. | `{ offset: Number }` |
 | `ln-{kind}:request-revalidate` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Sent to a windowed view on a store change in place of `set-data`: the view refreshes through its own window cache rather than being served store rows. | *(no payload)* |
 | `ln-{kind}:request-invalidate` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Sent to a windowed view when the coordinator's query changes: the view drops its window and restarts from page 0. | *(no payload)* |
 | `ln-options:set-data` | Emits | No | Delivers all records to a bound options binder. | `{ data: Array }` |
 | `ln-stat:set-count` | Emits | No | Delivers the resolved count to a bound stat binder. | `{ count: Number }` |
-| `ln-data-store:ready` / `:loaded` / `:created` / `:updated` / `:deleted` | Listens | No | Store change notifications — on any of these, re-queries and re-serves all non-windowed bound view elements using their last cached query. Windowed views (carrying `data-ln-table-window` / `data-ln-list-window`) instead receive `ln-{kind}:request-revalidate` and refresh through their own window cache, since a partial store cannot answer an offset-based slice. | *(handler-internal; no detail consumed)* |
+| `ln-data-store:ready` / `:loaded` / `:created` / `:updated` / `:deleted` | Listens | No | Store change notifications — on any of these, re-queries and re-serves all non-windowed bound view elements using their last cached query. Windowed views (carrying `data-ln-table-window` / `data-ln-list-window`) instead receive `ln-{kind}:request-revalidate` and refresh through their own window cache. | *(handler-internal; no detail consumed)* |
 | `ln-data-store:synced` | Listens | No | Same re-serve as above, but only when `detail.changed` is true. | `{ changed: Boolean }` |
 
 **Write-Pipeline / Infrastructure Wiring**
@@ -193,31 +194,16 @@ When users type, filter, or sort, `ln-search`/`ln-filter`/`ln-sort` update the U
 | `ln-data-store:request-sync-failed` | Emits | No | Dispatched to the store when the connector's sync fails. | `{ error: String, status: Number }` |
 | `ln-api-queue:request-remap` | Emits | No | Re-keys a queued chain from a temp ID to the server-issued ID once a create resolves. | `{ oldKey: String, newId: ID }` |
 | `ln-api-queue:resolve-create` | Emits | No | A queued create was confirmed by the server — the queue deletes the entry and remaps its siblings in one transaction. | `{ entryId: ID, oldKey: String, newId: ID }` |
-| `ln-data-store:request-page` | Listens | No | Windowed store residency: forwards the missing page to the connector as `request-query`. | `{ store: String, offset: Number, limit: Number, query: Object, queryGen: Number }` |
 | `ln-data-store:mutation-error` | Listens | No | Rejects the pending store-mutation receipt matched by `requestId`. | `{ store: String, action: String, requestId: String, error: Error }` |
-| `ln-api-queue:failed` | Listens | No | Terminal retry-exhaustion notification from the queue — surfaces a `network` toast via the dict. | `{ entryId: ID, chainKey: String, attempts: Number }` |
-| `ln-api-connector:fetched` / `:created` / `:updated` / `:deleted` / `:bulk-deleted` / `:error` | Listens | No | Connector response handling (also namespaced under `ln-couchdb-connector:...` and `ln-websocket-connector:...` — generalized across concrete connector implementations). Reconciles the store, fires toasts, and drives queue ack/nack. A socket beside a REST connector delivers its pushes here as `:fetched`. | *(shape per response — see [`ln-api-connector.md`](./ln-api-connector.md) Events API)* |
+| `ln-api-queue:failed` | Listens | No | Terminal retry-exhaustion notification from the queue — emits `ln-data-coordinator:error` with `operation: 'queue-failed'`. | `{ entryId: ID, chainKey: String, attempts: Number }` |
+| `ln-api-connector:fetched` / `:created` / `:updated` / `:deleted` / `:bulk-deleted` / `:error` | Listens | No | Connector response handling (also namespaced under `ln-couchdb-connector:...` and `ln-websocket-connector:...` — generalized across concrete connector implementations). Reconciles the store, fires toasts, and drives queue ack/nack. A socket beside a REST connector delivers its pushes here as `:fetched`. With no store child, a view query's `:fetched` answer is delivered straight to the requesting view and `:created` / `:updated` / `:deleted` / `:bulk-deleted` confirmations re-serve all bound views. An `:error` whose `meta` carries `kind` and `offset` is additionally reported to that view as `ln-{kind}:page-failed`. | *(shape per response — see [`ln-api-connector.md`](./ln-api-connector.md) Events API)* |
 | `ln-websocket-connector:connected` | Listens | No | Catch-up after a (re)opened socket: runs `store.forceSync()`, a delta since `lastSyncedAt` over the request connector. | `{ url: String }` |
 
-**The two-phase answer**
+**Read routing**
 
-When both a cache and a transport are present, a query is answered **twice**. The cache
-answers immediately, flagged `provisional: true`; the view renders those rows and keeps its
-loading indicator on. The transport then answers authoritatively, the result is ingested into
-the cache and delivered with `provisional: false`, and the view clears the indicator.
+A query is answered once: by the store when it holds records that can answer it and has not declined local queries (`data-ln-data-store-no-local-query`), otherwise by the connector. **Absence of a participant is a topology, not an error.**
 
-This is a protocol, not an optimisation: it is what makes a search feel instant on cached
-data while staying correct against the server. It is **not** a merge of two result sets — it
-is one answer arriving twice, the second superseding the first.
-
-`queryGen` is the generation counter that makes this safe. Each dual-dispatch query takes the
-next generation for that view element; an answer carrying a stale generation is discarded
-rather than overwriting a newer one. A store managing its own residency window
-(`data-ln-data-store-window`) opts itself out, because it already runs this exchange through
-`ln-data-store:request-page` and a second parallel request would race it.
-
-A topology with only one of the two answers once: cache-only serves locally, transport-only
-goes straight to the connector. **Absence of a participant is a topology, not an error.**
+**Without a store.** The coordinator serves reads from the connector alone: `set-loading true`, `request-query`, then the ingress-mapped `:fetched` answer delivered as `set-loading false` + `set-data` (options: `ln-options:set-data`; stat: `ln-stat:set-count`). Writes dispatch the remote request only, and a connector confirmation re-serves the bound views. A store whose IndexedDB initialization failed is treated the same way.
 
 ---
 
@@ -249,6 +235,7 @@ goes straight to the connector. **Absence of a participant is a topology, not an
 > [!CAUTION]
 > 1. **Co-locating children outside sub-graph:** The coordinator searches its immediate DOM tree children for stores, queues, and connectors. Do not place these nodes outside the coordinator wrapper.
 > 2. **Evaluation of script mappers:** Script-based inline mappers `<script data-ln-mapper>` are deprecated due to XSS vulnerability. Always register custom mappers securely via `window.lnCore.registerDataMapper(...)`.
+> 3. **Computed fields without a store:** Presenters (`setPresenters`) live in `ln-data-store`. A coordinator with no store child delivers records through `mapper.ingress` only, so a computed display field a template needs must come from the mapper.
 
 ---
 
@@ -274,6 +261,8 @@ sequenceDiagram
     Coord->>Store: store.applySync(normalizedData) (Single Source of Truth)
     Store-->>Table: Event: ln-table:set-data (Delivered directly from Store)
 ```
+
+Without a store child, the **Store** participant drops out: **Coord** delivers the connector's answer straight to the table.
 
 ### B. Form Write Intake & Parallel Fan-Out Cycle (Write Flow)
 

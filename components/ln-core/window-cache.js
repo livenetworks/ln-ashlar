@@ -7,8 +7,7 @@
 // requestPage() (kick a fetch — any transport) and onChange() (cache mutated,
 // re-render). Render clients pull rows via get()/has() and read logicalTotal
 // for spacer geometry; they hold no cache of their own. Shared by the ln-table
-// and ln-list windowed paths; a future ln-data-store windowed mode plugs in by
-// making requestPage resolve getAll({offset,limit}) then call ingest().
+// and ln-list windowed paths.
 
 export function createWindowCache(config) {
 	config = config || {};
@@ -133,15 +132,12 @@ export function createWindowCache(config) {
 				if (rows[i] != null) resolved++;
 			}
 
-			// A page that resolved nothing is not an answer in two cases. A windowed
-			// store whose position index was just reset answers the next request with
-			// pure nulls and a carried-over filtered count; and a provisional page
-			// states rows only, so an empty one states nothing at all. Letting either
-			// through consumes the swap below and blanks the view — the exact flash
-			// stale-while-revalidate exists to prevent. An authoritative filtered === 0
-			// is a different statement: the source declaring an empty result set, which
-			// must render the empty state.
-			if (resolved === 0 && (detail.provisional || detail.filtered > 0)) {
+			// A page that resolved nothing while the source still reports matching rows is
+			// not an answer: letting it through consumes the swap below and blanks the view —
+			// the exact flash stale-while-revalidate exists to prevent. An authoritative
+			// filtered === 0 is a different statement: the source declaring an empty result
+			// set, which must render the empty state.
+			if (resolved === 0 && detail.filtered > 0) {
 				inflight.delete(offset);
 				return false;
 			}
@@ -154,16 +150,10 @@ export function createWindowCache(config) {
 				pendingSwap = false;
 			}
 
-			// A provisional page carries rows, not totals. Knowing how many records
-			// match requires looking at every one of them, which is exactly the work
-			// the local answer skips to stay fast — so the counts and the spacer
-			// geometry hold at whatever the last authoritative answer established.
-			if (!detail.provisional) {
-				grandTotal = detail.total != null ? detail.total : grandTotal;
-				logicalTotal = detail.filtered != null
-					? detail.filtered
-					: (detail.data ? detail.data.length : logicalTotal);
-			}
+			grandTotal = detail.total != null ? detail.total : grandTotal;
+			logicalTotal = detail.filtered != null
+				? detail.filtered
+				: (detail.data ? detail.data.length : logicalTotal);
 
 			for (let i = 0; i < rows.length; i++) {
 				// A windowed source sends null for a position it has not resolved

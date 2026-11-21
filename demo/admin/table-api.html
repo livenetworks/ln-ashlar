@@ -23,7 +23,7 @@
 	(function () {
 		var config = [
 			{ key: 'ln-demo-mode', attr: 'data-mode', valid: ['light', 'dark'] },
-			{ key: 'ln-demo-skin', attr: 'data-skin', valid: ['glass', 'outline'] },
+			{ key: 'ln-demo-skin', attr: 'data-skin', valid: ['glass', 'outline', 'hairline'] },
 			{ key: 'ln-demo-theme', attr: 'data-theme', valid: ['ocean', 'sunset', 'midnight', 'glass'] },
 			{ key: 'ln-demo-density', attr: 'data-density', valid: ['compact', 'comfortable', 'spacious'] }
 		];
@@ -154,6 +154,7 @@
 							<ul>
 								<li><button type="button" data-demo-skin="default">Solid</button></li>
 								<li><button type="button" data-demo-skin="outline"><span class="demo-theme-swatch" data-preset="outline"></span>Outline</button></li>
+								<li><button type="button" data-demo-skin="hairline"><span class="demo-theme-swatch" data-preset="hairline"></span>Hairline</button></li>
 								<li><button type="button" data-demo-skin="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
 							</ul>
 						</section>
@@ -339,61 +340,100 @@
 
 <!-- 3 Table Architectures Comparison Banner -->
 <section class="section-card">
-	<header><h3>3 Architectural Modes for ln-table</h3></header>
+	<header>
+		<h3>3 Architectural Modes for ln-table</h3>
+	</header>
 	<main>
-		<p>Ashlar provides three distinct architectural paradigms for data grids, allowing you to choose the exact trade-off between SEO/initial paint, client memory, and network throughput:</p>
-		<div class="card-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--size-md); margin-top: var(--size-md);">
-			<div class="card" style="border-top: 4px solid var(--color-info); padding: var(--size-md); background: var(--bg-surface); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
-				<header><h4 style="margin-top:0;">1. SSR Pre-Rendered Table</h4></header>
+		<p>Ashlar provides three distinct architectural paradigms for data grids, allowing you to choose the exact
+			trade-off between SEO/initial paint, client memory, and network throughput:</p>
+		<ul id="table-modes">
+			<li>
+				<header>
+					<h4>1. SSR Pre-Rendered Table</h4>
+				</header>
 				<main>
-					<p><small>HTML <code>&lt;tr&gt;</code> DOM elements emitted by backend (PHP/Node). Instant initial paint &amp; SEO. Zero client template compile. In-memory DOM sorting &amp; filtering.</small></p>
+					<p><small>HTML <code>&lt;tr&gt;</code> DOM elements emitted by backend (PHP/Node). Instant initial
+							paint &amp; SEO. Zero client template compile. In-memory DOM sorting &amp;
+							filtering.</small></p>
 					<a href="table.html" class="btn btn-sm">View SSR Demo &rarr;</a>
 				</main>
-			</div>
-			<div class="card" style="border-top: 4px solid var(--color-warning); padding: var(--size-md); background: var(--bg-sunken); border: 2px solid var(--color-warning); border-radius: var(--radius-md); box-shadow: var(--shadow-md);">
-				<header><h4 style="margin-top:0; color: var(--color-warning);">2. Remote API &amp; Virtual Window (Active)</h4></header>
+			</li>
+			<li aria-current="page">
+				<header>
+					<h4>2. Remote API &amp; Virtual Window (Active)</h4>
+				</header>
 				<main>
-					<p><small>Paginates infinite backend data on-demand via <code>ln-api-connector</code>. Ideal for huge databases (100k+ records) with server-side SQL/querying.</small></p>
+					<p><small>Paginates infinite backend data on-demand via <code>ln-api-connector</code>. Ideal for
+							huge databases (100k+ records) with server-side SQL/querying.</small></p>
 					<span class="badge warning">Active Demo</span>
 				</main>
-			</div>
-			<div class="card" style="border-top: 4px solid var(--color-success); padding: var(--size-md); background: var(--bg-surface); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
-				<header><h4 style="margin-top:0;">3. Injected JSON Seed</h4></header>
+			</li>
+			<li>
+				<header>
+					<h4>3. Injected JSON Seed</h4>
+				</header>
 				<main>
-					<p><small>Backend injects 1,000+ JSON records directly into <code>&lt;script type="application/json"&gt;</code>. Ingested into <code>ln-data-store</code> in 0ms. Rendered via Cheetah/Glide virtual DOM row recycling pool (~35 recycled rows).</small></p>
+					<p><small>Backend injects 1,000+ JSON records directly into
+							<code>&lt;script type="application/json"&gt;</code>. Ingested into
+							<code>ln-data-store</code> in 0ms. Rendered via Cheetah/Glide virtual DOM row recycling pool
+							(~35 recycled rows).</small></p>
 					<a href="table-seed.html" class="btn btn-sm">View Injected Seed Demo &rarr;</a>
 				</main>
-			</div>
-		</div>
+			</li>
+		</ul>
 	</main>
 </section>
 
 <section class="section-card">
-	<header><h3>Overview &amp; Architecture</h3></header>
+	<header>
+		<h3>Overview &amp; Architecture</h3>
+	</header>
 	<main>
-		<p>This page demonstrates a <strong>pure Client-Side Data Architecture</strong> coordinating <code>ln-table</code>, <code>ln-data-store</code>, and <code>ln-api-connector</code> via <code>ln-data-coordinator</code>. There are no pre-rendered SSR rows in <code>&lt;tbody&gt;</code> — rows are fetched remotely from the backend (<code>api.php</code>) on demand and rendered dynamically using <code>&lt;template data-ln-template="hybrid-docs-row"&gt;</code>.</p>
+		<p>This page demonstrates a <strong>pure Client-Side Data Architecture</strong> coordinating
+			<code>ln-table</code> and <code>ln-api-connector</code> via <code>ln-data-coordinator</code>, with no
+			client-side store. There are no pre-rendered SSR rows in <code>&lt;tbody&gt;</code> — rows are fetched
+			remotely from the backend (<code>api.php</code>) on demand and rendered dynamically using
+			<code>&lt;template data-ln-template="hybrid-docs-row"&gt;</code>.
+		</p>
 
-<section class="alert-box">
-	<h4>
-		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg>
-		Data Flow &amp; Lifecycle
-	</h4>
-	<ol>
-		<li><strong>Mount &amp; Request Initial.</strong> On initialization, <code>ln-table</code> enters sliding-window mode and emits <code>ln-table:request-data</code> for page 0.</li>
-		<li><strong>Transport &amp; Cache.</strong> <code>ln-api-connector</code> fetches the slice from <code>api.php</code> and forwards records to <code>ln-data-store</code> (with optional IndexedDB persistence).</li>
-		<li><strong>Template Rendering.</strong> <code>ln-table</code> ingests the records and stamps them out via <code>hybrid-docs-row</code> template into <code>&lt;tbody&gt;</code>.</li>
-		<li><strong>Virtual Windowing.</strong> As the user scrolls, searches, or filters, only the active viewport rows are kept in the DOM, while offscreen records are virtualized for maximum performance with 10,000+ items.</li>
-	</ol>
-</section>
+		<section class="alert-box">
+			<h4>
+				<svg class="ln-icon" aria-hidden="true">
+					<use href="#ln-icon-info-circle"></use>
+				</svg>
+				Data Flow &amp; Lifecycle
+			</h4>
+			<ol>
+				<li><strong>Mount &amp; Request Initial.</strong> On initialization, <code>ln-table</code> enters
+					sliding-window mode and emits <code>ln-table:request-data</code> for page 0.</li>
+				<li><strong>Transport.</strong> <code>ln-data-coordinator</code> forwards the request to
+					<code>ln-api-connector</code>, which fetches the page (<code>offset</code>/<code>limit</code>) from
+					<code>api.php</code> and returns it to the table's window cache. There is no client-side store and
+					no IndexedDB.
+				</li>
+				<li><strong>Template Rendering.</strong> <code>ln-table</code> ingests the records and stamps them out
+					via <code>hybrid-docs-row</code> template into <code>&lt;tbody&gt;</code>.</li>
+				<li><strong>Virtual Windowing.</strong> As the user scrolls, <code>ln-table</code> requests page-aligned
+					slices and keeps at most 1,000 rows resident, while only the viewport rows are in the DOM. A new
+					search, sort or filter restarts the window at page 0.</li>
+			</ol>
+		</section>
 
-<h4>What each control is wired to</h4>
-<p>The toolbar search and department/status popovers dispatch to <code>ln-table</code>. Each sortable header carries an <code>ln-sort</code> control whose <code>ln-sort:change</code> event is intercepted. The <code>ln-data-coordinator</code> coordinates fetching new pages from the backend (<code>api.php</code>) via the <code>ln-api-connector</code> and feeding the cached data store.</p>
+		<h4>What each control is wired to</h4>
+		<p>The toolbar search and department/status popovers dispatch to <code>ln-data-coordinator</code>
+			(<code>hybrid-docs</code>). Each sortable header carries an <code>ln-sort</code> control whose
+			<code>ln-sort:change</code> event is intercepted. The <code>ln-data-coordinator</code> coordinates fetching
+			new pages from the backend (<code>api.php</code>) via the <code>ln-api-connector</code> and delivering them
+			to the table's window.
+		</p>
 	</main>
 </section>
 
 <!-- Live Control Panel -->
 <section class="section-card">
-	<header><h3>Integration Log Terminal</h3></header>
+	<header>
+		<h3>Integration Log Terminal</h3>
+	</header>
 	<main>
 		<pre id="hybrid-log"></pre>
 	</main>
@@ -401,256 +441,335 @@
 
 <!-- Active Table Component -->
 <section data-ln-table-coordinator>
-<section class="section-card" data-demo-html>
-	<header><h3>Interactive Table Demo</h3></header>
-	<main>
-		<!-- Declarative 3-Tier Data Layer -->
-		<ul data-ln-data-coordinator="hybrid-docs" id="hybrid-table-coordinator" hidden>
-			<li data-ln-data-store="hybrid-docs"
-			    data-ln-data-store-indexes="department,status,priority,updated_at"
-			    data-ln-data-store-search-fields="title,department,owner,tags,status,priority"
-			    data-ln-data-store-window="1000"
-			    data-ln-data-store-window-page="200"
-			    data-ln-search=""
-			    id="hybrid-docs"></li>
-			<li data-ln-api-connector
-			    data-ln-api-base-url="data"
-			    data-ln-api-path="/api.php"
-			    id="hybrid-table-connector"></li>
-		</ul>
+	<section class="section-card" data-demo-html>
+		<header>
+			<h3>Interactive Table Demo</h3>
+		</header>
+		<main>
+			<!-- Declarative Data Layer (coordinator + connector, no store) -->
+			<ul data-ln-data-coordinator="hybrid-docs" data-ln-search="" id="hybrid-docs" hidden>
+				<li data-ln-api-connector data-ln-api-base-url="data" data-ln-api-path="/api.php"
+					id="hybrid-table-connector"></li>
+			</ul>
 
-		<section data-ln-table="hybrid-docs"
-		         data-ln-table-source="hybrid-docs"
-		         data-ln-table-selectable
-		         id="hybrid-table"
-		         class="data-table-demo">
-			<table>
-				<thead>
-					<tr>
-						<th colspan="9">
-							<div class="ln-table__toolbar">
-								<div>
-									<h3>Documents Manager</h3>
+			<section data-ln-table="hybrid-docs" data-ln-table-source="hybrid-docs" data-ln-table-selectable
+				data-ln-table-window="1000" data-ln-table-window-page="200" id="hybrid-table" class="data-table-demo">
+				<table>
+					<thead>
+						<tr>
+							<th colspan="9">
+								<div class="ln-table__toolbar">
+									<div>
+										<h3>Documents Manager</h3>
+									</div>
+									<search aria-label="Search documents">
+										<svg class="ln-icon" aria-hidden="true">
+											<use href="#ln-icon-search"></use>
+										</svg>
+										<input type="search" placeholder="Search documents..."
+											data-ln-search-for="hybrid-docs" data-ln-query="search">
+										<button type="button" data-ln-search-clear aria-label="Clear search">
+											<svg class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-x"></use>
+											</svg>
+										</button>
+									</search>
 								</div>
-								<search aria-label="Search cache or server">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-									<input type="search" placeholder="Search cache or server..." data-ln-search-for="hybrid-docs" data-ln-query="search">
-									<button type="button" data-ln-search-clear aria-label="Clear search">
-										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
-									</button>
-								</search>
-							</div>
-						</th>
+							</th>
+						</tr>
+						<tr>
+							<th data-ln-table-col-select></th>
+							<th data-ln-table-col="title">
+								Title
+								<ul data-ln-sort="hybrid-docs" data-ln-sort-field="title" data-ln-sort-state="none"
+									data-ln-query="sort">
+									<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrows-sort"></use>
+											</svg></button></li>
+									<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrow-up"></use>
+											</svg></button></li>
+									<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrow-down"></use>
+											</svg></button></li>
+								</ul>
+							</th>
+							<th data-ln-table-col="department" data-ln-table-filter-col="department">
+								Department
+								<button type="button" data-ln-table-col-filter data-ln-popover-for="filter-hybrid-dept"
+									aria-label="Filter department">
+									<svg class="ln-icon" aria-hidden="true">
+										<use href="#ln-icon-filter"></use>
+									</svg>
+								</button>
+								<ul data-ln-sort="hybrid-docs" data-ln-sort-field="department" data-ln-sort-state="none"
+									data-ln-query="sort">
+									<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrows-sort"></use>
+											</svg></button></li>
+									<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrow-up"></use>
+											</svg></button></li>
+									<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrow-down"></use>
+											</svg></button></li>
+								</ul>
+							</th>
+							<th data-ln-table-col="status" data-ln-table-filter-col="status">
+								Status
+								<button type="button" data-ln-table-col-filter
+									data-ln-popover-for="filter-hybrid-status" aria-label="Filter status">
+									<svg class="ln-icon" aria-hidden="true">
+										<use href="#ln-icon-filter"></use>
+									</svg>
+								</button>
+								<ul data-ln-sort="hybrid-docs" data-ln-sort-field="status" data-ln-sort-state="none"
+									data-ln-query="sort">
+									<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrows-sort"></use>
+											</svg></button></li>
+									<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrow-up"></use>
+											</svg></button></li>
+									<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrow-down"></use>
+											</svg></button></li>
+								</ul>
+							</th>
+							<th data-ln-table-col="priority">
+								Priority
+								<ul data-ln-sort="hybrid-docs" data-ln-sort-field="priority" data-ln-sort-state="none"
+									data-ln-query="sort">
+									<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrows-sort"></use>
+											</svg></button></li>
+									<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrow-up"></use>
+											</svg></button></li>
+									<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrow-down"></use>
+											</svg></button></li>
+								</ul>
+							</th>
+							<th data-ln-table-col="owner">
+								Owner
+								<ul data-ln-sort="hybrid-docs" data-ln-sort-field="owner" data-ln-sort-state="none"
+									data-ln-query="sort">
+									<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrows-sort"></use>
+											</svg></button></li>
+									<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrow-up"></use>
+											</svg></button></li>
+									<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrow-down"></use>
+											</svg></button></li>
+								</ul>
+							</th>
+							<th data-ln-table-col="file_size">
+								Size
+								<ul data-ln-sort="hybrid-docs" data-ln-sort-field="file_size" data-ln-sort-state="none"
+									data-ln-query="sort">
+									<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrows-sort"></use>
+											</svg></button></li>
+									<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrow-up"></use>
+											</svg></button></li>
+									<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrow-down"></use>
+											</svg></button></li>
+								</ul>
+							</th>
+							<th data-ln-table-col="updated_at">
+								Updated
+								<ul data-ln-sort="hybrid-docs" data-ln-sort-field="updated_at" data-ln-sort-state="none"
+									data-ln-query="sort">
+									<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrows-sort"></use>
+											</svg></button></li>
+									<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrow-up"></use>
+											</svg></button></li>
+									<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg
+												class="ln-icon" aria-hidden="true">
+												<use href="#ln-icon-arrow-down"></use>
+											</svg></button></li>
+								</ul>
+							</th>
+						</tr>
+					</thead>
+					<tbody data-ln-table-body>
+					</tbody>
+				</table>
+
+				<footer class="ln-table__footer">
+					<p>
+						<span class="hidden"><span data-ln-table-filtered data-ln-number></span> / </span>
+						<span data-ln-table-total data-ln-number></span> items
+						<span class="hidden">(<span data-ln-table-selected data-ln-number></span> selected)</span>
+					</p>
+				</footer>
+
+				<!-- Row Template -->
+				<template data-ln-template="hybrid-docs-row" data-ln-table-row>
+					<tr data-ln-table-row data-ln-table-row-id="{{ id }}">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td data-label="Title">{{ title }}</td>
+						<td data-label="Department">{{ department }}</td>
+						<td data-label="Status">{{ status }}</td>
+						<td data-label="Priority">{{ priority }}</td>
+						<td data-label="Owner">{{ owner }}</td>
+						<td data-label="Size" data-ln-value="{{ file_size }}">{{ file_size_display }}</td>
+						<td data-label="Updated" data-ln-value="{{ updated_at }}"><time datetime="{{ updated_at }}"
+								data-ln-date="short">{{ updated_display }}</time></td>
 					</tr>
-					<tr>
-						<th data-ln-table-col-select></th>
-						<th data-ln-table-col="title">
-							Title
-							<ul data-ln-sort="hybrid-docs" data-ln-sort-field="title" data-ln-sort-state="none" data-ln-query="sort">
-								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
-								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
-								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
-							</ul>
-						</th>
-						<th data-ln-table-col="department" data-ln-table-filter-col="department">
-							Department
-							<button type="button" data-ln-table-col-filter data-ln-popover-for="filter-hybrid-dept" aria-label="Filter department">
-								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
-							</button>
-							<ul data-ln-sort="hybrid-docs" data-ln-sort-field="department" data-ln-sort-state="none" data-ln-query="sort">
-								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
-								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
-								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
-							</ul>
-						</th>
-						<th data-ln-table-col="status" data-ln-table-filter-col="status">
-							Status
-							<button type="button" data-ln-table-col-filter data-ln-popover-for="filter-hybrid-status" aria-label="Filter status">
-								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
-							</button>
-							<ul data-ln-sort="hybrid-docs" data-ln-sort-field="status" data-ln-sort-state="none" data-ln-query="sort">
-								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
-								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
-								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
-							</ul>
-						</th>
-						<th data-ln-table-col="priority">
-							Priority
-							<ul data-ln-sort="hybrid-docs" data-ln-sort-field="priority" data-ln-sort-state="none" data-ln-query="sort">
-								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
-								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
-								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
-							</ul>
-						</th>
-						<th data-ln-table-col="owner">
-							Owner
-							<ul data-ln-sort="hybrid-docs" data-ln-sort-field="owner" data-ln-sort-state="none" data-ln-query="sort">
-								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
-								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
-								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
-							</ul>
-						</th>
-						<th data-ln-table-col="file_size">
-							Size
-							<ul data-ln-sort="hybrid-docs" data-ln-sort-field="file_size" data-ln-sort-state="none" data-ln-query="sort">
-								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
-								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
-								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
-							</ul>
-						</th>
-						<th data-ln-table-col="updated_at">
-							Updated
-							<ul data-ln-sort="hybrid-docs" data-ln-sort-field="updated_at" data-ln-sort-state="none" data-ln-query="sort">
-								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
-								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
-								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
-							</ul>
-						</th>
-					</tr>
-				</thead>
-				<tbody data-ln-table-body>
-				</tbody>
-			</table>
+				</template>
 
-			<footer class="ln-table__footer">
-				<p>
-					<span class="hidden"><span data-ln-table-filtered data-ln-number></span> / </span>
-					<span data-ln-table-total data-ln-number></span> items
-					<span class="hidden">(<span data-ln-table-selected data-ln-number></span> selected)</span>
-				</p>
-			</footer>
+				<!-- Empty State templates -->
+				<template data-ln-table-empty>
+					<section data-ln-table-empty-when="initial" data-ln-empty-state="no-data">
+						<h3>No documents found</h3>
+					</section>
+					<section data-ln-table-empty-when="search" data-ln-empty-state="no-results">
+						<svg class="ln-icon ln-icon--xl" aria-hidden="true">
+							<use href="#ln-icon-search"></use>
+						</svg>
+						<h3>No results found</h3>
+						<p>Try refining your search terms.</p>
+						<button type="button" data-ln-table-clear-all class="btn">Clear Filters</button>
+					</section>
+				</template>
+			</section>
+		</main>
+	</section>
 
-			<!-- Row Template -->
-			<template data-ln-template="hybrid-docs-row" data-ln-table-row>
-				<tr data-ln-table-row data-ln-table-row-id="{{ id }}">
-					<td><input type="checkbox" data-ln-table-row-select></td>
-					<td data-label="Title">{{ title }}</td>
-					<td data-label="Department">{{ department }}</td>
-					<td data-label="Status">{{ status }}</td>
-					<td data-label="Priority">{{ priority }}</td>
-					<td data-label="Owner">{{ owner }}</td>
-					<td data-label="Size" data-ln-value="{{ file_size }}">{{ file_size_display }}</td>
-					<td data-label="Updated" data-ln-value="{{ updated_at }}"><time datetime="{{ updated_at }}" data-ln-date="short">{{ updated_display }}</time></td>
-				</tr>
-			</template>
+	<!-- Department filter popover -->
+	<div data-ln-popover id="filter-hybrid-dept">
+		<search aria-label="Filter departments">
+			<svg class="ln-icon" aria-hidden="true">
+				<use href="#ln-icon-search"></use>
+			</svg>
+			<input type="search" placeholder="Search..." data-ln-search-for="filter-hybrid-dept-list">
+			<button type="button" data-ln-search-clear aria-label="Clear search">
+				<svg class="ln-icon" aria-hidden="true">
+					<use href="#ln-icon-x"></use>
+				</svg>
+			</button>
+		</search>
+		<ul id="filter-hybrid-dept-list" data-ln-filter="hybrid-docs" data-ln-query="department" data-ln-search=""
+			data-ln-search-items="label">
+			<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label>
+			</li>
+			<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering">
+					Engineering</label></li>
+			<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Finance">
+					Finance</label></li>
+			<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="HR"> HR</label></li>
+			<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="IT"> IT</label></li>
+			<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Legal">
+					Legal</label></li>
+			<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Marketing">
+					Marketing</label></li>
+			<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Operations">
+					Operations</label></li>
+		</ul>
+	</div>
 
-			<!-- Empty State templates -->
-			<template data-ln-table-empty>
-				<section data-ln-table-empty-when="initial" data-ln-empty-state="no-data">
-					<h3>No documents found</h3>
-				</section>
-				<section data-ln-table-empty-when="search" data-ln-empty-state="no-results">
-					<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<h3>No results found</h3>
-					<p>Try refining your search terms.</p>
-					<button type="button" data-ln-table-clear-all class="btn">Clear Filters</button>
-				</section>
-			</template>
-		</section>
-	</main>
-</section>
-
-<!-- Department filter popover -->
-<div data-ln-popover id="filter-hybrid-dept">
-	<search aria-label="Filter departments">
-		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-		<input type="search" placeholder="Search..." data-ln-search-for="filter-hybrid-dept-list">
-		<button type="button" data-ln-search-clear aria-label="Clear search">
-			<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
-		</button>
-	</search>
-	<ul id="filter-hybrid-dept-list" data-ln-filter="hybrid-docs" data-ln-query="department" data-ln-search="" data-ln-search-items="label">
-		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Finance"> Finance</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="HR"> HR</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="IT"> IT</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Legal"> Legal</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Marketing"> Marketing</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Operations"> Operations</label></li>
-	</ul>
-</div>
-
-<!-- Status filter popover -->
-<div data-ln-popover id="filter-hybrid-status">
-	<ul id="filter-hybrid-status-list" data-ln-filter="hybrid-docs" data-ln-query="status">
-		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Approved"> Approved</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Draft"> Draft</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Pending"> Pending</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Archived"> Archived</label></li>
-	</ul>
-</div>
+	<!-- Status filter popover -->
+	<div data-ln-popover id="filter-hybrid-status">
+		<ul id="filter-hybrid-status-list" data-ln-filter="hybrid-docs" data-ln-query="status">
+			<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
+			<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Approved">
+					Approved</label></li>
+			<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Draft"> Draft</label>
+			</li>
+			<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Pending">
+					Pending</label></li>
+			<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Archived">
+					Archived</label></li>
+		</ul>
+	</div>
 </section>
 
 <script>
-(function () {
-	// Clear cached sort icons to force a fresh fetch from CDN
-	try {
-		localStorage.removeItem('lni:ln-arrows-sort');
-		localStorage.removeItem('lni:ln-arrow-up');
-		localStorage.removeItem('lni:ln-arrow-down');
-	} catch (e) {}
+	(function () {
+		// Clear cached sort icons to force a fresh fetch from CDN
+		try {
+			localStorage.removeItem('lni:ln-arrows-sort');
+			localStorage.removeItem('lni:ln-arrow-up');
+			localStorage.removeItem('lni:ln-arrow-down');
+		} catch (e) { }
 
-	const logConsole = document.getElementById('hybrid-log');
-	const tableEl = document.getElementById('hybrid-table');
+		const logConsole = document.getElementById('hybrid-log');
+		const tableEl = document.getElementById('hybrid-table');
 
-	function log(msg, color = 'var(--fg-muted)') {
-		const time = new Date().toLocaleTimeString() + '.' + String(new Date().getMilliseconds()).padStart(3, '0');
-		const span = document.createElement('span');
-		span.textContent = `[${time}] ${msg}\n`;
-		span.style.color = color;
-		logConsole.appendChild(span);
-		logConsole.scrollTop = logConsole.scrollHeight;
-	}
+		function log(msg, color = 'var(--fg-muted)') {
+			const time = new Date().toLocaleTimeString() + '.' + String(new Date().getMilliseconds()).padStart(3, '0');
+			const span = document.createElement('span');
+			span.textContent = `[${time}] ${msg}\n`;
+			span.style.color = color;
+			logConsole.appendChild(span);
+			logConsole.scrollTop = logConsole.scrollHeight;
+		}
 
-	document.addEventListener('DOMContentLoaded', function() {
-		log("Page initialized. Requesting initial records from API endpoint...", 'var(--color-primary)');
-		log("Declarative 3-Tier architecture active: data-ln-data-coordinator <-> data-ln-api-connector <-> data-ln-table-source.", 'var(--color-primary)');
-	});
-
-	tableEl.addEventListener('ln-table:request-data', function (e) {
-		log(`[Intent] Table emitted 'ln-table:request-data' (offset: ${e.detail.offset || 0}, limit: ${e.detail.limit || 200})`, '#fbbf24');
-	});
-
-	const storeEl = document.getElementById('hybrid-docs');
-	if (storeEl) {
-		storeEl.addEventListener('ln-data-store:request-page', function (e) {
-			log(`[Store] Sliding window index emitted 'ln-data-store:request-page' (offset: ${e.detail.offset}, limit: ${e.detail.limit})`, '#a78bfa');
+		document.addEventListener('DOMContentLoaded', function () {
+			log("Page initialized. Requesting initial records from API endpoint...", 'var(--color-primary)');
+			log("Declarative architecture active: data-ln-table-source <-> data-ln-data-coordinator <-> data-ln-api-connector (windowed table, no store).", 'var(--color-primary)');
 		});
-		storeEl.addEventListener('ln-data-store:synced', function (e) {
-			log(`[Store] Synchronized cache with IndexedDB (+${e.detail.added || 0} records)`, '#34d399');
+
+		tableEl.addEventListener('ln-table:request-data', function (e) {
+			log(`[Intent] Table emitted 'ln-table:request-data' (offset: ${e.detail.offset || 0}, limit: ${e.detail.limit || 200})`, 'var(--color-warning)');
 		});
-	}
 
-	const connEl = document.getElementById('hybrid-table-connector');
-	if (connEl) {
-		connEl.addEventListener('ln-api-connector:fetched', function (e) {
-			const count = e.detail.data ? e.detail.data.length : 0;
-			log(`[Transport] Connector fetched ${count} records from /api.php (Grand total: ${e.detail.total || 'N/A'})`, '#38bdf8');
+		const connEl = document.getElementById('hybrid-table-connector');
+		if (connEl) {
+			connEl.addEventListener('ln-api-connector:fetched', function (e) {
+				const count = e.detail.data ? e.detail.data.length : 0;
+				log(`[Transport] Connector fetched ${count} records from /api.php (Grand total: ${e.detail.total || 'N/A'})`, 'var(--color-info)');
+			});
+		}
+
+		tableEl.addEventListener('ln-table:ready', function (e) {
+			log(`Component emitted 'ln-table:ready' (Total: ${e.detail.total}).`, 'var(--color-primary)');
 		});
-	}
 
-	tableEl.addEventListener('ln-table:ready', function(e) {
-		log(`Component emitted 'ln-table:ready' (Total: ${e.detail.total}).`, 'var(--color-primary)');
-	});
+		tableEl.addEventListener('ln-table:rendered', function (e) {
+			log(`Component emitted 'ln-table:rendered' (Visible: ${e.detail.visible}, Total: ${e.detail.total}).`, 'var(--color-success)');
+		});
 
-	tableEl.addEventListener('ln-table:rendered', function(e) {
-		log(`Component emitted 'ln-table:rendered' (Visible: ${e.detail.visible}, Total: ${e.detail.total}).`, '#34d399');
-	});
+		tableEl.addEventListener('ln-table:sorted', function (e) {
+			log(`ln-table:sorted -> sorted by column index ${e.detail.column} (${e.detail.direction || 'none'}), matched: ${e.detail.matched} / ${e.detail.total}`, 'var(--color-success)');
+		});
 
-	tableEl.addEventListener('ln-table:sorted', function (e) {
-		log(`ln-table:sorted -> sorted by column index ${e.detail.column} (${e.detail.direction || 'none'}), matched: ${e.detail.matched} / ${e.detail.total}`, '#34d399');
-	});
+		tableEl.addEventListener('ln-table:filter', function (e) {
+			log(`ln-table:filter -> search term: "${e.detail.term}", matched: ${e.detail.matched} / ${e.detail.total}`, 'var(--color-info)');
+		});
 
-	tableEl.addEventListener('ln-table:filter', function (e) {
-		log(`ln-table:filter -> search term: "${e.detail.term}", matched: ${e.detail.matched} / ${e.detail.total}`, '#60a5fa');
-	});
-
-	tableEl.addEventListener('ln-table:select', function (e) {
-		log(`ln-table:select -> ${e.detail.count} rows selected`, '#fbbf24');
-	});
-})();
+		tableEl.addEventListener('ln-table:select', function (e) {
+			log(`ln-table:select -> ${e.detail.count} rows selected`, 'var(--color-warning)');
+		});
+	})();
 </script>
 			</div>
 		</section>
@@ -700,7 +819,7 @@
 
 	(function () {
 		const KEY = 'ln-demo-skin';
-		const VALID = ['glass', 'outline'];
+		const VALID = ['glass', 'outline', 'hairline'];
 		const root = document.documentElement;
 
 		function markActive() {

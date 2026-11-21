@@ -40,29 +40,29 @@ const html = `<!-- ln-page: title="Table — Injected JSON Seed — ln-ashlar" h
 	<header><h3>3 Architectural Modes for ln-table</h3></header>
 	<main>
 		<p>Ashlar provides three distinct architectural paradigms for data grids, allowing you to choose the exact trade-off between SEO/initial paint, client memory, and network throughput:</p>
-		<div class="card-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--size-md); margin-top: var(--size-md);">
-			<div class="card" style="border-top: 4px solid var(--color-info); padding: var(--size-md); background: var(--bg-surface); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
-				<header><h4 style="margin-top:0;">1. SSR Pre-Rendered Table</h4></header>
+		<ul id="table-modes">
+			<li>
+				<header><h4>1. SSR Pre-Rendered Table</h4></header>
 				<main>
 					<p><small>HTML <code>&lt;tr&gt;</code> DOM elements emitted by backend (PHP/Node). Instant initial paint &amp; SEO. Zero client template compile. In-memory DOM sorting &amp; filtering.</small></p>
 					<a href="table.html" class="btn btn-sm">View SSR Demo &rarr;</a>
 				</main>
-			</div>
-			<div class="card" style="border-top: 4px solid var(--color-warning); padding: var(--size-md); background: var(--bg-surface); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
-				<header><h4 style="margin-top:0;">2. Remote API &amp; Virtual Window</h4></header>
+			</li>
+			<li>
+				<header><h4>2. Remote API &amp; Virtual Window</h4></header>
 				<main>
 					<p><small>Paginates infinite backend data on-demand via <code>ln-api-connector</code>. Ideal for huge databases (100k+ records) with server-side SQL/querying.</small></p>
 					<a href="table-api.html" class="btn btn-sm">View Remote API Demo &rarr;</a>
 				</main>
-			</div>
-			<div class="card" style="border-top: 4px solid var(--color-success); padding: var(--size-md); background: var(--bg-sunken); border: 2px solid var(--color-success); border-radius: var(--radius-md); box-shadow: var(--shadow-md);">
-				<header><h4 style="margin-top:0; color: var(--color-success);">3. Injected JSON Seed (Active)</h4></header>
+			</li>
+			<li aria-current="page">
+				<header><h4>3. Injected JSON Seed (Active)</h4></header>
 				<main>
 					<p><small>Backend injects 10,000 JSON records directly into <code>&lt;script type="application/json"&gt;</code>. Ingested into <code>ln-data-store</code> in 0ms. Rendered via Cheetah/Glide virtual DOM row recycling pool (~35 recycled rows).</small></p>
 					<span class="badge success">Active Demo</span>
 				</main>
-			</div>
-		</div>
+			</li>
+		</ul>
 	</main>
 </section>
 

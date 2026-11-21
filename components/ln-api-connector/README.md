@@ -138,6 +138,8 @@ The delay defaults to **300 ms** and is overridable via `data-ln-api-connector-q
 
 Mutations (`create`, `update`, `delete`, `bulk-delete`) are never debounced — they fire immediately every time.
 
+Debounce timers and in-flight fetches are keyed per `meta.targetEl`. A query that carries an `offset` (one page of a windowed view) is keyed per `(targetEl, offset)` instead, so two different pages of one view run independently; a repeat of the same page still coalesces into the latest one and supersedes the earlier fetch. A query without `offset` keeps the per-`targetEl` key.
+
 ---
 
 ## DOM Events
@@ -150,7 +152,7 @@ You can trigger mutations and fetches asynchronously by dispatching standard eve
 |-------|------------------|-------------|
 | `ln-api-connector:request-sync` | `{ since, meta }` | Triggers a delta fetch request. |
 | `ln-api-connector:request-query` | `{ query, meta }` | Triggers a structured query/pagination request. |
-| `ln-api-connector:request-cancel` | `{ targetEl?, key?, meta? }` | Aborts active in-flight request for target element or key. |
+| `ln-api-connector:request-cancel` | `{ targetEl?, key?, meta? }` | Aborts active in-flight request for target element or key. A paged request (`query.offset` set) is tracked per page and is not reached by `targetEl` alone. |
 | `ln-api-connector:request-create` | `{ data, tempId, url, idempotencyKey?, meta }` | Triggers a creation request. |
 | `ln-api-connector:request-update` | `{ id, data, expected_version, url, idempotencyKey?, meta }` | Triggers a PUT update (supports 409 conflict checks). |
 | `ln-api-connector:request-delete` | `{ id, url, idempotencyKey?, meta }` | Triggers a deletion request. |

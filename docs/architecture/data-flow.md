@@ -23,11 +23,11 @@ never reach in.
 
 Two flows cross the concerns:
 
-- **Read.** A renderer binds to a store by its `id` (`data-ln-table-source`,
+- **Read.** A renderer binds to a coordinator by name (`data-ln-table-source`,
   `data-ln-list-source`, `data-ln-chart-source`, `data-ln-options`,
   `data-ln-stat`) and dispatches its
-  own `request-data` intent. The coordinator that owns the matching store
-  resolves it against the store's query engine and delivers
+  own `request-data` intent. The coordinator that owns the matching name
+  resolves it against its store's query engine, or against its connector when it has no store, and delivers
   `ln-{kind}:set-data`. The renderer draws.
 - **Write.** A scoped form (`data-ln-data-coordinator-scope`) — or a coordinator-
   namespaced `request-create`/`-update`/`-delete`/`-bulk-delete` event for
@@ -69,7 +69,7 @@ record lands in IndexedDB immediately and the store fans out
 `ln-data-coordinator`: the mediator. Claims scoped form submits
 (`data-ln-data-coordinator-scope`) or coordinator-namespaced request events, serializes
 and maps the payload, and fans out from one synchronous handler to the store
-(local write) and, independently, to the transport layer (`ln-*-connector`
+(local write, when a store child exists) and, independently, to the transport layer (`ln-*-connector`
 directly, or `ln-api-queue`'s outbox when present). Reconciles server
 responses with an ordinary `ln-data-store:request-update` (id-swap on create — no
 separate confirm/revert method). Delivers live data to bound view components
@@ -83,7 +83,7 @@ sort/filter/search input (intent).
 and `ln-search` produce **intent** — which column to sort by, which filter
 to apply, what to search for — via `ln-table:request-data` /
 `ln-list:request-data`. The coordinator resolves the request against its
-owned store's `getAll()` and delivers the result; the store runs the actual
+store's `getAll()`, or its connector when it has no store, and delivers the result; the store runs the actual
 query against the cache. The split is general: intent is a UI concern,
 execution is a data concern.
 
@@ -99,25 +99,23 @@ intent) into an `ln-table:request-data` / `ln-list:request-data` payload.
 and receives a fresh array on every `ln-{kind}:set-data`. The query engine.
 Network calls.
 
-> **Windowed residency.** In windowed residency mode (`data-ln-data-store-window`),
-> the store (`ln-data-store`) owns the bounded position index (`window-index`).
-> The renderer remains stateless about records: it holds only a single resident
-> page slice (`_sliceData` at `_sliceOffset`) and draws placeholders (empty items/rows)
-> for indices outside that slice. When scrolling outside this slice, the renderer
-> dispatches `request-data` with `offset`/`limit` to fetch the missing slice from
-> the coordinator.
+> **Windowed views.** A windowed view (`data-ln-table-window`, `data-ln-list-window`)
+> holds a bounded sparse row cache (`createWindowCache`) keyed by logical index and
+> draws placeholders (empty items/rows) for indices not yet loaded. When scrolling
+> reaches an unloaded page, the view dispatches `request-data` with
+> `offset`/`limit`/`queryGen` and the coordinator resolves the page.
 
-A renderer binds to a coordinator-owned store by attribute —
-`data-ln-table-source="<storeName>"` on `[data-ln-table]`, or
-`data-ln-list-source="<storeName>"` on `[data-ln-list]`. On mount, and on
+A renderer binds to a coordinator by attribute —
+`data-ln-table-source="<name>"` on `[data-ln-table]`, or
+`data-ln-list-source="<name>"` on `[data-ln-list]`. On mount, and on
 every sort/filter/search change, the renderer dispatches
 `ln-table:request-data` / `ln-list:request-data` at itself; the coordinator
-whose child store matches `<storeName>` (guarded by an ownership check, so
+whose name matches `<name>` (guarded by an ownership check, so
 multiple coordinators on one page never cross-serve) resolves the query and
 dispatches `ln-{kind}:set-data` — or `ln-{kind}:set-loading` while the store
 hasn't finished loading yet. The same binder vocabulary covers
-`data-ln-options="<storeName>"` on a `<select>` (served via
-`ln-options:set-data`) and `data-ln-stat="<storeName>"` on any inline
+`data-ln-options="<name>"` on a `<select>` (served via
+`ln-options:set-data`) and `data-ln-stat="<name>"` on any inline
 element (served via `ln-stat:set-count`). **The renderer is reactive to a
 stream, not a puller of state.**
 
@@ -252,6 +250,8 @@ configuration: the fan-out stops after the local dispatch, no network call
 is made, and the record simply keeps its `_temp_`-prefixed id until a
 connector is added.
 
+A coordinator with a connector and no store is equally first-class: the fan-out dispatches the remote request only, and views refresh when the connector confirms.
+
 **Error reconciliation.** Every non-2xx connector response is classified
 into exactly one of three buckets by status — never a fourth "unknown"
 bucket:
@@ -368,10 +368,10 @@ function _dispatchChange(storeName, records) {
 `ln-data-store` never does this — it fans out `ln-data-store:created` /
 `-updated` / `-deleted` on its own element only, and knows nothing about
 renderers. Re-serving bound views is `ln-data-coordinator`'s job: on those
-same store-level notifications it queries
+same store-level notifications (or, with no store child, the connector's confirmations) it queries
 `[data-ln-table-source],[data-ln-list-source],[data-ln-chart-source],[data-ln-options],[data-ln-stat]`
-once, filters to the elements whose store name matches its own child
-(`_ownsStore()`), and re-runs each one's last query. This still avoids the
+once, filters to the elements whose name matches its own
+(`_owns()`), and re-runs each one's last query. This still avoids the
 O(n)-per-record cost the rejected pattern above has — the scan runs once
 per store-level event (a handful of times per user action, never once per
 record or per keystroke), and only within the coordinator that actually
@@ -758,7 +758,7 @@ _scan(document.body);  // init
 |------|------------|
 | **Coordinator** | A component or script that listens for events on one element and writes attributes (or dispatches events) on another, never calling instance methods directly. Two flavours — page-level (consumer-written shim that bridges data-flow components) and library-shipped (encapsulates a reusable cross-component rule, e.g. `ln-accordion`, or the data layer's own `ln-data-coordinator`). For details, see the [Coordinator Doctrine](coordinator.md). |
 | **Store** | An `ln-data-store` instance (marker attribute `data-ln-data-store`, identified by its `id`) bound to a single resource. One element, one cache. It is a pure cache — it holds no write queue of its own; the optional offline outbox lives in `ln-api-queue`. |
-| **Renderer** | Any element with `data-ln-table-source`, `data-ln-list-source`, `data-ln-chart-source`, `data-ln-options`, or `data-ln-stat`. Receives `ln-{kind}:set-data` / `:set-loading` (or `:set-count` for stats) from the coordinator that owns the matching store. |
+| **Renderer** | Any element with `data-ln-table-source`, `data-ln-list-source`, `data-ln-chart-source`, `data-ln-options`, or `data-ln-stat`. Receives `ln-{kind}:set-data` / `:set-loading` (or `:set-count` for stats) from the coordinator that owns the matching name. |
 | **Scoped form** | `data-ln-data-coordinator-scope="<name>"` on a `<form>` matches it to the `data-ln-data-coordinator` of the same name (or, when empty, to the nearest containing coordinator). The coordinator claims its native submit at the `document` bubble phase, after `ln-validate`'s own gate has already run. |
 | **Intent** | A UI component's output describing what the user wants — sort by column X descending, filter by status, search for "foo". Produced by `ln-sort`, `ln-filter`, `ln-search`; delivered via `request-data`, consumed by the coordinator through the owning store's `getAll()` options. |
 | **Optimistic write** | Writing to the local cache before the server confirms. There is no `_pending` flag — a create's only marker is its `_temp_<uuid>` id, held until the server response arrives. |

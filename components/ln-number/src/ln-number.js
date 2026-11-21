@@ -212,6 +212,7 @@ import { calculateCursorPosition } from './number-model.js';
 		if (!isNaN(num)) {
 			this._rawValue = num;
 			if (!dom.hasAttribute('data-ln-value')) {
+				this._autoValue = true;
 				dom.setAttribute('data-ln-value', String(num));
 			}
 			this._formatTextContent();
@@ -223,7 +224,11 @@ import { calculateCursorPosition } from './number-model.js';
 	_component.prototype._formatTextContent = function () {
 		if (this._rawValue !== null && !isNaN(this._rawValue)) {
 			const maxDecimals = this.dom.getAttribute('data-ln-number-decimals');
-			this.dom.textContent = formatNumber(this._rawValue, getLocale(this.dom), { maxDecimals });
+			const formatted = formatNumber(this._rawValue, getLocale(this.dom), { maxDecimals });
+			this._formattedText = formatted;
+			if (this.dom.textContent !== formatted) {
+				this.dom.textContent = formatted;
+			}
 		}
 	};
 
@@ -427,11 +432,21 @@ import { calculateCursorPosition } from './number-model.js';
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
+	function _onSubtreeChange(el) {
+		const inst = el[DOM_ATTRIBUTE];
+		if (!inst || !inst.isTextElement) return;
+		if (el.textContent !== inst._formattedText) {
+			if (inst._autoValue) el.removeAttribute('data-ln-value');
+			inst._initTextElement();
+		}
+	}
+
 	// ─── Init ──────────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-number', {
 		attributes: ATTRIBUTES,
 		extraAttributes: ['lang'],
-		onAttributeChange: _syncAttribute
+		onAttributeChange: _syncAttribute,
+		onSubtreeChange: _onSubtreeChange
 	});
 })();
