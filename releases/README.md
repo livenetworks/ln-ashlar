@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.2.6](./v2.2.6.md) — November 21, 2026
+Data layer query SSOT consolidation (`ln-data-coordinator`, `ln-data-store`, `ln-core/window-cache`), SSR table filtering/sorting restoration (`ln-table`), autonomous text-element subtree re-formatting (`ln-date`, `ln-number`, `ln-time`), hairline skin & layout token refinements, and 17 MB asset footprint reduction.  
+👉 [Read full v2.2.6 release notes](./v2.2.6.md)
+
 ### [v2.2.5](./v2.2.5.md) — November 9, 2026
 Dynamic `<use>` lifecycle detection in `ln-icon`, responsive breakpoint collapse and sibling margin reset in `@mixin form-grid`, modal form grid demo, and regression test suites.  
 👉 [Read full v2.2.5 release notes](./v2.2.5.md)
