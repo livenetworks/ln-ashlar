@@ -40,7 +40,7 @@ The JavaScript source follows the Two-Tier Archetype: domain logic and algorithm
 <form data-ln-translations data-ln-translations-default="en">
 	<header>
 		<h3>Company Info</h3>
-		<div class="ln-translations__actions">
+		<div class="actions">
 			<ul data-ln-translations-active></ul>
 			<div data-ln-dropdown>
 				<button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu" aria-label="Add translation">
@@ -95,7 +95,7 @@ When translations are already rendered server-side, mark each pre-rendered field
 <form data-ln-translations data-ln-translations-default="en">
 	<header>
 		<h3>Standard Details</h3>
-		<div class="ln-translations__actions">
+		<div class="actions">
 			<ul data-ln-translations-active></ul>
 			<div data-ln-dropdown>
 				<button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu-2" aria-label="Add translation">
@@ -171,17 +171,24 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 // In theme/config/mixins/_translations.scss
 @mixin translations-actions {
 	@include inline-flex;
-	@include items-center;
+	block-size: var(--size-lg);
 	--gap: var(--size-xs);
 	gap: var(--gap);
 	margin-left: auto;
 }
 
+@mixin translations-dropdown {
+	@include flex;
+}
+
 @mixin translations-active-list {
 	@include inline-flex;
-	@include items-center;
 	--gap: var(--size-xs);
 	gap: var(--gap);
+}
+
+@mixin translations-active-item {
+	@include flex;
 }
 
 @mixin translations-badge {
@@ -189,9 +196,8 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 	@include items-center;
 	--gap: var(--size-xs);
 	gap: var(--gap);
-	--padding-y: var(--size-2xs);
 	--padding-x: var(--size-xs);
-	padding: var(--padding-y) var(--padding-x);
+	padding-inline: var(--padding-x);
 	@include text-xs;
 	@include font-semibold;
 	@include rounded-sm;
@@ -215,7 +221,7 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 	@include inline-flex;
 	@include items-center;
 	@include justify-center;
-	@include size(1.5rem);
+	aspect-ratio: 1;
 	@include rounded-sm;
 	@include tinted-surface(0.08);
 
@@ -226,8 +232,10 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 ### SCSS Component Selector Bindings
 ```scss
 // In theme/components/_translations.scss
-.ln-translations__actions { @include translations-actions; }
+[data-ln-translations] .actions { @include translations-actions; }
+[data-ln-translations] .actions [data-ln-dropdown] { @include translations-dropdown; }
 [data-ln-translations-active] { @include translations-active-list; }
+[data-ln-translations-active] > li { @include translations-active-item; }
 [data-ln-translations-active] p { @include translations-badge; }
 [data-ln-translations-active] button { @include translations-badge-remove; }
 [data-ln-translations-add] { @include translations-add-button; }

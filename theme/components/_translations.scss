@@ -88,12 +88,20 @@ $lang-auto: mk, de, fr, it, bg, pt, ro, nl, pl, fi, hu, lt, lv, tr, az, is, mt, 
 
 // ─── Header actions ──────────────────────────────────────────────
 
-.ln-translations__actions {
+[data-ln-translations] .actions {
 	@include translations-actions;
+}
+
+[data-ln-translations] .actions [data-ln-dropdown] {
+	@include translations-dropdown;
 }
 
 [data-ln-translations-active] {
 	@include translations-active-list;
+}
+
+[data-ln-translations-active] > li {
+	@include translations-active-item;
 }
 
 [data-ln-translations-active] p {

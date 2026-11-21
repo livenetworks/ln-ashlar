@@ -507,7 +507,7 @@ Every `ln-ajax:start` is followed by exactly one of `ln-ajax:complete` or `ln-aj
 | `element.lnApiConnector.refreshConfig` | `()` | `void` | Reloads URL, path, and header configurations. |
 | `element.lnApiConnector.cancel` | `(key?: String)` | `Boolean` | Aborts active in-flight request for the given key/element. |
 | `element.lnApiConnector.fetchDelta` | `(since: String, targetEl?: Element)` | `Promise` | Fetches delta updates since sequence tag. |
-| `element.lnApiConnector.query` | `(queryParams: Object, targetEl?: Element)` | `Promise` | Sends query request with pagination and filters. |
+| `element.lnApiConnector.query` | `(queryParams: Object, targetEl?: Element)` | `Promise` | Sends query request with pagination and filters. A call with `queryParams.offset` and a `targetEl` is tracked per `(targetEl, offset)`. |
 | `element.lnApiConnector.create` | `(payload: Object, url?: String, idempotencyKey?: String)` | `Promise` | Sends POST request. |
 | `element.lnApiConnector.update` | `(id: ID, payload: Object, expectedVersion?: Int, url?: String, idempotencyKey?: String)` | `Promise` | Sends PUT update. |
 | `element.lnApiConnector.delete` | `(id: ID, url?: String, idempotencyKey?: String)` | `Promise` | Sends DELETE request. |
@@ -519,8 +519,8 @@ Every `ln-ajax:start` is followed by exactly one of `ln-ajax:complete` or `ln-aj
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-api-connector:request-sync` | Listens | No | Triggers delta updates query. | `{ since?: String, meta?: Object }` |
-| `ln-api-connector:request-query` | Listens | No | Triggers structured query/pagination fetch. | `{ query?: Object, meta?: Object }` |
-| `ln-api-connector:request-cancel` | Listens | No | Aborts in-flight fetch or query for the target element/key. | `{ targetEl?: Element, key?: String, meta?: Object }` |
+| `ln-api-connector:request-query` | Listens | No | Triggers structured query/pagination fetch. Debounce and in-flight cancellation are keyed per `meta.targetEl`; a query with `query.offset` set is keyed per `(targetEl, offset)`, so distinct pages of one view never supersede each other. | `{ query?: Object, meta?: Object }` |
+| `ln-api-connector:request-cancel` | Listens | No | Aborts in-flight fetch or query for the target element/key. A paged request (`query.offset` set) is tracked per `(targetEl, offset)` and is not reached by `targetEl` alone. | `{ targetEl?: Element, key?: String, meta?: Object }` |
 | `ln-api-connector:request-create` | Listens | No | Triggers document create request. | `{ data: Object, tempId: String, url?: String, idempotencyKey?: String, meta?: Object }` |
 | `ln-api-connector:request-update` | Listens | No | Triggers document PUT edit. | `{ id: ID, data: Object, expected_version?: Int, url?: String, idempotencyKey?: String, meta?: Object }` |
 | `ln-api-connector:request-delete` | Listens | No | Triggers document DELETE. | `{ id: ID, url?: String, idempotencyKey?: String, meta?: Object }` |
@@ -530,7 +530,7 @@ Every `ln-ajax:start` is followed by exactly one of `ln-ajax:complete` or `ln-aj
 | `ln-api-connector:updated` | Emits | No | Dispatched upon successful document edit. | `{ record: Object, id: ID, message: String, meta: Object }` |
 | `ln-api-connector:deleted` | Emits | No | Dispatched upon successful document deletion. | `{ response: Object, id: ID, message: String, meta: Object }` |
 | `ln-api-connector:bulk-deleted` | Emits | No | Dispatched upon successful bulk deletion. | `{ response: Object, ids: Array, message: String, meta: Object }` |
-| `ln-api-connector:error` | Emits | No | Dispatched upon HTTP or network errors (silent on AbortError). | `{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }` |
+| `ln-api-connector:error` | Emits | No | Dispatched upon HTTP or network errors (silent on AbortError). A failed page query carries the request's `meta` (including `kind` and `offset`). | `{ action: String, error: String, status: Int, conflictData?: Object, meta: Object }` |
 | `ln-api-connector:config-changed` | Emits | No | Dispatched whenever `refreshConfig()` reloads URL, path, and header configuration (including on init). | `{ baseUrl: String, path: String, headers: Object, paramKeys: Object }` |
 
 ---
@@ -1199,10 +1199,11 @@ async function performSecureOperation() {
 - **Summary:** Orchestrates local IndexedDB cache sync with remote database drivers and queues.
 
 > **Classification:** ⚙️ Coordinator (Coordinator / Orchestrator)  
-> Applied to a parent container (`<ul data-ln-data-coordinator hidden>`) enclosing a `data-ln-data-store` and a
-> `data-ln-api-connector`. It catches store staleness and pagination requests to dispatch fetch events to the connector,
-> populating the store with server responses (`request-populate`). On store data mutations, it executes local queries and
-> dispatches `set-data` events directly to bound view elements (`data-ln-table-source`, `data-ln-list-source`).
+> Applied to a parent container (`<ul data-ln-data-coordinator hidden>`) enclosing a `data-ln-api-connector` and, optionally, a
+> `data-ln-data-store`. With a store it catches store staleness and pagination requests to dispatch fetch events to the connector,
+> populating the store with server responses (`request-populate`); on store data mutations it executes local queries. Without a store,
+> views are served from the connector's answers alone. In both topologies it dispatches `set-data` events directly to bound view
+> elements (`data-ln-table-source`, `data-ln-list-source`).
 
 #### Minimal HTML Markup & Usage:
 ### Base HTML Markup
@@ -1341,14 +1342,14 @@ When users type, filter, or sort, `ln-search`/`ln-filter`/`ln-sort` update the U
 | `ln-chart:request-data` | Listens | No | Query from a chart to fetch an ordered dataset. | `{ target: HTMLElement, sort, filters, search }` |
 | `ln-options:request-data` | Listens | No | Query from an `<select>`/options binder to fetch all records. | `{ target: HTMLElement }` |
 | `ln-stat:request-count` | Listens | No | Query from a stat/counter binder to fetch a record count. | `{ target: HTMLElement, filters?: Object }` |
-| `ln-{kind}:set-data` | Emits | No | Pattern row — `{kind}` is `table`, `list`, or `chart`, matching the requesting view's own namespace. Delivers the resolved query result. When a cache **and** a transport are both present, this is dispatched **twice** for one query: the cache answers immediately with `provisional: true`, then the transport's authoritative answer supersedes it with `provisional: false`. See *The two-phase answer* below. | `{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number, provisional?: Boolean }` |
+| `ln-{kind}:set-data` | Emits | No | Pattern row — `{kind}` is `table`, `list`, or `chart`, matching the requesting view's own namespace. Delivers the resolved query result: from the store when it can serve the read, otherwise the connector's `:fetched` answer. | `{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }` |
 | `ln-{kind}:set-loading` | Emits | No | Pattern row — `{kind}` is `table`, `list`, or `chart`. Dispatched instead of `set-data` while the store hasn't finished loading yet. | `{ loading: Boolean }` |
-| `ln-{kind}:page-failed` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Reports that a windowed page query failed, so the view can release that offset for a later retry. | `{ offset: Number }` |
+| `ln-{kind}:page-failed` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Dispatched to the requesting view when a connector `:error` arrives for a view query whose `meta` carries `offset` (a windowed page), so the view can release that offset for a later request. There is no automatic retry. | `{ offset: Number }` |
 | `ln-{kind}:request-revalidate` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Sent to a windowed view on a store change in place of `set-data`: the view refreshes through its own window cache rather than being served store rows. | *(no payload)* |
 | `ln-{kind}:request-invalidate` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Sent to a windowed view when the coordinator's query changes: the view drops its window and restarts from page 0. | *(no payload)* |
 | `ln-options:set-data` | Emits | No | Delivers all records to a bound options binder. | `{ data: Array }` |
 | `ln-stat:set-count` | Emits | No | Delivers the resolved count to a bound stat binder. | `{ count: Number }` |
-| `ln-data-store:ready` / `:loaded` / `:created` / `:updated` / `:deleted` | Listens | No | Store change notifications — on any of these, re-queries and re-serves all non-windowed bound view elements using their last cached query. Windowed views (carrying `data-ln-table-window` / `data-ln-list-window`) instead receive `ln-{kind}:request-revalidate` and refresh through their own window cache, since a partial store cannot answer an offset-based slice. | *(handler-internal; no detail consumed)* |
+| `ln-data-store:ready` / `:loaded` / `:created` / `:updated` / `:deleted` | Listens | No | Store change notifications — on any of these, re-queries and re-serves all non-windowed bound view elements using their last cached query. Windowed views (carrying `data-ln-table-window` / `data-ln-list-window`) instead receive `ln-{kind}:request-revalidate` and refresh through their own window cache. | *(handler-internal; no detail consumed)* |
 | `ln-data-store:synced` | Listens | No | Same re-serve as above, but only when `detail.changed` is true. | `{ changed: Boolean }` |
 
 **Write-Pipeline / Infrastructure Wiring**
@@ -1361,31 +1362,16 @@ When users type, filter, or sort, `ln-search`/`ln-filter`/`ln-sort` update the U
 | `ln-data-store:request-sync-failed` | Emits | No | Dispatched to the store when the connector's sync fails. | `{ error: String, status: Number }` |
 | `ln-api-queue:request-remap` | Emits | No | Re-keys a queued chain from a temp ID to the server-issued ID once a create resolves. | `{ oldKey: String, newId: ID }` |
 | `ln-api-queue:resolve-create` | Emits | No | A queued create was confirmed by the server — the queue deletes the entry and remaps its siblings in one transaction. | `{ entryId: ID, oldKey: String, newId: ID }` |
-| `ln-data-store:request-page` | Listens | No | Windowed store residency: forwards the missing page to the connector as `request-query`. | `{ store: String, offset: Number, limit: Number, query: Object, queryGen: Number }` |
 | `ln-data-store:mutation-error` | Listens | No | Rejects the pending store-mutation receipt matched by `requestId`. | `{ store: String, action: String, requestId: String, error: Error }` |
-| `ln-api-queue:failed` | Listens | No | Terminal retry-exhaustion notification from the queue — surfaces a `network` toast via the dict. | `{ entryId: ID, chainKey: String, attempts: Number }` |
-| `ln-api-connector:fetched` / `:created` / `:updated` / `:deleted` / `:bulk-deleted` / `:error` | Listens | No | Connector response handling (also namespaced under `ln-couchdb-connector:...` and `ln-websocket-connector:...` — generalized across concrete connector implementations). Reconciles the store, fires toasts, and drives queue ack/nack. A socket beside a REST connector delivers its pushes here as `:fetched`. | *(shape per response — see [`ln-api-connector.md`](./ln-api-connector.md) Events API)* |
+| `ln-api-queue:failed` | Listens | No | Terminal retry-exhaustion notification from the queue — emits `ln-data-coordinator:error` with `operation: 'queue-failed'`. | `{ entryId: ID, chainKey: String, attempts: Number }` |
+| `ln-api-connector:fetched` / `:created` / `:updated` / `:deleted` / `:bulk-deleted` / `:error` | Listens | No | Connector response handling (also namespaced under `ln-couchdb-connector:...` and `ln-websocket-connector:...` — generalized across concrete connector implementations). Reconciles the store, fires toasts, and drives queue ack/nack. A socket beside a REST connector delivers its pushes here as `:fetched`. With no store child, a view query's `:fetched` answer is delivered straight to the requesting view and `:created` / `:updated` / `:deleted` / `:bulk-deleted` confirmations re-serve all bound views. An `:error` whose `meta` carries `kind` and `offset` is additionally reported to that view as `ln-{kind}:page-failed`. | *(shape per response — see [`ln-api-connector.md`](./ln-api-connector.md) Events API)* |
 | `ln-websocket-connector:connected` | Listens | No | Catch-up after a (re)opened socket: runs `store.forceSync()`, a delta since `lastSyncedAt` over the request connector. | `{ url: String }` |
 
-**The two-phase answer**
+**Read routing**
 
-When both a cache and a transport are present, a query is answered **twice**. The cache
-answers immediately, flagged `provisional: true`; the view renders those rows and keeps its
-loading indicator on. The transport then answers authoritatively, the result is ingested into
-the cache and delivered with `provisional: false`, and the view clears the indicator.
+A query is answered once: by the store when it holds records that can answer it and has not declined local queries (`data-ln-data-store-no-local-query`), otherwise by the connector. **Absence of a participant is a topology, not an error.**
 
-This is a protocol, not an optimisation: it is what makes a search feel instant on cached
-data while staying correct against the server. It is **not** a merge of two result sets — it
-is one answer arriving twice, the second superseding the first.
-
-`queryGen` is the generation counter that makes this safe. Each dual-dispatch query takes the
-next generation for that view element; an answer carrying a stale generation is discarded
-rather than overwriting a newer one. A store managing its own residency window
-(`data-ln-data-store-window`) opts itself out, because it already runs this exchange through
-`ln-data-store:request-page` and a second parallel request would race it.
-
-A topology with only one of the two answers once: cache-only serves locally, transport-only
-goes straight to the connector. **Absence of a participant is a topology, not an error.**
+**Without a store.** The coordinator serves reads from the connector alone: `set-loading true`, `request-query`, then the ingress-mapped `:fetched` answer delivered as `set-loading false` + `set-data` (options: `ln-options:set-data`; stat: `ln-stat:set-count`). Writes dispatch the remote request only, and a connector confirmation re-serves the bound views. A store whose IndexedDB initialization failed is treated the same way.
 
 ---
 
@@ -1475,8 +1461,6 @@ Use when backend pre-populates dataset into the initial page response. The store
 | `data-ln-data-store-stale` | Root | `Integer` \| `"never"` \| `-1` | `300` | Seconds before data is considered stale. |
 | `data-ln-data-store-indexes` | Root | `String` | `""` | Comma-separated IndexedDB index fields. |
 | `data-ln-data-store-search-fields` | Root | `String` | `""` | Comma-separated list of text fields for search. |
-| `data-ln-data-store-window` | Root | `Integer` | `1000` | Enables server-side windowing. Presence activates windowed mode; the value bounds how many record positions stay resident. |
-| `data-ln-data-store-window-page` | Root | `Integer` | `200` | Page size the windowed store requests from the backend. Becomes the `limit` on each `ln-data-store:request-page` event. |
 | `data-ln-data-store-no-local-query` | Root | Flag / Valueless | *Absent* | Opts out of answering reads from the local cache; queries wait for the server. |
 | `data-ln-data-store-frozen` | Root | `String` | *Absent* | **Runtime-written, dev-only.** Set by the component when `data-ln-data-store` or `-indexes` is edited after init, naming the attribute that was touched. Surfaced as a diagnostic under `[data-ln-debug]`. Never authored. |
 
@@ -1512,10 +1496,6 @@ Exposed on the root element via `el.lnDataStore`:
 | `ln-data-store:request-delete` | Listens | No | Optimistically deletes a record. | `{ id: ID }` |
 | `ln-data-store:request-bulk-delete` | Listens | No | Optimistically deletes multiple records. | `{ ids: Array }` |
 | `ln-data-store:request-sync-failed` | Listens | No | The coordinator reports a failed connector sync. Clears `isSyncing` and re-emits it as `ln-data-store:sync-error`. | `{ error: String, status: Number }` |
-| `ln-search:change` | Listens | Yes (`preventDefault`) | Updates `query.search` and dispatches `ln-data-store:query-changed`. | `{ term: String }` |
-| `ln-filter:change` | Listens | Yes (`preventDefault`) | Updates `query.filters[key]` and dispatches `ln-data-store:query-changed`. | `{ key: String, values: Array, targetId: String }` |
-| `ln-sort:change` | Listens | Yes (`preventDefault`) | Updates `query.sort` and dispatches `ln-data-store:query-changed`. | `{ field: String, direction: String }` |
-| `ln-data-store:query-changed` | Emits | No | Emitted when store filters, search, or sort are modified. | `{ store: String, query: { filters: Object, search: String, sort: Object\|null } }` |
 | `ln-data-store:request-remote-sync` | Emits | No | Triggers network sync request. | `{ since: Number\|null }` |
 | `ln-data-store:initialized` | Emits | No | Emitted when store IndexedDB is configured. | `{ store: String, hasCache: Boolean, lastSyncedAt: Number\|null, count: Number }` |
 | `ln-data-store:ready` | Emits | No | Emitted when data is ready for viewing. | `{ store: String, count: Number, source: 'cache'\|'server' }` |
@@ -1529,7 +1509,6 @@ Exposed on the root element via `el.lnDataStore`:
 | `ln-data-store:sync-error` | Emits | No | A connector sync or local cache commit failed; `isSyncing` is cleared so a later retry can run. | `{ store: String, error: String, status?: Number }` |
 | `ln-data-store:blocked` | Emits | No | Emitted on `document` if an IndexedDB version upgrade is blocked by open connections in other tabs. | `{ db: String }` |
 | `ln-data-store:mutation-error` | Emits | No | A local mutation failed. `requestId` correlates it with the coordinator's request. | `{ store: String, action: String, requestId: String, error: Error }` |
-| `ln-data-store:request-page` | Emits | No | Windowed residency: pages inside the sliding window are missing and must be fetched from the server. | `{ store: String, offset: Number, limit: Number, query: Object, queryGen: Number }` |
 
 ---
 
@@ -4928,7 +4907,7 @@ In SSR mode, the table is functional immediately with the server-rendered markup
   <template data-ln-table-empty>
     <div class="ln-table__empty-state">
       <h3>No matches found</h3>
-      <button type="button" data-ln-table-clear>Clear Filters</button>
+      <button type="button" class="btn btn-ghost" data-ln-table-clear>Clear Filters</button>
     </div>
   </template>
 
@@ -5132,6 +5111,10 @@ Use when the backend embeds the entire dataset (e.g. 10,000 records) into `<scri
 | `data-ln-table` | Root container | `String` | - | Identifies the table. The value names generated events. Must have a unique `id`. |
 | `data-ln-table-source` | Root container | `String` | - | Enables Data-Driven mode. Value maps to the target data store ID. |
 | `data-ln-table-selectable` | Root container | `Boolean` | `false` | Enables row multi-selection and checkboxes. |
+| `data-ln-table-window` | Root container | `Integer` (min 10) | `1000` (bare attribute) | Opt-in server-side sliding window (Data-Driven mode only; ignored on an SSR table). Value is the resident-row cap: the table requests pages by position and evicts rows that leave the window. Header select-all is hidden (`hidden`); per-row selection survives eviction. |
+| `data-ln-table-window-page` | Root container | `Integer` (min 5) | `200` | Rows requested per page in windowed mode. |
+| `data-ln-table-window-threshold` | Root container | `Integer` (min 0) | `25` | Prefetch margin in rows before an unloaded page boundary in windowed mode. |
+| `data-ln-table-count` | Root container | `Integer` (min 0) | - | Declared unfiltered grand total for a windowed table seeded with resident rows. |
 | `data-ln-table-col` | `<th>` | `String` | - | Maps a table header to a JSON payload field. |
 | `data-ln-value` | `<td>` | `String` | - | Raw computer-readable sorting value, ignoring HTML formatting. *(Processed externally via `ln-core.js` / `fill()`)* |
 | `data-ln-table-col-filter` | `<button>` | - | - | Receives `.ln-filter-active` styling when filters are active on the column. |
@@ -5157,15 +5140,18 @@ Use when the backend embeds the entire dataset (e.g. 10,000 records) into `<scri
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-table:set-data` | Listens | No | Populates the table with a raw dataset (Data-Driven mode). Triggers rendering and updates total/filtered counts. | `{ data: Array, total: Number, filtered: Number }` |
-| `ln-table:set-loading` | Listens | No | Updates loading state (Data-Driven mode). Prior to initial data load, renders the loading template into `<tbody>` and sets `aria-busy="true"`. During subsequent queries, preserves existing rows, toggles `.ln-table--loading`, and reveals the `[data-ln-table-loading]` footer spinner. | `{ loading: Boolean }` |
+| `ln-table:set-data` | Listens | No | Populates the table with a raw dataset (Data-Driven mode). Triggers rendering and updates total/filtered counts. Windowed mode splices the page into the window cache at `offset`; a page whose `queryGen` is stale is dropped. | `{ data: Array, total: Number, filtered: Number }`; windowed: also `{ offset: Number, queryGen: Number }` |
+| `ln-table:set-loading` | Listens | No | Updates loading state (Data-Driven mode). Prior to initial data load, renders the loading template into `<tbody>` and sets `aria-busy="true"`. During subsequent queries, preserves existing rows, toggles `.ln-table--loading`, and reveals the `[data-ln-table-loading]` footer spinner. Windowed mode ignores `{ loading: true }` after the first load: a scroll page fetch is shown by placeholder rows, and a query change dims the table itself. | `{ loading: Boolean }` |
+| `ln-table:request-invalidate` | Listens | No | Windowed mode only. Sent by [`ln-data-coordinator`](./ln-data-coordinator.md) on a query change: the window restarts at page 0 under a new `queryGen`; current rows stay visible until the first accepted page. | `{ query: Object }` |
+| `ln-table:request-revalidate` | Listens | No | Windowed mode only. Sent by `ln-data-coordinator` on a data change: re-requests the page at the current scroll position under a new `queryGen`; rows stay visible until the swap. | `{ query: Object }` |
+| `ln-table:page-failed` | Listens | No | Windowed mode only. Sent by [`ln-data-coordinator`](./ln-data-coordinator.md) when a page query failed at the connector: the table releases that offset from its window cache's in-flight set so a later scroll pass can request it again; there is no automatic retry. | `{ offset: Number }` |
 | `ln-table:set-search` | Listens | No | Applies a search term. Data-Driven mode emits `ln-table:search` and requests fresh data; SSR mode filters in memory and emits `ln-table:filter`. | `{ query: String }` (`term` is read when `query` is absent) |
 | `ln-search:change` | Listens | Yes (`preventDefault`) | Consumed directly on itself in SSR mode only, triggering local in-memory search matching. In Data-Driven mode `ln-table-coordinator` intercepts this event on the search input's target and dispatches `ln-table:set-search` instead. | `{ term: String }` |
 | `ln-filter:change` | Listens | Yes (`preventDefault`) | Consumed directly on itself in SSR mode only (`!this.isDataDriven`), applying column filters to the in-memory `_data` cache. | `{ key: String, values: Array, targetId: String }` |
 | `ln-sort:change` | Listens | No | Column sort intent from [`ln-sort`](./ln-sort.md). SSR mode re-orders in-memory rows locally and dispatches `ln-table:sorted`; Data-Driven mode sets `currentSort` and dispatches a fresh `ln-table:request-data`. `ln-table` always calls `preventDefault()`, superseding `ln-sort`'s own default DOM-reorder fallback. | `{ field: String\|null, column: Number\|null, direction: 'asc'\|'desc'\|'none', targetId: String }` |
 | `ln-table:ready` | Emits | No | Fired once after initial row hydration/parsing completes (SSR and Data-Driven modes). | `{ total: Number }` |
 | `ln-table:rendered` | Emits | No | Fired after `ln-table:set-data` finishes rendering (Data-Driven mode). | `{ table: String, total: Number, visible: Number }` |
-| `ln-table:request-data` | Emits | No | Requests a fresh data payload from the coordinator whenever sort/filter/search state changes, including the initial mount (Data-Driven mode). | `{ table: String, sort: Object\|null, filters: Object, search: String }` |
+| `ln-table:request-data` | Emits | No | Requests a fresh data payload from the coordinator whenever sort/filter/search state changes, including the initial mount (Data-Driven mode). Windowed mode emits one request per page. | `{ table: String, sort: Object\|null, filters: Object, search: String }`; windowed: also `{ offset: Number, limit: Number, queryGen: Number }` |
 | `ln-table:sorted` | Emits | No | Emitted after applying a local sort (SSR mode). | `{ column: Number, direction: String\|null, matched: Number, total: Number }` |
 | `ln-table:filter` | Emits | No | Emitted after applying search, column filter, or clear actions locally (SSR mode). | `{ term: String, matched: Number, total: Number }` |
 | `ln-table:search` | Emits | No | Emitted when receiving an `ln-table:set-search` command (dispatched by `ln-table-coordinator` in response to `ln-search:change`), before requesting fresh data (Data-Driven mode). | `{ table: String, query: String }` |
@@ -5690,7 +5676,7 @@ This component emits and listens to no custom ln-* events.
 <form data-ln-translations data-ln-translations-default="en">
 	<header>
 		<h3>Company Info</h3>
-		<div class="ln-translations__actions">
+		<div class="actions">
 			<ul data-ln-translations-active></ul>
 			<div data-ln-dropdown>
 				<button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu" aria-label="Add translation">
@@ -5745,7 +5731,7 @@ When translations are already rendered server-side, mark each pre-rendered field
 <form data-ln-translations data-ln-translations-default="en">
 	<header>
 		<h3>Standard Details</h3>
-		<div class="ln-translations__actions">
+		<div class="actions">
 			<ul data-ln-translations-active></ul>
 			<div data-ln-dropdown>
 				<button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu-2" aria-label="Add translation">

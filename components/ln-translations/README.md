@@ -33,7 +33,7 @@ The JavaScript source follows the Two-Tier Archetype: domain logic and algorithm
 <form data-ln-translations data-ln-translations-default="en">
 	<header>
 		<h3>Company Info</h3>
-		<div class="ln-translations__actions">
+		<div class="actions">
 			<ul data-ln-translations-active></ul>
 			<div data-ln-dropdown>
 				<button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu" aria-label="Add translation">

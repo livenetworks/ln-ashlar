@@ -49,19 +49,31 @@
 
 @mixin translations-actions {
 	@include inline-flex;
-	@include items-center;
+	// Height set once here; children stretch (default align-items).
+	block-size: var(--size-lg);
 	--gap: var(--size-xs);
 	gap: var(--gap);
 	margin-inline-start: auto;
+}
+
+// ─── Dropdown inside header actions ──────────────────────────────
+
+@mixin translations-dropdown {
+	@include flex; // Lets the add button stretch to the actions height.
 }
 
 // ─── Active translations list ────────────────────────────────────
 
 @mixin translations-active-list {
 	@include inline-flex;
-	@include items-center;
 	--gap: var(--size-xs);
 	gap: var(--gap);
+}
+
+// ─── Active list item ────────────────────────────────────────────
+
+@mixin translations-active-item {
+	@include flex; // Block li would not stretch its <p> chip.
 }
 
 // ─── Badge with flag ─────────────────────────────────────────────
@@ -71,9 +83,8 @@
 	@include items-center;
 	--gap: var(--size-xs);
 	gap: var(--gap);
-	--padding-y: var(--size-2xs);
 	--padding-x: var(--size-xs);
-	padding-block: var(--padding-y);
+	// No vertical padding: height comes from the stretched parent.
 	padding-inline: var(--padding-x);
 	@include text-xs;
 	@include font-semibold;
@@ -113,7 +124,7 @@
 	@include inline-flex;
 	@include items-center;
 	@include justify-center;
-	@include size(1.5rem);
+	aspect-ratio: 1; // Width = stretched height.
 	@include rounded-sm;
 	@include cursor-pointer;
 	@include transition-fast;

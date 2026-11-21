@@ -210,7 +210,7 @@
 	}
 
 	// Dynamic content width: expands when sidebar is closed so the user gains working surface
-	--app-content-max-w: var(--max-w-container-expanded, 96rem);
+	--app-content-max-w: var(--max-w-container-expanded, 100%);
 
 	// Open drawer on desktop: reserve its width on the parent so content
 	// and footer shift together (padding, not child margin — no overflow).
