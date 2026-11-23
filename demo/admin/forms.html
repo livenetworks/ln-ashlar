@@ -44,9 +44,9 @@
 	(function () {
 		var KEY = 'ln-demo-engine';
 		var HREF = {
-			ashlar: 'dist/admin.css?v=2.2.6',
-			tailwind: 'dist/admin-tailwind.css?v=2.2.6',
-			relaxed: 'dist/admin-relaxed.css?v=2.2.6'
+			ashlar: 'dist/admin.css?v=2.2.7',
+			tailwind: 'dist/admin-tailwind.css?v=2.2.7',
+			relaxed: 'dist/admin-relaxed.css?v=2.2.7'
 		};
 		var root = document.documentElement;
 		var engine = 'ashlar';
@@ -99,7 +99,7 @@
 		document.addEventListener('DOMContentLoaded', markActive);
 	})();
 	</script>
-	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css?v=2.2.6">
+	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css?v=2.2.7">
 		<script src="../dist/ln-ashlar.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
 </head>
@@ -303,7 +303,7 @@
 			</main>
 
 			<footer>
-				<small>ashlar-gui v2.2.6</small>
+				<small>ashlar-gui v2.2.7</small>
 			</footer>
 		</aside>
 		<script>
@@ -574,13 +574,13 @@ form.lnForm.reset();</code></pre>
 				<section class="section-card" data-demo-html>
 					<header><h3>Filled Pills (Joined Group)</h3></header>
 					<script type="text/plain" data-demo-scss>
-// Horizontal filled button segmented control
+// Filled pills: one wrapping group that owns the corners
 ul.pills {
 	@include pills;
 }
 					</script>
 					<main>
-						<p>Joined horizontal segmented control using <code>ul.pills</code>. Corner radiuses are automatically adjusted for a cohesive, joined horizontal block.</p>
+						<p>Segmented control using <code>ul.pills</code>. The options form one group that wraps onto further rows when they do not fit; the group owns the outer corner radius and clips its options, so the corners stay round however the rows break.</p>
 
 						<h4>Radio selection</h4>
 						<ul class="pills">
@@ -634,7 +634,7 @@ ul.pills {
 				<section class="section-card" data-demo-html>
 					<header><h3>Outline Pills</h3></header>
 					<script type="text/plain" data-demo-scss>
-// Joined horizontal outline segmented control
+// Outline pills: one wrapping group that owns the corners
 ul.pills-outline {
 	@include pills-outline;
 }
@@ -645,7 +645,7 @@ label.pill-outline {
 }
 					</script>
 					<main>
-						<p>Outline variant with transparent background, visible input indicator, and border highlighting. Can be grouped horizontally or used as a standalone label choice.</p>
+						<p>Outline variant with transparent background, visible input indicator, and border highlighting. Can be grouped into one wrapping group or used as a standalone label choice.</p>
 
 						<h4>Grouped Outline (<code>ul.pills-outline</code>)</h4>
 						<ul class="pills-outline">
@@ -684,6 +684,60 @@ label.pill-outline {
 								</label>
 							</li>
 						</ul>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     SECTION: WRAPPING PILL GROUPS
+				     ========================================== -->
+				<section id="demo-pills-wrap" class="section-card" data-demo-html>
+					<header><h3>Wrapping Pill Groups</h3></header>
+					<script type="text/plain" data-demo-scss>
+// The group wraps and owns the corners
+ul.pills {
+	@include pills;
+}
+
+ul.pills-outline {
+	@include pills-outline;
+}
+					</script>
+					<main>
+						<p>Pills form one group that wraps onto further rows when the options do not fit. The group owns the outer corners and clips its options, rows stretch to the full width and the option text is centred. A <code>&lt;fieldset&gt;</code> with a <code>&lt;legend&gt;</code> names the group; the fieldset has no border and the legend reads as a field label.</p>
+
+						<fieldset>
+							<legend>Departments</legend>
+							<ul class="pills">
+								<li><label><input type="checkbox" name="pill-dept[]" value="engineering" checked> Engineering</label></li>
+								<li><label><input type="checkbox" name="pill-dept[]" value="human-resources"> Human Resources</label></li>
+								<li><label><input type="checkbox" name="pill-dept[]" value="finance"> Finance</label></li>
+								<li><label><input type="checkbox" name="pill-dept[]" value="marketing" checked> Marketing</label></li>
+								<li><label><input type="checkbox" name="pill-dept[]" value="legal"> Legal</label></li>
+								<li><label><input type="checkbox" name="pill-dept[]" value="operations"> Operations</label></li>
+								<li><label><input type="checkbox" name="pill-dept[]" value="support"> Customer Support</label></li>
+								<li><label><input type="checkbox" name="pill-dept[]" value="design"> Product Design</label></li>
+								<li><label><input type="checkbox" name="pill-dept[]" value="quality"> Quality Assurance</label></li>
+								<li><label><input type="checkbox" name="pill-dept[]" value="procurement"> Procurement</label></li>
+								<li><label><input type="checkbox" name="pill-dept[]" value="facilities"> Facilities</label></li>
+								<li><label><input type="checkbox" name="pill-dept[]" value="security"> Information Security</label></li>
+							</ul>
+						</fieldset>
+
+						<fieldset>
+							<legend>Regions</legend>
+							<ul class="pills-outline">
+								<li><label><input type="checkbox" name="pill-region[]" value="north-america" checked> North America</label></li>
+								<li><label><input type="checkbox" name="pill-region[]" value="south-america"> South America</label></li>
+								<li><label><input type="checkbox" name="pill-region[]" value="western-europe"> Western Europe</label></li>
+								<li><label><input type="checkbox" name="pill-region[]" value="eastern-europe"> Eastern Europe</label></li>
+								<li><label><input type="checkbox" name="pill-region[]" value="middle-east"> Middle East</label></li>
+								<li><label><input type="checkbox" name="pill-region[]" value="africa"> Africa</label></li>
+								<li><label><input type="checkbox" name="pill-region[]" value="central-asia"> Central Asia</label></li>
+								<li><label><input type="checkbox" name="pill-region[]" value="east-asia" checked> East Asia</label></li>
+								<li><label><input type="checkbox" name="pill-region[]" value="south-asia"> South Asia</label></li>
+								<li><label><input type="checkbox" name="pill-region[]" value="oceania"> Oceania</label></li>
+							</ul>
+						</fieldset>
 					</main>
 				</section>
 
@@ -1635,7 +1689,7 @@ input:focus-visible {
 		<!-- Footer -->
 		<footer class="app-footer">
 			<span>ashlar-gui &copy; 2026 LiveNetworks</span>
-			<span>ln-ashlar v2.2.6</span>
+			<span>ln-ashlar v2.2.7</span>
 		</footer>
 		</main>
 	</div><!-- /.app-wrapper -->

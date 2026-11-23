@@ -4,12 +4,22 @@
 
 // Layout — grid, stack, container
 
-// Respond to available parent width, including sidebars and panel gutters.
-// The min() allows a single item to shrink below its preferred minimum.
-@mixin grid-auto($min: var(--grid-item-min-width)) {
+@mixin _grid-intrinsic($repeat, $min) {
 	display: grid;
 	gap: var(--gap);
-	grid-template-columns: repeat(auto-fit, minmax(min(100%, #{$min}), 1fr));
+	grid-template-columns: repeat(#{$repeat}, minmax(min(100%, #{$min}), 1fr));
+}
+
+// Respond to available parent width, including sidebars and panel gutters.
+// The min() allows a single item to shrink below its preferred minimum.
+//   grid-auto: auto-fit — collapses empty tracks so items fill the row (KPI/banner rows).
+//   grid-fill: auto-fill — preserves empty tracks so items keep their slot width (card collections).
+@mixin grid-auto($min: var(--grid-item-min-width)) {
+	@include _grid-intrinsic(auto-fit, $min);
+}
+
+@mixin grid-fill($min: var(--grid-item-min-width)) {
+	@include _grid-intrinsic(auto-fill, $min);
 }
 
 @mixin _grid-base {
@@ -19,34 +29,52 @@
 	grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
-@mixin grid {
+@mixin _grid-bp($mq, $cq, $container) {
+	@if $container == true {
+		@include cq-up($cq) {
+			@content;
+		}
+	} @else if $container {
+		@include cq-up($cq, $container) {
+			@content;
+		}
+	} @else {
+		@include mq-up($mq) {
+			@content;
+		}
+	}
+}
+
+// Explicit column grids. Pass a container name (e.g. `@include grid(content)`)
+// or `true` (anonymous container) to query `@container` instead of viewport `@media`.
+@mixin grid($container: null) {
 	@include _grid-base;
 
-	@include mq-up(md) {
+	@include _grid-bp(md, compact, $container) {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
-	@include mq-up(lg) {
+	@include _grid-bp(lg, medium, $container) {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
 }
 
-@mixin grid-2 {
+@mixin grid-2($container: null) {
 	@include _grid-base;
 
-	@include mq-up(md) {
+	@include _grid-bp(md, compact, $container) {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
 
-@mixin grid-4 {
+@mixin grid-4($container: null) {
 	@include _grid-base;
 
-	@include mq-up(md) {
+	@include _grid-bp(md, compact, $container) {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
-	@include mq-up(lg) {
+	@include _grid-bp(lg, medium, $container) {
 		grid-template-columns: repeat(4, minmax(0, 1fr));
 	}
 }

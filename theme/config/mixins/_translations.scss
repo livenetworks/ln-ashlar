@@ -23,6 +23,11 @@
 	background-repeat: no-repeat;
 	background-size: var(--size-md-up) auto;
 	background-position: var(--size-sm-up) center;
+
+	& + [data-ln-translatable-lang] {
+		--margin-block: var(--size-sm);
+		margin-block-start: var(--margin-block);
+	}
 }
 
 // ─── Dropdown menu item: flag via ::before ───────────────────────
@@ -42,6 +47,22 @@
 		background-repeat: no-repeat;
 		background-position: center;
 		flex-shrink: 0;
+	}
+}
+
+// ─── Form header ────────────────────────────────────────────────
+
+@mixin translations-header {
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	--gap: var(--size-sm-up);
+	gap: var(--gap);
+	--margin-block: var(--size-md);
+	margin-bottom: var(--margin-block);
+
+	:is(h1, h2, h3, h4, h5, h6) {
+		margin: 0;
 	}
 }
 
@@ -68,12 +89,14 @@
 	@include inline-flex;
 	--gap: var(--size-xs);
 	gap: var(--gap);
+	align-items: stretch; // panel-header sets items-center on every header ul
 }
 
 // ─── Active list item ────────────────────────────────────────────
 
 @mixin translations-active-item {
 	@include flex; // Block li would not stretch its <p> chip.
+	align-items: stretch; // panel-header sets items-center on every header li; chip must fill height
 }
 
 // ─── Badge with flag ─────────────────────────────────────────────
@@ -83,9 +106,9 @@
 	@include items-center;
 	--gap: var(--size-xs);
 	gap: var(--gap);
-	--padding-x: var(--size-xs);
 	// No vertical padding: height comes from the stretched parent.
-	padding-inline: var(--padding-x);
+	// Start padding clears the 1rem flag icon at --size-xs; end padding stays compact.
+	padding-inline: var(--size-lg) var(--size-xs);
 	@include text-xs;
 	@include font-semibold;
 	@include rounded-sm;
@@ -95,21 +118,30 @@
 	background-repeat: no-repeat;
 	background-position: var(--size-xs) center; // Intrinsic flag-icon position, not shell rhythm.
 	background-size: 1rem auto;
-	--padding-x: var(--size-lg);
-	padding-inline-start: var(--padding-x);
 }
 
 // ─── Badge remove button ─────────────────────────────────────────
 
 @mixin translations-badge-remove {
+	--btn-bg: transparent;
+	--btn-fg: inherit;
+	--btn-border: transparent;
+	--btn-bg-hover: transparent;
+	--btn-fg-hover: hsl(var(--color-error));
+	--btn-border-hover: transparent;
+	--btn-padding-y: 0;
+	--btn-padding-x: 0;
+	--btn-line-height: 1;
+	@include inline-flex;
+	@include items-center;
+	@include justify-center;
 	background: none;
 	border: none;
+	min-height: 0;
 	@include cursor-pointer;
 	@include text-sm;
 	@include font-bold;
 	color: inherit;
-	--btn-padding-y: 0;
-	--btn-padding-x: 0;
 	line-height: 1;
 	@include transition-fast;
 
@@ -121,15 +153,29 @@
 // ─── Trigger button ──────────────────────────────────────────────
 
 @mixin translations-add-button {
+	--btn-padding-y: 0;
+	--btn-padding-x: 0;
+	--btn-line-height: 1;
+	--btn-bg: hsl(var(--color-primary) / 0.08);
+	--btn-fg: hsl(var(--color-primary));
+	--btn-border: transparent;
+	--btn-bg-hover: hsl(var(--color-primary) / 0.15);
+	--btn-fg-hover: hsl(var(--color-primary));
+	--btn-border-hover: transparent;
 	@include inline-flex;
 	@include items-center;
 	@include justify-center;
 	aspect-ratio: 1; // Width = stretched height.
+	min-height: 0;
 	@include rounded-sm;
 	@include cursor-pointer;
 	@include transition-fast;
 	@include tinted-surface(0.08);
 	border: none;
+
+	svg.ln-icon {
+		--icon-size: 1rem; // Fits cleanly inside block-size: var(--size-lg) square.
+	}
 
 	&:hover {
 		@include tinted-surface(0.15);

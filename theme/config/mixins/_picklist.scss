@@ -17,9 +17,8 @@
 //         > li > label > input         one checkbox pill
 //
 // Deliberately `check-list-outline`, NOT `check-list`: @mixin pill
-// hides the input with `display: none`, which drops the checkbox out
-// of the tab order — and here the checkbox IS the control, not a
-// decorative marker. `pill-outline` keeps it visible and focusable.
+// visually hides the input, and here the checkbox IS the control, not
+// a decorative marker. `pill-outline` keeps it visible.
 //
 // Usage:
 //   [data-ln-picklist] { @include picklist; }
@@ -49,7 +48,7 @@
 		overscroll-behavior: contain;
 	}
 
-	// The input stays visible (pill-outline reverts pill's display:none),
+	// The input stays visible (pill-outline undoes pill's hiding),
 	// so the ring belongs on the pill that surrounds it.
 	[data-ln-picklist-list] li label:has(> input:focus-visible) {
 		@include focus-ring;

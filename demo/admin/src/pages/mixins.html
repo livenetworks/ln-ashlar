@@ -573,9 +573,11 @@ table {
 								<tr><th>Mixin</th><th>Columns</th><th>Responsive</th></tr>
 							</thead>
 							<tbody>
-								<tr><td><code>@include grid</code></td><td>1 &rarr; 2 &rarr; 3</td><td>768px &rarr; 2col, 1024px &rarr; 3col</td></tr>
-								<tr><td><code>@include grid-2</code></td><td>1 &rarr; 2</td><td>768px &rarr; 2col</td></tr>
-								<tr><td><code>@include grid-4</code></td><td>1 &rarr; 2 &rarr; 4</td><td>768px &rarr; 2col, 1024px &rarr; 4col</td></tr>
+								<tr><td><code>@include grid($container)</code></td><td>1 &rarr; 2 &rarr; 3</td><td>768px &rarr; 2col, 1024px &rarr; 3col (or <code>@container</code> 580px / 880px when <code>$container</code> is set)</td></tr>
+								<tr><td><code>@include grid-2($container)</code></td><td>1 &rarr; 2</td><td>768px &rarr; 2col (or <code>@container</code> 580px when <code>$container</code> is set)</td></tr>
+								<tr><td><code>@include grid-4($container)</code></td><td>1 &rarr; 2 &rarr; 4</td><td>768px &rarr; 2col, 1024px &rarr; 4col (or <code>@container</code> 580px / 880px when <code>$container</code> is set)</td></tr>
+								<tr><td><code>@include grid-auto($min)</code></td><td>Intrinsic (<code>auto-fit</code>)</td><td>Columns of at least <code>$min</code> (default <code>14rem</code>); stretches sparse rows to fill width (KPI/banner rows)</td></tr>
+								<tr><td><code>@include grid-fill($min)</code></td><td>Intrinsic (<code>auto-fill</code>)</td><td>Columns of at least <code>$min</code> (default <code>14rem</code>); preserves empty slot width for sparse card collections</td></tr>
 								<tr><td><code>@include form-grid</code></td><td>6-column grid</td><td>&lt;768px &rarr; 1col. Children use <code>grid-column: span N</code></td></tr>
 								<tr><td><code>@include stack($gap)</code></td><td>Flex column</td><td>Vertical stack with configurable gap (default: 1rem)</td></tr>
 							</tbody>

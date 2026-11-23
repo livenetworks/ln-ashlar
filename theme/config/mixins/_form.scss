@@ -15,7 +15,8 @@
 
 // ─── Form layout ────────────────────────────────────────────────
 
-@mixin form-label {
+// Label typography + label-to-control gap. Shared by <label> and <legend>.
+@mixin form-label-base {
 	@include block;
 	// label-md / medium — a 12px semibold caption over every field reads
 	// as dialog-box chrome; field labels sit one step under body text.
@@ -25,6 +26,10 @@
 	// Structural label-to-input gap (not shell rhythm).
 	--margin-block: 0.375rem;
 	margin-bottom: var(--margin-block);
+}
+
+@mixin form-label {
+	@include form-label-base;
 
 	// Required indicator — red * when any control under the label's parent is required
 	// (siblings, nested field shells).
@@ -46,7 +51,7 @@
 	}
 
 	// Trailing feedback after the control gets slot treatment.
-	:where(& > :is(input, select, textarea, [data-ln-date-field], search) ~ :not(input)) {
+	:where(& > :is(input, select, textarea, [data-ln-date-field], search) ~ :not(input, select, textarea)) {
 		@include form-slot;
 		color: var(--fg-muted);
 	}
@@ -473,7 +478,7 @@
 // Must be idempotent when re-applied over `@include pill` (the filled
 // default installed globally by components/_form.scss on fieldset pills).
 // Each rule below resets a behavior that `pill` adds: bg-sunken fill,
-// hidden input, accent-fg text on checked.
+// visually-hidden input, accent-fg text on checked.
 
 @mixin pill-outline {
 	@include flex;
@@ -494,10 +499,13 @@
 	background: transparent;
 	position: relative;
 
-	// Restore the native input indicator. `display: revert` returns the
-	// UA default (inline-block for checkbox/radio) and cleanly undoes
-	// pill's `display: none` when pill-outline is applied as an override.
-	> input { display: revert; }
+	// Undo pill's visual hiding so the native indicator shows again. Must
+	// list every property pill's hiding sets; `revert` is exact because no
+	// author rule sets them (size/border stay with form-check).
+	> input {
+		position: revert;
+		clip-path: revert;
+	}
 
 	&:hover {
 		border-color: var(--color-accent);
@@ -513,7 +521,7 @@
 	}
 }
 
-// ─── Pill filled — extends pill-outline, hides input ───────────
+// ─── Pill filled — extends pill-outline, visually hides input ──
 
 @mixin pill {
 	@include pill-outline;
@@ -527,7 +535,13 @@
 	background-color: var(--color-bg);
 	border-color: transparent;
 
-	> input { display: none; }
+	// Visual-only hide: the input stays in the tab order and a11y tree.
+	// Only position + clip-path — width/height/border belong to form-check
+	// and pill-outline cannot revert them. Keep in sync with its reset.
+	> input {
+		position: absolute;
+		clip-path: inset(50%);
+	}
 
 	&:hover {
 		border-color: var(--color-border);
@@ -540,6 +554,13 @@
 		&:hover {
 			background-color: var(--color-accent-hover);
 		}
+	}
+
+	// The input is clipped, so the ring goes on the label. z-index lifts it
+	// over joined neighbours (same reason as hover/checked in pill-outline).
+	&:has(> input:focus-visible) {
+		@include focus-ring;
+		z-index: 1;
 	}
 }
 
@@ -564,13 +585,12 @@
 }
 
 // ─── Pills — GCD for joined-pill checkbox/radio lists ──────────
-// Joined-group filled pills: pill on each <li><label><input>, with
-// joined-corner border-radius (square middles, partial-radius first/
-// last) inlined here rather than composed via pill-group. Inlining
-// is required because pill-group's `li label` selectors (0,1,5) are
-// out-specificityed by pill's :has selector (0,2,5), which would
-// reassert full radius on every pill. The selectors below match
-// pill's :has shape so source-order/specificity resolves cleanly.
+// One joined group that wraps by default. The corner radius belongs to the
+// group: the <ul> rounds and clips, every label is square, and each <li> grows
+// so a wrapped row fills the width and the group corners land on the right
+// pills. A lone pill on the last row therefore spans the full width. The <ul>
+// stays inline-flex, so a group that fits one line is max-content wide and
+// growth changes nothing.
 // Apply to a <ul> whose direct children are <li><label><input> pairs.
 //
 // Usage: project SCSS applies this on its own ul selector:
@@ -586,56 +606,79 @@
 
 @mixin pills {
 	@include inline-flex;
+	@include flex-wrap;
+	border-radius: var(--radius);
+	overflow: clip;
+
+	// Not flex-1: its 0% basis would never wrap.
+	> li {
+		flex-grow: 1;
+	}
 
 	> li > label:has(> input:is([type="checkbox"], [type="radio"])) {
 		@include pill;
+		@include justify-center;
 		border-radius: 0;
-	}
 
-	> li:first-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
-		border-radius: var(--radius) 0 0 var(--radius);
-	}
+		&:hover {
+			border-color: transparent;
+			background-color: var(--bg-hover);
+		}
 
-	> li:last-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
-		border-radius: 0 var(--radius) var(--radius) 0;
-	}
+		// The group clip would cut pill's outer ring, so draw it inside the label.
+		&:has(> input:focus-visible) {
+			@include focus-border-thicken;
+		}
 
-	> li:only-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
-		border-radius: var(--radius);
+		// An accent outline vanishes on the accent fill.
+		&:has(> input:checked:focus-visible) {
+			@include focus-border-thicken(var(--color-accent-fg));
+		}
 	}
 }
 
+// Outline variant of pills (same wrapping group model). The <ul> owns the
+// rounded outer border and clips its children; each <label> draws only its
+// block-start and inline-start dividers, pulled 1px under the <ul> border
+// (or previous sibling) so outer edges never double up and corners never clip.
+// Hover and checked states use accent background tints instead of per-cell
+// border-color changes, keeping all four outer corners cleanly rounded.
+
 @mixin pills-outline {
 	@include inline-flex;
+	@include flex-wrap;
+	@include border;
+	border-radius: var(--radius);
+	overflow: clip;
 
 	> li {
-		position: relative;
-
-		&:not(:first-child) {
-			margin-left: calc(var(--border-width) * -1);
-		}
-
-		&:hover,
-		&:has(> label > input:checked) {
-			z-index: 1;
-		}
+		flex-grow: 1;
+		margin-block-start: calc(var(--border-width) * -1);
+		margin-inline-start: calc(var(--border-width) * -1);
 	}
 
 	> li > label:has(> input:is([type="checkbox"], [type="radio"])) {
 		@include pill-outline;
+		@include justify-center;
+		border: 0;
+		border-block-start: var(--border-width) solid var(--color-border);
+		border-inline-start: var(--border-width) solid var(--color-border);
 		border-radius: 0;
-	}
 
-	> li:first-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
-		border-radius: var(--radius) 0 0 var(--radius);
-	}
+		&:hover {
+			border-color: var(--color-border);
+			background: color-mix(in srgb, var(--color-accent) var(--tint-hover), transparent);
+		}
 
-	> li:last-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
-		border-radius: 0 var(--radius) var(--radius) 0;
-	}
+		&:has(> input:checked) {
+			border-color: var(--color-border);
+			background: color-mix(in srgb, var(--color-accent) var(--tint-selected), transparent);
+			color: var(--color-accent);
 
-	> li:only-child > label:has(> input:is([type="checkbox"], [type="radio"])) {
-		border-radius: var(--radius);
+			&:hover {
+				background: color-mix(in srgb, var(--color-accent) var(--tint-active), transparent);
+			}
+		}
 	}
 }
 
@@ -792,7 +835,7 @@
 }
 
 // ─── Check list filled — vertical list with filled labels ──────
-// Extends check-list-outline: hides input, fills bg on checked.
+// Extends check-list-outline: visually hides input (still focusable), fills bg on checked.
 //
 // Usage:
 //   #dept-filter { @include check-list; }
@@ -809,10 +852,8 @@
 // semibold) instead of the solid-accent pill fill. Shared by the filter
 // popover (@mixin popover) and the ln-table column-filter dropdown
 // (@mixin filter-dropdown) so every filter list matches the sidebar nav
-// (nav-links-rounded). Extends check-list to keep the hidden-input filled
-// structure; overrides only color, weight and size. Consumers that need
-// the checkbox kept keyboard-focusable (popover a11y) re-reveal the input
-// themselves after including this.
+// (nav-links-rounded). Extends check-list to keep the visually-hidden-input
+// filled structure; overrides only color, weight and size.
 @mixin check-list-nav {
 	@include check-list;
 

@@ -257,6 +257,8 @@
 			float: left;
 			--margin-inline: var(--size-sm);
 			margin-right: var(--margin-inline);
+			// reset the global legend gap (flex item, centred)
+			margin-bottom: 0;
 			line-height: 1.75rem;
 		}
 

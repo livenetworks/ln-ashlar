@@ -7,10 +7,14 @@
 }
 
 [data-ln-dropdown-menu] {
-	display: none;
 	position: fixed;
 	inset: auto;
 	margin: 0;
+
+	// Outranks ancestor `ul` display rules (e.g. a menu inside a panel header).
+	&:not(.open) {
+		display: none;
+	}
 
 	&.open {
 		display: block;

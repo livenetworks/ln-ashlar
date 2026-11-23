@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Publish all tagged releases from releases/ (backfill) or a single tag'
+        type: choice
+        default: backfill
+        options:
+          - backfill
+          - single
+      tag:
+        description: 'Tag to publish when mode is single (e.g. v2.2.6)'
+        required: false
+        type: string
+        default: ''
+      overwrite:
+        description: 'Update existing GitHub Releases if they already exist'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  github-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_MODE: ${{ inputs.mode }}
+          INPUT_TAG: ${{ inputs.tag }}
+          INPUT_OVERWRITE: ${{ inputs.overwrite }}
+        run: |
+          if [ "$EVENT_NAME" = "push" ]; then
+            node scripts/publish-github-releases.mjs --tag "$REF_NAME" --overwrite
+          elif [ "$INPUT_MODE" = "single" ]; then
+            if [ -z "$INPUT_TAG" ]; then
+              echo "Error: input 'tag' is required when mode is 'single'." >&2
+              exit 1
+            fi
+            if [ "$INPUT_OVERWRITE" = "true" ]; then
+              node scripts/publish-github-releases.mjs --tag "$INPUT_TAG" --overwrite
+            else
+              node scripts/publish-github-releases.mjs --tag "$INPUT_TAG"
+            fi
+          else
+            if [ "$INPUT_OVERWRITE" = "true" ]; then
+              node scripts/publish-github-releases.mjs --backfill --overwrite
+            else
+              node scripts/publish-github-releases.mjs --backfill
+            fi
+          fi

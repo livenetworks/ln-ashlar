@@ -116,7 +116,8 @@ The `ln-ashlar` mixin architecture powers the **Visual Theme Layer** (`ln-ashlar
 | `m`, `mx`, `my`, `mt`, `mb`, `ml`, `mr` | mixin | `$val: CSS length` | Margin shorthand recipes |
 | `gap` | mixin | `$val: CSS length` | Flexbox / CSS Grid gap |
 | `stack` | mixin | `$gap: var(--gap)` | Vertical flex column with gap |
-| `grid-auto` | mixin | `$min: var(--grid-item-min-width)` | Auto-fit grid: columns of at least `$min`, shrinking below it for a single item |
+| `grid-auto` | mixin | `$min: var(--grid-item-min-width)` | Auto-fit grid: columns of at least `$min`, stretching items to fill the row (KPI/banner rows) |
+| `grid-fill` | mixin | `$min: var(--grid-item-min-width)` | Auto-fill grid: columns of at least `$min`, preserving empty slot width so sparse card collections do not stretch |
 | `tabs-nav-segmented` | mixin | — | Pill-track variant of the tabs nav for compact panel-header switches |
 | `stat-card-tone` | mixin | — | Leading accent strip and icon tint from the semantic-color cascade |
 | `section-card`, `panel-header` | mixin | `$group: false` | `$group: true` renders a transparent titled group: no surface, border, shadow, or radius, and a title row without divider or inline padding |
@@ -128,7 +129,7 @@ The `ln-ashlar` mixin architecture powers the **Visual Theme Layer** (`ln-ashlar
 | `flex-1`, `flex-shrink-0` | mixin | — | Flex grow/shrink controls |
 | `items-center`, `items-start`, `items-end` | mixin | — | Cross-axis alignment (`align-items`) |
 | `justify-center`, `justify-between`, `justify-end` | mixin | — | Main-axis alignment (`justify-content`) |
-| `grid`, `grid-2`, `grid-3`, `grid-4` | mixin | — | Responsive CSS Grid column presets |
+| `grid`, `grid-2`, `grid-4` | mixin | `$container: null` | Responsive CSS Grid column presets (1→2→3, 1→2, 1→2→4); pass a container name or `true` for `@container` queries |
 | `container` | mixin | `$name: null` | Declares container query context (`container-type: inline-size`) |
 | `size` | mixin | `$width, $height: $width` | Equal width and height dimension shorthand |
 | `w-full`, `h-full`, `min-h-screen` | mixin | — | Dimensional extent shorthands |
@@ -146,6 +147,7 @@ The `ln-ashlar` mixin architecture powers the **Visual Theme Layer** (`ln-ashlar
 | `transition` | mixin | `$prop: all, $duration: var(--transition-base)` | Standardized transition animation timing |
 | **Component Recipes (Composites)** | | | |
 | `card` | mixin | — | Standard container card with border, resting shadow, and `--color-bg` |
+| `card-add` | mixin | — | "Add new item" overlay on `card`: dashed transparent border, no shadow, centred muted icon + label that turns accent on hover; works on `<a>` and `<button>` |
 | `card-header`, `card-body`, `card-footer` | mixin | — | Internal card structural regions with standard padding |
 | `section` | mixin | — | Page section vertical rhythm and container constraints |
 | `table-base`, `table-striped` | mixin | `$sticky: true`, `$responsive: true` | Full table styling with sunken, page-sticky header and interactive hover |
@@ -162,6 +164,7 @@ The `ln-ashlar` mixin architecture powers the **Visual Theme Layer** (`ln-ashlar
 | `sidebar`, `sidebar-drawer` | mixin | — | Desktop sidebar and responsive mobile drawer |
 | `breadcrumbs`, `stepper`, `timeline` | mixin | — | Navigation trails and sequential step indicators |
 | `stat-card` | mixin | — | Key performance indicator (KPI) metric card |
+| `icon-tile` | mixin | — | Icon on a tinted square (accent tint background, accent colour); apply on any `svg.ln-icon`, tone follows the semantic-color cascade |
 | `prose` | mixin | — | Editorial typography rhythm with styled lists and quotes |
 | `loader`, `progress-track`, `progress-fill`, `circular-progress` | mixin | — | Progress and activity loading indicators |
 

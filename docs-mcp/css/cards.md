@@ -67,14 +67,16 @@ The `cards` module (`theme/config/mixins/_card.scss` and `theme/components/_card
 | Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
 | `card` | mixin | — | Base container card with resting shadow and border |
+| `card-add` | mixin | — | Overlay for the "Add new item" tile: dashed border, transparent surface, no shadow, centred muted `svg.ln-icon` + label that turns accent on hover; include after `card`, on an `<a>` or `<button>` |
 | `section-card` | mixin | `$group: false` | Composed layout card with structured header, body, and footer. `$group: true` renders a transparent titled group on the canvas (bound to `.section-card` in the `relaxed` design) |
-| `panel-header` | mixin | `$group: false` | Card header region with title-sm typography and border. `$group: true` drops the divider, surface, and inline padding |
+| `panel-header` | mixin | `$group: false` | Card header region with title-sm typography, consistent density-reactive `min-height`, and automatic `@include btn-header` geometry on header `<button>` and `<a>` actions. `$group: true` drops the divider, surface, and inline padding |
+| `btn-header` | mixin | — | Compact header action button geometry (`--btn-padding-y: var(--size-xs)`, `--btn-padding-x: var(--size-sm-up)`, `--btn-line-height: 1.25`, `min-height: 0`); identical on `<button>` and `<a>` |
 | `panel-body` | mixin | — | Card content body with standard padding and flex rhythm |
 | `panel-footer` | mixin | — | Card footer region with border-t and action alignment |
 | `.card` | class | — | Prototyping class for `card` |
 | `.section-card` | class | — | Prototyping class for `section-card` |
 | `--color-bg` | token | `var(--bg-base)` | Active card background |
-| `--shadow` | token | `var(--shadow-resting)` | Active card elevation shadow |
+| `--shadow` | token | `var(--shadow-resting)` + top highlight | Active card elevation shadow; the highlight is part of the default, so `--shadow: none` drops both and a custom value replaces both |
 
 ---
 

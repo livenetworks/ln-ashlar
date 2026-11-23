@@ -31,6 +31,69 @@
 						</script>
 					</section>
 
+					<!-- Add tile & flat card -->
+					<section class="section-card" data-demo-html>
+						<header><h3>Add Tile &amp; Flat Card — <code>card-add</code>, <code>--shadow: none</code></h3></header>
+						<main>
+							<h4>Add tile — <code>card-add</code></h4>
+							<ul id="demo-card-add">
+								<li>
+									<article>
+										<h5>Website</h5>
+										<p>12 documents</p>
+									</article>
+								</li>
+								<li>
+									<article>
+										<h5>Mobile app</h5>
+										<p>8 documents</p>
+									</article>
+								</li>
+								<li>
+									<article>
+										<h5>Intranet</h5>
+										<p>31 documents</p>
+									</article>
+								</li>
+								<li>
+									<button type="button">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
+										Add project
+									</button>
+								</li>
+							</ul>
+
+							<h4>No shadow — <code>--shadow: none</code></h4>
+							<ul id="demo-card-flat">
+								<li>
+									<article>
+										<h5>Default</h5>
+										<p>Resting shadow and top highlight.</p>
+									</article>
+								</li>
+								<li>
+									<article>
+										<h5>Flat</h5>
+										<p><code>--shadow: none</code> drops both.</p>
+									</article>
+								</li>
+							</ul>
+						</main>
+						<script type="text/plain" data-demo-scss>
+						// Add tile: card-add follows card
+						#add-project {
+							@include card;
+							@include card-add;
+						}
+
+						// Flat card: drops shadow and top highlight
+						article {
+							@include card;
+							--shadow: none;
+						}
+						</script>
+					</section>
+
 					<!-- Accent Top -->
 					<section class="section-card" data-demo-html>
 						<header><h3>Accent Top — <code>card-accent-top</code></h3></header>

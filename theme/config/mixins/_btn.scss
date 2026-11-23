@@ -32,13 +32,14 @@
 	@include inline-flex;
 	@include items-center;
 	@include justify-center;
-	gap: var(--gap, var(--size-xs-up));
+	--gap: var(--btn-gap, var(--size-xs-up));
+	gap: var(--gap);
 	--padding-y: var(--btn-padding-y, var(--size-sm));
 	--padding-x: var(--btn-padding-x, var(--size-md));
 	padding: var(--padding-y) var(--padding-x);
-	@include text-sm;
+	font-size: var(--btn-font-size, var(--text-sm));
 	// Shared control line box — aligns with inputs/selects (see _tokens.scss).
-	line-height: var(--control-line-height);
+	line-height: var(--btn-line-height, var(--control-line-height));
 	@include font-medium;
 	border-radius: var(--radius);
 	white-space: nowrap;
@@ -69,76 +70,81 @@
 }
 
 @mixin btn {
+	@include button-base;
 	// Accent variant — rebinds the --btn-* token surface to accent values.
-	--color-accent:       hsl(var(--color-primary));
+	--color-accent: hsl(var(--color-primary));
 	--color-accent-hover: hsl(from var(--color-accent) h s calc(l + var(--accent-hover-shift)));
 
-	--btn-bg:           var(--color-accent-bg,       var(--color-accent));
-	--btn-fg:           var(--color-accent-bg-fg,    var(--color-accent-fg));
-	--btn-border:       hsl(from var(--color-accent) h s calc(l - 4));
-	--btn-bg-hover:     var(--color-accent-bg-hover, var(--color-accent-hover));
-	--btn-fg-hover:     var(--color-accent-bg-fg,    var(--color-accent-fg));
+	--btn-bg: var(--color-accent-bg, var(--color-accent));
+	--btn-fg: var(--color-accent-bg-fg, var(--color-accent-fg));
+	--btn-border: hsl(from var(--color-accent) h s calc(l - 4));
+	--btn-bg-hover: var(--color-accent-bg-hover, var(--color-accent-hover));
+	--btn-fg-hover: var(--color-accent-bg-fg, var(--color-accent-fg));
 	--btn-border-hover: hsl(from var(--color-accent) h s calc(l + var(--accent-hover-shift)));
 }
 
 @mixin btn-soft {
+	@include button-base;
 	// Soft/Subtle variant — pastel accent surface with saturated text.
-	--color-accent:       hsl(var(--color-primary));
+	--color-accent: hsl(var(--color-primary));
 
-	--btn-bg:           color-mix(in srgb, var(--color-accent) 10%, transparent);
-	--btn-fg:           var(--color-accent);
-	--btn-border:       color-mix(in srgb, var(--color-accent) 20%, transparent);
-	--btn-bg-hover:     color-mix(in srgb, var(--color-accent) 18%, transparent);
-	--btn-fg-hover:     var(--color-accent);
+	--btn-bg: color-mix(in srgb, var(--color-accent) 10%, transparent);
+	--btn-fg: var(--color-accent);
+	--btn-border: color-mix(in srgb, var(--color-accent) 20%, transparent);
+	--btn-bg-hover: color-mix(in srgb, var(--color-accent) 18%, transparent);
+	--btn-fg-hover: var(--color-accent);
 	--btn-border-hover: color-mix(in srgb, var(--color-accent) 25%, transparent);
 }
 
 @mixin btn-ghost {
+	@include button-base;
 	// Ghost variant — transparent idle, subtle sunken hover surface.
-	--btn-bg:           transparent;
-	--btn-fg:           var(--color-fg);
-	--btn-border:       transparent;
-	--btn-bg-hover:     var(--bg-hover);
-	--btn-fg-hover:     var(--color-fg);
+	--btn-bg: transparent;
+	--btn-fg: var(--color-fg);
+	--btn-border: transparent;
+	--btn-bg-hover: var(--bg-hover);
+	--btn-fg-hover: var(--color-fg);
 	--btn-border-hover: transparent;
 
 	&:is(.success, .error, .warning, .info) {
-		--color-accent:     hsl(var(--color-primary));
-		--btn-fg:           var(--color-accent);
-		--btn-bg-hover:     color-mix(in srgb, var(--color-accent) 10%, transparent);
-		--btn-fg-hover:     var(--color-accent);
+		--color-accent: hsl(var(--color-primary));
+		--btn-fg: var(--color-accent);
+		--btn-bg-hover: color-mix(in srgb, var(--color-accent) 10%, transparent);
+		--btn-fg-hover: var(--color-accent);
 	}
 }
 
 @mixin btn-outline {
+	@include button-base;
 	// Outline variant — transparent idle with crisp border.
-	--btn-bg:           transparent;
-	--btn-fg:           var(--color-fg);
-	--btn-border:       var(--border-strong);
-	--btn-bg-hover:     var(--bg-hover);
-	--btn-fg-hover:     var(--color-fg);
+	--btn-bg: transparent;
+	--btn-fg: var(--color-fg);
+	--btn-border: var(--border-strong);
+	--btn-bg-hover: var(--bg-hover);
+	--btn-fg-hover: var(--color-fg);
 	--btn-border-hover: var(--border-strong);
 
 	&:is(.success, .error, .warning, .info) {
-		--color-accent:     hsl(var(--color-primary));
-		--btn-fg:           var(--color-accent);
-		--btn-border:       color-mix(in srgb, var(--color-accent) 30%, transparent);
-		--btn-bg-hover:     color-mix(in srgb, var(--color-accent) 10%, transparent);
-		--btn-fg-hover:     var(--color-accent);
+		--color-accent: hsl(var(--color-primary));
+		--btn-fg: var(--color-accent);
+		--btn-border: color-mix(in srgb, var(--color-accent) 30%, transparent);
+		--btn-bg-hover: color-mix(in srgb, var(--color-accent) 10%, transparent);
+		--btn-fg-hover: var(--color-accent);
 		--btn-border-hover: color-mix(in srgb, var(--color-accent) 30%, transparent);
 	}
 }
 
 @mixin btn-link {
+	@include button-base;
 	// Link variant — text button with hover underline.
-	--btn-bg:           transparent;
-	--btn-fg:           var(--color-accent, hsl(var(--color-primary)));
-	--btn-border:       transparent;
-	--btn-bg-hover:     transparent;
-	--btn-fg-hover:     hsl(from var(--btn-fg) h s calc(l - 10));
+	--btn-bg: transparent;
+	--btn-fg: var(--color-accent, hsl(var(--color-primary)));
+	--btn-border: transparent;
+	--btn-bg-hover: transparent;
+	--btn-fg-hover: hsl(from var(--btn-fg) h s calc(l - 10));
 	--btn-border-hover: transparent;
-	--padding-x:        0;
-	--padding-y:        0;
+	--padding-x: 0;
+	--padding-y: 0;
 	padding: 0;
 	text-decoration: none;
 
@@ -148,18 +154,36 @@
 }
 
 @mixin btn-sm {
+	@include button-base;
+	--btn-padding-y: var(--size-xs);
 	--btn-padding-x: var(--size-sm-up);
-	--gap:           var(--size-xs);
-	gap: var(--gap);
-	@include text-xs;
+	--btn-font-size: var(--text-xs);
+	--btn-line-height: 1rem;
+	--btn-gap: var(--size-xs);
+	min-height: 0;
 }
 
 @mixin btn-lg {
+	@include button-base;
 	--btn-padding-x: var(--size-lg);
 	--btn-padding-y: var(--size-md);
-	--gap:           var(--size-sm-up);
-	gap: var(--gap);
-	@include text-base;
+	--btn-font-size: var(--text-base);
+	--btn-line-height: 1.5rem;
+	--btn-gap: var(--size-sm-up);
+}
+
+// Compact action button for card / section headers — identical geometry on
+// both <button> and <a>, sized so it never stretches panel-header's height.
+@mixin btn-header {
+	@include button-base;
+	--btn-padding-y: var(--size-xs);
+	--btn-padding-x: var(--size-sm-up);
+	--btn-line-height: 1.25;
+	min-height: 0;
+
+	svg.ln-icon {
+		--icon-size: 0.875rem;
+	}
 }
 
 @mixin btn-group {
@@ -174,4 +198,3 @@
 		color: var(--fg-subtle);
 	}
 }
-

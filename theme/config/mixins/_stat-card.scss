@@ -5,6 +5,7 @@
 @use 'borders' as *;
 @use 'transitions' as *;
 @use 'position' as *;
+@use 'icon-tile' as *;
 
 @mixin stat-card {
 	--shadow: var(--shadow-resting);
@@ -34,19 +35,12 @@
 		margin: 0;
 	}
 
-	// Icon tile — a direct-child <svg class="ln-icon"> pinned top-right,
-	// tinted with the card's accent (tone).
+	// Icon tile pinned top-right; tone comes from the card's accent.
 	> .ln-icon {
 		position: absolute;
 		inset-block-start: var(--padding-y);
 		inset-inline-end: var(--padding-x);
-		width: 1.25rem;
-		height: 1.25rem;
-		padding: var(--size-xs-up);
-		box-sizing: content-box;
-		border-radius: var(--radius);
-		background: var(--color-accent-tint-strong);
-		color: var(--color-accent);
+		@include icon-tile;
 	}
 
 	&:has(> .ln-icon) > [data-ln-stat-label] {

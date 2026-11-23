@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.2.7](./v2.2.7.md) — November 23, 2026
+`ln-fill` reactivity and modal/dropdown styling fixes for `ln-translations`, keyboard-accessible wrapping pills and `fieldset`/`legend` defaults, new `@mixin icon-tile` / `card-add` / `btn-header` / `grid-fill` mixins with container-query grid support, plus root `CHANGELOG.md`, npm release-note packaging, and automated GitHub Releases workflow.  
+👉 [Read full v2.2.7 release notes](./v2.2.7.md)
+
 ### [v2.2.6](./v2.2.6.md) — November 21, 2026
 Data layer query SSOT consolidation (`ln-data-coordinator`, `ln-data-store`, `ln-core/window-cache`), SSR table filtering/sorting restoration (`ln-table`), autonomous text-element subtree re-formatting (`ln-date`, `ln-number`, `ln-time`), hairline skin & layout token refinements, and 17 MB asset footprint reduction.  
 👉 [Read full v2.2.6 release notes](./v2.2.6.md)

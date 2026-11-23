@@ -1098,7 +1098,8 @@
 			],
 			"listened_by": [
 				"ln-core",
-				"ln-form"
+				"ln-form",
+				"ln-translations"
 			],
 			"cancelable": false,
 			"description": "Dispatched at every target form and fillable container to prompt population.",

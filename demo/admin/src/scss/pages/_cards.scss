@@ -12,6 +12,51 @@
 	}
 }
 
+// ─── Add tile (card-add) ───────────────────────────────
+#demo-card-add {
+	@include grid-4;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+
+	> li { @include flex; }
+
+	article {
+		@include card;
+		@include p(var(--size-md));
+
+		h5 { margin: 0; }
+		p { margin: 0; @include text-sm; color: var(--fg-muted); }
+	}
+
+	> li > button {
+		@include card;
+		@include card-add;
+	}
+}
+
+// ─── Card without shadow (--shadow: none) ──────────────
+#demo-card-flat {
+	// Section-card bodies flatten nested cards; reset so "Default" shows its shadow.
+	--nested-card-shadow: initial;
+	@include grid-2;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+
+	> li { @include flex; }
+
+	article {
+		@include card;
+		@include p(var(--size-md));
+
+		h5 { margin: 0; }
+		p { margin: 0; @include text-sm; color: var(--fg-muted); }
+	}
+
+	> li:last-child > article { --shadow: none; }
+}
+
 // ─── Accent top variants ───────────────────────────────
 #demo-accent-top {
 	@include grid-4;
@@ -227,5 +272,25 @@
 
 	[data-ln-stat-card] {
 		flex: 1 1 240px;
+	}
+}
+
+// ─── Icon tile demo (stat-card page) ───────────────────
+#demo-icon-tiles {
+	@include flex-col;
+	@include gap(var(--size-md));
+	list-style: none;
+	padding: 0;
+	margin: 0;
+
+	> li {
+		@include flex;
+		@include items-center;
+		@include gap(var(--size-md));
+
+		> svg { @include icon-tile; flex-shrink: 0; }
+
+		h4, p { margin: 0; }
+		p { @include text-sm; color: var(--fg-muted); }
 	}
 }

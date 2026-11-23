@@ -2372,6 +2372,13 @@
 			],
 			"listens": [
 				{
+					"name": "ln-fill",
+					"cancelable": false,
+					"description": "Rebuilds the translation languages from a record: every active non-default language is removed (server-rendered ones included, without `before-remove`/`removed` events), then each language in `record.trans` is activated. A `null` record removes them only. Handled only when the event target is the container itself.",
+					"detail": "Object` (record) | `null",
+					"source": "dynamic-allowlist"
+				},
+				{
 					"name": "ln-translations:request-add",
 					"cancelable": false,
 					"description": "Requests activation of a language programmatically. Event listener is bound to the container element (`data-ln-translations`), not `document`.",

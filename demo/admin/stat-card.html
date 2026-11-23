@@ -44,9 +44,9 @@
 	(function () {
 		var KEY = 'ln-demo-engine';
 		var HREF = {
-			ashlar: 'dist/admin.css?v=2.2.6',
-			tailwind: 'dist/admin-tailwind.css?v=2.2.6',
-			relaxed: 'dist/admin-relaxed.css?v=2.2.6'
+			ashlar: 'dist/admin.css?v=2.2.7',
+			tailwind: 'dist/admin-tailwind.css?v=2.2.7',
+			relaxed: 'dist/admin-relaxed.css?v=2.2.7'
 		};
 		var root = document.documentElement;
 		var engine = 'ashlar';
@@ -99,7 +99,7 @@
 		document.addEventListener('DOMContentLoaded', markActive);
 	})();
 	</script>
-	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css?v=2.2.6">
+	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css?v=2.2.7">
 		<script src="../dist/ln-ashlar.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
 </head>
@@ -303,7 +303,7 @@
 			</main>
 
 			<footer>
-				<small>ashlar-gui v2.2.6</small>
+				<small>ashlar-gui v2.2.7</small>
 			</footer>
 		</aside>
 		<script>
@@ -439,13 +439,57 @@
 					}
 					</script>
 				</section>
+
+					<!-- Icon tile outside a stat card -->
+					<section class="section-card" data-demo-html>
+						<header><h3>Icon Tile — <code>icon-tile</code></h3></header>
+						<main>
+							<p>An icon on a tinted square. The tone follows <code>--color-accent</code>, so a <code>.success</code>, <code>.warning</code> or <code>.error</code> ancestor re-tones it.</p>
+							<ul id="demo-icon-tiles">
+								<li>
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-file"></use></svg>
+									<hgroup>
+										<h4>Quarterly report</h4>
+										<p>Draft saved 2 hours ago</p>
+									</hgroup>
+								</li>
+								<li class="success">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg>
+									<hgroup>
+										<h4>Backup completed</h4>
+										<p>All 48 documents archived</p>
+									</hgroup>
+								</li>
+								<li class="warning">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg>
+									<hgroup>
+										<h4>Storage almost full</h4>
+										<p>92% of the quota is used</p>
+									</hgroup>
+								</li>
+								<li class="error">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-x"></use></svg>
+									<hgroup>
+										<h4>Sync failed</h4>
+										<p>Check the connection and retry</p>
+									</hgroup>
+								</li>
+							</ul>
+						</main>
+						<script type="text/plain" data-demo-scss>
+						// Tile on any svg.ln-icon; tone comes from an ancestor:
+						#demo-icon-tiles > li > svg {
+							@include icon-tile;
+						}
+						</script>
+					</section>
 			</div>
 		</section>
 
 		<!-- Footer -->
 		<footer class="app-footer">
 			<span>ashlar-gui &copy; 2026 LiveNetworks</span>
-			<span>ln-ashlar v2.2.6</span>
+			<span>ln-ashlar v2.2.7</span>
 		</footer>
 		</main>
 	</div><!-- /.app-wrapper -->

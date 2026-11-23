@@ -60,6 +60,7 @@ The `stat-card` module (`theme/config/mixins/_stat-card.scss` and `theme/compone
 |---|---|---|---|
 | `stat-card` | mixin | — | KPI card container layout with tabular numeral styling |
 | `stat-card-tone` | mixin | — | Leading accent strip and icon tint from the semantic-color cascade |
+| `icon-tile` | mixin | — | Tinted-square icon look used by the stat card's direct-child icon; reusable on project selectors |
 | `data-ln-stat-card` | attribute | — | Binds the `stat-card` mixin to the container |
 | `data-ln-stat-label` | attribute | — | Muted medium-weight caption; direct child |
 | `data-ln-stat-value` | attribute | — | Tabular-numeral metric value; direct child |

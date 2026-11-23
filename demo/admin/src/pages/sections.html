@@ -53,6 +53,31 @@
 			</script>
 		</section>
 
+		<!-- Section with h3 header -->
+		<section id="demo-section-h3" class="section-card" data-demo-html>
+			<header><h3>.section header with <code>h3</code></h3></header>
+			<main>
+				<p>The section header styles every heading level (<code>h1</code>–<code>h6</code>) the same, so the heading level follows the document outline instead of the visual size.</p>
+				<section class="section">
+					<header>
+						<h3>Recent Activity</h3>
+						<div class="section-actions">
+							<button type="button">View all</button>
+						</div>
+					</header>
+					<main>
+						<p>Section content...</p>
+					</main>
+				</section>
+			</main>
+			<script type="text/plain" data-demo-scss>
+// Header heading level is free:
+.section {
+    @include section;
+}
+			</script>
+		</section>
+
 		<!-- Section Card -->
 		<section class="section-card" data-demo-html>
 			<header><h3>.section-card</h3></header>

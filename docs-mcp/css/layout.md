@@ -17,7 +17,7 @@ tags: [layout, grid, flexbox, stack, row, container-queries, flat-stack]
 The `layout` mixin module (`theme/config/mixins/_layout.scss`) provides foundational layout primitives for both macro and micro component structure:
 
 - **Flexbox Primitives:** `stack` (vertical column with gap) and `row` / `row-between` / `row-center` (horizontal rows).
-- **Responsive Grids:** `grid`, `grid-2`, and `grid-4` generating responsive CSS Grid column structures with standard gaps.
+- **Responsive Grids:** Explicit column presets (`grid`, `grid-2`, and `grid-4`, with optional `$container` for `@container` queries) and intrinsic auto grids (`grid-auto` using `auto-fit` for KPI/banner rows, `grid-fill` using `auto-fill` for card collections that should not stretch when sparse).
 - **Flat Stack (`flat-stack`):** Joins vertical sibling cards/panels into a seamless flush list with a shared horizontal divider rule, flattening inner radii and elevation shadows.
 - **Container Query Contexts (`container`):** Declares `container-type: inline-size` on parents so child components adapt responsive styling to their immediate available width.
 
@@ -83,9 +83,11 @@ The `layout` mixin module (`theme/config/mixins/_layout.scss`) provides foundati
 | `row` | mixin | `$gap: var(--gap)` | Horizontal flex container with centered vertical alignment |
 | `row-between` | mixin | `$gap: var(--gap)` | Horizontal flex row with `justify-content: space-between` |
 | `row-center` | mixin | `$gap: var(--gap)` | Horizontal flex row centered on both axes |
-| `grid` | mixin | — | Responsive 1→2→3 column CSS Grid |
-| `grid-2` | mixin | — | Responsive 1→2 column CSS Grid |
-| `grid-4` | mixin | — | Responsive 1→2→4 column CSS Grid |
+| `grid` | mixin | `$container: null` | Responsive 1→2→3 column CSS Grid (viewport `@media` by default; pass container name or `true` for `@container`) |
+| `grid-2` | mixin | `$container: null` | Responsive 1→2 column CSS Grid (viewport `@media` by default; pass container name or `true` for `@container`) |
+| `grid-4` | mixin | `$container: null` | Responsive 1→2→4 column CSS Grid (viewport `@media` by default; pass container name or `true` for `@container`) |
+| `grid-auto` | mixin | `$min: var(--grid-item-min-width)` | Auto-fit grid: columns of at least `$min`, collapsing empty tracks so sparse rows stretch (KPI/banner rows) |
+| `grid-fill` | mixin | `$min: var(--grid-item-min-width)` | Auto-fill grid: columns of at least `$min`, preserving empty slot width so sparse card collections do not stretch |
 | `flat-stack` | mixin | — | Parent-scope rebind joining card children flush with shared divider rule |
 | `container` | mixin | `$name: null` | Declares container query context (`container-type: inline-size`) |
 | `.grid`, `.grid-2`, `.grid-4` | class | — | Prototyping classes for grid layouts |

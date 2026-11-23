@@ -114,6 +114,11 @@ export const COLONLESS_ALLOWLIST = [
 		file: 'components/ln-form/src/ln-form.js',
 		emits: [],
 		listens: ['ln-fill']
+	},
+	{
+		file: 'components/ln-translations/src/ln-translations.js',
+		emits: [],
+		listens: ['ln-fill']
 	}
 ];
 

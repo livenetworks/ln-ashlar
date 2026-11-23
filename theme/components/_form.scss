@@ -86,6 +86,24 @@ label:not(:has(> input)) {
 	@include form-label;
 }
 
+// Border-less group; the legend reads as a field label. Base only — the
+// required star's :has([required]) would star every section fieldset.
+fieldset {
+	@include border-none;
+	min-inline-size: 0;
+
+	// Same zero-specificity stacking as form-element, so form-grid's
+	// `> * { margin: 0 }` and ID-scoped overrides still win.
+	:where(&) + :where(&) {
+		--margin-block: var(--size-md);
+		margin-top: var(--margin-block);
+	}
+}
+
+legend {
+	@include form-label-base;
+}
+
 // ─── Pill groups — radio & checkbox lists ──────────────────────────
 // Clean class-driven segmented controls and switch panels.
 // No <fieldset> tag dependency to prevent layout collisions.

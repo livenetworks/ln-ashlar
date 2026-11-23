@@ -88,6 +88,10 @@ $lang-auto: mk, de, fr, it, bg, pt, ro, nl, pl, fi, hu, lt, lv, tr, az, is, mt, 
 
 // ─── Header actions ──────────────────────────────────────────────
 
+:where([data-ln-translations] > header) {
+	@include translations-header;
+}
+
 [data-ln-translations] .actions {
 	@include translations-actions;
 }
@@ -96,11 +100,12 @@ $lang-auto: mk, de, fr, it, bg, pt, ro, nl, pl, fi, hu, lt, lv, tr, az, is, mt, 
 	@include translations-dropdown;
 }
 
-[data-ln-translations-active] {
+// Scoped under the host so these stay at (0,3,0) above generic trigger/button rules (e.g. button[data-ln-toggle-for] in _toggle.scss).
+[data-ln-translations] .actions [data-ln-translations-active] {
 	@include translations-active-list;
 }
 
-[data-ln-translations-active] > li {
+[data-ln-translations] .actions [data-ln-translations-active] > li {
 	@include translations-active-item;
 }
 
@@ -108,19 +113,19 @@ $lang-auto: mk, de, fr, it, bg, pt, ro, nl, pl, fi, hu, lt, lv, tr, az, is, mt, 
 	@include translations-badge;
 }
 
-[data-ln-translations-active] button {
+[data-ln-translations] .actions [data-ln-translations-active] button {
 	@include translations-badge-remove;
 }
 
-[data-ln-translations-add] {
+[data-ln-translations] .actions [data-ln-translations-add] {
 	@include translations-add-button;
 }
 
 // ─── Reduced motion ─────────────────────────────────────────────
 
 @media (prefers-reduced-motion: reduce) {
-	[data-ln-translations-add],
-	[data-ln-translations-active] button {
+	[data-ln-translations] .actions [data-ln-translations-add],
+	[data-ln-translations] .actions [data-ln-translations-active] button {
 		transition: none;
 	}
 }

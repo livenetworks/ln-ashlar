@@ -5,7 +5,7 @@
 					<header><h3>Overview &amp; Philosophy</h3></header>
 					<main class="prose">
 						<p><strong><code>ln-translations</code></strong> is applied to form elements via <code>&lt;form data-ln-translations data-ln-translations-default="en"
-							      data-ln-translations-locales='{"en":"English","sq":"Shqip","sr":"Srpski","de":"Deutsch","mk":"Македонски"}'&gt;</code> to coordinate multi-lingual field editing. It identifies translatable input containers (<code>[data-ln-translatable="field"]</code>), dynamically cloning form controls with deterministic nested naming (e.g. <code>trans[lang][field]</code>) as languages are added. It synchronizes active locale badges and selection menus using <code>&lt;template&gt;</code> elements, submitting localized values natively through the standard HTML form submission pipeline without custom network logic.</p>
+							      data-ln-translations-locales='{"en":"English","de":"Deutsch","mk":"Македонски"}'&gt;</code> to coordinate multi-lingual field editing. It identifies translatable input containers (<code>[data-ln-translatable="field"]</code>), dynamically cloning form controls with deterministic nested naming (e.g. <code>trans[lang][field]</code>) as languages are added. It synchronizes active locale badges and selection menus using <code>&lt;template&gt;</code> elements, submitting localized values natively through the standard HTML form submission pipeline without custom network logic.</p>
 
 						<p>In <code>ln-ashlar</code>, this zero-dependency coordinator manages inline multi-lingual inputs by dynamically cloning translatable fields on-demand.</p>
 
@@ -65,30 +65,34 @@
 							      action="#"
 							      method="post"
 							      data-ln-translations-default="en"
-							      data-ln-translations-locales='{"en":"English","sq":"Shqip","sr":"Srpski","de":"Deutsch","mk":"Македонски"}'>
+							      data-ln-translations-locales='{"en":"English","de":"Deutsch","mk":"Македонски"}'>
 								<header>
 									<h3>Company Info</h3>
 									<div class="actions">
 										<ul data-ln-translations-active></ul>
 										<div data-ln-dropdown>
-											<button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu-1" ><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg></button>
+											<button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu-1" aria-label="Add translation"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg></button>
 											<ul id="trans-menu-1" data-ln-toggle data-ln-dropdown-menu></ul>
 										</div>
 									</div>
 								</header>
 								<main>
-									<p>
-										<label>Name <input type="text" name="name" value="Acme Corp"></label>
-									</p>
-									<p data-ln-translatable="scope">
-										<label>Scope <textarea name="scope">Food and beverage production</textarea></label>
-									</p>
-									<p>
-										<label>EA Code <input type="text" name="ea_code" value="28"></label>
-									</p>
-									<p data-ln-translatable="address">
-										<label>Address <input type="text" name="address" value="123 Main Street, New York"></label>
-									</p>
+									<div class="form-element">
+										<label for="trans-ex1-name">Name</label>
+										<input type="text" id="trans-ex1-name" name="name" value="Acme Corp">
+									</div>
+									<div class="form-element" data-ln-translatable="scope">
+										<label for="trans-ex1-scope">Scope</label>
+										<textarea id="trans-ex1-scope" name="scope">Food and beverage production</textarea>
+									</div>
+									<div class="form-element">
+										<label for="trans-ex1-ea">EA Code</label>
+										<input type="text" id="trans-ex1-ea" name="ea_code" value="28">
+									</div>
+									<div class="form-element" data-ln-translatable="address">
+										<label for="trans-ex1-address">Address</label>
+										<input type="text" id="trans-ex1-address" name="address" value="123 Main Street, New York">
+									</div>
 								</main>
 							</form>
 						</main>
@@ -102,26 +106,28 @@
 							      action="#"
 							      method="post"
 							      data-ln-translations-default="en"
-							      data-ln-translations-locales='{"en":"English","sq":"Shqip","sr":"Srpski","de":"Deutsch","mk":"Македонски"}'>
+							      data-ln-translations-locales='{"en":"English","de":"Deutsch","mk":"Македонски"}'>
 								<header>
 									<h3>Standard Details</h3>
 									<div class="actions">
 										<ul data-ln-translations-active></ul>
 										<div data-ln-dropdown>
-											<button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu-2" ><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg></button>
+											<button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu-2" aria-label="Add translation"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg></button>
 											<ul id="trans-menu-2" data-ln-toggle data-ln-dropdown-menu></ul>
 										</div>
 									</div>
 								</header>
 								<main>
-									<p data-ln-translatable="title">
-										<label>Title <input type="text" name="title" value="Information Security"></label>
+									<div class="form-element" data-ln-translatable="title">
+										<label for="trans-ex2-title">Title</label>
+										<input type="text" id="trans-ex2-title" name="title" value="Information Security">
 										<input data-ln-translatable-lang="en" name="trans[en][title]" value="Information Security" placeholder="English translation">
-									</p>
-									<p data-ln-translatable="description">
-										<label>Description <textarea name="description">Requirements for establishing, implementing, maintaining and continually improving an information security management system.</textarea></label>
+									</div>
+									<div class="form-element" data-ln-translatable="description">
+										<label for="trans-ex2-description">Description</label>
+										<textarea id="trans-ex2-description" name="description">Requirements for establishing, implementing, maintaining and continually improving an information security management system.</textarea>
 										<textarea data-ln-translatable-lang="en" name="trans[en][description]" placeholder="English translation">Requirements for establishing, implementing, maintaining and continually improving an information security management system.</textarea>
-									</p>
+									</div>
 								</main>
 							</form>
 						</main>
@@ -135,31 +141,199 @@
 							      action="#"
 							      method="post"
 							      data-ln-translations-default="en"
-							      data-ln-translations-locales='{"en":"English","sq":"Shqip","sr":"Srpski","de":"Deutsch","mk":"Македонски"}'>
+							      data-ln-translations-locales='{"en":"English","de":"Deutsch","mk":"Македонски"}'>
 								<header>
 									<h3>Checklist Items</h3>
 									<div class="actions">
 										<ul data-ln-translations-active></ul>
 										<div data-ln-dropdown>
-											<button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu-3" ><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg></button>
+											<button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu-3" aria-label="Add translation"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg></button>
 											<ul id="trans-menu-3" data-ln-toggle data-ln-dropdown-menu></ul>
 										</div>
 									</div>
 								</header>
 								<main>
-									<article data-ln-translatable="title" data-ln-translations-prefix="items[1]">
-										<label>Item 1 <input type="text" name="items[1][title]" value="Leadership"></label>
-									</article>
-									<article data-ln-translatable="title" data-ln-translations-prefix="items[2]">
-										<label>Item 2 <input type="text" name="items[2][title]" value="Planning"></label>
-									</article>
-									<article data-ln-translatable="title" data-ln-translations-prefix="items[3]">
-										<label>Item 3 <input type="text" name="items[3][title]" value="Support"></label>
-									</article>
+									<div class="form-element" data-ln-translatable="title" data-ln-translations-prefix="items[1]">
+										<label for="trans-ex3-item1">Item 1</label>
+										<input type="text" id="trans-ex3-item1" name="items[1][title]" value="Leadership">
+									</div>
+									<div class="form-element" data-ln-translatable="title" data-ln-translations-prefix="items[2]">
+										<label for="trans-ex3-item2">Item 2</label>
+										<input type="text" id="trans-ex3-item2" name="items[2][title]" value="Planning">
+									</div>
+									<div class="form-element" data-ln-translatable="title" data-ln-translations-prefix="items[3]">
+										<label for="trans-ex3-item3">Item 3</label>
+										<input type="text" id="trans-ex3-item3" name="items[3][title]" value="Support">
+									</div>
 								</main>
 							</form>
 						</main>
 					</section>
+
+					<!-- Example 4: Modal create / edit (ln-fill + ln-form + ln-translations) -->
+					<section class="section-card" data-demo-html>
+						<header><h3>Example — Modal Create / Edit</h3></header>
+						<main>
+							<p>Each trigger carries <code>data-ln-fill-form</code> and the record in <code>data-ln-fill-*</code> attributes. One <code>ln-fill</code> event fills the base fields through <code>ln-form</code> and rebuilds the translated languages through <code>ln-translations</code>. <strong>New</strong> sends no record, which clears the form and removes every added language.</p>
+
+							<nav class="demo-actions">
+								<button type="button" class="btn"
+								        data-ln-modal-for="trans-modal"
+								        data-ln-fill-form="trans-modal-form">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
+									New policy
+								</button>
+							</nav>
+
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Title</th><th>Description</th><th>Translations</th><th>Actions</th></tr></thead>
+								<tbody>
+									<tr>
+										<td data-label="Title">Политика за безбедност</td>
+										<td data-label="Description">Опис на политиката</td>
+										<td data-label="Translations">en, de</td>
+										<td data-label="Actions">
+											<ul class="btn-group">
+												<li>
+													<button type="button" aria-label="Edit"
+													        data-ln-modal-for="trans-modal"
+													        data-ln-modal-mode="edit"
+													        data-ln-fill-form="trans-modal-form"
+													        data-ln-fill-id="1"
+													        data-ln-fill-title="Политика за безбедност"
+													        data-ln-fill-description="Опис на политиката"
+													        data-ln-fill-trans='{"en":{"title":"Security Policy","description":"Policy description"},"de":{"title":"Sicherheitsrichtlinie"}}'>
+														<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg>
+													</button>
+												</li>
+											</ul>
+										</td>
+									</tr>
+									<tr>
+										<td data-label="Title">Упатство за работа</td>
+										<td data-label="Description">Опис на упатството</td>
+										<td data-label="Translations">en</td>
+										<td data-label="Actions">
+											<ul class="btn-group">
+												<li>
+													<button type="button" aria-label="Edit"
+													        data-ln-modal-for="trans-modal"
+													        data-ln-modal-mode="edit"
+													        data-ln-fill-form="trans-modal-form"
+													        data-ln-fill-id="2"
+													        data-ln-fill-title="Упатство за работа"
+													        data-ln-fill-description="Опис на упатството"
+													        data-ln-fill-trans='{"en":{"title":"Work Instructions"}}'>
+														<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg>
+													</button>
+												</li>
+											</ul>
+										</td>
+									</tr>
+									<tr>
+										<td data-label="Title">Записник</td>
+										<td data-label="Description">Опис</td>
+										<td data-label="Translations">none</td>
+										<td data-label="Actions">
+											<ul class="btn-group">
+												<li>
+													<button type="button" aria-label="Edit"
+													        data-ln-modal-for="trans-modal"
+													        data-ln-modal-mode="edit"
+													        data-ln-fill-form="trans-modal-form"
+													        data-ln-fill-id="3"
+													        data-ln-fill-title="Записник"
+													        data-ln-fill-description="Опис">
+														<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg>
+													</button>
+												</li>
+											</ul>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							</div>
+
+							<h4>Submitted payload</h4>
+							<pre id="trans-modal-log" class="demo-log demo-log--compact"></pre>
+
+							<script>
+							(function () {
+								const modal = document.getElementById('trans-modal');
+								const form  = document.getElementById('trans-modal-form');
+								const log   = document.getElementById('trans-modal-log');
+								if (!modal || !form || !log) return;
+
+								const ts = function () {
+									const d = new Date();
+									const pad = function (n) { return String(n).padStart(2, '0'); };
+									return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+								};
+
+								const appendLog = function (line) {
+									log.textContent += (log.textContent ? '\n' : '') + line;
+									log.scrollTop = log.scrollHeight;
+								};
+
+								// The form has no data-ln-ajax and no coordinator scope, so ln-form never
+								// intercepts submit — listen to the native event and serialize with FormData.
+								form.addEventListener('submit', function (e) {
+									e.preventDefault();
+									const data = Object.fromEntries(new FormData(form).entries());
+									const methodInput = form.querySelector('input[name="_method"]');
+									const verb = (methodInput && methodInput.value) ? methodInput.value : 'POST';
+									appendLog('[' + ts() + '] ' + verb + ' ' + form.getAttribute('action') + '\n' + JSON.stringify(data, null, 2));
+									modal.setAttribute('data-ln-modal', 'close');
+								});
+							})();
+							</script>
+						</main>
+					</section>
+
+					<!-- Example 4 modal (outside the section — document-level overlay, still after Examples 1-3 in document order) -->
+					<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="trans-modal">
+						<form id="trans-modal-form"
+						      data-ln-form
+						      method="post"
+						      action="/api/policies"
+						      data-ln-form-action-edit="/api/policies/:id"
+						      data-ln-form-action-method="PUT"
+						      data-ln-translations
+						      data-ln-translations-default="mk"
+						      data-ln-translations-locales='{"en":"English","de":"Deutsch","mk":"Македонски"}'>
+							<header>
+								<h3>
+									<span data-ln-modal-when="new">New policy</span>
+									<span data-ln-modal-when="edit">Edit policy</span>
+								</h3>
+								<div class="actions">
+									<ul data-ln-translations-active></ul>
+									<div data-ln-dropdown>
+										<button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu-4" aria-label="Add translation"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg></button>
+										<ul id="trans-menu-4" data-ln-toggle data-ln-dropdown-menu></ul>
+									</div>
+								</div>
+								<button type="button" data-ln-modal-close aria-label="Close">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+								</button>
+							</header>
+							<main>
+								<div class="form-element" data-ln-translatable="title">
+									<label for="trans-modal-title">Title</label>
+									<input type="text" id="trans-modal-title" name="title">
+								</div>
+								<div class="form-element" data-ln-translatable="description">
+									<label for="trans-modal-description">Description</label>
+									<textarea id="trans-modal-description" name="description"></textarea>
+								</div>
+							</main>
+							<footer>
+								<button type="button" data-ln-modal-close>Cancel</button>
+								<button type="submit">Save</button>
+							</footer>
+						</form>
+					</dialog>
 
 					<!-- API & Events -->
 					<section class="section-card">
@@ -169,7 +343,7 @@
 								<h4>Instance API</h4>
 								<pre><code>const el = document.querySelector('[data-ln-translations]');
 el.lnTranslations.addLanguage('en');
-el.lnTranslations.addLanguage('sq', { scope: 'Prodhimi...' });
+el.lnTranslations.addLanguage('de', { scope: 'Produktion...' });
 el.lnTranslations.removeLanguage('en');
 el.lnTranslations.hasLanguage('en');          // boolean
 el.lnTranslations.getActiveLanguages();       // Set</code></pre>

@@ -5,6 +5,8 @@
 
 🌐 **Live Interactive Demo:** [ashlar.live.net.mk](https://ashlar.live.net.mk)
 
+📋 **Releases & Changelog:** [GitHub Releases](https://github.com/livenetworks/ln-ashlar/releases) · [Changelog](https://github.com/livenetworks/ln-ashlar/blob/main/CHANGELOG.md) · [Release Notes](https://github.com/livenetworks/ln-ashlar/blob/main/releases/README.md)
+
 ---
 
 ## 🏛️ The Paradigm: DOM as the Runtime State Surface

@@ -121,6 +121,20 @@ import {
 		dom.addEventListener('ln-translations:request-add', this._onRequestAdd);
 		dom.addEventListener('ln-translations:request-remove', this._onRequestRemove);
 
+		// Rebuild translations from an ln-fill record. Handle only a dispatch at this
+		// host, not events bubbled from [data-ln-fillable] descendants.
+		this._onFill = function (e) {
+			if (e.target !== self.dom) return;
+			self._clearLanguages();
+			if (!e.detail) return;
+			// record.trans: object or JSON string -> plain object (same contract as locales)
+			const trans = parseLocales(e.detail.trans);
+			for (const lang of Object.keys(trans)) {
+				self.addLanguage(lang, trans[lang]);
+			}
+		};
+		dom.addEventListener('ln-fill', this._onFill);
+
 		// Detect pre-rendered server translations
 		this._detectExisting();
 
@@ -218,6 +232,25 @@ import {
 		});
 	};
 
+	// ─── Language field cleanup ────────────────────────────────
+
+	_component.prototype._removeLanguageFields = function (lang) {
+		const fields = this.dom.querySelectorAll('[data-ln-translatable-lang="' + lang + '"]');
+		for (const el of fields) {
+			el.parentNode.removeChild(el);
+		}
+		this.activeLanguages.delete(lang);
+	};
+
+	// Silent bulk removal (no before-remove / removed events): used by ln-fill, where a veto must not leave stale languages.
+	_component.prototype._clearLanguages = function () {
+		for (const lang of Array.from(this.activeLanguages)) {
+			this._removeLanguageFields(lang);
+		}
+		this._updateDropdown();
+		this._updateBadges();
+	};
+
 	// ─── Public API ────────────────────────────────────────────
 
 	_component.prototype.addLanguage = function (lang, values) {
@@ -287,12 +320,7 @@ import {
 		if (before.defaultPrevented) return;
 
 		// Remove all translation inputs for this language
-		const fields = this.dom.querySelectorAll('[data-ln-translatable-lang="' + lang + '"]');
-		for (const el of fields) {
-			el.parentNode.removeChild(el);
-		}
-
-		this.activeLanguages.delete(lang);
+		this._removeLanguageFields(lang);
 		this._updateDropdown();
 		this._updateBadges();
 
@@ -341,6 +369,7 @@ import {
 
 		this.dom.removeEventListener('ln-translations:request-add', this._onRequestAdd);
 		this.dom.removeEventListener('ln-translations:request-remove', this._onRequestRemove);
+		this.dom.removeEventListener('ln-fill', this._onFill);
 
 		this.activeLanguages.clear();
 		delete this.dom[DOM_ATTRIBUTE];

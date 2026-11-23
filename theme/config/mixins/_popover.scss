@@ -97,22 +97,6 @@
 		// When containing checkbox/radio filter options
 		&:has(> li > label) {
 			@include check-list-nav;
-
-			> li > label > input {
-				// Override pill's display:none — keep in focus order for keyboard nav
-				display: revert;
-				position: absolute;
-				width: 1px;
-				height: 1px;
-				overflow: hidden;
-				clip-path: inset(50%);
-				white-space: nowrap;
-			}
-
-			// Focus ring on label when the hidden input receives keyboard focus
-			> li > label:has(> input:focus-visible) {
-				@include focus-ring;
-			}
 		}
 	}
 }

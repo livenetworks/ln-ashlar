@@ -135,10 +135,21 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 |---|---|---|---|---|
 | `ln-translations:request-add` | Listens | No | Requests activation of a language programmatically. | `{ lang: String, values?: Object }` |
 | `ln-translations:request-remove` | Listens | No | Requests deactivation of a language programmatically. | `{ lang: String }` |
+| `ln-fill` | Listens | No | Rebuilds the translation languages from a record: every active non-default language is removed (server-rendered ones included, without `before-remove`/`removed` events), then each language in `record.trans` is activated. A `null` record removes them only. Handled only when the event target is the container itself. | `Object` (record) \| `null` |
 | `ln-translations:before-add` | Emits | Yes | Fires before a language's fields are cloned. `preventDefault()` aborts activation. | `{ target: HTMLElement, lang: String, langName: String }` |
 | `ln-translations:added` | Emits | No | Fires after a language's fields are cloned and menu/badges are updated. | `{ target: HTMLElement, lang: String, langName: String }` |
 | `ln-translations:before-remove` | Emits | Yes | Fires before a language's cloned fields are removed. `preventDefault()` aborts removal. | `{ target: HTMLElement, lang: String }` |
 | `ln-translations:removed` | Emits | No | Fires after a language's cloned fields are removed and menu/badges are updated. | `{ target: HTMLElement, lang: String }` |
+
+> [!NOTE]
+> **Fill record shape (`ln-fill`).** `lnFill(container, record)`, `data-ln-fill-form` triggers and `ln-fill:request` dispatch `ln-fill` only at elements matching `[data-ln-form], [data-ln-fillable]`. The translations container therefore carries one of them: `<form data-ln-form data-ln-translations data-ln-translations-default="en">`.
+>
+> `record.trans = { "<lang>": { "<field>": "<value>" } }`
+>
+> - `trans` is an object, or a JSON string of one (as read from a `data-ln-fill-trans='{"sq":{"title":"..."}}'` trigger attribute). Any other value, including malformed JSON, activates no language.
+> - Keys are language codes; each value is a field-name to value map, the same shape as `addLanguage(lang, values)`; missing fields are empty.
+> - The default language is not read from `trans`; its values live in the base fields filled by `ln-form`.
+> - The base fields are never written by this component.
 
 ---
 

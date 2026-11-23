@@ -61,6 +61,10 @@
 	@include flex-wrap;
 }
 
+.demo-actions + .table-container {
+	margin-block-start: var(--size-md);
+}
+
 // ==========================================================================
 // Expandable/Collapsible Demo Code Panel (HTML & SCSS)
 // ==========================================================================

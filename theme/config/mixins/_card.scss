@@ -8,12 +8,14 @@
 @use 'transitions' as *;
 @use 'position' as *;
 @use 'focus' as *;
+@use 'btn' as *;
 
 // Card & Section — composite mixins
 
 @mixin card {
 	--color-bg: var(--nested-card-bg, var(--bg-base));
-	--shadow:   var(--nested-card-shadow, var(--shadow-resting));
+	// Highlight rides in the default so `--shadow: none` drops both.
+	--shadow:   var(--nested-card-shadow, var(--shadow-resting), var(--surface-highlight, inset 0 0 0 0 transparent));
 
 	background: var(--color-bg);
 	@include border;
@@ -26,7 +28,7 @@
 	overflow: clip;
 	min-inline-size: 0;
 	@include transition;
-	box-shadow: var(--shadow), var(--surface-highlight, inset 0 0 0 0 transparent);
+	box-shadow: var(--shadow);
 
 	// Only whole-card links/buttons signal interaction. Passive containers
 	// must not respond merely because the pointer crosses their content.
@@ -93,11 +95,11 @@
 	@include items-center;
 	@include justify-between;
 	@if $group {
-		padding: var(--card-padding-y) 0;
+		padding: calc(var(--card-padding-y) - var(--size-xs-up)) 0;
 	} @else {
-		padding: var(--card-padding-y) var(--card-padding-x);
+		padding: calc(var(--card-padding-y) - var(--size-xs-up)) var(--card-padding-x);
 	}
-	min-height: 2.5rem;
+	min-height: calc(var(--control-line-height) + 2 * var(--card-padding-y) - var(--size-2xs));
 	@if $group {
 		background: transparent;
 	} @else {
@@ -131,39 +133,48 @@
 		}
 	}
 
+	ul:where(:not(
+		[role="tablist"],
+		[role="menu"],
+		[data-ln-dropdown-menu],
+		.dropdown,
+		[data-ln-dropdown] ul,
+		[data-ln-popover] ul,
+		[data-ln-translations-active]
+	)) {
+		@include flex;
+		@include items-center;
+		gap: var(--size-sm);
+
+		> li {
+			@include inline-flex;
+			@include items-center;
+		}
+	}
+
 	label {
 		--padding-y: var(--size-xs);
 		min-height: calc(var(--control-line-height) + 2 * var(--padding-y) + 2 * var(--border-width));
 	}
 
-	// Header actions lock to the control height: --control-line-height +
-	// 2 × --padding-y + 2 × border-width. This is a DESCENDANT selector,
-	// so it also reaches a button that belongs to a nested field — that button
-	// is the field's own chrome, not a header action, and form-field-group
-	// stretches it to the field's full height. An explicit height beats
-	// `align-self: stretch`, so such a button has to be excluded here; it
-	// cannot defend itself by out-weighing this rule.
+	// Header action buttons (<button> and <a> alike, excluding composite field
+	// buttons, tab links, and links inside headings) share @mixin btn-header:
+	// compact padding + line-height so header height stays identical whether
+	// actions are present or not.
 	//
-	// Only ln-date needs the exclusion. Every other composite field clears
-	// (0,1,2) on its own, because its binding carries a :has() guard and :has()
-	// adopts its argument's specificity:
-	//   icon-group auto-bind  :is(label,div,span,search):has(>.ln-icon):has(>…) > button   (0,1,4)
-	//   search clear          search:has(> input[type="search"]) > button                  (0,1,3)
-	//   this rule             .card > header button                                        (0,1,2)
-	//   ln-date               [data-ln-date-field] > button                                (0,1,1)
-	// ln-date builds its own wrapper in JS, so it has nothing to guard against
-	// and its binding is a bare attribute — the one that falls below the line.
-	// A new composite field whose wrapper needs no :has() belongs in this list.
-	//
-	// Both :where()s are load-bearing:
-	//   inner — keeps the wrapper from lending ITS weight to the exclusion.
-	//   outer — :not() adopts its argument's specificity, which would lift this
-	//           rule to (0,1,3) and silently outrank consumers that override it
-	//           at equal weight by source order.
-	// Wrapped, the rule stays exactly (0,1,2); only its match set narrows.
-	button:where(:not(:where([data-ln-date-field]) > button)) {
-		--btn-padding-y: var(--size-xs);
-		min-height: calc(var(--control-line-height) + 2 * var(--padding-y) + 2 * var(--border-width));
+	// Both :where()s are load-bearing — rule stays at (0,1,2) so icon-group
+	// auto-bind (0,1,4), search clear (0,1,3), and close/toggle buttons (0,2,2)
+	// below outrank it cleanly.
+	:is(button, a):where(:not(
+		:where([data-ln-date-field], label, search) > button,
+		[role="tab"],
+		[data-ln-tab],
+		:where(h1, h2, h3, h4, h5, h6, hgroup) a,
+		:where([data-ln-dropdown-menu], .dropdown, [data-ln-popover], [role="menu"], [data-ln-dropdown] > [data-ln-toggle]) :is(button, a),
+		[data-ln-translations-active] button,
+		[data-ln-translations-add]
+	)) {
+		@include btn-header;
 	}
 
 	// Close/dismiss and toggle buttons inside the header should be tight and flat.
@@ -177,6 +188,16 @@
 		height: 1.75rem;
 		width: 1.75rem;
 	}
+
+	// Tablist inside a panel header sits flush on the header's bottom divider.
+	&:has(> nav[role="tablist"]) {
+		padding-block: 0;
+		min-height: 0;
+
+		> nav[role="tablist"] {
+			border-bottom: none;
+		}
+	}
 }
 
 @mixin panel-body {
@@ -187,7 +208,7 @@
 	--nested-card-shadow: none;
 
 	// `clip`, not `auto` — a scrolling cell would trap the sticky thead.
-	&:has(> :is(table, .table-container, [data-ln-table])) {
+	&:has(> :is(table, .table-container, [data-ln-table], [data-ln-table-coordinator])) {
 		overflow-x: clip;
 		max-width: 100%;
 	}
@@ -205,12 +226,15 @@
 	// If main has mixed content (intro <p>, demo-split, <h4>,
 	// then <table>), :only-child doesn't match, padding stays,
 	// and the table keeps its own inset.
-	&:has(> :is(table, .table-container, [data-ln-table]):only-child) {
+	&:has(> :is(table, .table-container, [data-ln-table], [data-ln-table-coordinator]):only-child) {
 		padding: 0;
 
 		> table,
 		> .table-container > table,
-		> [data-ln-table] > table {
+		> [data-ln-table] > table,
+		> [data-ln-table-coordinator] [data-ln-table],
+		> [data-ln-table-coordinator] table {
+			border: none;
 			border-radius: 0;
 			box-shadow: none;
 			margin-bottom: 0;
@@ -242,7 +266,7 @@
 		padding-bottom: var(--padding-y);
 		@include border-b;
 
-		h2 {
+		:is(h1, h2, h3, h4, h5, h6) {
 			@include text-xl;
 			@include font-bold;
 			color: var(--color-fg);
@@ -324,6 +348,36 @@
 	}
 }
 
+// ─── Card add ("Add new item" tile) ────────────────────
+// Dashed transparent tile, centred icon + label; usually last in a card grid.
+// Apply on <a> or <button>, AFTER card (border-style must follow card's border).
+// Usage: #add-project { @include card; @include card-add; }
+//   <button><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>Add project</button>
+
+@mixin card-add {
+	--color-fg: var(--fg-muted);
+	// button-base repaints bg/border on :hover/:active via --btn-*; route them
+	// back so <button> matches <a> (card's hover border lives in --color-border).
+	--btn-bg-hover:     transparent;
+	--btn-border-hover: var(--color-border);
+
+	background: transparent;
+	border-style: dashed;
+	box-shadow: none;
+	@include items-center;
+	@include justify-center;
+	gap: var(--size-xs-up);
+	padding: var(--card-padding-y) var(--card-padding-x);
+	text-align: center;
+	@include text-sm;
+	@include font-medium;
+	color: var(--color-fg);
+
+	&:is(a, button):hover:not(:disabled) {
+		color: var(--color-accent);
+	}
+}
+
 // $group: true — a transparent titled group: no surface, border, shadow or
 // radius; content sits directly on the canvas.
 @mixin section-card($group: false) {
@@ -365,19 +419,19 @@
 // ─── Floating panel ────────────────────────────────────
 // Chrome recipe for floating overlays (popover, dropdown menu, toast).
 // Rebinds --color-bg to elevated surface and --shadow to floating
-// shadow so floating panels lift off the page surface correctly.
+// shadow + top highlight so floating panels lift off the page surface correctly.
 
 @mixin floating-panel {
 	--color-bg:     var(--bg-elevated);
 	--color-border: var(--border-subtle);
-	--shadow:       var(--shadow-floating);
+	--shadow:       var(--shadow-floating), var(--surface-highlight, inset 0 0 0 0 transparent);
 	background: var(--color-bg);
 	border-block-start:  var(--border-block-start,  var(--border-width) solid var(--color-border));
 	border-block-end:    var(--border-block-end,    var(--border-width) solid var(--color-border));
 	border-inline-start: var(--border-inline-start, var(--border-width) solid var(--color-border));
 	border-inline-end:   var(--border-inline-end,   var(--border-width) solid var(--color-border));
 	border-radius: var(--radius);
-	box-shadow: var(--shadow), var(--surface-highlight, inset 0 0 0 0 transparent);
+	box-shadow: var(--shadow);
 	@include frosted-glass(0.92, 10px);
 	// z-index is the caller's responsibility: top-layer consumers (dropdown,
 	// popover, tooltip portal) don't need one; standalone consumers do —

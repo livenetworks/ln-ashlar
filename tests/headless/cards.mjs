@@ -99,5 +99,5 @@ run('demo/admin/cards.html', async ({ page }) => {
 
 	section('Page structure');
 	const sections = await page.evaluate(() => document.querySelectorAll('section.section-card').length);
-	assert(sections === 12, `12 section-card blocks (got ${sections})`);
+	assert(sections === 13, `13 section-card blocks (got ${sections})`);
 });
