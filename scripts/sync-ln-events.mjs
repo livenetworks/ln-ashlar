@@ -116,6 +116,11 @@ export const COLONLESS_ALLOWLIST = [
 		listens: ['ln-fill']
 	},
 	{
+		file: 'components/ln-repeater/src/ln-repeater.js',
+		emits: [],
+		listens: ['ln-fill']
+	},
+	{
 		file: 'components/ln-translations/src/ln-translations.js',
 		emits: [],
 		listens: ['ln-fill']

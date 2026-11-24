@@ -1,0 +1,102 @@
+@use 'display' as *;
+@use 'spacing' as *;
+@use 'sizing' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'transitions' as *;
+@use 'interaction' as *;
+@use 'focus' as *;
+@use 'btn' as *;
+
+// ─── Repeater ──────────────────────────────────────────────────
+// Dynamic repeating field rows cloned from a <template>.
+// Supports single-input rows, multi-field horizontal groups,
+// inline side-by-side translatable fields ([data-ln-translatable]),
+// and drag handles ([data-ln-sortable-handle]).
+//
+// Usage:
+//   [data-ln-repeater] { @include repeater; }
+
+@mixin repeater {
+	@include flex-col;
+	--gap: var(--size-sm);
+	gap: var(--gap);
+
+	[data-ln-repeater-list] {
+		@include flex-col;
+		--gap: var(--size-sm);
+		gap: var(--gap);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	[data-ln-repeater-item] {
+		@include flex;
+		@include items-start;
+		--gap: var(--size-sm);
+		gap: var(--gap);
+
+		// Direct form controls and field wrappers share row width cleanly
+		> :is(input, select, textarea, .form-element, [data-ln-translatable]) {
+			flex: 1 1 0;
+			min-width: 0;
+			margin: 0;
+		}
+
+		// Inline side-by-side layout when a row field is translatable
+		[data-ln-translatable] {
+			@include flex;
+			@include items-center;
+			flex-wrap: wrap;
+			--gap: var(--size-sm);
+			gap: var(--gap);
+
+			> :is(input, select, textarea) {
+				flex: 1 1 10rem;
+				min-width: 0;
+			}
+
+			// Override vertical translation stacking when side-by-side inside a repeater row
+			[data-ln-translatable-lang] + [data-ln-translatable-lang] {
+				margin-block-start: 0;
+			}
+		}
+
+		> :is(button, [data-ln-repeater-remove], [data-ln-sortable-handle]) {
+			flex-shrink: 0;
+		}
+	}
+
+	[data-ln-repeater-remove] {
+		@include btn-ghost;
+		--btn-padding-x: var(--size-xs-up);
+		min-height: calc(var(--control-line-height) + 2 * var(--input-padding-y, var(--size-xs-up)) + 2 * var(--border-width));
+		color: var(--fg-muted);
+		@include transition-fast;
+
+		&:hover:not(:disabled) {
+			color: hsl(var(--color-error));
+			background: hsl(var(--color-error) / 0.08);
+		}
+	}
+
+	[data-ln-sortable-handle] {
+		@include inline-flex;
+		@include items-center;
+		@include justify-center;
+		min-height: calc(var(--control-line-height) + 2 * var(--input-padding-y, var(--size-xs-up)) + 2 * var(--border-width));
+		padding-inline: var(--size-2xs);
+		color: var(--fg-muted);
+		@include rounded-sm;
+		@include transition-fast;
+
+		&:hover {
+			color: var(--color-fg);
+		}
+	}
+
+	[data-ln-repeater-add] {
+		align-self: flex-start;
+	}
+}

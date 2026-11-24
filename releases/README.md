@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.2.8](./v2.2.8.md) — November 24, 2026
+New `ln-repeater` generic dynamic form-row component (`min`/`max` bounds, `{index}`/`{index1}` substitution, optional reindexing, external triggers, `ln-fill` hydration, and `ln-sortable` composition) plus automatic dynamic-row synchronization (`onSubtreeChange`, `sync()`, and nested prefix value resolution) in `ln-translations`.  
+👉 [Read full v2.2.8 release notes](./v2.2.8.md)
+
 ### [v2.2.7](./v2.2.7.md) — November 23, 2026
 `ln-fill` reactivity and modal/dropdown styling fixes for `ln-translations`, keyboard-accessible wrapping pills and `fieldset`/`legend` defaults, new `@mixin icon-tile` / `card-add` / `btn-header` / `grid-fill` mixins with container-query grid support, plus root `CHANGELOG.md`, npm release-note packaging, and automated GitHub Releases workflow.  
 👉 [Read full v2.2.7 release notes](./v2.2.7.md)

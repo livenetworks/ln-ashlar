@@ -1,0 +1,394 @@
+<!-- ln-page: title="Repeater — ln-ashlar" h1="Repeater" -->
+
+				<!-- Overview / philosophy -->
+				<section class="section-card">
+					<header><h3>Overview &amp; Philosophy</h3></header>
+					<main class="prose">
+						<p><strong><code>ln-repeater</code></strong> is applied to a container via <code>data-ln-repeater="name"</code> wrapping a list (<code>[data-ln-repeater-list]</code>), add/remove triggers (<code>[data-ln-repeater-add]</code>, <code>[data-ln-repeater-remove]</code>), and an HTML <code>&lt;template&gt;</code> defining a single row. It clones rows from the template, substitutes <code>{index}</code> / <code>{index1}</code> placeholders, enforces <code>data-ln-repeater-min</code> / <code>max</code> bounds via native <code>disabled</code> state, and hydrates rows from <code>ln-fill</code> payloads.</p>
+
+						<p>The component knows nothing about what inputs live inside a row — a single text input, a translatable multi-language group, or a multi-column line-item fieldset all use the exact same primitive. Everything else composes orthogonally: add <code>data-ln-sortable</code> to the list for drag-and-drop reordering, wrap the form in <code>data-ln-translations</code> for inline side-by-side translations, and drive Edit/Create modals with <code>ln-fill</code>.</p>
+
+						<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/components/ln-repeater/README.md"><code>ln-repeater</code> README</a>.</p>
+					</main>
+				</section>
+
+				<!-- Example 1: Basic single-field repeater -->
+				<section class="section-card" data-demo-html>
+					<header><h3>Example 1 — Basic Options (min="1", max="5")</h3></header>
+					<main>
+						<p>Starts empty in HTML, auto-seeds 1 row because <code>data-ln-repeater-min="1"</code>, disables the remove button at 1 row, and disables Add at 5 rows.</p>
+
+						<form id="repeater-basic-form" action="#" method="post">
+							<div class="form-element">
+								<label>Choice options</label>
+								<div data-ln-repeater="basic-options" data-ln-repeater-min="1" data-ln-repeater-max="5">
+									<ul data-ln-repeater-list></ul>
+
+									<button type="button" data-ln-repeater-add>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
+										Add option
+									</button>
+
+									<template data-ln-template="basic-options">
+										<li data-ln-repeater-item>
+											<input type="text" name="options[]" placeholder="Option {index1}" aria-label="Option {index1}" required>
+											<button type="button" data-ln-repeater-remove aria-label="Remove option">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+											</button>
+										</li>
+									</template>
+								</div>
+							</div>
+
+							<div class="form-actions">
+								<button type="submit">Inspect FormData</button>
+							</div>
+						</form>
+
+						<pre id="repeater-basic-log" class="demo-log demo-log--compact">(submit to inspect serialized FormData)</pre>
+					</main>
+				</section>
+
+				<!-- Example 2: Translatable + Sortable options -->
+				<section class="section-card" data-demo-html>
+					<header><h3>Example 2 — Translatable + Sortable Options</h3></header>
+					<main>
+						<p>Add a language (e.g. English or Deutsch) from the globe menu, then click <strong>Add option</strong> — new rows automatically receive inputs for every active language side-by-side in flex. Drag the handle to reorder rows.</p>
+
+						<form id="repeater-trans-form"
+						      action="#"
+						      method="post"
+						      data-ln-translations
+						      data-ln-translations-default="mk"
+						      data-ln-translations-locales='{"mk":"Македонски","en":"English","de":"Deutsch"}'>
+							<header>
+								<h4>Field Options (Select Type)</h4>
+								<div class="actions">
+									<ul data-ln-translations-active></ul>
+									<div data-ln-dropdown>
+										<button type="button" data-ln-translations-add data-ln-toggle-for="repeater-trans-menu" aria-label="Add translation">
+											<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg>
+										</button>
+										<ul id="repeater-trans-menu" data-ln-toggle data-ln-dropdown-menu></ul>
+									</div>
+								</div>
+							</header>
+
+							<main>
+								<div data-ln-repeater="trans-options" data-ln-repeater-min="1">
+									<ul data-ln-repeater-list data-ln-sortable></ul>
+
+									<button type="button" data-ln-repeater-add>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
+										Додај опција
+									</button>
+
+									<template data-ln-template="trans-options">
+										<li data-ln-repeater-item>
+											<span data-ln-sortable-handle aria-hidden="true">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
+											</span>
+											<div data-ln-translatable="label" data-ln-translations-prefix="options[{index}]">
+												<input type="text" name="options[{index}][label]" placeholder="Опција {index1}" aria-label="Опција {index1}" required>
+											</div>
+											<button type="button" data-ln-repeater-remove aria-label="Отстрани опција">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+											</button>
+										</li>
+									</template>
+								</div>
+							</main>
+
+							<div class="form-actions">
+								<button type="submit">Inspect FormData</button>
+							</div>
+						</form>
+
+						<pre id="repeater-trans-log" class="demo-log demo-log--compact">(submit to inspect serialized FormData)</pre>
+					</main>
+				</section>
+
+				<!-- Example 3: Multi-field indexed rows + Reindex + External trigger -->
+				<section class="section-card" data-demo-html>
+					<header>
+						<h3>Example 3 — Multi-Field Rows + Reindex + External Trigger</h3>
+						<button type="button" class="btn btn-sm" data-ln-repeater-add-for="sacks-repeater">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
+							Add sack
+						</button>
+					</header>
+					<main>
+						<p>Multiple controls per row (<code>select</code> + two <code>number</code> inputs), an external <code>data-ln-repeater-add-for</code> trigger in the card header, <code>data-ln-sortable</code> drag reordering, and <code>data-ln-repeater-reindex</code> so names stay strictly sequential (<code>0, 1, 2…</code>) after remove or drag.</p>
+
+						<form id="repeater-sacks-form" action="#" method="post">
+							<div id="sacks-repeater" data-ln-repeater="sacks" data-ln-repeater-min="1" data-ln-repeater-max="8" data-ln-repeater-reindex>
+								<ul data-ln-repeater-list data-ln-sortable></ul>
+
+								<template data-ln-template="sacks">
+									<li data-ln-repeater-item>
+										<span data-ln-sortable-handle aria-hidden="true">
+											<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
+										</span>
+										<select name="sacks[{index}][type]" aria-label="Sack type {index1}" required>
+											<option value="standard">Standard sack</option>
+											<option value="window">Window sack</option>
+											<option value="pallet">Pallet</option>
+										</select>
+										<input type="number" name="sacks[{index}][weight]" step="0.1" min="0" placeholder="Weight (kg)" aria-label="Weight {index1}" required>
+										<input type="number" name="sacks[{index}][qty]" min="1" value="1" placeholder="Qty" aria-label="Quantity {index1}" required>
+										<button type="button" data-ln-repeater-remove aria-label="Remove sack">
+											<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+										</button>
+									</li>
+								</template>
+							</div>
+
+							<div class="form-actions">
+								<button type="submit">Inspect FormData</button>
+							</div>
+						</form>
+
+						<pre id="repeater-sacks-log" class="demo-log demo-log--compact">(submit to inspect serialized FormData)</pre>
+					</main>
+				</section>
+
+				<!-- Example 4: Modal Create / Edit with ln-fill + ln-form + ln-repeater + ln-translations -->
+				<section class="section-card" data-demo-html>
+					<header><h3>Example 4 — Modal Create / Edit (ln-fill Hydration)</h3></header>
+					<main>
+						<p><strong>New field</strong> dispatches <code>ln-fill</code> with <code>null</code>, resetting the repeater to 1 empty row and clearing extra languages. <strong>Edit</strong> hydrates the base field, saved option rows, and per-option translations in one click.</p>
+
+						<nav class="demo-actions">
+							<button type="button" class="btn"
+							        data-ln-modal-for="repeater-modal"
+							        data-ln-fill-form="repeater-modal-form">
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
+								New IT Resource Field
+							</button>
+						</nav>
+
+						<div class="table-container">
+							<table>
+								<thead><tr><th>Field Name</th><th>Options</th><th>Translations</th><th>Actions</th></tr></thead>
+								<tbody>
+									<tr>
+										<td data-label="Field Name">Оперативен систем</td>
+										<td data-label="Options">Линукс, Виндоус, macOS</td>
+										<td data-label="Translations">en, de</td>
+										<td data-label="Actions">
+											<ul class="btn-group">
+												<li>
+													<button type="button" aria-label="Edit"
+													        data-ln-modal-for="repeater-modal"
+													        data-ln-modal-mode="edit"
+													        data-ln-fill-form="repeater-modal-form"
+													        data-ln-fill-id="10"
+													        data-ln-fill-name="Оперативен систем"
+													        data-ln-fill-options='[{"label":"Линукс"},{"label":"Виндоус"},{"label":"macOS"}]'
+													        data-ln-fill-trans='{"en":{"name":"Operating System","options":[{"label":"Linux"},{"label":"Windows"},{"label":"macOS"}]},"de":{"name":"Betriebssystem","options":[{"label":"Linux"},{"label":"Windows"},{"label":"macOS"}]}}'>
+														<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg>
+													</button>
+												</li>
+											</ul>
+										</td>
+									</tr>
+									<tr>
+										<td data-label="Field Name">Статус</td>
+										<td data-label="Options">Активен, Во сервис</td>
+										<td data-label="Translations">en</td>
+										<td data-label="Actions">
+											<ul class="btn-group">
+												<li>
+													<button type="button" aria-label="Edit"
+													        data-ln-modal-for="repeater-modal"
+													        data-ln-modal-mode="edit"
+													        data-ln-fill-form="repeater-modal-form"
+													        data-ln-fill-id="11"
+													        data-ln-fill-name="Статус"
+													        data-ln-fill-options='[{"label":"Активен"},{"label":"Во сервис"}]'
+													        data-ln-fill-trans='{"en":{"name":"Status","options":[{"label":"Active"},{"label":"In Service"}]}}'>
+														<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg>
+													</button>
+												</li>
+											</ul>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<pre id="repeater-modal-log" class="demo-log demo-log--compact">(save modal to inspect serialized FormData)</pre>
+					</main>
+				</section>
+
+				<!-- API & Events -->
+				<section class="section-card">
+					<header><h3>Attributes, API &amp; Events</h3></header>
+					<main>
+						<article>
+							<h4>Attributes</h4>
+							<div class="table-container">
+								<table>
+									<thead><tr><th>Attribute</th><th>On element</th><th>Default</th><th>Description</th></tr></thead>
+									<tbody>
+										<tr><td data-label="Attribute"><code>data-ln-repeater</code></td><td data-label="On element">Root</td><td data-label="Default"><code>""</code></td><td data-label="Description">Mounts the repeater. Optional value names the <code>&lt;template data-ln-template&gt;</code> and the <code>ln-fill</code> array key.</td></tr>
+										<tr><td data-label="Attribute"><code>data-ln-repeater-min</code></td><td data-label="On element">Root</td><td data-label="Default"><code>0</code></td><td data-label="Description">Minimum rows. Auto-seeds on init when empty and disables remove buttons at <code>count &lt;= min</code>.</td></tr>
+										<tr><td data-label="Attribute"><code>data-ln-repeater-max</code></td><td data-label="On element">Root</td><td data-label="Default"><code>Infinity</code></td><td data-label="Description">Maximum rows. Disables internal/external add triggers once reached.</td></tr>
+										<tr><td data-label="Attribute"><code>data-ln-repeater-reindex</code></td><td data-label="On element">Root</td><td data-label="Default"><code>false</code></td><td data-label="Description">Sequentially re-numbers <code>{index}</code> / <code>{index1}</code> attributes on remove or <code>ln-sortable:reordered</code>.</td></tr>
+										<tr><td data-label="Attribute"><code>data-ln-repeater-list</code></td><td data-label="On element"><code>&lt;ul&gt;</code> / <code>&lt;ol&gt;</code></td><td data-label="Default">—</td><td data-label="Description">Container where repeated rows are appended.</td></tr>
+										<tr><td data-label="Attribute"><code>data-ln-repeater-item</code></td><td data-label="On element">Row</td><td data-label="Default">—</td><td data-label="Description">Marks an individual repeated row (added automatically to cloned rows).</td></tr>
+										<tr><td data-label="Attribute"><code>data-ln-repeater-add</code></td><td data-label="On element"><code>&lt;button type="button"&gt;</code></td><td data-label="Default">—</td><td data-label="Description">Internal button that appends a new row from the template.</td></tr>
+										<tr><td data-label="Attribute"><code>data-ln-repeater-add-for</code></td><td data-label="On element"><code>&lt;button type="button"&gt;</code></td><td data-label="Default">—</td><td data-label="Description">External trigger referencing a repeater root by <code>id</code>.</td></tr>
+										<tr><td data-label="Attribute"><code>data-ln-repeater-remove</code></td><td data-label="On element"><code>&lt;button type="button"&gt;</code></td><td data-label="Default">—</td><td data-label="Description">Per-row button that removes its owning item.</td></tr>
+									</tbody>
+								</table>
+							</div>
+						</article>
+
+						<article>
+							<h4>Instance API</h4>
+							<pre><code>const el = document.querySelector('[data-ln-repeater]');
+el.lnRepeater.add({ label: 'Linux' });  // appends &amp; populates row
+el.lnRepeater.remove(0);                // removes row by index or element
+el.lnRepeater.clear();                  // clears down to min (or { force: true })
+el.lnRepeater.items;                    // HTMLElement[]
+el.lnRepeater.count;                    // number</code></pre>
+						</article>
+
+						<article>
+							<h4>Events</h4>
+							<div class="table-container">
+								<table>
+									<thead><tr><th>Event</th><th>Direction</th><th>Cancelable</th><th>Detail</th></tr></thead>
+									<tbody>
+										<tr><td data-label="Event"><code>ln-repeater:request-add</code></td><td data-label="Direction">Listens</td><td data-label="Cancelable">no</td><td data-label="Detail"><code>{ values?, focus? }</code></td></tr>
+										<tr><td data-label="Event"><code>ln-repeater:request-remove</code></td><td data-label="Direction">Listens</td><td data-label="Cancelable">no</td><td data-label="Detail"><code>{ item? | index?, focusNeighbor? }</code></td></tr>
+										<tr><td data-label="Event"><code>ln-fill</code></td><td data-label="Direction">Listens</td><td data-label="Cancelable">no</td><td data-label="Detail"><code>Object | null</code></td></tr>
+										<tr><td data-label="Event"><code>ln-repeater:before-add</code></td><td data-label="Direction">Emits</td><td data-label="Cancelable">yes</td><td data-label="Detail"><code>{ target, index, count }</code></td></tr>
+										<tr><td data-label="Event"><code>ln-repeater:added</code></td><td data-label="Direction">Emits</td><td data-label="Cancelable">no</td><td data-label="Detail"><code>{ target, item, index, count }</code></td></tr>
+										<tr><td data-label="Event"><code>ln-repeater:before-remove</code></td><td data-label="Direction">Emits</td><td data-label="Cancelable">yes</td><td data-label="Detail"><code>{ target, item, index, count }</code></td></tr>
+										<tr><td data-label="Event"><code>ln-repeater:removed</code></td><td data-label="Direction">Emits</td><td data-label="Cancelable">no</td><td data-label="Detail"><code>{ target, item, index, count }</code></td></tr>
+										<tr><td data-label="Event"><code>ln-repeater:reindexed</code></td><td data-label="Direction">Emits</td><td data-label="Cancelable">no</td><td data-label="Detail"><code>{ target, count }</code></td></tr>
+										<tr><td data-label="Event"><code>ln-repeater:max-reached</code></td><td data-label="Direction">Emits</td><td data-label="Cancelable">no</td><td data-label="Detail"><code>{ target, max, count }</code></td></tr>
+										<tr><td data-label="Event"><code>ln-repeater:min-reached</code></td><td data-label="Direction">Emits</td><td data-label="Cancelable">no</td><td data-label="Detail"><code>{ target, min, count }</code></td></tr>
+									</tbody>
+								</table>
+							</div>
+						</article>
+					</main>
+				</section>
+
+				<!-- Modal dialog for Example 4 -->
+				<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="repeater-modal">
+					<form id="repeater-modal-form"
+					      data-ln-form
+					      method="post"
+					      action="/api/fields"
+					      data-ln-form-action-edit="/api/fields/:id"
+					      data-ln-form-action-method="PUT"
+					      data-ln-translations
+					      data-ln-translations-default="mk"
+					      data-ln-translations-locales='{"mk":"Македонски","en":"English","de":"Deutsch"}'>
+						<header>
+							<h3>
+								<span data-ln-modal-when="new">Ново поле</span>
+								<span data-ln-modal-when="edit">Уреди поле</span>
+							</h3>
+							<div class="actions">
+								<ul data-ln-translations-active></ul>
+								<div data-ln-dropdown>
+									<button type="button" data-ln-translations-add data-ln-toggle-for="repeater-modal-trans-menu" aria-label="Add translation">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg>
+									</button>
+									<ul id="repeater-modal-trans-menu" data-ln-toggle data-ln-dropdown-menu></ul>
+								</div>
+							</div>
+							<button type="button" data-ln-modal-close aria-label="Close">
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+							</button>
+						</header>
+						<main>
+							<div class="form-element" data-ln-translatable="name">
+								<label for="repeater-modal-name">Назив на поле</label>
+								<input type="text" id="repeater-modal-name" name="name" required>
+							</div>
+
+							<div class="form-element">
+								<label>Опции (тип: избор)</label>
+								<div data-ln-repeater="options" data-ln-repeater-min="1">
+									<ul data-ln-repeater-list data-ln-sortable></ul>
+
+									<button type="button" data-ln-repeater-add>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
+										Додај опција
+									</button>
+
+									<template data-ln-template="options">
+										<li data-ln-repeater-item>
+											<span data-ln-sortable-handle aria-hidden="true">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
+											</span>
+											<div data-ln-translatable="label" data-ln-translations-prefix="options[{index}]">
+												<input type="text" name="options[{index}][label]" placeholder="Опција {index1}" aria-label="Опција {index1}" required>
+											</div>
+											<button type="button" data-ln-repeater-remove aria-label="Отстрани опција">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+											</button>
+										</li>
+									</template>
+								</div>
+							</div>
+						</main>
+						<footer>
+							<button type="button" data-ln-modal-close>Cancel</button>
+							<button type="submit">Save</button>
+						</footer>
+					</form>
+				</dialog>
+
+<script>
+(function () {
+	'use strict';
+
+	function bindPreview(formId, logId, modalId) {
+		const form = document.getElementById(formId);
+		const log = document.getElementById(logId);
+		const modal = modalId ? document.getElementById(modalId) : null;
+		if (!form || !log) return;
+
+		form.addEventListener('submit', function (e) {
+			e.preventDefault();
+			const entries = [];
+			for (const [k, v] of new FormData(form).entries()) {
+				entries.push(k + ' = ' + JSON.stringify(v));
+			}
+			const methodInput = form.querySelector('input[name="_method"]');
+			const verb = (methodInput && methodInput.value) ? methodInput.value : 'POST';
+			const header = modal ? (verb + ' ' + form.getAttribute('action') + '\n') : '';
+			log.textContent = header + (entries.join('\n') || '(empty)');
+			if (modal) modal.setAttribute('data-ln-modal', 'close');
+		});
+	}
+
+	bindPreview('repeater-basic-form', 'repeater-basic-log');
+	bindPreview('repeater-trans-form', 'repeater-trans-log');
+	bindPreview('repeater-sacks-form', 'repeater-sacks-log');
+	bindPreview('repeater-modal-form', 'repeater-modal-log', 'repeater-modal');
+})();
+</script>
+
+<!-- Required global templates for ln-translations badges and menu items -->
+<template data-ln-template="ln-translations-badge">
+	<li>
+		<p data-ln-translations-lang>
+			<span></span>
+			<button type="button" aria-label="Remove">
+				<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+			</button>
+		</p>
+	</li>
+</template>
+
+<template data-ln-template="ln-translations-menu-item">
+	<li><button type="button" data-ln-translations-lang></button></li>
+</template>

@@ -96,6 +96,7 @@ Each component ships one file — usage guide plus architecture reference
 | Autosave | `data-ln-autosave` | [components/ln-autosave/README.md](../components/ln-autosave/README.md) |
 | Autoresize | `data-ln-autoresize` | [components/ln-autoresize/README.md](../components/ln-autoresize/README.md) |
 | Translations | `data-ln-translations` | [components/ln-translations/README.md](../components/ln-translations/README.md) |
+| Repeater | `data-ln-repeater` | [components/ln-repeater/README.md](../components/ln-repeater/README.md) |
 | External Links | (automatic) | [components/ln-external-links/README.md](../components/ln-external-links/README.md) |
 
 ---

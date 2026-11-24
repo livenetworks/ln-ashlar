@@ -1,0 +1,20 @@
+// ==========================================================================
+// ln-repeater — Functional Layout & State Rules
+// ==========================================================================
+
+[data-ln-repeater-list] {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+[data-ln-repeater-item] {
+	display: flex;
+	align-items: flex-start;
+}
+
+[data-ln-repeater-add]:disabled,
+[data-ln-repeater-add-for]:disabled,
+[data-ln-repeater-remove]:disabled {
+	pointer-events: none;
+}

@@ -71,7 +71,7 @@ import { populateForm, registerComponent, defineAttrs, attrSpec, attrStr } from 
 	_component.prototype.fill = function (data) {
 		const filled = populateForm(this.dom, data);
 
-		// Trigger events so reactive consumers (ln-validate, ln-autoresize)
+		// Trigger events so reactive consumers (e.g. ln-validate, ln-slug)
 		// pick up the changes. SELECT/checkbox/radio -> 'change',
 		// everything else -> 'input'.
 		for (let k = 0; k < filled.length; k++) {

@@ -209,6 +209,49 @@ export function filterAvailableLocales(locales, activeLanguages, defaultLang = '
 }
 
 /**
+ * Resolves a translation value for a field, honoring optional bracketed prefix paths
+ * (e.g. `prefix = 'options[0]'`, `field = 'label'` -> `values.options[0].label`).
+ *
+ * @param {Record<string, any>} values - Per-language values object
+ * @param {string} field - Field name from `data-ln-translatable`
+ * @param {string} [prefix=''] - Optional prefix from `data-ln-translations-prefix`
+ * @returns {string}
+ */
+export function resolveTranslationValue(values, field, prefix = '') {
+	if (!values || typeof values !== 'object' || !field) return '';
+
+	if (prefix) {
+		// 1. Nested traversal: e.g. "options[0]" -> ["options", "0"], "company[profile]" -> ["company", "profile"]
+		const segments = prefix.replace(/\]/g, '').split('[').filter(Boolean);
+		let cur = values;
+		for (let i = 0; i < segments.length; i++) {
+			if (cur == null || typeof cur !== 'object') {
+				cur = undefined;
+				break;
+			}
+			cur = cur[segments[i]];
+		}
+		if (cur && typeof cur === 'object' && cur[field] !== undefined && cur[field] !== null) {
+			return String(cur[field]);
+		}
+
+		// 2. Flat prefixed key fallback (e.g. "options[0][label]" or "options[0].label")
+		const bracketKey = `${prefix}[${field}]`;
+		if (values[bracketKey] !== undefined && values[bracketKey] !== null) {
+			return String(values[bracketKey]);
+		}
+		const dotKey = `${prefix}.${field}`;
+		if (values[dotKey] !== undefined && values[dotKey] !== null) {
+			return String(values[dotKey]);
+		}
+
+		return '';
+	}
+
+	return (values[field] !== undefined && values[field] !== null) ? String(values[field]) : '';
+}
+
+/**
  * Resolves ISO 3166-1 alpha-2 country code for flag lookup.
  *
  * @param {string} lang - ISO 639-1 language code

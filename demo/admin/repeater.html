@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Repeater — ln-ashlar</title>
+	<link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
+	<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-dark-32x32.png?v=2" media="(prefers-color-scheme: dark)">
+	<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-dark-16x16.png?v=2" media="(prefers-color-scheme: dark)">
+	<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-light-32x32.png?v=2" media="(prefers-color-scheme: light)">
+	<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-light-16x16.png?v=2" media="(prefers-color-scheme: light)">
+	<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png?v=2">
+	<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png?v=2">
+	<link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png?v=2">
+	<link rel="manifest" href="../site.webmanifest?v=2">
+	<link rel="shortcut icon" href="favicon.ico?v=2">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<!-- UI state bootstrap (mode, skin, theme, density) — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var config = [
+			{ key: 'ln-demo-mode', attr: 'data-mode', valid: ['light', 'dark'] },
+			{ key: 'ln-demo-skin', attr: 'data-skin', valid: ['glass', 'outline', 'hairline'] },
+			{ key: 'ln-demo-theme', attr: 'data-theme', valid: ['ocean', 'sunset', 'midnight', 'glass'] },
+			{ key: 'ln-demo-density', attr: 'data-density', valid: ['compact', 'comfortable', 'spacious'] }
+		];
+		try {
+			for (var i = 0; i < config.length; i++) {
+				var stored = localStorage.getItem(config[i].key);
+				if (stored && config[i].valid.indexOf(stored) !== -1) {
+					document.documentElement.setAttribute(config[i].attr, stored);
+				}
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
+	<!-- CSS engine — the stored choice is written as a parser-inserted <link>: first paint waits for it
+	     and no other engine bundle is fetched. A pick preloads the next bundle (media="not all") and swaps
+	     it in one task, so no frame shows zero or two engine sheets. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-engine';
+		var HREF = {
+			ashlar: 'dist/admin.css?v=2.2.8',
+			tailwind: 'dist/admin-tailwind.css?v=2.2.8',
+			relaxed: 'dist/admin-relaxed.css?v=2.2.8'
+		};
+		var root = document.documentElement;
+		var engine = 'ashlar';
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && HREF.hasOwnProperty(stored)) engine = stored;
+		} catch (e) { /* localStorage unavailable */ }
+		root.setAttribute('data-css-engine', engine);
+		document.write('<link rel="stylesheet" id="theme-engine" href="' + HREF[engine] + '">');
+
+		function markActive() {
+			var current = root.getAttribute('data-css-engine');
+			document.querySelectorAll('[data-demo-engine]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-engine') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			var btn = e.target.closest('[data-demo-engine]');
+			if (!btn) return;
+			var value = btn.getAttribute('data-demo-engine');
+			if (!HREF.hasOwnProperty(value)) return;
+
+			var popover = document.getElementById('demo-engine-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+			try { localStorage.setItem(KEY, value); } catch (err) { /* ignore */ }
+			if (value === root.getAttribute('data-css-engine')) return;
+
+			var current = document.getElementById('theme-engine');
+			var next = document.createElement('link');
+			next.rel = 'stylesheet';
+			next.media = 'not all';
+			next.href = HREF[value];
+			next.addEventListener('load', function () {
+				next.media = 'all';
+				next.id = 'theme-engine';
+				current.remove();
+				root.setAttribute('data-css-engine', value);
+				markActive();
+			});
+			current.after(next);
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+	})();
+	</script>
+	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css?v=2.2.8">
+		<script src="../dist/ln-ashlar.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body data-ln-debug>
+	<!-- Toast container -->
+	<ul data-ln-toast>
+		<template data-ln-template="ln-toast-item">
+		<li data-ln-toast-item data-ln-attr="class:type">
+			<div class="icon">
+				<ul>
+					<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg></li>
+					<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-x"></use></svg></li>
+					<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg></li>
+					<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg></li>
+				</ul>
+			</div>
+			<section class="content">
+				<header>
+					<strong class="title" data-ln-field="title"></strong>
+					<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+				</header>
+				<main class="body" data-ln-field="message"></main>
+			</section>
+		</li>
+		</template>
+	</ul>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header class="app-header">
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
+				</button>
+				<h1>Repeater</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Appearance">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-palette"></use></svg>
+					</button>
+					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
+						<section>
+							<h4>Mode</h4>
+							<ul>
+								<li><button type="button" data-demo-mode="light"><span class="demo-theme-swatch" data-preset="light"></span>Light</button></li>
+								<li><button type="button" data-demo-mode="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
+							</ul>
+						</section>
+						<section>
+							<h4>Skin</h4>
+							<ul>
+								<li><button type="button" data-demo-skin="default">Solid</button></li>
+								<li><button type="button" data-demo-skin="outline"><span class="demo-theme-swatch" data-preset="outline"></span>Outline</button></li>
+								<li><button type="button" data-demo-skin="hairline"><span class="demo-theme-swatch" data-preset="hairline"></span>Hairline</button></li>
+								<li><button type="button" data-demo-skin="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
+							</ul>
+						</section>
+						<section>
+							<h4>Theme</h4>
+							<ul>
+								<li><button type="button" data-demo-theme="default">Default</button></li>
+								<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
+								<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
+								<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+								<li><button type="button" data-demo-theme="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
+							</ul>
+						</section>
+						<section>
+							<h4>Sidebar</h4>
+							<ul>
+								<li><button type="button" data-demo-sidebar="light">Light</button></li>
+								<li><button type="button" data-demo-sidebar="navy"><span class="demo-theme-swatch" data-preset="navy"></span>Navy</button></li>
+							</ul>
+						</section>
+					</div>
+					<button type="button" id="demo-density-trigger" data-ln-popover-for="demo-density-picker" aria-label="Choose density">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-adjustments-horizontal"></use></svg>
+					</button>
+					<div class="demo-density-picker" data-ln-popover id="demo-density-picker">
+						<ul>
+							<li><button type="button" data-demo-density="compact">Compact</button></li>
+							<li><button type="button" data-demo-density="comfortable">Comfortable</button></li>
+							<li><button type="button" data-demo-density="spacious">Spacious</button></li>
+						</ul>
+					</div>
+					<button type="button" id="demo-engine-trigger" data-ln-popover-for="demo-engine-picker" aria-label="Choose CSS Engine" title="Choose CSS Engine">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-adjustments-alt"></use></svg>
+					</button>
+					<div class="demo-engine-picker" data-ln-popover id="demo-engine-picker">
+						<ul>
+							<li><button type="button" data-demo-engine="ashlar">Ashlar SCSS</button></li>
+							<li><button type="button" data-demo-engine="tailwind">Tailwind v4</button></li>
+							<li><button type="button" data-demo-engine="relaxed">Relaxed</button></li>
+						</ul>
+					</div>
+					<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'This is a demo notification.'}}))">
+						<span>Test Toast</span>
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<main class="app-main">
+		<!-- Sidebar -->
+		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
+			<header>
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+				<img class="logo logo-dark" src="ln-ashlar-logo-dark.png?v=2" alt="ln-ashlar">
+				<img class="logo logo-light" src="ln-ashlar-logo-light.png?v=2" alt="ln-ashlar">
+				<span class="app-name">ashlar-gui</span>
+				<search aria-label="Filter menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+					<input type="search" placeholder="Filter menu…" aria-label="Filter menu" data-ln-search-for="demo-nav">
+					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
+				</search>
+			</header>
+
+			<main>
+				<nav class="nav" id="demo-nav" data-ln-nav="active" data-ln-search="" data-ln-search-items="li" data-ln-persist>
+					<ul>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+						<li><a href="getting-started.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-rocket"></use></svg><span class="nav-label">Getting started</span></a></li>
+					</ul>
+
+					<h2 class="nav-section">CSS Components</h2>
+					<ul>
+						<li><a href="typography.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-typography"></use></svg><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-cards"></use></svg><span class="nav-label">Cards</span></a></li>
+						<li><a href="chip.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-tag"></use></svg><span class="nav-label">Chip</span></a></li>
+						<li><a href="density.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-rows"></use></svg><span class="nav-label">Density</span></a></li>
+						<li><a href="tables.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-table"></use></svg><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-forms"></use></svg><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-grid"></use></svg><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-list"></use></svg><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-icons"></use></svg><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-tool"></use></svg><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-code"></use></svg><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="page-header.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-heading"></use></svg><span class="nav-label">Page Header</span></a></li>
+						<li><a href="prose.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-article"></use></svg><span class="nav-label">Prose</span></a></li>
+						<li><a href="stat-card.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-chart-bar"></use></svg><span class="nav-label">Stat Card</span></a></li>
+						<li><a href="status-badge.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-badge"></use></svg><span class="nav-label">Status Badge</span></a></li>
+						<li><a href="stepper.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-list-numbers"></use></svg><span class="nav-label">Stepper</span></a></li>
+						<li><a href="timeline.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-timeline"></use></svg><span class="nav-label">Timeline</span></a></li>
+						<li><a href="empty-state.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-mood-empty"></use></svg><span class="nav-label">Empty State</span></a></li>
+					</ul>
+
+					<h2 class="nav-section">JS Components</h2>
+					<ul>
+						<li><a href="accordion.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-bottombar-expand"></use></svg><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-bolt"></use></svg><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autoresize.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-vertical"></use></svg><span class="nav-label">Autoresize</span></a></li>
+						<li><a href="autosave.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-device-floppy"></use></svg><span class="nav-label">Autosave</span></a></li>
+						<li><a href="circular-progress.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-chart-donut"></use></svg><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="confirm.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg><span class="nav-label">Confirm</span></a></li>
+						<li><a href="dropdown.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-selector"></use></svg><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="editor.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-pencil"></use></svg><span class="nav-label">Editor</span></a></li>
+						<li><a href="external-links.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-external-link"></use></svg><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg><span class="nav-label">Filter</span></a></li>
+						<li><a href="http.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg><span class="nav-label">HTTP</span></a></li>
+						<li><a href="include.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-file-import"></use></svg><span class="nav-label">Include</span></a></li>
+						<li><a href="kbd.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-keyboard"></use></svg><span class="nav-label">Key (Shortcuts)</span></a></li>
+						<li><a href="link.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-link"></use></svg><span class="nav-label">Link</span></a></li>
+						<li><a href="localization.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-language"></use></svg><span class="nav-label">Localization (Date &amp; Number)</span></a></li>
+						<li><a href="modal.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-app-window"></use></svg><span class="nav-label">Modal</span></a></li>
+						<li><a href="nav.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu-2"></use></svg><span class="nav-label">Nav</span></a></li>
+						<li><a href="obfuscator.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-shield-check"></use></svg><span class="nav-label">Obfuscator</span></a></li>
+						<li><a href="persist.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-database"></use></svg><span class="nav-label">Persist</span></a></li>
+						<li><a href="picklist.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-list-details"></use></svg><span class="nav-label">Picklist</span></a></li>
+						<li><a href="popover.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-message-2"></use></svg><span class="nav-label">Popover</span></a></li>
+						<li><a href="progress.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-progress"></use></svg><span class="nav-label">Progress</span></a></li>
+						<li><a href="repeater.html" aria-current="page"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-stack-2"></use></svg><span class="nav-label">Repeater</span></a></li>
+						<li><a href="router.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-route"></use></svg><span class="nav-label">Router</span></a></li>
+						<li><a href="search.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg><span class="nav-label">Search</span></a></li>
+						<li><a href="slug.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-link"></use></svg><span class="nav-label">Slug</span></a></li>
+						<li><a href="sortable.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg><span class="nav-label">Sortable</span></a></li>
+						<li><a href="store.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-database-cog"></use></svg><span class="nav-label">Store</span></a></li>
+						<li><a href="store-usecase.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-database-share"></use></svg><span class="nav-label">Store — Usecase</span></a></li>
+						<li><a href="list.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-list-details"></use></svg><span class="nav-label">List &amp; Card Grid</span></a></li>
+						<li><a href="coordinator.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-git-merge"></use></svg><span class="nav-label">Data Coordinator</span></a></li>
+						<li><a href="api-connector.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plug"></use></svg><span class="nav-label">API Connector</span></a></li>
+						<li><a href="couchdb-connector.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plug-connected"></use></svg><span class="nav-label">CouchDB Connector</span></a></li>
+						<li><a href="websocket-connector.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plug-connected"></use></svg><span class="nav-label">WebSocket Connector</span></a></li>
+						<li><a href="api-queue.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-stack-2"></use></svg><span class="nav-label">API Queue</span></a></li>
+						<li><a href="write-workflow.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-right-bar"></use></svg><span class="nav-label">Write Workflow (Form → Data)</span></a></li>
+						<li><a href="table.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-table-options"></use></svg><span class="nav-label">Table 1: SSR Pre-Rendered</span></a></li>
+						<li><a href="table-api.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-database-share"></use></svg><span class="nav-label">Table 2: Remote API Sync</span></a></li>
+						<li><a href="table-seed.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-database"></use></svg><span class="nav-label">Table 3: Injected JSON Seed</span></a></li>
+						<li><a href="table-filter.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-table-column"></use></svg><span class="nav-label">Table — Advanced Filters</span></a></li>
+						<li><a href="tabs.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-layout-navbar"></use></svg><span class="nav-label">Tabs</span></a></li>
+						<li><a href="time.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-clock"></use></svg><span class="nav-label">Time</span></a></li>
+						<li><a href="toast.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-notification"></use></svg><span class="nav-label">Toast</span></a></li>
+						<li><a href="toggle.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-toggle-left"></use></svg><span class="nav-label">Toggle</span></a></li>
+						<li><a href="tooltip.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-tooltip"></use></svg><span class="nav-label">Tooltip</span></a></li>
+						<li><a href="translations.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-language"></use></svg><span class="nav-label">Translations</span></a></li>
+						<li><a href="upload.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-upload"></use></svg><span class="nav-label">Upload</span></a></li>
+						<li><a href="validate.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-shield-check"></use></svg><span class="nav-label">Validate</span></a></li>
+						<li><a href="diagnostics.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-stethoscope"></use></svg><span class="nav-label">Diagnostics (DOM Linter)</span></a></li>
+					</ul>
+				</nav>
+			</main>
+
+			<footer>
+				<small>ashlar-gui v2.2.8</small>
+			</footer>
+		</aside>
+		<script>
+		// Sidebar tone bootstrap — applied before first paint. The default is the
+		// light sidebar; navy is a dark-polarity brand region.
+		(function () {
+			try {
+				if (localStorage.getItem('ln-demo-sidebar') === 'navy') {
+					var sidebar = document.getElementById('demo-sidebar');
+					sidebar.setAttribute('data-mode', 'dark');
+					sidebar.setAttribute('data-theme', 'navy');
+				}
+			} catch (e) { /* localStorage unavailable */ }
+		})();
+		</script>
+		<div class="app-scrim"></div>
+
+		<!-- Content -->
+		<section>
+			<div class="app-content-wrapper">
+<!-- Overview / philosophy -->
+				<section class="section-card">
+					<header><h3>Overview &amp; Philosophy</h3></header>
+					<main class="prose">
+						<p><strong><code>ln-repeater</code></strong> is applied to a container via <code>data-ln-repeater="name"</code> wrapping a list (<code>[data-ln-repeater-list]</code>), add/remove triggers (<code>[data-ln-repeater-add]</code>, <code>[data-ln-repeater-remove]</code>), and an HTML <code>&lt;template&gt;</code> defining a single row. It clones rows from the template, substitutes <code>{index}</code> / <code>{index1}</code> placeholders, enforces <code>data-ln-repeater-min</code> / <code>max</code> bounds via native <code>disabled</code> state, and hydrates rows from <code>ln-fill</code> payloads.</p>
+
+						<p>The component knows nothing about what inputs live inside a row — a single text input, a translatable multi-language group, or a multi-column line-item fieldset all use the exact same primitive. Everything else composes orthogonally: add <code>data-ln-sortable</code> to the list for drag-and-drop reordering, wrap the form in <code>data-ln-translations</code> for inline side-by-side translations, and drive Edit/Create modals with <code>ln-fill</code>.</p>
+
+						<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/components/ln-repeater/README.md"><code>ln-repeater</code> README</a>.</p>
+					</main>
+				</section>
+
+				<!-- Example 1: Basic single-field repeater -->
+				<section class="section-card" data-demo-html>
+					<header><h3>Example 1 — Basic Options (min="1", max="5")</h3></header>
+					<main>
+						<p>Starts empty in HTML, auto-seeds 1 row because <code>data-ln-repeater-min="1"</code>, disables the remove button at 1 row, and disables Add at 5 rows.</p>
+
+						<form id="repeater-basic-form" action="#" method="post">
+							<div class="form-element">
+								<label>Choice options</label>
+								<div data-ln-repeater="basic-options" data-ln-repeater-min="1" data-ln-repeater-max="5">
+									<ul data-ln-repeater-list></ul>
+
+									<button type="button" data-ln-repeater-add>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
+										Add option
+									</button>
+
+									<template data-ln-template="basic-options">
+										<li data-ln-repeater-item>
+											<input type="text" name="options[]" placeholder="Option {index1}" aria-label="Option {index1}" required>
+											<button type="button" data-ln-repeater-remove aria-label="Remove option">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+											</button>
+										</li>
+									</template>
+								</div>
+							</div>
+
+							<div class="form-actions">
+								<button type="submit">Inspect FormData</button>
+							</div>
+						</form>
+
+						<pre id="repeater-basic-log" class="demo-log demo-log--compact">(submit to inspect serialized FormData)</pre>
+					</main>
+				</section>
+
+				<!-- Example 2: Translatable + Sortable options -->
+				<section class="section-card" data-demo-html>
+					<header><h3>Example 2 — Translatable + Sortable Options</h3></header>
+					<main>
+						<p>Add a language (e.g. English or Deutsch) from the globe menu, then click <strong>Add option</strong> — new rows automatically receive inputs for every active language side-by-side in flex. Drag the handle to reorder rows.</p>
+
+						<form id="repeater-trans-form"
+						      action="#"
+						      method="post"
+						      data-ln-translations
+						      data-ln-translations-default="mk"
+						      data-ln-translations-locales='{"mk":"Македонски","en":"English","de":"Deutsch"}'>
+							<header>
+								<h4>Field Options (Select Type)</h4>
+								<div class="actions">
+									<ul data-ln-translations-active></ul>
+									<div data-ln-dropdown>
+										<button type="button" data-ln-translations-add data-ln-toggle-for="repeater-trans-menu" aria-label="Add translation">
+											<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg>
+										</button>
+										<ul id="repeater-trans-menu" data-ln-toggle data-ln-dropdown-menu></ul>
+									</div>
+								</div>
+							</header>
+
+							<main>
+								<div data-ln-repeater="trans-options" data-ln-repeater-min="1">
+									<ul data-ln-repeater-list data-ln-sortable></ul>
+
+									<button type="button" data-ln-repeater-add>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
+										Додај опција
+									</button>
+
+									<template data-ln-template="trans-options">
+										<li data-ln-repeater-item>
+											<span data-ln-sortable-handle aria-hidden="true">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
+											</span>
+											<div data-ln-translatable="label" data-ln-translations-prefix="options[{index}]">
+												<input type="text" name="options[{index}][label]" placeholder="Опција {index1}" aria-label="Опција {index1}" required>
+											</div>
+											<button type="button" data-ln-repeater-remove aria-label="Отстрани опција">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+											</button>
+										</li>
+									</template>
+								</div>
+							</main>
+
+							<div class="form-actions">
+								<button type="submit">Inspect FormData</button>
+							</div>
+						</form>
+
+						<pre id="repeater-trans-log" class="demo-log demo-log--compact">(submit to inspect serialized FormData)</pre>
+					</main>
+				</section>
+
+				<!-- Example 3: Multi-field indexed rows + Reindex + External trigger -->
+				<section class="section-card" data-demo-html>
+					<header>
+						<h3>Example 3 — Multi-Field Rows + Reindex + External Trigger</h3>
+						<button type="button" class="btn btn-sm" data-ln-repeater-add-for="sacks-repeater">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
+							Add sack
+						</button>
+					</header>
+					<main>
+						<p>Multiple controls per row (<code>select</code> + two <code>number</code> inputs), an external <code>data-ln-repeater-add-for</code> trigger in the card header, <code>data-ln-sortable</code> drag reordering, and <code>data-ln-repeater-reindex</code> so names stay strictly sequential (<code>0, 1, 2…</code>) after remove or drag.</p>
+
+						<form id="repeater-sacks-form" action="#" method="post">
+							<div id="sacks-repeater" data-ln-repeater="sacks" data-ln-repeater-min="1" data-ln-repeater-max="8" data-ln-repeater-reindex>
+								<ul data-ln-repeater-list data-ln-sortable></ul>
+
+								<template data-ln-template="sacks">
+									<li data-ln-repeater-item>
+										<span data-ln-sortable-handle aria-hidden="true">
+											<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
+										</span>
+										<select name="sacks[{index}][type]" aria-label="Sack type {index1}" required>
+											<option value="standard">Standard sack</option>
+											<option value="window">Window sack</option>
+											<option value="pallet">Pallet</option>
+										</select>
+										<input type="number" name="sacks[{index}][weight]" step="0.1" min="0" placeholder="Weight (kg)" aria-label="Weight {index1}" required>
+										<input type="number" name="sacks[{index}][qty]" min="1" value="1" placeholder="Qty" aria-label="Quantity {index1}" required>
+										<button type="button" data-ln-repeater-remove aria-label="Remove sack">
+											<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+										</button>
+									</li>
+								</template>
+							</div>
+
+							<div class="form-actions">
+								<button type="submit">Inspect FormData</button>
+							</div>
+						</form>
+
+						<pre id="repeater-sacks-log" class="demo-log demo-log--compact">(submit to inspect serialized FormData)</pre>
+					</main>
+				</section>
+
+				<!-- Example 4: Modal Create / Edit with ln-fill + ln-form + ln-repeater + ln-translations -->
+				<section class="section-card" data-demo-html>
+					<header><h3>Example 4 — Modal Create / Edit (ln-fill Hydration)</h3></header>
+					<main>
+						<p><strong>New field</strong> dispatches <code>ln-fill</code> with <code>null</code>, resetting the repeater to 1 empty row and clearing extra languages. <strong>Edit</strong> hydrates the base field, saved option rows, and per-option translations in one click.</p>
+
+						<nav class="demo-actions">
+							<button type="button" class="btn"
+							        data-ln-modal-for="repeater-modal"
+							        data-ln-fill-form="repeater-modal-form">
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
+								New IT Resource Field
+							</button>
+						</nav>
+
+						<div class="table-container">
+							<table>
+								<thead><tr><th>Field Name</th><th>Options</th><th>Translations</th><th>Actions</th></tr></thead>
+								<tbody>
+									<tr>
+										<td data-label="Field Name">Оперативен систем</td>
+										<td data-label="Options">Линукс, Виндоус, macOS</td>
+										<td data-label="Translations">en, de</td>
+										<td data-label="Actions">
+											<ul class="btn-group">
+												<li>
+													<button type="button" aria-label="Edit"
+													        data-ln-modal-for="repeater-modal"
+													        data-ln-modal-mode="edit"
+													        data-ln-fill-form="repeater-modal-form"
+													        data-ln-fill-id="10"
+													        data-ln-fill-name="Оперативен систем"
+													        data-ln-fill-options='[{"label":"Линукс"},{"label":"Виндоус"},{"label":"macOS"}]'
+													        data-ln-fill-trans='{"en":{"name":"Operating System","options":[{"label":"Linux"},{"label":"Windows"},{"label":"macOS"}]},"de":{"name":"Betriebssystem","options":[{"label":"Linux"},{"label":"Windows"},{"label":"macOS"}]}}'>
+														<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg>
+													</button>
+												</li>
+											</ul>
+										</td>
+									</tr>
+									<tr>
+										<td data-label="Field Name">Статус</td>
+										<td data-label="Options">Активен, Во сервис</td>
+										<td data-label="Translations">en</td>
+										<td data-label="Actions">
+											<ul class="btn-group">
+												<li>
+													<button type="button" aria-label="Edit"
+													        data-ln-modal-for="repeater-modal"
+													        data-ln-modal-mode="edit"
+													        data-ln-fill-form="repeater-modal-form"
+													        data-ln-fill-id="11"
+													        data-ln-fill-name="Статус"
+													        data-ln-fill-options='[{"label":"Активен"},{"label":"Во сервис"}]'
+													        data-ln-fill-trans='{"en":{"name":"Status","options":[{"label":"Active"},{"label":"In Service"}]}}'>
+														<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg>
+													</button>
+												</li>
+											</ul>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<pre id="repeater-modal-log" class="demo-log demo-log--compact">(save modal to inspect serialized FormData)</pre>
+					</main>
+				</section>
+
+				<!-- API & Events -->
+				<section class="section-card">
+					<header><h3>Attributes, API &amp; Events</h3></header>
+					<main>
+						<article>
+							<h4>Attributes</h4>
+							<div class="table-container">
+								<table>
+									<thead><tr><th>Attribute</th><th>On element</th><th>Default</th><th>Description</th></tr></thead>
+									<tbody>
+										<tr><td data-label="Attribute"><code>data-ln-repeater</code></td><td data-label="On element">Root</td><td data-label="Default"><code>""</code></td><td data-label="Description">Mounts the repeater. Optional value names the <code>&lt;template data-ln-template&gt;</code> and the <code>ln-fill</code> array key.</td></tr>
+										<tr><td data-label="Attribute"><code>data-ln-repeater-min</code></td><td data-label="On element">Root</td><td data-label="Default"><code>0</code></td><td data-label="Description">Minimum rows. Auto-seeds on init when empty and disables remove buttons at <code>count &lt;= min</code>.</td></tr>
+										<tr><td data-label="Attribute"><code>data-ln-repeater-max</code></td><td data-label="On element">Root</td><td data-label="Default"><code>Infinity</code></td><td data-label="Description">Maximum rows. Disables internal/external add triggers once reached.</td></tr>
+										<tr><td data-label="Attribute"><code>data-ln-repeater-reindex</code></td><td data-label="On element">Root</td><td data-label="Default"><code>false</code></td><td data-label="Description">Sequentially re-numbers <code>{index}</code> / <code>{index1}</code> attributes on remove or <code>ln-sortable:reordered</code>.</td></tr>
+										<tr><td data-label="Attribute"><code>data-ln-repeater-list</code></td><td data-label="On element"><code>&lt;ul&gt;</code> / <code>&lt;ol&gt;</code></td><td data-label="Default">—</td><td data-label="Description">Container where repeated rows are appended.</td></tr>
+										<tr><td data-label="Attribute"><code>data-ln-repeater-item</code></td><td data-label="On element">Row</td><td data-label="Default">—</td><td data-label="Description">Marks an individual repeated row (added automatically to cloned rows).</td></tr>
+										<tr><td data-label="Attribute"><code>data-ln-repeater-add</code></td><td data-label="On element"><code>&lt;button type="button"&gt;</code></td><td data-label="Default">—</td><td data-label="Description">Internal button that appends a new row from the template.</td></tr>
+										<tr><td data-label="Attribute"><code>data-ln-repeater-add-for</code></td><td data-label="On element"><code>&lt;button type="button"&gt;</code></td><td data-label="Default">—</td><td data-label="Description">External trigger referencing a repeater root by <code>id</code>.</td></tr>
+										<tr><td data-label="Attribute"><code>data-ln-repeater-remove</code></td><td data-label="On element"><code>&lt;button type="button"&gt;</code></td><td data-label="Default">—</td><td data-label="Description">Per-row button that removes its owning item.</td></tr>
+									</tbody>
+								</table>
+							</div>
+						</article>
+
+						<article>
+							<h4>Instance API</h4>
+							<pre><code>const el = document.querySelector('[data-ln-repeater]');
+el.lnRepeater.add({ label: 'Linux' });  // appends &amp; populates row
+el.lnRepeater.remove(0);                // removes row by index or element
+el.lnRepeater.clear();                  // clears down to min (or { force: true })
+el.lnRepeater.items;                    // HTMLElement[]
+el.lnRepeater.count;                    // number</code></pre>
+						</article>
+
+						<article>
+							<h4>Events</h4>
+							<div class="table-container">
+								<table>
+									<thead><tr><th>Event</th><th>Direction</th><th>Cancelable</th><th>Detail</th></tr></thead>
+									<tbody>
+										<tr><td data-label="Event"><code>ln-repeater:request-add</code></td><td data-label="Direction">Listens</td><td data-label="Cancelable">no</td><td data-label="Detail"><code>{ values?, focus? }</code></td></tr>
+										<tr><td data-label="Event"><code>ln-repeater:request-remove</code></td><td data-label="Direction">Listens</td><td data-label="Cancelable">no</td><td data-label="Detail"><code>{ item? | index?, focusNeighbor? }</code></td></tr>
+										<tr><td data-label="Event"><code>ln-fill</code></td><td data-label="Direction">Listens</td><td data-label="Cancelable">no</td><td data-label="Detail"><code>Object | null</code></td></tr>
+										<tr><td data-label="Event"><code>ln-repeater:before-add</code></td><td data-label="Direction">Emits</td><td data-label="Cancelable">yes</td><td data-label="Detail"><code>{ target, index, count }</code></td></tr>
+										<tr><td data-label="Event"><code>ln-repeater:added</code></td><td data-label="Direction">Emits</td><td data-label="Cancelable">no</td><td data-label="Detail"><code>{ target, item, index, count }</code></td></tr>
+										<tr><td data-label="Event"><code>ln-repeater:before-remove</code></td><td data-label="Direction">Emits</td><td data-label="Cancelable">yes</td><td data-label="Detail"><code>{ target, item, index, count }</code></td></tr>
+										<tr><td data-label="Event"><code>ln-repeater:removed</code></td><td data-label="Direction">Emits</td><td data-label="Cancelable">no</td><td data-label="Detail"><code>{ target, item, index, count }</code></td></tr>
+										<tr><td data-label="Event"><code>ln-repeater:reindexed</code></td><td data-label="Direction">Emits</td><td data-label="Cancelable">no</td><td data-label="Detail"><code>{ target, count }</code></td></tr>
+										<tr><td data-label="Event"><code>ln-repeater:max-reached</code></td><td data-label="Direction">Emits</td><td data-label="Cancelable">no</td><td data-label="Detail"><code>{ target, max, count }</code></td></tr>
+										<tr><td data-label="Event"><code>ln-repeater:min-reached</code></td><td data-label="Direction">Emits</td><td data-label="Cancelable">no</td><td data-label="Detail"><code>{ target, min, count }</code></td></tr>
+									</tbody>
+								</table>
+							</div>
+						</article>
+					</main>
+				</section>
+
+				<!-- Modal dialog for Example 4 -->
+				<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="repeater-modal">
+					<form id="repeater-modal-form"
+					      data-ln-form
+					      method="post"
+					      action="/api/fields"
+					      data-ln-form-action-edit="/api/fields/:id"
+					      data-ln-form-action-method="PUT"
+					      data-ln-translations
+					      data-ln-translations-default="mk"
+					      data-ln-translations-locales='{"mk":"Македонски","en":"English","de":"Deutsch"}'>
+						<header>
+							<h3>
+								<span data-ln-modal-when="new">Ново поле</span>
+								<span data-ln-modal-when="edit">Уреди поле</span>
+							</h3>
+							<div class="actions">
+								<ul data-ln-translations-active></ul>
+								<div data-ln-dropdown>
+									<button type="button" data-ln-translations-add data-ln-toggle-for="repeater-modal-trans-menu" aria-label="Add translation">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg>
+									</button>
+									<ul id="repeater-modal-trans-menu" data-ln-toggle data-ln-dropdown-menu></ul>
+								</div>
+							</div>
+							<button type="button" data-ln-modal-close aria-label="Close">
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+							</button>
+						</header>
+						<main>
+							<div class="form-element" data-ln-translatable="name">
+								<label for="repeater-modal-name">Назив на поле</label>
+								<input type="text" id="repeater-modal-name" name="name" required>
+							</div>
+
+							<div class="form-element">
+								<label>Опции (тип: избор)</label>
+								<div data-ln-repeater="options" data-ln-repeater-min="1">
+									<ul data-ln-repeater-list data-ln-sortable></ul>
+
+									<button type="button" data-ln-repeater-add>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
+										Додај опција
+									</button>
+
+									<template data-ln-template="options">
+										<li data-ln-repeater-item>
+											<span data-ln-sortable-handle aria-hidden="true">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
+											</span>
+											<div data-ln-translatable="label" data-ln-translations-prefix="options[{index}]">
+												<input type="text" name="options[{index}][label]" placeholder="Опција {index1}" aria-label="Опција {index1}" required>
+											</div>
+											<button type="button" data-ln-repeater-remove aria-label="Отстрани опција">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+											</button>
+										</li>
+									</template>
+								</div>
+							</div>
+						</main>
+						<footer>
+							<button type="button" data-ln-modal-close>Cancel</button>
+							<button type="submit">Save</button>
+						</footer>
+					</form>
+				</dialog>
+
+<script>
+(function () {
+	'use strict';
+
+	function bindPreview(formId, logId, modalId) {
+		const form = document.getElementById(formId);
+		const log = document.getElementById(logId);
+		const modal = modalId ? document.getElementById(modalId) : null;
+		if (!form || !log) return;
+
+		form.addEventListener('submit', function (e) {
+			e.preventDefault();
+			const entries = [];
+			for (const [k, v] of new FormData(form).entries()) {
+				entries.push(k + ' = ' + JSON.stringify(v));
+			}
+			const methodInput = form.querySelector('input[name="_method"]');
+			const verb = (methodInput && methodInput.value) ? methodInput.value : 'POST';
+			const header = modal ? (verb + ' ' + form.getAttribute('action') + '\n') : '';
+			log.textContent = header + (entries.join('\n') || '(empty)');
+			if (modal) modal.setAttribute('data-ln-modal', 'close');
+		});
+	}
+
+	bindPreview('repeater-basic-form', 'repeater-basic-log');
+	bindPreview('repeater-trans-form', 'repeater-trans-log');
+	bindPreview('repeater-sacks-form', 'repeater-sacks-log');
+	bindPreview('repeater-modal-form', 'repeater-modal-log', 'repeater-modal');
+})();
+</script>
+
+<!-- Required global templates for ln-translations badges and menu items -->
+<template data-ln-template="ln-translations-badge">
+	<li>
+		<p data-ln-translations-lang>
+			<span></span>
+			<button type="button" aria-label="Remove">
+				<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+			</button>
+		</p>
+	</li>
+</template>
+
+<template data-ln-template="ln-translations-menu-item">
+	<li><button type="button" data-ln-translations-lang></button></li>
+</template>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<footer class="app-footer">
+			<span>ashlar-gui &copy; 2026 LiveNetworks</span>
+			<span>ln-ashlar v2.2.8</span>
+		</footer>
+		</main>
+	</div><!-- /.app-wrapper -->
+
+	<script>
+	(function () {
+		const KEY = 'ln-demo-mode';
+		const VALID = ['light', 'dark'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-mode') || 'light';
+			document.querySelectorAll('[data-demo-mode]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-mode') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-mode]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-mode');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-mode', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+
+	(function () {
+		const KEY = 'ln-demo-skin';
+		const VALID = ['glass', 'outline', 'hairline'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-skin') || 'default';
+			document.querySelectorAll('[data-demo-skin]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-skin') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-skin]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-skin');
+			if (value === 'default') {
+				root.removeAttribute('data-skin');
+				try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ }
+			} else if (VALID.indexOf(value) !== -1) {
+				root.setAttribute('data-skin', value);
+				try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			} else {
+				return;
+			}
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+
+	(function () {
+		const KEY = 'ln-demo-theme';
+		const VALID = ['ocean', 'sunset', 'midnight', 'glass'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-theme') || 'default';
+			document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-theme') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-theme]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-theme');
+			if (value === 'default') {
+				root.removeAttribute('data-theme');
+				try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ }
+			} else if (VALID.indexOf(value) !== -1) {
+				root.setAttribute('data-theme', value);
+				try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			} else {
+				return;
+			}
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+
+	(function () {
+		const root = document.documentElement;
+
+		function markActive() {
+			const btn = document.querySelector('[data-demo-preset="glass-legacy"]');
+			if (!btn) return;
+			const isActive = root.getAttribute('data-skin') === 'glass'
+				&& root.getAttribute('data-theme') === 'glass'
+				&& root.getAttribute('data-mode') === 'dark';
+			if (isActive) {
+				btn.setAttribute('aria-current', 'true');
+			} else {
+				btn.removeAttribute('aria-current');
+			}
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-preset="glass-legacy"]');
+			if (!btn) return;
+			root.setAttribute('data-skin', 'glass');
+			root.setAttribute('data-theme', 'glass');
+			root.setAttribute('data-mode', 'dark');
+			try {
+				localStorage.setItem('ln-demo-skin', 'glass');
+				localStorage.setItem('ln-demo-theme', 'glass');
+				localStorage.setItem('ln-demo-mode', 'dark');
+			} catch (e) { /* ignore */ }
+			document.querySelectorAll('[data-demo-mode],[data-demo-skin],[data-demo-theme]').forEach(function (b) {
+				b.removeAttribute('aria-current');
+			});
+			const modeDark = document.querySelector('[data-demo-mode="dark"]');
+			const skinGlass = document.querySelector('[data-demo-skin="glass"]');
+			const themeGlass = document.querySelector('[data-demo-theme="glass"]');
+			if (modeDark) modeDark.setAttribute('aria-current', 'true');
+			if (skinGlass) skinGlass.setAttribute('aria-current', 'true');
+			if (themeGlass) themeGlass.setAttribute('aria-current', 'true');
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+
+	(function () {
+		const KEY = 'ln-demo-density';
+		const VALID = ['compact', 'comfortable', 'spacious'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-density') || 'comfortable';
+			document.querySelectorAll('[data-demo-density]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-density') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-density]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-density');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-density', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-density-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+
+
+	(function () {
+		const KEY = 'ln-demo-sidebar';
+		const VALID = ['light', 'navy'];
+		const sidebar = document.getElementById('demo-sidebar');
+
+		function markActive() {
+			const current = sidebar && sidebar.getAttribute('data-theme') === 'navy' ? 'navy' : 'light';
+			document.querySelectorAll('[data-demo-sidebar]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-sidebar') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-sidebar]');
+			if (!btn || !sidebar) return;
+			const value = btn.getAttribute('data-demo-sidebar');
+			if (VALID.indexOf(value) === -1) return;
+			if (value === 'navy') {
+				sidebar.setAttribute('data-mode', 'dark');
+				sidebar.setAttribute('data-theme', 'navy');
+			} else {
+				sidebar.removeAttribute('data-mode');
+				sidebar.removeAttribute('data-theme');
+			}
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+	</script>
+</body>
+</html>

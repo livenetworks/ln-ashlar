@@ -117,8 +117,9 @@ Before writing or editing HTML, SCSS, or JS code, verify:
 | `ln-validate` | Field-level constraint validation with visual errors | Server-side validation feedback |
 | `ln-upload` | Drag-and-drop file intake | Single trivial file input; camera capture |
 | `ln-autosave` | Long forms, comment boxes — draft persistence to localStorage | Sensitive data (unencrypted) |
-| `ln-autoresize` | Textareas with unpredictable content length | Fixed-height inputs |
+| `ln-autoresize` | Textareas with unpredictable content length. **Not a JS component** — pure CSS (`field-sizing: content`) only | Fixed-height inputs |
 | `ln-picklist` | Choosing a subset from a long pool — available list on the left, chosen on the right | Few options -> inline pill group; filtering a view rather than moving items -> `ln-filter` |
+| `ln-repeater` | Dynamic repeatable form rows cloned from `<template>` (single-field options, multi-field line items, translatable/sortable rows) with `min`/`max` bounds and `ln-fill` hydration | Fixed static form fields; rendering read-only data collections → `ln-list` / `ln-table` |
 
 ## Navigation
 
@@ -711,7 +712,7 @@ Shows how to configure continuous debounced auto-saving while typing, manually e
 
     <div class="form-element">
         <label for="content">Content</label>
-        <!-- Composes with ln-autoresize via native input events -->
+        <!-- Automatically resizes via pure CSS field-sizing: content -->
         <textarea id="content" name="content" data-ln-autoresize></textarea>
     </div>
 
@@ -3967,6 +3968,134 @@ This service module emits and listens to no custom DOM events directly.
 
 ---
 
+### ln-repeater
+- **Classification:** `simple` | **Status:** `stable`
+- **Summary:** A generic dynamic form-row repeater that clones rows from an HTML template, manages add/remove controls with min/max bounds, substitutes row indices, and integrates cleanly with ln-translations, ln-sortable, and ln-fill.
+
+> **Classification:** 🟢 Simple Component / Dynamic Form-Row Primitive  
+> Applied to a container (`data-ln-repeater="name"`) wrapping a list (`[data-ln-repeater-list]`), add/remove triggers (`[data-ln-repeater-add]`, `[data-ln-repeater-remove]`), and a `<template>` defining one row. It clones rows from the `<template>`, substitutes `{index}`/`{index1}` placeholders, enforces `data-ln-repeater-min`/`max` bounds via native `disabled` state, and hydrates rows from `ln-fill` array payloads. Native form controls inside each row remain the single source of truth for form submission — zero hidden inputs, zero JS data mirrors, and zero sibling component coupling.
+
+#### Minimal HTML Markup & Usage:
+### Base HTML Markup (Single-Field Repeater with `min="1"`)
+
+```html
+<div data-ln-repeater="options" data-ln-repeater-min="1" data-ln-repeater-max="20">
+	<ul data-ln-repeater-list></ul>
+
+	<button type="button" data-ln-repeater-add>Add option</button>
+
+	<template data-ln-template="options">
+		<li data-ln-repeater-item>
+			<input type="text" name="options[]" required aria-label="Option {index1}">
+			<button type="button" data-ln-repeater-remove aria-label="Remove option">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+			</button>
+		</li>
+	</template>
+</div>
+```
+
+### Variant 1: Translatable & Sortable Option Rows (`ln-translations` + `ln-sortable`)
+
+When `[data-ln-translatable]` sits inside `[data-ln-repeater-item]`, `ln-repeater`'s theme mixin automatically lays out language inputs side-by-side in flex, and `ln-translations` automatically clones all active languages onto newly appended rows:
+
+```html
+<form data-ln-form data-ln-translations data-ln-translations-default="en" data-ln-translations-locales='{"en":"English","de":"Deutsch","mk":"Македонски"}'>
+	<div data-ln-repeater="options" data-ln-repeater-min="1">
+		<ul data-ln-repeater-list data-ln-sortable></ul>
+
+		<button type="button" data-ln-repeater-add>Add option</button>
+
+		<template data-ln-template="options">
+			<li data-ln-repeater-item>
+				<span data-ln-sortable-handle aria-hidden="true">⋮⋮</span>
+				<div data-ln-translatable="label" data-ln-translations-prefix="options[{index}]">
+					<input type="text" name="options[{index}][label]" required>
+				</div>
+				<button type="button" data-ln-repeater-remove aria-label="Remove option">×</button>
+			</li>
+		</template>
+	</div>
+</form>
+```
+
+### Variant 2: Multi-Field Indexed Rows with Sequential Reindexing & External Add Trigger
+
+```html
+<header>
+	<h3>Sacks</h3>
+	<button type="button" data-ln-repeater-add-for="sacks-repeater">Add sack</button>
+</header>
+
+<div id="sacks-repeater" data-ln-repeater="sacks" data-ln-repeater-min="1" data-ln-repeater-reindex>
+	<ul data-ln-repeater-list data-ln-sortable></ul>
+
+	<template data-ln-template="sacks">
+		<li data-ln-repeater-item>
+			<span data-ln-sortable-handle aria-hidden="true">⋮⋮</span>
+			<select name="sacks[{index}][type]" required>
+				<option value="standard">Standard</option>
+				<option value="window">Window</option>
+			</select>
+			<input type="number" name="sacks[{index}][weight]" step="0.1" min="0" required>
+			<input type="number" name="sacks[{index}][qty]" min="1" value="1" required>
+			<button type="button" data-ln-repeater-remove aria-label="Remove row">×</button>
+		</li>
+	</template>
+</div>
+```
+
+---
+
+#### Declarative API Contract (Attributes & Events):
+### Attributes Table
+
+| Attribute | Element | Type / Values | Default | Description |
+|---|---|---|---|---|
+| `data-ln-repeater` | Root container | `string` | `""` | Initializes the repeater. Optional value names the `<template data-ln-template="...">` and the `ln-fill` array key. |
+| `data-ln-repeater-min` | Root container | `integer` (`>= 0`) | `0` | Minimum number of rows; auto-seeds on init when empty and disables remove buttons at `count <= min`. |
+| `data-ln-repeater-max` | Root container | `integer` (`>= 1`) | `Infinity` | Maximum number of rows; disables internal/external add triggers once reached. |
+| `data-ln-repeater-reindex` | Root container | `boolean` | `false` | When enabled, re-numbers `{index}`/`{index1}` attributes sequentially after remove or `ln-sortable:reordered`. |
+| `data-ln-repeater-list` | `<ul>` / `<ol>` / container | marker | — | List container where repeated items live. Falls back to root if omitted. |
+| `data-ln-repeater-item` | Row element | marker | — | Marks an individual repeated row (applied automatically to cloned rows if omitted). |
+| `data-ln-repeater-add` | `<button type="button">` | trigger | — | Internal button that appends a new row. |
+| `data-ln-repeater-add-for` | `<button type="button">` | `string` (ID) | — | External trigger targeting a repeater container by `id`. |
+| `data-ln-repeater-remove` | `<button type="button">` | trigger | — | Per-row button that removes its owning item. |
+
+### Programmatic JS API
+
+Accessed via `element.lnRepeater`:
+
+| Member | Signature | Returns | Description |
+|---|---|---|---|
+| `element.lnRepeater.items` | getter | `HTMLElement[]` | Live array of current row elements. |
+| `element.lnRepeater.count` | getter | `number` | Current number of rows. |
+| `element.lnRepeater.add` | `(values?, options?)` | `HTMLElement \| null` | Appends a cloned row, optionally populating fields from `values`. |
+| `element.lnRepeater.remove` | `(itemOrIndex, options?)` | `boolean` | Removes a row by element or 0-based position unless blocked by `min` or prevented. |
+| `element.lnRepeater.clear` | `(options?)` | `void` | Removes rows down to `min` (or all rows when `{ force: true }`). |
+| `element.lnRepeater.destroy` | `()` | `void` | Detaches listeners, resets `disabled`/`aria-disabled` on triggers, and deletes `element.lnRepeater`. |
+
+### Events API
+
+All emitted events bubble from the repeater root (`{ bubbles: true }`):
+
+| Event | Direction | Cancelable | Description | `detail` Object |
+|---|---|---|---|---|
+| `ln-repeater:request-add` | Listens | No | Requests appending a new row on the repeater root. | `{ values?: Object\|string\|null, focus?: boolean }` |
+| `ln-repeater:request-remove` | Listens | No | Requests removing a row by element or 0-based position on the repeater root. | `{ item?: HTMLElement, index?: number, focusNeighbor?: boolean }` |
+| `ln-fill` | Listens | No | Hydrates rows from `detail[templateName]` (array or JSON array string), or clears and re-seeds `min` rows when `detail` is `null`. | `Object \| null` |
+| `ln-repeater:before-add` | Emits | Yes | Fires before a row is cloned and appended. `preventDefault()` aborts the addition. | `{ target: HTMLElement, index: number, count: number }` |
+| `ln-repeater:added` | Emits | No | Fires after a row is appended and controls are synced. | `{ target: HTMLElement, item: HTMLElement, index: number, count: number }` |
+| `ln-repeater:before-remove` | Emits | Yes | Fires before a row is removed. `preventDefault()` aborts the removal. | `{ target: HTMLElement, item: HTMLElement, index: number, count: number }` |
+| `ln-repeater:removed` | Emits | No | Fires after a row is removed and controls are synced. | `{ target: HTMLElement, item: HTMLElement, index: number, count: number }` |
+| `ln-repeater:reindexed` | Emits | No | Fires after sequential reindexing completes (only when `data-ln-repeater-reindex` is active). | `{ target: HTMLElement, count: number }` |
+| `ln-repeater:max-reached` | Emits | No | Fires when an add attempt is blocked by `data-ln-repeater-max`. | `{ target: HTMLElement, max: number, count: number }` |
+| `ln-repeater:min-reached` | Emits | No | Fires when a remove attempt is blocked by `data-ln-repeater-min`. | `{ target: HTMLElement, min: number, count: number }` |
+
+---
+
+---
+
 ### ln-router
 - **Classification:** `coordinator` | **Status:** `stable`
 - **Summary:** SPA router engine managing declarative template routes, path specificity ranking, multi-region outlets, View Transitions, and teardown lifecycles.
@@ -5779,6 +5908,7 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 | `dom.lnTranslations.removeLanguage` | `(lang: String)` | `void` | Deactivates `lang`, removes its cloned fields, updates the menu and badges, and dispatches the remove lifecycle events. No-op if `lang` is not active. |
 | `dom.lnTranslations.hasLanguage` | `(lang: String)` | `Boolean` | Returns whether `lang` is currently active. |
 | `dom.lnTranslations.getActiveLanguages` | `()` | `Set<String>` | Returns a new `Set` copy of the active languages (safe to mutate without affecting internal state). |
+| `dom.lnTranslations.sync` | `()` | `void` | Re-scans all `[data-ln-translatable]` wrappers, applies `defaultLang` to unflagged originals, and clones any missing active-language fields. |
 | `dom.lnTranslations.destroy` | `()` | `void` | Removes non-default-language clones, detaches the request-event listeners, and deletes the instance reference. |
 
 ### Events API
@@ -5787,6 +5917,7 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 |---|---|---|---|---|
 | `ln-translations:request-add` | Listens | No | Requests activation of a language programmatically. Event listener is bound to the container element (`data-ln-translations`), not `document`. | `{ lang: String }` |
 | `ln-translations:request-remove` | Listens | No | Requests deactivation of a language programmatically. Event listener is bound to the container element (`data-ln-translations`), not `document`. | `{ lang: String }` |
+| `ln-fill` | Listens | No | Rebuilds the translation languages from a record: every active non-default language is removed (server-rendered ones included, without `before-remove`/`removed` events), then each language in `record.trans` is activated. A `null` record removes them only. Handled only when the event target is the container itself. | `Object` (record) \| `null` |
 | `ln-translations:before-add` | Emits | Yes | Fires before a language's fields are cloned. `preventDefault()` aborts the activation. | `{ target: HTMLElement, lang: String, langName: String }` |
 | `ln-translations:added` | Emits | No | Fires after a language's fields are cloned and the menu/badges are updated. | `{ target: HTMLElement, lang: String, langName: String }` |
 | `ln-translations:before-remove` | Emits | Yes | Fires before a language's cloned fields are removed. `preventDefault()` aborts the removal. | `{ target: HTMLElement, lang: String }` |
@@ -5794,6 +5925,16 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 
 > [!NOTE]
 > Both `request-add` and `request-remove` listeners are bound directly on the container element (the one carrying `data-ln-translations`), never on `document`. Dispatch the event on the container itself or on a bubbling descendant â€” a `document`-level dispatch never reaches the component.
+
+> [!NOTE]
+> **Fill record shape (`ln-fill`).** `lnFill(container, record)`, `data-ln-fill-form` triggers and `ln-fill:request` dispatch `ln-fill` only at elements matching `[data-ln-form], [data-ln-fillable]`. The translations container therefore carries one of them: `<form data-ln-form data-ln-translations data-ln-translations-default="en">`.
+>
+> `record.trans = { "<lang>": { "<field>": "<value>" } }`
+>
+> - `trans` is an object, or a JSON string of one (as read from a `data-ln-fill-trans='{"sq":{"title":"..."}}'` trigger attribute). Any other value, including malformed JSON, activates no language.
+> - Keys are language codes; each value is a field-name to value map, the same shape as `addLanguage(lang, values)`; missing fields are empty.
+> - The default language is not read from `trans`; its values live in the base fields filled by `ln-form`.
+> - The base fields are never written by this component.
 
 ---
 

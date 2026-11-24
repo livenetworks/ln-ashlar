@@ -1,7 +1,7 @@
 {
 	"$schema": "https://json.schemastore.org/web-types",
 	"name": "@livenetworks/ashlar",
-	"version": "2.2.7",
+	"version": "2.2.8",
 	"framework": "html",
 	"contributions": {
 		"html": {
@@ -1351,6 +1351,69 @@
 				{
 					"name": "data-ln-render-key",
 					"description": "data-ln-render-key attribute",
+					"value": {
+						"type": "string"
+					}
+				},
+				{
+					"name": "data-ln-repeater",
+					"description": "Mounts dynamic row repeater on container; optional value names the template and ln-fill array field key",
+					"value": {
+						"type": "string"
+					}
+				},
+				{
+					"name": "data-ln-repeater-add",
+					"description": "Button trigger inside the repeater root that appends a new row from the template",
+					"value": {
+						"type": "string"
+					}
+				},
+				{
+					"name": "data-ln-repeater-add-for",
+					"description": "External button trigger referencing a repeater container by element ID",
+					"value": {
+						"type": "string"
+					}
+				},
+				{
+					"name": "data-ln-repeater-item",
+					"description": "Marks an individual repeated row element inside the repeater list",
+					"value": {
+						"type": "boolean"
+					}
+				},
+				{
+					"name": "data-ln-repeater-list",
+					"description": "List container element (e.g. <ul> or <ol>) where repeated items are appended",
+					"value": {
+						"type": "boolean"
+					}
+				},
+				{
+					"name": "data-ln-repeater-max",
+					"description": "Maximum number of rows allowed; disables add triggers once reached",
+					"value": {
+						"type": "number"
+					}
+				},
+				{
+					"name": "data-ln-repeater-min",
+					"description": "Minimum number of rows; blocks removal below this count and auto-seeds rows on init when empty",
+					"value": {
+						"type": "number"
+					}
+				},
+				{
+					"name": "data-ln-repeater-reindex",
+					"description": "When enabled, sequentially re-numbers indexed field attributes after remove or reorder",
+					"value": {
+						"type": "boolean"
+					}
+				},
+				{
+					"name": "data-ln-repeater-remove",
+					"description": "Button trigger inside a repeated row that removes its owning item",
 					"value": {
 						"type": "string"
 					}

@@ -265,8 +265,9 @@ For detailed manual instructions, properties, attributes, and events of individu
 | **Number** | 🔢 **[ln-number docs](components/ln-number/README.md)** | 📄 **[number architecture](components/ln-number/README.md)** |
 | **Editor** | ✍️ **[ln-editor docs](components/ln-editor/README.md)** | 📄 **[editor architecture](components/ln-editor/README.md)** |
 | **Autosave** | 💾 **[ln-autosave docs](components/ln-autosave/README.md)** | 📄 **[autosave architecture](components/ln-autosave/README.md)** |
-| **Autoresize** | ↕️ **[ln-autoresize docs](components/ln-autoresize/README.md)** | 📄 **[autoresize architecture](components/ln-autoresize/README.md)** |
+| **Autoresize** | ↕️ **[ln-autoresize docs](docs-mcp/components/ln-autoresize.md)** *(Pure CSS)* | — |
 | **Translations** | 🗣️ **[ln-translations docs](components/ln-translations/README.md)** | 📄 **[translations architecture](components/ln-translations/README.md)** |
+| **Repeater** | 🔁 **[ln-repeater docs](components/ln-repeater/README.md)** | 📄 **[repeater architecture](components/ln-repeater/README.md)** |
 | **External Links** | 🌐 **[ln-external-links docs](components/ln-external-links/README.md)** | 📄 **[external-links architecture](components/ln-external-links/README.md)** |
 | **Debug** | 🐞 **[ln-debug docs](components/ln-debug/README.md)** | 📄 **[debug architecture](components/ln-debug/README.md)** |
 

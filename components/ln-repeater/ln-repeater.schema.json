@@ -1,0 +1,125 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction, sources, type, values, fallback, and description keys are owned by the generator and synchronized from JS source code. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-repeater",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-repeater-dev.scss"
+			]
+		},
+		"data-ln-fill-as": {
+			"direction": "author",
+			"sources": [
+				"src/ln-repeater.js"
+			]
+		},
+		"data-ln-fillable": {
+			"direction": "author",
+			"sources": [
+				"src/ln-repeater.js"
+			]
+		},
+		"data-ln-repeater": {
+			"direction": "author",
+			"sources": [
+				"ln-repeater-dev.scss",
+				"src/ln-repeater.js"
+			],
+			"type": "string",
+			"fallback": "",
+			"description": "Mounts dynamic row repeater on container; optional value names the template and ln-fill array field key"
+		},
+		"data-ln-repeater-add": {
+			"direction": "author",
+			"sources": [
+				"ln-repeater-dev.scss",
+				"ln-repeater.scss",
+				"src/ln-repeater.js"
+			],
+			"type": "trigger",
+			"description": "Button trigger inside the repeater root that appends a new row from the template"
+		},
+		"data-ln-repeater-add-for": {
+			"direction": "author",
+			"sources": [
+				"ln-repeater-dev.scss",
+				"ln-repeater.scss",
+				"src/ln-repeater.js"
+			],
+			"type": "string",
+			"description": "External button trigger referencing a repeater container by element ID"
+		},
+		"data-ln-repeater-item": {
+			"direction": "both",
+			"sources": [
+				"ln-repeater-dev.scss",
+				"ln-repeater.scss",
+				"src/ln-repeater.js"
+			],
+			"type": "marker",
+			"description": "Marks an individual repeated row element inside the repeater list"
+		},
+		"data-ln-repeater-list": {
+			"direction": "author",
+			"sources": [
+				"ln-repeater-dev.scss",
+				"ln-repeater.scss",
+				"src/ln-repeater.js"
+			],
+			"type": "marker",
+			"description": "List container element (e.g. <ul> or <ol>) where repeated items are appended"
+		},
+		"data-ln-repeater-max": {
+			"direction": null,
+			"sources": [
+				"src/ln-repeater.js"
+			],
+			"type": "integer",
+			"min": 1,
+			"description": "Maximum number of rows allowed; disables add triggers once reached"
+		},
+		"data-ln-repeater-min": {
+			"direction": null,
+			"sources": [
+				"src/ln-repeater.js"
+			],
+			"type": "integer",
+			"fallback": 0,
+			"min": 0,
+			"description": "Minimum number of rows; blocks removal below this count and auto-seeds rows on init when empty"
+		},
+		"data-ln-repeater-reindex": {
+			"direction": null,
+			"sources": [
+				"src/ln-repeater.js"
+			],
+			"type": "boolean",
+			"fallback": false,
+			"description": "When enabled, sequentially re-numbers indexed field attributes after remove or reorder"
+		},
+		"data-ln-repeater-remove": {
+			"direction": "author",
+			"sources": [
+				"ln-repeater-dev.scss",
+				"ln-repeater.scss",
+				"src/ln-repeater.js"
+			],
+			"type": "trigger",
+			"description": "Button trigger inside a repeated row that removes its owning item"
+		},
+		"data-ln-template": {
+			"direction": "author",
+			"sources": [
+				"src/ln-repeater.js"
+			]
+		},
+		"data-ln-value": {
+			"direction": "runtime",
+			"sources": [
+				"src/ln-repeater.js"
+			]
+		}
+	}
+}

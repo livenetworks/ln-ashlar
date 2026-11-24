@@ -1014,7 +1014,7 @@ The component calls `_ensureDefaultItemTemplate()` at the top of `_initUpload()`
 | ln-link | Instance | `data-ln-link` | Clickable rows/containers |
 | ln-confirm | Instance | `data-ln-confirm` | Two-click confirmation for destructive actions |
 | ln-autosave | Instance | `data-ln-autosave` | Auto-save form to localStorage on blur/change |
-| ln-autoresize | Instance | `data-ln-autoresize` | Auto-resize textarea height |
+| ln-autoresize | CSS utility | `data-ln-autoresize` | Pure CSS textarea auto-resize (`field-sizing: content`, zero JS) |
 | ln-date | Instance | `data-ln-date` | Locale-aware date formatter with native picker and typing support |
 | ln-number | Instance | `data-ln-number` | Locale-aware number formatter (decimal, currency, percent) |
 | ln-time | Instance | `data-ln-time` | Relative and absolute time formatter, auto-updates on shared 60s tick |

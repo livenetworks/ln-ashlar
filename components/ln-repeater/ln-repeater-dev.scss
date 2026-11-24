@@ -1,0 +1,18 @@
+@use '../../theme/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Orphan Check: repeater sub-elements must live inside a [data-ln-repeater] root
+	:is([data-ln-repeater-list], [data-ln-repeater-item], [data-ln-repeater-add], [data-ln-repeater-remove]):not([data-ln-repeater] *) {
+		@include dev-inline-error("ln-repeater sub-element is orphaned (not inside a [data-ln-repeater] root)");
+	}
+
+	// 2. Button Type Check: helper buttons inside a <form> must declare type="button" so they do not submit the form
+	form button:is([data-ln-repeater-add], [data-ln-repeater-add-for], [data-ln-repeater-remove]):not([type="button"]) {
+		@include dev-inline-error("ln-repeater button inside <form> must set type='button'");
+	}
+
+	// 3. Anonymous Repeater Template Check: bare data-ln-repeater without a value needs a local <template>
+	[data-ln-repeater=""]:not(:has(> template, template)) {
+		@include dev-inline-error("bare data-ln-repeater requires a local <template> or a named template value");
+	}
+}

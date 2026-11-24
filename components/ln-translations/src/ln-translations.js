@@ -19,7 +19,8 @@ import {
 	formatRemoveLabel,
 	parseLocales,
 	resolveLanguageName,
-	filterAvailableLocales
+	filterAvailableLocales,
+	resolveTranslationValue
 } from './translations-model.js';
 
 (function () {
@@ -143,14 +144,76 @@ import {
 
 	// ─── Default language flag ─────────────────────────────────
 
+	_component.prototype._applyDefaultLangToWrapper = function (wrapper) {
+		if (!this.defaultLang || !wrapper) return;
+		const originals = wrapper.querySelectorAll('input:not([data-ln-translatable-lang]), textarea:not([data-ln-translatable-lang]), select:not([data-ln-translatable-lang])');
+		for (const el of originals) {
+			el.setAttribute('data-ln-translatable-lang', this.defaultLang);
+		}
+	};
+
 	_component.prototype._applyDefaultLang = function () {
 		if (!this.defaultLang) return;
 
 		const translatables = this.dom.querySelectorAll('[data-ln-translatable]');
 		for (const wrapper of translatables) {
-			const originals = wrapper.querySelectorAll('input:not([data-ln-translatable-lang]), textarea:not([data-ln-translatable-lang]), select:not([data-ln-translatable-lang])');
-			for (const el of originals) {
-				el.setAttribute('data-ln-translatable-lang', this.defaultLang);
+			this._applyDefaultLangToWrapper(wrapper);
+		}
+	};
+
+	_component.prototype._cloneForWrapper = function (wrapper, lang, values) {
+		if (!wrapper || !lang) return;
+		if (wrapper.querySelector('[data-ln-translatable-lang="' + lang + '"]')) return;
+
+		const field = wrapper.getAttribute('data-ln-translatable');
+		const prefix = wrapper.getAttribute('data-ln-translations-prefix') || '';
+
+		const original = wrapper.querySelector('[data-ln-translatable-lang="' + this.defaultLang + '"]') || wrapper.querySelector('input, textarea, select');
+		if (!original) return;
+
+		const langName = resolveLanguageName(lang, this.locales, this.locale);
+		const placeholderPattern = (this.dict && this.dict['placeholder']) || this.placeholderLabel;
+		const placeholderText = formatPlaceholder(placeholderPattern, langName);
+
+		const clone = original.cloneNode(original.tagName === 'SELECT');
+		clone.name = buildFieldName(field, lang, prefix);
+		clone.value = values ? resolveTranslationValue(values, field, prefix) : '';
+		clone.removeAttribute('id');
+
+		if ('placeholder' in clone) {
+			clone.placeholder = placeholderText;
+		}
+		clone.setAttribute('aria-label', placeholderText);
+		clone.setAttribute('data-ln-translatable-lang', lang);
+
+		const existing = wrapper.querySelectorAll('[data-ln-translatable-lang]');
+		const insertAfter = existing.length > 0 ? existing[existing.length - 1] : original;
+		insertAfter.parentNode.insertBefore(clone, insertAfter.nextSibling);
+	};
+
+	_component.prototype._syncWrapper = function (wrapper) {
+		if (!wrapper) return;
+		this._applyDefaultLangToWrapper(wrapper);
+		for (const lang of this.activeLanguages) {
+			this._cloneForWrapper(wrapper, lang, null);
+		}
+	};
+
+	_component.prototype._onSubtreeChange = function (mutation) {
+		if (!mutation || !mutation.addedNodes || !mutation.addedNodes.length) return;
+
+		for (let i = 0; i < mutation.addedNodes.length; i++) {
+			const node = mutation.addedNodes[i];
+			if (node.nodeType !== 1) continue;
+
+			if (node.matches && node.matches('[data-ln-translatable]')) {
+				this._syncWrapper(node);
+			}
+			if (node.querySelectorAll) {
+				const nested = node.querySelectorAll('[data-ln-translatable]');
+				for (let j = 0; j < nested.length; j++) {
+					this._syncWrapper(nested[j]);
+				}
 			}
 		}
 	};
@@ -265,41 +328,10 @@ import {
 		this.activeLanguages.add(lang);
 		values = values || {};
 
-		const placeholderPattern = (this.dict && this.dict['placeholder']) || this.placeholderLabel;
-		const placeholderText = formatPlaceholder(placeholderPattern, langName);
-
 		// Clone inputs for each translatable field
 		const translatables = this.dom.querySelectorAll('[data-ln-translatable]');
 		for (const wrapper of translatables) {
-			const field = wrapper.getAttribute('data-ln-translatable');
-			const prefix = wrapper.getAttribute('data-ln-translations-prefix') || '';
-
-			// The original input is the base field (flagged defaultLang or first input)
-			const original = wrapper.querySelector('[data-ln-translatable-lang="' + this.defaultLang + '"]') || wrapper.querySelector('input, textarea, select');
-			if (!original) continue;
-
-			const clone = original.cloneNode(original.tagName === 'SELECT');
-
-			// Set deterministic nested name: trans[lang][field]
-			clone.name = buildFieldName(field, lang, prefix);
-
-			// Set value
-			clone.value = (values[field] !== undefined) ? values[field] : '';
-
-			// Remove id to avoid duplicates in document
-			clone.removeAttribute('id');
-
-			// Set placeholder and accessible label
-			if ('placeholder' in clone) {
-				clone.placeholder = placeholderText;
-			}
-			clone.setAttribute('aria-label', placeholderText);
-			clone.setAttribute('data-ln-translatable-lang', lang);
-
-			// Insert after the last translation or after original
-			const existing = wrapper.querySelectorAll('[data-ln-translatable-lang]');
-			const insertAfter = existing.length > 0 ? existing[existing.length - 1] : original;
-			insertAfter.parentNode.insertBefore(clone, insertAfter.nextSibling);
+			this._cloneForWrapper(wrapper, lang, values);
 		}
 
 		this._updateDropdown();
@@ -308,6 +340,13 @@ import {
 		dispatch(this.dom, 'ln-translations:added', {
 			target: this.dom, lang: lang, langName: langName
 		});
+	};
+
+	_component.prototype.sync = function () {
+		const translatables = this.dom.querySelectorAll('[data-ln-translatable]');
+		for (const wrapper of translatables) {
+			this._syncWrapper(wrapper);
+		}
 	};
 
 	_component.prototype.removeLanguage = function (lang) {
@@ -378,6 +417,9 @@ import {
 	// ─── Init ──────────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-translations', {
-		attributes: ATTRIBUTES
+		attributes: ATTRIBUTES,
+		onSubtreeChange: function (host, mutation) {
+			if (host[DOM_ATTRIBUTE]) host[DOM_ATTRIBUTE]._onSubtreeChange(mutation);
+		}
 	});
 })();

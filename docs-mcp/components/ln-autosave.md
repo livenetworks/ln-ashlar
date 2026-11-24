@@ -24,12 +24,12 @@ tags: [forms, inputs, state, localstorage]
 - **Form Serialization:** Automatically serializes form elements and stores them on `focusout` or `change` events.
 - **Opt-in Debounced Input:** Optionally performs debounced auto-saving on native `input` events while typing (configured via `data-ln-autosave-debounce-input`).
 - **Clean Invalidation:** Clears the stored draft when the form is submitted (`submit`), reset (`reset`), or when an element marked with `data-ln-autosave-clear` is clicked.
-- **Decoupled Event Restoration:** Restores form state on initialization and dispatches standard native `input` and `change` events on all restored fields. This automatically triggers sibling primitives (such as `ln-validate` and `ln-autoresize`) to re-evaluate their state without direct integration logic in `ln-autosave`.
+- **Decoupled Event Restoration:** Restores form state on initialization and dispatches standard native `input` and `change` events on all restored fields. This automatically triggers sibling primitives (such as `ln-validate` and `ln-slug`) to re-evaluate their state without direct integration logic in `ln-autosave`.
 - Located in [`components/ln-autosave/src/ln-autosave.js`](../../components/ln-autosave/src/ln-autosave.js).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
-> - **Does NOT directly query or control sibling components** — It is completely unaware of [`ln-autoresize`](./ln-autoresize.md) or [`ln-validate`](./ln-validate.md). Instead, it relies on standard, decoupled native DOM events (`input` and `change`) during form restoration, which naturally trigger those components.
+> - **Does NOT directly query or control sibling components** — It is completely unaware of [`ln-validate`](./ln-validate.md) or [`ln-slug`](./ln-slug.md). Instead, it relies on standard, decoupled native DOM events (`input` and `change`) during form restoration, which naturally trigger those components.
 > - **Does NOT submit data or perform network requests** — Form submissions and remote server sync are managed by [`ln-form`](./ln-form.md) or [`ln-data-coordinator`](./ln-data-coordinator.md).
 > - **Does NOT validate input constraints** — Form validation is delegated to [`ln-validate`](./ln-validate.md).
 > - **Does NOT persist sensitive fields or nameless inputs** — Automatically excludes fields of type `password` and `file`, fields without a `name` attribute, and elements decorated with `data-ln-autosave-exclude`.
@@ -72,7 +72,7 @@ Shows how to configure continuous debounced auto-saving while typing, manually e
 
     <div class="form-element">
         <label for="content">Content</label>
-        <!-- Composes with ln-autoresize via native input events -->
+        <!-- Automatically resizes via pure CSS field-sizing: content -->
         <textarea id="content" name="content" data-ln-autoresize></textarea>
     </div>
 
@@ -144,7 +144,7 @@ Access the persistence instance directly via the `lnAutosave` property on the fo
   restored[k].dispatchEvent(new Event('change', { bubbles: true }));
   ```
   This is the official contract of cooperation between `ln-autosave` and styling or validation helpers:
-  - `input` triggers visual textarea resizing in `ln-autoresize` and re-evaluation in `ln-validate`.
+  - `input` triggers re-evaluation in `ln-validate` and mirroring in `ln-slug`.
   - `change` triggers updates in checkboxes, select drop-downs, and radio groups.
 
 ---
@@ -184,7 +184,7 @@ sequenceDiagram
     participant Form as form[data-ln-autosave]
     participant Component as ln-autosave JS
     participant Storage as LocalStorage
-    participant Sibling as Sibling (ln-autoresize / ln-validate)
+    participant Sibling as Sibling (ln-validate / ln-slug)
 
     Note over Form, Storage: 1. Setup & Restore Phase
     Form->>Component: Mount Component
@@ -196,7 +196,7 @@ sequenceDiagram
             Component->>Form: Populate form inputs (populateForm)
             Component->>Form: Dispatch synthetic input & change events
             Form->>Sibling: Listeners detect input / change events
-            Sibling->>Sibling: Trigger resize / validation updates
+            Sibling->>Sibling: Trigger validation / slug updates
             Component->>Form: Dispatch ln-autosave:restored
         end
     end
@@ -219,6 +219,6 @@ sequenceDiagram
 ## 8. Related Components
 
 - [`ln-form.md`](./ln-form.md) — Standard wrapping form context.
-- [`ln-autoresize.md`](./ln-autoresize.md) — Standard textarea resizing component that reacts to the restored `input` events.
+- [`ln-autoresize.md`](./ln-autoresize.md) — Pure CSS textarea auto-resizing (`field-sizing: content`) that intrinsically sizes restored textarea content.
 - [`ln-validate.md`](./ln-validate.md) — Form validation component that reacts to the restored `change`/`input` events.
 - [`ln-persist.md`](./ln-persist.md) — Lower-level storage utility primitive.

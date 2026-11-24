@@ -7,6 +7,27 @@ For GitHub releases and individual release pages, see [GitHub Releases](https://
 
 ---
 
+## [v2.2.8](https://github.com/livenetworks/ln-ashlar/blob/main/releases/v2.2.8.md) — November 24, 2026
+
+> **Summary:** New `ln-repeater` generic dynamic form-row component (`min`/`max` bounds, `{index}`/`{index1}` token substitution, optional reindexing, external `data-ln-repeater-add-for` triggers, `ln-fill` hydration, and `ln-sortable` composition) plus automatic dynamic-row synchronization (`onSubtreeChange`, `sync()`, and nested prefix value resolution) in `ln-translations`.
+
+### Overview
+
+**1. New `ln-repeater` Component (`components/ln-repeater/`).**
+- Implemented the Two-Tier `ln-repeater` primitive ([repeater-model.js](https://github.com/livenetworks/ln-ashlar/blob/main/components/ln-repeater/src/repeater-model.js) + [ln-repeater.js](https://github.com/livenetworks/ln-ashlar/blob/main/components/ln-repeater/src/ln-repeater.js)) for dynamic repeatable form rows cloned from an authored HTML `<template>`.
+- Supports `data-ln-repeater-min` / `data-ln-repeater-max` bounds (auto-seeding rows on init when empty and syncing native `disabled` / `aria-disabled` on internal and external `[data-ln-repeater-add-for]` / `[data-ln-repeater-remove]` triggers), `{index}` (0-based) and `{index1}` (1-based) placeholder substitution, SSR max-index detection, monotonic default indices, opt-in sequential renumbering via `data-ln-repeater-reindex` (including on `ln-sortable:reordered`), accessible focus management on add/remove, and `ln-fill` create/edit hydration.
+- Added functional CSS (`components/ln-repeater/ln-repeater.scss`), theme mixin and bindings (`theme/config/mixins/_repeater.scss`, `theme/components/_repeater.scss`) with horizontal flex side-by-side layout for `[data-ln-translatable]` fields inside repeater rows, and dev diagnostics (`components/ln-repeater/ln-repeater-dev.scss`).
+
+**2. Dynamic Row Synchronization & Nested Prefix Resolution in `ln-translations`.**
+- Wired `onSubtreeChange` via `ln-core`'s shared lifecycle observer and added `dom.lnTranslations.sync()` (`components/ln-translations/src/ln-translations.js`) so dynamically inserted `[data-ln-translatable]` wrappers (such as rows appended by `ln-repeater`) automatically receive default-language flags and clones for every currently active language with zero coupling between components.
+- Added `resolveTranslationValue(values, field, prefix)` in `components/ln-translations/src/translations-model.js` to resolve nested bracketed prefix paths (e.g. `options[0]` → `values.options[0].label`) cleanly during `ln-fill` hydration without leaking top-level field values.
+
+**3. Demo Page, Documentation, Schemas & Tests.**
+- Added the interactive admin demo page (`demo/admin/src/pages/repeater.html` → `demo/admin/repeater.html`) showcasing basic options, translatable + sortable rows, multi-field indexed rows with external add trigger, and modal create/edit `ln-fill` hydration.
+- Added component documentation (`components/ln-repeater/README.md`, `docs-mcp/components/ln-repeater.md`), updated `docs-mcp/component-router.md`, `README.md`, `docs/README.md`, `llms.txt` / `llms-full.txt`, attribute/event catalogs, and unit tests (`tests/ln-repeater.test.js`, `tests/ln-translations.test.js`).
+
+---
+
 ## [v2.2.7](https://github.com/livenetworks/ln-ashlar/blob/main/releases/v2.2.7.md) — November 23, 2026
 
 > **Summary:** `ln-fill` reactivity and modal/dropdown styling fixes for `ln-translations`, keyboard-accessible wrapping pills and `fieldset`/`legend` defaults, new `@mixin icon-tile` / `card-add` / `btn-header` / `grid-fill` mixins with container-query grid support, plus root `CHANGELOG.md`, npm release-note packaging, and automated GitHub Releases workflow.

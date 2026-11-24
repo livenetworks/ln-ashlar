@@ -10,6 +10,7 @@ import {
 	parseLocales,
 	resolveLanguageName,
 	filterAvailableLocales,
+	resolveTranslationValue,
 	getCountryForLanguage
 } from '../components/ln-translations/src/translations-model.js';
 
@@ -132,4 +133,37 @@ test('getCountryForLanguage maps ISO 639-1 to ISO 3166-1 flag codes', () => {
 	assert.equal(getCountryForLanguage('mk'), 'mk');
 	assert.equal(getCountryForLanguage('de'), 'de');
 	assert.equal(getCountryForLanguage(''), '');
+});
+
+test('resolveTranslationValue resolves flat, nested bracketed, and prefixed keys', () => {
+	// Top-level unprefixed field
+	assert.equal(resolveTranslationValue({ title: 'Hello' }, 'title', ''), 'Hello');
+	assert.equal(resolveTranslationValue({ title: 'Hello' }, 'missing', ''), '');
+
+	// Nested repeater array path: prefix="options[0]", field="label"
+	const nested = {
+		label: 'Top-level label',
+		options: [
+			{ label: 'Linux' },
+			{ label: 'Windows' }
+		]
+	};
+	assert.equal(resolveTranslationValue(nested, 'label', 'options[0]'), 'Linux');
+	assert.equal(resolveTranslationValue(nested, 'label', 'options[1]'), 'Windows');
+	// Prefixed field must NOT leak top-level field value when missing
+	assert.equal(resolveTranslationValue(nested, 'label', 'options[2]'), '');
+
+	// Nested object path: prefix="company[profile]", field="scope"
+	assert.equal(
+		resolveTranslationValue({ company: { profile: { scope: 'IT' } } }, 'scope', 'company[profile]'),
+		'IT'
+	);
+
+	// Flat prefixed fallbacks
+	assert.equal(resolveTranslationValue({ 'options[0][label]': 'Flat Bracket' }, 'label', 'options[0]'), 'Flat Bracket');
+	assert.equal(resolveTranslationValue({ 'options[0].label': 'Flat Dot' }, 'label', 'options[0]'), 'Flat Dot');
+
+	// Null / invalid safety
+	assert.equal(resolveTranslationValue(null, 'label', 'options[0]'), '');
+	assert.equal(resolveTranslationValue(nested, '', 'options[0]'), '');
 });

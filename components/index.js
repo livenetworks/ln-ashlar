@@ -61,6 +61,9 @@ import './ln-circular-progress/src/ln-circular-progress.js';
 import './ln-sortable/src/ln-sortable.js';
 import './ln-picklist/src/ln-picklist.js';
 import './ln-confirm/src/ln-confirm.js';
+// ln-repeater imports before ln-translations so on a shared form ln-fill,
+// repeated rows are built before ln-translations clones active language fields.
+import './ln-repeater/src/ln-repeater.js';
 import './ln-translations/src/ln-translations.js';
 import './ln-autosave/src/ln-autosave.js';
 import './ln-editor/src/ln-editor.js';

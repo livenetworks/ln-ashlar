@@ -11,7 +11,7 @@
 
 1. **Synchronous local storage:** Unlike async network databases, `ln-autosave` uses browser `localStorage`. This ensures drafts are written instantly on field blur/leave (`focusout` / `change`), eliminating race conditions during page changes.
 2. **Zero-Keystroke flood:** By default, writing only triggers on field blur. For continuous typing fields (like editors), an opt-in debounced input listener can be configured.
-3. **Decoupled Event Restoration:** restored values are applied by dispatching standard synthetic `input` and `change` events. This ensures sibling primitives (such as `ln-validate` and `ln-autoresize`) re-evaluate automatically.
+3. **Decoupled Event Restoration:** restored values are applied by dispatching standard synthetic `input` and `change` events. This ensures sibling primitives (such as `ln-validate` and `ln-slug`) re-evaluate automatically.
 
 ---
 

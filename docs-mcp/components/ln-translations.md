@@ -20,7 +20,8 @@ tags: [i18n, forms, translation, localization, clone]
 - **Inline field cloning:** wraps translatable form fields via `data-ln-translatable`; when a language is activated (`addLanguage`), scans for translatable fields in the DOM, clones the wrapper's original `<input>`/`<textarea>`/`<select>` and appends the clone flagged with `data-ln-translatable-lang="{lang}"`.
 - **Deterministic name generation:** cloned inputs get a nested array `name`, e.g. `trans[en][title]`, or `product[trans][en][title]` when the wrapper declares `data-ln-translations-prefix="product"`.
 - **Menu & badge synchronization:** renders the available-language dropdown menu and the active-language badge list from two `<template>` elements (`ln-translations-menu-item`, `ln-translations-badge`), keeping both in sync on every add/remove.
-- **Server-rendered hydration:** on init, scans the container for existing `[data-ln-translatable-lang]` elements and treats any language found there (other than the default) as already active, rebuilding the menu and badges accordingly â€” no `addLanguage()` call required.
+- **Server-rendered hydration:** on init, scans the container for existing `[data-ln-translatable-lang]` elements and treats any language found there (other than the default) as already active, rebuilding the menu and badges accordingly — no `addLanguage()` call required.
+- **Dynamic row synchronization:** observes dynamically inserted `[data-ln-translatable]` subtrees via `ln-core`'s shared lifecycle observer (for example, new rows appended by [`ln-repeater`](./ln-repeater.md)), automatically flagging default-language inputs and cloning all currently active languages onto each newly added wrapper.
 
 The JavaScript source follows the Two-Tier Archetype: domain logic and algorithms are isolated in [translations-model.js](../../components/ln-translations/src/translations-model.js), while the DOM coordinator shell is implemented in [ln-translations.js](../../components/ln-translations/src/ln-translations.js).
 
@@ -144,6 +145,7 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 | `dom.lnTranslations.removeLanguage` | `(lang: String)` | `void` | Deactivates `lang`, removes its cloned fields, updates the menu and badges, and dispatches the remove lifecycle events. No-op if `lang` is not active. |
 | `dom.lnTranslations.hasLanguage` | `(lang: String)` | `Boolean` | Returns whether `lang` is currently active. |
 | `dom.lnTranslations.getActiveLanguages` | `()` | `Set<String>` | Returns a new `Set` copy of the active languages (safe to mutate without affecting internal state). |
+| `dom.lnTranslations.sync` | `()` | `void` | Re-scans all `[data-ln-translatable]` wrappers, applies `defaultLang` to unflagged originals, and clones any missing active-language fields. |
 | `dom.lnTranslations.destroy` | `()` | `void` | Removes non-default-language clones, detaches the request-event listeners, and deletes the instance reference. |
 
 ### Events API
@@ -333,4 +335,5 @@ sequenceDiagram
 - [`ln-form`](./ln-form.md) â€” the enclosing form coordinator that submits the generated `trans[lang][field]` fields as native form data.
 - [`ln-dropdown`](./ln-dropdown.md) â€” provides the overlay positioning and dismissal behavior for the language-selection menu.
 - [`ln-toggle`](./ln-toggle.md) â€” the binary open/close state primitive that `ln-dropdown` observes to drive the menu.
-- [`ln-validate`](./ln-validate.md) â€” validates cloned translation fields the same way it validates the originals, since clones inherit `required`/`pattern` attributes.
+- [`ln-validate`](./ln-validate.md) — validates cloned translation fields the same way it validates the originals, since clones inherit `required`/`pattern` attributes.
+- [`ln-repeater`](./ln-repeater.md) — dynamically cloned repeater rows containing `[data-ln-translatable]` automatically receive default-language flags and all active translation inputs via `onSubtreeChange`.

@@ -11,7 +11,7 @@
 
 1. **Populate, don't orchestrate.** `ln-form` writes values into the form
    on `ln-fill` and dispatches synthetic `input`/`change` events so
-   reactive consumers (`ln-validate`, `ln-autoresize`) react in sync. It
+   reactive consumers (`ln-validate`, `ln-slug`) react in sync. It
    keeps no validation state and no submit-button logic.
 2. **Native submit, always.** Forms MUST carry a real `action` and
    `method` in HTML. Without JavaScript they do a normal native submit.
@@ -235,7 +235,7 @@ Source: `components/ln-form/ln-form.js`. Instance state is minimal: `dom` (the f
 
 ### `fill(data)`
 
-Iterates `form.elements` writing by `name`: checkboxes get `.checked = Boolean(value)`, radios match `el.value === String(value)`, `select-multiple` sets `options[n].selected`, everything else sets `.value`. Each written element then dispatches exactly one synthetic event — `change` for `SELECT`/checkbox/radio, `input` otherwise (the `isChangeBased` discriminator). This mirrors the same discriminator `ln-validate` and `ln-autoresize` use for their own listener registration, so every field fires the event those consumers actually listen for — no double fires, no missed reactions.
+Iterates `form.elements` writing by `name`: checkboxes get `.checked = Boolean(value)`, radios match `el.value === String(value)`, `select-multiple` sets `options[n].selected`, everything else sets `.value`. Each written element then dispatches exactly one synthetic event — `change` for `SELECT`/checkbox/radio, `input` otherwise (the `isChangeBased` discriminator). This mirrors the same discriminator `ln-validate` uses for its own listener registration, so every field fires the event reactive consumers actually listen for — no double fires, no missed reactions.
 
 ### `ln-fill` handling
 

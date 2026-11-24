@@ -132,11 +132,11 @@ const H = {};
 function ve(e, t) {
   H[e] = t;
 }
-function Se(e) {
+function xe(e) {
   return H[e] || { ingress: (t) => t, egress: (t) => t };
 }
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerDataMapper = ve, window.lnCore.getDataMapper = Se);
-function xe() {
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerDataMapper = ve, window.lnCore.getDataMapper = xe);
+function Se() {
   typeof window > "u" || (window.lnCore = window.lnCore || {}, !window.lnCore._localeObserverBound && (window.lnCore._localeObserverBound = !0, b(function() {
     new MutationObserver(function() {
       me(document, "ln-core:locale-change", {});
@@ -158,7 +158,7 @@ function _e(e) {
   const t = e.toLowerCase().split("-")[0];
   return z[t] || null;
 }
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerLocaleFallback = ke, window.lnCore.getLocaleFallback = _e, window.lnCore.ensureLocaleObserver = xe);
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerLocaleFallback = ke, window.lnCore.getLocaleFallback = _e, window.lnCore.ensureLocaleObserver = Se);
 const _ = {};
 function Ee(e, t) {
   _[e] || (_[e] = document.querySelector('[data-ln-template="' + e + '"]'));
@@ -624,10 +624,10 @@ function se(e, t, n, a, l = {}) {
     const w = v || document.body;
     if (te(w, e, t, n), u && L())
       for (const h in u) {
-        const he = u[h], S = Array.from(w.querySelectorAll("[" + h + "]"));
-        w.matches && w.matches("[" + h + "]") && S.push(w);
-        for (let x = 0; x < S.length; x++) {
-          const k = S[x];
+        const he = u[h], x = Array.from(w.querySelectorAll("[" + h + "]"));
+        w.matches && w.matches("[" + h + "]") && x.push(w);
+        for (let S = 0; S < x.length; S++) {
+          const k = x[S];
           O(k) && ee(he, k.getAttribute(h), h, a, k);
         }
       }
@@ -981,6 +981,15 @@ const M = /* @__PURE__ */ new Set([
   "data-ln-progress-max",
   "data-ln-query",
   "data-ln-render-key",
+  "data-ln-repeater",
+  "data-ln-repeater-add",
+  "data-ln-repeater-add-for",
+  "data-ln-repeater-item",
+  "data-ln-repeater-list",
+  "data-ln-repeater-max",
+  "data-ln-repeater-min",
+  "data-ln-repeater-reindex",
+  "data-ln-repeater-remove",
   "data-ln-route",
   "data-ln-route-keep",
   "data-ln-route-target",

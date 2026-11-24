@@ -1071,6 +1071,45 @@
 			"description": "data-ln-render-key attribute"
 		},
 		{
+			"name": "data-ln-repeater",
+			"description": "Mounts dynamic row repeater on container; optional value names the template and ln-fill array field key"
+		},
+		{
+			"name": "data-ln-repeater-add",
+			"description": "Button trigger inside the repeater root that appends a new row from the template"
+		},
+		{
+			"name": "data-ln-repeater-add-for",
+			"description": "External button trigger referencing a repeater container by element ID"
+		},
+		{
+			"name": "data-ln-repeater-item",
+			"description": "Marks an individual repeated row element inside the repeater list",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-repeater-list",
+			"description": "List container element (e.g. <ul> or <ol>) where repeated items are appended",
+			"valueSet": "v"
+		},
+		{
+			"name": "data-ln-repeater-max",
+			"description": "Maximum number of rows allowed; disables add triggers once reached"
+		},
+		{
+			"name": "data-ln-repeater-min",
+			"description": "Minimum number of rows; blocks removal below this count and auto-seeds rows on init when empty"
+		},
+		{
+			"name": "data-ln-repeater-reindex",
+			"description": "When enabled, sequentially re-numbers indexed field attributes after remove or reorder",
+			"valueSet": "b"
+		},
+		{
+			"name": "data-ln-repeater-remove",
+			"description": "Button trigger inside a repeated row that removes its owning item"
+		},
+		{
 			"name": "data-ln-route",
 			"description": "URL path pattern matched by this route template"
 		},

@@ -73,7 +73,7 @@ The component dispatches a synthetic `new Event('input', { bubbles: true })` on 
 
 ## 🔧 Internals
 
-Source: `components/ln-slug/ln-slug.js`. Single IIFE, `registerComponent`, per-element instance — same micro-component pattern as `ln-autoresize` (no Proxy/state machine, no templates).
+Source: `components/ln-slug/ln-slug.js`. Single IIFE, `registerComponent`, per-element instance — lightweight micro-component pattern (no Proxy/state machine, no templates).
 
 ### Instance state
 

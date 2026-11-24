@@ -1099,6 +1099,7 @@
 			"listened_by": [
 				"ln-core",
 				"ln-form",
+				"ln-repeater",
 				"ln-translations"
 			],
 			"cancelable": false,
@@ -1695,6 +1696,98 @@
 			"detail": "{ target: HTMLElement, value: Number, max: Number, percentage: Number }",
 			"source": "static"
 		},
+		"ln-repeater:added": {
+			"emitted_by": [
+				"ln-repeater"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "Fires after a row is appended and controls are synced.",
+			"detail": "{ target: HTMLElement, item: HTMLElement, index: number, count: number }",
+			"source": "static"
+		},
+		"ln-repeater:before-add": {
+			"emitted_by": [
+				"ln-repeater"
+			],
+			"listened_by": [],
+			"cancelable": true,
+			"description": "Fires before a row is cloned and appended. `preventDefault()` aborts the addition.",
+			"detail": "{ target: HTMLElement, index: number, count: number }",
+			"source": "static"
+		},
+		"ln-repeater:before-remove": {
+			"emitted_by": [
+				"ln-repeater"
+			],
+			"listened_by": [],
+			"cancelable": true,
+			"description": "Fires before a row is removed. `preventDefault()` aborts the removal.",
+			"detail": "{ target: HTMLElement, item: HTMLElement, index: number, count: number }",
+			"source": "static"
+		},
+		"ln-repeater:max-reached": {
+			"emitted_by": [
+				"ln-repeater"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "Fires when an add attempt is blocked by `data-ln-repeater-max`.",
+			"detail": "{ target: HTMLElement, max: number, count: number }",
+			"source": "static"
+		},
+		"ln-repeater:min-reached": {
+			"emitted_by": [
+				"ln-repeater"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "Fires when a remove attempt is blocked by `data-ln-repeater-min`.",
+			"detail": "{ target: HTMLElement, min: number, count: number }",
+			"source": "static"
+		},
+		"ln-repeater:reindexed": {
+			"emitted_by": [
+				"ln-repeater"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "Fires after sequential reindexing completes (only when `data-ln-repeater-reindex` is active).",
+			"detail": "{ target: HTMLElement, count: number }",
+			"source": "static"
+		},
+		"ln-repeater:removed": {
+			"emitted_by": [
+				"ln-repeater"
+			],
+			"listened_by": [],
+			"cancelable": false,
+			"description": "Fires after a row is removed and controls are synced.",
+			"detail": "{ target: HTMLElement, item: HTMLElement, index: number, count: number }",
+			"source": "static"
+		},
+		"ln-repeater:request-add": {
+			"emitted_by": [
+				"ln-repeater"
+			],
+			"listened_by": [
+				"ln-repeater"
+			],
+			"cancelable": false,
+			"description": "Requests appending a new row on the repeater root.",
+			"detail": "{ values?: Object|string|null, focus?: boolean }",
+			"source": "static"
+		},
+		"ln-repeater:request-remove": {
+			"emitted_by": [],
+			"listened_by": [
+				"ln-repeater"
+			],
+			"cancelable": false,
+			"description": "Requests removing a row by element or 0-based position on the repeater root.",
+			"detail": "{ item?: HTMLElement, index?: number, focusNeighbor?: boolean }",
+			"source": "static"
+		},
 		"ln-router:before-navigate": {
 			"emitted_by": [
 				"ln-router"
@@ -1818,7 +1911,9 @@
 			"emitted_by": [
 				"ln-sortable"
 			],
-			"listened_by": [],
+			"listened_by": [
+				"ln-repeater"
+			],
 			"cancelable": false,
 			"description": "Dispatched upon pointer release ONLY if the DOM index changed.",
 			"detail": "{ item: HTMLElement, oldIndex: number, newIndex: number }",
