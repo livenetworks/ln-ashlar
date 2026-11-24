@@ -7,6 +7,20 @@ For GitHub releases and individual release pages, see [GitHub Releases](https://
 
 ---
 
+## [v2.2.9](https://github.com/livenetworks/ln-ashlar/blob/main/releases/v2.2.9.md) — November 24, 2026
+
+> **Summary:** npm registry release for `ln-repeater` and `ln-translations` dynamic-row sync (superseding previously used npm version `2.2.8`), plus draft-release handling fix in `scripts/publish-github-releases.mjs`.
+
+### Overview
+
+**1. npm Version Bump (Supersedes `2.2.8`).**
+- Publishes the full `v2.2.8` feature set (`ln-repeater` dynamic form-row component, `ln-translations` `onSubtreeChange` dynamic-row sync & `resolveTranslationValue`, interactive `demo/admin/repeater.html`, schemas, and documentation) as `@livenetworks/ashlar@2.2.9` on npm.
+
+**2. GitHub Releases Automation Fix.**
+- Updated `scripts/publish-github-releases.mjs` to pass `--draft=false` (and `--prerelease=false` when setting `--latest`) during `gh release edit`, preventing `HTTP 422: Latest release cannot be draft or prerelease` when re-publishing a tag that had a leftover draft release.
+
+---
+
 ## [v2.2.8](https://github.com/livenetworks/ln-ashlar/blob/main/releases/v2.2.8.md) — November 24, 2026
 
 > **Summary:** New `ln-repeater` generic dynamic form-row component (`min`/`max` bounds, `{index}`/`{index1}` token substitution, optional reindexing, external `data-ln-repeater-add-for` triggers, `ln-fill` hydration, and `ln-sortable` composition) plus automatic dynamic-row synchronization (`onSubtreeChange`, `sync()`, and nested prefix value resolution) in `ln-translations`.

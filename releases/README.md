@@ -4,6 +4,10 @@ A chronological index of releases for the Ashlar UI framework. Each release incl
 
 ---
 
+### [v2.2.9](./v2.2.9.md) — November 24, 2026
+npm registry release for `ln-repeater` and `ln-translations` dynamic-row sync (superseding previously used npm version `2.2.8`), plus draft-release handling fix in `scripts/publish-github-releases.mjs`.  
+👉 [Read full v2.2.9 release notes](./v2.2.9.md)
+
 ### [v2.2.8](./v2.2.8.md) — November 24, 2026
 New `ln-repeater` generic dynamic form-row component (`min`/`max` bounds, `{index}`/`{index1}` substitution, optional reindexing, external triggers, `ln-fill` hydration, and `ln-sortable` composition) plus automatic dynamic-row synchronization (`onSubtreeChange`, `sync()`, and nested prefix value resolution) in `ln-translations`.  
 👉 [Read full v2.2.8 release notes](./v2.2.8.md)
