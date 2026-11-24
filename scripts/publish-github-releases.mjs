@@ -182,14 +182,14 @@ function publishSingleRelease({ tag, highestTag, overwrite, dryRun, notesInfo })
     }
 
     if (exists) {
-      const editArgs = ['release', 'edit', tag, '--title', title];
+      const editArgs = ['release', 'edit', tag, '--title', title, '--draft=false'];
       if (notesFilePath) {
         editArgs.push('--notes-file', notesFilePath);
       } else {
         console.warn(`⚠ No local release notes for ${tag}; updating title/latest flag only.`);
       }
       if (isLatest) {
-        editArgs.push('--latest');
+        editArgs.push('--prerelease=false', '--latest');
       }
       console.log(`↻ Updating GitHub Release ${tag} (${sourceLabel})...`);
       runGh(editArgs);
