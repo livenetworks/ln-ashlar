@@ -30,17 +30,22 @@ try {
 ```
 
 ### Path B (Event-Driven Concurrency)
-Dispatch an `ln-http:request` event with a unique `key` from any element.
+Dispatch an `ln-http:request` event with a unique `key` from any element (e.g., on `ln-sortable:reordered`). Use `FormData` when sending payloads without custom headers:
 ```js
-element.dispatchEvent(new CustomEvent('ln-http:request', {
-  bubbles: true, // Must bubble to document!
-  detail: {
-    url: '/api/items/reorder',
-    method: 'POST',
-    body: JSON.stringify({ ids }),
-    key: 'items-reorder'
-  }
-}));
+list.addEventListener('ln-sortable:reordered', () => {
+  const body = new FormData();
+  Array.from(list.children).forEach(li => body.append('ids[]', li.dataset.id));
+
+  list.dispatchEvent(new CustomEvent('ln-http:request', {
+    bubbles: true, // Must bubble to document!
+    detail: {
+      url: '/api/items/reorder',
+      method: 'POST',
+      body,
+      key: 'reorder-' + list.id
+    }
+  }));
+});
 ```
 
 ---
@@ -92,12 +97,13 @@ Fired when network-level failures reject the fetch promise (excluding aborts).
 - **Forgetting `bubbles: true`:** Path B listens on the `document` level. Events dispatched without `bubbles: true` will never reach the service and fail silently.
 - **Ignoring `AbortError`:** Canceled Path A GET promises reject with an `AbortError`. Presenters must explicitly check and catch this error to avoid logging false failures.
 - **Accessing response body twice:** `response` in the `ln-http:response` detail is a native `Response` stream. It can only be parsed (e.g., `.json()`, `.text()`) once.
+- **Passing `headers` to `ln-http:request`:** Path B forwards only `{ method, body, signal }` to `fetch()` and ignores `detail.headers`. Use `FormData`, or call native `fetch()` with a local `AbortController` when custom headers (`Content-Type: application/json`, `X-CSRF-TOKEN`) are required.
 
 ---
 
 ## 🔧 Internals
 
-Source: `components/ln-http/ln-http.js`. A **service-style global**: wraps `window.fetch`, listens on `document`, no DOM instance, no `data-ln-*`, no MutationObserver. Two closure-private `Map`s hold all state — `_inflight` (`"METHOD URL" → AbortController`, Path A) and `_keyed` (`consumer key → AbortController`, Path B) — plus `_origFetch`, the unwrapped `fetch` captured at load, used to restore on `destroy()`.
+Source: `components/ln-http/src/ln-http.js`. A **service-style global**: wraps `window.fetch`, listens on `document`, no DOM instance, no `data-ln-*`, no MutationObserver. Two closure-private `Map`s hold all state — `_inflight` (`"METHOD URL" → AbortController`, Path A) and `_keyed` (`consumer key → AbortController`, Path B) — plus `_origFetch`, the unwrapped `fetch` captured at load, used to restore on `destroy()`.
 
 ### Parasitic design
 

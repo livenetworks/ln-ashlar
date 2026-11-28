@@ -48,31 +48,41 @@ fetch('/api/search?q=ab'); // Aborts the previous GET request
 
 ### Path B: Explicit Deduplication via Event API
 
-Used for non-idempotent updates (like POST or PUT mutations) that must be throttled or debounced.
+Used for non-idempotent updates (like drag-and-drop reorder POSTs or PUT mutations) where only the latest user state should reach the server.
 
 ```javascript
-const triggerEl = document.getElementById('save-button');
+const list = document.getElementById('task-list');
 
-// Dispatching a deduplicated request
-triggerEl.dispatchEvent(new CustomEvent('ln-http:request', {
-    bubbles: true, // Must bubble to document
-    detail: {
-        url: '/api/posts/reorder',
-        method: 'POST',
-        body: JSON.stringify({ items: [1, 3, 2] }),
-        key: 'reorder-action' // Identical key aborts any preceding in-flight requests
-    }
-}));
+// Dispatch a keyed POST whenever ln-sortable completes a drag reorder
+list.addEventListener('ln-sortable:reordered', function () {
+    const body = new FormData();
+    Array.from(list.children).forEach(function (li) {
+        body.append('ids[]', li.getAttribute('data-task-id'));
+    });
 
-// Listening for the response
-triggerEl.addEventListener('ln-http:response', function(e) {
+    list.dispatchEvent(new CustomEvent('ln-http:request', {
+        bubbles: true, // Must bubble to document
+        detail: {
+            url: '/api/posts/reorder',
+            method: 'POST',
+            body: body,
+            key: 'reorder-' + list.id // Identical key aborts any preceding in-flight POST
+        }
+    }));
+});
+
+// Listening for the response (aborted requests are silent and do not fire ln-http:error)
+list.addEventListener('ln-http:response', function (e) {
     console.log('Response status:', e.detail.status, 'OK:', e.detail.ok);
 });
 
-triggerEl.addEventListener('ln-http:error', function(e) {
+list.addEventListener('ln-http:error', function (e) {
     console.error('Network error occurred:', e.detail.error);
 });
 ```
+
+> [!NOTE]
+> Consistent with `ln-http`'s **No Header Manipulation** boundary, `ln-http:request` forwards only `{ method, body, signal }` to `fetch()` (no `headers` field in `detail`). Use `FormData` with `ln-http:request`, or call native `fetch()` with a local `AbortController` if your backend requires custom headers such as `Content-Type: application/json`, `X-CSRF-TOKEN`, or `Authorization`.
 
 ---
 
@@ -127,6 +137,7 @@ The `ln-http:request` `detail` fields:
 > 1. **Missing Event Bubbling:** When dispatching `ln-http:request`, always include `{ bubbles: true }`. Because `ln-http` listens at the document level, non-bubbling events will never be detected.
 > 2. **Double Consumption of Response Stream:** The `response` property passed in `ln-http:response` is the raw browser `Response` stream. It can be read (via `.json()`, `.text()`, etc.) only **once**. Reading it twice will throw a `TypeError`.
 > 3. **Unhandled AbortError in consumer code:** If your code uses `fetch` directly with try-catch and depends on `AbortController`, you must explicitly check `err.name === 'AbortError'` and ignore it, rather than showing it to users as a network error.
+> 4. **No custom `headers` on `ln-http:request`:** Path B forwards `{ method, body, signal }` to `fetch()` and ignores any `headers` field in `detail`. Use `FormData`, or use native `fetch()` with a local `AbortController` when custom headers (`Content-Type: application/json`, `X-CSRF-TOKEN`, `Authorization`) are required.
 
 ---
 
@@ -166,6 +177,7 @@ sequenceDiagram
 
 ## 7. Related Components
 
+- [`ln-sortable`](./ln-sortable.md) — Drag-and-drop list primitive whose `ln-sortable:reordered` event pairs with `ln-http` Path B (`key`) to cancel superseded reorder POSTs.
 - [`ln-ajax`](./ln-ajax.md) — Relies on native `fetch` calls which transparently benefit from Path A GET/HEAD deduplication.
 - [`ln-api-queue`](./ln-api-queue.md) — Manages offline request queues that rely on network status monitored at the `ln-http` layer.
 - [`ln-data-coordinator`](./ln-data-coordinator.md) — Integrates with `ln-http` to synchronize local cache databases with backend servers.

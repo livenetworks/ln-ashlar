@@ -11,9 +11,11 @@ tags: [interactions, drag-and-drop, sorting, list]
 # 🔀 ln-sortable
 
 > **Classification:** 🟢 Simple Component / Drag & Drop Reordering Primitive  
-> Applied to a `<ul data-ln-sortable>` or `<ol>` list. It listens for `pointerdown`, `pointermove`, and `pointerup` events
-> on list items (or `[data-ln-sortable-handle]`). On drag, it adds `.ln-sortable--dragging`, repositions items in the DOM via
-> `insertBefore`, and places a placeholder element. On release, it removes drag classes, purges the placeholder, and emits an `ln-sortable:change` CustomEvent.
+> Applied to a `<ul data-ln-sortable>` or `<ol data-ln-sortable>` list (or `<div>` container). It listens for `pointerdown`,
+> `pointermove`, and `pointerup` events on direct children (or `[data-ln-sortable-handle]`), applies `.ln-sortable--dragging`
+> to the dragged item and `.ln-sortable--drop-before`/`.ln-sortable--drop-after` to the hovered sibling, and on release
+> repositions via `insertBefore`, cleans up classes/ARIA, and emits `ln-sortable:reordered` (`{ item, oldIndex, newIndex }`).
+> State is governed strictly by the `data-ln-sortable` attribute; it makes zero network requests (persist order via a thin coordinator using [`ln-http`](./ln-http.md) `ln-http:request` with a deduplication `key`).
 
 ---
 
@@ -25,7 +27,7 @@ tags: [interactions, drag-and-drop, sorting, list]
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
-> - **Does NOT persist order to the backend** — `ln-sortable` only updates the visual/DOM hierarchy (`insertBefore`). Saving the new indices to a database is delegated to a project coordinator listening for the `ln-sortable:reordered` event.
+> - **Does NOT persist order to the backend** — `ln-sortable` only updates the visual/DOM hierarchy (`insertBefore`). Saving the new order is delegated to a thin project coordinator listening for `ln-sortable:reordered` and dispatching [`ln-http`](./ln-http.md) Path B (`ln-http:request` with an explicit `key` to abort superseded in-flight reorder POSTs).
 > - **Does NOT inject inline styles** — It avoids inline visual changes (such as `transform` or `position: absolute`). State transformations are applied via CSS classes (`.ln-sortable--dragging`, `.ln-sortable--drop-before`, `.ln-sortable--drop-after`, `.ln-sortable--active`) and ARIA attributes.
 > - **Does NOT implement domain business logic** — It maintains strict component isolation, managing only coordinates and child DOM reordering.
 
@@ -77,9 +79,9 @@ Drag interactions can be blocked dynamically or statically:
 </ul>
 ```
 
-### Variant 3: Syncing Order with Backend (Rollback Pattern)
+### Variant 3: Persisting Order with Automatic Cancellation (`ln-http` Path B + Rollback)
 
-An example of how an application script listens to the `ln-sortable:reordered` event, extracts the IDs in the new DOM order, and issues a request, applying a rollback on failure:
+Wire `ln-sortable:reordered` to [`ln-http`](./ln-http.md) Path B (`ln-http:request` with a per-list `key`). If the user drags again before the previous save completes, `ln-http` automatically aborts the superseded in-flight POST silently (no `ln-http:error` is fired), so only the latest order commits. Track `lastConfirmedOrder` so rapid consecutive drags roll back cleanly to the last server-confirmed DOM state on failure:
 
 ```html
 <ul id="task-list" data-ln-sortable>
@@ -98,67 +100,111 @@ An example of how an application script listens to the `ln-sortable:reordered` e
 </ul>
 
 <script>
-document.getElementById('task-list').addEventListener('ln-sortable:reordered', async function (e) {
-    const { item, oldIndex, newIndex } = e.detail;
-    const container = e.target;
+(function () {
+    const list = document.getElementById('task-list');
+    if (!list) return;
 
-    const orderedIds = Array.from(container.children)
-        .map(child => child.getAttribute('data-task-id'))
-        .filter(Boolean);
+    let lastConfirmedOrder = Array.from(list.children);
 
-    try {
-        const response = await fetch('/api/tasks/reorder', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                taskId: item.getAttribute('data-task-id'),
-                oldIndex,
-                newIndex,
-                orderedIds
-            })
+    function rollback(message) {
+        lastConfirmedOrder.forEach(function (node) {
+            list.appendChild(node);
+        });
+        window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+            detail: { type: 'error', title: 'Error', message: message }
+        }));
+    }
+
+    list.addEventListener('ln-sortable:reordered', function () {
+        const body = new FormData();
+        Array.from(list.children).forEach(function (child) {
+            const id = child.getAttribute('data-task-id');
+            if (id) body.append('ids[]', id);
         });
 
-        if (!response.ok) throw new Error(`Server error: ${response.status}`);
+        // Same `key` tells ln-http Path B to abort any earlier in-flight POST for this list
+        list.dispatchEvent(new CustomEvent('ln-http:request', {
+            bubbles: true,
+            detail: {
+                url: '/api/tasks/reorder',
+                method: 'POST',
+                body: body,
+                key: 'reorder-' + list.id
+            }
+        }));
+    });
 
+    list.addEventListener('ln-http:response', function (e) {
+        if (!e.detail) return;
+        if (!e.detail.ok) {
+            rollback('Failed to sync order (' + e.detail.status + '). Rolled back changes.');
+            return;
+        }
+        lastConfirmedOrder = Array.from(list.children);
         window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
             detail: { type: 'success', title: 'Saved', message: 'Order successfully saved.' }
         }));
-    } catch (err) {
-        console.error('Reorder sync error:', err);
+    });
 
-        // Rollback: return item to its original DOM position
-        const children = Array.from(container.children);
-        children.splice(newIndex, 1); // remove from new position
-
-        if (oldIndex >= children.length) {
-            container.appendChild(item);
-        } else {
-            container.insertBefore(item, children[oldIndex]);
-        }
-
-        window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-            detail: { type: 'danger', title: 'Error', message: 'Failed to sync order. Rolled back changes.' }
-        }));
-    }
-});
+    // Aborted requests are silent and never dispatch ln-http:error
+    list.addEventListener('ln-http:error', function () {
+        rollback('Network error while saving order. Rolled back changes.');
+    });
+})();
 </script>
 ```
 
-### Variant 4: Coordinator Integration (`data-project-sortable-sync`)
+> [!NOTE]
+> `ln-http:request` intentionally forwards only `{ method, body, signal }` to `fetch()` (no custom `headers` field in `detail`). Use `FormData` with `ln-http:request` as shown above, or use Variant 4 when your backend requires custom headers such as `Content-Type: application/json`, `X-CSRF-TOKEN`, or `Authorization`.
 
-In accordance with Ashlar architecture, communication is mediated using a project-specific coordinator registered through `registerComponent`. 
+### Variant 4: JSON POST with Custom Headers & Manual `AbortController`
+
+When an endpoint requires JSON (`Content-Type: application/json`) or custom auth/CSRF headers, maintain a local `AbortController` per list in a lean IIFE coordinator:
 
 ```html
-<ul data-ln-sortable 
-    data-project-sortable-sync="/api/tasks/reorder" 
-    data-project-item-key="task-id">
-    <li data-task-id="101">
-        <span data-ln-sortable-handle class="sortable-handle">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-grip-vertical"></use></svg>
-        </span>
-        <span>Task 1</span>
-    </li>
-</ul>
+<script>
+(function () {
+    const list = document.getElementById('task-list');
+    if (!list) return;
+
+    let lastConfirmedOrder = Array.from(list.children);
+    let controller = null;
+
+    list.addEventListener('ln-sortable:reordered', async function () {
+        if (controller) controller.abort();
+        controller = new AbortController();
+        const signal = controller.signal;
+
+        const ids = Array.from(list.children)
+            .map(function (child) { return child.getAttribute('data-task-id'); })
+            .filter(Boolean);
+
+        try {
+            const response = await fetch('/api/tasks/reorder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                },
+                body: JSON.stringify({ ids: ids }),
+                signal: signal
+            });
+            if (!response.ok) throw new Error('Server error: ' + response.status);
+
+            lastConfirmedOrder = Array.from(list.children);
+            window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+                detail: { type: 'success', title: 'Saved', message: 'Order successfully saved.' }
+            }));
+        } catch (err) {
+            if (err && err.name === 'AbortError') return; // Superseded by newer drag
+            lastConfirmedOrder.forEach(function (node) { list.appendChild(node); });
+            window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+                detail: { type: 'error', title: 'Error', message: 'Failed to sync order. Rolled back changes.' }
+            }));
+        }
+    });
+})();
+</script>
 ```
 
 ---
@@ -180,9 +226,10 @@ Direct instance operations via `element.lnSortable`:
 
 | Helper | Signature | Returns | Description |
 |---|---|---|---|
-| `element.lnSortable.enable` | `()` | `void` | Enables drag reordering (sets `data-ln-sortable=""`). |
-| `element.lnSortable.disable` | `()` | `void` | Disables drag reordering (sets `data-ln-sortable="disabled"`). |
+| `element.lnSortable.isEnabled` | `(property)` | `Boolean` | Read-only query reflecting whether `data-ln-sortable` is active (not `"disabled"`). |
 | `element.lnSortable.destroy` | `()` | `void` | Removes event bindings and cleans up the instance property. |
+
+To enable or disable sorting programmatically, write the DOM attribute directly (`el.setAttribute('data-ln-sortable', '')` or `el.setAttribute('data-ln-sortable', 'disabled')`).
 
 ### Events API
 
@@ -270,7 +317,7 @@ All events bubble from the parent container (`this.dom`):
 > 1. **Omitting `touch-action: none;` on Drag Triggers:**
 >    On touch devices, if drag handles or target elements lack `touch-action: none`, the browser will intercept touch gestures as page scrolling (pan-scroll). This terminates pointer capture immediately and triggers `pointercancel`.
 > 2. **Assuming Auto-Syncing:**
->    `ln-sortable` is solely a DOM sorting primitive. It **never performs network requests**. Order persistence must be wired separately using events or custom coordinators.
+>    `ln-sortable` is solely a DOM sorting primitive. It **never performs network requests**. Wire `ln-sortable:reordered` to [`ln-http`](./ln-http.md) (`ln-http:request` with a per-list `key`) — or a local `AbortController` when custom headers are needed — so rapid drags abort superseded POSTs.
 > 3. **Improper Handle Nesting:**
 >    `data-ln-sortable-handle` elements must reside within a direct child element of the `data-ln-sortable` container. If placed outside, the sorting engine cannot associate the target gesture with a list item.
 > 4. **Drags Triggered on Form Elements:**
@@ -286,7 +333,7 @@ sequenceDiagram
     actor User as User (Pointer)
     participant DOM as DOM ([data-ln-sortable])
     participant JS as ln-sortable.js
-    participant Coord as Coordinator / Backend
+    participant Coord as Coordinator / ln-http
 
     User->>DOM: PointerDown on handle or item
     DOM->>JS: event: pointerdown
@@ -310,7 +357,7 @@ sequenceDiagram
         JS->>DOM: Perform DOM insertion (insertBefore)
         JS->>DOM: Clean up CSS classes & aria-grabbed
         JS->>DOM: Emit 'ln-sortable:reordered' { item, oldIndex, newIndex }
-        DOM->>Coord: Persist new index layout
+        DOM->>Coord: Dispatch ln-http:request (keyed POST, aborts prior in-flight reorder)
     end
 ```
 
@@ -318,6 +365,8 @@ sequenceDiagram
 
 ## 7. Related Components
 
+- [`ln-http.md`](./ln-http.md) — Explicit-key (`Path B`) request deduplication that aborts superseded in-flight reorder POSTs during rapid drags.
+- [`ln-repeater.md`](./ln-repeater.md) — Composes `data-ln-sortable` on `[data-ln-repeater-list]` with optional sequential reindexing on `ln-sortable:reordered`.
 - [`ln-table.md`](./ln-table.md) — Table displays that utilize sortable row primitives.
 - [`ln-data-coordinator.md`](./ln-data-coordinator.md) — Mediates backend syncing for model order modifications.
 - [`ln-toast.md`](./ln-toast.md) — Outputs success/error status toasts for reordering transactions.

@@ -1,8 +1,7 @@
 # ln-sortable
 
-> Applied to a `<ul data-ln-sortable>` or `<ol>` list. It listens for `pointerdown`, `pointermove`, and `pointerup` events
-> on list items (or `[data-ln-sortable-handle]`). On drag, it adds `.ln-sortable--dragging`, repositions items in the DOM via
-> `insertBefore`, and places a placeholder element. On release, it removes drag classes, purges the placeholder, and emits an `ln-sortable:change` CustomEvent.
+> Applied to a `<ul data-ln-sortable>` or `<ol data-ln-sortable>` list (or `<div>` container). It listens for `pointerdown`, `pointermove`, and `pointerup` events
+> on list items (or `[data-ln-sortable-handle]`). On drag, it adds `.ln-sortable--dragging` and toggles `.ln-sortable--drop-before`/`.ln-sortable--drop-after` on the hovered sibling. On release, it repositions via `insertBefore`, removes drag classes, and emits `ln-sortable:reordered` (`{ item, oldIndex, newIndex }`) — zero network requests.
 
 ---
 
@@ -95,18 +94,25 @@ Fired when `data-ln-sortable` toggles between enabled and `"disabled"` — writt
 ## ⚠️ Common Pitfalls
 
 - **Missing `touch-action: none`:** Drag handles must carry `touch-action: none` in CSS. Failing to add this prevents mobile browsers from scrolling, causing the browser to capture pointer tracks and breaking touch drags.
-- **Auto-Sync Assumptions:** The primitive does not call servers automatically. You must wire an `ln-sortable:reordered` listener and dispatch your sync request (e.g. via `ln-http`):
+- **Auto-Sync Assumptions:** The primitive does not call servers automatically. Wire `ln-sortable:reordered` to `ln-http:request` with a per-list `key` so rapid drags automatically abort any superseded in-flight POST request:
   ```javascript
-  document.addEventListener('ln-sortable:reordered', function(e) {
-    saveNewListOrder(e.target.id, e.detail.oldIndex, e.detail.newIndex);
+  list.addEventListener('ln-sortable:reordered', function () {
+    const body = new FormData();
+    Array.from(list.children).forEach(li => body.append('ids[]', li.dataset.id));
+
+    list.dispatchEvent(new CustomEvent('ln-http:request', {
+      bubbles: true,
+      detail: { url: '/api/items/reorder', method: 'POST', body, key: 'reorder-' + list.id }
+    }));
   });
   ```
+  *(Note: `ln-http:request` forwards `{ method, body, signal }` only and does not accept custom `headers`; if your endpoint requires `Content-Type: application/json` or `X-CSRF-TOKEN`, use native `fetch()` with a local `AbortController`.)*
 
 ---
 
 ## 🔧 Internals
 
-Source: `components/ln-sortable/ln-sortable.js`. Each `[data-ln-sortable]` container gets a `_component` instance at `element.lnSortable` (`dom`, `isEnabled`, `_dragging` — the child currently being dragged, or `null` — and the bound `pointerdown` handler).
+Source: `components/ln-sortable/src/ln-sortable.js`. Each `[data-ln-sortable]` container gets a `_component` instance at `element.lnSortable` (`dom`, `isEnabled`, `_dragging` — the child currently being dragged, or `null` — and the bound `pointerdown` handler).
 
 ### Handle resolution
 
