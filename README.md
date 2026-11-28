@@ -3,7 +3,7 @@
 > **AI-Native, DOM-First Web Application Architecture for Long-Lived Systems.**  
 > Unlike mainstream JS frameworks that treat the DOM as a passive output projection of an in-memory JavaScript state tree, `ln-ashlar` leverages the native W3C DOM as an **authoritative runtime state surface**. Built with **zero runtime npm dependencies** for maximum speed, longevity, AI-agent efficiency, and security.
 
-🌐 **Live Interactive Demo:** [ashlar.live.net.mk](https://ashlar.live.net.mk)
+🌐 **Official Website:** [ashlar.software](https://ashlar.software/) · **Live Demo:** [ashlar.live.net.mk](https://ashlar.live.net.mk) · **npm:** [@livenetworks/ashlar](https://www.npmjs.com/package/@livenetworks/ashlar)
 
 📋 **Releases & Changelog:** [GitHub Releases](https://github.com/livenetworks/ln-ashlar/releases) · [Changelog](https://github.com/livenetworks/ln-ashlar/blob/main/CHANGELOG.md) · [Release Notes](https://github.com/livenetworks/ln-ashlar/blob/main/releases/README.md)
 

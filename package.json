@@ -1,7 +1,7 @@
 {
   "name": "@livenetworks/ashlar",
   "version": "2.2.10",
-  "description": "LiveNetworks unified frontend library - CSS framework and vanilla JS components",
+  "description": "AI-native, DOM-first frontend framework built with Vanilla JavaScript and SCSS",
   "license": "GPL-3.0-or-later",
   "author": "Live Networks",
   "type": "module",
@@ -12,15 +12,23 @@
     "type": "git",
     "url": "git+https://github.com/livenetworks/ln-ashlar.git"
   },
-  "homepage": "https://github.com/livenetworks/ln-ashlar#readme",
-  "bugs": "https://github.com/livenetworks/ln-ashlar/issues",
+  "homepage": "https://ashlar.software/",
+  "bugs": {
+    "url": "https://github.com/livenetworks/ln-ashlar/issues"
+  },
   "keywords": [
+    "dom-first",
+    "frontend-framework",
+    "vanilla-js",
+    "javascript",
     "css",
     "scss",
     "design-system",
-    "frontend",
+    "ui-components",
     "components",
-    "vanilla-js"
+    "progressive-enhancement",
+    "ai-native",
+    "zero-dependencies"
   ],
   "main": "./dist/ln-ashlar.js",
   "style": "./dist/ln-ashlar.css",

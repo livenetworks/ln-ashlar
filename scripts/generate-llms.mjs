@@ -111,6 +111,10 @@ function buildLlmsTxt() {
   lines.push('');
   lines.push('ln-ashlar provides a robust, production-proven foundation for web applications. It supports both Progressive Enhancement (Server-Rendered HTML in Laravel, Go, Rails, Django) and Client-Side Single Page Applications (SPAs consuming REST/JSON APIs).');
   lines.push('');
+  lines.push('- Official Website: https://ashlar.software/');
+  lines.push('- GitHub Repository: https://github.com/livenetworks/ln-ashlar');
+  lines.push('- npm Package: https://www.npmjs.com/package/@livenetworks/ashlar');
+  lines.push('');
   lines.push('### Core Architectural Invariants:');
   lines.push('- **Rule Zero**: Read the source before you write. Never invent component names, attributes, mixins, or tokens. Query the live documentation first.');
   lines.push('- **Three-Layer Architecture**: Layer 1 (Autonomous Components managing own DOM), Layer 2 (Coordinators orchestrating cross-component state and UI triggers), Layer 3 (ln-core primitives, storage, and helpers).');

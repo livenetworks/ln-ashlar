@@ -171,8 +171,7 @@ Before writing or editing HTML, SCSS, or JS code, verify:
 |---|---|---|
 | `ln-time` | Auto-updating relative timestamps | Precise absolute dates → plain `<time>` |
 | `ln-obfuscator` | Anti-crawler text & email/phone/link obfuscation (`data-ln-obfuscator`) | Cryptographic encryption at rest/in transit → `ln-core crypto` |
-| `ln-translations` | Static text swapping by language key | User-generated content; RTL layout (CSS concern) |
-| `ln-dictionary` | *TODO — confirm scope via `get_component`* | |
+| `ln-translations` | Multi-language form field cloning (`data-ln-translatable`) with locale dropdown & active badges | Static UI label translation → dictionary (`<ul hidden>`) / `Intl`; RTL layout (CSS concern) |
 | `ln-icon` | Sprite-based icons, localStorage-cached | Inline one-off SVGs |
 
 ## Styling & SCSS Architecture
@@ -206,7 +205,7 @@ Only the flags that change a decision. Everything else → `get_attribute`.
 ## Golden Rules
 
 1. HTML describes **what**, not how. No layout classes in markup.
-2. State lives in `data-ln-*` attributes, never JS variables.
+2. Public control state lives in `data-ln-*` attributes, never mirrored in JS variables. (Application data lives in `ln-data-store`/IndexedDB; operational mechanics and transient runtime status like `AbortController`, `queryGen`, timers, or loading/connecting flags stay private in JS.)
 3. Zero initialization — `MutationObserver` handles everything. Never `new LnX()`.
 4. Semantic elements only: `<dialog>`, `<nav>`, `<form>`, `<section>`, `<article>`.
 5. SCSS mixins on IDs/selectors, not utility classes.
@@ -469,7 +468,7 @@ Every `ln-ajax:start` is followed by exactly one of `ln-ajax:complete` or `ln-aj
 - **Summary:** A stateless RESTful API network connection driver.
 
 > **Classification:** 🌐 Simple component / Remote DB Connection Driver  
-> Applied to a gateway element (`<li data-ln-api-connector data-ln-api-connector-path="/api/path">`) inside a coordinator. It listens for request CustomEvents (`ln-api-connector:request-query`, `create`, `update`, `delete`), attaches a forced `X-LN-Response: data` header, and issues RESTful `fetch()` calls. Upon resolution, it parses JSON payloads and emits `ln-api-connector:data` or mutation response events to the parent coordinator.
+> Applied to a gateway element (`<li data-ln-api-connector data-ln-api-connector-path="/api/path">`) inside a coordinator. It listens for request CustomEvents (`ln-api-connector:request-query`, `create`, `update`, `delete`), attaches a forced `X-LN-Response: data` header, and issues RESTful `fetch()` calls. Upon resolution, it parses JSON payloads and emits `ln-api-connector:fetched` or mutation response events to the parent coordinator.
 
 #### Minimal HTML Markup & Usage:
 ### Base HTML Markup
@@ -817,6 +816,10 @@ Access the persistence instance directly via the `lnAutosave` property on the fo
 | `data-ln-chart-line` | `polyline` | Flag | — | Polyline element for line representation. |
 | `data-ln-chart-labels` | `ol` / `ul` | Flag | — | Container for category labels rendered from template. |
 | `data-ln-chart-empty` | `p` / `div` | Flag | — | Element shown when dataset is empty. |
+| `data-ln-chart-padding` | `figure` | `Integer` (min 0) | `20` | Internal plot padding in authored SVG viewBox units. |
+| `data-ln-chart-min` | Descendant element | Flag | — | Optional destination element populated with the minimum rendered value. |
+| `data-ln-chart-max` | Descendant element | Flag | — | Optional destination element populated with the maximum rendered value. |
+| `data-ln-chart-count` | Descendant element | Flag | — | Optional destination element populated with the rendered point count. |
 
 ### Events API
 
@@ -1333,7 +1336,6 @@ When users type, filter, or sort, `ln-search`/`ln-filter`/`ln-sort` update the U
 | `ln-api-queue:ack` / `nack` | Emits | No | Confirms or rejects a queue message. | `{ entryId: ID, reason?: String }` |
 | `ln-toast:enqueue` | Emits | No | Dispatched to `window` for success/error alerts. | `{ message: String, type: String }` |
 | `ln-data-coordinator:error` | Emits | No | A reconciliation step or a view query failed. | `{ operation: String, error, meta: Object\|null }` \| `{ operation: 'query', kind: String, store: String, target: HTMLElement, error }` |
-| `ln-data-coordinator:online` / `ln-data-coordinator:offline` | Emits | No | Dispatched on `document` once per browser `online` / `offline` event; `online` also runs a sync check on every coordinator. | `{}` |
 
 **View-Binder Contract**
 
@@ -1385,8 +1387,8 @@ A query is answered once: by the store when it holds records that can answer it 
 > **Classification:** 🟢 Simple component / Local Database Cache  
 > Applied to a hidden element via `data-ln-data-store id="name"`. It initializes and queries an IndexedDB database
 > (`ln_app_cache`) with automatic schema upgrades and optional AES-GCM encryption. It is completely blind to the network:
-> listening for request CustomEvents (`ln-data-store:request-query`, `request-save`, `request-delete`), resolving results
-> against local records, and emitting `ln-data-store:stale` when cached data exceeds its configured timeout.
+> listening for mutation/sync CustomEvents (`ln-data-store:request-create`, `request-update`, `request-delete`, `request-bulk-delete`, `request-sync-failed`),
+> serving reads via async query methods (`getAll`, `getById`, `count`, `aggregate`), and emitting `ln-data-store:request-remote-sync` when cached data needs synchronization.
 
 #### Minimal HTML Markup & Usage:
 ### Base HTML Markup
@@ -1605,6 +1607,8 @@ Registers custom translation strings for Macedonian locale to act as fallback tr
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-date` | `<input>`, `<time>`, `<td>` | `"short"` \| `"medium"` \| `"long"` \| `"short datetime"` \| `"medium datetime"` \| `"long datetime"` \| Custom Pattern | `"medium"` | Enables date formatting and defines display format pattern. |
+| `data-ln-date-format` | `<input>`, `<time>`, `<td>` | `String` | — | Custom `Intl.DateTimeFormat` pattern or format override. |
+| `data-ln-date-locale` | `<input>`, `<time>`, `<td>` | `String` (BCP 47) | Document `lang` | Locale tag override for date formatting (e.g., `"mk"`, `"en-US"`). |
 | `datetime` | `<time>` | String (ISO 8601) | — | Native machine-readable date attribute; primary observable SSOT on `<time>` elements. |
 | `data-ln-value` | `<td>`, `<span>`, `<input>` | String (ISO 8601) | — | Raw ISO date string or timestamp; acts as raw value for non-`<time>` elements. |
 | `data-ln-date-label` | `<input>` | `String` | `"Open date picker"` | Optional custom `aria-label` for the dynamically generated calendar trigger button. |
@@ -1621,7 +1625,6 @@ Instance interfaces accessed via `element.lnDate`:
 | `element.lnDate.value` | `String` | Getter/Setter | Accesses or sets the clean ISO 8601 string value (`YYYY-MM-DD`). |
 | `element.lnDate.date` | `Date` | Getter/Setter | Accesses or sets the active date as a JavaScript `Date` object. |
 | `element.lnDate.formatted` | `String` | Getter | Gets the formatted text display value currently shown in the input. |
-| `element.lnDate.reset` | `()` | `void` | Resets value, hidden fields, and restores initial/empty state. |
 | `element.lnDate.destroy` | `()` | `void` | Tears down wrapper, inputs, buttons, and restores native element states. |
 
 ### Events API
@@ -2541,31 +2544,41 @@ fetch('/api/search?q=ab'); // Aborts the previous GET request
 
 ### Path B: Explicit Deduplication via Event API
 
-Used for non-idempotent updates (like POST or PUT mutations) that must be throttled or debounced.
+Used for non-idempotent updates (like drag-and-drop reorder POSTs or PUT mutations) where only the latest user state should reach the server.
 
 ```javascript
-const triggerEl = document.getElementById('save-button');
+const list = document.getElementById('task-list');
 
-// Dispatching a deduplicated request
-triggerEl.dispatchEvent(new CustomEvent('ln-http:request', {
-    bubbles: true, // Must bubble to document
-    detail: {
-        url: '/api/posts/reorder',
-        method: 'POST',
-        body: JSON.stringify({ items: [1, 3, 2] }),
-        key: 'reorder-action' // Identical key aborts any preceding in-flight requests
-    }
-}));
+// Dispatch a keyed POST whenever ln-sortable completes a drag reorder
+list.addEventListener('ln-sortable:reordered', function () {
+    const body = new FormData();
+    Array.from(list.children).forEach(function (li) {
+        body.append('ids[]', li.getAttribute('data-task-id'));
+    });
 
-// Listening for the response
-triggerEl.addEventListener('ln-http:response', function(e) {
+    list.dispatchEvent(new CustomEvent('ln-http:request', {
+        bubbles: true, // Must bubble to document
+        detail: {
+            url: '/api/posts/reorder',
+            method: 'POST',
+            body: body,
+            key: 'reorder-' + list.id // Identical key aborts any preceding in-flight POST
+        }
+    }));
+});
+
+// Listening for the response (aborted requests are silent and do not fire ln-http:error)
+list.addEventListener('ln-http:response', function (e) {
     console.log('Response status:', e.detail.status, 'OK:', e.detail.ok);
 });
 
-triggerEl.addEventListener('ln-http:error', function(e) {
+list.addEventListener('ln-http:error', function (e) {
     console.error('Network error occurred:', e.detail.error);
 });
 ```
+
+> [!NOTE]
+> Consistent with `ln-http`'s **No Header Manipulation** boundary, `ln-http:request` forwards only `{ method, body, signal }` to `fetch()` (no `headers` field in `detail`). Use `FormData` with `ln-http:request`, or call native `fetch()` with a local `AbortController` if your backend requires custom headers such as `Content-Type: application/json`, `X-CSRF-TOKEN`, or `Authorization`.
 
 ---
 
@@ -2860,7 +2873,7 @@ Used inside grids to navigate to a record detail view when clicking anywhere on 
 > **Classification:** 🟢 Simple component / Presenter (Layer 1 - Presenter Component)  
 > Applied to a list or grid container via `data-ln-list="name"`. In SSR mode, it coordinates direct DOM search,
 > filter, and sort interactions on its child items. In data-driven mode (`data-ln-list-source="store"`), it listens for
-> `ln-data-store:data` CustomEvents, clones `<template data-ln-template="name-row">`, populates fields via `fill()`,
+> `ln-list:set-data` CustomEvents, clones `<template data-ln-template="name-row">`, populates fields via `fill()`,
 > and mounts rendered items into `[data-ln-list-body]` with optional virtual scroll windowing.
 
 #### Minimal HTML Markup & Usage:
@@ -4073,7 +4086,10 @@ Accessed via `element.lnRepeater`:
 | `element.lnRepeater.add` | `(values?, options?)` | `HTMLElement \| null` | Appends a cloned row, optionally populating fields from `values`. |
 | `element.lnRepeater.remove` | `(itemOrIndex, options?)` | `boolean` | Removes a row by element or 0-based position unless blocked by `min` or prevented. |
 | `element.lnRepeater.clear` | `(options?)` | `void` | Removes rows down to `min` (or all rows when `{ force: true }`). |
-| `element.lnRepeater.destroy` | `()` | `void` | Detaches listeners, resets `disabled`/`aria-disabled` on triggers, and deletes `element.lnRepeater`. |
+| `element.lnRepeater.destroy` | `()` | `void` | Detaches listeners, restores initial `disabled`/`aria-disabled` state on triggers, and deletes `element.lnRepeater`. |
+
+> [!NOTE]
+> **Row hydration design:** `_populateRow()` intentionally handles repeater rows separately from `ln-core`'s `populateForm(form, data)` because each row is an `<li>`/`<tr>` (not a `<form>` with `.elements`) and must hydrate primitive arrays (`["Red", "Blue"]`) and bracketed leaf keys (`options[0][label]` → `label`). Boolean checkbox coercion reuses `ln-core`'s `coerceBool()`, and display bindings delegate to `fill()`.
 
 ### Events API
 
@@ -4601,9 +4617,11 @@ Target a generic `<ul>`/`<li>` container by `id`. Set `data-ln-sort-items` for d
 - **Summary:** A touch-friendly drag-and-drop reordering primitive using Pointer Events.
 
 > **Classification:** 🟢 Simple Component / Drag & Drop Reordering Primitive  
-> Applied to a `<ul data-ln-sortable>` or `<ol>` list. It listens for `pointerdown`, `pointermove`, and `pointerup` events
-> on list items (or `[data-ln-sortable-handle]`). On drag, it adds `.ln-sortable--dragging`, repositions items in the DOM via
-> `insertBefore`, and places a placeholder element. On release, it removes drag classes, purges the placeholder, and emits an `ln-sortable:change` CustomEvent.
+> Applied to a `<ul data-ln-sortable>` or `<ol data-ln-sortable>` list (or `<div>` container). It listens for `pointerdown`,
+> `pointermove`, and `pointerup` events on direct children (or `[data-ln-sortable-handle]`), applies `.ln-sortable--dragging`
+> to the dragged item and `.ln-sortable--drop-before`/`.ln-sortable--drop-after` to the hovered sibling, and on release
+> repositions via `insertBefore`, cleans up classes/ARIA, and emits `ln-sortable:reordered` (`{ item, oldIndex, newIndex }`).
+> State is governed strictly by the `data-ln-sortable` attribute; it makes zero network requests (persist order via a thin coordinator using [`ln-http`](./ln-http.md) `ln-http:request` with a deduplication `key`).
 
 #### Minimal HTML Markup & Usage:
 ### Base HTML Markup (Drag-anywhere list)
@@ -4650,9 +4668,9 @@ Drag interactions can be blocked dynamically or statically:
 </ul>
 ```
 
-### Variant 3: Syncing Order with Backend (Rollback Pattern)
+### Variant 3: Persisting Order with Automatic Cancellation (`ln-http` Path B + Rollback)
 
-An example of how an application script listens to the `ln-sortable:reordered` event, extracts the IDs in the new DOM order, and issues a request, applying a rollback on failure:
+Wire `ln-sortable:reordered` to [`ln-http`](./ln-http.md) Path B (`ln-http:request` with a per-list `key`). If the user drags again before the previous save completes, `ln-http` automatically aborts the superseded in-flight POST silently (no `ln-http:error` is fired), so only the latest order commits. Track `lastConfirmedOrder` so rapid consecutive drags roll back cleanly to the last server-confirmed DOM state on failure:
 
 ```html
 <ul id="task-list" data-ln-sortable>
@@ -4671,67 +4689,111 @@ An example of how an application script listens to the `ln-sortable:reordered` e
 </ul>
 
 <script>
-document.getElementById('task-list').addEventListener('ln-sortable:reordered', async function (e) {
-    const { item, oldIndex, newIndex } = e.detail;
-    const container = e.target;
+(function () {
+    const list = document.getElementById('task-list');
+    if (!list) return;
 
-    const orderedIds = Array.from(container.children)
-        .map(child => child.getAttribute('data-task-id'))
-        .filter(Boolean);
+    let lastConfirmedOrder = Array.from(list.children);
 
-    try {
-        const response = await fetch('/api/tasks/reorder', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                taskId: item.getAttribute('data-task-id'),
-                oldIndex,
-                newIndex,
-                orderedIds
-            })
+    function rollback(message) {
+        lastConfirmedOrder.forEach(function (node) {
+            list.appendChild(node);
+        });
+        window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+            detail: { type: 'error', title: 'Error', message: message }
+        }));
+    }
+
+    list.addEventListener('ln-sortable:reordered', function () {
+        const body = new FormData();
+        Array.from(list.children).forEach(function (child) {
+            const id = child.getAttribute('data-task-id');
+            if (id) body.append('ids[]', id);
         });
 
-        if (!response.ok) throw new Error(`Server error: ${response.status}`);
+        // Same `key` tells ln-http Path B to abort any earlier in-flight POST for this list
+        list.dispatchEvent(new CustomEvent('ln-http:request', {
+            bubbles: true,
+            detail: {
+                url: '/api/tasks/reorder',
+                method: 'POST',
+                body: body,
+                key: 'reorder-' + list.id
+            }
+        }));
+    });
 
+    list.addEventListener('ln-http:response', function (e) {
+        if (!e.detail) return;
+        if (!e.detail.ok) {
+            rollback('Failed to sync order (' + e.detail.status + '). Rolled back changes.');
+            return;
+        }
+        lastConfirmedOrder = Array.from(list.children);
         window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
             detail: { type: 'success', title: 'Saved', message: 'Order successfully saved.' }
         }));
-    } catch (err) {
-        console.error('Reorder sync error:', err);
+    });
 
-        // Rollback: return item to its original DOM position
-        const children = Array.from(container.children);
-        children.splice(newIndex, 1); // remove from new position
-
-        if (oldIndex >= children.length) {
-            container.appendChild(item);
-        } else {
-            container.insertBefore(item, children[oldIndex]);
-        }
-
-        window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-            detail: { type: 'danger', title: 'Error', message: 'Failed to sync order. Rolled back changes.' }
-        }));
-    }
-});
+    // Aborted requests are silent and never dispatch ln-http:error
+    list.addEventListener('ln-http:error', function () {
+        rollback('Network error while saving order. Rolled back changes.');
+    });
+})();
 </script>
 ```
 
-### Variant 4: Coordinator Integration (`data-project-sortable-sync`)
+> [!NOTE]
+> `ln-http:request` intentionally forwards only `{ method, body, signal }` to `fetch()` (no custom `headers` field in `detail`). Use `FormData` with `ln-http:request` as shown above, or use Variant 4 when your backend requires custom headers such as `Content-Type: application/json`, `X-CSRF-TOKEN`, or `Authorization`.
 
-In accordance with Ashlar architecture, communication is mediated using a project-specific coordinator registered through `registerComponent`. 
+### Variant 4: JSON POST with Custom Headers & Manual `AbortController`
+
+When an endpoint requires JSON (`Content-Type: application/json`) or custom auth/CSRF headers, maintain a local `AbortController` per list in a lean IIFE coordinator:
 
 ```html
-<ul data-ln-sortable 
-    data-project-sortable-sync="/api/tasks/reorder" 
-    data-project-item-key="task-id">
-    <li data-task-id="101">
-        <span data-ln-sortable-handle class="sortable-handle">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-grip-vertical"></use></svg>
-        </span>
-        <span>Task 1</span>
-    </li>
-</ul>
+<script>
+(function () {
+    const list = document.getElementById('task-list');
+    if (!list) return;
+
+    let lastConfirmedOrder = Array.from(list.children);
+    let controller = null;
+
+    list.addEventListener('ln-sortable:reordered', async function () {
+        if (controller) controller.abort();
+        controller = new AbortController();
+        const signal = controller.signal;
+
+        const ids = Array.from(list.children)
+            .map(function (child) { return child.getAttribute('data-task-id'); })
+            .filter(Boolean);
+
+        try {
+            const response = await fetch('/api/tasks/reorder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                },
+                body: JSON.stringify({ ids: ids }),
+                signal: signal
+            });
+            if (!response.ok) throw new Error('Server error: ' + response.status);
+
+            lastConfirmedOrder = Array.from(list.children);
+            window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+                detail: { type: 'success', title: 'Saved', message: 'Order successfully saved.' }
+            }));
+        } catch (err) {
+            if (err && err.name === 'AbortError') return; // Superseded by newer drag
+            lastConfirmedOrder.forEach(function (node) { list.appendChild(node); });
+            window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+                detail: { type: 'error', title: 'Error', message: 'Failed to sync order. Rolled back changes.' }
+            }));
+        }
+    });
+})();
+</script>
 ```
 
 ---
@@ -4752,9 +4814,10 @@ Direct instance operations via `element.lnSortable`:
 
 | Helper | Signature | Returns | Description |
 |---|---|---|---|
-| `element.lnSortable.enable` | `()` | `void` | Enables drag reordering (sets `data-ln-sortable=""`). |
-| `element.lnSortable.disable` | `()` | `void` | Disables drag reordering (sets `data-ln-sortable="disabled"`). |
+| `element.lnSortable.isEnabled` | `(property)` | `Boolean` | Read-only query reflecting whether `data-ln-sortable` is active (not `"disabled"`). |
 | `element.lnSortable.destroy` | `()` | `void` | Removes event bindings and cleans up the instance property. |
+
+To enable or disable sorting programmatically, write the DOM attribute directly (`el.setAttribute('data-ln-sortable', '')` or `el.setAttribute('data-ln-sortable', 'disabled')`).
 
 ### Events API
 
@@ -5022,7 +5085,7 @@ Multiple `data-ln-table-coordinator` wrappers can safely exist on the same page.
 > **Classification:** 🟢 Simple component / Presenter (Layer 1 - Data Grid View)  
 > Applied to a table container via `<div data-ln-table id="...">` or `<table>`. In SSR mode, it indexes server-rendered
 > `<tbody>` rows, intercepting `ln-search`, `ln-filter`, and `ln-sort` CustomEvents to toggle `.hidden` on `<tr>` elements
-> or reorder rows in the DOM. In data-driven mode (`data-ln-table-source="store"`), it listens for `ln-data-store:data` events,
+> or reorder rows in the DOM. In data-driven mode (`data-ln-table-source="store"`), it listens for `ln-table:set-data` events,
 > clones `<template data-ln-table-row>`, populates cells via `fill()`, and mounts rendered rows into `<tbody>` with sliding-window virtual scrolling.
 
 #### Minimal HTML Markup & Usage:
@@ -5262,6 +5325,8 @@ Use when the backend embeds the entire dataset (e.g. 10,000 records) into `<scri
 | `data-ln-table-clear-all` | `<button>` | - | - | Resets all active filters and triggers a new data request in Data-Driven mode. |
 | `data-ln-table-cell-attr` | Template element | `String` | - | List of `field:attribute` mappings for attribute interpolation. *(Processed externally via `ln-core.js` / `fillTemplate()`)* |
 | `data-ln-table-empty-when` | Template element | `initial`\|`search` | - | Targets empty state variant to show based on search vs initial load. |
+| `data-ln-table-select-all-label` | Root container | `String` | `"Select all"` | Accessible `aria-label` for the select-all header checkbox. |
+| `data-ln-table-dict` | Hidden `<li>` | `"select-all"` | - | Translatable dictionary key for table UI strings (fallback before `"Select all"`). |
 
 ---
 
@@ -5891,12 +5956,14 @@ When translations are already rendered server-side, mark each pre-rendered field
 | `data-ln-translations` | Container (`<form>` or any element) | Flag | â€” | Initializes the translations coordinator on the container element. |
 | `data-ln-translations-default` | Container | `String` | `""` | Default language code. When set, flags the original (non-cloned) translatable inputs with `data-ln-translatable-lang="{default}"` on init. |
 | `data-ln-translations-locales` | Container | `JSON` | `null` | JSON object mapping language codes to display labels. Auto-parsed via `attrJson`. |
-| `data-ln-translations-active` | `<ul>` | Flag | â€” | Marks the mount container where active-language badges are rendered. |
-| `data-ln-translations-add` | `<button>` | Flag | â€” | Marks the trigger button that opens the language menu; `style.display = 'none'` is set automatically once every configured language is active. |
+| `data-ln-translations-active` | `<ul>` | Flag | â€” | Empty component-owned mount container where active-language badges are rendered exclusively from templates (cleared via `textContent = ''` on `destroy()`). |
+| `data-ln-translations-add` | `<button>` | Flag | â€” | Marks the trigger button that opens the language menu; the native `hidden` attribute is set automatically once every configured language is active. |
 | `data-ln-translatable` | Field wrapper | `String` (field name) | â€” *(required)* | Marks a translatable field group; the value is the field name used in generated `name` attributes. |
 | `data-ln-translations-prefix` | Field wrapper | `String` | `""` | Optional name prefix for nested entities, e.g. `items[1]` produces `items[1][trans][en][title]`. |
 | `data-ln-translatable-lang` | `<input>`, `<textarea>`, `<select>` | `String` (language code) | â€” | Marks a cloned or server-rendered translation field for a specific language; written by the component and also readable on server-rendered markup for hydration. |
 | `data-ln-translations-lang` | Inside `<template data-ln-template="ln-translations-badge">` and `<template data-ln-template="ln-translations-menu-item">` | Flag (contract attribute) | â€” *(required)* | Required anchor attribute inside both templates â€” the component locates it via `querySelector` to populate the language code, label and event bindings. Templates without it fail to render. |
+| `data-ln-translations-placeholder` | Container | `String` | `"{lang} translation"` | Opt-in placeholder template for cloned translation inputs (`{lang}` is replaced with the language label). |
+| `data-ln-translations-remove-label` | Container | `String` | `"Remove {lang}"` | Opt-in `aria-label` template for active-language badge remove buttons. |
 
 ### Programmatic JS API
 
@@ -5909,7 +5976,7 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 | `dom.lnTranslations.hasLanguage` | `(lang: String)` | `Boolean` | Returns whether `lang` is currently active. |
 | `dom.lnTranslations.getActiveLanguages` | `()` | `Set<String>` | Returns a new `Set` copy of the active languages (safe to mutate without affecting internal state). |
 | `dom.lnTranslations.sync` | `()` | `void` | Re-scans all `[data-ln-translatable]` wrappers, applies `defaultLang` to unflagged originals, and clones any missing active-language fields. |
-| `dom.lnTranslations.destroy` | `()` | `void` | Removes non-default-language clones, detaches the request-event listeners, and deletes the instance reference. |
+| `dom.lnTranslations.destroy` | `()` | `void` | Removes only dynamically cloned fields (preserving SSR `[data-ln-translatable-lang]` fields), strips auto-tagged `defaultLang` attributes from originals, clears the component-owned `active` and `menu` mount containers, restores the add trigger's initial `hidden` state, detaches listeners, and deletes the instance reference. |
 
 ### Events API
 
@@ -5935,6 +6002,7 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 > - Keys are language codes; each value is a field-name to value map, the same shape as `addLanguage(lang, values)`; missing fields are empty.
 > - The default language is not read from `trans`; its values live in the base fields filled by `ln-form`.
 > - The base fields are never written by this component.
+> - **Intentional non-transactional `ln-fill` semantics:** `_clearLanguages()` always clears previous record languages first (including SSR ones) to prevent cross-record data bleed when switching records in Edit modals. If an external listener vetoes `ln-translations:before-add` for one language, only that language is skipped while the rest of the record still hydrates cleanly.
 
 ---
 
@@ -6262,10 +6330,11 @@ To support validation errors returned from the backend (e.g. "username taken").
 ---
 
 ### ln-websocket-connector
-- **Classification:** `simple` | **Status:** `draft`
+- **Classification:** `simple` | **Status:** `stable`
 - **Summary:** A WebSocket push transport — delivers live server changes beside a REST connector, or carries reads, writes and pushes on its own.
 
-> **Classification:** 🌐 Simple component / Push Transport Driver
+> **Classification:** 🌐 Simple component / Push Transport Driver  
+> Applied to a connector element (`<li data-ln-websocket-connector data-ln-websocket-connector-url="wss://...">`) inside a `data-ln-data-coordinator`. Driven by the `data-ln-websocket-connector` attribute (`connect`/`disconnect`), it translates server pushes into `ln-websocket-connector:fetched` and answers connector CRUD/sync request events over JSON frames; connection status is emitted strictly via events (`:connecting`, `:connected`, `:disconnected`) — never mirrored to attributes.
 
 #### Minimal HTML Markup & Usage:
 ### Base HTML Markup
