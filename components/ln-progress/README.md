@@ -19,8 +19,8 @@ If you only need the progress bar component, load the compiled zero-dependency I
 ```
 
 ### Source Files & Development
-- **Active Development Source**: [components/ln-progress/src/ln-progress.js](file:///c:/laragon/www/ln-ashlar/components/ln-progress/src/ln-progress.js) — The source of truth for component logic.
-- **Compiled Standalone**: [components/ln-progress/ln-progress.js](file:///c:/laragon/www/ln-ashlar/components/ln-progress/ln-progress.js) — The compiled, ready-to-use standalone bundle.
+- **Active Development Source**: [components/ln-progress/src/ln-progress.js](./src/ln-progress.js) — The source of truth for component logic.
+- **Compiled Standalone**: [components/ln-progress/ln-progress.js](./ln-progress.js) — The compiled, ready-to-use standalone bundle.
 
 ## Philosophy
 

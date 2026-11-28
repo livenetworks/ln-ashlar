@@ -58,7 +58,7 @@ To completely avoid refactoring and off-doctrine mistakes, **BEFORE writing or m
 
 2. **CSS & Styling Separation**:
    - **No inline styles**: Are there decorative `style="..."` attributes? (Strictly forbidden).
-   - **No presentational classes in HTML**: Are there classes like `flex`, `grid`, `text-red`, or component utilities in HTML? (Visual styles must live in SCSS).
+   - **No presentational classes in HTML**: Are there classes like `flex`, `grid`, `text-red`, or component utilities in HTML? (Visual styles must live in SCSS — or, in Tailwind mode, inside `theme/tailwind/components.css` semantic/attribute selectors, never as utility classes in markup).
    - **Semantic SCSS Selectors**: In production, are styles/mixins applied via semantic selectors (e.g., `#my-element { @include card; }`) instead of utility classes in markup?
 
 3. **JS & Component Behavior**:

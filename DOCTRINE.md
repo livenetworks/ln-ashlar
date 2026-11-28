@@ -88,7 +88,7 @@
 * **Dev-Time Type Validation & Zero Production Overhead:**
   - In development mode (`window.lnDebug` active or `[data-ln-debug]` present in DOM), `validateAttrValue` checks all attribute mutations and initial DOM values against the declared `type` and `values` contract, emitting descriptive console warnings with component tags and expected constraints.
   - In production mode, attribute iteration and validation checks are completely bypassed via the `hasActiveDebug()` fast-path gate.
-* **Automated Schema Synchronization:** Whenever component attributes are added or modified, run `npm run sync:ln-schemas` to synchronize `.schema.json` files and the centralized attribute catalog. Run `npm run sync:ln-schemas:check` in CI to ensure 100% contract compliance.
+* **Automated Schema Synchronization:** Whenever component attributes are added or modified, run `npm run sync:ln-schemas` to synchronize `.schema.json` files and the centralized attribute catalog. Run `npm run sync:ln-schemas:check` in CI to ensure 100% contract compliance. Per-component `.schema.json` files preserve strict component-scoped types (e.g., `data-ln-value` is `float` on `ln-number` and `string` on `ln-date`), while global IDE metadata (`ln-ashlar.html-data.json`, `web-types.json`) intentionally widens shared attribute names across components.
 * **Forbidden ("Checkbox Hack"):** Using `<input type="checkbox">` for toggle state is strictly forbidden (breaks `MutationObserver`, teleportation, ARIA semantics, and encapsulation).
 
 ---
@@ -169,7 +169,7 @@
 
 ## 📖 9. Extended Doctrine Reference & Sub-Doctrines
 
-For deep-dive technical specs on specific domains, consult the sub-doctrines in [`docs-mcp/doctrine/`](docs-mcp/doctrine/README.md):
+For deep-dive technical specs on specific domains, consult the sub-doctrines in [`docs-mcp/doctrine/`](docs-mcp/README.md):
 
 * 🧩 **[JS Component Model Doctrine](docs-mcp/doctrine/js-component-model.md)** — Lifecycle hooks, shadow-free encapsulation, and Proxy traps.
 * 🏷️ **[HTML Markup Rules](docs-mcp/doctrine/html-markup-rules.md)** — Template cloning, accessibility ARIA patterns, and micro-component specs.

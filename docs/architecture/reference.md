@@ -497,7 +497,7 @@ breaks any component that uses both.
   label-width inside a stacked cell). Component design, not
   rhythm. Comment required.
 
-For the complete list of color, shadow, typography, border, and spacing primitives, see the [Design Tokens](../css/tokens.md) documentation.
+For the complete list of color, shadow, typography, border, and spacing primitives, see the [Design Tokens](../../docs-mcp/css/tokens.md) documentation.
 
 Every mixin read must go through the primitive layer, not a scale token directly. Components rebind primitives on their own scope; themes rebind vocabulary at theme `:root`.
 
@@ -507,7 +507,7 @@ Every mixin read must go through the primitive layer, not a scale token directly
 
 The styling system enforces a clean separation between scale values (the scale tokens), named design choices (the vocabulary), and what components actually read (the primitives).
 
-For a complete, exhaustive catalog of all CSS spacing scales, background/foreground vocabularies, border custom properties, and full tables of Primitives and Vocabulary, see [Design Tokens](../css/tokens.md).
+For a complete, exhaustive catalog of all CSS spacing scales, background/foreground vocabularies, border custom properties, and full tables of Primitives and Vocabulary, see [Design Tokens](../../docs-mcp/css/tokens.md).
 
 The following rules govern how these tokens are applied and overridden within the codebase:
 

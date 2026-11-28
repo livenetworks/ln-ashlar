@@ -91,8 +91,7 @@
 |---|---|---|
 | `ln-time` | Auto-updating relative timestamps | Precise absolute dates → plain `<time>` |
 | `ln-obfuscator` | Anti-crawler text & email/phone/link obfuscation (`data-ln-obfuscator`) | Cryptographic encryption at rest/in transit → `ln-core crypto` |
-| `ln-translations` | Static text swapping by language key | User-generated content; RTL layout (CSS concern) |
-| `ln-dictionary` | *TODO — confirm scope via `get_component`* | |
+| `ln-translations` | Multi-language form field cloning (`data-ln-translatable`) with locale dropdown & active badges | Static UI label translation → dictionary (`<ul hidden>`) / `Intl`; RTL layout (CSS concern) |
 | `ln-icon` | Sprite-based icons, localStorage-cached | Inline one-off SVGs |
 
 ## Styling & SCSS Architecture
@@ -126,7 +125,7 @@ Only the flags that change a decision. Everything else → `get_attribute`.
 ## Golden Rules
 
 1. HTML describes **what**, not how. No layout classes in markup.
-2. State lives in `data-ln-*` attributes, never JS variables.
+2. Public control state lives in `data-ln-*` attributes, never mirrored in JS variables. (Application data lives in `ln-data-store`/IndexedDB; operational mechanics and transient runtime status like `AbortController`, `queryGen`, timers, or loading/connecting flags stay private in JS.)
 3. Zero initialization — `MutationObserver` handles everything. Never `new LnX()`.
 4. Semantic elements only: `<dialog>`, `<nav>`, `<form>`, `<section>`, `<article>`.
 5. SCSS mixins on IDs/selectors, not utility classes.

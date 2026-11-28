@@ -123,7 +123,7 @@ Opening B from inside A leaves A open. Pressing `ESC` once closes B first, and t
   ```html
   <script src="components/ln-popover/ln-popover.js" defer></script>
   ```
-- **Active Source (ESM)**: Development source is located at [components/ln-popover/src/ln-popover.js](file:///c:/laragon/www/ln-ashlar/components/ln-popover/src/ln-popover.js).
+- **Active Source (ESM)**: Development source is located at [components/ln-popover/src/ln-popover.js](./src/ln-popover.js).
 
 ---
 

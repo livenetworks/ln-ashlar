@@ -52,7 +52,8 @@
     "./tailwind.css": "./dist/ln-ashlar-tailwind.css"
   },
   "scripts": {
-    "test": "npm run sync:ln-schemas:check && npm run sync:ln-events:check && npm run sync:css-tokens:check && npm run sync:changelog:check && node --test \"tests/*.test.js\"",
+    "test": "npm run check:doc-links && npm run sync:ln-schemas:check && npm run sync:ln-events:check && npm run sync:css-tokens:check && npm run sync:changelog:check && node --test \"tests/*.test.js\"",
+    "check:doc-links": "node scripts/check-doc-links.mjs",
     "test:p0": "node --test tests/p0-data-integrity.test.js",
     "test:headless": "node tests/headless/run-all.mjs",
     "dev": "node scripts/build.mjs --watch",

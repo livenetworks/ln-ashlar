@@ -166,7 +166,7 @@ Use **button triggers** and add `data-ln-persist="key"` to remember the active t
   ```html
   <script src="components/ln-tabs/ln-tabs.js" defer></script>
   ```
-- **Active Source (ESM)**: Development source is located at [components/ln-tabs/src/ln-tabs.js](file:///c:/laragon/www/ln-ashlar/components/ln-tabs/src/ln-tabs.js).
+- **Active Source (ESM)**: Development source is located at [components/ln-tabs/src/ln-tabs.js](./src/ln-tabs.js).
 
 ---
 

@@ -55,6 +55,9 @@ import {
 		this.dict = buildDict(dom, 'data-ln-translations-dict');
 		this.locale = getLocale(dom);
 		this.activeLanguages = new Set();
+		this._clonedFields = new Set();
+		this._flaggedOriginals = new Set();
+		this._triggerHiddenSnapshots = new WeakMap();
 
 		this.badgesEl = dom.querySelector('[data-ln-translations-active]');
 		this.menuEl = dom.querySelector('[data-ln-translations-menu]') || dom.querySelector('[data-ln-dropdown] > [data-ln-toggle]');
@@ -149,6 +152,7 @@ import {
 		const originals = wrapper.querySelectorAll('input:not([data-ln-translatable-lang]), textarea:not([data-ln-translatable-lang]), select:not([data-ln-translatable-lang])');
 		for (const el of originals) {
 			el.setAttribute('data-ln-translatable-lang', this.defaultLang);
+			this._flaggedOriginals.add(el);
 		}
 	};
 
@@ -189,6 +193,7 @@ import {
 		const existing = wrapper.querySelectorAll('[data-ln-translatable-lang]');
 		const insertAfter = existing.length > 0 ? existing[existing.length - 1] : original;
 		insertAfter.parentNode.insertBefore(clone, insertAfter.nextSibling);
+		this._clonedFields.add(clone);
 	};
 
 	_component.prototype._syncWrapper = function (wrapper) {
@@ -259,6 +264,9 @@ import {
 		// Hide trigger if no languages available
 		const triggerBtn = this.dom.querySelector('[data-ln-translations-add]');
 		if (triggerBtn) {
+			if (!this._triggerHiddenSnapshots.has(triggerBtn)) {
+				this._triggerHiddenSnapshots.set(triggerBtn, triggerBtn.hidden);
+			}
 			triggerBtn.hidden = available.length === 0;
 		}
 	};
@@ -300,6 +308,7 @@ import {
 	_component.prototype._removeLanguageFields = function (lang) {
 		const fields = this.dom.querySelectorAll('[data-ln-translatable-lang="' + lang + '"]');
 		for (const el of fields) {
+			this._clonedFields.delete(el);
 			el.parentNode.removeChild(el);
 		}
 		this.activeLanguages.delete(lang);
@@ -379,13 +388,19 @@ import {
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 
-		// Remove all dynamically added translation inputs
-		for (const lang of this.activeLanguages) {
-			const fields = this.dom.querySelectorAll('[data-ln-translatable-lang="' + lang + '"]');
-			for (const el of fields) {
+		// Remove only dynamically cloned translation inputs (preserve SSR fields)
+		for (const el of this._clonedFields) {
+			if (el.parentNode) {
 				el.parentNode.removeChild(el);
 			}
 		}
+		this._clonedFields.clear();
+
+		// Remove default-lang attribute only from originals tagged by this instance
+		for (const el of this._flaggedOriginals) {
+			el.removeAttribute('data-ln-translatable-lang');
+		}
+		this._flaggedOriginals.clear();
 
 		if (this.badgesEl) {
 			this.badgesEl.textContent = '';
@@ -404,7 +419,10 @@ import {
 		}
 
 		const triggerBtn = this.dom.querySelector('[data-ln-translations-add]');
-		if (triggerBtn) triggerBtn.hidden = false;
+		if (triggerBtn && this._triggerHiddenSnapshots.has(triggerBtn)) {
+			triggerBtn.hidden = this._triggerHiddenSnapshots.get(triggerBtn);
+			this._triggerHiddenSnapshots.delete(triggerBtn);
+		}
 
 		this.dom.removeEventListener('ln-translations:request-add', this._onRequestAdd);
 		this.dom.removeEventListener('ln-translations:request-remove', this._onRequestRemove);

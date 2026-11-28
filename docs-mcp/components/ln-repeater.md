@@ -133,7 +133,10 @@ Accessed via `element.lnRepeater`:
 | `element.lnRepeater.add` | `(values?, options?)` | `HTMLElement \| null` | Appends a cloned row, optionally populating fields from `values`. |
 | `element.lnRepeater.remove` | `(itemOrIndex, options?)` | `boolean` | Removes a row by element or 0-based position unless blocked by `min` or prevented. |
 | `element.lnRepeater.clear` | `(options?)` | `void` | Removes rows down to `min` (or all rows when `{ force: true }`). |
-| `element.lnRepeater.destroy` | `()` | `void` | Detaches listeners, resets `disabled`/`aria-disabled` on triggers, and deletes `element.lnRepeater`. |
+| `element.lnRepeater.destroy` | `()` | `void` | Detaches listeners, restores initial `disabled`/`aria-disabled` state on triggers, and deletes `element.lnRepeater`. |
+
+> [!NOTE]
+> **Row hydration design:** `_populateRow()` intentionally handles repeater rows separately from `ln-core`'s `populateForm(form, data)` because each row is an `<li>`/`<tr>` (not a `<form>` with `.elements`) and must hydrate primitive arrays (`["Red", "Blue"]`) and bracketed leaf keys (`options[0][label]` → `label`). Boolean checkbox coercion reuses `ln-core`'s `coerceBool()`, and display bindings delegate to `fill()`.
 
 ### Events API
 

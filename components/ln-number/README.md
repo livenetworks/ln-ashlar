@@ -36,9 +36,9 @@ To load `ln-number` as a standalone component, include its compiled IIFE under t
 
 ### Source Files
 
-* **Active Development Source**: [components/ln-number/src/ln-number.js](file:///c:/laragon/www/ln-ashlar/components/ln-number/src/ln-number.js) (source of truth)
-* **Pure Mathematical & Formatting Model**: [components/ln-number/src/number-model.js](file:///c:/laragon/www/ln-ashlar/components/ln-number/src/number-model.js)
-* **Compiled Standalone**: [components/ln-number/ln-number.js](file:///c:/laragon/www/ln-ashlar/components/ln-number/ln-number.js)
+* **Active Development Source**: [components/ln-number/src/ln-number.js](./src/ln-number.js) (source of truth)
+* **Pure Mathematical & Formatting Model**: [components/ln-number/src/number-model.js](./src/number-model.js)
+* **Compiled Standalone**: [components/ln-number/ln-number.js](./ln-number.js)
 
 ## Attributes
 
@@ -91,7 +91,7 @@ Two different parsing rules apply depending on where a value comes from:
 ### Backend contract for `data-ln-value` / `data-ln-number`
 
 This is the standing raw-format contract for `data-ln-value` (see
-[`ln-core`'s `data-ln-value` primitive](file:///c:/laragon/www/ln-ashlar/components/ln-core/README.md#the-data-ln-value-primitive) —
+[`ln-core`'s `data-ln-value` primitive](../ln-core/README.md#the-data-ln-value-primitive) —
 "plain number, dot decimal, NO thousands grouping") — `ln-number` now actually reads its inputs this way
 instead of running them through locale-aware parsing:
 

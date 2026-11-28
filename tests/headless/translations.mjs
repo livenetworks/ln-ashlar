@@ -565,6 +565,54 @@ run('demo/admin/translations.html', async ({ page }) => {
 		assert(await page.evaluate(() => document.querySelectorAll('#fill-fx [data-ln-translatable-lang="sq"]').length) === 0, 'no sq fields after destroy');
 	});
 
+	await check('destroy preserves SSR translation fields and authored hidden trigger state', async () => {
+		await page.evaluate(() => {
+			document.getElementById('ssr-destroy-fx')?.remove();
+			document.body.insertAdjacentHTML('beforeend', `
+				<form id="ssr-destroy-fx" data-ln-translations data-ln-translations-default="en"
+					data-ln-translations-locales='{"en":"English","de":"Deutsch","sq":"Shqip"}'>
+					<ul data-ln-translations-active></ul>
+					<button type="button" data-ln-translations-add hidden>Add</button>
+					<ul data-ln-translations-menu></ul>
+					<div class="form-element" data-ln-translatable="title">
+						<input type="text" name="title" value="Base">
+						<input type="text" name="trans[de][title]" data-ln-translatable-lang="de" value="SSR Deutsch">
+					</div>
+					<template data-ln-template="ln-translations-menu-item"><li><button type="button" data-ln-translations-lang></button></li></template>
+					<template data-ln-template="ln-translations-badge"><li><p data-ln-translations-lang><span></span><button type="button" aria-label="Remove"></button></p></li></template>
+				</form>
+			`);
+		});
+		await page.waitForFunction(() => !!document.getElementById('ssr-destroy-fx')?.lnTranslations, { timeout: 5000 });
+		await page.evaluate(() => {
+			const form = document.getElementById('ssr-destroy-fx');
+			form.lnTranslations.addLanguage('sq', { title: 'Dynamic Shqip' });
+			form.lnTranslations.destroy();
+		});
+		const state = await page.evaluate(() => {
+			const form = document.getElementById('ssr-destroy-fx');
+			const base = form.querySelector('[name="title"]');
+			const ssr = form.querySelector('[name="trans[de][title]"]');
+			const dyn = form.querySelector('[name="trans[sq][title]"]');
+			const trigger = form.querySelector('[data-ln-translations-add]');
+			const res = {
+				hasInstance: !!form.lnTranslations,
+				baseHasLang: base.hasAttribute('data-ln-translatable-lang'),
+				ssrExists: !!ssr,
+				ssrValue: ssr ? ssr.value : null,
+				dynExists: !!dyn,
+				triggerHidden: trigger.hidden
+			};
+			form.remove();
+			return res;
+		});
+		assert(state.hasInstance === false, 'instance deleted on destroy');
+		assert(state.baseHasLang === false, 'auto-tagged defaultLang removed from original input');
+		assert(state.ssrExists === true && state.ssrValue === 'SSR Deutsch', 'SSR translation field preserved on destroy');
+		assert(state.dynExists === false, 'dynamically cloned sq field removed on destroy');
+		assert(state.triggerHidden === true, 'initial authored hidden state on add trigger preserved');
+	});
+
 	await page.evaluate(() => { document.getElementById('fill-fx')?.remove(); document.getElementById('fill-trigger')?.remove(); });
 
 	if (failures.length) {

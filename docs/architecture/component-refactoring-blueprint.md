@@ -66,13 +66,13 @@ function _maybeRemoveListener() {
 
 | Component | Architecture Category | Solution & Implementation |
 |---|---|---|
-| [`ln-key`](file:///c:/laragon/www/ln-ashlar/components/ln-key/src/ln-key.js) | Category A: Domain Model | `key-model.js` (pure shortcut parsing, key matching, action inference) |
-| [`ln-date`](file:///c:/laragon/www/ln-ashlar/components/ln-date/src/ln-date.js) | Category A: Domain Model | `date-model.js` (custom token parsing) + `ln-core/date.js` |
-| [`ln-number`](file:///c:/laragon/www/ln-ashlar/components/ln-number/src/ln-number.js) | Category A: Domain Model | `number-model.js` (cursor mapping) + `ln-core/number.js` |
-| [`ln-tabs`](file:///c:/laragon/www/ln-ashlar/components/ln-tabs/src/ln-tabs.js) | Category A: Domain Model | `tabs-model.js` (hash fragment & trigger/panel mapping) |
-| [`ln-search`](file:///c:/laragon/www/ln-ashlar/components/ln-search/src/ln-search.js) | Category B: Single-File | Consumes pure primitives from `ln-core/matching.js` |
-| [`ln-filter`](file:///c:/laragon/www/ln-ashlar/components/ln-filter/src/ln-filter.js) | Category B: Single-File | Consumes pure primitives from `ln-core/matching.js` |
-| [`ln-toggle`](file:///c:/laragon/www/ln-ashlar/components/ln-toggle/src/ln-toggle.js) | Category B: Behavioral Decorator | Direct DOM trigger consuming `ln-core` helpers (`shouldIgnoreClick`) |
+| [`ln-key`](../../components/ln-key/src/ln-key.js) | Category A: Domain Model | `key-model.js` (pure shortcut parsing, key matching, action inference) |
+| [`ln-date`](../../components/ln-date/src/ln-date.js) | Category A: Domain Model | `date-model.js` (custom token parsing) + `ln-core/date.js` |
+| [`ln-number`](../../components/ln-number/src/ln-number.js) | Category A: Domain Model | `number-model.js` (cursor mapping) + `ln-core/number.js` |
+| [`ln-tabs`](../../components/ln-tabs/src/ln-tabs.js) | Category A: Domain Model | `tabs-model.js` (hash fragment & trigger/panel mapping) |
+| [`ln-search`](../../components/ln-search/src/ln-search.js) | Category B: Single-File | Consumes pure primitives from `ln-core/matching.js` |
+| [`ln-filter`](../../components/ln-filter/src/ln-filter.js) | Category B: Single-File | Consumes pure primitives from `ln-core/matching.js` |
+| [`ln-toggle`](../../components/ln-toggle/src/ln-toggle.js) | Category B: Behavioral Decorator | Direct DOM trigger consuming `ln-core` helpers (`shouldIgnoreClick`) |
 
 ---
 

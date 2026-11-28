@@ -161,7 +161,7 @@ not found')` at clone time, no silent fallback.
   ```html
   <script src="components/ln-toast/ln-toast.js" defer></script>
   ```
-- **Active Source (ESM)**: Development source is located at [components/ln-toast/src/ln-toast.js](file:///c:/laragon/www/ln-ashlar/components/ln-toast/src/ln-toast.js).
+- **Active Source (ESM)**: Development source is located at [components/ln-toast/src/ln-toast.js](./src/ln-toast.js).
 
 ---
 

@@ -24,7 +24,7 @@ The `ln-progress` component is a lightweight (~85 lines JS) passive visualizatio
 *   **Attribute Bridge Pattern (Attribute IS State):** There are no imperative mutation methods (e.g. `setValue()`). Developers update `data-ln-progress="N"` on the element, and an internal `MutationObserver` automatically recalculates width (`style.width = "%"`) and ARIA attributes.
 *   **Parent-Child Max Inheritance:** Supports declaring `data-ln-progress-max` on the parent track container (`.progress`). This allows multiple child bars (stacked bars) to share a common denominator. The component observes the parent track for attribute changes via a secondary `MutationObserver`.
 *   **Native ARIA Reflection:** Automatically manages and maintains ARIA properties on every render: `role="progressbar"`, `aria-valuemin="0"`, `aria-valuemax`, and `aria-valuenow` (clamped to `[0, max]`).
-*   **Self-Initialization:** Registers automatically via `registerComponent` from [`ln-core`](../../components/ln-core/src/ln-core.js) targeting elements with `[data-ln-progress]`.
+*   **Self-Initialization:** Registers automatically via `registerComponent` from [`ln-core`](../../components/ln-core/index.js) targeting elements with `[data-ln-progress]`.
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**

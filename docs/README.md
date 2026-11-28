@@ -94,7 +94,7 @@ Each component ships one file — usage guide plus architecture reference
 | Validate | `data-ln-validate` | [components/ln-validate/README.md](../components/ln-validate/README.md) |
 | Time | `data-ln-time` | [components/ln-time/README.md](../components/ln-time/README.md) |
 | Autosave | `data-ln-autosave` | [components/ln-autosave/README.md](../components/ln-autosave/README.md) |
-| Autoresize | `data-ln-autoresize` | [components/ln-autoresize/README.md](../components/ln-autoresize/README.md) |
+| Autoresize (CSS-only) | `data-ln-autoresize` | [docs-mcp/components/ln-autoresize.md](../docs-mcp/components/ln-autoresize.md) |
 | Translations | `data-ln-translations` | [components/ln-translations/README.md](../components/ln-translations/README.md) |
 | Repeater | `data-ln-repeater` | [components/ln-repeater/README.md](../components/ln-repeater/README.md) |
 | External Links | (automatic) | [components/ln-external-links/README.md](../components/ln-external-links/README.md) |

@@ -12,6 +12,7 @@ import {
 	extractLeafFieldName,
 	replaceLeadingIndex
 } from '../components/ln-repeater/src/repeater-model.js';
+import { coerceBool } from '../components/ln-core/form.js';
 
 test('hasIndexToken detects {index} and {index1} placeholders', () => {
 	assert.equal(hasIndexToken('options[{index}][label]'), true);
@@ -99,4 +100,23 @@ test('replaceLeadingIndex updates first matching bracketed index segment', () =>
 		replaceLeadingIndex('options[]', 2, 0),
 		'options[]'
 	);
+});
+
+test('coerceBool parses boolean strings and primitives safely', () => {
+	assert.equal(coerceBool(true), true);
+	assert.equal(coerceBool(false), false);
+	assert.equal(coerceBool(1), true);
+	assert.equal(coerceBool(0), false);
+	assert.equal(coerceBool(null), false);
+	assert.equal(coerceBool(undefined), false);
+	assert.equal(coerceBool('true'), true);
+	assert.equal(coerceBool('1'), true);
+	assert.equal(coerceBool('yes'), true);
+	assert.equal(coerceBool('on'), true);
+	assert.equal(coerceBool('false'), false);
+	assert.equal(coerceBool('FALSE'), false);
+	assert.equal(coerceBool(' 0 '), false);
+	assert.equal(coerceBool('off'), false);
+	assert.equal(coerceBool('no'), false);
+	assert.equal(coerceBool(''), false);
 });

@@ -179,8 +179,8 @@ If you only need date-formatting functionality without the rest of the Ashlar li
 ```
 
 ### 3. Source & Reference
-* **Active Development Source**: [components/ln-date/src/ln-date.js](file:///c:/laragon/www/ln-ashlar/components/ln-date/src/ln-date.js) — The source of truth containing the ES module implementation.
-* **Compiled Standalone Release**: [components/ln-date/ln-date.js](file:///c:/laragon/www/ln-ashlar/components/ln-date/ln-date.js) — The compiled IIFE distribution file.
+* **Active Development Source**: [components/ln-date/src/ln-date.js](./src/ln-date.js) — The source of truth containing the ES module implementation.
+* **Compiled Standalone Release**: [components/ln-date/ln-date.js](./ln-date.js) — The compiled IIFE distribution file.
 
 ---
 

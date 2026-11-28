@@ -36,10 +36,10 @@ if (typeof window < "u" && (window.lnCore = window.lnCore || {}, !window.lnCore.
     e.apply(console, t);
   };
 }
-function be(e, t) {
+function me(e, t) {
   window.lnCore = window.lnCore || {}, window.lnCore._debugSink = e, window.lnCore._debugIsContained = t || null;
 }
-function me(e, t, n) {
+function ge(e, t, n) {
   const a = n || {};
   window.lnCore._debugSink && window.lnCore._debugSink("event", t, e, a), e.dispatchEvent(new CustomEvent(t, {
     bubbles: !0,
@@ -55,11 +55,11 @@ function b(e, t) {
   }
   e();
 }
-function ge(e) {
+function ye(e) {
   const t = e.querySelector('input[name="_method"]');
   return ((t && t.value !== "" ? t.value : e.method) || "").toUpperCase();
 }
-function ye(e, t) {
+function Ce(e, t) {
   const n = !!(t && t.typed), a = t && t.exclude, l = {}, i = e.elements, r = {};
   if (n)
     for (let d = 0; d < i.length; d++) {
@@ -87,7 +87,7 @@ function ye(e, t) {
   }
   return l;
 }
-function Ce(e) {
+function H(e) {
   if (typeof e != "string") return !!e;
   const t = e.trim().toLowerCase();
   return t !== "false" && t !== "0" && t !== "" && t !== "off" && t !== "no";
@@ -113,7 +113,7 @@ function Ae(e, t) {
         });
         r.checked = s.indexOf(r.value) !== -1;
       } else
-        r.checked = Ce(o);
+        r.checked = H(o);
       a.push(r);
     } else if (r.type === "radio")
       r.checked = r.value === String(o), a.push(r);
@@ -127,19 +127,19 @@ function Ae(e, t) {
   }
   return a;
 }
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.populateForm = Ae, window.lnCore.serializeForm = ye, window.lnCore.resolveFormMethod = ge);
-const H = {};
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.coerceBool = H, window.lnCore.populateForm = Ae, window.lnCore.serializeForm = Ce, window.lnCore.resolveFormMethod = ye);
+const z = {};
 function ve(e, t) {
-  H[e] = t;
+  z[e] = t;
 }
 function xe(e) {
-  return H[e] || { ingress: (t) => t, egress: (t) => t };
+  return z[e] || { ingress: (t) => t, egress: (t) => t };
 }
 typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerDataMapper = ve, window.lnCore.getDataMapper = xe);
 function Se() {
   typeof window > "u" || (window.lnCore = window.lnCore || {}, !window.lnCore._localeObserverBound && (window.lnCore._localeObserverBound = !0, b(function() {
     new MutationObserver(function() {
-      me(document, "ln-core:locale-change", {});
+      ge(document, "ln-core:locale-change", {});
     }).observe(document.documentElement, {
       attributes: !0,
       attributeFilter: ["lang"],
@@ -147,16 +147,16 @@ function Se() {
     });
   }, "ln-core")));
 }
-const z = {};
+const G = {};
 function ke(e, t) {
   if (!e || typeof t != "object") return;
   const n = e.toLowerCase().split("-")[0];
-  z[n] = t;
+  G[n] = t;
 }
 function _e(e) {
   if (!e) return null;
   const t = e.toLowerCase().split("-")[0];
-  return z[t] || null;
+  return G[t] || null;
 }
 typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerLocaleFallback = ke, window.lnCore.getLocaleFallback = _e, window.lnCore.ensureLocaleObserver = Se);
 const _ = {};
@@ -165,7 +165,7 @@ function Ee(e, t) {
   const n = _[e];
   return n ? n.content.cloneNode(!0) : (console.warn("[" + (t || "ln-core") + '] Template "' + e + '" not found'), null);
 }
-function G(e, t) {
+function Q(e, t) {
   if (!e || !t) return e;
   const n = e.querySelectorAll("[data-ln-field]");
   for (let r = 0; r < n.length; r++) {
@@ -209,14 +209,14 @@ function De(e, t) {
 typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore._fillBound || (window.lnCore._fillBound = !0, document.addEventListener("ln-fill", function(e) {
   if (!(!e.target.matches || !e.target.matches("[data-ln-fillable]")))
     if (e.detail)
-      G(e.target, e.detail);
+      Q(e.target, e.detail);
     else {
       const t = e.target.querySelectorAll("[data-ln-field]");
       for (let n = 0; n < t.length; n++)
         t[n].textContent = "";
     }
 })));
-function Q(e, t) {
+function J(e, t) {
   if (!e || !t) return e;
   const n = document.createTreeWalker(e, NodeFilter.SHOW_TEXT);
   for (; n.nextNode(); ) {
@@ -255,33 +255,33 @@ function Ie(e, t, n, a, l, i) {
       l(u, s, o);
     else {
       const f = Ee(n, i);
-      if (!f || (Q(f, s), u = f.firstElementChild, !u)) continue;
+      if (!f || (J(f, s), u = f.firstElementChild, !u)) continue;
       u.setAttribute("data-ln-render-key", c), l(u, s, o);
     }
     d.appendChild(u);
   }
   e.textContent = "", e.appendChild(d);
 }
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.fillTemplate = Q, window.lnCore.fill = G, window.lnCore.lnFill = De, window.lnCore.renderList = Ie);
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.fillTemplate = J, window.lnCore.fill = Q, window.lnCore.lnFill = De, window.lnCore.renderList = Ie);
 function I(e, t, n) {
   const a = e.getAttribute(t);
   return a === null ? n : a;
 }
-function J(e, t, n) {
+function K(e, t, n) {
   const a = parseInt(e.getAttribute(t), 10);
   return isNaN(a) ? n : a;
 }
-function K(e, t, n = !1) {
+function P(e, t, n = !1) {
   const a = e.getAttribute(t);
   if (a === null) return !!n;
   const l = a.trim().toLowerCase();
   return !(l === "false" || l === "0");
 }
-function P(e, t) {
+function X(e, t) {
   return (e.getAttribute(t) || "").split(",").map((n) => n.trim()).filter(Boolean);
 }
 const E = /* @__PURE__ */ new Map();
-function X(e, t) {
+function Y(e, t) {
   const n = (e ? e.join("|") : "") + "::" + t;
   if (E.has(n)) return E.get(n);
   const a = new Set(e || []), l = function(i, r) {
@@ -290,11 +290,11 @@ function X(e, t) {
   };
   return E.set(n, l), l;
 }
-function Y(e, t, n) {
+function Z(e, t, n) {
   const a = parseFloat(e.getAttribute(t));
   return isNaN(a) ? n : a;
 }
-function Z(e, t, n) {
+function ee(e, t, n) {
   const a = e.getAttribute(t);
   if (!a) return n;
   try {
@@ -303,7 +303,7 @@ function Z(e, t, n) {
     return n;
   }
 }
-function ee(e, t, n, a, l) {
+function te(e, t, n, a, l) {
   if (!e || t === null) return !0;
   const i = a || "ln-component", r = e.type;
   if (r === "trigger" || r === "marker" || r === "string" || r === "list" || !r || t === "" && e.fallback !== void 0)
@@ -359,22 +359,22 @@ function $e(e) {
     if (!l && a.type)
       switch (a.type) {
         case "enum":
-          l = X(a.values, a.fallback);
+          l = Y(a.values, a.fallback);
           break;
         case "integer":
-          l = J;
-          break;
-        case "float":
-          l = Y;
-          break;
-        case "boolean":
           l = K;
           break;
-        case "list":
+        case "float":
+          l = Z;
+          break;
+        case "boolean":
           l = P;
           break;
+        case "list":
+          l = X;
+          break;
         case "json":
-          l = Z;
+          l = ee;
           break;
         case "string":
         default:
@@ -400,7 +400,7 @@ function Oe(e) {
   if (e.onAttrChange && e.declared) for (const n of e.declared) t.add(n);
   return t;
 }
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.defineAttrs = qe, window.lnCore.attrSpec = $e, window.lnCore.attrStr = I, window.lnCore.attrInt = J, window.lnCore.attrBool = K, window.lnCore.attrList = P, window.lnCore.attrEnum = X, window.lnCore.attrFloat = Y, window.lnCore.attrJson = Z);
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.defineAttrs = qe, window.lnCore.attrSpec = $e, window.lnCore.attrStr = I, window.lnCore.attrInt = K, window.lnCore.attrBool = P, window.lnCore.attrList = X, window.lnCore.attrEnum = Y, window.lnCore.attrFloat = Z, window.lnCore.attrJson = ee);
 function y(e, t) {
   if (!e[t.attribute]) {
     window.lnCore._persistSink && e.hasAttribute && e.hasAttribute("data-ln-persist") && window.lnCore._persistSink(e, t.selector);
@@ -411,7 +411,7 @@ function y(e, t) {
     }
   }
 }
-function te(e, t, n, a) {
+function ne(e, t, n, a) {
   if (e.nodeType !== 1) return;
   const i = t.indexOf("[") !== -1 || t.indexOf(".") !== -1 || t.indexOf("#") !== -1 ? t : "[" + t + "]", r = { selector: t, attribute: n, ComponentFn: a };
   if (e.matches && e.matches(i) && y(e, r), e.querySelectorAll) {
@@ -421,19 +421,19 @@ function te(e, t, n, a) {
   }
 }
 typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore._bootHolds = window.lnCore._bootHolds || 0, window.lnCore._bootQueue = window.lnCore._bootQueue || []);
-function ne() {
+function ae() {
   return typeof window < "u" && window.lnCore && window.lnCore._bootHolds || 0;
 }
-function ae(e) {
+function oe(e) {
   typeof window < "u" ? (window.lnCore = window.lnCore || {}, window.lnCore._bootHolds = window.lnCore._bootHolds || 0, window.lnCore._bootQueue = window.lnCore._bootQueue || [], window.lnCore._bootHolds > 0 ? window.lnCore._bootQueue.push(e) : setTimeout(e, 0)) : e();
 }
-function oe() {
+function re() {
   window.lnCore = window.lnCore || {};
   const e = window.lnCore._attrRegistry = window.lnCore._attrRegistry || { byAttr: /* @__PURE__ */ new Map(), reactive: [], persist: [] };
   return e.byReactive = e.byReactive || /* @__PURE__ */ new Map(), e.reactiveWildcard = e.reactiveWildcard || [], e;
 }
-function re(e) {
-  const t = oe(), n = e.observed || [];
+function le(e) {
+  const t = re(), n = e.observed || [];
   for (let a = 0; a < n.length; a++) {
     const l = n[a];
     t.byAttr.has(l) || t.byAttr.set(l, []), t.byAttr.get(l).push(e);
@@ -467,7 +467,7 @@ function W(e, t, n, a) {
   }
 }
 function Te(e) {
-  const t = e.attributeName, n = t.indexOf("data-ln-") === 0, a = oe(), l = a.byAttr.get(t), i = L() && a.byDeclaredAttr && a.byDeclaredAttr.has(t);
+  const t = e.attributeName, n = t.indexOf("data-ln-") === 0, a = re(), l = a.byAttr.get(t), i = L() && a.byDeclaredAttr && a.byDeclaredAttr.has(t);
   if (!n && !l && !i)
     return;
   const r = e.target;
@@ -475,7 +475,7 @@ function Te(e) {
     if (i && O(r)) {
       const d = a.byDeclaredAttr.get(t), o = r.getAttribute(t);
       for (let s = 0; s < d.length; s++)
-        ee(d[s].spec, o, t, d[s].componentTag, r);
+        te(d[s].spec, o, t, d[s].componentTag, r);
     }
     if (window.lnCore._debugSink && (n || l) && window.lnCore._debugSink("attr", t, r, { oldValue: e.oldValue, newValue: r.getAttribute(t) }), n) {
       const d = a.byReactive.get(t);
@@ -488,11 +488,11 @@ function Te(e) {
           o.handler(r, t, e.oldValue);
           continue;
         }
-        o.onAttributeChange && r[o.attribute] ? o.onAttributeChange(r, t) : (te(r, o.selector, o.attribute, o.ComponentFn), o.onInit && o.onInit(r));
+        o.onAttributeChange && r[o.attribute] ? o.onAttributeChange(r, t) : (ne(r, o.selector, o.attribute, o.ComponentFn), o.onInit && o.onInit(r));
       }
   }
 }
-function le() {
+function ie() {
   window.lnCore = window.lnCore || {}, !window.lnCore._attrObserverBound && (window.lnCore._attrObserverBound = !0, b(function() {
     new MutationObserver(function(t) {
       for (let n = 0; n < t.length; n++)
@@ -527,7 +527,7 @@ function U(e, t) {
       delete e[t.attribute];
     } else t.onDestroy && t.onDestroy(e);
 }
-function ie(e) {
+function de(e) {
   const t = T();
   if (!t.length) return;
   const n = e.target;
@@ -568,14 +568,14 @@ function ie(e) {
     }
   }
 }
-function de() {
+function se() {
   window.lnCore = window.lnCore || {}, !window.lnCore._lifecycleObserverBound && (window.lnCore._lifecycleObserverBound = !0, b(function() {
     const e = new MutationObserver(function(t) {
       for (let n = 0; n < t.length; n++) {
         const a = t[n];
         if (a.type === "childList")
           try {
-            ie(a);
+            de(a);
           } catch (l) {
             console.error("[ln-core] lifecycle handler failed", a.target, l);
           }
@@ -597,7 +597,7 @@ function Fe(e) {
     const l = n[a];
     if (l.type === "childList")
       try {
-        ie(l);
+        de(l);
       } catch (i) {
         console.error("[ln-core] lifecycle handler failed", l.target, i);
       }
@@ -613,22 +613,22 @@ function Fe(e) {
   }
 }
 function Re(e, t) {
-  re({ observed: e, handler: t }), le();
+  le({ observed: e, handler: t }), ie();
 }
 function Me(e) {
-  T().push(e), e.onSubtreeChange && e.query && F().push(e), de();
+  T().push(e), e.onSubtreeChange && e.query && F().push(e), se();
 }
-function se(e, t, n, a, l = {}) {
-  const i = l.extraAttributes || [], r = l.onAttributeChange || null, d = l.onSubtreeChange || null, o = l.onInit || null, s = l.onAttrChange || null, c = l.effects || null, u = l.attributes || null, f = u ? Le(u) : c, C = u ? new Set(Object.keys(u)) : null, we = l.persist || null;
+function ce(e, t, n, a, l = {}) {
+  const i = l.extraAttributes || [], r = l.onAttributeChange || null, d = l.onSubtreeChange || null, o = l.onInit || null, s = l.onAttrChange || null, c = l.effects || null, u = l.attributes || null, f = u ? Le(u) : c, C = u ? new Set(Object.keys(u)) : null, pe = l.persist || null;
   function m(v) {
     const w = v || document.body;
-    if (te(w, e, t, n), u && L())
+    if (ne(w, e, t, n), u && L())
       for (const h in u) {
-        const he = u[h], x = Array.from(w.querySelectorAll("[" + h + "]"));
+        const be = u[h], x = Array.from(w.querySelectorAll("[" + h + "]"));
         w.matches && w.matches("[" + h + "]") && x.push(w);
         for (let S = 0; S < x.length; S++) {
           const k = x[S];
-          O(k) && ee(he, k.getAttribute(h), h, a, k);
+          O(k) && te(be, k.getAttribute(h), h, a, k);
         }
       }
     o && o(w);
@@ -641,7 +641,7 @@ function se(e, t, n, a, l = {}) {
       A.push(w[1]);
   } else
     A.push(e);
-  re({
+  le({
     selector: e,
     attribute: t,
     componentTag: a,
@@ -653,9 +653,9 @@ function se(e, t, n, a, l = {}) {
     onAttrChange: s,
     effects: f,
     declared: C,
-    persist: we
-  }), le();
-  const pe = e.indexOf("[") !== -1 || e.indexOf(".") !== -1 || e.indexOf("#") !== -1, N = l.subtreeQuery || (pe ? e : "[" + e + "]"), j = {
+    persist: pe
+  }), ie();
+  const he = e.indexOf("[") !== -1 || e.indexOf(".") !== -1 || e.indexOf("#") !== -1, N = l.subtreeQuery || (he ? e : "[" + e + "]"), j = {
     selector: e,
     attribute: t,
     ComponentFn: n,
@@ -663,19 +663,19 @@ function se(e, t, n, a, l = {}) {
     onSubtreeChange: d,
     query: N
   };
-  T().push(j), d && N && F().push(j), de(), window[t] = m, typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerComponent = se, window.lnCore.observeLifecycle = Me, window.lnCore.withoutLifecycle = Fe);
+  T().push(j), d && N && F().push(j), se(), window[t] = m, typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerComponent = ce, window.lnCore.observeLifecycle = Me, window.lnCore.withoutLifecycle = Fe);
   function B() {
-    ne() > 0 ? ae(function() {
+    ae() > 0 ? oe(function() {
       m(document.body);
     }) : m(document.body);
   }
   return document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", B) : B(), m;
 }
-function ce(e) {
+function ue(e) {
   return (e || "").replace(/^#/, "");
 }
 function R(e) {
-  const t = e === void 0 ? location.hash : e, n = {}, a = ce(t);
+  const t = e === void 0 ? location.hash : e, n = {}, a = ue(t);
   if (!a) return n;
   const l = a.split("&");
   for (let i = 0; i < l.length; i++) {
@@ -704,7 +704,7 @@ function je(e, t) {
     const r = n[i];
     return r === "" ? i : i + ":" + encodeURIComponent(r);
   }).join("&");
-  ce(location.hash) !== l && (location.hash = l);
+  ue(location.hash) !== l && (location.hash = l);
 }
 function Be(e) {
   return e.button === 1 || e.ctrlKey || e.metaKey || e.shiftKey ? !1 : (e.preventDefault(), !0);
@@ -1151,7 +1151,7 @@ function at(e, t = M) {
   }
   return a <= l ? n : null;
 }
-function ue(e) {
+function fe(e) {
   return typeof CSS < "u" && CSS.escape ? CSS.escape(e) : e.replace(/([!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~])/g, "\\$1");
 }
 function ot(e = document) {
@@ -1175,7 +1175,7 @@ function ot(e = document) {
             });
             continue;
           }
-          t.getElementById(s) || t.querySelector("#" + ue(s)) || a.push({
+          t.getElementById(s) || t.querySelector("#" + fe(s)) || a.push({
             type: "id-unresolved",
             element: r,
             attribute: o.name,
@@ -1208,7 +1208,7 @@ function rt(e = document) {
             });
             continue;
           }
-          const u = ue(c), f = t.querySelector(`[data-ln-data-store="${u}"], [data-ln-store="${u}"]`), C = typeof window < "u" && window.lnDataStore && typeof window.lnDataStore.getStore == "function" && window.lnDataStore.getStore(c);
+          const u = fe(c), f = t.querySelector(`[data-ln-data-store="${u}"], [data-ln-store="${u}"]`), C = typeof window < "u" && window.lnDataStore && typeof window.lnDataStore.getStore == "function" && window.lnDataStore.getStore(c);
           !f && !C && a.push({
             type: "store-unresolved",
             element: r,
@@ -1294,7 +1294,7 @@ function g(e = typeof document < "u" ? document : null, t = 50, n = null) {
       n && n(l);
     }, t);
   };
-  if (ne() > 0) return ae(a);
+  if (ae() > 0) return oe(a);
   a();
 }
 function dt(e, t, n, a) {
@@ -1304,7 +1304,7 @@ let p = [];
 function st() {
   p = Array.from(document.body.querySelectorAll("[data-ln-debug]")), document.body.hasAttribute("data-ln-debug") && p.push(document.body);
 }
-function fe(e) {
+function we(e) {
   if (e === window || e === document)
     return p.indexOf(document.body) !== -1;
   for (let t = 0; t < p.length; t++)
@@ -1312,10 +1312,10 @@ function fe(e) {
   return !1;
 }
 function ct(e, t, n, a) {
-  fe(n) && dt(e, t, n, a);
+  we(n) && dt(e, t, n, a);
 }
 function $() {
-  st(), be(p.length > 0 ? ct : null, p.length > 0 ? fe : null);
+  st(), me(p.length > 0 ? ct : null, p.length > 0 ? we : null);
 }
 function V() {
   $();
@@ -1340,7 +1340,7 @@ function ut() {
   }, a.prototype.destroy = function() {
     delete this.dom[t], V();
   };
-  const l = se(e, t, a, "ln-debug", {
+  const l = ce(e, t, a, "ln-debug", {
     attributes: n,
     onInit: (i) => g(i),
     onSubtreeChange: (i) => g(i)

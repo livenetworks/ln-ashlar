@@ -1,5 +1,6 @@
 import {
 	cloneTemplateScoped,
+	coerceBool,
 	dispatch,
 	dispatchCancelable,
 	fill,
@@ -61,6 +62,7 @@ import {
 		this._attrTemplates = new WeakMap();
 		this._textTemplates = new WeakMap();
 		this._itemIndices = new WeakMap();
+		this._triggerSnapshots = new WeakMap();
 
 		this.listEl = this._resolveList();
 		this._nextIndex = this._detectInitialNextIndex();
@@ -302,7 +304,7 @@ import {
 				const el = controls[i];
 				if (el.type === 'hidden' || el.type === 'button' || el.type === 'submit' || el.type === 'file') continue;
 				if (el.type === 'checkbox') {
-					el.checked = !!values;
+					el.checked = coerceBool(values);
 				} else {
 					el.value = String(values);
 				}
@@ -334,7 +336,7 @@ import {
 				if (Array.isArray(val)) {
 					el.checked = val.indexOf(el.value) !== -1;
 				} else {
-					el.checked = !!val;
+					el.checked = coerceBool(val);
 				}
 			} else if (el.type === 'radio') {
 				el.checked = el.value === String(val);
@@ -416,6 +418,27 @@ import {
 		return triggers;
 	};
 
+	_component.prototype._snapshotTrigger = function (btn) {
+		if (!this._triggerSnapshots.has(btn)) {
+			this._triggerSnapshots.set(btn, {
+				disabled: btn.disabled,
+				ariaDisabled: btn.getAttribute('aria-disabled')
+			});
+		}
+	};
+
+	_component.prototype._restoreTrigger = function (btn) {
+		const snap = this._triggerSnapshots.get(btn);
+		if (!snap) return;
+		btn.disabled = snap.disabled;
+		if (snap.ariaDisabled !== null) {
+			btn.setAttribute('aria-disabled', snap.ariaDisabled);
+		} else {
+			btn.removeAttribute('aria-disabled');
+		}
+		this._triggerSnapshots.delete(btn);
+	};
+
 	_component.prototype._syncControls = function () {
 		const bounds = this._getBounds();
 		const items = this._getItems();
@@ -426,6 +449,7 @@ import {
 		const addTriggers = this._getAddTriggers();
 		for (let i = 0; i < addTriggers.length; i++) {
 			const btn = addTriggers[i];
+			this._snapshotTrigger(btn);
 			btn.disabled = !allowAdd;
 			if (!allowAdd) {
 				btn.setAttribute('aria-disabled', 'true');
@@ -439,6 +463,7 @@ import {
 			for (let j = 0; j < removeBtns.length; j++) {
 				const btn = removeBtns[j];
 				if (!this._ownsElement(btn)) continue;
+				this._snapshotTrigger(btn);
 				btn.disabled = !allowRemove;
 				if (!allowRemove) {
 					btn.setAttribute('aria-disabled', 'true');
@@ -673,19 +698,17 @@ import {
 			this._form.removeEventListener('ln-fill', this._onFill);
 		}
 
-		// Reset disabled / aria-disabled on triggers
+		// Restore initial disabled / aria-disabled state on triggers
 		const addTriggers = this._getAddTriggers();
 		for (let i = 0; i < addTriggers.length; i++) {
-			addTriggers[i].disabled = false;
-			addTriggers[i].removeAttribute('aria-disabled');
+			this._restoreTrigger(addTriggers[i]);
 		}
 		const items = this._getItems();
 		for (let i = 0; i < items.length; i++) {
 			const removeBtns = items[i].querySelectorAll('[' + REMOVE_ATTR + ']');
 			for (let j = 0; j < removeBtns.length; j++) {
 				if (!this._ownsElement(removeBtns[j])) continue;
-				removeBtns[j].disabled = false;
-				removeBtns[j].removeAttribute('aria-disabled');
+				this._restoreTrigger(removeBtns[j]);
 			}
 		}
 

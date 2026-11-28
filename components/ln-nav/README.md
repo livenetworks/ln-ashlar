@@ -19,8 +19,8 @@ If you only need the active link highlighter component, load the compiled zero-d
 ```
 
 ### Source Files & Development
-- **Active Development Source**: [components/ln-nav/src/ln-nav.js](file:///c:/laragon/www/ln-ashlar/components/ln-nav/src/ln-nav.js) — The source of truth for component logic.
-- **Compiled Standalone**: [components/ln-nav/ln-nav.js](file:///c:/laragon/www/ln-ashlar/components/ln-nav/ln-nav.js) — The compiled, ready-to-use standalone bundle.
+- **Active Development Source**: [components/ln-nav/src/ln-nav.js](./src/ln-nav.js) — The source of truth for component logic.
+- **Compiled Standalone**: [components/ln-nav/ln-nav.js](./ln-nav.js) — The compiled, ready-to-use standalone bundle.
 
 ## Attributes
 

@@ -25,6 +25,19 @@ const ALIAS_RE = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*['"](data-ln-[a
 const METHOD_RE = /\.(setAttribute|removeAttribute|toggleAttribute|getAttribute|hasAttribute|closest|matches|querySelector|querySelectorAll)\s*\(/g;
 const WRITE_METHODS = new Set(['setAttribute', 'removeAttribute', 'toggleAttribute']);
 const READ_METHODS = new Set(['getAttribute', 'hasAttribute', 'closest', 'matches', 'querySelector', 'querySelectorAll']);
+const KNOWN_CSS_ONLY_ATTRS = new Set([
+	'data-ln-empty-state',
+	'data-ln-filter-options',
+	'data-ln-filter-search',
+	'data-ln-fluid',
+	'data-ln-stat-card',
+	'data-ln-stat-label',
+	'data-ln-stat-trend',
+	'data-ln-stat-value',
+	'data-ln-step',
+	'data-ln-step-label',
+	'data-ln-stepper'
+]);
 
 /**
  * Отстранува еднолиниски и повеќелиниски коментари од JS/SCSS код
@@ -918,16 +931,26 @@ function main() {
 
 	// Печати извештај
 	const changedFiles = pendingWrites.filter((p) => p.changed);
+	const knownCssOnly = unplaced.filter((u) => KNOWN_CSS_ONLY_ATTRS.has(u.attr));
+	const unknownCssOnly = unplaced.filter((u) => !KNOWN_CSS_ONLY_ATTRS.has(u.attr));
 	console.log(`sync-ln-schemas: root: ${root}`);
 	console.log(`  обработени папки: ${compDirs.length}`);
 	console.log(`  прескокнати папки: 0`);
 	console.log(`  прескокнати compiled bundles: ${totalBundlesSkipped}`);
 	console.log(`  атрибути во компонентите: ${allComponentAttrs.size}`);
-	console.log(`  несместливи CSS атрибути (scss/): ${unplaced.length}`);
+	console.log(`  CSS-only визуелни атрибути (намерни): ${knownCssOnly.length}`);
+	console.log(`  несместливи CSS атрибути (потребна проверка): ${unknownCssOnly.length}`);
 
-	if (unplaced.length) {
-		console.log('\n  Несместливи атрибути:');
-		for (const u of unplaced) {
+	if (knownCssOnly.length) {
+		console.log('\n  CSS-only визуелни атрибути (намерни):');
+		for (const u of knownCssOnly) {
+			console.log(`    - ${u.attr} (${u.sources.join(', ')})`);
+		}
+	}
+
+	if (unknownCssOnly.length) {
+		console.log('\n  Несместливи атрибути (потребна проверка):');
+		for (const u of unknownCssOnly) {
 			console.log(`    - ${u.attr} (${u.sources.join(', ')})`);
 		}
 	}

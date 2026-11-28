@@ -289,8 +289,8 @@ If you only need this component and want to avoid loading the full bundle, you c
 
 ### Source Files
 
-- **Active Development (Source of Truth)**: [components/ln-link/src/ln-link.js](file:///c:/laragon/www/ln-ashlar/components/ln-link/src/ln-link.js)
-- **Compiled Standalone Distribution**: [components/ln-link/ln-link.js](file:///c:/laragon/www/ln-ashlar/components/ln-link/ln-link.js)
+- **Active Development (Source of Truth)**: [components/ln-link/src/ln-link.js](./src/ln-link.js)
+- **Compiled Standalone Distribution**: [components/ln-link/ln-link.js](./ln-link.js)
 
 ## See also
 

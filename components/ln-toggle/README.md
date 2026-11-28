@@ -130,7 +130,7 @@ Combine the alert card with `data-ln-persist` so that once the user closes the a
   ```html
   <script src="components/ln-toggle/ln-toggle.js" defer></script>
   ```
-- **Active Source (ESM)**: Development source is located at [components/ln-toggle/src/ln-toggle.js](file:///c:/laragon/www/ln-ashlar/components/ln-toggle/src/ln-toggle.js).
+- **Active Source (ESM)**: Development source is located at [components/ln-toggle/src/ln-toggle.js](./src/ln-toggle.js).
 
 ---
 

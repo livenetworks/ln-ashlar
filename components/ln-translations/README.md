@@ -129,7 +129,7 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 | `dom.lnTranslations.hasLanguage` | `(lang: String)` | `Boolean` | Returns whether `lang` is currently active. |
 | `dom.lnTranslations.getActiveLanguages` | `()` | `Set<String>` | Returns a new `Set` copy of the active languages. |
 | `dom.lnTranslations.sync` | `()` | `void` | Re-scans all `[data-ln-translatable]` wrappers, applies `defaultLang` to unflagged originals, and clones any missing active-language fields. |
-| `dom.lnTranslations.destroy` | `()` | `void` | Removes non-default clones, cleans auto-tagged attributes, detaches request listeners, and deletes instance. |
+| `dom.lnTranslations.destroy` | `()` | `void` | Removes only dynamically cloned fields (preserving SSR `[data-ln-translatable-lang]` fields), strips auto-tagged `defaultLang` attributes from originals, restores the add trigger's initial `hidden` state, detaches listeners, and deletes the instance. |
 
 ### Events API
 
@@ -152,6 +152,7 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 > - Keys are language codes; each value is a field-name to value map, the same shape as `addLanguage(lang, values)`; missing fields are empty.
 > - The default language is not read from `trans`; its values live in the base fields filled by `ln-form`.
 > - The base fields are never written by this component.
+> - **Intentional non-transactional `ln-fill` semantics:** `_clearLanguages()` always clears previous record languages first (including SSR ones) to prevent cross-record data bleed when switching records in Edit modals. If an external listener vetoes `ln-translations:before-add` for one language, only that language is skipped while the rest of the record still hydrates cleanly.
 
 ---
 

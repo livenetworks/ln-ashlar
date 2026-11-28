@@ -11,7 +11,7 @@ All agents consuming this corpus must understand that `ln-ashlar` supports **two
 2. **Client-Side Single Page Applications (SPA / JSON Mode):** Pure client-side SPAs consuming REST/JSON APIs powered by `ln-router` (path routing & region swapping), `hash.js` (compound hash state & deep-linking), `ln-http`/`ln-api-connector` (async JSON API client), `lnCore.renderList`/`lnCore.fill` (client-side template binding), and `spa-starter/` (modular Layer 2 coordinators event-driven via `ln-router:navigated`).
 3. **Dual CSS Engine (Ashlar SCSS & Tailwind CSS v4):** 
    - **Native Ashlar SCSS (`ln-ashlar.css`):** Class-free semantic styling, design tokens, and optimized CSSOM selector hierarchies.
-   - **Tailwind CSS v4 (`ln-ashlar-tailwind.css`):** Utility-first engine with 100% visual layout parity and `@theme` token mappings.
+   - **Tailwind CSS v4 (`ln-ashlar-tailwind.css`):** A semantic component visual engine built with Tailwind v4 `@theme` tokens (`theme/tailwind/`) delivering 100% HTML markup parity with Native Ashlar SCSS—HTML stays semantic and free of presentational utility classes.
 
 ## Audience and Layers
 
@@ -96,8 +96,8 @@ Skills are library-agnostic decision doctrine — they never reference component
 
 ## Prescribed Headings (Parsing Contract)
 
-The MCP parser binds directly to EXACT headings. Do not modify wording, order, or numbering.
-The templates in `_templates/` are the only allowed structures:
+The MCP parser binds directly to EXACT headings in `docs-mcp/` (validated via `validate_docs`). Do not modify wording, order, or numbering here. By design, `components/ln-*/README.md` files are developer-facing internals docs rather than MCP corpus docs and share only the opening mental-model blockquote.
+The templates in `_templates/` are the only allowed structures for `docs-mcp/`:
 
 - `_templates/component.md` → for `components/`
 - `_templates/css.md` → for `css/`

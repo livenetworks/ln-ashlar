@@ -58,7 +58,7 @@ export function serializeForm(form, opts) {
 
 // ─── Form Population ──────────────────────────────────────
 
-function _coerceBool(value) {
+export function coerceBool(value) {
 	if (typeof value !== 'string') return !!value;
 	const v = value.trim().toLowerCase();
 	return v !== 'false' && v !== '0' && v !== '' && v !== 'off' && v !== 'no';
@@ -92,7 +92,7 @@ export function populateForm(form, data) {
 				const list = String(value).split(',').map(function (s) { return s.trim(); });
 				el.checked = list.indexOf(el.value) !== -1;
 			} else {
-				el.checked = _coerceBool(value);
+				el.checked = coerceBool(value);
 			}
 			filled.push(el);
 		} else if (el.type === 'radio') {
@@ -140,6 +140,7 @@ export function interceptValueProperty(dom, descriptor, { get, set }) {
 
 if (typeof window !== 'undefined') {
 	window.lnCore = window.lnCore || {};
+	window.lnCore.coerceBool = coerceBool;
 	window.lnCore.populateForm = populateForm;
 	window.lnCore.serializeForm = serializeForm;
 	window.lnCore.resolveFormMethod = resolveFormMethod;

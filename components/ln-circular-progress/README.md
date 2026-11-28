@@ -140,8 +140,8 @@ If you only need circular progress indicators without the rest of the Ashlar lib
 ```
 
 ### 3. Source & Reference
-* **Active Development Source**: [components/ln-circular-progress/src/ln-circular-progress.js](file:///c:/laragon/www/ln-ashlar/components/ln-circular-progress/src/ln-circular-progress.js) — The source of truth containing the ES module implementation.
-* **Compiled Standalone Release**: [components/ln-circular-progress/ln-circular-progress.js](file:///c:/laragon/www/ln-ashlar/components/ln-circular-progress/ln-circular-progress.js) — The compiled IIFE distribution file.
+* **Active Development Source**: [components/ln-circular-progress/src/ln-circular-progress.js](./src/ln-circular-progress.js) — The source of truth containing the ES module implementation.
+* **Compiled Standalone Release**: [components/ln-circular-progress/ln-circular-progress.js](./ln-circular-progress.js) — The compiled IIFE distribution file.
 
 ## 🔧 Internals
 

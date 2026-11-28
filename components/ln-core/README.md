@@ -984,7 +984,7 @@ value lives in `data-ln-value`. Sort and filter operate on the raw value —
 <td data-ln-value="1700000000">15 Nov 2023</td>
 ```
 
-For details on using `data-ln-value` alongside semantic HTML5 elements like `<data>` and `<time>`, see the [HTML Markup Rules](file:///c:/laragon/www/ln-ashlar/docs-mcp/doctrine/html-markup-rules.md#L65-L79).
+For details on using `data-ln-value` alongside semantic HTML5 elements like `<data>` and `<time>`, see the [HTML Markup Rules](../../docs-mcp/doctrine/html-markup-rules.md#L65-L79).
 
 ### Raw format
 

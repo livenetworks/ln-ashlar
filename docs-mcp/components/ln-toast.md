@@ -21,7 +21,7 @@ tags: [toast, notification, messaging, viewports]
 
 The `ln-toast` component provides a global non-blocking toast notification service driven by a window-level CustomEvent bus (`window.addEventListener`). It is located in [`components/ln-toast/src/ln-toast.js`](../../components/ln-toast/src/ln-toast.js).
 
-*   **Declarative Templating:** Toast cards are rendered declaratively from an HTML template (`<template data-ln-template="ln-toast-item">`) using `cloneTemplateScoped` and `fill` from [`ln-core`](../../components/ln-core/src/ln-core.js).
+*   **Declarative Templating:** Toast cards are rendered declaratively from an HTML template (`<template data-ln-template="ln-toast-item">`) using `cloneTemplateScoped` and `fill` from [`ln-core`](../../components/ln-core/index.js).
 *   **SSR / Hydration:** Supports auto-hydrating pre-rendered server-side `<li>` elements existing inside the toast container on initial load.
 *   **Queue Eviction (FIFO):** Automatically caps the maximum number of visible notifications (`data-ln-toast-max="5"`), evicting the oldest card when the queue threshold is exceeded.
 *   **Automatic Timeout & Manual Dismissal:** Manages auto-dismiss timers (`data-ln-toast-timeout="6000"`) and binds click handlers to `[data-ln-toast-close]` buttons.

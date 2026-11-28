@@ -114,7 +114,9 @@ Everything composes orthogonally:
 | `add` | `(values?, options?)` | `HTMLElement \| null` | Clones and appends a new row, optionally populating controls from `values`. |
 | `remove` | `(itemOrIndex, options?)` | `boolean` | Removes a row by element or 0-based position unless blocked by `min` or canceled. |
 | `clear` | `(options?)` | `void` | Removes rows down to `min` (or all rows with `{ force: true }`). |
-| `destroy` | `()` | `void` | Detaches listeners, resets trigger `disabled` attributes, and deletes `element.lnRepeater`. |
+| `destroy` | `()` | `void` | Detaches listeners, restores initial trigger `disabled`/`aria-disabled` state, and deletes `element.lnRepeater`. |
+
+> **Why `_populateRow()` instead of `ln-core`'s `populateForm()`?** A repeater row is an `<li>`/`<tr>` (not a `<form>` with `.elements`) and supports primitive array items (`["Red", "Blue"]`) as well as bracketed leaf-field resolution (`options[0][label]` → `label`). It shares `ln-core`'s `coerceBool()` for checkboxes and delegates display bindings to `fill()`.
 
 ---
 

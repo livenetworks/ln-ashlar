@@ -15,7 +15,7 @@ In `ln-ashlar`, the core design principle is **orthogonality**. Rather than crea
    - **`fill(el, data)`**: Performs attribute-driven binding (`data-ln-field` → `textContent`, `data-ln-attr` → `setAttribute`), which is also inherently secure.
    
 > [!WARNING]
-> **Reflected XSS Security**: The route coordinator is responsible for populating the view. When binding URL parameters (e.g., username in `/profile/:username`) or query parameters to the DOM, **never** use unsafe methods like `innerHTML` or `outerHTML`. Always use `fillTemplate`, `fill`, or set `textContent` directly to avoid reflected XSS injections. For more, see [Security Architecture](file:///c:/laragon/www/ln-ashlar/docs/architecture/security.md#safe-dom-interpolation).
+> **Reflected XSS Security**: The route coordinator is responsible for populating the view. When binding URL parameters (e.g., username in `/profile/:username`) or query parameters to the DOM, **never** use unsafe methods like `innerHTML` or `outerHTML`. Always use `fillTemplate`, `fill`, or set `textContent` directly to avoid reflected XSS injections. For more, see [Security Architecture](../../docs/architecture/security.md#safe-dom-interpolation).
 
 ---
 

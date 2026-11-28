@@ -225,7 +225,7 @@ dispatches a custom event, and never listens for `submit`.
   <script src="components/ln-form/ln-form.js" defer></script>
   ```
 - **Active Source (ESM)**: Development source is located at
-  [components/ln-form/src/ln-form.js](file:///c:/laragon/www/ln-ashlar/components/ln-form/src/ln-form.js).
+  [components/ln-form/src/ln-form.js](./src/ln-form.js).
 
 ---
 

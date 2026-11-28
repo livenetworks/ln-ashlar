@@ -15,7 +15,7 @@ export { dispatch, dispatchCancelable, requestData, setDebugSink, setPersistSink
 export { guardBody, isVisible, shouldIgnoreClick, isEditableTarget, isTargetDisabled, isUsableTarget, shouldInterceptLink, readValue } from './dom.js';
 
 // Form Utilities
-export { resolveFormMethod, serializeForm, populateForm, interceptValueProperty } from './form.js';
+export { coerceBool, resolveFormMethod, serializeForm, populateForm, interceptValueProperty } from './form.js';
 
 // HTTP & Data Mappers
 export { buildUrl, getHeaders, parseHeaders, registerDataMapper, getDataMapper } from './http.js';

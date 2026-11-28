@@ -25,12 +25,13 @@ A frequent misconception is that DOM-First architecture is restricted to standar
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Layer 2: Project Coordinator / Domain Logic (data-myapp-*) │  ← Audio Decks, Playlists, Medical EHR, POS flows
+│  Layer 2: Coordinator / Domain Logic (data-myapp-*)         │  ← Audio Decks, Playlists, Medical EHR, POS flows
 ├─────────────────────────────────────────────────────────────┤
-│  Layer 1: Ashlar Generic Infrastructure (data-ln-*)         │  ← Modals, Accordions, Sortable, Forms, Toasts
+│  Layer 1: Component / Ashlar Infrastructure (data-ln-*)     │  ← Modals, Accordions, Sortable, Forms, Toasts
 ├─────────────────────────────────────────────────────────────┤
-│  Layer 0: Native W3C DOM & Browser Standards                │  ← The Universal Bus (Events & Attributes)
+│  Layer 3: ln-ashlar Core (ln-core primitives)               │  ← Registry, fill(), buildDict(), storage & DOM bus
 └─────────────────────────────────────────────────────────────┘
+        ▲ Built directly on Native W3C DOM & Browser Standards (zero Virtual DOM)
 ```
 
 - **Ashlar Primitives Are Domain-Agnostic:** Generic components (`data-ln-modal`, `data-ln-accordion`, `data-ln-sortable`, `data-ln-form`) manage DOM state, layout mechanics, and ARIA semantics. They neither know nor care what a "DJ deck", "audio track", or "patient chart" is.
@@ -125,14 +126,20 @@ Combine autonomous components directly in semantic HTML — **zero initializatio
 
 ## ⚡ Quick Start
 
-`ln-ashlar` is a source-only package. Import SCSS and JS directly into your project bundler.
+`ln-ashlar` ships **both** prebuilt distribution bundles (`dist/` exported from `package.json`) **and** raw source exports (`theme/*`, `components/*`) so you can either drop in the compiled assets or bundle directly from source.
 
 ### 1. Install via npm
 ```bash
 npm install @livenetworks/ashlar
 ```
 
-Import source files into your main entries:
+**Option A — Import prebuilt bundles:**
+```js
+import '@livenetworks/ashlar';                // JS components (auto-init)
+import '@livenetworks/ashlar/full.css';       // Full CSS (or ./core.css, ./theme.css, ./tailwind.css)
+```
+
+**Option B — Import from source (for custom SCSS tokens/mixins or selective bundling):**
 ```js
 // main.scss - Import SCSS tokens, mixins, and defaults
 @use '@livenetworks/ashlar/theme/ln-ashlar.scss';
@@ -154,13 +161,13 @@ Then reference the submodule paths:
 import 'resources/ln-ashlar/components/index.js';
 ```
 
-### 3. Build & Watch (For Library Demos Only)
-If you are developing inside this repository, compile the static demo assets:
+### 3. Build & Watch (Library Development)
+If you are developing inside this repository, compile the `dist/` package bundles, standalone component IIFEs, and static demo assets:
 ```bash
-npm run build   # Produces demo/dist/ln-ashlar.{css,js,iife.js} + compiles HTML demo pages
+npm run build   # Produces dist/* + demo/dist/* + syncs schemas/events/tokens + builds demos
 npm run dev     # Watch mode (automatic compilation on SCSS or JS changes)
 ```
-*Note: The `demo/dist/` artifact exists solely for the demo pages. Product consumers should always bundle from source.*
+*Note: `dist/` holds the published package exports declared in `package.json`, while `demo/dist/` serves the local repository demo pages.*
 
 ---
 

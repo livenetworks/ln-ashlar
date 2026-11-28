@@ -129,7 +129,7 @@ Never place `data-ln-toggle` and `data-ln-toggle-for` on the same element. One e
   ```html
   <script src="components/ln-accordion/ln-accordion.js" defer></script>
   ```
-- **Active Source (ESM)**: Development source is located at [components/ln-accordion/src/ln-accordion.js](file:///c:/laragon/www/ln-ashlar/components/ln-accordion/src/ln-accordion.js).
+- **Active Source (ESM)**: Development source is located at [components/ln-accordion/src/ln-accordion.js](./src/ln-accordion.js).
 
 ---
 
