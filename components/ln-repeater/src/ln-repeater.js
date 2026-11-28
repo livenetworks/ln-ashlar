@@ -62,7 +62,7 @@ import {
 		this._attrTemplates = new WeakMap();
 		this._textTemplates = new WeakMap();
 		this._itemIndices = new WeakMap();
-		this._triggerSnapshots = new WeakMap();
+		this._triggerSnapshots = new Map();
 
 		this.listEl = this._resolveList();
 		this._nextIndex = this._detectInitialNextIndex();
@@ -698,19 +698,11 @@ import {
 			this._form.removeEventListener('ln-fill', this._onFill);
 		}
 
-		// Restore initial disabled / aria-disabled state on triggers
-		const addTriggers = this._getAddTriggers();
-		for (let i = 0; i < addTriggers.length; i++) {
-			this._restoreTrigger(addTriggers[i]);
+		// Restore initial disabled / aria-disabled state on all triggers mutated by this instance
+		for (const btn of Array.from(this._triggerSnapshots.keys())) {
+			this._restoreTrigger(btn);
 		}
-		const items = this._getItems();
-		for (let i = 0; i < items.length; i++) {
-			const removeBtns = items[i].querySelectorAll('[' + REMOVE_ATTR + ']');
-			for (let j = 0; j < removeBtns.length; j++) {
-				if (!this._ownsElement(removeBtns[j])) continue;
-				this._restoreTrigger(removeBtns[j]);
-			}
-		}
+		this._triggerSnapshots.clear();
 
 		delete this.dom[DOM_ATTRIBUTE];
 	};

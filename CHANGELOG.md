@@ -7,6 +7,32 @@ For GitHub releases and individual release pages, see [GitHub Releases](https://
 
 ---
 
+## [v2.2.10](https://github.com/livenetworks/ln-ashlar/blob/main/releases/v2.2.10.md) — November 28, 2026
+
+> **Summary:** Lifecycle & DOM ownership fixes in `ln-translations` and `ln-repeater`, shared `coerceBool()` helper in `ln-core`, automated doc link validation, and MCP/doctrine alignment.
+
+### Overview
+
+**1. Lifecycle & DOM Ownership (`ln-translations` & `ln-repeater`).**
+- `ln-translations.destroy()` now tracks and removes only dynamically cloned fields (`_clonedFields`), strips `data-ln-translatable-lang` only from originals it tagged (`_flaggedOriginals`), preserves server-rendered (SSR) translation inputs, and restores the initial `hidden` state of `[data-ln-translations-add]` (`_triggerHiddenSnapshots`).
+- `ln-repeater.destroy()` now snapshots and restores initial `disabled` and `aria-disabled` state across all mutated triggers via a `Map` (`_triggerSnapshots`), preserving authored state even on moved or retargeted external `[data-ln-repeater-add-for]` triggers.
+
+**2. Shared Boolean Coercion (`ln-core` + `ln-repeater`).**
+- Lifted `_coerceBool` from `components/ln-core/form.js` as exported `coerceBool()` (also re-exported from `components/ln-core` and `window.lnCore.coerceBool`).
+- Updated `ln-repeater._populateRow()` to use `coerceBool()` instead of `!!val`, ensuring boolean strings such as `"false"`, `"0"`, `"off"`, and `"no"` coerce to `false`.
+
+**3. Documentation Integrity, Router & Automated Verification.**
+- Added `scripts/check-doc-links.mjs` (`npm run check:doc-links`) and wired it into `npm test`, verifying all markdown files with zero broken relative links and zero `file:///` paths.
+- Unified 3-layer architecture numbering across `README.md`, `DOCTRINE.md`, and `.agents/AGENTS.md`; updated `README.md` to document both prebuilt `dist/` exports and raw source imports.
+- Updated `docs-mcp/component-router.md` (removed stale `ln-dictionary` TODO, corrected `ln-translations` summary, refined Golden Rule #2) and aligned `ln-sortable`/`ln-http` and MCP component docs (`status: stable`).
+- Explicitly documented intentional design boundaries: Tailwind v4 semantic component stylesheet (`theme/tailwind/`) parity with class-free HTML, non-transactional `ln-fill` clearing in `ln-translations`, component-owned `active`/`menu` mount containers, `_populateRow()` vs. `populateForm()` rationale in `ln-repeater`, and `data-ln-value` type widening in global IDE metadata.
+
+**4. Schema Classification & Test Coverage.**
+- Partitioned intentional `KNOWN_CSS_ONLY_ATTRS` from unplaced CSS attributes in `scripts/sync-ln-schemas.mjs`.
+- Added `coerceBool()` unit tests in `tests/ln-repeater.test.js`, SSR `destroy()` checks in `tests/headless/translations.mjs`, and `tests/headless/repeater.mjs` (including nested repeaters and retargeted external trigger teardown).
+
+---
+
 ## [v2.2.9](https://github.com/livenetworks/ln-ashlar/blob/main/releases/v2.2.9.md) — November 24, 2026
 
 > **Summary:** npm registry release for `ln-repeater` and `ln-translations` dynamic-row sync (superseding previously used npm version `2.2.8`), plus draft-release handling fix in `scripts/publish-github-releases.mjs`.

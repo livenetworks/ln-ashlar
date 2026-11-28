@@ -183,6 +183,77 @@ run('demo/admin/repeater.html', async ({ page }) => {
 		assert(res.hasInstance === false, 'instance deleted on destroy');
 	});
 
+	await check('Nested repeaters stay isolated & retargeted external trigger restores on destroy', async () => {
+		await page.evaluate(() => {
+			document.getElementById('nested-repeater-fx')?.remove();
+			document.getElementById('nested-ext-add')?.remove();
+			document.body.insertAdjacentHTML('beforeend', `
+				<button type="button" id="nested-ext-add" data-ln-repeater-add-for="nested-parent" disabled aria-disabled="true">Add parent</button>
+				<div id="nested-repeater-fx">
+					<div id="nested-parent" data-ln-repeater="groups" data-ln-repeater-min="1" data-ln-repeater-max="3">
+						<ul data-ln-repeater-list></ul>
+						<button type="button" data-ln-repeater-add>Add group</button>
+						<template data-ln-template="groups">
+							<li data-ln-repeater-item>
+								<input type="text" name="groups[{index}][title]">
+								<div data-ln-repeater="sub" data-ln-repeater-min="1">
+									<ul data-ln-repeater-list></ul>
+									<button type="button" data-ln-repeater-add>Add sub</button>
+									<template data-ln-template="sub">
+										<li data-ln-repeater-item>
+											<input type="text" name="sub[]">
+											<button type="button" data-ln-repeater-remove>Remove sub</button>
+										</li>
+									</template>
+								</div>
+								<button type="button" data-ln-repeater-remove>Remove group</button>
+							</li>
+						</template>
+					</div>
+				</div>
+			`);
+		});
+		await page.waitForFunction(() => {
+			const p = document.getElementById('nested-parent');
+			return p?.lnRepeater && p.querySelector('[data-ln-repeater="sub"]')?.lnRepeater;
+		}, { timeout: 5000 });
+
+		const state = await page.evaluate(() => {
+			const parent = document.getElementById('nested-parent');
+			const child = parent.querySelector('[data-ln-repeater="sub"]');
+			const extBtn = document.getElementById('nested-ext-add');
+
+			// Child add/remove should not mutate parent count
+			child.querySelector('[data-ln-repeater-add]').click();
+			const parentCountAfterChildAdd = parent.lnRepeater.count;
+			const childCountAfterAdd = child.lnRepeater.count;
+
+			// Retarget external button before destroying parent
+			extBtn.setAttribute('data-ln-repeater-add-for', 'other-repeater');
+			child.lnRepeater.destroy();
+			const parentAliveAfterChildDestroy = !!parent.lnRepeater && parent.lnRepeater.count === 1;
+			const parentAddDisabled = parent.querySelector(':scope > [data-ln-repeater-add]').disabled;
+
+			parent.lnRepeater.destroy();
+			const out = {
+				parentCountAfterChildAdd,
+				childCountAfterAdd,
+				parentAliveAfterChildDestroy,
+				parentAddDisabled,
+				extDisabled: extBtn.disabled,
+				extAria: extBtn.getAttribute('aria-disabled')
+			};
+			document.getElementById('nested-repeater-fx')?.remove();
+			extBtn.remove();
+			return out;
+		});
+		assert(state.parentCountAfterChildAdd === 1, 'adding child row keeps parent count at 1');
+		assert(state.childCountAfterAdd === 2, 'child repeater adds its own row independently');
+		assert(state.parentAliveAfterChildDestroy === true, 'destroying child repeater leaves parent intact');
+		assert(state.parentAddDisabled === false, 'parent add trigger remains enabled after child destroy');
+		assert(state.extDisabled === true && state.extAria === 'true', 'retargeted external trigger still restores initial disabled/aria-disabled on parent destroy');
+	});
+
 	if (failures.length) {
 		console.error('\nFailed sections:');
 		failures.forEach(f => console.error('  - ' + f));

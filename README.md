@@ -287,7 +287,7 @@ For detailed manual instructions, properties, attributes, and events of individu
 `ln-ashlar` offers dual-engine visual styling with 100% design parity across all components and layouts:
 
 1. **Native Ashlar SCSS:** Class-free semantic HTML styling and design tokens. Optimized for minimal CSSOM invalidation by eliminating mixin selector explosions and `:not(:has())` bottlenecks.
-2. **Tailwind CSS v4 Engine:** Utility-first stylesheet compiled directly with Tailwind v4 `@theme` tokens (`npm run build:tailwind`).
+2. **Tailwind CSS v4 Engine:** Semantic component visual stylesheet compiled directly with Tailwind v4 `@theme` tokens (`npm run build:tailwind`) with 100% class-free HTML markup parity.
 
 See [Theme Architecture & SCSS Guidelines](theme/README.md) for details.
 

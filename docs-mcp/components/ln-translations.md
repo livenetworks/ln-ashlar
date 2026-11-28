@@ -128,7 +128,7 @@ When translations are already rendered server-side, mark each pre-rendered field
 | `data-ln-translations` | Container (`<form>` or any element) | Flag | â€” | Initializes the translations coordinator on the container element. |
 | `data-ln-translations-default` | Container | `String` | `""` | Default language code. When set, flags the original (non-cloned) translatable inputs with `data-ln-translatable-lang="{default}"` on init. |
 | `data-ln-translations-locales` | Container | `JSON` | `null` | JSON object mapping language codes to display labels. Auto-parsed via `attrJson`. |
-| `data-ln-translations-active` | `<ul>` | Flag | â€” | Marks the mount container where active-language badges are rendered. |
+| `data-ln-translations-active` | `<ul>` | Flag | â€” | Empty component-owned mount container where active-language badges are rendered exclusively from templates (cleared via `textContent = ''` on `destroy()`). |
 | `data-ln-translations-add` | `<button>` | Flag | â€” | Marks the trigger button that opens the language menu; the native `hidden` attribute is set automatically once every configured language is active. |
 | `data-ln-translatable` | Field wrapper | `String` (field name) | â€” *(required)* | Marks a translatable field group; the value is the field name used in generated `name` attributes. |
 | `data-ln-translations-prefix` | Field wrapper | `String` | `""` | Optional name prefix for nested entities, e.g. `items[1]` produces `items[1][trans][en][title]`. |
@@ -148,7 +148,7 @@ The initialized instance is exposed on the container element via `dom.lnTranslat
 | `dom.lnTranslations.hasLanguage` | `(lang: String)` | `Boolean` | Returns whether `lang` is currently active. |
 | `dom.lnTranslations.getActiveLanguages` | `()` | `Set<String>` | Returns a new `Set` copy of the active languages (safe to mutate without affecting internal state). |
 | `dom.lnTranslations.sync` | `()` | `void` | Re-scans all `[data-ln-translatable]` wrappers, applies `defaultLang` to unflagged originals, and clones any missing active-language fields. |
-| `dom.lnTranslations.destroy` | `()` | `void` | Removes only dynamically cloned fields (preserving SSR `[data-ln-translatable-lang]` fields), strips auto-tagged `defaultLang` attributes from originals, restores the add trigger's initial `hidden` state, detaches listeners, and deletes the instance reference. |
+| `dom.lnTranslations.destroy` | `()` | `void` | Removes only dynamically cloned fields (preserving SSR `[data-ln-translatable-lang]` fields), strips auto-tagged `defaultLang` attributes from originals, clears the component-owned `active` and `menu` mount containers, restores the add trigger's initial `hidden` state, detaches listeners, and deletes the instance reference. |
 
 ### Events API
 
