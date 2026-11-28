@@ -1,7 +1,7 @@
 ---
 name: scss-architecture
 classification: doctrine
-status: draft
+status: stable
 domain: frontend
 summary: Two-layer SCSS design system, tokens, mixins vs components, theming strategy, and z-index stacking layers in ln-ashlar.
 source: docs/architecture/reference.md, docs-mcp/css/theming.md, docs-mcp/css/tokens.md

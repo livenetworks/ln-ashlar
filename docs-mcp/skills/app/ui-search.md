@@ -1,7 +1,7 @@
 ---
 name: ui-search
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: Standalone completeness rules for search interactions — client-side versus server-side modes, where rate limiting lives, clear triggers, and query state preservation.
 tags: [ui, search, filtering, keyup, debounce]

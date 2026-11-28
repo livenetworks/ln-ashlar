@@ -1,7 +1,7 @@
 ---
 name: data-views
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: List and table screens — layout, search/sort/filter composition, virtual scroll over pagination, selection and bulk actions, and empty states.
 tags: [skill, data-table, list, search, filter, ln-specific]

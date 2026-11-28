@@ -164,7 +164,6 @@ When users type, filter, or sort, `ln-search`/`ln-filter`/`ln-sort` update the U
 | `ln-api-queue:ack` / `nack` | Emits | No | Confirms or rejects a queue message. | `{ entryId: ID, reason?: String }` |
 | `ln-toast:enqueue` | Emits | No | Dispatched to `window` for success/error alerts. | `{ message: String, type: String }` |
 | `ln-data-coordinator:error` | Emits | No | A reconciliation step or a view query failed. | `{ operation: String, error, meta: Object\|null }` \| `{ operation: 'query', kind: String, store: String, target: HTMLElement, error }` |
-| `ln-data-coordinator:online` / `ln-data-coordinator:offline` | Emits | No | Dispatched on `document` once per browser `online` / `offline` event; `online` also runs a sync check on every coordinator. | `{}` |
 
 **View-Binder Contract**
 

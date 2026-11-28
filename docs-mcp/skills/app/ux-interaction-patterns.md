@@ -1,7 +1,7 @@
 ---
 name: ux-interaction-patterns
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: Concrete interaction flows for data-driven views — search, sort, filter, virtual scroll, row selection/bulk actions, inline editing, keyboard navigation, empty states, and row actions.
 tags: [ux, interaction-patterns, search, sort, filter, virtual-scroll, bulk-actions, keyboard]

@@ -134,6 +134,8 @@ When translations are already rendered server-side, mark each pre-rendered field
 | `data-ln-translations-prefix` | Field wrapper | `String` | `""` | Optional name prefix for nested entities, e.g. `items[1]` produces `items[1][trans][en][title]`. |
 | `data-ln-translatable-lang` | `<input>`, `<textarea>`, `<select>` | `String` (language code) | â€” | Marks a cloned or server-rendered translation field for a specific language; written by the component and also readable on server-rendered markup for hydration. |
 | `data-ln-translations-lang` | Inside `<template data-ln-template="ln-translations-badge">` and `<template data-ln-template="ln-translations-menu-item">` | Flag (contract attribute) | â€” *(required)* | Required anchor attribute inside both templates â€” the component locates it via `querySelector` to populate the language code, label and event bindings. Templates without it fail to render. |
+| `data-ln-translations-placeholder` | Container | `String` | `"{lang} translation"` | Opt-in placeholder template for cloned translation inputs (`{lang}` is replaced with the language label). |
+| `data-ln-translations-remove-label` | Container | `String` | `"Remove {lang}"` | Opt-in `aria-label` template for active-language badge remove buttons. |
 
 ### Programmatic JS API
 

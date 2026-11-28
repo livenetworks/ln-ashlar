@@ -11,7 +11,7 @@ tags: [network, REST, sync, fetch, debounce]
 # 🔗 ln-api-connector
 
 > **Classification:** 🌐 Simple component / Remote DB Connection Driver  
-> Applied to a gateway element (`<li data-ln-api-connector data-ln-api-connector-path="/api/path">`) inside a coordinator. It listens for request CustomEvents (`ln-api-connector:request-query`, `create`, `update`, `delete`), attaches a forced `X-LN-Response: data` header, and issues RESTful `fetch()` calls. Upon resolution, it parses JSON payloads and emits `ln-api-connector:data` or mutation response events to the parent coordinator.
+> Applied to a gateway element (`<li data-ln-api-connector data-ln-api-connector-path="/api/path">`) inside a coordinator. It listens for request CustomEvents (`ln-api-connector:request-query`, `create`, `update`, `delete`), attaches a forced `X-LN-Response: data` header, and issues RESTful `fetch()` calls. Upon resolution, it parses JSON payloads and emits `ln-api-connector:fetched` or mutation response events to the parent coordinator.
 
 ---
 

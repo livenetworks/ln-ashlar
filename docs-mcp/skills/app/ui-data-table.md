@@ -1,7 +1,7 @@
 ---
 name: ui-data-table
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: Standalone completeness rules for data tables — viewport principles, sticky header/footer, virtual scroll, row selection, optimistic mutations, and anti-patterns.
 tags: [ui, data-table, table, virtual-scroll, selection, optimistic-updates]

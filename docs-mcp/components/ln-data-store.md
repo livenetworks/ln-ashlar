@@ -13,8 +13,8 @@ tags: [data, store, database, indexeddb, offline-first]
 > **Classification:** 🟢 Simple component / Local Database Cache  
 > Applied to a hidden element via `data-ln-data-store id="name"`. It initializes and queries an IndexedDB database
 > (`ln_app_cache`) with automatic schema upgrades and optional AES-GCM encryption. It is completely blind to the network:
-> listening for request CustomEvents (`ln-data-store:request-query`, `request-save`, `request-delete`), resolving results
-> against local records, and emitting `ln-data-store:stale` when cached data exceeds its configured timeout.
+> listening for mutation/sync CustomEvents (`ln-data-store:request-create`, `request-update`, `request-delete`, `request-bulk-delete`, `request-sync-failed`),
+> serving reads via async query methods (`getAll`, `getById`, `count`, `aggregate`), and emitting `ln-data-store:request-remote-sync` when cached data needs synchronization.
 
 ---
 

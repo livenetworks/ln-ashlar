@@ -1,7 +1,7 @@
 ---
 name: ux-flows
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: Interaction flows — the action-feedback loop, four view states, feedback channels, navigation, the destructive-action ladder, error recovery, and motion.
 tags: [skill, ux, feedback, states, navigation, ln-specific]

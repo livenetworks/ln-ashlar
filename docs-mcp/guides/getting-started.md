@@ -1,7 +1,7 @@
 ---
 name: getting-started
 classification: guide
-status: draft
+status: stable
 domain: frontend
 summary: Quickstart guide covering every way to install ln-ashlar — CDN, npm, self-hosted build, and git submodule — then building your first progressive DOM-First interface.
 source:

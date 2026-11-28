@@ -1,7 +1,7 @@
 ---
 name: ui-empty-state
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: Standalone completeness rules for empty states — distinguishing "no data exists" from "query returned zero", call-to-action requirements, and visual hierarchy.
 tags: [ui, empty-state, onboarding, search-zero, feedback]

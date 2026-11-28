@@ -1,7 +1,7 @@
 ---
 name: html-markup-rules
 classification: doctrine
-status: draft
+status: stable
 domain: frontend
 summary: Semantic HTML requirements, the dictionary pattern, interactive element rules, and DOM structure standards in ln-ashlar.
 source: docs/architecture/reference.md, .agents/AGENTS.md

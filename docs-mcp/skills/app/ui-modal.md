@@ -1,7 +1,7 @@
 ---
 name: ui-modal
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: Standalone completeness rules for modals and dialog overlays — four sizes, form root requirements, focus trapping, destructive confirmations, and modal vs page decision trees.
 tags: [ui, modal, dialog, overlay, confirmation, decision-tree]

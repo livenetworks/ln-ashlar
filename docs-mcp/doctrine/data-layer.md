@@ -1,7 +1,7 @@
 ---
 name: data-layer
 classification: doctrine
-status: draft
+status: stable
 domain: frontend
 summary: 3-Tier offline-first data layer in ln-ashlar - stores, connectors, coordinators, the secure mapper, and dynamic write queues.
 source: docs/architecture/data-store-architecture.md, docs/architecture/coordinator.md

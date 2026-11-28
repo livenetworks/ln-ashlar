@@ -1,7 +1,7 @@
 ---
 name: modal-crud
 classification: pattern
-status: draft
+status: stable
 domain: frontend
 summary: Shared create and edit modal flow with declarative form prefill, automatic action rewriting, and zero custom coordinator JS.
 source: demo/docuflow/index.html

@@ -1,7 +1,7 @@
 ---
 name: ln-websocket-connector
 classification: simple
-status: draft
+status: stable
 domain: frontend
 summary: A WebSocket push transport — delivers live server changes beside a REST connector, or carries reads, writes and pushes on its own.
 source: components/ln-websocket-connector/src/ln-websocket-connector.js
@@ -10,7 +10,8 @@ tags: [network, websocket, realtime, sync]
 
 # 🔌 ln-websocket-connector
 
-> **Classification:** 🌐 Simple component / Push Transport Driver
+> **Classification:** 🌐 Simple component / Push Transport Driver  
+> Applied to a connector element (`<li data-ln-websocket-connector data-ln-websocket-connector-url="wss://...">`) inside a `data-ln-data-coordinator`. Driven by the `data-ln-websocket-connector` attribute (`connect`/`disconnect`), it translates server pushes into `ln-websocket-connector:fetched` and answers connector CRUD/sync request events over JSON frames; connection status is emitted strictly via events (`:connecting`, `:connected`, `:disconnected`) — never mirrored to attributes.
 
 ---
 

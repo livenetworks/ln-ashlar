@@ -1,7 +1,7 @@
 ---
 name: write-workflow
 classification: guide
-status: draft
+status: stable
 domain: frontend
 summary: Progressive write pipeline in ln-ashlar - form scopes, native-submit intake, optimistic writes, offline queue, and server confirmation loops.
 source: architecture_docs_draft/write-workflow-guide.md, architecture_docs_draft/form-write-workflow.md

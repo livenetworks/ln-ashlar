@@ -1,7 +1,7 @@
 ---
 name: ui-coordination
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: Decision rules for when and how an AI agent should introduce a project-level coordinator vs simple component binding or data store.
 tags: [ui, architecture, coordinator, mediator, cqs, isolation]

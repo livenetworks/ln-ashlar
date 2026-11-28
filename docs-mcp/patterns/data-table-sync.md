@@ -1,7 +1,7 @@
 ---
 name: data-table-sync
 classification: pattern
-status: draft
+status: stable
 domain: frontend
 summary: Full synchronized data table architecture integrating ln-table sliding-window virtualization, client-side sort, filter, search, ln-data-store sync, and coordinator fan-out.
 source: demo/admin/table-api.html

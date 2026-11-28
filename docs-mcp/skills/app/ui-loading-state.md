@@ -1,7 +1,7 @@
 ---
 name: ui-loading-state
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: Standalone completeness rules for loading indicators — button spinners vs content shimmers, scoping requirements, and anti-patterns.
 tags: [ui, loading-state, spinner, shimmer, feedback]

@@ -1,7 +1,7 @@
 ---
 name: ui-visual-language
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: System-wide visual consistency rules — radius/spacing, shadow vs border, color meaning, forms, buttons, tables, modals, feedback, responsive behavior, and typography for business UI.
 tags: [ui, visual-language, radius, color, forms, buttons, tables, modals, feedback, responsive, typography]

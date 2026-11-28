@@ -1,7 +1,7 @@
 ---
 name: ux
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: Decision rules for interaction flow — action-feedback loops, state machines, feedback channels, navigation, destructive-action confirmation, and error recovery for data-driven business UI.
 tags: [ux, interaction, feedback, states, navigation, forms, error-recovery]

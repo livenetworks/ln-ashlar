@@ -1,7 +1,7 @@
 ---
 name: spa-routing
 classification: guide
-status: draft
+status: stable
 domain: frontend
 summary: Client-side routing and hash-state architecture in ln-ashlar - compound URL fragments, navigation lifecycles, and view teardowns.
 source: docs/architecture/hash-state.md, components/ln-router/README.md

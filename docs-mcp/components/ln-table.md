@@ -13,7 +13,7 @@ tags: [tables, data-grid, virtual-scrolling, sorting, selection]
 > **Classification:** 🟢 Simple component / Presenter (Layer 1 - Data Grid View)  
 > Applied to a table container via `<div data-ln-table id="...">` or `<table>`. In SSR mode, it indexes server-rendered
 > `<tbody>` rows, intercepting `ln-search`, `ln-filter`, and `ln-sort` CustomEvents to toggle `.hidden` on `<tr>` elements
-> or reorder rows in the DOM. In data-driven mode (`data-ln-table-source="store"`), it listens for `ln-data-store:data` events,
+> or reorder rows in the DOM. In data-driven mode (`data-ln-table-source="store"`), it listens for `ln-table:set-data` events,
 > clones `<template data-ln-table-row>`, populates cells via `fill()`, and mounts rendered rows into `<tbody>` with sliding-window virtual scrolling.
 
 ---
@@ -276,6 +276,8 @@ Use when the backend embeds the entire dataset (e.g. 10,000 records) into `<scri
 | `data-ln-table-clear-all` | `<button>` | - | - | Resets all active filters and triggers a new data request in Data-Driven mode. |
 | `data-ln-table-cell-attr` | Template element | `String` | - | List of `field:attribute` mappings for attribute interpolation. *(Processed externally via `ln-core.js` / `fillTemplate()`)* |
 | `data-ln-table-empty-when` | Template element | `initial`\|`search` | - | Targets empty state variant to show based on search vs initial load. |
+| `data-ln-table-select-all-label` | Root container | `String` | `"Select all"` | Accessible `aria-label` for the select-all header checkbox. |
+| `data-ln-table-dict` | Hidden `<li>` | `"select-all"` | - | Translatable dictionary key for table UI strings (fallback before `"Select all"`). |
 
 ---
 

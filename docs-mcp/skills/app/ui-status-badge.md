@@ -1,7 +1,7 @@
 ---
 name: ui-status-badge
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: Standalone completeness rules for status badges — three-signal accessibility rules (dot + text + tint), five semantic categories, and actionable badge dropdowns.
 tags: [ui, status-badge, badge, accessibility, semantic-colors]

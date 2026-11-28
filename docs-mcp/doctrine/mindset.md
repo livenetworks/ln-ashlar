@@ -1,7 +1,7 @@
 ---
 name: mindset
 classification: doctrine
-status: draft
+status: stable
 domain: frontend
 summary: Operational and strategic mindset of ln-ashlar - DOM-first architecture, performance, security, and longevity.
 source: docs/architecture/mindset.md, docs/architecture/philosophy.md

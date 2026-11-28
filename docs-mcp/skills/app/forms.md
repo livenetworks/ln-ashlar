@@ -1,7 +1,7 @@
 ---
 name: forms
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: Form composition — field anatomy, the selection-control ladder (pills vs popover vs search), validation/fill wiring, submit behavior, and multi-step rules.
 tags: [skill, form, selection-controls, validation, ln-specific]

@@ -1,7 +1,7 @@
 ---
 name: ui-kpi-card
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: Standalone completeness rules for KPI cards and metric indicators — single primary metric rule, structural label/value hierarchy, and dashboard caps.
 tags: [ui, kpi-card, stat-card, metrics, dashboard]

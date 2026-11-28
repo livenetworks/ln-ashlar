@@ -1,7 +1,7 @@
 ---
 name: data-flow
 classification: doctrine
-status: draft
+status: stable
 domain: frontend
 summary: Unidirectional data flow in ln-ashlar - concern boundaries, template binding matrix, and dynamic form synchronization.
 source: docs/architecture/data-flow.md

@@ -1,7 +1,7 @@
 ---
 name: ui-form
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: Standalone completeness rules for forms and validation — reserved error space, keyup validation, field grouping, submit state behavior, and edit mode filling.
 tags: [ui, form, validation, inputs, grid, editing]

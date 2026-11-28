@@ -119,6 +119,8 @@ Registers custom translation strings for Macedonian locale to act as fallback tr
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-date` | `<input>`, `<time>`, `<td>` | `"short"` \| `"medium"` \| `"long"` \| `"short datetime"` \| `"medium datetime"` \| `"long datetime"` \| Custom Pattern | `"medium"` | Enables date formatting and defines display format pattern. |
+| `data-ln-date-format` | `<input>`, `<time>`, `<td>` | `String` | — | Custom `Intl.DateTimeFormat` pattern or format override. |
+| `data-ln-date-locale` | `<input>`, `<time>`, `<td>` | `String` (BCP 47) | Document `lang` | Locale tag override for date formatting (e.g., `"mk"`, `"en-US"`). |
 | `datetime` | `<time>` | String (ISO 8601) | — | Native machine-readable date attribute; primary observable SSOT on `<time>` elements. |
 | `data-ln-value` | `<td>`, `<span>`, `<input>` | String (ISO 8601) | — | Raw ISO date string or timestamp; acts as raw value for non-`<time>` elements. |
 | `data-ln-date-label` | `<input>` | `String` | `"Open date picker"` | Optional custom `aria-label` for the dynamically generated calendar trigger button. |
@@ -135,7 +137,6 @@ Instance interfaces accessed via `element.lnDate`:
 | `element.lnDate.value` | `String` | Getter/Setter | Accesses or sets the clean ISO 8601 string value (`YYYY-MM-DD`). |
 | `element.lnDate.date` | `Date` | Getter/Setter | Accesses or sets the active date as a JavaScript `Date` object. |
 | `element.lnDate.formatted` | `String` | Getter | Gets the formatted text display value currently shown in the input. |
-| `element.lnDate.reset` | `()` | `void` | Resets value, hidden fields, and restores initial/empty state. |
 | `element.lnDate.destroy` | `()` | `void` | Tears down wrapper, inputs, buttons, and restores native element states. |
 
 ### Events API

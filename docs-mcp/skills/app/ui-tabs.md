@@ -1,7 +1,7 @@
 ---
 name: ui-tabs
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: Standalone completeness rules for tabbed interfaces — URL hash synchronization, badge counts, initial DOM mounting, and responsive overflow handling.
 tags: [ui, tabs, navigation, hash-sync, badges]

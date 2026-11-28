@@ -76,6 +76,10 @@ Source: [`ln-chart.js`](../../components/ln-chart/src/ln-chart.js).
 | `data-ln-chart-line` | `polyline` | Flag | — | Polyline element for line representation. |
 | `data-ln-chart-labels` | `ol` / `ul` | Flag | — | Container for category labels rendered from template. |
 | `data-ln-chart-empty` | `p` / `div` | Flag | — | Element shown when dataset is empty. |
+| `data-ln-chart-padding` | `figure` | `Integer` (min 0) | `20` | Internal plot padding in authored SVG viewBox units. |
+| `data-ln-chart-min` | Descendant element | Flag | — | Optional destination element populated with the minimum rendered value. |
+| `data-ln-chart-max` | Descendant element | Flag | — | Optional destination element populated with the maximum rendered value. |
+| `data-ln-chart-count` | Descendant element | Flag | — | Optional destination element populated with the rendered point count. |
 
 ### Events API
 

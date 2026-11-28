@@ -1,7 +1,7 @@
 ---
 name: accessibility
 classification: doctrine
-status: draft
+status: stable
 domain: frontend
 summary: Accessibility position statement, WCAG 2.2 Level AA design target with 1.4.6 Contrast (Enhanced) met on all shipped color pairs, project responsibilities, and verification workflows.
 source: docs-mcp/doctrine/html-markup-rules.md, theme/config/mixins/_focus.scss, theme/config/mixins/_motion.scss, theme/config/mixins/_form.scss, theme/config/_density.scss, theme/config/_theme.scss, theme/base/_reset.scss, components/ln-modal/src/ln-modal.js, components/ln-nav/src/ln-nav.js

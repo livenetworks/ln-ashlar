@@ -1,7 +1,7 @@
 ---
 name: ui
 classification: skill
-status: draft
+status: stable
 domain: frontend
 summary: Decision rules for visual layout and information presentation — what to show, where to place it, which component to pick, and what makes a component or page complete.
 tags: [ui, layout, components, density, hierarchy, completeness]
